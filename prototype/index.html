@@ -45,7 +45,10 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,44px);l
 
 .hud{position:absolute;top:2cqw;left:2.2cqw;right:2.2cqw;display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);
   font-size:clamp(10px,1.55cqw,15px);letter-spacing:.06em;color:var(--ink);pointer-events:none;font-variant-numeric:tabular-nums}
-.hud span{background:rgba(13,10,9,.62);padding:.25em .6em;border-radius:3px}
+.hud span{display:inline-block;background:rgba(13,10,9,.62);padding:.25em .6em;border-radius:3px;transition:background-color .2s,color .2s}
+.hud span.hot{background:var(--vest);color:#1b120c}
+.hud span.pulse{animation:pulse .35s ease-out}
+@keyframes pulse{0%{transform:scale(1.3)}100%{transform:scale(1)}}
 
 .bubble{position:absolute;left:3cqw;bottom:61%;max-width:36cqw;background:var(--paper);color:var(--paper-ink);font-weight:600;
   font-size:clamp(11px,1.9cqw,18px);line-height:1.35;padding:.45em .75em;border-radius:6px;pointer-events:none;box-shadow:0 2px 0 rgba(0,0,0,.45)}
@@ -109,7 +112,7 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,44px);l
 .sync output{font-family:var(--mono);min-width:7ch;text-align:center;font-variant-numeric:tabular-nums}
 kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;padding:0 .4em;background:var(--panel);color:var(--ink)}
 @media (prefers-reduced-motion: reduce){
-  .judge.pop{animation:fade .6s forwards} .dialog .next{animation:none}
+  .judge.pop{animation:fade .6s forwards} .dialog .next{animation:none} .hud span.pulse{animation:none}
   @keyframes fade{0%,70%{opacity:1}100%{opacity:0}}
 }
 </style>
@@ -181,6 +184,8 @@ kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-b
         <li>큐는 음악이 아니라 반장님 손이에요. 상자를 내려놓는 "툭" 소리가 기준이에요.</li>
         <li>중반에 반장님 무릎이 아파서 상자가 반 박 늦게 올라와요. 음악 대신 반장님을 따라가야 맞아요.</li>
         <li>긴 액자 화물은 앞이 닿을 때 누르고, 끝이 지나갈 때까지 누르고 있어요.</li>
+        <li>벨트의 노란 눈금이 정박이에요. 정박 상자는 눈금 위에, 늦은 상자는 눈금 사이에 실려 와요.</li>
+        <li>스캐너 아래 작은 바늘이 빠름과 늦음을 보여줘요. 가운데 초록 칸이 딱이에요.</li>
       </ol>
     </section>
     <section>
@@ -304,6 +309,11 @@ const thick = (x1, y1, x2, y2, s, c) => {
 const check = (x, y) => [[0,2],[1,3],[2,4],[3,3],[4,2],[5,1],[6,0]].forEach(([a, b]) => { R(x + a, y + b, 1, 2, C.ok); });
 const cross = (x, y) => { for (let k = 0; k < 5; k++) { R(x + k, y + k, 1, 1, C.red); R(x + 4 - k, y + k, 1, 1, C.red); } };
 
+const CHORDS = [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
+const FX = { particles: [], marks: [], react: { type: '', at: -1e9 }, lastMiss: -1e9, shakeUntil: -1e9, playerNod: -1e9 };
+const BIN = { x: 306, y: 186, w: 38, h: 22 }, PALLET = { x: 348, y: 204 };
+const FALL_X = SCAN_X + 16, GRAV = 520;
+
 function drawLights(bt, t, active) {
   const tubes = [60, 180, 300];
   const alpha = tubes.map((x, k) => {
@@ -312,19 +322,26 @@ function drawLights(bt, t, active) {
     const s = Math.sin(bt * 37) + Math.sin(bt * 13.3);
     return (inD ? s > 0.9 : s > 1.93) ? 0.15 : 1;
   });
+  const ph = active && t > 0 ? t / SPB - Math.floor(t / SPB) : 1;
+  const pulse = Math.max(0, 1 - ph * 5) * 0.06;
   g.save(); g.globalCompositeOperation = 'lighter';
   tubes.forEach((x, k) => {
     const grd = g.createLinearGradient(0, 18, 0, 170);
-    grd.addColorStop(0, `rgba(255,236,170,${0.15 * alpha[k]})`); grd.addColorStop(1, 'rgba(255,236,170,0)');
+    grd.addColorStop(0, `rgba(255,236,170,${(0.15 + pulse) * alpha[k]})`); grd.addColorStop(1, 'rgba(255,236,170,0)');
     g.fillStyle = grd; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 88, 170); g.lineTo(x - 42, 170); g.closePath(); g.fill();
   });
+  if (active && stats.combo >= 10) {
+    const grd = g.createLinearGradient(0, BELT_Y - 10, 0, BELT_Y + 4);
+    grd.addColorStop(0, 'rgba(255,190,90,0)'); grd.addColorStop(1, `rgba(255,190,90,${Math.min(0.22, 0.08 + stats.combo * 0.004)})`);
+    g.fillStyle = grd; g.fillRect(49, BELT_Y - 10, W - 49, 14);
+  }
   g.restore();
   tubes.forEach((x, k) => { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, alpha[k] > 0.5 ? '#fff3c8' : '#5d5446'); });
 }
 
 function bossPose(t, bt, active) {
   const idle = { x: BOSS_X + 13, y: 134 };
-  const pose = { hand: idle, carry: null, wince: false, dip: 0, bob: 0 };
+  const pose = { hand: idle, carry: null, wince: false, dip: 0, bob: 0, nod: 0 };
   if (!active) { pose.bob = Math.sin(bt * 1.7) > 0.85 ? 1 : 0; return pose; }
   const ph = t / SPB - Math.floor(t / SPB);
   pose.bob = t > 0 && ph < 0.18 ? 1 : 0;
@@ -350,9 +367,12 @@ function carryPos(n, p) {
   const q = Math.max(0, Math.min(1, p));
   return { x: lerp(16, PLACE_X, q), y: lerp(112, BELT_Y - n.h / 2, ease(q)) - Math.sin(Math.PI * q) * 14 };
 }
+const bossTop = pose => 90 + pose.dip + pose.bob + pose.nod;
 
-function drawBoss(pose) {
-  const cx = BOSS_X, top = 90 + pose.dip + pose.bob;
+function eighthNote(x, y, c) { R(x, y + 3, 2, 2, c); R(x + 1, y - 2, 1, 5, c); R(x + 2, y - 2, 2, 1, c); R(x + 3, y - 1, 1, 1, c); }
+function drawBoss(pose, nowMs, active) {
+  const cx = BOSS_X, top = bossTop(pose);
+  const r = FX.react, age = nowMs - r.at;
   R(cx - 11, top + 20, 3, 18, C.shirt);
   R(cx - 9, top + 18, 18, 40, C.shirt);
   R(cx - 9, top + 18, 6, 40, C.vest); R(cx + 3, top + 18, 6, 40, C.vest);
@@ -363,16 +383,28 @@ function drawBoss(pose) {
   R(cx - 6, top + 4, 3, 5, C.hair);
   R(cx - 7, top - 1, 14, 5, C.cap); R(cx + 3, top + 3, 9, 2, C.cap);
   if (pose.wince) { R(cx + 2, top + 8, 4, 1, C.ink); R(cx - 9, top + 5, 2, 3, '#9fd0ff'); }
+  else if (r.type === 'glance' && age < 700) { R(cx + 1, top + 6, 5, 1, C.hair); R(cx + 2, top + 8, 3, 1, C.ink); }
   else R(cx + 3, top + 7, 2, 2, C.ink);
   R(cx + 1, top + 11, 6, 2, C.hair);
+  if (r.type === 'relief' && age < 900) {
+    const p = age / 900, x = cx + 9 + p * 10, y = top + 10 - p * 6;
+    g.globalAlpha = 1 - p; R(x, y, 3, 2, '#e9e4da'); R(x + 2, y - 1, 3, 2, '#e9e4da'); R(x + 4, y, 2, 2, '#e9e4da'); g.globalAlpha = 1;
+  }
+  if (active && stats.combo >= 16) {
+    for (let k = 0; k < 2; k++) {
+      const p = ((nowMs / 1000) / (SPB * 2) + k * 0.5) % 1;
+      g.globalAlpha = Math.sin(Math.PI * p); eighthNote(cx + 8 + p * 10, top - 6 - p * 16, '#ffe9a8'); g.globalAlpha = 1;
+    }
+  }
 }
 function drawBossArm(pose) {
-  const top = 90 + pose.dip + pose.bob;
+  const top = bossTop(pose);
   thick(BOSS_X + 7, top + 22, pose.hand.x, pose.hand.y, 4, C.shirt);
   R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
 }
-function drawPlayer(kick) {
-  const cx = PLAYER_X, top = 94 - (kick > 0.5 ? 1 : 0);
+const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
+function drawPlayer(kick, nowMs) {
+  const cx = PLAYER_X, top = playerTop(kick, nowMs);
   R(cx - 9, top + 18, 18, 36, C.hoodie);
   R(cx - 9, top + 20, 18, 22, C.vest2); R(cx - 9, top + 32, 18, 2, C.reflect);
   R(cx - 7, top + 14, 15, 5, '#264149');
@@ -380,8 +412,8 @@ function drawPlayer(kick) {
   R(cx - 7, top - 1, 14, 5, C.hairDark); R(cx + 1, top + 1, 6, 10, C.hairDark);
   R(cx - 4, top + 7, 2, 2, C.ink);
 }
-function drawPlayerArm(kick) {
-  const top = 94 - (kick > 0.5 ? 1 : 0);
+function drawPlayerArm(kick, nowMs) {
+  const top = playerTop(kick, nowMs);
   const gx = 324 - kick * 4, gy = 128;
   thick(PLAYER_X - 6, top + 22, gx + 2, gy + 3, 4, C.hoodie);
   R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33');
@@ -389,39 +421,59 @@ function drawPlayerArm(kick) {
   R(gx, gy + 2, 3, 3, C.skin);
 }
 
-function drawBeltTop(bt) {
+// belt top doubles as a beat grid: bright paint = beat, mid = 8th, dim = 16th
+function drawBeltTop(time) {
   R(48, BELT_Y, W - 48, 4, C.belt);
-  const off = (bt * SPEED) % 10;
-  for (let x = 48 + off - 10; x < W; x += 10) if (x >= 48) R(x, BELT_Y, 1, 4, C.slat);
   R(48, BELT_Y, W - 48, 1, '#4a403b');
+  const bp = SPB * SPEED, frac = (((time / SPB) % 1) + 1) % 1, base = SCAN_X + frac * bp;
+  for (let m = -14; m <= 3; m++) {
+    const x = Math.round(base + m * bp / 4);
+    if (x < 49 || x >= W) continue;
+    const q = ((m % 4) + 4) % 4;
+    if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); }
+    else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44');
+    else R(x, BELT_Y + 1, 1, 3, C.slat);
+  }
 }
-function drawBeltFront(bt) {
+function drawBeltFront(time) {
   R(46, BELT_Y + 4, W - 46, 12, C.face);
-  const ro = (bt * SPEED) % 14;
+  const ro = (((time * SPEED) % 14) + 14) % 14;
   for (let x = 50 + ro - 14; x < W; x += 14) if (x >= 48) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); }
   R(46, BELT_Y + 15, W - 46, 1, '#0c0a09');
   for (const x of [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422');
   R(44, BELT_Y - 1, 5, 17, '#3d3431');
 }
 function drawScannerBack() { R(SCAN_X - 11, 108, 4, 40, '#555a5f'); R(SCAN_X - 11, 105, 24, 5, C.metal); R(SCAN_X - 2, 110, 6, 3, '#2b2e31'); }
-function drawScannerFront(flash, holding) {
+function drawScannerFront(flash, holding, missFlash) {
   R(SCAN_X + 8, 108, 4, 56, '#7b8288'); R(SCAN_X + 8, 108, 4, 2, '#9aa1a6');
-  const col = flash > 0 || holding ? C.ok : C.laser;
-  g.globalAlpha = 0.25 + (flash > 0 ? 0.3 : 0); R(SCAN_X - 2, 113, 5, 33, col); g.globalAlpha = 1;
-  R(SCAN_X, 113, 1, 33, col);
-  R(SCAN_X + 2, 103, 5, 2, flash > 0 || holding ? C.ok : '#5a2b27');
+  const green = flash > 0 || holding;
+  const col = green ? C.ok : C.laser;
+  g.globalAlpha = 0.25 + (flash > 0 ? 0.35 * flash : 0) + (missFlash ? 0.4 : 0);
+  R(SCAN_X - (missFlash ? 4 : 2), 113, missFlash ? 9 : 5, 33, missFlash ? '#ff2a1a' : col);
+  g.globalAlpha = 1;
+  R(SCAN_X, 113, 1, 33, missFlash ? '#ffd0c8' : col);
+  R(SCAN_X + 2, 103, 5, 2, green ? C.ok : missFlash ? '#ff4a3d' : '#5a2b27');
 }
-function drawBox(n, cx, bottom, mark) {
+function drawStamp(cx, cy, age, kind) {
+  const s = age < 0.09 ? lerp(2.4, 1, age / 0.09) : 1;
+  g.save(); g.translate(Math.round(cx), Math.round(cy)); g.rotate(kind === 'good' ? 0.4 : -0.12); g.scale(s, s);
+  g.globalAlpha = age < 0.09 ? 0.75 : 1;
+  g.fillStyle = kind === 'good' ? '#e0c45a' : '#5fc06c';
+  g.fillRect(-5, -4, 10, 1); g.fillRect(-5, 3, 10, 1); g.fillRect(-5, -4, 1, 8); g.fillRect(4, -4, 1, 8);
+  [[-3,-1],[-2,0],[-1,1],[0,0],[1,-1],[2,-2]].forEach(([a, b]) => g.fillRect(a, b, 1, 1));
+  g.restore();
+}
+function drawBox(n, cx, bottom, mark, t) {
   const w = n.w, h = n.h, x = Math.round(cx - w / 2), y = Math.round(bottom - h);
   R(x + 1, bottom, w, 1, 'rgba(0,0,0,.45)');
   R(x, y, w, h, C.kraft); R(x, y, w, 2, C.kraftTop); R(x + w - 2, y + 2, 2, h - 2, C.kraftDark);
   R(x + (w >> 1) - 1, y, 3, h, C.tape);
   R(x + 2, y + h - 6, 7, 4, C.label);
   for (let k = 0; k < 3; k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink);
-  if (mark === 'hit') check(x + w - 9, y + 3);
+  if (mark === 'hit') drawStamp(x + w - 6, y + 5, t - n.hitAt, n.judge);
   if (mark === 'miss') { g.globalAlpha = 0.35; R(x, y, w, h, '#7a1f18'); g.globalAlpha = 1; cross(x + w - 7, y + 3); }
 }
-function drawCrate(n, headX, bottom) {
+function drawCrate(n, headX, bottom, t) {
   const len = n.len * SPB * SPEED, x0 = Math.round(headX - len - 8), w = Math.round(len + 16), h = n.h, y = bottom - h;
   R(x0 + 1, bottom, w, 1, 'rgba(0,0,0,.45)');
   R(x0, y, w, h, C.crate); R(x0, y, w, 2, '#cfa676'); R(x0, y + h - 2, w, 2, '#8a6640');
@@ -430,42 +482,121 @@ function drawCrate(n, headX, bottom) {
   for (let x = x0 + 14; x < x0 + w - 22; x += 40) {
     R(x, y + 4, 16, 4, C.red); R(x + 3, y + 5, 3, 1, '#fff'); R(x + 4, y + 6, 1, 1, '#fff'); R(x + 9, y + 5, 4, 2, '#f3d5cf');
   }
-  if (n.state === 'holding') { g.fillStyle = 'rgba(143,214,148,.32)'; const a = Math.max(x0, SCAN_X); g.fillRect(a, y, x0 + w - a, h); }
-  if (n.state === 'hit') { g.fillStyle = 'rgba(143,214,148,.28)'; g.fillRect(x0, y, w, h); check(x0 + w - 10, y + 3); }
+  if (n.state === 'holding') {
+    const a = Math.max(x0, SCAN_X);
+    g.fillStyle = 'rgba(143,214,148,.3)'; g.fillRect(a, y, x0 + w - a, h);
+    R(a, y + 1, x0 + w - a, 2, C.tape);
+  }
+  if (n.state === 'hit') { g.fillStyle = 'rgba(143,214,148,.25)'; g.fillRect(x0, y, w, h); R(x0, y + 1, w, 2, C.tape); drawStamp(x0 + w - 8, y + 6, t - n.doneAt, 'perfect'); }
   if (n.state === 'broken' || n.state === 'miss') { g.fillStyle = 'rgba(200,40,30,.32)'; g.fillRect(x0, y, w, h); cross(x0 + w - 8, y + 3); }
+}
+function missFall(n, t) {
+  const cx = SCAN_X + (t - n.arr) * SPEED;
+  if (cx < FALL_X) return null;
+  const tf = (cx - FALL_X) / SPEED, landY = BIN.y + 6;
+  const tLand = Math.sqrt(2 * (landY - BELT_Y) / GRAV), tt = Math.min(tf, tLand);
+  return { x: FALL_X + tt * 60, y: BELT_Y + 0.5 * GRAV * tt * tt, rot: Math.min(tt * 9, 1.1), landed: tf >= tLand };
+}
+// rework bin: missed boxes fall in and stay visible
+function drawBin(count) {
+  const { x, y, w, h } = BIN;
+  for (let k = 0; k < Math.min(count, 6); k++) {
+    const bx = x + 3 + (k % 3) * 11 + (k > 2 ? 5 : 0), by = y - 4 - (k > 2 ? 3 : 0);
+    R(bx, by, 10, 8, '#8f6236'); R(bx, by, 10, 1, '#a8774a'); cross(bx + 3, by + 1);
+  }
+  R(x + 1, y + h, w, 2, 'rgba(0,0,0,.45)');
+  R(x, y, w, h, '#2f5d8a'); R(x - 1, y, w + 2, 2, '#4682b8');
+  R(x + w / 2 - 6, y + 5, 12, 2, '#1c3a57');
+  R(x + 4, y + 12, w - 8, 4, '#d8463b'); R(x + 6, y + 13, w - 12, 2, '#f08a7a');
+}
+// finished pallet: every three cleared boxes add one to the stack
+function drawPallet(count) {
+  const px = PALLET.x, py = PALLET.y;
+  R(px - 2, py, 38, 3, '#6b4a2e'); R(px - 2, py + 3, 38, 2, '#4a3220'); R(px, py + 5, 3, 3, '#4a3220'); R(px + 30, py + 5, 3, 3, '#4a3220');
+  const vis = Math.min(16, Math.ceil(count / 3));
+  for (let k = 0; k < vis; k++) {
+    const col = k % 4, row = Math.floor(k / 4), bx = px + col * 8 + (row % 2 ? 2 : 0) - 1, by = py - 7 - row * 7;
+    R(bx, by, 8, 7, C.kraft); R(bx, by, 8, 1, C.kraftTop); R(bx + 7, by + 1, 1, 6, C.kraftDark); R(bx + 3, by, 2, 7, C.tape);
+  }
+  if (vis > 0) { R(px + 2, py - 2, 30, 1, '#5fc06c'); }
+}
+// early/late needle under the scanner; the green slot is the 딱 window
+function drawGauge(nowMs) {
+  const cx = SCAN_X, y = BELT_Y + 18, span = 20, pz = Math.round(WIN_P / WIN_M * span);
+  R(cx - span - 2, y, span * 2 + 5, 5, '#0c0a09');
+  R(cx - pz, y + 1, pz * 2 + 1, 3, '#24402a');
+  R(cx, y - 1, 1, 7, '#8a7f72');
+  FX.marks = FX.marks.filter(m => nowMs - m.at < 2500);
+  for (const m of FX.marks) {
+    g.globalAlpha = 1 - (nowMs - m.at) / 2500;
+    R(cx + Math.round(Math.max(-1, Math.min(1, m.d / WIN_M)) * span), y - 1, 1, 7, m.c);
+  }
+  g.globalAlpha = 1;
+}
+function spawnBits(count, nowMs) {
+  for (let k = 0; k < count; k++) FX.particles.push({ x: SCAN_X + 1, y: 108, vx: -30 + Math.random() * 90, vy: -95 + Math.random() * 55, at: nowMs, c: k % 3 ? '#efe6d2' : '#ffe9a8' });
+}
+function drawParticles(nowMs) {
+  FX.particles = FX.particles.filter(p => nowMs - p.at < 700);
+  for (const p of FX.particles) {
+    const a = (nowMs - p.at) / 1000;
+    g.globalAlpha = 1 - (nowMs - p.at) / 700;
+    R(p.x + p.vx * a, p.y + p.vy * a + 160 * a * a, 2, 1, p.c);
+  }
+  g.globalAlpha = 1;
 }
 
 let rings = [];
 function drawScene(t, bt, active, nowMs) {
+  g.save();
+  if (!reduce && nowMs < FX.shakeUntil) g.translate(Math.round(Math.random() * 2 - 1), Math.round(Math.random() * 2 - 1));
   g.drawImage(bg, 0, 0);
   drawLights(bt, t, active);
   const pose = bossPose(t, bt, active);
+  pose.nod = FX.react.type === 'nod' && nowMs - FX.react.at < 130 ? 1 : 0;
   const kick = Math.max(0, 1 - (nowMs - lastPress) / 140);
-  drawBoss(pose);
-  drawPlayer(kick);
+  drawBoss(pose, nowMs, active);
+  drawPlayer(kick, nowMs);
   drawScannerBack();
-  drawBeltTop(bt);
-  let holding = false;
+  const beltT = active ? t : bt;
+  drawBeltTop(beltT);
+  let holding = false, delivered = 0, binned = 0;
+  const falling = [];
   if (active) {
     g.save(); g.beginPath(); g.rect(49, 0, W, H); g.clip();
     for (const n of notes) {
       if (t < n.place) break;
       const cx = SCAN_X + (t - n.arr) * SPEED;
-      if (n.len) { if (cx - n.len * SPB * SPEED - 8 > W) continue; if (n.state === 'holding') holding = true; drawCrate(n, cx, BELT_Y); }
-      else {
-        if (cx - n.w / 2 > W) continue;
-        const hop = n.hitAt != null && n.state === 'hit' ? Math.round(3 * Math.exp(-(t - n.hitAt) * 14)) : 0;
-        drawBox(n, cx, BELT_Y - hop, n.state === 'hit' ? 'hit' : n.state === 'miss' ? 'miss' : '');
+      if (n.len) {
+        if (cx - n.len * SPB * SPEED - 8 > W) { if (n.state === 'hit') delivered++; else binned++; continue; }
+        if (n.state === 'holding') holding = true;
+        drawCrate(n, cx, BELT_Y, t);
+        continue;
       }
+      if (n.state === 'miss') {
+        const f = missFall(n, t);
+        if (f) {
+          if (f.landed) { binned++; if (!n.binSfx) { n.binSfx = true; if (ctx) thud(ctx.currentTime, 0.45); } }
+          else falling.push([n, f]);
+          continue;
+        }
+      }
+      if (cx - n.w / 2 > W) { if (n.state === 'hit') delivered++; continue; }
+      const hop = n.state === 'hit' ? Math.round((n.judge === 'perfect' ? 4 : 2) * Math.exp(-(t - n.hitAt) * 14)) : 0;
+      drawBox(n, cx, BELT_Y - hop, n.state, t);
     }
     g.restore();
   }
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160);
-  drawScannerFront(flash > 0 ? flash : 0, holding);
-  drawBeltFront(bt);
-  if (pose.carry) drawBox(pose.carry.n, pose.carry.x, pose.carry.y + pose.carry.n.h / 2, '');
+  drawScannerFront(flash, holding, nowMs - FX.lastMiss < 220);
+  drawBeltFront(beltT);
+  drawGauge(nowMs);
+  drawBin(binned);
+  drawPallet(delivered);
+  for (const [n, f] of falling) { g.save(); g.translate(f.x, f.y - n.h / 2); g.rotate(f.rot); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); }
+  if (pose.carry) drawBox(pose.carry.n, pose.carry.x, pose.carry.y + pose.carry.n.h / 2, '', t);
   drawBossArm(pose);
-  drawPlayerArm(kick);
+  drawPlayerArm(kick, nowMs);
   rings = rings.filter(r => nowMs - r.at < 420);
   for (const r of rings) {
     const a = (nowMs - r.at) / 420, s = 6 + a * 34;
@@ -473,6 +604,8 @@ function drawScene(t, bt, active, nowMs) {
     g.strokeRect(Math.round(SCAN_X - s) + 0.5, Math.round(BELT_Y - 8 - s * 0.6) + 0.5, Math.round(s * 2), Math.round(s * 1.2));
     g.globalAlpha = 1;
   }
+  drawParticles(nowMs);
+  g.restore();
 }
 
 // ---------- audio ----------
@@ -518,11 +651,12 @@ const lead = (t, f, d) => osc('triangle', f, t, 0.005, 0.07, d);
 const beep = (t, f) => { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 4200; fl.connect(bus); osc('square', f, t, 0.002, 0.09, 0.06, fl); };
 const buzz = t => osc('sawtooth', 98, t, 0.004, 0.08, 0.16);
 const click = t => noise(t, 'bandpass', 1800, 0.12, 0.02, 3);
+const tear = t => noise(t, 'highpass', 2500, 0.22, 0.12);
 const blip = (f) => { if (ctx && ctx.state === 'running') osc('square', f, ctx.currentTime, 0.002, 0.025, 0.025); };
 
 function buildEvents() {
   const ev = [], B = b => b * SPB;
-  const chords = [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
+  const chords = CHORDS;
   const roots = [110, 87.31, 130.81, 98];
   const arp = [0, 1, 2, 1, 0, 2, 1, 2];
   for (let b = 0; b < 80; b++) {
@@ -535,6 +669,9 @@ function buildEvents() {
     ev.push([t, T => hat(T, D ? 0.03 : 0.07)]); ev.push([t + SPB / 2, T => hat(T, D ? 0.05 : 0.11)]);
     if (D) { if (inBar === 0) ev.push([t, T => bass(T, roots[ci], SPB * 3.5)]); }
     else { ev.push([t, T => bass(T, roots[ci], SPB * 0.4)]); ev.push([t + SPB / 2, T => bass(T, inBar === 3 ? roots[ci] * 2 : roots[ci], SPB * 0.4)]); }
+    // combo layers: a shaker joins at 8 combo, a bell on each bar at 20 combo
+    for (let k = 0; k < 4; k++) ev.push([t + k * SPB / 4, T => { if (stats.combo >= 8) noise(T, 'highpass', 6000, k % 2 ? 0.035 : 0.06, 0.03); }]);
+    if (inBar === 0) ev.push([t, T => { if (stats.combo >= 20) { osc('sine', chords[ci][2] * 4, T, 0.003, 0.05, 0.6); osc('sine', chords[ci][0] * 4, T + SPB / 2, 0.003, 0.035, 0.5); } }]);
     if ((b >= 24 && b < 40) || (b >= 64 && b < 80)) {
       for (let k = 0; k < 2; k++) { const f = chords[ci][arp[inBar * 2 + k]] * 2; ev.push([t + k * SPB / 2, T => lead(T, f, SPB * 0.4)]); }
     }
@@ -584,7 +721,8 @@ $('sync-plus').addEventListener('click', () => setSync(offsetMs + 10));
 showSync();
 
 function resetRun() {
-  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; });
+  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; });
+  FX.particles = []; FX.marks = []; FX.react = { type: '', at: -1e9 }; FX.lastMiss = -1e9; FX.shakeUntil = -1e9; FX.playerNod = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, lateHit: 0 };
   rings = [];
 }
@@ -601,8 +739,22 @@ function popJudge(kind, sub = '') {
   void judgeEl.offsetWidth; judgeEl.classList.add('pop');
 }
 function ring(c) { rings.push({ at: performance.now(), c }); }
-function addCombo() { stats.combo++; stats.maxCombo = Math.max(stats.maxCombo, stats.combo); }
-function registerMiss(sub) { stats.miss++; stats.combo = 0; popJudge('miss', sub); if (ctx) buzz(ctx.currentTime); }
+function addCombo() {
+  stats.combo++; stats.maxCombo = Math.max(stats.maxCombo, stats.combo);
+  if (stats.combo % 10 === 0) {
+    FX.playerNod = performance.now();
+    comboEl.classList.remove('pulse'); void comboEl.offsetWidth; comboEl.classList.add('pulse');
+    return stats.combo + ' 콤보';
+  }
+  return '';
+}
+function registerMiss(sub, d) {
+  stats.miss++; stats.combo = 0; popJudge('miss', sub);
+  const now = performance.now();
+  FX.lastMiss = now; FX.react = { type: 'glance', at: now };
+  if (d != null) FX.marks.push({ d, at: now, c: C.laser });
+  if (ctx) buzz(ctx.currentTime);
+}
 
 function onHit(ts) {
   const t = songAt(ts) - offsetMs / 1000;
@@ -619,30 +771,45 @@ function onHit(ts) {
   const d = t - target.arr, ad = Math.abs(d);
   target.hitAt = t;
   if (ad <= WIN_G) {
-    const j = ad <= WIN_P ? 'perfect' : 'good';
-    stats[j]++; addCombo(); if (target.late) stats.lateHit++;
-    beep(ctx.currentTime, j === 'perfect' ? 1760 : 1320);
-    lastGood = performance.now(); ring(j === 'perfect' ? C.ok : '#ffe9a8');
-    popJudge(j, j === 'good' ? (d < 0 ? '빠름' : '늦음') : '');
+    const j = ad <= WIN_P ? 'perfect' : 'good', now = performance.now();
+    target.judge = j; stats[j]++;
+    const milestone = addCombo();
+    // the scan tone follows the current chord, so a clean run plays a melody
+    const tones = CHORDS[Math.floor(Math.max(0, target.beat) / 4) % 4];
+    if (j === 'perfect') { const f = tones[stats.combo % 3] * 4; beep(ctx.currentTime, f); osc('triangle', f * 2, ctx.currentTime, 0.002, 0.035, 0.14); }
+    else beep(ctx.currentTime, tones[0] * 4);
+    lastGood = now; ring(j === 'perfect' ? C.ok : '#ffe9a8');
+    spawnBits(j === 'perfect' ? 7 : 3, now);
+    FX.marks.push({ d, at: now, c: j === 'perfect' ? C.ok : '#ffe9a8' });
+    if (target.late) { stats.lateHit++; FX.react = { type: 'relief', at: now }; }
+    else if (j === 'perfect') FX.react = { type: 'nod', at: now };
+    popJudge(j, milestone || (j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''));
     if (target.len) { target.state = 'holding'; startHold(); } else target.state = 'hit';
-  } else { target.state = 'miss'; registerMiss(d < 0 ? '빠름' : '늦음'); }
+    if (target.i === notes.length - 1 && j === 'perfect') FX.shakeUntil = now + 220;
+  } else { target.state = 'miss'; registerMiss(d < 0 ? '빠름' : '늦음', d); }
 }
 function completeHold(n) {
-  n.state = 'hit'; stats.tailOk++; addCombo(); stopHold();
-  beep(ctx.currentTime, 2093); lastGood = performance.now(); ring(C.ok); popJudge('done');
+  const now = performance.now();
+  n.state = 'hit'; n.doneAt = songAt(now); stats.tailOk++; const milestone = addCombo(); stopHold();
+  beep(ctx.currentTime, 2093); tear(ctx.currentTime);
+  lastGood = now; ring(C.ok); spawnBits(10, now); FX.shakeUntil = now + 150; FX.react = { type: 'nod', at: now };
+  popJudge('done', milestone);
 }
 function onRelease(ts) {
   const t = songAt(ts) - offsetMs / 1000;
   for (const n of notes) {
     if (n.state !== 'holding') continue;
     if (t >= n.end - 0.12) completeHold(n);
-    else { n.state = 'broken'; stats.tailBroken++; stats.combo = 0; stopHold(); popJudge('broken'); buzz(ctx.currentTime); }
+    else {
+      n.state = 'broken'; stats.tailBroken++; stats.combo = 0; stopHold(); popJudge('broken'); buzz(ctx.currentTime);
+      const now = performance.now(); FX.lastMiss = now; FX.react = { type: 'glance', at: now };
+    }
   }
 }
 function judgeTick(t) {
   const tt = t - offsetMs / 1000;
   for (const n of notes) {
-    if (n.state === 'pending' && tt - n.arr > WIN_M) { n.state = 'miss'; registerMiss(''); }
+    if (n.state === 'pending' && tt - n.arr > WIN_M) { n.state = 'miss'; n.hitAt = tt; registerMiss(''); }
     else if (n.state === 'holding' && tt >= n.end) completeHold(n);
   }
 }
@@ -654,7 +821,7 @@ function updateHud(t) {
   const mins = 12 + Math.max(0, Math.floor(t / SPB / 4));
   const c = `B동 3번 라인 · 03:${String(mins).padStart(2, '0')}`;
   if (c !== lastClock) { clockEl.textContent = c; lastClock = c; }
-  if (stats.combo !== lastCombo) { comboEl.textContent = '콤보 ' + stats.combo; lastCombo = stats.combo; }
+  if (stats.combo !== lastCombo) { comboEl.textContent = '콤보 ' + stats.combo; comboEl.classList.toggle('hot', stats.combo >= 10); lastCombo = stats.combo; }
   const beat = t / SPB;
   const line = SAY.find(([b, , d]) => beat >= b && beat < b + d);
   const s = line ? line[1] : '';
