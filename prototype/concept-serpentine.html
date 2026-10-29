@@ -1,0 +1,1520 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>벨트 위의 박자</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+/* Layout: a portrait game screen. A 9:16 stage with an ㄹ-shaped belt down its middle, and one rubber touch pad below it split into left and right hands. One committed look: a warehouse at 3am under fluorescent tubes. */
+:root{
+  --night:#0a0807;
+  --panel:#1f1915;
+  --line:#3a2f28;
+  --ink:#efe6d2;
+  --muted:#a6978a;
+  --paper:#efe6d2;
+  --paper-ink:#1d1815;
+  --paper-muted:#6d6156;
+  --vest:#f07a2a;
+  --vest-dark:#9c4512;
+  --lime:#cfe04a;
+  --tube:#ffe9a8;
+  --ok:#8fd694;
+  --laser:#ff5a4a;
+  --stamp:#c8372d;
+  --display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{box-sizing:border-box;margin:0;background:var(--night);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;
+  padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px));padding-block:8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+.page{--pad:clamp(96px,17dvh,150px);width:min(100%,480px,calc((100dvh - var(--pad) - 32px) * 9 / 16));display:flex;flex-direction:column;gap:8px}
+
+.stage{position:relative;width:100%;aspect-ratio:9/16;max-width:100%;container-type:inline-size;overflow:hidden;border-radius:6px;background:#0d0a09;
+  box-shadow:0 0 0 1px #000,0 0 40px rgba(0,0,0,.6);touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer}
+.stage canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+
+/* touch pad: one rubber pad with a seam down the middle. Left half is the left hand, right half the right hand. */
+.pad{position:relative;box-sizing:border-box;height:var(--pad);display:grid;grid-template-columns:1fr 1fr;border-radius:20px;overflow:hidden;
+  background:#1a1714 repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 2px,transparent 2px 7px);
+  box-shadow:inset 0 2px 0 #2d2824,inset 0 -4px 0 #0c0a09,0 6px 18px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none;touch-action:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent}
+.pad::after{content:"";position:absolute;left:50%;top:16%;bottom:16%;width:2px;margin-left:-1px;background:#0b0908;box-shadow:1px 0 0 #2e2925;border-radius:2px}
+.half{--c:var(--vest);--glow:rgba(240,122,42,.42);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35em;
+  color:#bfb3a5;transition:color .08s}
+.half.right{--c:var(--lime);--glow:rgba(207,224,74,.38)}
+.half::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--x,50%) var(--y,50%),var(--glow),transparent 62%);opacity:0;transition:opacity .12s}
+.half::after{content:"";position:absolute;bottom:12%;left:32%;right:32%;height:3px;border-radius:2px;background:var(--c);opacity:.28;transition:opacity .08s,box-shadow .08s}
+.half.on{color:var(--ink)}
+.half.on::before{opacity:1;transition:none}
+.half.on::after{opacity:1;box-shadow:0 0 10px var(--c)}
+.half .lamp{position:relative;width:9px;height:9px;border-radius:50%;background:#3a2f27;box-shadow:inset 0 1px 1px rgba(0,0,0,.7)}
+.half.on .lamp{background:var(--c);box-shadow:0 0 8px var(--c)}
+.half .lbl{position:relative;font-family:var(--display);font-size:clamp(17px,3dvh,24px);line-height:1}
+.half .sub{position:relative;font-family:var(--mono);font-size:clamp(10px,1.6dvh,12px);letter-spacing:.06em;color:var(--muted);min-height:1.3em;display:flex;align-items:center;gap:.4em}
+.half .sub i{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--c)}
+.half .k{position:absolute;top:10px;font-family:var(--mono);font-size:11px;color:#5d534a;letter-spacing:.1em}
+.half.left .k{left:16px} .half.right .k{right:16px}
+
+.hud{position:absolute;top:2.4cqw;left:2.8cqw;right:2.8cqw;display:flex;justify-content:space-between;gap:6px;font-family:var(--mono);
+  font-size:clamp(10px,3.1cqw,14px);line-height:1.3;letter-spacing:.04em;color:var(--ink);pointer-events:none;font-variant-numeric:tabular-nums}
+.hud span{display:inline-block;background:rgba(13,10,9,.66);padding:.18em .6em;border-radius:3px;transition:background-color .2s,color .2s}
+.hud span.hot{background:var(--vest);color:#1b120c}
+.hud span.pulse{animation:pulse .35s ease-out}
+.hud span.broke{animation:broke .5s ease-out}
+@keyframes broke{0%{background:var(--laser);color:#1b120c;transform:translateX(-4px)}15%{transform:translateX(4px)}30%{transform:translateX(-3px)}45%{transform:translateX(2px)}70%{background:var(--laser);color:#1b120c}100%{transform:none}}
+@keyframes pulse{0%{transform:scale(1.3)}100%{transform:scale(1)}}
+
+.bubble{position:absolute;left:3cqw;bottom:76%;max-width:64cqw;background:var(--paper);color:var(--paper-ink);font-weight:600;
+  font-size:clamp(11px,3.6cqw,16px);line-height:1.35;padding:.45em .75em;border-radius:6px;pointer-events:none;box-shadow:0 2px 0 rgba(0,0,0,.45)}
+.bubble::after{content:"";position:absolute;left:var(--tail,1.4em);bottom:-.45em;border:.5em solid transparent;border-top-color:var(--paper);border-bottom:0}
+
+.judge{position:absolute;left:69.4%;top:47%;transform:translateX(-50%);font-family:var(--display);font-size:clamp(18px,8cqw,38px);line-height:1;
+  text-shadow:0 2px 0 #000,0 0 12px rgba(0,0,0,.7);pointer-events:none;white-space:nowrap;text-align:center;opacity:0}
+.judge small{display:block;font-family:var(--mono);font-size:.36em;letter-spacing:.08em;margin-top:.35em;color:var(--ink)}
+.judge.perfect{color:var(--ok)} .judge.good{color:var(--tube)} .judge.miss{color:var(--laser)}
+.judge.pop{animation:pop .55s ease-out forwards}
+.judge.miss.pop{animation:popmiss .7s ease-out forwards}
+@keyframes popmiss{0%{opacity:1;transform:translate(-50%,0) rotate(-7deg) scale(1.2)}12%{transform:translate(calc(-50% + 5px),0) rotate(5deg)}24%{transform:translate(calc(-50% - 4px),0) rotate(-3deg)}36%{transform:translate(-50%,0) rotate(0)}70%{opacity:1;transform:translate(-50%,12%)}100%{opacity:0;transform:translate(-50%,45%)}}
+@keyframes pop{0%{opacity:1;transform:translate(-50%,12%) scale(1.25)}20%{transform:translate(-50%,0) scale(1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-35%)}}
+
+.hint{position:absolute;left:50%;top:94%;transform:translateX(-50%);font-family:var(--mono);font-size:clamp(10px,3.1cqw,14px);
+  background:var(--vest);color:#1b120c;padding:.2em .7em;border-radius:3px;pointer-events:none;white-space:nowrap}
+
+.dialog{position:absolute;left:3cqw;right:3cqw;bottom:3cqw;background:rgba(17,13,11,.95);border:1px solid var(--line);border-radius:6px;
+  padding:3cqw 4cqw 6cqw;min-height:24cqw}
+.dialog .who{display:inline-block;font-family:var(--display);font-size:clamp(12px,3.7cqw,16px);background:var(--vest);color:#1b120c;
+  padding:.05em .55em;border-radius:3px;margin-bottom:.4em}
+.dialog .text{font-size:clamp(13px,4.3cqw,19px);line-height:1.55;margin:0;min-height:1.5em}
+.dialog .text.narr{color:#cfc3b4}
+.dialog .next{position:absolute;right:4cqw;bottom:2.2cqw;font-family:var(--mono);font-size:clamp(10px,2.8cqw,12px);color:var(--muted);animation:blink 1s steps(2) infinite}
+.dialog .skip{position:absolute;top:2.4cqw;right:3cqw;font-family:var(--mono);font-size:clamp(10px,2.8cqw,12px);background:transparent;color:var(--muted);
+  border:1px solid var(--line);border-radius:3px;padding:.2em .6em;cursor:pointer}
+.dialog .skip:focus-visible{outline:2px solid var(--tube);outline-offset:2px}
+@keyframes blink{50%{opacity:0}}
+
+.overlay{position:absolute;inset:0;display:grid;place-items:center;background:rgba(10,8,7,.55);padding:4cqw}
+.label{box-sizing:border-box;width:min(100%,90cqw);max-height:100%;overflow:auto;background:var(--paper);color:var(--paper-ink);border-radius:4px;
+  box-shadow:0 2cqw 0 rgba(0,0,0,.4);padding:4cqw 5cqw 4.5cqw;position:relative;transform:rotate(-1.5deg);cursor:default}
+.label .bar{height:4cqw;min-height:10px;margin-bottom:2.4cqw;
+  background:repeating-linear-gradient(90deg,var(--paper-ink) 0 2px,transparent 2px 4px,var(--paper-ink) 4px 5px,transparent 5px 8px,var(--paper-ink) 8px 11px,transparent 11px 13px,var(--paper-ink) 13px 14px,transparent 14px 17px)}
+.label .kicker{font-family:var(--mono);font-size:clamp(9px,2.8cqw,12px);letter-spacing:.1em;display:flex;justify-content:space-between;gap:8px;
+  border-bottom:2px solid var(--paper-ink);padding-bottom:.35em}
+.label h2{font-family:var(--display);font-weight:400;font-size:clamp(26px,11cqw,48px);line-height:1.02;margin:.32em 0 .22em;text-wrap:balance}
+.label p{margin:0;font-size:clamp(12px,3.8cqw,16px);line-height:1.5}
+.label .row{display:flex;flex-wrap:wrap;align-items:center;gap:3cqw;margin-top:3.5cqw}
+.sync{display:inline-flex;align-items:center;gap:.4em;margin-left:auto;font-family:var(--mono);font-size:clamp(10px,3cqw,13px);color:var(--paper-muted)}
+.sync button{width:2.2em;height:2.2em;border-radius:3px;border:1px solid var(--paper-muted);background:transparent;color:var(--paper-ink);font-size:inherit;cursor:pointer}
+.sync button:focus-visible{outline:2px solid var(--vest);outline-offset:2px}
+.sync output{min-width:6ch;text-align:center;font-variant-numeric:tabular-nums}
+.btn{font-family:var(--display);font-size:clamp(14px,4.4cqw,20px);background:var(--vest);color:#1b120c;border:0;border-radius:3px;padding:.42em 1.1em;
+  cursor:pointer;box-shadow:0 3px 0 var(--vest-dark)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--vest-dark)}
+.btn.ghost{background:transparent;color:var(--paper-ink);box-shadow:inset 0 0 0 2px var(--paper-ink)}
+.btn:focus-visible{outline:3px solid var(--vest);outline-offset:3px}
+
+.slip h2{font-size:clamp(22px,8.5cqw,38px)}
+.slip dl{display:grid;grid-template-columns:auto 1fr;gap:.15em 1em;margin:.6em 0 0;font-size:clamp(11px,3.5cqw,15px);line-height:1.45}
+.slip dt{font-family:var(--mono);color:var(--paper-muted);letter-spacing:.03em}
+.slip dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums;min-width:0}
+.stamp{position:absolute;right:5cqw;top:13cqw;border:.7cqw solid var(--stamp);color:var(--stamp);font-family:var(--display);
+  font-size:clamp(14px,6cqw,28px);padding:.12em .5em;border-radius:.3em;transform:rotate(-12deg);opacity:.88;pointer-events:none}
+
+.board{box-sizing:border-box;width:min(100%,92cqw);max-height:100%;overflow:auto;background:#5b4330;border:3px solid #3a2a1e;border-radius:4px;box-shadow:0 2cqw 0 rgba(0,0,0,.45);
+  padding:3.5cqw 3.5cqw 4cqw;cursor:default;color:var(--ink)}
+.board-head{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:clamp(9px,2.8cqw,12px);letter-spacing:.1em;color:#e9dcc3;
+  border-bottom:1px solid #8a6a4a;padding-bottom:.4em;margin-bottom:3cqw}
+.cards{display:grid;grid-template-columns:1fr;gap:2.4cqw}
+.card{position:relative;display:flex;gap:3cqw;align-items:center;text-align:left;background:var(--paper);color:var(--paper-ink);border:0;border-radius:3px;
+  padding:2cqw 2.6cqw;cursor:pointer;box-shadow:0 .8cqw 0 rgba(0,0,0,.35);font-family:var(--body);min-width:0;transform:rotate(var(--tilt,0deg))}
+.card:hover,.card:focus-visible{outline:3px solid var(--vest);outline-offset:1px}
+.card canvas{width:12cqw;height:19cqw;flex:none;image-rendering:pixelated;background:#2a211c;border-radius:2px}
+.card .info{min-width:0;display:flex;flex-direction:column;gap:.2em}
+.card .name{font-family:var(--display);font-size:clamp(15px,5.2cqw,22px);line-height:1}
+.card .role{font-family:var(--mono);font-size:clamp(9px,2.7cqw,12px);color:var(--paper-muted);letter-spacing:.03em}
+.card .tag{display:inline-block;align-self:flex-start;font-family:var(--mono);font-size:clamp(9px,2.7cqw,12px);background:var(--paper-ink);color:var(--paper);
+  padding:.05em .5em;border-radius:2px;margin-top:.2em}
+.card .best{position:absolute;right:2.4cqw;top:50%;margin-top:-.8em;font-family:var(--display);font-size:clamp(11px,3.6cqw,16px);color:var(--stamp);border:.5cqw solid var(--stamp);
+  padding:0 .35em;border-radius:.3em;transform:rotate(8deg);opacity:.85}
+
+@media (prefers-reduced-motion: reduce){
+  .judge.pop{animation:fade .6s forwards} .dialog .next{animation:none} .hud span.pulse,.hud span.broke{animation:none} .judge.miss.pop{animation:fade .7s forwards}
+  @keyframes fade{0%,70%{opacity:1}100%{opacity:0}}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="stage" id="stage">
+    <canvas id="cv" width="216" height="384" aria-label="ㄹ자 컨베이어 벨트 작업 화면"></canvas>
+    <div class="hud" id="hud" hidden><span id="clock">B동 3번 라인 · 03:12</span><span id="combo">콤보 0</span></div>
+    <div class="bubble" id="bubble" hidden></div>
+    <div class="judge" id="judge"></div>
+    <div class="hint" id="hint" hidden></div>
+
+    <div class="dialog" id="dialog" hidden>
+      <span class="who" id="who"></span>
+      <p class="text" id="dtext"></p>
+      <span class="next">▼ 터치</span>
+      <button class="skip" id="skip" type="button">건너뛰기</button>
+    </div>
+
+    <div class="overlay" id="title">
+      <div class="label">
+        <div class="bar"></div>
+        <div class="kicker"><span>작업지시서 · 야간조</span><span>No. 0312-3B</span></div>
+        <h2>벨트 위의 박자</h2>
+        <p>옆 사람이 상자를 벨트에 올립니다. 벨트가 한 바퀴 도는 데 딱 한 마디. 상자가 빨간 선에 닿는 순간 터치하세요.</p>
+        <div class="row">
+          <button class="btn" id="start" type="button">출근하기</button>
+          <span class="sync">싱크 <button id="sync-minus" type="button" aria-label="보정값 낮추기">−</button><output id="sync-val">0 ms</output><button id="sync-plus" type="button" aria-label="보정값 높이기">+</button></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="select" hidden>
+      <div class="board">
+        <div class="board-head"><span>출근부 · 3번 라인</span><span>오늘 밤 페어</span></div>
+        <div class="cards" id="cards"></div>
+      </div>
+    </div>
+
+    <div class="overlay" id="result" hidden>
+      <div class="label slip">
+        <div class="bar"></div>
+        <div class="kicker"><span>근무 확인서</span><span id="r-no">B03-0312-0001</span></div>
+        <h2 id="r-title">첫 야간 근무</h2>
+        <div class="stamp" id="r-stamp">정상 처리</div>
+        <dl>
+          <dt>보내는 분</dt><dd id="r-from">반장 · 3번 라인</dd>
+          <dt>받는 분</dt><dd>신입 (나)</dd>
+          <dt>처리 내역</dt><dd id="r-counts">딱 0 · 좋아 0 · 놓침 0</dd>
+          <dt>최대 콤보</dt><dd id="r-combo">0</dd>
+          <dt id="r-special-k">늦은 상자</dt><dd id="r-special">0 / 3 받아냄</dd>
+          <dt>정확도</dt><dd id="r-acc">0%</dd>
+        </dl>
+        <div class="row">
+          <button class="btn" id="retry" type="button">다시 하기</button>
+          <button class="btn ghost" id="again" type="button">대화부터</button>
+          <button class="btn ghost" id="board" type="button">출근부</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pad" id="pad" role="group" aria-label="터치 패드: 왼쪽은 왼손, 오른쪽은 오른손">
+    <div class="half left" id="halfL"><span class="k">F</span><span class="lamp"></span><span class="lbl">왼손</span><span class="sub" id="subL"></span></div>
+    <div class="half right" id="halfR"><span class="k">J</span><span class="lamp"></span><span class="lbl">오른손</span><span class="sub" id="subR"></span></div>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+// ---------- constants ----------
+const W = 216, H = 384, BAR_BEATS = 4;
+const BOSS_X = 22, SCAN_X = 150;
+const WIN_P = 0.05, WIN_G = 0.10, WIN_M = 0.16;
+const $ = id => document.getElementById(id);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const rnd = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
+const lerp = (a, b, p) => a + (b - a) * p;
+const ease = p => p < 0 ? 0 : p > 1 ? 1 : p * p * (3 - 2 * p);
+const inRange = (b, ranges) => !!ranges && ranges.some(([a, z]) => b >= a && b < z);
+
+const C = {
+  kraft:'#c48b52', kraftTop:'#e0ae72', kraftDark:'#8f6236', tape:'#e6c88f', label:'#efe6d2', ink:'#1b1716',
+  vest:'#f07a2a', reflect:'#ebe5c9', shirt:'#6b7073', cap:'#2c3b57', skin:'#d9a27a', skinDark:'#b98260', hair:'#9a948e',
+  laser:'#ff4a3d', ok:'#8fd694', hoodie:'#2f4f58', vest2:'#cfe04a', hairDark:'#1e1a1a', crate:'#b48a5c', red:'#d8463b',
+  belt:'#38302c', slat:'#2a2320', face:'#171312', metal:'#6a7075', sweat:'#9fd0ff', lime:'#cfe04a'
+};
+
+// ---------- the ㄹ belt ----------
+// Three runs joined by two U-turns, centred on the screen. One trip from the start to the scanner takes one bar,
+// so whatever rhythm the partner lays down comes back to you exactly a bar later.
+const PX0 = 40, PX1 = 176, PR = 28, PY1 = 150, PY2 = PY1 + 2 * PR, PY3 = PY2 + 2 * PR, PEND = 206;
+const SEG = [
+  { k:'line', x0:PX0, y0:PY1, x1:PX1, y1:PY1 },
+  { k:'arc', cx:PX1, cy:PY1 + PR, a0:-Math.PI / 2, dir:1 },
+  { k:'line', x0:PX1, y0:PY2, x1:PX0, y1:PY2 },
+  { k:'arc', cx:PX0, cy:PY2 + PR, a0:-Math.PI / 2, dir:-1 },
+  { k:'line', x0:PX0, y0:PY3, x1:PEND, y1:PY3 }
+];
+SEG.forEach(sg => { sg.len = sg.k === 'line' ? Math.hypot(sg.x1 - sg.x0, sg.y1 - sg.y0) : Math.PI * PR; });
+const PATH_LEN = SEG.reduce((a, sg) => a + sg.len, 0);
+const SCAN_S = PATH_LEN - (PEND - SCAN_X), BOX_S0 = 4;
+function pathAt(s) {
+  if (s < 0) { const sg = SEG[0]; return { x: sg.x0 + s, y: sg.y0, tx: 1, ty: 0 }; }
+  for (const sg of SEG) {
+    if (s <= sg.len) {
+      if (sg.k === 'line') { const tx = (sg.x1 - sg.x0) / sg.len, ty = (sg.y1 - sg.y0) / sg.len; return { x: sg.x0 + tx * s, y: sg.y0 + ty * s, tx, ty }; }
+      const a = sg.a0 + sg.dir * s / PR;
+      return { x: sg.cx + PR * Math.cos(a), y: sg.cy + PR * Math.sin(a), tx: -Math.sin(a) * sg.dir, ty: Math.cos(a) * sg.dir };
+    }
+    s -= sg.len;
+  }
+  const sg = SEG[SEG.length - 1]; return { x: sg.x1 + s, y: sg.y1, tx: 1, ty: 0 };
+}
+// lanes keep their side relative to the direction of travel, like a real two-lane belt
+function lanePt(s, d) { const p = pathAt(s); return { x: p.x - p.ty * d, y: p.y + p.tx * d, tx: p.tx, ty: p.ty }; }
+const BELT_PATH = (() => {
+  const p = new Path2D(); p.moveTo(PX0, PY1);
+  p.lineTo(PX1, PY1); p.arc(PX1, PY1 + PR, PR, -Math.PI / 2, Math.PI / 2, false);
+  p.lineTo(PX0, PY2); p.arc(PX0, PY2 + PR, PR, -Math.PI / 2, -3 * Math.PI / 2, true);
+  p.lineTo(PEND, PY3); return p;
+})();
+
+
+// ---------- levels ----------
+const MAJ = [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
+const LEVELS = [
+  {
+    id:'boss', who:'반장', role:'20년차 · 3번 라인', tag:'정박', bpm:96, div:2, style:'straight', clock:'03:12', title:'첫 야간 근무', partners:['boss'],
+    chords: MAJ, roots:[110, 87.31, 130.81, 98], quiet:[[48, 64]], tutorial:true, special:['늦은 상자', 'late', '받아냄'],
+    bars:['........', '........', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x.x.x...', 'x.x.x...', 'x.x.x...', 'x.x.x...',
+          'h=..x...', 'h=..x.x.', 'x...x...', 'L...x...', 'L...x...', 'L...x...', 'x.x.x.x.', 'xxx.x...', 'h==.....', 'x.x.x.x.', '........'],
+    say:[[2, '자, 간다. 내 손 봐.', 4], [23, '좋아. 손 풀렸지?', 3], [37, '긴 거 온다. 끝까지 잡고 있어.', 3],
+         [49, '…읏.', 1.6], [52.8, '미안. 무릎이 좀.', 2.6], [56.6, '음악 말고 내 손을 봐.', 2.8], [62.4, '…됐다. 다시 맞추자.', 2.4], [80.5, '수고했다.', 3]],
+    comfort:['괜찮아. 다음 거 봐.', '숨 쉬어. 내 손만 봐.'],
+    intro:[
+      { who:'', text:'새벽 3시 10분. 물류센터 B동, 3번 라인.' },
+      { who:'반장', text:'신입이지? 장갑 껴. 오늘은 내 옆이야.' },
+      { who:'반장', text:'이어폰 빼. 여기선 음악 듣는 거 아니다.' },
+      { who:'반장', text:'내가 상자 올리면, 그게 스캐너에 닿을 때 찍어. 삑 소리 나게.' },
+      { who:'반장', text:'벨트가 한 바퀴 도는 데 딱 한 마디다. 내가 올린 박자가 그대로 너한테 간다.' },
+      { who:'반장', text:'벨트는 일정해. 박자는 사람이 만드는 거고.' },
+      { who:'', text:'반장님 무릎 쪽에서 파스 냄새가 났다.' }],
+    outro:(good, sp) => good ? [
+      { who:'반장', text:'…괜찮네, 신입.' },
+      { who:'반장', text: sp >= 2 ? '아까 내가 늦었을 때, 네가 기다려줬지.' : '근데 내가 늦을 땐 음악을 따라가더라. 사람을 봐야지.' },
+      { who:'반장', text:'내일도 3번 라인이다. 늦지 마.' },
+      { who:'', text:'퇴근길, 반장님이 자판기 커피를 하나 더 뽑아 내 손에 쥐여줬다.' }] : [
+      { who:'반장', text:'처음엔 다 그래.' },
+      { who:'반장', text: sp >= 2 ? '그래도 내가 늦었을 때 맞춰주더라. 그거면 됐어.' : '음악 말고 손을 봐. 내 손이 늦으면 너도 늦어야 돼.' },
+      { who:'반장', text:'내일 또 하자.' },
+      { who:'', text:'반장님은 무릎을 한 번 두드리고 먼저 나갔다.' }]
+  },
+  {
+    id:'jiwoo', who:'지우', role:'대학생 알바 · 시험기간', tag:'엇박', bpm:104, div:2, style:'offbeat', clock:'02:40', title:'뒤에서 치는 밤', partners:['jiwoo'],
+    chords:[[261.63, 329.63, 392], [174.61, 220, 261.63], [196, 246.94, 293.66], [220, 261.63, 329.63]], roots:[130.81, 87.31, 98, 110],
+    doze:[[40, 56]], special:['조는 동안 상자', 'range', '받아냄', [40, 56]],
+    bars:['........', '........', 'x...x...', 'x...x...', '.x...x..', '.x...x..', '.x...x..', '.x...x..', '.x.x.x.x', '.x.x.x.x',
+          '.L...x..', '.x...L..', '.L...x..', '.x...L..', 'x.x.x.x.', '.x.x.x.x', 'x..x..x.', 'x..x..x.', '.x.x.x.x', 'x.......', '........'],
+    say:[[2, '아 네네. 저 박자감 좋아요. 원랜 음악 들으면서 해요.', 4], [16, '앗, 뒤에서 치는 거 느껴져요? 재밌죠.', 3],
+         [34, '어제 밤새서… 아 괜찮아요 괜찮아요.', 3], [41, 'zzZ…', 14], [56, '헉. 죄송해요! 시험기간이라…', 3], [64, '다시! 이번엔 안 졸아요.', 3], [78, '수고하셨어요!', 3]],
+    comfort:['괜찮아요, 저도 맨날 틀려요.', '반장님이 그랬어요. 손을 보라고.'],
+    intro:[
+      { who:'', text:'다음 날 밤. 3번 라인에 반장님 대신 대학생이 서 있었다.' },
+      { who:'지우', text:'안녕하세요! 지우예요. 반장님 오늘 병원 가셨대요. 무릎.' },
+      { who:'지우', text:'저 원래 음악 들으면서 하는데… 아 맞다, 반장님이 빼라고 했죠.' },
+      { who:'지우', text:'저는 박자를 좀 뒤에서 쳐요. 머리 끄덕이고 나서, 손이 가요. 그 사이에 찍으시면 돼요.' },
+      { who:'', text:'한쪽 귀에 이어폰이 아직 걸려 있었다.' }],
+    outro:(good, sp) => good ? [
+      { who:'지우', text:'우와, 저랑 잘 맞네요?' },
+      { who:'지우', text: sp >= 6 ? '저 졸 때 손 늦어진 것까지 맞춰주셨죠… 감사해요. 진짜로.' : '저 졸았을 때 손이 늦어졌나 봐요. 죄송해요.' },
+      { who:'지우', text:'시험 끝나면 떡볶이 사드릴게요.' },
+      { who:'', text:'지우는 벨트 끝에 기대 5초 만에 잠들었다.' }] : [
+      { who:'지우', text:'아… 저 때문이죠. 박자 이상하게 쳐서.' },
+      { who:'지우', text:'내일은 좀 덜 뒤에서 칠게요. 아니, 그냥 안 졸게요.' },
+      { who:'', text:'지우는 남은 이어폰 한쪽도 빼서 주머니에 넣었다.' }]
+  },
+  {
+    id:'park', who:'박씨', role:'재취업 · 첫 달', tag:'하프타임 · 두 손', bpm:84, tempo:[[0, 84], [24, 88], [40, 92], [56, 96]], div:2, style:'halftime', clock:'01:50', title:'무거운 것부터', partners:['park'],
+    chords:[[164.81, 196, 246.94], [130.81, 164.81, 196], [146.83, 174.61, 220], [174.61, 220, 261.63]], roots:[82.41, 65.41, 73.42, 87.31],
+    special:['중량물', 'heavy', '같이 듦'],
+    bars:['........', '........', 'x...x...', 'x...x...', 'H...H...', 'H...H...', 'H...x...', 'x...H...', 'H.......', 'H...H...',
+          'H...x.x.', 'H...x.x.', 'H.x.H.x.', 'H.x.H.x.', 'H...H...', 'H.x.x.x.', 'H.x.H.x.', 'H...H...', 'H.......', '........'],
+    say:[[2, '…어. 어, 안녕하세요. 박입니다.', 3], [8, '내가 느려요. 좀만 봐줘요.', 3], [15, '이건 무거워. 두 손으로 같이.', 3],
+         [30, '…음. 슬슬 되네.', 2.5], [44, '아까보다 빨라졌지? 나도 알아.', 3], [60, '좋다. 이 속도.', 2.5], [73, '…수고했어요. 아니, 수고했다.', 3]],
+    comfort:['…괜찮아요. 나도 첫날 다 떨궜어.', '천천히. 무거운 건 천천히.'],
+    intro:[
+      { who:'', text:'셋째 밤. 벨트 옆에 처음 보는 아저씨가 장갑을 세 번 고쳐 끼고 있었다.' },
+      { who:'박씨', text:'…안녕하세요. 어, 박입니다. 여기 처음이에요.' },
+      { who:'박씨', text:'전에는 사무실에… 아니, 됐고. 내가 좀 느릴 거예요.' },
+      { who:'박씨', text:'무거운 건 두 손으로 받아요. 한 손으론 안 들려. 왼손 오른손 같이.' },
+      { who:'', text:'목에 두른 수건이 새것이었다.' }],
+    outro:(good, sp) => good ? [
+      { who:'박씨', text:'…고마워요. 나 따라오느라 답답했지.' },
+      { who:'박씨', text: sp >= 8 ? '무거운 거 같이 들어줘서 편했어. 진짜로.' : '무거운 건 아직 손이 안 맞네. 내 탓이야.' },
+      { who:'박씨', text:'내일은 더 빨리 할게. 아니, 할 수 있어.' },
+      { who:'', text:'박씨는 퇴근길에 수건을 접어 주머니에 넣었다. 버리지 않았다.' }] : [
+      { who:'박씨', text:'…내가 느려서 그래요. 미안.' },
+      { who:'박씨', text:'그래도 끝까지 했네. 나도, 자네도.' },
+      { who:'', text:'박씨는 장갑을 벗지 않고 휴게실로 갔다.' }]
+  },
+  {
+    id:'sunja', who:'순자 이모', role:'분류 달인 · 손주 등원 담당', tag:'탁, 탁탁, 탁', bpm:100, div:4, style:'fast', clock:'04:05', title:'작은 것 넷', partners:['sunja'],
+    chords:[[261.63, 329.63, 392], [220, 261.63, 329.63], [174.61, 220, 261.63], [196, 246.94, 293.66]], roots:[130.81, 110, 87.31, 98],
+    phone:[[40, 48]], small:true, special:['통화 중 상자', 'range', '받아냄', [40, 52]],
+    bars:['................', '................', 'x...x...x...x...', 'x...x...x...x...', 'x...xx..x...xx..', 'x...xx..x...xx..',
+          'x.x.x...x.x.x...', 'x.x.x...x.x.x...', 'x...xx..x.x.x...', 'x...xx..x.x.x...', 'x.......x.......', 'x.....x.x.......',
+          '....x...x...xx..', 'x...xx..x.x.x...', 'x...xx..x...xx..', 'x.x.x.x.x...xx..', 'x...............', '................'],
+    say:[[2, '어서 와, 신입! 이모 박자는 이거야. 탁, 탁탁, 탁.', 3.5], [10, '손은 눈보다 빠르다. 눈 말고 귀!', 3], [24, '탁탁은 두 번 빨리. 손목으로.', 3],
+         [38.5, '어? 잠깐만. 우리 손주.', 2], [41, '응, 할미야. 열은? 응. 응. 약 먹였어?', 6], [48, '…됐다. 다시 가자!', 2], [59, '마지막! 탁, 탁탁, 탁!', 2.5], [65, '호, 이 정도면 야간조 해도 되겠네.', 3]],
+    comfort:['괜찮아, 이모가 빨랐어.', '귀로 들어. 탁, 탁탁, 탁.'],
+    intro:[
+      { who:'', text:'넷째 밤. 라인에 도착하기 전부터 소리가 들렸다. 탁, 탁탁, 탁.' },
+      { who:'순자 이모', text:'신입? 이모라고 불러. 순자 이모.' },
+      { who:'순자 이모', text:'이모 박자는 좀 달라. 탁, 탁탁, 탁. 두 번째가 둘이야.' },
+      { who:'순자 이모', text:'작은 건 금방 가. 큰 거 하나 올릴 시간에 작은 거 둘.' },
+      { who:'', text:'이모 핸드폰 배경화면은 유치원 가방을 멘 아이였다.' }],
+    outro:(good, sp) => good ? [
+      { who:'순자 이모', text:'어머, 잘하네! 이모 박자 따라오는 사람 처음 봐.' },
+      { who:'순자 이모', text: sp >= 4 ? '아까 전화 받을 때 알아서 해줬지. 다 봤어.' : '전화 받을 땐 좀 흔들렸지? 이모 탓이야.' },
+      { who:'순자 이모', text:'아침에 손주 데려다주고 자야지. 수고했어, 신입.' },
+      { who:'', text:'이모는 퇴근하면서 벨트를 한 번 쓰다듬었다.' }] : [
+      { who:'순자 이모', text:'아이고, 탁탁이 어려웠지? 이모가 미안해.' },
+      { who:'순자 이모', text:'내일은 탁, 탁, 탁으로 갈게. 하나씩.' },
+      { who:'', text:'이모는 핸드폰을 한 번 더 확인하고 나갔다.' }]
+  },
+  {
+    id:'duo', who:'반장 + 지우', role:'세일 전야 · 두 줄 벨트', tag:'둘이서 · 정전', bpm:100, div:2, style:'duo', clock:'23:40', title:'세일 전야', partners:['boss', 'jiwoo'], lanes:2,
+    chords: MAJ, roots:[110, 87.31, 130.81, 98], crazy:[[64, 80]], special:['정전 중 상자', 'range', '받아냄', [64, 80]],
+    bars: ['........', '........', 'x...x...', 'x...x...', 'x...x...', 'x...x...', '........', '........', '........', '........',
+           'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x.x.x...', '........', '........', '........', '........',
+           'x...x...', 'L...x...', 'x...x...', 'L...x...', 'x...x...', 'x...x...', 'x.......', '........'],
+    bars2:['........', '........', '........', '........', '........', '........', '.x...x..', '.x...x..', '.x...x..', '.x...x..',
+           '.x...x..', '.x...x..', '.x...x..', '.x...x..', '.x.x.x.x', '.x...x..', '.x...x..', '.x...x..', '.x...x..', '.x.x.x.x',
+           '.x...x..', '.x...x..', '.x.x.x.x', '.x...x..', '.x.x.x.x', '.x...x..', '........', '........'],
+    say:[[2, '주황 테이프는 내 거다. 왼손.', 3, 0], [22, '연두는 저요! 오른손!', 3, 1], [38, '둘 다 간다. 왼손, 오른손.', 3, 0], [55, '오, 되네요? 양손!', 2.5, 1],
+         [63.2, '정전이다!', 2, 0], [65.5, '불 꺼져도 손은 가요! 소리 들으세요!', 4, 1], [72, '내 쪽은 멈췄다. 지우 소리만 들어.', 4, 0],
+         [80.5, '…들어왔다. 자, 다시.', 3, 0], [84.5, '무릎 조심하세요, 반장님!', 2.5, 1], [100, '마지막. 둘 다.', 2.5, 0], [104.5, '끝!', 2, 1]],
+    comfort:['괜찮아. 한 손씩 세.', '지우 쪽만 먼저 맞춰. 내 건 나중에.'],
+    intro:[
+      { who:'', text:'세일 전야. 3번 라인 벨트가 두 줄짜리로 바뀌었다.' },
+      { who:'반장', text:'병원 갔다 왔다. 무릎은… 됐고. 오늘 물량 두 배다.' },
+      { who:'지우', text:'시험 끝났어요! 이어폰도 뺐어요. 둘 다요.' },
+      { who:'반장', text:'주황 테이프는 내가, 연두 테이프는 지우가 올린다. 너는 양손이다.' },
+      { who:'지우', text:'주황은 왼손, 연두는 오른손이에요. 패드 왼쪽, 오른쪽.' },
+      { who:'', text:'창고 전체에 불이 켜져 있었다. 아직은.' }],
+    outro:(good, sp) => good ? [
+      { who:'반장', text:'…둘 다 잘했다.' },
+      { who:'지우', text: sp >= 5 ? '정전 때 제 소리 들으셨죠? 손 안 멈췄어요!' : '정전 때 좀 놓쳤죠? 어두우면 저도 무서워요.' },
+      { who:'반장', text:'봤다. 신입, 내일부터 네가 3번 라인이다.' },
+      { who:'', text:'불이 다시 켜진 창고에서, 세 사람의 박자가 같았다.' }] : [
+      { who:'반장', text:'두 줄은 원래 어렵다.' },
+      { who:'지우', text:'정전 때 소리 들으셨어요? 저 손 안 멈췄어요.' },
+      { who:'', text:'내일도 벨트는 두 줄이다.' }]
+  }
+];
+
+// ---------- tempo + chart ----------
+let L = LEVELS[0], SPB = 60 / 96, notes = [], END_BEAT = 0, CHORDS = MAJ;
+let tempoSeg = [];
+function setTempo(level) {
+  const pts = level.tempo || [[0, level.bpm]];
+  tempoSeg = []; let t = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const [b, bpm] = pts[i], spb = 60 / bpm, nb = i + 1 < pts.length ? pts[i + 1][0] : Infinity;
+    tempoSeg.push({ b, t, spb, nb }); if (nb !== Infinity) t += (nb - b) * spb;
+  }
+}
+function timeAt(beat) { let s = tempoSeg[0]; for (const x of tempoSeg) if (beat >= x.b) s = x; return s.t + (beat - s.b) * s.spb; }
+function beatAt(t) { let s = tempoSeg[0]; for (const x of tempoSeg) if (t >= x.t) s = x; return s.b + (t - s.t) / s.spb; }
+function spbAt(t) { let s = tempoSeg[0]; for (const x of tempoSeg) if (t >= x.t) s = x; return s.spb; }
+
+const beltW = () => L.lanes === 2 ? 26 : 16;
+const laneD = lane => L.lanes === 2 ? (lane === 0 ? 6.5 : -6.5) : 0;
+// partner standing spots: lane 0 beside the belt start, lane 1 (duo only) behind the first run
+const laneOX = lane => lane === 1 ? 36 : 0;
+
+function loadLevel(level) {
+  L = level; setTempo(level); SPB = 60 / level.bpm; CHORDS = level.chords;
+  notes = [];
+  const div = level.div;
+  [level.bars, level.bars2 || []].forEach((bars, lane) => bars.forEach((bar, bi) => {
+    for (let c = 0; c < bar.length; c++) {
+      const ch = bar[c]; if (ch === '.' || ch === '=') continue;
+      let len = 0;
+      if (ch === 'h') { let k = c + 1, cnt = 1; while (bar[k] === '=') { cnt++; k++; } len = cnt / div; }
+      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : 0), len, late: ch === 'L', heavy: ch === 'H', lane });
+    }
+  }));
+  notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
+  const two = level.lanes === 2;
+  notes.forEach((n, i) => {
+    n.i = i; n.arr = timeAt(n.beat); n.place = timeAt(n.beat - BAR_BEATS); n.end = timeAt(n.beat + n.len);
+    n.rate = (SCAN_S - BOX_S0) / (n.arr - n.place);
+    if (n.heavy) { n.w = 19 + Math.floor(rnd(i, 1) * 3); n.h = 15; }
+    else if (level.small) { n.w = 8 + Math.floor(rnd(i, 1) * 3); n.h = 8 + Math.floor(rnd(i, 2) * 2); }
+    else if (two) { n.w = 10 + Math.floor(rnd(i, 1) * 2); n.h = 10 + Math.floor(rnd(i, 2) * 2); }
+    else { n.w = 12 + Math.floor(rnd(i, 1) * 4); n.h = 11 + Math.floor(rnd(i, 2) * 3); }
+    let prev = null; for (let k = i - 1; k >= 0; k--) if (notes[k].lane === n.lane) { prev = notes[k]; break; }
+    const gap = prev ? (n.place - prev.place) / SPB : 2;
+    n.carry = Math.min(0.75, Math.max(0.25, gap * 0.8)) * SPB;
+  });
+  END_BEAT = level.bars.length * 4;
+}
+const sAt = (n, t) => BOX_S0 + (t - n.place) * n.rate;
+const firstWith = key => notes.find(n => n[key]);
+
+// ---------- static background ----------
+const bg = document.createElement('canvas'); bg.width = W; bg.height = H;
+(() => {
+  const b = bg.getContext('2d');
+  const r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  // back wall with racks
+  r(0, 0, W, H, '#1a1411');
+  r(0, 0, W, 112, '#231b17');
+  r(0, 0, W, 20, '#191311');
+  for (let x = 0; x < W; x += 36) r(x, 0, 2, 20, '#211915');
+  r(0, 20, W, 2, '#2e241f');
+  let seed = 1;
+  const bays = [[2, 64], [74, 70], [150, 64]];
+  for (const [x0, w] of bays) {
+    r(x0, 28, 2, 84, '#41332a'); r(x0 + w - 2, 28, 2, 84, '#41332a');
+    for (const y of [48, 76, 104]) {
+      let x = x0 + 4;
+      while (x < x0 + w - 10) {
+        const bw = 6 + Math.floor(rnd(seed, 3) * 9), bh = 6 + Math.floor(rnd(seed, 4) * 12);
+        const c = ['#5b4330', '#4f3a2a', '#66503a'][Math.floor(rnd(seed, 5) * 3)];
+        r(x, y - bh, bw, bh, c); r(x, y - bh, bw, 1, '#76604a'); r(x + (bw >> 1), y - bh, 1, bh, '#6e5a42');
+        x += bw + 2 + Math.floor(rnd(seed, 6) * 4); seed++;
+      }
+      r(x0, y, w, 2, '#4a3a2f'); r(x0, y + 2, w, 1, '#1d1714');
+    }
+  }
+  // lane sign "3"
+  r(100, 20, 1, 6, '#4a4038'); r(114, 20, 1, 6, '#4a4038');
+  r(96, 26, 23, 13, '#d9a520'); r(96, 38, 23, 1, '#8a6a12');
+  ['111', '001', '111', '001', '111'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') r(104 + x * 2, 28 + y * 2, 2, 2, '#1d1815'); }));
+  // floor: concrete slabs, seams, a walkway line
+  r(0, 112, W, 2, '#2e241f');
+  for (let y = 146; y < H; y += 40) r(0, y, W, 1, '#1f1814');
+  for (let x = 54; x < W; x += 54) r(x, 114, 1, H - 114, '#1f1814');
+  for (let x = 0; x < W; x += 12) r(x, 362, 7, 2, '#c99a1e');
+  // supply pallet behind the partner
+  r(0, 128, 34, 3, '#6b4a2e'); r(0, 131, 34, 2, '#4a3220');
+  const sb = (x, y) => { r(x, y, 14, 4, '#e0ae72'); r(x, y + 4, 14, 8, C.kraft); r(x + 12, y + 4, 2, 8, C.kraftDark); r(x + 6, y, 2, 12, C.tape); };
+  sb(2, 116); sb(17, 116); sb(9, 104);
+  // exit hatch with strip curtain where finished boxes leave
+  r(204, PY3 - 16, 12, 30, '#0b0908'); r(203, PY3 - 18, 13, 3, '#4a403b');
+  for (let k = 0; k < 4; k++) r(205 + k * 3, PY3 - 15, 2, 26, k % 2 ? '#3d5560' : '#4b6873');
+})();
+
+// ---------- drawing helpers ----------
+const cv = $('cv');
+let g = cv.getContext('2d');
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+const thick = (x1, y1, x2, y2, s, c) => {
+  const d = Math.max(1, Math.hypot(x2 - x1, y2 - y1));
+  for (let k = 0; k <= d; k++) { const p = k / d; R(lerp(x1, x2, p) - s / 2, lerp(y1, y2, p) - s / 2, s, s, c); }
+};
+const cross = (x, y) => { for (let k = 0; k < 5; k++) { R(x + k, y + k, 1, 1, C.red); R(x + 4 - k, y + k, 1, 1, C.red); } };
+
+const FX = { particles: [], marks: [], react: [{ type: '', at: -1e9 }, { type: '', at: -1e9 }], lastMiss: -1e9, missKind: '', missLane: 0, goodLane: 0, shakeUntil: -1e9, playerNod: -1e9, flinch: -1e9, binHit: -1e9, bossLine: null };
+const BIN = { x: 176, y: 300, w: 34, h: 20 }, PALLET = { x: 12, y: 350 };
+const FALL_S = SCAN_S + 14, GRAV = 520;
+
+function drawLights(bt, t, active) {
+  const tubes = [10, 84, 158];
+  const beat = active ? beatAt(t) : 0;
+  const dark = active && blackout(beat);
+  const alpha = tubes.map((x, k) => {
+    if (dark) return 0;
+    if (reduce || k !== 1) return 1;
+    const inD = active && inRange(beat, L.quiet);
+    const s = Math.sin(bt * 37 + k) + Math.sin(bt * 13.3);
+    return (inD ? s > 0.9 : s > 1.93) ? 0.15 : 1;
+  });
+  const ph = active && t > 0 ? beat - Math.floor(beat) : 1;
+  const pulse = Math.max(0, 1 - ph * 5) * 0.05;
+  g.save(); g.globalCompositeOperation = 'lighter';
+  tubes.forEach((x, k) => {
+    const grd = g.createLinearGradient(0, 10, 0, H);
+    grd.addColorStop(0, `rgba(255,236,170,${(0.13 + pulse) * alpha[k]})`); grd.addColorStop(1, 'rgba(255,236,170,0)');
+    g.fillStyle = grd; g.beginPath(); g.moveTo(x, 12); g.lineTo(x + 48, 12); g.lineTo(x + 84, H); g.lineTo(x - 36, H); g.closePath(); g.fill();
+  });
+  if (active && stats.combo >= 10) {
+    g.strokeStyle = `rgba(255,170,70,${Math.min(0.2, 0.06 + stats.combo * 0.004)})`; g.lineWidth = beltW() + 10; g.lineCap = 'butt'; g.stroke(BELT_PATH);
+  }
+  g.restore();
+  tubes.forEach((x, k) => { R(x + 4, 0, 1, 8, '#3a332c'); R(x + 43, 0, 1, 8, '#3a332c'); R(x - 2, 8, 52, 2, '#3a332c'); R(x, 10, 48, 3, alpha[k] > 0.5 ? '#fff3c8' : '#5d5446'); });
+}
+// blackout: the concept flips. Boxes are only visible inside the scanner's glow, so the partner's "thud" a bar earlier is the cue.
+const blackout = beat => inRange(beat, L.crazy);
+const BLACK_FADE = 0.6;
+function blackoutAmount(t) {
+  if (!L.crazy) return 0;
+  let a = 0;
+  for (const [s, e] of L.crazy) {
+    const ts = timeAt(s), te = timeAt(e);
+    if (t >= ts && t < te) a = Math.max(a, Math.min(1, (t - ts) / 0.12));
+    else if (t >= te && t < te + BLACK_FADE) { const p = (t - te) / BLACK_FADE; a = Math.max(a, (Math.sin(p * 40) > 0.3 ? 1 : 0) * (1 - p)); }
+  }
+  return a;
+}
+
+// ---------- partner pose (shared by every coworker), in world coordinates ----------
+const IDLE_LOCAL = { x: BOSS_X + 13, y: 134 }, STACK_LOCAL = { x: 16, y: 104 };
+function partnerPose(t, bt, active, lane = 0) {
+  const ox = laneOX(lane), idle = { x: IDLE_LOCAL.x + ox, y: IDLE_LOCAL.y };
+  const pose = { hand: idle, carry: null, wince: false, dip: 0, bob: 0, nod: 0, doze: false, phone: false, beat: 0, lane, ox };
+  if (!active) { pose.bob = Math.sin(bt * 1.7 + lane) > 0.85 ? 1 : 0; return pose; }
+  const beat = beatAt(t), ph = beat - Math.floor(beat);
+  pose.beat = beat;
+  pose.bob = t > 0 && ph < 0.18 ? 1 : 0;
+  pose.doze = inRange(beat, L.doze); pose.phone = inRange(beat, L.phone);
+  if (pose.doze) pose.bob = 0;
+  let cur = null;
+  for (const n of notes) {
+    if (n.lane !== lane) continue;
+    if (n.late && t > n.place - SPB && t < n.place + 0.4 * SPB) { pose.wince = !pose.doze; pose.dip = 2; }
+    if (n.place - n.carry <= t) cur = n;
+  }
+  if (!cur) return pose;
+  const pp = lanePt(BOX_S0, laneD(lane));
+  const push = { x: pp.x - 8, y: pp.y - 4 };
+  if (t <= cur.place) {
+    const p = (t - (cur.place - cur.carry)) / cur.carry;
+    if (cur.len) pose.hand = { x: lerp(idle.x, push.x, ease(p)), y: lerp(idle.y, push.y, ease(p)) };
+    else { const b = carryPos(cur, p, ox, pp); pose.carry = { n: cur, x: b.x, y: b.y }; pose.hand = { x: b.x - cur.w / 2 + 1, y: b.y - 2 }; }
+  } else if (t < cur.place + 0.35 * SPB) {
+    const p = ease((t - cur.place) / (0.35 * SPB));
+    const from = cur.len ? push : { x: pp.x - cur.w / 2 + 1, y: pp.y - 4 };
+    pose.hand = { x: lerp(from.x, idle.x, p), y: lerp(from.y, idle.y, p) };
+  }
+  return pose;
+}
+// box bottom-centre while it travels from the supply pallet to the belt
+function carryPos(n, p, ox, pp) {
+  const q = Math.max(0, Math.min(1, p));
+  return { x: lerp(STACK_LOCAL.x + ox, pp.x, q), y: lerp(STACK_LOCAL.y, pp.y + 3, ease(q)) - Math.sin(Math.PI * q) * 10 };
+}
+const bodyTop = (base, pose) => base + pose.dip + pose.bob + pose.nod;
+
+function eighthNote(x, y, c) { R(x, y + 3, 2, 2, c); R(x + 1, y - 2, 1, 5, c); R(x + 2, y - 2, 2, 1, c); R(x + 3, y - 1, 1, 1, c); }
+function zzz(x, y, nowMs) {
+  for (let k = 0; k < 2; k++) {
+    const p = ((nowMs / 1400) + k * 0.5) % 1;
+    g.globalAlpha = Math.sin(Math.PI * p);
+    const zx = x + p * 8 + k * 4, zy = y - p * 12;
+    R(zx, zy, 3, 1, '#e9e4da'); R(zx + 1, zy + 1, 1, 1, '#e9e4da'); R(zx, zy + 2, 3, 1, '#e9e4da');
+    g.globalAlpha = 1;
+  }
+}
+// eye, brow, sweat and breath for a human partner. ex/ey is the eye's top-left; faces right.
+function faceFx(cx, top, ex, ey, pose, nowMs, hairColor, active) {
+  const r = FX.react[pose.lane], age = nowMs - r.at;
+  if (pose.doze) { R(ex - 1, ey + 1, 4, 1, C.ink); zzz(cx + 10, top + 2, nowMs); }
+  else if (pose.wince) { R(ex - 1, ey + 1, 4, 1, C.ink); R(cx - 9, top + 5, 2, 3, C.sweat); }
+  else if (r.type === 'glance' && age < 700) { R(ex - 2, ey - 1, 5, 1, hairColor); R(ex - 1, ey + 1, 3, 1, C.ink); }
+  else R(ex, ey, 2, 2, C.ink);
+  if (r.type === 'relief' && age < 900) {
+    const p = age / 900, x = cx + 9 + p * 10, y = top + 10 - p * 6;
+    g.globalAlpha = 1 - p; R(x, y, 3, 2, '#e9e4da'); R(x + 2, y - 1, 3, 2, '#e9e4da'); R(x + 4, y, 2, 2, '#e9e4da'); g.globalAlpha = 1;
+  }
+  if (active && stats.combo >= 16 && !pose.doze) {
+    for (let k = 0; k < 2; k++) {
+      const p = ((nowMs / 1000) / (SPB * 2) + k * 0.5) % 1;
+      g.globalAlpha = Math.sin(Math.PI * p); eighthNote(cx + 8 + p * 10, top - 6 - p * 16, '#ffe9a8'); g.globalAlpha = 1;
+    }
+  }
+}
+
+// each partner: draw(pose, nowMs, active) and arm(pose). Same 4-head silhouette as the first mockup, different build and props.
+const PARTNERS = {
+  boss: {
+    base: 90,
+    draw(pose, nowMs, active) {
+      const cx = BOSS_X, top = bodyTop(90, pose);
+      R(cx - 11, top + 20, 3, 18, C.shirt);
+      R(cx - 9, top + 18, 18, 40, C.shirt);
+      R(cx - 9, top + 18, 6, 40, C.vest); R(cx + 3, top + 18, 6, 40, C.vest);
+      R(cx - 9, top + 34, 18, 2, C.reflect);
+      R(cx - 2, top + 15, 5, 4, C.skinDark);
+      R(cx - 6, top + 2, 12, 14, C.skin);
+      R(cx - 6, top + 7, 2, 3, C.skinDark);
+      R(cx - 6, top + 4, 3, 5, C.hair);
+      R(cx - 7, top - 1, 14, 5, C.cap); R(cx + 3, top + 3, 9, 2, C.cap);
+      faceFx(cx, top, cx + 3, top + 7, pose, nowMs, C.hair, active);
+      R(cx + 1, top + 11, 6, 2, C.hair);
+    },
+    arm(pose) { const top = bodyTop(90, pose); thick(BOSS_X + 7, top + 22, pose.hand.x, pose.hand.y, 4, C.shirt); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin); }
+  },
+  jiwoo: {
+    base: 84,
+    draw(pose, nowMs, active) {
+      const cx = BOSS_X, top = bodyTop(84, pose) + (pose.bob ? 1 : 0) + (pose.doze ? 3 : 0), hood = '#6b2f3f', hoodD = '#4a2030';
+      R(cx - 7, top + 18, 14, 46, hood);
+      R(cx - 7, top + 20, 14, 20, C.vest2); R(cx - 7, top + 30, 14, 2, C.reflect);
+      R(cx - 7, top + 40, 14, 2, hoodD);
+      R(cx - 9, top - 2, 18, 20, hood); R(cx - 9, top - 2, 18, 2, hoodD);
+      R(cx - 5, top + 3, 10, 12, C.skin);
+      R(cx - 5, top + 3, 10, 2, C.hairDark);
+      faceFx(cx, top, cx + 1, top + 8, pose, nowMs, C.hairDark, active);
+      R(cx + 5, top + 8, 2, 2, '#f4f1ea');
+      for (let k = 0; k < 10; k++) R(cx + 6 + (k % 2), top + 10 + k, 1, 1, '#f4f1ea');
+      if (!pose.doze && active && pose.bob) R(cx - 9, top + 6, 2, 1, hoodD);
+    },
+    arm(pose) { const top = bodyTop(84, pose); thick(BOSS_X + 5, top + 23, pose.hand.x, pose.hand.y, 4, '#6b2f3f'); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin); }
+  },
+  park: {
+    base: 92,
+    draw(pose, nowMs, active) {
+      const cx = BOSS_X, top = bodyTop(92, pose), jacket = '#6e4a33', jacketD = '#4f3424';
+      R(cx - 13, top + 18, 26, 38, jacket);
+      R(cx - 13, top + 34, 28, 22, jacket);
+      R(cx - 11, top + 20, 22, 22, C.vest2); R(cx - 11, top + 31, 22, 2, C.reflect);
+      R(cx - 11, top + 42, 24, 2, jacketD);
+      R(cx - 7, top + 14, 14, 4, '#e9e4da'); R(cx - 7, top + 17, 3, 6, '#e9e4da');
+      R(cx - 6, top + 1, 12, 14, C.skin);
+      R(cx - 7, top + 2, 3, 6, '#5a5550'); R(cx + 5, top + 2, 3, 6, '#5a5550'); R(cx - 2, top - 1, 1, 2, '#5a5550'); R(cx + 1, top - 1, 1, 2, '#5a5550');
+      faceFx(cx, top, cx + 3, top + 7, pose, nowMs, '#5a5550', active);
+      R(cx + 1, top + 6, 7, 1, '#2a2a2a'); R(cx + 1, top + 6, 1, 3, '#2a2a2a'); R(cx + 7, top + 6, 1, 3, '#2a2a2a');
+    },
+    arm(pose) {
+      const top = bodyTop(92, pose), sx = BOSS_X + 9, sy = top + 22, mx = lerp(sx, pose.hand.x, 0.5), my = lerp(sy, pose.hand.y, 0.5);
+      thick(sx, sy, mx, my, 5, '#6e4a33'); thick(mx, my, pose.hand.x, pose.hand.y, 4, C.skin); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
+    }
+  },
+  sunja: {
+    base: 100,
+    draw(pose, nowMs, active) {
+      const cx = BOSS_X, top = bodyTop(100, pose), perm = '#4a2e22', visor = '#6a3d8a', floral = '#8a4a6a';
+      R(cx - 8, top + 17, 16, 32, floral);
+      R(cx - 6, top + 30, 12, 20, '#e9dcc3');
+      R(cx - 8, top + 19, 16, 14, C.vest2); R(cx - 8, top + 26, 16, 2, C.reflect);
+      R(cx - 7, top, 14, 8, perm); R(cx - 9, top + 2, 2, 7, perm); R(cx + 7, top + 2, 2, 7, perm); R(cx - 8, top - 1, 4, 2, perm); R(cx + 3, top - 1, 4, 2, perm);
+      R(cx - 6, top + 6, 12, 11, C.skin);
+      R(cx - 7, top + 4, 14, 2, visor); R(cx - 1, top + 6, 15, 2, visor);
+      faceFx(cx, top, cx + 3, top + 9, pose, nowMs, perm, active);
+      R(cx + 1, top + 13, 5, 1, C.skinDark);
+      if (pose.phone) { R(cx + 5, top + 6, 4, 7, '#1e1a1a'); R(cx + 6, top + 7, 2, 4, '#8fe3f0'); thick(cx - 7, top + 24, cx + 7, top + 13, 3, '#d87a9a'); R(cx + 5, top + 11, 4, 3, C.skin); }
+    },
+    arm(pose) {
+      const top = bodyTop(100, pose), sx = BOSS_X + 6, sy = top + 21;
+      thick(sx, sy, pose.hand.x, pose.hand.y, 4, '#d87a9a');
+      const d = Math.max(1, Math.hypot(pose.hand.x - sx, pose.hand.y - sy));
+      for (let k = 3; k < d; k += 5) { const p = k / d; R(lerp(sx, pose.hand.x, p) - 1, lerp(sy, pose.hand.y, p) - 1, 1, 1, '#f5d0dc'); }
+      R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
+    }
+  },
+};
+function drawPartnerBody(id, pose, nowMs, active) { PARTNERS[id].draw(pose, nowMs, active); }
+function drawPartnerArmOf(id, pose) { PARTNERS[id].arm(pose); }
+
+
+// legs for a partner standing beside the belt (the body sprites stop at the waist)
+const PANTS = { boss: '#2d2d34', jiwoo: '#2b3340', park: '#3a3a42', sunja: '#4a3e5a' };
+function drawLegs(pid, pose) {
+  const cx = BOSS_X, y = 148 + pose.dip, c = PANTS[pid] || '#2d2d34';
+  R(cx - 7, y, 6, 16 - pose.dip, c); R(cx + 1, y, 6, 16 - pose.dip, c);
+  if (pid === 'boss') R(cx + 1, y + 6, 6, 3, '#c9b48a');
+  R(cx - 8, 164, 7, 3, '#201b19'); R(cx + 1, 164, 8, 3, '#201b19');
+}
+
+// ---------- player: seen from behind, in front of the last run, a scanner in each hand ----------
+const PLAYER_X = 146;
+function playerState(nowMs) {
+  return { fl: nowMs - FX.flinch, nod: nowMs - FX.playerNod < 160 ? 1 : 0 };
+}
+function drawPlayer(nowMs) {
+  const { fl, nod } = playerState(nowMs), cx = PLAYER_X + (fl < 160 ? 1 : 0), top = 280 + nod;
+  R(cx - 7, 318, 6, 22, '#2b3036'); R(cx + 1, 318, 6, 22, '#2b3036');
+  R(cx - 8, 339, 7, 4, '#d9d4c8'); R(cx + 1, 339, 7, 4, '#d9d4c8'); R(cx - 8, 342, 7, 1, '#2a2320'); R(cx + 1, 342, 7, 1, '#2a2320');
+  R(cx - 10, top + 10, 20, 30, C.hoodie);
+  R(cx - 9, top + 12, 18, 20, C.vest2); R(cx - 9, top + 20, 18, 2, C.reflect); R(cx - 1, top + 12, 2, 20, '#b6c63e');
+  R(cx - 7, top + 7, 14, 5, '#264149');
+  R(cx - 3, top + 5, 6, 3, C.skinDark);
+  R(cx - 6, top - 8, 12, 14, C.hairDark); R(cx - 5, top - 9, 10, 1, C.hairDark);
+  R(cx - 7, top - 2, 1, 3, C.skin); R(cx + 6, top - 2, 1, 3, C.skin);
+  if (fl < 500) R(cx + 8, top - 6 + Math.floor(fl / 120), 2, 3, C.sweat);
+}
+function drawPlayerArms(nowMs, kickL, kickR, heavy) {
+  const { fl, nod } = playerState(nowMs), cx = PLAYER_X + (fl < 160 ? 1 : 0), sy = 292 + nod;
+  const hands = [
+    { sx: cx - 9, hx: SCAN_X - 7, kick: kickL, lane: 0 },
+    { sx: cx + 9, hx: SCAN_X + 9, kick: kickR, lane: 1 }
+  ];
+  for (const h of hands) {
+    const k = Math.max(h.kick, heavy ? 1 : 0), hy = 286 - k * 3;
+    thick(h.sx, sy, h.hx, hy + 3, 4, C.hoodie);
+    R(h.hx - 2, hy - 6, 4, 7, '#2d2f33'); R(h.hx - 1, hy - 7, 2, 1, k > 0.2 ? C.ok : C.laser);
+    R(h.hx - 2, hy + 1, 4, 3, C.skin);
+  }
+}
+
+// ---------- belt ----------
+// beat paint: where the belt will be when beat k reaches the scanner
+function markS(k, time, active) {
+  if (active) { const t0 = timeAt(k - BAR_BEATS), t1 = timeAt(k); return BOX_S0 + (SCAN_S - BOX_S0) * (time - t0) / (t1 - t0); }
+  const v = (SCAN_S - BOX_S0) / (BAR_BEATS * SPB); return SCAN_S + (time - k * SPB) * v;
+}
+function crossLine(s, d0, d1, color, width) {
+  const a = lanePt(s, d0), b = lanePt(s, d1);
+  g.strokeStyle = color; g.lineWidth = width; g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke();
+}
+function drawBelt(time, active) {
+  const bw = beltW(), half = bw / 2 - 1;
+  g.save(); g.lineCap = 'butt'; g.lineJoin = 'round';
+  g.save(); g.translate(0, 4); g.strokeStyle = '#0d0a09'; g.lineWidth = bw + 3; g.stroke(BELT_PATH); g.restore();
+  g.strokeStyle = '#4a403b'; g.lineWidth = bw + 3; g.stroke(BELT_PATH);
+  g.strokeStyle = C.belt; g.lineWidth = bw; g.stroke(BELT_PATH);
+  // moving slats
+  const v = (SCAN_S - BOX_S0) / (BAR_BEATS * SPB), ph = (((time * v) % 7) + 7) % 7;
+  g.strokeStyle = C.slat; g.lineWidth = 1; g.beginPath();
+  for (let s = ph; s < PATH_LEN; s += 7) { const a = lanePt(s, -half), b = lanePt(s, half); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); }
+  g.stroke();
+  // beat grid: bright = beat, dim = 8th
+  const beat = active ? beatAt(time) : time / SPB, b0 = Math.floor(beat * 2) / 2;
+  for (let k = b0 - 1; k <= b0 + BAR_BEATS + 1; k += 0.5) {
+    const s = markS(k, time, active);
+    if (s < 1 || s > PATH_LEN - 1) continue;
+    if (k % 1 === 0) crossLine(s, -half, half, '#a08a3c', 2); else crossLine(s, -half, half, '#55493f', 1);
+  }
+  if (L.lanes === 2) { g.strokeStyle = '#1e1917'; g.lineWidth = 1; g.stroke(BELT_PATH); }
+  g.restore();
+}
+function drawStamp(cx, cy, age, kind) {
+  const s = age < 0.09 ? lerp(2.4, 1, age / 0.09) : 1;
+  g.save(); g.translate(Math.round(cx), Math.round(cy)); g.rotate(kind === 'good' ? 0.4 : -0.12); g.scale(s * 0.8, s * 0.8);
+  g.globalAlpha = age < 0.09 ? 0.75 : 1;
+  g.fillStyle = kind === 'good' ? '#e0c45a' : '#5fc06c';
+  g.fillRect(-5, -4, 10, 1); g.fillRect(-5, 3, 10, 1); g.fillRect(-5, -4, 1, 8); g.fillRect(4, -4, 1, 8);
+  [[-3,-1],[-2,0],[-1,1],[0,0],[1,-1],[2,-2]].forEach(([a, b]) => g.fillRect(a, b, 1, 1));
+  g.restore();
+}
+// a box seen from slightly above: lid on top, front face below. (cx, bottom) is its bottom-centre.
+function drawBox(n, cx, bottom, mark, t) {
+  const w = n.w, h = n.h, lid = Math.max(3, Math.round(h * 0.38)), x = Math.round(cx - w / 2), y = Math.round(bottom - h);
+  const tape = L.lanes === 2 ? (n.lane === 0 ? C.vest : C.lime) : C.tape;
+  R(x + 1, bottom, w, 2, 'rgba(0,0,0,.4)');
+  R(x, y, w, lid, C.kraftTop); R(x, y + lid, w, h - lid, C.kraft); R(x + w - 2, y + lid, 2, h - lid, C.kraftDark);
+  R(x + (w >> 1) - 1, y, 3, lid, tape); R(x + (w >> 1) - 1, y + lid, 3, 2, tape);
+  const lw = Math.min(6, w - 5);
+  if (lw >= 3 && h - lid >= 5) { R(x + 2, y + h - 4, lw, 3, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 3, 1, 1, C.ink); }
+  if (n.heavy) { R(x + 1, y + lid, w - 2, 3, '#1b1716'); for (let k = 1; k < w - 4; k += 4) R(x + k + 1, y + lid + 1, 2, 1, '#f0b429'); }
+  if (mark === 'hit') drawStamp(x + w / 2, y + lid / 2 + 1, t - n.hitAt, n.judge);
+  if (mark === 'miss') { g.globalAlpha = 0.35; R(x, y, w, h, '#7a1f18'); g.globalAlpha = 1; cross(x + (w >> 1) - 2, y + 1); }
+}
+// a long fragile roll that follows the belt round the bends
+function strokeSpan(s0, s1, d, yoff) {
+  g.beginPath(); let first = true;
+  for (let s = s0; s <= s1; s += 2) { const p = lanePt(s, d); if (first) { g.moveTo(p.x, p.y + yoff); first = false; } else g.lineTo(p.x, p.y + yoff); }
+  const p = lanePt(s1, d); g.lineTo(p.x, p.y + yoff); g.stroke();
+}
+function drawCrate(n, t) {
+  const head = sAt(n, t), tail = head - n.rate * (n.end - n.arr), s0 = Math.max(0, tail), s1 = Math.min(PATH_LEN - 2, head);
+  if (s1 <= s0) return;
+  const d = laneD(n.lane), wdt = beltW() / (L.lanes === 2 ? 2 : 1) - 5;
+  g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+  g.strokeStyle = '#6b4c30'; g.lineWidth = wdt; strokeSpan(s0, s1, d, 1);
+  g.strokeStyle = C.crate; g.lineWidth = wdt - 1; strokeSpan(s0, s1, d, -2);
+  g.setLineDash([3, 9]); g.strokeStyle = C.red; g.lineWidth = 3; strokeSpan(s0, s1, d, -2); g.setLineDash([]);
+  if (n.state === 'holding' && head > SCAN_S) { g.strokeStyle = 'rgba(143,214,148,.55)'; g.lineWidth = wdt - 1; strokeSpan(Math.max(s0, SCAN_S), s1, d, -2); g.strokeStyle = C.tape; g.lineWidth = 2; strokeSpan(Math.max(s0, SCAN_S), s1, d, -3); }
+  if (n.state === 'hit') { g.strokeStyle = 'rgba(143,214,148,.45)'; g.lineWidth = wdt - 1; strokeSpan(s0, s1, d, -2); }
+  if (n.state === 'broken' || n.state === 'miss') { g.strokeStyle = 'rgba(200,40,30,.5)'; g.lineWidth = wdt - 1; strokeSpan(s0, s1, d, -2); }
+  g.restore();
+  if (n.state === 'hit' && head < PATH_LEN - 4) { const p = lanePt(s1, d); drawStamp(p.x - 4, p.y - 3, t - n.doneAt, 'perfect'); }
+}
+function missFall(n, t) {
+  const s = sAt(n, t);
+  if (s < FALL_S) return null;
+  const tf = (s - FALL_S) / n.rate, p0 = lanePt(FALL_S, laneD(n.lane)), landY = BIN.y + 8;
+  const tLand = Math.sqrt(2 * Math.max(4, landY - p0.y) / GRAV), tt = Math.min(tf, tLand);
+  return { x: p0.x + tt * 75, y: p0.y + 3 + 0.5 * GRAV * tt * tt, rot: Math.min(tt * 9, 1.1), landed: tf >= tLand };
+}
+function drawBin(count, nowMs) {
+  const { x, w, h } = BIN, y = BIN.y + (nowMs - FX.binHit < 120 ? 1 : 0);
+  R(x + 1, y + h, w, 3, 'rgba(0,0,0,.45)');
+  R(x, y - 4, w, 6, '#1c3a57');
+  for (let k = 0; k < Math.min(count, 6); k++) {
+    const bx = x + 3 + (k % 3) * 10 + (k > 2 ? 4 : 0), by = y - 5 - (k > 2 ? 3 : 0);
+    R(bx, by, 9, 7, '#8f6236'); R(bx, by, 9, 2, '#a8774a'); cross(bx + 2, by + 1);
+  }
+  R(x, y, w, h, '#2f5d8a'); R(x - 1, y - 1, w + 2, 2, '#4682b8');
+  R(x + w / 2 - 6, y + 4, 12, 2, '#1c3a57');
+  R(x + 4, y + 11, w - 8, 4, '#d8463b'); R(x + 6, y + 12, w - 12, 2, '#f08a7a');
+}
+function drawPallet(count) {
+  const px = PALLET.x, py = PALLET.y;
+  R(px - 2, py, 40, 3, '#6b4a2e'); R(px - 2, py + 3, 40, 2, '#4a3220'); R(px, py + 5, 3, 3, '#4a3220'); R(px + 32, py + 5, 3, 3, '#4a3220');
+  const vis = Math.min(20, Math.ceil(count / 3));
+  for (let k = 0; k < vis; k++) {
+    const col = k % 4, row = Math.floor(k / 4), bx = px + col * 9 + (row % 2 ? 2 : 0) - 1, by = py - 7 - row * 6;
+    R(bx, by, 9, 3, C.kraftTop); R(bx, by + 3, 9, 4, C.kraft); R(bx + 8, by + 3, 1, 4, C.kraftDark); R(bx + 4, by, 2, 3, C.tape);
+  }
+}
+function drawGauge(nowMs) {
+  const cx = 96, y = PY3 + beltW() / 2 + 14, span = 20, pz = Math.round(WIN_P / WIN_M * span);
+  R(cx - span - 2, y, span * 2 + 5, 5, '#0c0a09');
+  R(cx - pz, y + 1, pz * 2 + 1, 3, '#24402a');
+  R(cx, y - 1, 1, 7, '#8a7f72');
+  FX.marks = FX.marks.filter(m => nowMs - m.at < 2500);
+  for (const m of FX.marks) {
+    g.globalAlpha = 1 - (nowMs - m.at) / 2500;
+    R(cx + Math.round(Math.max(-1, Math.min(1, m.d / WIN_M)) * span), y - 1, 1, 7, m.c);
+  }
+  g.globalAlpha = 1;
+}
+function spawn(x, y, count, colors, vx0, vx1, vy0, vy1, grav = 320, life = 700, size = [2, 1]) {
+  const at = performance.now();
+  for (let k = 0; k < count; k++) FX.particles.push({ x, y, vx: lerp(vx0, vx1, Math.random()), vy: lerp(vy0, vy1, Math.random()), at, c: colors[k % colors.length], grav, life, size });
+}
+function spawnBits(count, lane = 0) { spawn(SCAN_X + 1, PY3 + laneD(lane) - 8, count, ['#ffe9a8', '#efe6d2', '#efe6d2'], -40, 40, -95, -40); }
+function drawParticles(nowMs) {
+  FX.particles = FX.particles.filter(p => nowMs - p.at < p.life);
+  for (const p of FX.particles) {
+    const a = (nowMs - p.at) / 1000;
+    g.globalAlpha = 1 - (nowMs - p.at) / p.life;
+    R(p.x + p.vx * a, p.y + p.vy * a + 0.5 * p.grav * a * a, p.size[0], p.size[1], p.c);
+  }
+  g.globalAlpha = 1;
+}
+// scanner: a light curtain across the last run, a post on each side of the belt
+function drawScannerPost(far) {
+  const y = far ? PY3 - beltW() / 2 - 2 : PY3 + beltW() / 2 + 3;
+  R(SCAN_X - 1, y - 12, 3, 13, far ? '#555a5f' : '#7b8288'); R(SCAN_X - 2, y - 14, 5, 3, far ? '#6a7075' : '#9aa1a6');
+}
+function drawLaser(nowMs, holdLanes) {
+  const bw = beltW(), mAge = nowMs - FX.lastMiss, flash = Math.max(0, 1 - (nowMs - lastGood) / 160);
+  const lanes = L.lanes === 2 ? [0, 1] : [0];
+  for (const lane of lanes) {
+    const y0 = L.lanes === 2 ? (lane === 1 ? PY3 - bw / 2 : PY3) : PY3 - bw / 2, len = L.lanes === 2 ? bw / 2 : bw;
+    const good = (FX.goodLane === lane && flash > 0) || holdLanes.has(lane);
+    const missF = FX.missLane === lane && (FX.missKind === 'pass' ? mAge < 420 && mAge % 210 < 120 : mAge < 220);
+    const col = missF ? '#ff2a1a' : good ? C.ok : C.laser;
+    g.globalAlpha = 0.28 + (good ? 0.3 : 0) + (missF ? 0.35 : 0); R(SCAN_X - (missF ? 3 : 2), y0 - 6, missF ? 7 : 5, len + 6, col); g.globalAlpha = 1;
+    R(SCAN_X, y0 - 6, 1, len + 6, missF ? '#ffd0c8' : col);
+  }
+}
+
+let rings = [];
+const darkBuf = document.createElement('canvas'); darkBuf.width = W; darkBuf.height = H;
+function drawScene(t, bt, active, nowMs) {
+  g.save();
+  if (!reduce && nowMs < FX.shakeUntil) g.translate(Math.round(Math.random() * 2 - 1), Math.round(Math.random() * 2 - 1));
+  g.drawImage(bg, 0, 0);
+  drawLights(bt, t, active);
+  const lanes = L.lanes === 2 ? [0, 1] : [0];
+  const poses = lanes.map(lane => { const p = partnerPose(t, bt, active, lane); p.nod = FX.react[lane].type === 'nod' && nowMs - FX.react[lane].at < 130 ? 1 : 0; return p; });
+  const local = p => ({ ...p, hand: { x: p.hand.x - p.ox, y: p.hand.y } });
+  // partners: lane 1 stands behind the first run, lane 0 beside the belt start
+  if (lanes.length === 2) { g.save(); g.translate(laneOX(1), -4); drawPartnerBody(L.partners[1], local(poses[1]), nowMs, active); g.restore(); }
+  drawLegs(L.partners[0], poses[0]);
+  drawPartnerBody(L.partners[0], local(poses[0]), nowMs, active);
+  drawScannerPost(true);
+  const beltT = active ? t : bt;
+  drawBelt(beltT, active);
+  let delivered = 0, binned = 0;
+  const holdLanes = new Set(), falling = [], boxes = [];
+  if (active) {
+    for (const n of notes) {
+      if (t < n.place) break;
+      if (n.len) {
+        const tail = sAt(n, t) - n.rate * (n.end - n.arr);
+        if (tail > PATH_LEN - 4) { if (n.state === 'hit') delivered++; else binned++; continue; }
+        if (n.state === 'holding') holdLanes.add(n.lane);
+        drawCrate(n, t);
+        continue;
+      }
+      const s = sAt(n, t);
+      if (n.state === 'miss') {
+        const f = missFall(n, t);
+        if (f) {
+          if (f.landed) {
+            binned++;
+            if (!n.binSfx) {
+              n.binSfx = true; FX.binHit = nowMs; FX.shakeUntil = nowMs + 110;
+              if (ctx) thud(ctx.currentTime, 0.6);
+              spawn(BIN.x + BIN.w / 2, BIN.y - 2, 8, ['#8a7a68', '#6d6052', '#efe6d2'], -35, 35, -60, -20, 200, 500);
+            }
+          } else falling.push([n, f]);
+          continue;
+        }
+      }
+      if (s > PATH_LEN - 4) { if (n.state === 'hit') delivered++; continue; }
+      const p = lanePt(s, laneD(n.lane));
+      const hop = n.state === 'hit' ? Math.round((n.judge === 'perfect' ? 4 : 2) * Math.exp(-(t - n.hitAt) * 14)) : 0;
+      const ja = n.missKind === 'bad' ? t - n.hitAt : 9;
+      const jolt = ja < 0.35 ? Math.round(Math.sin(ja * 70) * 2.5 * Math.exp(-ja * 8)) : 0;
+      boxes.push([p.y, n, p.x + jolt, p.y + 3 - hop]);
+    }
+    boxes.sort((a, b) => a[0] - b[0]);
+    for (const [, n, x, y] of boxes) drawBox(n, x, y, n.state, t);
+  }
+  drawLaser(nowMs, holdLanes);
+  drawScannerPost(false);
+  drawGauge(nowMs);
+  drawPallet(delivered);
+  drawBin(binned, nowMs);
+  for (const [n, f] of falling) { g.save(); g.translate(f.x, f.y - n.h / 2); g.rotate(f.rot); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); }
+  for (const p of poses) if (p.carry) drawBox(p.carry.n, p.carry.x, p.carry.y, '', t);
+  poses.forEach((p, i) => {
+    const pid = L.partners[i];
+    g.save(); if (i === 1) g.translate(laneOX(1), -4);
+    drawPartnerArmOf(pid, i === 1 ? { ...local(p), hand: { x: p.hand.x - p.ox, y: p.hand.y + 4 } } : local(p));
+    g.restore();
+  });
+  drawPlayer(nowMs);
+  const kL = Math.max(0, 1 - (nowMs - lastPressL) / 140), kR = Math.max(0, 1 - (nowMs - lastPressR) / 140);
+  drawPlayerArms(nowMs, kL, kR, nowMs - lastHeavy < 260);
+  rings = rings.filter(r => nowMs - r.at < 420);
+  for (const r of rings) {
+    const a = (nowMs - r.at) / 420, s = 5 + a * 26, cy = PY3 + laneD(r.lane) - 4;
+    g.globalAlpha = 1 - a; g.strokeStyle = r.c; g.lineWidth = 1;
+    g.strokeRect(Math.round(SCAN_X - s) + 0.5, Math.round(cy - s * 0.6) + 0.5, Math.round(s * 2), Math.round(s * 1.2));
+    g.globalAlpha = 1;
+  }
+  drawParticles(nowMs);
+  const dark = active ? blackoutAmount(t) : 0;
+  if (dark > 0) {
+    const d = darkBuf.getContext('2d');
+    d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, W, H);
+    d.fillStyle = `rgba(4,2,2,${0.93 * dark})`; d.fillRect(0, 0, W, H);
+    d.globalCompositeOperation = 'destination-out';
+    const hole = (x, y, r0, r1, a) => { const gr = d.createRadialGradient(x, y, r0, x, y, r1); gr.addColorStop(0, `rgba(0,0,0,${a})`); gr.addColorStop(0.55, `rgba(0,0,0,${a * 0.85})`); gr.addColorStop(1, 'rgba(0,0,0,0)'); d.fillStyle = gr; d.fillRect(x - r1, y - r1, r1 * 2, r1 * 2); };
+    hole(SCAN_X, PY3 - 2, 4, 34, 1);
+    hole(SCAN_X - 4, 300, 4, 34, 0.5);
+    lanes.forEach(lane => hole(BOSS_X + laneOX(lane), 118, 2, 30, 0.35));
+    g.drawImage(darkBuf, 0, 0);
+    const pulse = 0.05 + 0.05 * Math.sin(nowMs / 160);
+    g.fillStyle = `rgba(220,30,20,${pulse * dark})`; g.fillRect(0, 0, W, H);
+    R(86, 2, 44, 3, `rgba(255,60,40,${(0.5 + 0.5 * Math.sin(nowMs / 160)) * dark})`);
+  }
+  const mAge = nowMs - FX.lastMiss;
+  if (mAge < 320) {
+    const a = (1 - mAge / 320) * 0.4;
+    g.fillStyle = `rgba(210,30,20,${a})`;
+    g.fillRect(0, 0, W, 5); g.fillRect(0, H - 5, W, 5); g.fillRect(0, 5, 5, H - 10); g.fillRect(W - 5, 5, 5, H - 10);
+    g.fillStyle = `rgba(210,30,20,${a * 0.45})`;
+    g.fillRect(5, 5, W - 10, 5); g.fillRect(5, H - 10, W - 10, 5); g.fillRect(5, 10, 5, H - 20); g.fillRect(W - 10, 10, 5, H - 20);
+  }
+  g.restore();
+}
+
+// ---------- audio ----------
+let ctx = null, bus = null, mus = null, musF = null, nbuf = null, hum = null, holdOsc = null;
+function ensureAudio() {
+  if (!ctx) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const comp = ctx.createDynamicsCompressor();
+    bus = ctx.createGain(); bus.gain.value = 0.7; bus.connect(comp); comp.connect(ctx.destination);
+    musF = ctx.createBiquadFilter(); musF.type = 'lowpass'; musF.frequency.value = 20000; musF.Q.value = 0.8;
+    mus = ctx.createGain(); mus.connect(musF); musF.connect(bus);
+    nbuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+    const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  if (ctx.state !== 'running') ctx.resume();
+}
+function env(gn, t, a, peak, dec) { gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(peak, t + a); gn.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); }
+function osc(type, f, t, a, peak, dec, dest = mus) {
+  const o = ctx.createOscillator(), gn = ctx.createGain(); o.type = type; o.frequency.setValueAtTime(f, t);
+  env(gn, t, a, peak, dec); o.connect(gn); gn.connect(dest); o.start(t); o.stop(t + a + dec + 0.05); return o;
+}
+function noise(t, type, freq, peak, dec, q = 0.7, dest = mus) {
+  const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), gn = ctx.createGain();
+  s.buffer = nbuf; f.type = type; f.frequency.value = freq; f.Q.value = q; env(gn, t, 0.002, peak, dec);
+  s.connect(f); f.connect(gn); gn.connect(dest); s.start(t, Math.random() * 0.5); s.stop(t + dec + 0.05);
+}
+const kick = (t, v = 0.9) => { const o = osc('sine', 150, t, 0.003, v, 0.28); o.frequency.exponentialRampToValueAtTime(42, t + 0.13); };
+const snare = (t, v = 0.32) => { noise(t, 'highpass', 1500, v, 0.14); osc('triangle', 190, t, 0.002, v * 0.55, 0.08); };
+const hat = (t, v) => noise(t, 'highpass', 7500, v, 0.035);
+const rim = (t, v) => noise(t, 'bandpass', 2600, v, 0.03, 4);
+const conga = (t, f, v) => { const o = osc('sine', f, t, 0.002, v, 0.12); o.frequency.exponentialRampToValueAtTime(f * 0.7, t + 0.1); };
+const crash = t => noise(t, 'highpass', 4000, 0.22, 1.4);
+const thud = (t, v = 1) => { noise(t, 'lowpass', 380, 0.9 * v, 0.1, 0.7, bus); const o = osc('sine', 90, t, 0.002, 0.35 * v, 0.12, bus); o.frequency.exponentialRampToValueAtTime(52, t + 0.1); };
+function bass(t, f, d, cut = 520) {
+  const o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
+  o.type = 'sawtooth'; o.frequency.value = f; fl.type = 'lowpass'; fl.frequency.value = cut; fl.Q.value = 3;
+  env(gn, t, 0.01, 0.2, d); o.connect(fl); fl.connect(gn); gn.connect(mus); o.start(t); o.stop(t + d + 0.05);
+}
+function pad(t, fs, d, type = 'sawtooth', vol = 0.03) {
+  const fl = ctx.createBiquadFilter(), gn = ctx.createGain(); fl.type = 'lowpass'; fl.frequency.value = 1000;
+  gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(vol, t + 0.3); gn.gain.setValueAtTime(vol, t + Math.max(0.31, d - 0.3)); gn.gain.linearRampToValueAtTime(0, t + d);
+  fl.connect(gn); gn.connect(mus);
+  fs.forEach(f => [-7, 7].forEach(dt => { const o = ctx.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = dt; o.connect(fl); o.start(t); o.stop(t + d + 0.05); }));
+}
+const stab = (t, fs, d) => fs.forEach(f => { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 1800; fl.connect(mus); osc('square', f, t, 0.004, 0.035, d, fl); });
+const lead = (t, f, d, type = 'triangle') => osc(type, f, t, 0.005, 0.07, d);
+const beep = (t, f) => { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 4200; fl.connect(bus); osc('square', f, t, 0.002, 0.09, 0.06, fl); };
+const buzz = t => { osc('sawtooth', 98, t, 0.004, 0.1, 0.18, bus); osc('square', 104, t, 0.004, 0.05, 0.16, bus); };
+const errBeep = t => { osc('square', 330, t, 0.002, 0.07, 0.07, bus); osc('square', 247, t + 0.11, 0.002, 0.07, 0.1, bus); };
+const comboBreak = t => { const o = osc('sawtooth', 523, t, 0.005, 0.06, 0.4, bus); o.frequency.exponentialRampToValueAtTime(98, t + 0.4); };
+const glass = t => { noise(t, 'highpass', 5000, 0.28, 0.25, 0.7, bus); for (let k = 0; k < 5; k++) osc('sine', 2400 + Math.random() * 2600, t + k * 0.03, 0.001, 0.04, 0.16, bus); };
+const click = t => noise(t, 'bandpass', 1800, 0.12, 0.02, 3, bus);
+const tear = t => noise(t, 'highpass', 2500, 0.22, 0.12, 0.7, bus);
+const blip = (f) => { if (ctx && ctx.state === 'running') osc('square', f, ctx.currentTime, 0.002, 0.025, 0.025, bus); };
+function muffle() {
+  const t = ctx.currentTime;
+  musF.frequency.cancelScheduledValues(t); musF.frequency.setValueAtTime(450, t); musF.frequency.exponentialRampToValueAtTime(20000, t + 0.55);
+}
+
+// one backing track per partner, built from the same primitives. b = beat index, t = its time, s = seconds per beat there.
+function buildEvents() {
+  const ev = [], chords = L.chords, roots = L.roots, style = L.style;
+  const arp = [0, 1, 2, 1, 0, 2, 1, 2];
+  const total = L.bars.length * 4;
+  for (let b = 0; b < total; b++) {
+    const t = timeAt(b), s = spbAt(t), ci = Math.floor(b / 4) % 4, inBar = b % 4;
+    const quiet = inRange(b, L.quiet), doze = inRange(b, L.doze), phone = inRange(b, L.phone), dark = blackout(b);
+    const E = (dt, fn) => ev.push([t + dt, fn]);
+    if (b < 4) { E(0, T => rim(T, inBar === 0 ? 0.5 : 0.3)); continue; }
+    if (b >= total - 4) continue;
+    // combo layers shared by every track
+    for (let k = 0; k < 4; k++) E(k * s / 4, T => { if (stats.combo >= 8) noise(T, 'highpass', 6000, k % 2 ? 0.035 : 0.06, 0.03); });
+    if (inBar === 0) E(0, T => { if (stats.combo >= 20) { osc('sine', chords[ci][2] * 4, T, 0.003, 0.05, 0.6); osc('sine', chords[ci][0] * 4, T + s / 2, 0.003, 0.035, 0.5); } });
+    if (style === 'straight') {
+      if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4));
+      if (b < 8) { E(s / 2, T => hat(T, 0.06)); continue; }
+      E(0, T => kick(T, quiet ? 0.4 : 0.9));
+      if (!quiet && (inBar === 1 || inBar === 3)) E(0, T => snare(T));
+      E(0, T => hat(T, quiet ? 0.03 : 0.07)); E(s / 2, T => hat(T, quiet ? 0.05 : 0.11));
+      if (quiet) { if (inBar === 0) E(0, T => bass(T, roots[ci], s * 3.5)); }
+      else { E(0, T => bass(T, roots[ci], s * 0.4)); E(s / 2, T => bass(T, inBar === 3 ? roots[ci] * 2 : roots[ci], s * 0.4)); }
+      if ((b >= 24 && b < 40) || (b >= 64 && b < 80)) for (let k = 0; k < 2; k++) { const f = chords[ci][arp[inBar * 2 + k]] * 2; E(k * s / 2, T => lead(T, f, s * 0.4)); }
+    } else if (style === 'offbeat') {
+      if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4, 'triangle', 0.05));
+      if (b < 8) { E(0, T => hat(T, 0.05)); E(s / 2, T => hat(T, 0.09)); continue; }
+      if (inBar === 0 || inBar === 2) E(0, T => kick(T, doze ? 0.5 : 0.85));
+      if (inBar === 1 || inBar === 3) E(0, T => snare(T, doze ? 0.15 : 0.3));
+      E(0, T => hat(T, 0.04)); E(s / 2, T => hat(T, doze ? 0.06 : 0.13));
+      E(s / 2, T => stab(T, chords[ci].map(f => f * 2), s * 0.25));
+      E(s / 2, T => bass(T, roots[ci], s * 0.35, 700));
+      if (b >= 56) E(s / 2 + s / 4, T => lead(T, chords[ci][arp[inBar * 2] ] * 4, s * 0.2, 'square'));
+    } else if (style === 'halftime') {
+      if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4, 'sawtooth', 0.025));
+      if (b < 8) { E(0, T => hat(T, 0.05)); continue; }
+      if (inBar === 0) { E(0, T => kick(T, 1)); E(0, T => bass(T, roots[ci], s * 1.8, 380)); }
+      if (inBar === 2) { E(0, T => snare(T, 0.4)); E(0, T => bass(T, roots[ci], s * 1.2, 380)); }
+      E(0, T => hat(T, 0.05)); E(s / 2, T => hat(T, 0.07));
+      if (b >= 40) E(s / 2, T => rim(T, 0.25));
+      if (b >= 56) E(0, T => lead(T, chords[ci][arp[inBar]] * 2, s * 0.6));
+    } else if (style === 'fast') {
+      if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4, 'triangle', 0.04));
+      if (b < 8) { for (let k = 0; k < 4; k++) E(k * s / 4, T => hat(T, k % 2 ? 0.05 : 0.08)); continue; }
+      if (inBar === 0 || inBar === 2) E(0, T => kick(T, phone ? 0.5 : 0.9));
+      if (inBar === 1) E(s / 2, T => kick(T, 0.6));
+      if (inBar === 1 || inBar === 3) E(0, T => snare(T, phone ? 0.15 : 0.32));
+      for (let k = 0; k < 4; k++) E(k * s / 4, T => hat(T, phone ? 0.03 : (k % 2 ? 0.05 : 0.1)));
+      if (!phone) { E(0, T => bass(T, roots[ci], s * 0.2, 800)); E(s / 2, T => bass(T, roots[ci] * (inBar === 3 ? 1.5 : 1), s * 0.2, 800)); }
+      if (b >= 32 && !phone) for (let k = 0; k < 4; k++) { const f = chords[ci][arp[(inBar * 4 + k) % 8]] * 4; E(k * s / 4, T => lead(T, f, s * 0.18, 'square')); }
+    } else if (style === 'duo') {
+      if (dark) {
+        // power is out: only the partner's thuds, a battery radio hiss and the alarm
+        if (inBar === 0) E(0, T => { osc('sine', 880, T, 0.005, 0.05, 0.25, bus); osc('sine', 880, T + s / 2, 0.005, 0.04, 0.2, bus); });
+        E(0, T => noise(T, 'bandpass', 900, 0.03, s * 0.9, 1.5, bus));
+        continue;
+      }
+      if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4, 'sawtooth', 0.035));
+      if (b < 8) { E(s / 2, T => hat(T, 0.06)); continue; }
+      E(0, T => kick(T, 0.9));
+      if (inBar === 1 || inBar === 3) E(0, T => snare(T));
+      E(0, T => hat(T, 0.07)); E(s / 2, T => hat(T, 0.11));
+      E(0, T => bass(T, roots[ci], s * 0.4)); E(s / 2, T => bass(T, inBar === 3 ? roots[ci] * 2 : roots[ci], s * 0.4));
+      if (b >= 40) E(s / 2, T => stab(T, chords[ci].map(f => f * 2), s * 0.25));
+      if (b >= 80) for (let k = 0; k < 2; k++) { const f = chords[ci][arp[inBar * 2 + k]] * 2; E(k * s / 2, T => lead(T, f, s * 0.4)); }
+    }
+  }
+  if (L.crazy) for (const [cs, ce] of L.crazy) {
+    ev.push([timeAt(cs) - 0.05, T => { const o = osc('sawtooth', 320, T, 0.01, 0.12, 0.7, bus); o.frequency.exponentialRampToValueAtTime(30, T + 0.7); noise(T, 'lowpass', 300, 0.5, 0.25, 0.7, bus); }]);
+    ev.push([timeAt(ce), T => { for (let k = 0; k < 4; k++) noise(T + k * 0.09, 'highpass', 3000, 0.12, 0.03, 0.7, bus); osc('sine', 1760, T + 0.4, 0.005, 0.05, 0.3, bus); }]);
+  }
+  const tEnd = timeAt(total - 4);
+  ev.push([tEnd, T => { kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4); }]);
+  notes.forEach(n => ev.push([n.place, T => thud(T, n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1)]));
+  return ev.sort((a, b) => a[0] - b[0]);
+}
+let events = [], evI = 0, T0 = 0;
+function schedule() {
+  if (state !== 'play' || !ctx) return;
+  const horizon = ctx.currentTime + 0.2;
+  while (evI < events.length && T0 + events[evI][0] < horizon) { const [st, fn] = events[evI++]; fn(Math.max(T0 + st, ctx.currentTime)); }
+}
+setInterval(schedule, 30);
+function startHum() {
+  const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), gn = ctx.createGain();
+  s.buffer = nbuf; s.loop = true; f.type = 'lowpass'; f.frequency.value = 170; gn.gain.value = 0.06;
+  s.connect(f); f.connect(gn); gn.connect(bus); s.start(); hum = s;
+}
+function stopHum() { if (hum) { try { hum.stop(); } catch (e) {} hum = null; } }
+function startHold() {
+  stopHold(); holdOsc = ctx.createOscillator(); const gn = ctx.createGain();
+  holdOsc.type = 'triangle'; holdOsc.frequency.value = 1320; gn.gain.value = 0.035; holdOsc.connect(gn); gn.connect(bus); holdOsc.start();
+}
+function stopHold() { if (holdOsc) { try { holdOsc.stop(); } catch (e) {} holdOsc = null; } }
+
+function songAt(perfMs) {
+  if (!ctx) return -99;
+  if (ctx.getOutputTimestamp) {
+    const ts = ctx.getOutputTimestamp();
+    if (ts.contextTime > 0 && ts.performanceTime > 0) return ts.contextTime + (perfMs - ts.performanceTime) / 1000 - T0;
+  }
+  return ctx.currentTime - (ctx.outputLatency || ctx.baseLatency || 0) + (perfMs - performance.now()) / 1000 - T0;
+}
+
+// ---------- game state ----------
+let state = 'title', stats = null, lastGood = -1e9, lastHeavy = -1e9, heavyPend = null;
+let offsetMs = 0;
+try { offsetMs = parseInt(localStorage.getItem('belt.offset') || '0', 10) || 0; } catch (e) {}
+const syncVal = $('sync-val');
+const showSync = () => { syncVal.textContent = (offsetMs > 0 ? '+' : '') + offsetMs + ' ms'; };
+const setSync = v => { offsetMs = Math.max(-200, Math.min(200, v)); showSync(); try { localStorage.setItem('belt.offset', String(offsetMs)); } catch (e) {} };
+$('sync-minus').addEventListener('click', () => setSync(offsetMs - 10));
+$('sync-plus').addEventListener('click', () => setSync(offsetMs + 10));
+showSync();
+let progress = {};
+try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}; } catch (e) {}
+
+function resetRun() {
+  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; });
+  FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null;
+  stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
+  rings = []; heavyPend = null;
+}
+loadLevel(LEVELS[0]); resetRun();
+
+const judgeEl = $('judge');
+function popJudge(kind, sub = '', lane = 0) {
+  const map = { perfect: ['딱!', 'perfect'], good: ['좋아', 'good'], miss: ['놓침', 'miss'], done: ['스캔 완료', 'perfect'], broken: ['깨짐', 'miss'] };
+  const [txt, cls] = map[kind];
+  judgeEl.className = 'judge ' + cls;
+  judgeEl.innerHTML = '';
+  judgeEl.append(txt);
+  if (sub) { const s = document.createElement('small'); s.textContent = sub; judgeEl.append(s); }
+  void judgeEl.offsetWidth; judgeEl.classList.add('pop');
+}
+function ring(c, lane = 0) { rings.push({ at: performance.now(), c, lane }); }
+function addCombo() {
+  stats.combo++; stats.maxCombo = Math.max(stats.maxCombo, stats.combo);
+  if (stats.combo % 10 === 0) {
+    FX.playerNod = performance.now();
+    comboEl.classList.remove('pulse'); void comboEl.offsetWidth; comboEl.classList.add('pulse');
+    return stats.combo + ' 콤보';
+  }
+  return '';
+}
+function failFx(kind, judgeKind, sub, d, lane = 0) {
+  const now = performance.now(), lost = stats.combo;
+  stats.combo = 0; stats.missStreak++;
+  popJudge(judgeKind, lost >= 10 ? lost + ' 콤보 끊김' : sub, lane);
+  FX.lastMiss = now; FX.missKind = kind; FX.missLane = lane; FX.react[lane] = { type: 'glance', at: now }; FX.flinch = now;
+  if (d != null) FX.marks.push({ d, at: now, c: C.laser });
+  if (ctx) {
+    if (kind === 'pass') errBeep(ctx.currentTime); else if (kind === 'broken') glass(ctx.currentTime); else buzz(ctx.currentTime);
+    muffle();
+    if (lost >= 10) comboBreak(ctx.currentTime + 0.06);
+  }
+  if (lost >= 10) { comboEl.classList.remove('pulse', 'broke'); void comboEl.offsetWidth; comboEl.classList.add('broke'); }
+  if (stats.missStreak === 3) sayNow(L.comfort[0]);
+  else if (stats.missStreak === 6) sayNow(L.comfort[1]);
+}
+function registerMiss(sub, d, kind, lane = 0) { stats.miss++; failFx(kind, 'miss', sub, d, lane); }
+function sayNow(text) { FX.bossLine = { text, until: songAt(performance.now()) + 2.6 * SPB }; }
+
+function isSpecial(n) {
+  const [, kind, , range] = L.special;
+  return kind === 'range' ? n.beat >= range[0] && n.beat < range[1] : !!n[kind];
+}
+function specialTotal() { return notes.filter(isSpecial).length; }
+
+// closest pending note inside the window, so dense 16th charts never hand a press to the wrong box
+function findTarget(t, lane) {
+  let best = null, bd = Infinity;
+  for (const n of notes) {
+    if (n.state !== 'pending' || n.lane !== lane) continue;
+    const d = t - n.arr;
+    if (d > WIN_M) continue;
+    if (d < -WIN_M) break;
+    if (Math.abs(d) < bd) { bd = Math.abs(d); best = n; }
+  }
+  return best;
+}
+function judgeNote(target, t) {
+  const d = t - target.arr, ad = Math.abs(d);
+  target.hitAt = t;
+  if (ad <= WIN_G) {
+    const j = ad <= WIN_P ? 'perfect' : 'good', now = performance.now();
+    target.judge = j; stats[j]++; stats.missStreak = 0;
+    const milestone = addCombo();
+    const tones = CHORDS[Math.floor(Math.max(0, target.beat) / 4) % 4];
+    if (j === 'perfect') { const f = tones[stats.combo % 3] * 4; beep(ctx.currentTime, f); osc('triangle', f * 2, ctx.currentTime, 0.002, 0.035, 0.14, bus); }
+    else beep(ctx.currentTime, tones[0] * 4);
+    lastGood = now; FX.goodLane = target.lane; ring(j === 'perfect' ? C.ok : '#ffe9a8', target.lane);
+    spawnBits(j === 'perfect' ? 7 : 3, target.lane);
+    FX.marks.push({ d, at: now, c: j === 'perfect' ? C.ok : '#ffe9a8' });
+    if (isSpecial(target)) stats.special++;
+    if (target.late) FX.react[target.lane] = { type: 'relief', at: now };
+    else if (j === 'perfect') FX.react[target.lane] = { type: 'nod', at: now };
+    if (target.heavy) { lastHeavy = now; FX.shakeUntil = now + 90; thud(ctx.currentTime, 0.5); }
+    const dark = blackout(target.beat);
+    popJudge(j, milestone || (dark ? '소리로' : target.heavy ? '두 손' : j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''), target.lane);
+    if (target.len) { target.state = 'holding'; startHold(); } else target.state = 'hit';
+    if (target.i === notes.length - 1 && j === 'perfect') FX.shakeUntil = now + 220;
+  } else { target.state = 'miss'; target.missKind = 'bad'; registerMiss(d < 0 ? '너무 빠름' : '너무 늦음', d, 'bad', target.lane); }
+}
+// heavy boxes need two different keys inside a short window; one hand alone drops it
+function onHit(ts, key, lane = 0) {
+  const t = songAt(ts) - offsetMs / 1000;
+  if (heavyPend) {
+    const hp = heavyPend;
+    if (hp.key !== key && performance.now() - hp.at < 110) { clearTimeout(hp.timer); heavyPend = null; judgeNote(hp.n, hp.t); return; }
+  }
+  const target = findTarget(t, lane);
+  if (!target) { click(ctx.currentTime); return; }
+  if (target.heavy) {
+    if (heavyPend && heavyPend.n === target) return;
+    heavyPend = { n: target, t, key, at: performance.now(), timer: setTimeout(() => {
+      if (heavyPend && heavyPend.n === target && target.state === 'pending') { heavyPend = null; target.state = 'miss'; target.missKind = 'bad'; target.hitAt = t; registerMiss('두 손으로!', null, 'bad'); }
+    }, 110) };
+    return;
+  }
+  judgeNote(target, t);
+}
+function completeHold(n) {
+  const now = performance.now();
+  n.state = 'hit'; n.doneAt = songAt(now); stats.tailOk++; const milestone = addCombo(); stopHold();
+  beep(ctx.currentTime, 2093); tear(ctx.currentTime);
+  lastGood = now; FX.goodLane = n.lane; ring(C.ok, n.lane); spawnBits(10, n.lane); FX.shakeUntil = now + 150; FX.react[n.lane] = { type: 'nod', at: now };
+  popJudge('done', milestone, n.lane);
+}
+function onRelease(ts, lane = 0) {
+  const t = songAt(ts) - offsetMs / 1000;
+  for (const n of notes) {
+    if (n.state !== 'holding' || n.lane !== lane) continue;
+    if (t >= n.end - 0.12) completeHold(n);
+    else {
+      n.state = 'broken'; n.brokeAt = t; stats.tailBroken++; stopHold();
+      spawn(SCAN_X - 2, PY3 + laneD(lane) - 8, 12, ['#d8eef5', '#ffffff', '#9fc6d4'], -60, 60, -110, -40, 360);
+      failFx('broken', 'broken', '너무 일찍 뗌', null, lane);
+    }
+  }
+}
+function judgeTick(t) {
+  const tt = t - offsetMs / 1000;
+  for (const n of notes) {
+    if (n.state === 'pending' && tt - n.arr > WIN_M) { n.state = 'miss'; n.hitAt = tt; n.missKind = 'pass'; registerMiss('지나감', null, 'pass', n.lane); }
+    else if (n.state === 'holding' && tt >= n.end) completeHold(n);
+  }
+}
+
+// ---------- overlays ----------
+const hud = $('hud'), clockEl = $('clock'), comboEl = $('combo'), bubble = $('bubble'), hint = $('hint');
+let lastClock = '', lastCombo = -1, lastSay = '', lastHint = '';
+function updateHud(t) {
+  const beat = beatAt(t);
+  const [hh, mm] = L.clock.split(':').map(Number);
+  const mins = mm + Math.max(0, Math.floor(beat / 4)), c = `B동 3번 라인 · ${String(hh + Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+  if (c !== lastClock) { clockEl.textContent = c; lastClock = c; }
+  if (stats.combo !== lastCombo) { comboEl.textContent = '콤보 ' + stats.combo; comboEl.classList.toggle('hot', stats.combo >= 10); lastCombo = stats.combo; }
+  const line = L.say.find(([b, , d]) => beat >= b && beat < b + d);
+  const s = line ? line[1] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.text : '';
+  if (s !== lastSay) {
+    bubble.textContent = s; bubble.hidden = !s; lastSay = s;
+    const lane = line ? (line[3] || 0) : 0;
+    bubble.style.left = lane === 1 ? '14cqw' : '3cqw';
+  }
+  let h = '';
+  if (L.tutorial) for (let i = 0; i < 3; i++) { const n = notes[i]; if (n && n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 터치'; break; } }
+  const hintFor = (key, text, holdText) => {
+    const n = firstWith(key); if (!n) return;
+    if (n.state === 'pending' && t > n.place - (key === 'ghost' ? 0 : 0)) h = text;
+    if (holdText && n.state === 'holding') h = holdText;
+  };
+  hintFor('len', '앞이 닿으면 누르고, 끝까지 유지', '유지…');
+  hintFor('heavy', '중량물: 왼손 + 오른손 동시에');
+  if (L.id === 'jiwoo') {
+    if (notes[4] && notes[4].state === 'pending' && t > notes[4].place) h = '머리 끄덕 다음에 손. 그 사이에 터치';
+    const fl = firstWith('late'); if (fl && fl.state === 'pending' && t > fl.place) h = '지우가 졸아요. 손이 늦어요. 손을 봐요';
+  }
+  if (L.id === 'sunja') { const n = notes.find(x => x.beat % 1 === 0.25 || x.beat % 1 === 0.75); if (n && n.state === 'pending' && t > n.place - 0.3) h = '탁탁: 손목으로 두 번'; }
+  if (L.lanes === 2) {
+    const f1 = notes.find(n => n.lane === 1);
+    if (notes[0].state === 'pending' && t > notes[0].place) h = '주황 테이프 = 왼손';
+    if (f1 && f1.state === 'pending' && t > f1.place) h = '연두 테이프 = 오른손';
+    if (blackout(beat)) h = '정전! 툭 소리 한 마디 뒤에 터치';
+  }
+  if (h !== lastHint) { hint.textContent = h; hint.hidden = !h; lastHint = h; }
+}
+
+const dialogEl = $('dialog'), whoEl = $('who'), textEl = $('dtext');
+let dlg = null, typeTimer = null;
+function runDialog(lines, done) { dlg = { lines, i: 0, done, n: 0, full: '' }; dialogEl.hidden = false; showLine(); }
+function showLine() {
+  const L_ = dlg.lines[dlg.i], robot = L_.who === 'AS-7';
+  whoEl.textContent = L_.who; whoEl.hidden = !L_.who; whoEl.classList.toggle('robot', robot);
+  textEl.classList.toggle('narr', !L_.who); textEl.classList.toggle('robot', robot);
+  dlg.full = L_.text; dlg.n = 0; clearInterval(typeTimer);
+  if (reduce) { dlg.n = L_.text.length; textEl.textContent = L_.text; return; }
+  textEl.textContent = '';
+  const pitch = { '반장': 220, '지우': 392, '박씨': 196, '순자 이모': 440 }[L_.who] || 330;
+  typeTimer = setInterval(() => {
+    if (!dlg) return clearInterval(typeTimer);
+    dlg.n++; textEl.textContent = dlg.full.slice(0, dlg.n);
+    if (L_.who && dlg.n % 3 === 0) blip(pitch);
+    if (dlg.n >= dlg.full.length) clearInterval(typeTimer);
+  }, robot ? 22 : 32);
+}
+function advanceDialog() {
+  if (!dlg) return;
+  if (dlg.n < dlg.full.length) { clearInterval(typeTimer); dlg.n = dlg.full.length; textEl.textContent = dlg.full; return; }
+  dlg.i++;
+  if (dlg.i >= dlg.lines.length) { const d = dlg.done; dlg = null; dialogEl.hidden = true; d(); }
+  else showLine();
+}
+$('skip').addEventListener('click', e => {
+  e.stopPropagation(); if (!dlg) return;
+  clearInterval(typeTimer); const d = dlg.done; dlg = null; dialogEl.hidden = true; d();
+});
+
+// attendance board
+const cardsEl = $('cards');
+function buildCards() {
+  cardsEl.innerHTML = '';
+  LEVELS.forEach((lv, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'card'; b.style.setProperty('--tilt', ((i * 7) % 5 - 2) * 0.5 + 'deg');
+    const c = document.createElement('canvas'); c.width = 40; c.height = 64;
+    const info = document.createElement('div'); info.className = 'info';
+    const name = document.createElement('span'); name.className = 'name'; name.textContent = lv.who;
+    const role = document.createElement('span'); role.className = 'role'; role.textContent = lv.role;
+    const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = `${lv.tag} · ${lv.bpm}${lv.tempo ? '+' : ''} BPM`;
+    info.append(name, role, tag);
+    b.append(c, info);
+    if (progress[lv.id] != null) { const best = document.createElement('span'); best.className = 'best'; best.textContent = (progress[lv.id] * 100).toFixed(0) + '%'; b.append(best); }
+    b.addEventListener('click', e => { e.stopPropagation(); beginShift(lv); });
+    cardsEl.append(b);
+    // portrait: the same partner drawing, offset into the small canvas
+    const saved = g; g = c.getContext('2d'); g.fillStyle = '#2a211c'; g.fillRect(0, 0, 40, 64);
+    const savedL = L; L = lv;
+    lv.partners.forEach((pid, k) => {
+      const P = PARTNERS[pid], n = lv.partners.length;
+      g.save(); g.translate((n === 2 ? 11 + k * 18 : 20) - BOSS_X, 8 - P.base);
+      const pose = { hand: { x: BOSS_X + 13, y: P.base + 44 }, carry: null, wince: false, dip: 0, bob: 0, nod: 0, doze: false, phone: false, lane: 0, ox: 0 };
+      P.draw(pose, 0, false); P.arm(pose); g.restore();
+    });
+    L = savedL; g = saved;
+  });
+}
+function openBoard() { ensureAudio(); state = 'select'; $('title').hidden = true; $('result').hidden = true; dialogEl.hidden = true; buildCards(); $('select').hidden = false; }
+
+function beginShift(level) {
+  ensureAudio(); loadLevel(level); resetRun(); handLabels();
+  $('title').hidden = true; $('result').hidden = true; $('select').hidden = true; state = 'intro';
+  runDialog(level.intro, startPlay);
+}
+function startPlay() {
+  ensureAudio(); resetRun();
+  $('title').hidden = true; $('result').hidden = true; $('select').hidden = true;
+  events = buildEvents(); evI = 0; T0 = ctx.currentTime + 0.8;
+  lastClock = ''; lastCombo = -1; lastSay = ''; lastHint = '';
+  musF.frequency.cancelScheduledValues(ctx.currentTime); musF.frequency.setValueAtTime(20000, ctx.currentTime);
+  hud.hidden = false; state = 'play'; startHum();
+}
+function accuracy() { return (stats.perfect + stats.good * 0.6 + stats.tailOk) / (notes.length + notes.filter(n => n.len).length); }
+function finishPlay() {
+  state = 'outro'; stopHum(); stopHold(); bubble.hidden = true; hint.hidden = true;
+  const acc = accuracy();
+  try { if ((progress[L.id] || 0) < acc) { progress[L.id] = acc; localStorage.setItem('belt.progress', JSON.stringify(progress)); } } catch (e) {}
+  runDialog(L.outro(acc >= 0.8, stats.special), showResult);
+}
+let runNo = 0;
+function showResult() {
+  state = 'result'; hud.hidden = true; runNo++;
+  const acc = accuracy();
+  $('r-no').textContent = 'B03-' + L.clock.replace(':', '') + '-' + String(runNo).padStart(4, '0');
+  $('r-title').textContent = L.title;
+  $('r-from').textContent = `${L.who} · 3번 라인`;
+  $('r-counts').textContent = `딱 ${stats.perfect} · 좋아 ${stats.good} · 놓침 ${stats.miss + stats.tailBroken}`;
+  $('r-combo').textContent = stats.maxCombo;
+  $('r-special-k').textContent = L.special[0];
+  $('r-special').textContent = `${stats.special} / ${specialTotal()} ${L.special[2]}`;
+  $('r-acc').textContent = (acc * 100).toFixed(1) + '%';
+  $('r-stamp').textContent = acc >= 0.9 ? '완벽 페어' : acc >= 0.75 ? '정상 처리' : acc >= 0.5 ? '재확인' : '재작업';
+  $('result').hidden = false;
+  $('retry').focus({ preventScroll: true });
+}
+$('start').addEventListener('click', e => { e.stopPropagation(); openBoard(); });
+$('retry').addEventListener('click', e => { e.stopPropagation(); startPlay(); });
+$('again').addEventListener('click', e => { e.stopPropagation(); beginShift(L); });
+$('board').addEventListener('click', e => { e.stopPropagation(); openBoard(); });
+
+// ---------- input ----------
+// held maps an input id (key code or pointer) to the lane it pressed. Left hand = F/D, left half of the pad or screen.
+const held = new Map();
+const LEFT_KEYS = new Set(['KeyF', 'KeyD']);
+const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyD', 'KeyK']);
+const padEl = $('pad'), halves = { L: $('halfL'), R: $('halfR') };
+let lastPressL = -1e9, lastPressR = -1e9;
+function laneOf(side) { return L.lanes === 2 ? (side === 'L' ? 0 : 1) : 0; }
+function handLabels() {
+  const two = L.lanes === 2;
+  $('subL').innerHTML = two ? `<i></i>${L.partners[0] === 'boss' ? '반장' : '왼쪽'}` : '';
+  $('subR').innerHTML = two ? `<i></i>${L.partners[1] === 'jiwoo' ? '지우' : '오른쪽'}` : '';
+}
+function lightHalf(side, on, x, y) {
+  const el = halves[side];
+  if (x != null) { el.style.setProperty('--x', x + 'px'); el.style.setProperty('--y', y + 'px'); }
+  el.classList.toggle('on', on);
+}
+function sideHeld(side) { for (const k of held.keys()) if (k.startsWith(side + ':')) return true; return false; }
+function pressSide(ts, side, id) {
+  const lane = laneOf(side);
+  held.set(side + ':' + id, lane);
+  if (side === 'L') lastPressL = performance.now(); else lastPressR = performance.now();
+  if (state === 'play') onHit(ts, side, lane);
+  else if (dlg) advanceDialog();
+  else if (state === 'title') openBoard();
+}
+function releaseSide(ts, side, id) {
+  const key = side + ':' + id, lane = held.get(key); if (lane == null) return;
+  held.delete(key);
+  if (!sideHeld(side)) lightHalf(side, false);
+  if (state === 'play' && ![...held.values()].includes(lane)) onRelease(ts, lane);
+}
+const ptrSide = new Map();
+padEl.addEventListener('pointerdown', e => {
+  e.preventDefault(); try { padEl.setPointerCapture(e.pointerId); } catch (err) {}
+  const r = padEl.getBoundingClientRect(), side = e.clientX - r.left < r.width / 2 ? 'L' : 'R';
+  const hr = halves[side].getBoundingClientRect();
+  ptrSide.set(e.pointerId, side); lightHalf(side, true, e.clientX - hr.left, e.clientY - hr.top);
+  pressSide(e.timeStamp, side, 'p' + e.pointerId);
+});
+const padUp = e => { const side = ptrSide.get(e.pointerId); if (!side) return; ptrSide.delete(e.pointerId); releaseSide(e.timeStamp, side, 'p' + e.pointerId); };
+padEl.addEventListener('pointerup', padUp); padEl.addEventListener('pointercancel', padUp);
+addEventListener('keydown', e => {
+  if (!KEYS.has(e.code)) return;
+  const onButton = e.target instanceof Element && e.target.closest('button');
+  if (state !== 'play' && onButton) return;
+  e.preventDefault();
+  if (e.repeat) return;
+  const side = LEFT_KEYS.has(e.code) ? 'L' : 'R';
+  lightHalf(side, true); pressSide(e.timeStamp, side, e.code);
+});
+addEventListener('keyup', e => { if (!KEYS.has(e.code)) return; releaseSide(e.timeStamp, LEFT_KEYS.has(e.code) ? 'L' : 'R', e.code); });
+const stage = $('stage');
+stage.addEventListener('pointerdown', e => {
+  if (e.target instanceof Element && e.target.closest('button, .label, .board')) return;
+  e.preventDefault();
+  const r = stage.getBoundingClientRect(), side = e.clientX - r.left < r.width / 2 ? 'L' : 'R';
+  ptrSide.set(e.pointerId, side); lightHalf(side, true);
+  pressSide(e.timeStamp, side, 'p' + e.pointerId);
+});
+addEventListener('pointerup', padUp); addEventListener('pointercancel', padUp);
+addEventListener('blur', () => { for (const k of [...held.keys()]) { const [side, id] = k.split(':'); releaseSide(performance.now(), side, id); } ptrSide.clear(); });
+
+// ---------- loop ----------
+function frame(now) {
+  requestAnimationFrame(frame);
+  const active = state === 'play';
+  const t = active ? songAt(now) : -99;
+  if (active) {
+    schedule(); judgeTick(t); updateHud(t);
+    if (t > timeAt(END_BEAT)) finishPlay();
+  }
+  drawScene(t, now / 1000, active, now);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
