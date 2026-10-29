@@ -324,31 +324,39 @@ const LEVELS = [
   }
   ,{
     id:'s1-2', stageNo:'1-2', who:'지우', role:'지우 · 116 BPM', tag:'쿵쿵쿵쿵 · 흥얼거림 · 이어폰 빼', bpm:116, div:2, style:'edm1',
-    clock:'02:40', title:'지우의 곡', partners:['jiwoo'], observer:'boss', obsCue: { enter: [76, 82], point: [100, 104.5], soft: 160 },
-    fxTheme: 'neon', preClub: [[40, 72]], hypePhases: [144, 160],
-    // A minor until the drop, then the song turns over into D major (chords 4-7)
+    clock:'02:40', title:'지우의 곡', partners:['jiwoo'], observer:'boss', obsCue: { enter: [76, 82], point: [100, 104.5], soft: 188 },
+    fxTheme: 'neon', preClub: [[40, 72], [112, 136]], hypePhases: [156, 180],
+    // A minor until the drop, then the song turns over into D major (chords 4-7); the second drop starts the cycle again on D
     chords: [...EDM.chords, ...ANTHEM.chords], roots: [...EDM.roots, ...ANTHEM.roots],
-    chordAt: bar => bar < 32 ? ((bar + 2) % 4 + 4) % 4 : 4 + (bar - 32) % 4,
+    chordAt: bar => bar < 35 ? ((bar + 2) % 4 + 4) % 4 : 4 + (bar - (bar >= 45 ? 45 : 35)) % 4,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
-    // 지우's own track plays in her earbuds. vibe: she hums along and her hand drifts late. unplug: 반장 makes her take them out,
-    // no boxes come while she fumbles (4 bars), then she plugs back in for "just this part" (2 bars) and the next box lands on the drop.
-    vibe: [[72, 104], [120, 128]], unplug: [[104, 120]], dim: [[104, 128]], club: [[128, 184]], hype: [[128, 176]], special:['흥얼거릴 때 늦은 상자', 'late', '받아냄'],
+    // 지우's own track plays in her earbuds. vibe: she hums along and her hand drifts late. unplug: 반장 makes her take them out and
+    // she keeps the belt's own beat (straight) while the song builds back up around her; she gives in and plugs back in, the vocal
+    // cuts, one bar of nothing (cut), then the drop. Halfway through the drop the drums fall out (break) and it hits a second time.
+    vibe: [[72, 104], [132, 136]], unplug: [[104, 132]], dim: [[104, 120]], cut: [[136, 140], [179, 180]],
+    club: [[140, 228]], lull: [[172, 180]], hype: [[140, 172], [180, 220]], special:['흥얼거릴 때 늦은 상자', 'late', '받아냄'],
     lateHint: '지우가 흥얼거려요. 손이 늦어요. 손을 봐요',
-    sections: [[0, 'intro'], [2, 'groove'], [10, 'verse'], [18, 'vibe'], [26, 'unplug'], [32, 'drop'], [44, 'outro']],
+    sections: [[0, 'intro'], [2, 'groove'], [10, 'verse'], [18, 'vibe'], [26, 'straight'], [34, 'cut'], [35, 'drop'], [43, 'break'], [45, 'drop'], [55, 'outro']],
     bars: [
       '........', '........',
       'x.......', 'x...x...', 'x...x...', 'x...x...', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x...',
       'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h=..x.x.', 'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h===....',
       'x...x...', 'x...L...', 'x.......', 'L...x...', 'x...L...', '........', 'L...L...', 'x...x...',
-      '........', '........', '........', '........', '........', '........',
-      'x.......', 'x...x...', 'x.......', 'x...x...', 'h===....', 'x...x...', 'x.......', 'x...x...', 'x...x...', 'h===....', 'x...x...', 'x.......',
+      // straight: earbuds out, boxes on the belt's own beat while the song builds
+      'x...x...', 'x...x...', 'x...x...', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x...',
+      '........',
+      'x.......', 'x...x...', 'x.......', 'x...x...', 'h===....', 'x...x...', 'x...x...', 'x.......',
+      'h===....', '........',
+      'x...x...', 'x.......', 'x...x...', 'h===....', 'x...x...', 'x...x...', 'h===....', 'x...x...', 'x...x...', 'x.......',
       '........', '........'
     ],
     // [beat, text, beats shown, lane, speaker] speaker 'b' = 반장 watching from behind the belt
     say: [[1, '(이어폰 꽂고) 쿵, 쿵, 쿵, 쿵.', 5], [30, '이거 제가 만든 곡이에요. 들려요?', 4], [62, '여기서부터 제일 좋아하는 부분이에요.', 4],
           [72, '(흥얼흥얼)', 4], [82.5, '…야. 손 늦는다.', 3, 0, 'b'], [86, '다다, 다다다…', 5],
-          [100, '이어폰 빼!', 3, 0, 'b'], [104, '아, 네, 네… 잠깐만요…', 4], [109, '하나, 둘, 셋, 넷. 벨트 박자.', 7, 0, 'b'],
-          [118, '아, 이 부분만 듣고 뺄게요!', 3.5], [122, '…야!', 2, 0, 'b'], [129, '…허 참.', 3, 0, 'b'], [133, '여기서 곡이 확 바뀌어요! 이거예요 이거!!', 4], [148, '꾹 누르고… 빰!!', 3], [162, '반장님도 까딱하시는 거 다 보여요!', 4], [174, '끝! 어땠어요?', 3]],
+          [100, '이어폰 빼!', 3, 0, 'b'], [104, '…네.', 2], [106, '하나, 둘, 셋, 넷. 벨트 박자.', 6, 0, 'b'], [114, '…벨트 소리로도 되네요.', 3],
+          [120, '(흥얼흥얼… 아, 여기 곧 터지는데…)', 5], [128, '…참자, 참자…', 3], [132, '아, 이 부분만 듣고 뺄게요!', 3.5], [137, '…야!', 2.5, 0, 'b'],
+          [142, '…허 참.', 3, 0, 'b'], [146, '여기서 곡이 확 바뀌어요! 이거예요 이거!!', 4], [160, '꾹 누르고… 빰!!', 3],
+          [174, '(숨 고르고…)', 2.5], [177, '한 번 더 가요!', 2], [196, '반장님도 까딱하시는 거 다 보여요!', 4], [218, '끝! 어땠어요?', 3]],
     comfort: ['괜찮아요! 다시 쿵, 쿵.', '반장님이 손 보래요.'],
     intro: [
       { who:'', text:'이틀째 밤. 3번 라인. 반장님은 사무실에 불려 갔다.' },
@@ -529,7 +537,7 @@ function drawLights(bt, t, active) {
     return (inD ? s > 0.9 : s > 1.93) ? 0.15 : 1;
   });
   const ph = active && t > 0 ? beat - Math.floor(beat) : 1;
-  const club = active && inRange(beat, L.club), lounge = active && inRange(beat, L.lounge), dimK = active && (inRange(beat, L.dim) || inRange(beat, L.tinny) || lounge) ? 0.45 : 1;
+  const club = active && inRange(beat, L.club), lounge = active && inRange(beat, L.lounge), dimK = active && inRange(beat, L.cut) ? 0.1 : active && (inRange(beat, L.dim) || inRange(beat, L.tinny) || lounge) ? 0.45 : 1;
   const pulse = Math.max(0, 1 - ph * (club ? 3 : 5)) * (club ? 0.22 : 0.06);
   g.save(); g.globalCompositeOperation = 'lighter';
   tubes.forEach((x, k) => {
@@ -574,7 +582,7 @@ function drawLounge(bt, beat, ph) {
   g.restore();
 }
 // the club lights fade over the last four beats of the club range instead of cutting
-function clubFade(beat) { const r = (L.club || []).find(([a, z]) => beat >= a && beat < z); return r ? Math.min(1, (r[1] - beat) / 4) : 1; }
+function clubFade(beat) { const r = (L.club || []).find(([a, z]) => beat >= a && beat < z); let k = r ? Math.min(1, (r[1] - beat) / 4) : 1; if (inRange(beat, L.lull)) k *= 0.4; if (inRange(beat, L.cut)) k *= 0.1; return k; }
 const hypeStage = beat => !L.hypePhases ? 1 : beat < L.hypePhases[0] ? 1 : beat < L.hypePhases[1] ? 2 : 3;
 // club lighting grows in three steps through the drop
 function drawClub(bt, beat, ph) {
@@ -1568,35 +1576,42 @@ function buildEvents() {
         for (let k = 0; k < 2; k++) { const nm = hook[inBar * 2 + k]; if (nm) E(k * s / 2, T => whistle(T, N_[nm], s * 0.9, 0.045)); }
         continue;
       }
-      if (sec === 'unplug') {
-        // earbuds out (bars 26-29): no drums at all, just the tinny leak of her track and the belt rollers under 반장's count.
-        // Plugged back in (30-31): the filter opens over two bars while the kick and a snare roll come back; the last beat is a whoosh.
-        const bi = bar - 26, back = bi >= 4;
-        if (bi === 0 && inBar === 0) E(0, T => { musHP.frequency.setValueAtTime(1300, T); musF.frequency.setValueAtTime(3200, T); mus.gain.setValueAtTime(0.22, T); });
-        if (!back) {
-          if (inBar === 0) E(0, T => supersaw(T, chords[ci], s * 4, 0.016, 2200));
-          E(0, T => hat(T, 0.02)); E(s / 2, T => openHat(T, 0.03));
-          for (let k = 0; k < 2; k++) { const nm = hook[inBar * 2 + k]; if (nm) E(k * s / 2, T => pluck(T, N_[nm], s * 0.4, 0.03)); }
-          E(0, T => noise(T, 'bandpass', 950, 0.09, 0.03, 5, bus)); E(s / 2, T => noise(T, 'bandpass', 950, 0.06, 0.03, 5, bus));
-          continue;
-        }
-        if (bi === 4 && inBar === 0) E(0, T => {
-          const T1 = timeAt(127);
-          musHP.frequency.setValueAtTime(1300, T); musHP.frequency.exponentialRampToValueAtTime(20, T1);
-          musF.frequency.setValueAtTime(3200, T); musF.frequency.exponentialRampToValueAtTime(20000, T1);
-          mus.gain.setValueAtTime(0.22, T); mus.gain.linearRampToValueAtTime(1, T1);
-          riser(T, T1 - T, 0.08);
-        });
-        if (bi === 5 && inBar === 3) { E(0, T => whoosh(T, s)); continue; }
-        const per = bi === 4 ? 4 : 8;
-        for (let k = 0; k < per; k++) E(k * s / per, T => snare(T, 0.14 + 0.05 * (bi - 4) + k * 0.01));
-        E(0, T => kick(T, 0.9));
-        if (inBar === 0) E(0, T => supersaw(T, chords[ci], s * 4, 0.016, 3200));
-        E(s / 2, T => bass(T, roots[ci], s * 0.4, 500 + (bi - 4) * 200));
+      if (sec === 'straight') {
+        // earbuds out: 지우 keeps the belt's own beat while the song builds back up around her. The filter sweeps open over eight bars,
+        // the snare roll tightens, a riser climbs, and from the fifth bar she is humming the hook again despite herself.
+        const bi = bar - 26;
+        if (bi === 0 && inBar === 0) E(0, T => { musHP.frequency.setValueAtTime(20, T); musF.frequency.setValueAtTime(500, T); musF.frequency.exponentialRampToValueAtTime(20000, timeAt(136)); mus.gain.setValueAtTime(1, T); });
+        E(0, T => noise(T, 'bandpass', 950, 0.09, 0.03, 5, bus)); E(s / 2, T => noise(T, 'bandpass', 950, 0.06, 0.03, 5, bus));
+        E(0, T => kick(T, bi < 2 ? 0.35 : 0.85 + bi * 0.02));
+        if (bi < 2) continue;
+        if (inBar === 0) E(0, T => pumpPad(T, chords[ci], s, 0.004 + bi * 0.002));
+        if (bi === 2 && inBar === 0) E(0, T => riser(T, timeAt(136) - T, 0.08));
+        E(0, T => hat(T, 0.03)); E(s / 2, T => openHat(T, 0.05));
+        if (inBar === 1 || inBar === 3) E(0, T => snare(T, 0.2 + bi * 0.01));
+        E(s / 2, T => bass(T, roots[ci], s * 0.4, 500 + bi * 150));
+        const per = bi < 4 ? 0 : bi < 6 ? (inBar === 3 ? 4 : 0) : bi === 6 ? 2 : 4;
+        for (let k = 0; k < per; k++) E(k * s / per, T => snare(T, 0.1 + 0.015 * bi + k * 0.01));
+        if (bi >= 4) for (let k = 0; k < 2; k++) { const nm = hook[inBar * 2 + k]; if (nm) E(k * s / 2, T => whistle(T, N_[nm], s * 0.9, 0.05)); }
+        continue;
+      }
+      if (sec === 'cut') {
+        // the hum stops mid-line and the room holds its breath for a bar; a half-beat pickup, then the drop
+        if (inBar === 0) E(0, T => mus.gain.setValueAtTime(0.0001, T));
+        if (inBar === 3) E(s / 2, T => { mus.gain.setValueAtTime(1, T); snare(T, 0.3); whistle(T, N_.A5, s * 0.45, 0.06); });
+        continue;
+      }
+      if (sec === 'break') {
+        // drums out: only the lead over a pad and the belt, a riser, then one beat of nothing before it all comes back
+        const rel = (b - 140) % 16;
+        if (bar === 44 && inBar === 3) { E(0, T => mus.gain.setValueAtTime(0.0001, T)); E(s / 2, T => { mus.gain.setValueAtTime(1, T); snare(T, 0.3); }); E(s * 0.75, T => snare(T, 0.35)); continue; }
+        if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4, 'sawtooth', 0.028));
+        if (bar === 44 && inBar === 0) E(0, T => riser(T, s * 3, 0.08));
+        for (const [ob, nm, len] of ANTHEM_LEAD) if (Math.floor(ob) === rel) E((ob - rel) * s, T => anthem(T, N_[nm], len * s * 0.92, 1));
+        E(0, T => noise(T, 'bandpass', 950, 0.06, 0.03, 5, bus));
         continue;
       }
       const drop = sec === 'drop', early = sec === 'groove' && bar < 6;
-      if (drop && bar === 32 && inBar === 0) E(0, T => { musHP.frequency.setValueAtTime(20, T); musF.frequency.setValueAtTime(L.lofi || 20000, T); mus.gain.setValueAtTime(1, T); crash(T); subDrop(T); });
+      if (drop && (bar === 35 || bar === 45) && inBar === 0) E(0, T => { musHP.frequency.setValueAtTime(20, T); musF.frequency.setValueAtTime(L.lofi || 20000, T); mus.gain.setValueAtTime(1, T); crash(T); subDrop(T); });
       E(0, T => kick(T, drop ? 1 : 0.85));
       if (!early) { E(0, T => hat(T, 0.03)); E(s / 2, T => openHat(T, drop ? 0.08 : 0.06)); }
       if ((inBar === 1 || inBar === 3) && sec !== 'groove') E(0, T => clap(T, drop ? 0.26 : 0.2));
@@ -1607,18 +1622,19 @@ function buildEvents() {
         // The big 빰 stabs still only happen when the player scans (see hypeHit). Under it: a pad that pumps with the kick,
         // rolling bass and a layered snare from step 2, 16th hats, an octave double on the lead and zaps from step 3,
         // a snare build at the end of every four bars, a crash and a falling sweep every eight, and a riser into each step-up.
-        const st = hypeStage(b), ph4 = ((bar - 32) % 4 + 4) % 4, ph8 = ((bar - 32) % 8 + 8) % 8, rel = (b - 128) % 16;
+        const d0 = bar >= 45 ? 45 : 35, st = hypeStage(b), ph4 = (bar - d0) % 4, ph8 = (bar - d0) % 8, rel = (b - d0 * 4) % 16, final = b >= 204;
         if (inBar === 0) E(0, T => pumpPad(T, chords[ci], s, 0.009 + st * 0.003));
         E(0, T => noise(T, 'highpass', 2500, 0.12, 0.02));
         for (const [ob, nm, len] of ANTHEM_LEAD) if (Math.floor(ob) === rel) E((ob - rel) * s, T => anthem(T, N_[nm], len * s * 0.92, st));
         E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.25, 0.006, 3000));
         for (let k = 1; k < 4; k += 2) E(k * s / 4, T => hat(T, st >= 2 ? 0.05 : 0.035));
         if (st >= 2) { E(s / 4, T => bass(T, roots[ci] * 2, s * 0.2, 1100)); E(3 * s / 4, T => bass(T, roots[ci] * 2, s * 0.2, 1100)); if (inBar === 1 || inBar === 3) E(0, T => snare(T, 0.2)); }
-        if (st >= 3) { for (let k = 0; k < 4; k++) E(k * s / 4 + s / 8, T => hat(T, 0.03)); if (inBar === 1 || inBar === 3) E(s / 2, T => zap(T, 0.028)); }
+        if (st >= 3) { for (let k = 0; k < 4; k++) E(k * s / 4 + s / 8, T => hat(T, 0.03)); if (final && (inBar === 1 || inBar === 3)) E(s / 2, T => zap(T, 0.028)); }
+        if (final && (inBar === 1 || inBar === 3)) E(0, T => clap(T, 0.3));
         if (ph4 === 3 && inBar === 2) { E(0, T => snare(T, 0.14)); E(s / 2, T => snare(T, 0.16)); }
         if (ph4 === 3 && inBar === 3) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.16 + k * 0.05));
-        if (ph8 === 0 && inBar === 0 && bar > 32) E(0, T => { crash(T); whoosh(T, s * 2, true); });
-        if (L.hypePhases && L.hypePhases.includes(b + 4)) E(0, T => riser(T, s * 4, 0.07));
+        if (ph8 === 0 && inBar === 0 && bar !== d0) E(0, T => { crash(T); whoosh(T, s * 2, true); });
+        if (L.hypePhases && L.hypePhases.includes(b + 4) && sec === 'drop') E(0, T => riser(T, s * 4, 0.07));
         if (L.hypePhases && L.hypePhases.includes(b)) E(0, T => subDrop(T));
       }
     } else if (style === 'mix13') {
@@ -1962,7 +1978,8 @@ function updateHud(t) {
   hintFor('len', '앞이 닿으면 누르고, 끝까지 유지', '유지…');
   hintFor('heavy', '무거운 상자: 양쪽을 같이');
   { const fl = firstWith('late'); if (L.id !== 'jiwoo' && fl && fl.state === 'pending' && t > fl.place - SPB) h = L.lateHint || '반장님 손이 늦어요. 음악 말고 손을 봐요'; }
-  if (L.id === 's1-2' && beat >= 104 && beat < 118) h = '지우가 이어폰 빼는 중. 잠깐 쉬어요';
+  if (L.id === 's1-2' && beat >= 104 && beat < 114) h = '이어폰 뺐어요. 벨트 박자로';
+  if (L.id === 's1-2' && beat >= 172 && beat < 179) h = '숨 고르기. 곧 한 번 더';
   if (L.id === 's1-3') {
     if (beat >= 63 && beat < 68) h = '템포가 바뀌어요. 반장님 손을 봐요';
     const sh = firstWith('shuffle'); if (sh && sh.state === 'pending' && t > sh.place - SPB) h = '셔플: 길게, 짧게';
