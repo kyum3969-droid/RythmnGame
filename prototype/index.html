@@ -52,9 +52,11 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,44px);l
 @keyframes broke{0%{background:var(--laser);color:#1b120c;transform:translateX(-4px)}15%{transform:translateX(4px)}30%{transform:translateX(-3px)}45%{transform:translateX(2px)}70%{background:var(--laser);color:#1b120c}100%{transform:none}}
 @keyframes pulse{0%{transform:scale(1.3)}100%{transform:scale(1)}}
 
-.bubble{position:absolute;left:3cqw;bottom:61%;max-width:36cqw;background:var(--paper);color:var(--paper-ink);font-weight:600;
+.bubble{position:absolute;left:3cqw;bottom:61%;max-width:38cqw;background:var(--paper);color:var(--paper-ink);font-weight:600;
   font-size:clamp(11px,1.9cqw,18px);line-height:1.35;padding:.45em .75em;border-radius:6px;pointer-events:none;box-shadow:0 2px 0 rgba(0,0,0,.45)}
 .bubble::after{content:"";position:absolute;left:1.6em;bottom:-.45em;border:.5em solid transparent;border-top-color:var(--paper);border-bottom:0}
+.bubble.robot{background:#1d2a30;color:#8fe3f0;font-family:var(--mono);font-weight:500;font-size:clamp(10px,1.6cqw,15px);border:1px solid #3d6b78}
+.bubble.robot::after{border-top-color:#1d2a30}
 
 .judge{position:absolute;left:78.1%;top:29%;transform:translateX(-50%);font-family:var(--display);font-size:clamp(16px,4cqw,40px);line-height:1;
   text-shadow:0 2px 0 #000,0 0 12px rgba(0,0,0,.7);pointer-events:none;white-space:nowrap;text-align:center;opacity:0}
@@ -69,13 +71,13 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,44px);l
   background:var(--vest);color:#1b120c;padding:.2em .6em;border-radius:3px;pointer-events:none;white-space:nowrap}
 
 .dialog{position:absolute;left:3cqw;right:3cqw;bottom:3cqw;background:rgba(17,13,11,.95);border:1px solid var(--line);border-radius:6px;
-  padding:1.4cqw 2.2cqw 1.8cqw;min-height:11cqw;display:flex;gap:1.6cqw;align-items:flex-start}
-.dialog .portrait{flex:none;width:9.5cqw;height:9.5cqw;image-rendering:pixelated;background:#2a211c;border:1px solid var(--line);border-radius:3px}
-.dialog .dbody{min-width:0;flex:1}
+  padding:1.4cqw 2.2cqw 1.8cqw;min-height:11cqw}
 .dialog .who{display:inline-block;font-family:var(--display);font-size:clamp(11px,1.8cqw,17px);background:var(--vest);color:#1b120c;
   padding:.05em .55em;border-radius:3px;margin-bottom:.35em}
+.dialog .who.robot{background:#3d6b78;color:#dff7fb;font-family:var(--mono)}
 .dialog .text{font-size:clamp(12px,2.25cqw,22px);line-height:1.5;margin:0;min-height:1.5em}
 .dialog .text.narr{color:#cfc3b4}
+.dialog .text.robot{font-family:var(--mono);color:#8fe3f0;font-size:clamp(11px,1.9cqw,18px)}
 .dialog .next{position:absolute;right:2.2cqw;bottom:1.2cqw;font-family:var(--mono);font-size:clamp(10px,1.4cqw,13px);color:var(--muted);animation:blink 1s steps(2) infinite}
 .dialog .skip{position:absolute;top:1.1cqw;right:1.6cqw;font-family:var(--mono);font-size:clamp(10px,1.4cqw,13px);background:transparent;color:var(--muted);
   border:1px solid var(--line);border-radius:3px;padding:.2em .6em;cursor:pointer}
@@ -106,6 +108,26 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,44px);l
 .stamp{position:absolute;right:3cqw;top:6cqw;border:.35cqw solid var(--stamp);color:var(--stamp);font-family:var(--display);
   font-size:clamp(14px,3.2cqw,32px);padding:.12em .5em;border-radius:.3em;transform:rotate(-12deg);opacity:.88;pointer-events:none}
 
+/* attendance board: who you work beside tonight */
+.board{width:min(100%,84cqw);max-height:100%;overflow:auto;background:#5b4330;border:3px solid #3a2a1e;border-radius:4px;box-shadow:0 1cqw 0 rgba(0,0,0,.45);
+  padding:1.6cqw 2cqw 1.8cqw;cursor:default;color:var(--ink)}
+.board-head{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:clamp(9px,1.4cqw,14px);letter-spacing:.12em;color:#e9dcc3;
+  border-bottom:1px solid #8a6a4a;padding-bottom:.4em;margin-bottom:1.2cqw}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2cqw}
+@container (max-width: 560px){.cards{grid-template-columns:repeat(2,1fr)}}
+.card{position:relative;display:flex;gap:1cqw;align-items:stretch;text-align:left;background:var(--paper);color:var(--paper-ink);border:0;border-radius:3px;
+  padding:1cqw 1.1cqw;cursor:pointer;box-shadow:0 .4cqw 0 rgba(0,0,0,.35);font-family:var(--body);min-width:0;transform:rotate(var(--tilt,0deg))}
+.card:hover,.card:focus-visible{outline:3px solid var(--vest);outline-offset:1px}
+.card canvas{width:7cqw;height:11cqw;flex:none;image-rendering:pixelated;background:#2a211c;border-radius:2px}
+.card .info{min-width:0;display:flex;flex-direction:column;gap:.15em}
+.card .name{font-family:var(--display);font-size:clamp(13px,2.4cqw,24px);line-height:1}
+.card .role{font-family:var(--mono);font-size:clamp(8px,1.15cqw,12px);color:var(--paper-muted);letter-spacing:.04em}
+.card .tag{display:inline-block;align-self:flex-start;font-family:var(--mono);font-size:clamp(8px,1.15cqw,12px);background:var(--paper-ink);color:var(--paper);
+  padding:.05em .5em;border-radius:2px;margin-top:.25em}
+.card .best{position:absolute;right:.8cqw;top:.6cqw;font-family:var(--display);font-size:clamp(9px,1.5cqw,15px);color:var(--stamp);border:.2cqw solid var(--stamp);
+  padding:0 .35em;border-radius:.3em;transform:rotate(8deg);opacity:.85}
+.board-foot{margin:1.2cqw 0 0;font-size:clamp(10px,1.5cqw,14px);color:#e9dcc3}
+
 .desk{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px 32px;border-top:1px solid var(--line);padding-top:16px}
 .desk section{min-width:0}
 .desk h3{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--muted);font-weight:500;margin:0 0 8px}
@@ -128,10 +150,10 @@ kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-b
 <div class="page">
   <header class="head">
     <div>
-      <div class="eyebrow">PROTOTYPE · 1장 · B동 3번 라인</div>
+      <div class="eyebrow">PROTOTYPE · B동 3번 라인 · 야간조</div>
       <h1>벨트 위의 박자</h1>
     </div>
-    <p>야간 물류센터 리듬게임 시안. 음악이 아니라 옆에서 같이 일하는 사람의 손에 박자를 맞춥니다.</p>
+    <p>야간 물류센터 리듬게임 시안. 음악이 아니라 옆에서 같이 일하는 사람의 손에 박자를 맞춥니다. 동료 여섯 명, 리듬 여섯 가지.</p>
   </header>
 
   <div class="stage" id="stage">
@@ -142,11 +164,8 @@ kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-b
     <div class="hint" id="hint" hidden></div>
 
     <div class="dialog" id="dialog" hidden>
-      <canvas class="portrait" id="portrait" width="24" height="24" aria-hidden="true" hidden></canvas>
-      <div class="dbody">
-        <span class="who" id="who"></span>
-        <p class="text" id="dtext"></p>
-      </div>
+      <span class="who" id="who"></span>
+      <p class="text" id="dtext"></p>
       <span class="next">▼ 스페이스 / 탭</span>
       <button class="skip" id="skip" type="button">건너뛰기</button>
     </div>
@@ -156,7 +175,7 @@ kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-b
         <div class="bar"></div>
         <div class="kicker"><span>작업지시서 · 야간조</span><span>No. 0312-3B</span></div>
         <h2>벨트 위의 박자</h2>
-        <p>반장님이 상자를 벨트에 올립니다. 상자가 스캐너에 닿는 순간 찍으세요.</p>
+        <p>옆 사람이 상자를 벨트에 올립니다. 상자가 스캐너에 닿는 순간 찍으세요. 사람마다 박자가 다릅니다.</p>
         <div class="row">
           <button class="btn" id="start" type="button">출근하기</button>
           <span class="keys">스페이스 · J · F · 화면 탭 / 소리 켜고</span>
@@ -164,23 +183,32 @@ kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-b
       </div>
     </div>
 
+    <div class="overlay" id="select" hidden>
+      <div class="board">
+        <div class="board-head"><span>출근부 · 야간조 · 3번 라인</span><span>오늘 밤 페어</span></div>
+        <div class="cards" id="cards"></div>
+        <p class="board-foot">카드를 누르면 그 사람 옆에서 일해요. 순서는 자유지만, 이야기는 위에서 아래로 이어져요.</p>
+      </div>
+    </div>
+
     <div class="overlay" id="result" hidden>
       <div class="label slip">
         <div class="bar"></div>
         <div class="kicker"><span>근무 확인서</span><span id="r-no">B03-0312-0001</span></div>
-        <h2>첫 야간 근무</h2>
+        <h2 id="r-title">첫 야간 근무</h2>
         <div class="stamp" id="r-stamp">정상 처리</div>
         <dl>
-          <dt>보내는 분</dt><dd>반장 · 3번 라인</dd>
+          <dt>보내는 분</dt><dd id="r-from">반장 · 3번 라인</dd>
           <dt>받는 분</dt><dd>신입 (나)</dd>
           <dt>처리 내역</dt><dd id="r-counts">딱 0 · 좋아 0 · 놓침 0</dd>
           <dt>최대 콤보</dt><dd id="r-combo">0</dd>
-          <dt>늦은 상자</dt><dd id="r-late">0 / 3 받아냄</dd>
+          <dt id="r-special-k">늦은 상자</dt><dd id="r-special">0 / 3 받아냄</dd>
           <dt>정확도</dt><dd id="r-acc">0%</dd>
         </dl>
         <div class="row">
           <button class="btn" id="retry" type="button">다시 하기</button>
           <button class="btn ghost" id="again" type="button">대화부터</button>
+          <button class="btn ghost" id="board" type="button">출근부로</button>
         </div>
       </div>
     </div>
@@ -188,27 +216,26 @@ kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-b
 
   <div class="desk">
     <section>
-      <h3>이 시안에서 볼 것</h3>
+      <h3>동료와 리듬</h3>
       <ol>
-        <li>캐릭터는 3등신 목업이에요. 반장님은 표정 여섯 가지(기본, 눈썹 올림, 곁눈질, 찡그림, 안도, 콧노래), 주인공은 네 가지(기본, 미소, 활짝, 움찔)를 써요. 대화창 초상화도 같은 얼굴이에요.</li>
-        <li>큐는 음악이 아니라 반장님 손이에요. 상자를 내려놓는 "툭" 소리가 기준이에요.</li>
-        <li>중반에 반장님 무릎이 아파서 상자가 반 박 늦게 올라와요. 음악 대신 반장님을 따라가야 맞아요.</li>
-        <li>긴 액자 화물은 앞이 닿을 때 누르고, 끝이 지나갈 때까지 누르고 있어요.</li>
-        <li>벨트의 노란 눈금이 정박이에요. 정박 상자는 눈금 위에, 늦은 상자는 눈금 사이에 실려 와요.</li>
-        <li>스캐너 아래 작은 바늘이 빠름과 늦음을 보여줘요. 가운데 초록 칸이 딱이에요.</li>
-        <li>놓치면 음악이 잠깐 먹먹해져요. 연속으로 놓치면 반장님이 한마디 해줘요.</li>
+        <li><b>반장</b> 정박. 무릎이 아파서 상자가 반 박 늦게 올라와요. 음악 말고 손을 봐요.</li>
+        <li><b>지우</b> 엇박. 머리는 정박에 끄덕이고 손은 그 사이에 와요. 졸면 상자가 비어서 와요. 원래 자리에 대신 찍어요.</li>
+        <li><b>박씨</b> 하프타임. 무거운 상자는 키 두 개를 동시에(J+F) 또는 두 손가락 탭. 점점 빨라져요.</li>
+        <li><b>순자 이모</b> 16분음표. 작은 소포가 빽빽하게 와요. 손주 전화가 오면 박자가 끊겨요.</li>
+        <li><b>하산</b> 셋잇단. 말 대신 손짓으로 셋을 세요. 둘과 셋이 겹치는 구간이 있어요.</li>
+        <li><b>AS-7</b> 로봇. 완벽한 정박인데 글리치가 나면 상자가 흔들려 보여요. 떠난 동료들 박자를 전부 흉내 내요.</li>
       </ol>
     </section>
     <section>
       <h3>조작</h3>
-      <p><kbd>Space</kbd> <kbd>J</kbd> <kbd>F</kbd> 또는 화면 탭. 대사는 같은 키로 넘겨요.</p>
+      <p><kbd>Space</kbd> <kbd>J</kbd> <kbd>F</kbd> 또는 화면 탭. 대사는 같은 키로 넘겨요. 긴 화물은 끝까지 누르고 있어요.</p>
       <h3 style="margin-top:14px">싱크 보정</h3>
       <div class="sync">
         <button id="sync-minus" type="button" aria-label="보정값 낮추기">−</button>
         <output id="sync-val">0 ms</output>
         <button id="sync-plus" type="button" aria-label="보정값 높이기">+</button>
       </div>
-      <p class="small">"늦음"이 자주 뜨면 +, "빠름"이 자주 뜨면 − 쪽으로.</p>
+      <p class="small">"늦음"이 자주 뜨면 +, "빠름"이 자주 뜨면 − 쪽으로. 벨트의 노란 눈금이 정박, 스캐너 아래 바늘이 빠름/늦음이에요.</p>
     </section>
   </div>
 </div>
@@ -217,59 +244,218 @@ kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-b
 (() => {
 'use strict';
 // ---------- constants ----------
-const W = 384, H = 216, BPM = 96, SPB = 60 / BPM, TRAVEL = 2;
-const PLACE_X = 66, SCAN_X = 300, BELT_Y = 146, BOSS_X = 38, PLAYER_X = 340;
-const SPEED = (SCAN_X - PLACE_X) / (TRAVEL * SPB);
-const WIN_P = 0.05, WIN_G = 0.10, WIN_M = 0.16, END_BEAT = 84;
+const W = 384, H = 216, TRAVEL = 2;
+const PLACE_X = 66, SCAN_X = 300, BELT_Y = 146, BOSS_X = 46, PLAYER_X = 340;
+const WIN_P = 0.05, WIN_G = 0.10, WIN_M = 0.16;
 const $ = id => document.getElementById(id);
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const rnd = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
 const lerp = (a, b, p) => a + (b - a) * p;
 const ease = p => p < 0 ? 0 : p > 1 ? 1 : p * p * (3 - 2 * p);
+const inRange = (b, ranges) => !!ranges && ranges.some(([a, z]) => b >= a && b < z);
 
 const C = {
   kraft:'#c48b52', kraftTop:'#d9a468', kraftDark:'#8f6236', tape:'#e6c88f', label:'#efe6d2', ink:'#1b1716',
   vest:'#f07a2a', reflect:'#ebe5c9', shirt:'#6b7073', cap:'#2c3b57', skin:'#d9a27a', skinDark:'#b98260', hair:'#9a948e',
   laser:'#ff4a3d', ok:'#8fd694', hoodie:'#2f4f58', vest2:'#cfe04a', hairDark:'#1e1a1a', crate:'#b48a5c', red:'#d8463b',
-  belt:'#38302c', slat:'#2a2320', face:'#171312', metal:'#6a7075'
+  belt:'#38302c', slat:'#2a2320', face:'#171312', metal:'#6a7075', sweat:'#9fd0ff', cyan:'#5ad7e8'
 };
 
-// ---------- chart (arrival beats) ----------
-const notes = [];
-const N = (beat, o = {}) => notes.push({ beat, len: o.len || 0, late: !!o.late });
-for (let b = 8; b <= 22; b += 2) N(b);
-[24,25,26,28,29,30,32,33,34,36,37,38].forEach(b => N(b));
-N(40, {len:1}); N(42); N(44, {len:1}); N(46); N(47);
-N(48); N(50); N(52.5, {late:true}); N(54); N(56.5, {late:true}); N(58); N(60.5, {late:true}); N(62);
-[64,65,66,67,68,68.5,69,70].forEach(b => N(b));
-N(72, {len:1.5}); N(76); N(77); N(78); N(79);
-notes.forEach((n, i) => {
-  n.i = i; n.arr = n.beat * SPB; n.place = n.arr - TRAVEL * SPB; n.end = n.arr + n.len * SPB;
-  n.w = n.len ? Math.round(n.len * SPB * SPEED) + 16 : 16 + Math.floor(rnd(i, 1) * 6);
-  n.h = n.len ? 12 : 12 + Math.floor(rnd(i, 2) * 5);
-  const prev = notes[i - 1];
-  const gap = prev ? (n.place - prev.place) / SPB : 2;
-  n.carry = Math.min(0.75, Math.max(0.3, gap * 0.8)) * SPB;
-});
-const LONG_COUNT = notes.filter(n => n.len).length;
-const LATE_COUNT = notes.filter(n => n.late).length;
-const TUTORIAL = new Set([0, 1, 2]);
-const FIRST_LONG = notes.find(n => n.len).i;
-
-const SAY = [
-  [2, '자, 간다. 내 손 봐.', 4], [23, '좋아. 손 풀렸지?', 3], [37, '긴 거 온다. 끝까지 잡고 있어.', 3],
-  [49, '…읏.', 1.6], [52.8, '미안. 무릎이 좀.', 2.6], [56.6, '음악 말고 내 손을 봐.', 2.8],
-  [62.4, '…됐다. 다시 맞추자.', 2.4], [80.5, '수고했다.', 3]
+// ---------- levels ----------
+// chart cells: '.' rest, 'x' box, 'L' late (lands half a beat after the cell), 'g' ghost (partner dozed; hit the empty beat),
+// 'H' heavy (two keys), 'G' glitch (drawn position jitters until the last moment), 'h' hold start with '=' continuation cells.
+const MAJ = [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
+const LEVELS = [
+  {
+    id:'boss', who:'반장', role:'20년차 · 3번 라인', tag:'정박', bpm:96, div:2, style:'straight', clock:'03:12', title:'첫 야간 근무',
+    chords: MAJ, roots:[110, 87.31, 130.81, 98], quiet:[[48, 64]], tutorial:true, special:['늦은 상자', 'late', '받아냄'],
+    bars:['........', '........', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x.x.x...', 'x.x.x...', 'x.x.x...', 'x.x.x...',
+          'h=..x...', 'h=..x.x.', 'x...x...', 'L...x...', 'L...x...', 'L...x...', 'x.x.x.x.', 'xxx.x...', 'h==.....', 'x.x.x.x.', '........'],
+    say:[[2, '자, 간다. 내 손 봐.', 4], [23, '좋아. 손 풀렸지?', 3], [37, '긴 거 온다. 끝까지 잡고 있어.', 3],
+         [49, '…읏.', 1.6], [52.8, '미안. 무릎이 좀.', 2.6], [56.6, '음악 말고 내 손을 봐.', 2.8], [62.4, '…됐다. 다시 맞추자.', 2.4], [80.5, '수고했다.', 3]],
+    comfort:['괜찮아. 다음 거 봐.', '숨 쉬어. 내 손만 봐.'],
+    intro:[
+      { who:'', text:'새벽 3시 10분. 물류센터 B동, 3번 라인.' },
+      { who:'반장', text:'신입이지? 장갑 껴. 오늘은 내 옆이야.' },
+      { who:'반장', text:'이어폰 빼. 여기선 음악 듣는 거 아니다.' },
+      { who:'반장', text:'내가 상자 올리면, 그게 스캐너에 닿을 때 찍어. 삑 소리 나게.' },
+      { who:'반장', text:'벨트는 일정해. 박자는 사람이 만드는 거고.' },
+      { who:'', text:'반장님 무릎 쪽에서 파스 냄새가 났다.' }],
+    outro:(good, sp) => good ? [
+      { who:'반장', text:'…괜찮네, 신입.' },
+      { who:'반장', text: sp >= 2 ? '아까 내가 늦었을 때, 네가 기다려줬지.' : '근데 내가 늦을 땐 음악을 따라가더라. 사람을 봐야지.' },
+      { who:'반장', text:'내일도 3번 라인이다. 늦지 마.' },
+      { who:'', text:'퇴근길, 반장님이 자판기 커피를 하나 더 뽑아 내 손에 쥐여줬다.' }] : [
+      { who:'반장', text:'처음엔 다 그래.' },
+      { who:'반장', text: sp >= 2 ? '그래도 내가 늦었을 때 맞춰주더라. 그거면 됐어.' : '음악 말고 손을 봐. 내 손이 늦으면 너도 늦어야 돼.' },
+      { who:'반장', text:'내일 또 하자.' },
+      { who:'', text:'반장님은 무릎을 한 번 두드리고 먼저 나갔다.' }]
+  },
+  {
+    id:'jiwoo', who:'지우', role:'대학생 알바 · 시험기간', tag:'엇박', bpm:104, div:2, style:'offbeat', clock:'02:40', title:'뒤에서 치는 밤',
+    chords:[[261.63, 329.63, 392], [174.61, 220, 261.63], [196, 246.94, 293.66], [220, 261.63, 329.63]], roots:[130.81, 87.31, 98, 110],
+    doze:[[40, 56]], special:['빈 박 채움', 'ghost', '채움'],
+    bars:['........', '........', 'x...x...', 'x...x...', '.x...x..', '.x...x..', '.x...x..', '.x...x..', '.x.x.x.x', '.x.x.x.x',
+          '.g...g..', '.g.g....', '.g...g..', '...g.g..', 'x.x.x.x.', '.x.x.x.x', 'x..x..x.', 'x..x..x.', '.x.x.x.x', 'x.......', '........'],
+    say:[[2, '아 네네. 저 박자감 좋아요. 원랜 음악 들으면서 해요.', 4], [16, '앗, 뒤에서 치는 거 느껴져요? 재밌죠.', 3],
+         [34, '어제 밤새서… 아 괜찮아요 괜찮아요.', 3], [41, 'zzZ…', 14], [56, '헉. 죄송해요! 시험기간이라…', 3], [64, '다시! 이번엔 안 졸아요.', 3], [78, '수고하셨어요!', 3]],
+    comfort:['괜찮아요, 저도 맨날 틀려요.', '반장님이 그랬어요. 손을 보라고.'],
+    intro:[
+      { who:'', text:'다음 날 밤. 3번 라인에 반장님 대신 대학생이 서 있었다.' },
+      { who:'지우', text:'안녕하세요! 지우예요. 반장님 오늘 병원 가셨대요. 무릎.' },
+      { who:'지우', text:'저 원래 음악 들으면서 하는데… 아 맞다, 반장님이 빼라고 했죠.' },
+      { who:'지우', text:'저는 박자를 좀 뒤에서 쳐요. 머리 끄덕이고 나서, 손이 가요. 그 사이에 찍으시면 돼요.' },
+      { who:'', text:'한쪽 귀에 이어폰이 아직 걸려 있었다.' }],
+    outro:(good, sp) => good ? [
+      { who:'지우', text:'우와, 저랑 잘 맞네요?' },
+      { who:'지우', text: sp >= 3 ? '저 졸 때 대신 채워주셨죠… 감사해요. 진짜로.' : '저 졸았을 때 상자 몇 개 빠졌나 봐요. 죄송해요.' },
+      { who:'지우', text:'시험 끝나면 떡볶이 사드릴게요.' },
+      { who:'', text:'지우는 벨트 끝에 기대 5초 만에 잠들었다.' }] : [
+      { who:'지우', text:'아… 저 때문이죠. 박자 이상하게 쳐서.' },
+      { who:'지우', text:'내일은 좀 덜 뒤에서 칠게요. 아니, 그냥 안 졸게요.' },
+      { who:'', text:'지우는 남은 이어폰 한쪽도 빼서 주머니에 넣었다.' }]
+  },
+  {
+    id:'park', who:'박씨', role:'재취업 · 첫 달', tag:'하프타임', bpm:84, tempo:[[0, 84], [24, 88], [40, 92], [56, 96]], div:2, style:'halftime', clock:'01:50', title:'무거운 것부터',
+    chords:[[164.81, 196, 246.94], [130.81, 164.81, 196], [146.83, 174.61, 220], [174.61, 220, 261.63]], roots:[82.41, 65.41, 73.42, 87.31],
+    special:['중량물', 'heavy', '같이 듦'],
+    bars:['........', '........', 'x...x...', 'x...x...', 'H...H...', 'H...H...', 'H...x...', 'x...H...', 'H.......', 'H...H...',
+          'H...x.x.', 'H...x.x.', 'H.x.H.x.', 'H.x.H.x.', 'H...H...', 'H.x.x.x.', 'H.x.H.x.', 'H...H...', 'H.......', '........'],
+    say:[[2, '…어. 어, 안녕하세요. 박입니다.', 3], [8, '내가 느려요. 좀만 봐줘요.', 3], [15, '이건 무거워. 두 손으로 같이.', 3],
+         [30, '…음. 슬슬 되네.', 2.5], [44, '아까보다 빨라졌지? 나도 알아.', 3], [60, '좋다. 이 속도.', 2.5], [73, '…수고했어요. 아니, 수고했다.', 3]],
+    comfort:['…괜찮아요. 나도 첫날 다 떨궜어.', '천천히. 무거운 건 천천히.'],
+    intro:[
+      { who:'', text:'셋째 밤. 벨트 옆에 처음 보는 아저씨가 장갑을 세 번 고쳐 끼고 있었다.' },
+      { who:'박씨', text:'…안녕하세요. 어, 박입니다. 여기 처음이에요.' },
+      { who:'박씨', text:'전에는 사무실에… 아니, 됐고. 내가 좀 느릴 거예요.' },
+      { who:'박씨', text:'무거운 건 두 손으로 받아요. 한 손으론 안 들려. 키 두 개 같이 누르면 돼요.' },
+      { who:'', text:'목에 두른 수건이 새것이었다.' }],
+    outro:(good, sp) => good ? [
+      { who:'박씨', text:'…고마워요. 나 따라오느라 답답했지.' },
+      { who:'박씨', text: sp >= 8 ? '무거운 거 같이 들어줘서 편했어. 진짜로.' : '무거운 건 아직 손이 안 맞네. 내 탓이야.' },
+      { who:'박씨', text:'내일은 더 빨리 할게. 아니, 할 수 있어.' },
+      { who:'', text:'박씨는 퇴근길에 수건을 접어 주머니에 넣었다. 버리지 않았다.' }] : [
+      { who:'박씨', text:'…내가 느려서 그래요. 미안.' },
+      { who:'박씨', text:'그래도 끝까지 했네. 나도, 자네도.' },
+      { who:'', text:'박씨는 장갑을 벗지 않고 휴게실로 갔다.' }]
+  },
+  {
+    id:'sunja', who:'순자 이모', role:'분류 달인 · 손주 등원 담당', tag:'16분', bpm:120, div:4, style:'fast', clock:'04:05', title:'작은 것 넷',
+    chords:[[261.63, 329.63, 392], [220, 261.63, 329.63], [174.61, 220, 261.63], [196, 246.94, 293.66]], roots:[130.81, 110, 87.31, 98],
+    phone:[[40, 48]], small:true, special:['통화 중 상자', 'range', '받아냄', [40, 52]],
+    bars:['................', '................', 'x...x...x...x...', 'x...x...x...x...', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.',
+          'x.x.x.x.xxxx....', 'x.x.x.x.xxxx....', 'xxxxx.x.xxxxx.x.', 'xxxxx.x.xxxxx.x.', 'x.......x.......', 'x.....x.x.......',
+          '....x.x.x.x.x.x.', 'xxxxx.x.xxxxx.x.', 'xxxxx.x.xxxxx.x.', 'xxxxxxxxxxxxxxxx', 'x...............', '................'],
+    say:[[2, '어서 와, 신입! 이모가 좀 빨라. 따라와.', 3], [10, '손은 눈보다 빠르다. 눈 말고 귀!', 3], [24, '자자자자!', 2],
+         [38.5, '어? 잠깐만. 우리 손주.', 2], [41, '응, 할미야. 열은? 응. 응. 약 먹였어?', 6], [48, '…됐다. 다시 가자!', 2], [59, '마지막! 한 번에!', 2], [65, '호, 이 정도면 야간조 해도 되겠네.', 3]],
+    comfort:['괜찮아, 이모가 빨랐어.', '귀로 들어. 탁, 탁탁, 탁.'],
+    intro:[
+      { who:'', text:'넷째 밤. 라인에 도착하기 전부터 소리가 들렸다. 탁, 탁탁, 탁.' },
+      { who:'순자 이모', text:'신입? 이모라고 불러. 순자 이모.' },
+      { who:'순자 이모', text:'이모는 빨라. 이모 손이 네 눈보다 빨라. 그러니까 귀로 들어.' },
+      { who:'순자 이모', text:'작은 건 금방 가. 큰 거 하나 올릴 시간에 작은 거 넷.' },
+      { who:'', text:'이모 핸드폰 배경화면은 유치원 가방을 멘 아이였다.' }],
+    outro:(good, sp) => good ? [
+      { who:'순자 이모', text:'어머, 잘하네! 이모 따라오는 사람 처음 봐.' },
+      { who:'순자 이모', text: sp >= 4 ? '아까 전화 받을 때 알아서 해줬지. 다 봤어.' : '전화 받을 땐 좀 흔들렸지? 이모 탓이야.' },
+      { who:'순자 이모', text:'아침에 손주 데려다주고 자야지. 수고했어, 신입.' },
+      { who:'', text:'이모는 퇴근하면서 벨트를 한 번 쓰다듬었다.' }] : [
+      { who:'순자 이모', text:'아이고, 빨랐지? 이모가 미안해.' },
+      { who:'순자 이모', text:'내일은 반 박만 늦게 갈게. 딱 반 박.' },
+      { who:'', text:'이모는 핸드폰을 한 번 더 확인하고 나갔다.' }]
+  },
+  {
+    id:'hasan', who:'하산', role:'야간조 2년차 · 고향에 상자 보냄', tag:'셋잇단', bpm:76, div:3, style:'six8', clock:'00:30', title:'하나, 둘, 셋',
+    chords:[[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [164.81, 207.65, 246.94]], roots:[110, 87.31, 130.81, 82.41],
+    sway:true, special:['셋째 박', 'range', '맞춤', [16, 60]],
+    bars:['............', '............', 'x..x..x..x..', 'x..x..x..x..', 'x.xx.xx.xx.x', 'x.xx.xx.xx.x', 'xxx...xxx...', 'xxx...xxx...',
+          'x..x.xx..x.x', 'x..x.xx..x.x', 'x.xx.xx.xx.x', 'xxx...xxx...', 'x.x.x.x.x.x.', 'x.x.x.x.x.x.', 'x...........', '............'],
+    say:[[2, '(엄지를 세운다)', 2.5], [8, '하나, 둘, 셋.', 3], [16, '하나, 둘, 셋. 하나, 둘, 셋.', 3], [24, '(손짓: 따라와)', 2],
+         [34, '좋아요.', 2], [47, '(손가락 둘, 그리고 셋)', 2.5], [58, '…좋아요. 아주.', 3]],
+    comfort:['(고개를 젓는다. 괜찮다는 뜻)', '하나, 둘, 셋.'],
+    intro:[
+      { who:'', text:'다섯째 밤. 벨트 옆의 키 큰 사람이 고개를 숙여 인사했다. 말은 없었다.' },
+      { who:'하산', text:'…하산. (가슴을 가리킨다)' },
+      { who:'하산', text:'(손가락 세 개를 펴 보인다) 하나, 둘, 셋.' },
+      { who:'하산', text:'(벨트를 가리키고, 손바닥으로 세 번 두드린다)' },
+      { who:'', text:'그의 박자는 둘이 아니라 셋으로 갔다.' }],
+    outro:(good, sp) => good ? [
+      { who:'하산', text:'(엄지를 세운다) …좋아요.' },
+      { who:'하산', text:'(자기 가슴을, 그리고 내 가슴을 가리킨다) 같아요.' },
+      { who:'', text:'하산은 휴게실에서 작은 상자에 송장을 붙이고 있었다. 받는 사람 칸의 글자는 읽을 수 없었지만, 주소는 멀었다.' }] : [
+      { who:'하산', text:'(고개를 젓는다. 그리고 손가락 셋) 하나, 둘, 셋.' },
+      { who:'하산', text:'(어깨를 두드린다) 내일.' },
+      { who:'', text:'하산은 손가락 세 개를 한 번 더 펴 보이고 나갔다.' }]
+  },
+  {
+    id:'robot', who:'AS-7', role:'자동 분류 유닛 · 학습 완료', tag:'메들리', bpm:100, div:4, style:'robot', clock:'03:00', title:'패턴 이름: 3번 라인', robot:true,
+    chords:[[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]], roots:[110, 87.31, 130.81, 98],
+    glitch:[[16, 24], [64, 72]], special:['글리치 상자', 'glitch', '읽어냄'],
+    bars:['................', '................', 'x...x...x...x...', 'x...x...x.x.x...', 'G...G...G...G...', 'G...G...G...G...',
+          'x.......x.......', 'x...x...x.......', '..x.......x.....', '..x...x...x...x.', 'H.......H.......', 'H...x...H...x...',
+          'x.x.x.x.xxxx....', 'xxxxx.x.xxxxx.x.', 'x..x..x..x..x...', 'x..x..x..x..x...', 'G.G.G.G.G.G.G.G.', 'GGGG....GGGG....',
+          'x.x.x.x.x.x.x.x.', 'x...x...x...x...', 'x...............', '................'],
+    say:[[2, '[AS-7] 신입 작업자 인식. 페어 모드.', 3], [8, '[AS-7] 표준 리듬.', 2], [15, '[AS-7] …패턴 오류. 재보정 중.', 4], [24, '[AS-7] 패턴 로드: 반장.', 3],
+         [32, '[AS-7] 패턴 로드: 지우.', 3], [40, '[AS-7] 패턴 로드: 박.', 3], [48, '[AS-7] 패턴 로드: 순자 이모.', 3], [56, '[AS-7] 패턴 로드: 하산.', 3],
+         [63.5, '[AS-7] 패턴… 충돌. 전부. 동시에.', 4], [72, '[AS-7] 재보정 완료. 패턴 이름: 3번 라인.', 4], [81, '[AS-7] …수고했다.', 3]],
+    comfort:['[AS-7] 오차 기록. 계속.', '[AS-7] 작업자 "반장"의 조언 재생: 숨 쉬어.'],
+    intro:[
+      { who:'', text:'마지막 밤. 3번 라인에 사람이 없었다. 천장에서 팔 하나가 내려왔다.' },
+      { who:'AS-7', text:'[AS-7] 자동 분류 유닛. 야간조 배정.' },
+      { who:'AS-7', text:'[AS-7] 이전 작업자 리듬 데이터: 5건. 학습 완료.' },
+      { who:'AS-7', text:'[AS-7] 페어 작업자: 신입. 데이터 없음.' },
+      { who:'', text:'팔 아래 바코드에 이름 다섯 개가 작게 찍혀 있었다.' }],
+    outro:(good, sp) => good ? [
+      { who:'AS-7', text:'[AS-7] 처리율 양호. 페어 모드 종료.' },
+      { who:'AS-7', text:'[AS-7] 질문. 작업자 "반장"의 무릎은 회복되었는가.' },
+      { who:'AS-7', text:'[AS-7] …데이터 없음. 기록 보존.' },
+      { who:'', text:'팔이 올라갔다. 벨트는 계속 돌았다. 나는 처음으로 혼자 박자를 셌다. 하나, 둘, 셋.' }] : [
+      { who:'AS-7', text:'[AS-7] 처리율 미달. 원인: 패턴 혼합.' },
+      { who:'AS-7', text:'[AS-7] …사람 리듬은 어렵다. 기록.' },
+      { who:'', text:'팔이 올라갔다. 바코드의 이름 다섯 개는 그대로 있었다.' }]
+  }
 ];
 
-const INTRO = [
-  { who:'', text:'새벽 3시 10분. 물류센터 B동, 3번 라인.' },
-  { who:'반장', text:'신입이지? 장갑 껴. 오늘은 내 옆이야.' },
-  { who:'반장', text:'이어폰 빼. 여기선 음악 듣는 거 아니다.', face:'glance' },
-  { who:'반장', text:'내가 상자 올리면, 그게 스캐너에 닿을 때 찍어. 삑 소리 나게.' },
-  { who:'반장', text:'벨트는 일정해. 박자는 사람이 만드는 거고.', face:'raise' },
-  { who:'', text:'반장님 무릎 쪽에서 파스 냄새가 났다.' }
-];
+// ---------- tempo + chart ----------
+let L = LEVELS[0], SPB = 60 / 96, SPEED = 0, notes = [], END_BEAT = 0, CHORDS = MAJ;
+let tempoSeg = [];
+function setTempo(level) {
+  const pts = level.tempo || [[0, level.bpm]];
+  tempoSeg = []; let t = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const [b, bpm] = pts[i], spb = 60 / bpm, nb = i + 1 < pts.length ? pts[i + 1][0] : Infinity;
+    tempoSeg.push({ b, t, spb, nb }); if (nb !== Infinity) t += (nb - b) * spb;
+  }
+}
+function timeAt(beat) { let s = tempoSeg[0]; for (const x of tempoSeg) if (beat >= x.b) s = x; return s.t + (beat - s.b) * s.spb; }
+function beatAt(t) { let s = tempoSeg[0]; for (const x of tempoSeg) if (t >= x.t) s = x; return s.b + (t - s.t) / s.spb; }
+function spbAt(t) { let s = tempoSeg[0]; for (const x of tempoSeg) if (t >= x.t) s = x; return s.spb; }
+
+function loadLevel(level) {
+  L = level; setTempo(level); SPB = 60 / level.bpm; SPEED = (SCAN_X - PLACE_X) / (TRAVEL * SPB); CHORDS = level.chords;
+  notes = [];
+  const div = level.div;
+  level.bars.forEach((bar, bi) => {
+    for (let c = 0; c < bar.length; c++) {
+      const ch = bar[c]; if (ch === '.' || ch === '=') continue;
+      let len = 0;
+      if (ch === 'h') { let k = c + 1, cnt = 1; while (bar[k] === '=') { cnt++; k++; } len = cnt / div; }
+      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : 0), len, late: ch === 'L', ghost: ch === 'g', heavy: ch === 'H', glitch: ch === 'G' });
+    }
+  });
+  notes.forEach((n, i) => {
+    n.i = i; n.arr = timeAt(n.beat); n.place = n.arr - TRAVEL * SPB; n.end = timeAt(n.beat + n.len);
+    if (n.len) { n.w = Math.round((n.end - n.arr) * SPEED) + 16; n.h = 12; }
+    else if (n.heavy) { n.w = 26 + Math.floor(rnd(i, 1) * 5); n.h = 17 + Math.floor(rnd(i, 2) * 4); }
+    else if (level.small) { n.w = 8 + Math.floor(rnd(i, 1) * 5); n.h = 7 + Math.floor(rnd(i, 2) * 4); }
+    else { n.w = 16 + Math.floor(rnd(i, 1) * 6); n.h = 12 + Math.floor(rnd(i, 2) * 5); }
+    const prev = notes[i - 1];
+    const gap = prev ? (n.place - prev.place) / SPB : 2;
+    n.carry = Math.min(0.75, Math.max(0.25, gap * 0.8)) * SPB;
+  });
+  END_BEAT = level.bars.length * 4;
+}
+const firstWith = key => notes.find(n => n[key]);
 
 // ---------- static background ----------
 const bg = document.createElement('canvas'); bg.width = W; bg.height = H;
@@ -296,22 +482,20 @@ const bg = document.createElement('canvas'); bg.width = W; bg.height = H;
       r(x0, y, w, 3, '#4a3a2f'); r(x0, y + 3, w, 1, '#1d1714');
     }
   }
-  // lane sign "3"
   r(186, 36, 1, 8, '#4a4038'); r(200, 36, 1, 8, '#4a4038');
   r(180, 44, 27, 15, '#d9a520'); r(180, 58, 27, 1, '#8a6a12');
   const three = ['111', '001', '111', '001', '111'];
   three.forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') r(190 + x * 2, 46 + y * 2, 2, 2, '#1d1815'); }));
-  // floor
   r(0, 168, W, 48, '#18120f'); r(0, 168, W, 1, '#2e241f');
   for (let x = 0; x < W; x += 14) r(x, 200, 8, 3, '#c99a1e');
-  // pallet + box stack beside the boss
   r(0, 158, 34, 4, '#6b4a2e'); r(0, 162, 34, 2, '#4a3220'); r(2, 164, 4, 4, '#4a3220'); r(28, 164, 4, 4, '#4a3220');
   const sb = (x, y) => { r(x, y, 15, 13, C.kraft); r(x, y, 15, 2, C.kraftTop); r(x + 13, y + 2, 2, 11, C.kraftDark); r(x + 6, y, 3, 13, C.tape); };
   sb(1, 145); sb(17, 145); sb(1, 132); sb(17, 132); sb(9, 119);
 })();
 
 // ---------- drawing helpers ----------
-const cv = $('cv'), g = cv.getContext('2d');
+const cv = $('cv');
+let g = cv.getContext('2d');
 const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
 const thick = (x1, y1, x2, y2, s, c) => {
   const d = Math.max(1, Math.hypot(x2 - x1, y2 - y1));
@@ -320,20 +504,22 @@ const thick = (x1, y1, x2, y2, s, c) => {
 const check = (x, y) => [[0,2],[1,3],[2,4],[3,3],[4,2],[5,1],[6,0]].forEach(([a, b]) => { R(x + a, y + b, 1, 2, C.ok); });
 const cross = (x, y) => { for (let k = 0; k < 5; k++) { R(x + k, y + k, 1, 1, C.red); R(x + 4 - k, y + k, 1, 1, C.red); } };
 
-const CHORDS = [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
 const FX = { particles: [], marks: [], react: { type: '', at: -1e9 }, lastMiss: -1e9, missKind: '', shakeUntil: -1e9, playerNod: -1e9, flinch: -1e9, binHit: -1e9, bossLine: null };
 const BIN = { x: 306, y: 186, w: 38, h: 22 }, PALLET = { x: 348, y: 204 };
 const FALL_X = SCAN_X + 16, GRAV = 520;
 
 function drawLights(bt, t, active) {
   const tubes = [60, 180, 300];
+  const beat = active ? beatAt(t) : 0;
+  const glitching = active && inRange(beat, L.glitch);
   const alpha = tubes.map((x, k) => {
-    if (reduce || k !== 1) return 1;
-    const inD = active && t > 48 * SPB && t < 64 * SPB;
-    const s = Math.sin(bt * 37) + Math.sin(bt * 13.3);
+    if (reduce) return 1;
+    const inD = active && (inRange(beat, L.quiet) || glitching);
+    if (k !== 1 && !glitching) return 1;
+    const s = Math.sin(bt * 37 + k) + Math.sin(bt * 13.3);
     return (inD ? s > 0.9 : s > 1.93) ? 0.15 : 1;
   });
-  const ph = active && t > 0 ? t / SPB - Math.floor(t / SPB) : 1;
+  const ph = active && t > 0 ? beat - Math.floor(beat) : 1;
   const pulse = Math.max(0, 1 - ph * 5) * 0.06;
   g.save(); g.globalCompositeOperation = 'lighter';
   tubes.forEach((x, k) => {
@@ -350,212 +536,225 @@ function drawLights(bt, t, active) {
   tubes.forEach((x, k) => { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, alpha[k] > 0.5 ? '#fff3c8' : '#5d5446'); });
 }
 
-function bossPose(t, bt, active) {
-  const idle = { x: BOSS_X + 9, y: 148 };
-  const pose = { hand: idle, carry: null, wince: false, dip: 0, bob: 0, nod: 0 };
+// ---------- partner pose (shared by every coworker) ----------
+const IDLE_HAND = { x: BOSS_X + 13, y: 134 };
+function partnerPose(t, bt, active) {
+  const pose = { hand: IDLE_HAND, carry: null, wince: false, dip: 0, bob: 0, nod: 0, doze: false, phone: false, sway: 0, glitch: false, beat: 0 };
   if (!active) { pose.bob = Math.sin(bt * 1.7) > 0.85 ? 1 : 0; return pose; }
-  const ph = t / SPB - Math.floor(t / SPB);
+  const beat = beatAt(t), ph = beat - Math.floor(beat);
+  pose.beat = beat;
   pose.bob = t > 0 && ph < 0.18 ? 1 : 0;
+  pose.doze = inRange(beat, L.doze); pose.phone = inRange(beat, L.phone); pose.glitch = inRange(beat, L.glitch);
+  if (L.sway) pose.sway = Math.round(Math.sin(beat * Math.PI / 2) * 1.4);
   let cur = null;
   for (const n of notes) {
     if (n.late && t > n.place - SPB && t < n.place + 0.4 * SPB) { pose.wince = true; pose.dip = 2; }
+    if (n.ghost) continue;
     if (n.place - n.carry <= t) cur = n;
   }
   if (!cur) return pose;
   const push = { x: PLACE_X - 10, y: 140 };
   if (t <= cur.place) {
     const p = (t - (cur.place - cur.carry)) / cur.carry;
-    if (cur.len) pose.hand = { x: lerp(idle.x, push.x, ease(p)), y: lerp(idle.y, push.y, ease(p)) };
+    if (cur.len) pose.hand = { x: lerp(IDLE_HAND.x, push.x, ease(p)), y: lerp(IDLE_HAND.y, push.y, ease(p)) };
     else { const b = carryPos(cur, p); pose.carry = { n: cur, x: b.x, y: b.y }; pose.hand = { x: b.x - cur.w / 2 + 1, y: b.y + 2 }; }
   } else if (t < cur.place + 0.35 * SPB) {
     const p = ease((t - cur.place) / (0.35 * SPB));
     const from = cur.len ? push : { x: PLACE_X - cur.w / 2 + 1, y: BELT_Y - cur.h / 2 + 2 };
-    pose.hand = { x: lerp(from.x, idle.x, p), y: lerp(from.y, idle.y, p) };
+    pose.hand = { x: lerp(from.x, IDLE_HAND.x, p), y: lerp(from.y, IDLE_HAND.y, p) };
   }
   return pose;
 }
 function carryPos(n, p) {
   const q = Math.max(0, Math.min(1, p));
-  return { x: lerp(20, PLACE_X, q), y: lerp(126, BELT_Y - n.h / 2, ease(q)) - Math.sin(Math.PI * q) * 5 };
+  return { x: lerp(16, PLACE_X, q), y: lerp(112, BELT_Y - n.h / 2, ease(q)) - Math.sin(Math.PI * q) * 14 };
 }
-// ---------- characters: 3-head-tall mockup ----------
-// Heads are pixel maps so faces can act; bodies are rects. Each layer is drawn
-// into a small buffer, outlined automatically, then blitted onto the stage.
-const BOSS_FEET = 166, PLAYER_FEET = 160;
-function mkbuf(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
-const BUF = { bossBody: mkbuf(72, 80), bossArm: mkbuf(72, 80), plBody: mkbuf(64, 80), plArm: mkbuf(64, 80) };
-function outline(buf) {
-  const c = buf.getContext('2d', { willReadFrequently: true }), w = buf.width, h = buf.height, img = c.getImageData(0, 0, w, h), d = img.data;
-  const op = new Uint8Array(w * h);
-  for (let i = 0; i < w * h; i++) op[i] = d[i * 4 + 3] > 0 ? 1 : 0;
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-    const i = y * w + x; if (op[i]) continue;
-    if ((x > 0 && op[i - 1]) || (x < w - 1 && op[i + 1]) || (y > 0 && op[i - w]) || (y < h - 1 && op[i + w])) { d[i * 4] = 21; d[i * 4 + 1] = 17; d[i * 4 + 2] = 14; d[i * 4 + 3] = 255; }
-  }
-  c.putImageData(img, 0, 0);
-}
-function layer(buf, ox, oy, fn, dest = g) {
-  const o = buf.getContext('2d', { willReadFrequently: true }); o.clearRect(0, 0, buf.width, buf.height);
-  o.save(); o.translate(-ox, -oy);
-  const Q = (x, y, w, h, c) => { o.fillStyle = c; o.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
-  fn(Q); o.restore(); outline(buf);
-  if (dest) dest.drawImage(buf, ox, oy);
-}
-function blit(Q, map, pal, x, y) { map.forEach((row, j) => { for (let i = 0; i < row.length; i++) { const ch = row[i]; if (ch !== '.') Q(x + i, y + j, 1, 1, pal[ch]); } }); }
-function dots(Q, list, pal, x, y) { for (const [i, j, ch] of list) Q(x + i, y + j, 1, 1, pal[ch]); }
-function lineQ(Q, x1, y1, x2, y2, s, c) { const d = Math.max(1, Math.hypot(x2 - x1, y2 - y1)); for (let k = 0; k <= d; k++) { const p = k / d; Q(lerp(x1, x2, p) - s / 2, lerp(y1, y2, p) - s / 2, s, s, c); } }
-
-const PB = { c:'#2c3b57', C:'#3d5078', h:'#9a948e', H:'#b5afa8', s:'#d9a27a', S:'#b98260', m:'#8a847e', k:'#1b1716', e:'#efe6d2', p:'#1b1716',
-  b:'#6e6862', d:'#9fd0ff', o:'#f07a2a', O:'#c25a16', r:'#ebe5c9', g:'#6b7073', G:'#50555a', P:'#2d2d34', t:'#3a3a42', B:'#201b19', n:'#c9b48a' };
-const BOSS_HEAD = [
-  '......ccccccc.......',
-  '....ccCCCCCccc......',
-  '...ccCCCcccccccc....',
-  '...cccccccccccccc...',
-  '..cccccccccccccccccc',
-  '.hhhhsssssssssskkkkk',
-  '.hhhhssssssssssss...',
-  '.hhhhssssssssssss...',
-  '.hhsSsssssssssssss..',
-  '.hhsSsssssssssssss..',
-  '..hhSssssssssssssS..',
-  '..hhSsssssssssssssS.',
-  '...hSsssssssssssss..',
-  '....Sssssssmmmmmms..',
-  '....Sssssssmmmmmm...',
-  '.....Sssssssssss....',
-  '......SSsssssss.....',
-  '.......SSSSSSS......',
-  '........SSSS........',
-  '........SSSS........'];
-const BOSS_FACE = {
-  idle:   [[11,7,'b'],[12,7,'b'],[13,7,'b'],[14,7,'b'],[12,8,'e'],[12,9,'e'],[13,8,'p'],[13,9,'p'],[12,10,'S'],[13,10,'S']],
-  raise:  [[11,6,'b'],[12,6,'b'],[13,6,'b'],[14,6,'b'],[12,8,'e'],[12,9,'e'],[13,8,'p'],[13,9,'p'],[12,10,'S'],[13,10,'S']],
-  glance: [[11,7,'b'],[12,7,'b'],[13,8,'b'],[14,8,'b'],[12,9,'e'],[13,9,'p'],[12,10,'S'],[13,10,'S'],[12,15,'S'],[13,15,'S'],[14,15,'S']],
-  wince:  [[11,6,'b'],[12,7,'b'],[13,7,'b'],[14,8,'b'],[12,9,'k'],[13,9,'k'],[16,7,'d'],[16,8,'d'],[12,15,'S'],[13,15,'S'],[14,15,'S']],
-  relief: [[11,6,'b'],[12,6,'b'],[13,6,'b'],[14,6,'b'],[11,9,'k'],[12,8,'k'],[13,9,'k']],
-};
-BOSS_FACE.hum = BOSS_FACE.relief;
-const PP = { h:'#1e1a1a', H:'#2e2828', s:'#d9a27a', S:'#b98260', k:'#1b1716', e:'#efe6d2', p:'#1b1716', d:'#9fd0ff',
-  t:'#2f4f58', T:'#223a42', v:'#cfe04a', V:'#a9b83a', r:'#ebe5c9', n:'#d9d4c8', N:'#2a2320', g:'#2d2f33' };
-const PL_HEAD = [
-  '......HHHHHHHH......',
-  '....HHhhhhhhhhhH....',
-  '...hhhhhhhhhhhhhhh..',
-  '..hhhhhhhhhhhhhhhhh.',
-  '..hhhhhhhhhhhhhhhhh.',
-  '..hhhhhhhhhhhhhhhhh.',
-  '..hhhhhhhhhhhhhhhhh.',
-  '..hhsshhssssssshhhh.',
-  '.Sssssssssssssshhhh.',
-  '.sssssssssssssshhhh.',
-  'Ssssssssssssssshhhh.',
-  'Sssssssssssssssshhh.',
-  '.sssssssssssssssshh.',
-  '..ssssssssssssssshh.',
-  '..sssssssssssssSSh..',
-  '...ssssssssssssS....',
-  '....sssssssssSS.....',
-  '.....SSSSSSSSS......',
-  '.......SSSS.........',
-  '.......SSSS.........'];
-const PL_FACE = {
-  idle:   [[4,8,'k'],[5,8,'k'],[6,8,'k'],[7,8,'k'],[5,9,'p'],[5,10,'p'],[6,9,'e'],[6,10,'e'],[5,11,'S'],[6,11,'S'],[3,14,'S'],[4,14,'S']],
-  smile:  [[4,8,'k'],[5,8,'k'],[6,8,'k'],[7,8,'k'],[5,9,'p'],[5,10,'p'],[6,9,'e'],[6,10,'e'],[5,11,'S'],[6,11,'S'],[2,13,'S'],[3,14,'S'],[4,14,'S']],
-  happy:  [[4,8,'k'],[5,8,'k'],[6,8,'k'],[7,8,'k'],[4,10,'k'],[5,9,'k'],[6,10,'k'],[2,13,'S'],[3,14,'S'],[4,14,'S']],
-  flinch: [[6,8,'e'],[6,9,'e'],[6,10,'e'],[5,8,'e'],[5,9,'p'],[5,10,'e'],[5,11,'S'],[6,11,'S'],[3,14,'k'],[3,15,'k'],[16,9,'d'],[16,10,'d']],
-};
-function drawBossHead(Q, hx, hy, face) { blit(Q, BOSS_HEAD, PB, hx, hy); dots(Q, BOSS_FACE[face] || BOSS_FACE.idle, PB, hx, hy); }
-function drawPlayerHead(Q, hx, hy, face) { blit(Q, PL_HEAD, PP, hx, hy); dots(Q, PL_FACE[face] || PL_FACE.idle, PP, hx, hy); }
+const bodyTop = (base, pose) => base + pose.dip + pose.bob + pose.nod;
 
 function eighthNote(x, y, c) { R(x, y + 3, 2, 2, c); R(x + 1, y - 2, 1, 5, c); R(x + 2, y - 2, 2, 1, c); R(x + 3, y - 1, 1, 1, c); }
-function bossFace(pose, nowMs, active) {
-  const r = FX.react, age = nowMs - r.at;
-  if (pose.wince) return 'wince';
-  if (r.type === 'glance' && age < 700) return 'glance';
-  if (r.type === 'relief' && age < 900) return 'relief';
-  if (r.type === 'nod' && age < 300) return 'raise';
-  if (active && stats.combo >= 16) return 'hum';
-  return 'idle';
+function zzz(x, y, nowMs) {
+  for (let k = 0; k < 2; k++) {
+    const p = ((nowMs / 1400) + k * 0.5) % 1;
+    g.globalAlpha = Math.sin(Math.PI * p);
+    const zx = x + p * 8 + k * 4, zy = y - p * 12;
+    R(zx, zy, 3, 1, '#e9e4da'); R(zx + 1, zy + 1, 1, 1, '#e9e4da'); R(zx, zy + 2, 3, 1, '#e9e4da');
+    g.globalAlpha = 1;
+  }
 }
-function drawBoss(pose, nowMs, active) {
-  const bx = BOSS_X, by = BOSS_FEET, tb = pose.bob + pose.dip, face = bossFace(pose, nowMs, active);
-  const tx = bx - 10, ty = by - 40 + tb, hy = ty - 19 + pose.nod;
-  layer(BUF.bossBody, bx - 28, by - 72, Q => {
-    Q(bx - 9, by - 16, 6, 16, PB.P);
-    if (pose.wince) { Q(bx - 1, by - 16, 6, 9, PB.t); Q(bx, by - 8, 6, 8, PB.t); Q(bx, by - 10, 7, 2, PB.n); }
-    else { Q(bx - 1, by - 16, 6, 16, PB.t); Q(bx - 1, by - 10, 7, 2, PB.n); }
-    Q(bx - 9, by - 3, 6, 3, PB.B); Q(bx - 1 + (pose.wince ? 1 : 0), by - 3, 7, 3, PB.B);
-    drawBossHead(Q, tx, hy, face);
-    Q(tx, ty, 22, 24, PB.o); Q(tx, ty + 22, 22, 2, PB.O); Q(tx, ty + 12, 22, 2, PB.r); Q(tx + 22, ty + 12, 1, 10, PB.o);
-    Q(tx + 15, ty + 2, 3, 22, PB.g); Q(tx + 13, ty, 9, 7, PB.g); Q(tx + 7, ty, 9, 2, PB.G);
-  });
+// eye, brow, sweat and breath for a human partner. ex/ey is the eye's top-left; faces right.
+function faceFx(cx, top, ex, ey, pose, nowMs, hairColor, active) {
   const r = FX.react, age = nowMs - r.at;
+  if (pose.doze) { R(ex - 1, ey + 1, 4, 1, C.ink); zzz(cx + 10, top + 2, nowMs); }
+  else if (pose.wince) { R(ex - 1, ey + 1, 4, 1, C.ink); R(cx - 9, top + 5, 2, 3, C.sweat); }
+  else if (r.type === 'glance' && age < 700) { R(ex - 2, ey - 1, 5, 1, hairColor); R(ex - 1, ey + 1, 3, 1, C.ink); }
+  else R(ex, ey, 2, 2, C.ink);
   if (r.type === 'relief' && age < 900) {
-    const p = age / 900, x = tx + 20 + p * 10, y = hy + 12 - p * 6;
+    const p = age / 900, x = cx + 9 + p * 10, y = top + 10 - p * 6;
     g.globalAlpha = 1 - p; R(x, y, 3, 2, '#e9e4da'); R(x + 2, y - 1, 3, 2, '#e9e4da'); R(x + 4, y, 2, 2, '#e9e4da'); g.globalAlpha = 1;
   }
-  if (active && stats.combo >= 16) {
+  if (active && stats.combo >= 16 && !pose.doze) {
     for (let k = 0; k < 2; k++) {
       const p = ((nowMs / 1000) / (SPB * 2) + k * 0.5) % 1;
-      g.globalAlpha = Math.sin(Math.PI * p); eighthNote(tx + 20 + p * 10, hy - 4 - p * 16, '#ffe9a8'); g.globalAlpha = 1;
+      g.globalAlpha = Math.sin(Math.PI * p); eighthNote(cx + 8 + p * 10, top - 6 - p * 16, '#ffe9a8'); g.globalAlpha = 1;
     }
   }
 }
-function drawBossArm(pose) {
-  const bx = BOSS_X, by = BOSS_FEET, tb = pose.bob + pose.dip, sx = bx + 7, sy = by - 40 + tb + 5;
-  const hx = pose.hand.x, hy = pose.hand.y, mx = lerp(sx, hx, 0.55), my = lerp(sy, hy, 0.55);
-  layer(BUF.bossArm, bx - 28, by - 72, Q => {
-    lineQ(Q, sx, sy, mx, my, 4, PB.g);
-    lineQ(Q, mx, my, hx, hy, 3, PB.s);
-    Q(hx - 2, hy - 2, 4, 4, PB.s);
-  });
-}
-function playerFace(nowMs) {
-  if (nowMs - FX.flinch < 500) return 'flinch';
-  if (nowMs - FX.playerNod < 160) return 'happy';
-  if (nowMs - lastGood < 250) return 'smile';
-  return 'idle';
-}
-const playerShift = (kick, nowMs) => (kick > 0.5 ? 1 : 0) + (nowMs - FX.flinch < 160 ? 1 : 0);
+
+// each partner: draw(pose, nowMs, active) and arm(pose). Same 4-head silhouette as the first mockup, different build and props.
+const PARTNERS = {
+  boss: {
+    base: 90,
+    draw(pose, nowMs, active) {
+      const cx = BOSS_X, top = bodyTop(90, pose);
+      R(cx - 11, top + 20, 3, 18, C.shirt);
+      R(cx - 9, top + 18, 18, 40, C.shirt);
+      R(cx - 9, top + 18, 6, 40, C.vest); R(cx + 3, top + 18, 6, 40, C.vest);
+      R(cx - 9, top + 34, 18, 2, C.reflect);
+      R(cx - 2, top + 15, 5, 4, C.skinDark);
+      R(cx - 6, top + 2, 12, 14, C.skin);
+      R(cx - 6, top + 7, 2, 3, C.skinDark);
+      R(cx - 6, top + 4, 3, 5, C.hair);
+      R(cx - 7, top - 1, 14, 5, C.cap); R(cx + 3, top + 3, 9, 2, C.cap);
+      faceFx(cx, top, cx + 3, top + 7, pose, nowMs, C.hair, active);
+      R(cx + 1, top + 11, 6, 2, C.hair);
+    },
+    arm(pose) { const top = bodyTop(90, pose); thick(BOSS_X + 7, top + 22, pose.hand.x, pose.hand.y, 4, C.shirt); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin); }
+  },
+  jiwoo: {
+    base: 84,
+    draw(pose, nowMs, active) {
+      const cx = BOSS_X, top = bodyTop(84, pose) + (pose.bob ? 1 : 0), hood = '#6b2f3f', hoodD = '#4a2030';
+      R(cx - 7, top + 18, 14, 46, hood);
+      R(cx - 7, top + 20, 14, 20, C.vest2); R(cx - 7, top + 30, 14, 2, C.reflect);
+      R(cx - 7, top + 40, 14, 2, hoodD);
+      R(cx - 9, top - 2, 18, 20, hood); R(cx - 9, top - 2, 18, 2, hoodD);
+      R(cx - 5, top + 3, 10, 12, C.skin);
+      R(cx - 5, top + 3, 10, 2, C.hairDark);
+      faceFx(cx, top, cx + 1, top + 8, pose, nowMs, C.hairDark, active);
+      R(cx + 5, top + 8, 2, 2, '#f4f1ea');
+      for (let k = 0; k < 10; k++) R(cx + 6 + (k % 2), top + 10 + k, 1, 1, '#f4f1ea');
+      if (!pose.doze && active && pose.bob) R(cx - 9, top + 6, 2, 1, hoodD);
+    },
+    arm(pose) { const top = bodyTop(84, pose); thick(BOSS_X + 5, top + 23, pose.hand.x, pose.hand.y, 4, '#6b2f3f'); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin); }
+  },
+  park: {
+    base: 92,
+    draw(pose, nowMs, active) {
+      const cx = BOSS_X, top = bodyTop(92, pose), jacket = '#6e4a33', jacketD = '#4f3424';
+      R(cx - 13, top + 18, 26, 38, jacket);
+      R(cx - 13, top + 34, 28, 22, jacket);
+      R(cx - 11, top + 20, 22, 22, C.vest2); R(cx - 11, top + 31, 22, 2, C.reflect);
+      R(cx - 11, top + 42, 24, 2, jacketD);
+      R(cx - 7, top + 14, 14, 4, '#e9e4da'); R(cx - 7, top + 17, 3, 6, '#e9e4da');
+      R(cx - 6, top + 1, 12, 14, C.skin);
+      R(cx - 7, top + 2, 3, 6, '#5a5550'); R(cx + 5, top + 2, 3, 6, '#5a5550'); R(cx - 2, top - 1, 1, 2, '#5a5550'); R(cx + 1, top - 1, 1, 2, '#5a5550');
+      faceFx(cx, top, cx + 3, top + 7, pose, nowMs, '#5a5550', active);
+      R(cx + 1, top + 6, 7, 1, '#2a2a2a'); R(cx + 1, top + 6, 1, 3, '#2a2a2a'); R(cx + 7, top + 6, 1, 3, '#2a2a2a');
+    },
+    arm(pose) {
+      const top = bodyTop(92, pose), sx = BOSS_X + 9, sy = top + 22, mx = lerp(sx, pose.hand.x, 0.5), my = lerp(sy, pose.hand.y, 0.5);
+      thick(sx, sy, mx, my, 5, '#6e4a33'); thick(mx, my, pose.hand.x, pose.hand.y, 4, C.skin); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
+    }
+  },
+  sunja: {
+    base: 100,
+    draw(pose, nowMs, active) {
+      const cx = BOSS_X, top = bodyTop(100, pose), perm = '#4a2e22', visor = '#6a3d8a', floral = '#8a4a6a';
+      R(cx - 8, top + 17, 16, 32, floral);
+      R(cx - 6, top + 30, 12, 20, '#e9dcc3');
+      R(cx - 8, top + 19, 16, 14, C.vest2); R(cx - 8, top + 26, 16, 2, C.reflect);
+      R(cx - 7, top, 14, 8, perm); R(cx - 9, top + 2, 2, 7, perm); R(cx + 7, top + 2, 2, 7, perm); R(cx - 8, top - 1, 4, 2, perm); R(cx + 3, top - 1, 4, 2, perm);
+      R(cx - 6, top + 6, 12, 11, C.skin);
+      R(cx - 7, top + 4, 14, 2, visor); R(cx - 1, top + 6, 15, 2, visor);
+      faceFx(cx, top, cx + 3, top + 9, pose, nowMs, perm, active);
+      R(cx + 1, top + 13, 5, 1, C.skinDark);
+      if (pose.phone) { R(cx + 5, top + 6, 4, 7, '#1e1a1a'); R(cx + 6, top + 7, 2, 4, '#8fe3f0'); thick(cx - 7, top + 24, cx + 7, top + 13, 3, '#d87a9a'); R(cx + 5, top + 11, 4, 3, C.skin); }
+    },
+    arm(pose) {
+      const top = bodyTop(100, pose), sx = BOSS_X + 6, sy = top + 21;
+      thick(sx, sy, pose.hand.x, pose.hand.y, 4, '#d87a9a');
+      const d = Math.max(1, Math.hypot(pose.hand.x - sx, pose.hand.y - sy));
+      for (let k = 3; k < d; k += 5) { const p = k / d; R(lerp(sx, pose.hand.x, p) - 1, lerp(sy, pose.hand.y, p) - 1, 1, 1, '#f5d0dc'); }
+      R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
+    }
+  },
+  hasan: {
+    base: 82,
+    draw(pose, nowMs, active) {
+      const cx = BOSS_X + pose.sway, top = bodyTop(82, pose), skin = '#8b5a3c', shirt = '#4d5d6e', band = '#2d6aa0';
+      R(cx - 9, top + 18, 18, 48, shirt);
+      R(cx - 9, top + 20, 18, 22, C.vest2); R(cx - 9, top + 31, 18, 2, C.reflect);
+      R(cx - 2, top + 15, 5, 4, '#6e4530');
+      R(cx - 6, top + 1, 12, 15, skin);
+      R(cx - 6, top + 1, 12, 3, C.hairDark); R(cx - 6, top + 11, 12, 4, C.hairDark); R(cx - 6, top + 10, 2, 2, C.hairDark);
+      R(cx - 7, top - 1, 14, 4, band); R(cx - 10, top + 1, 4, 2, band); R(cx - 10, top + 3, 2, 4, band);
+      faceFx(cx, top, cx + 3, top + 6, pose, nowMs, C.hairDark, active);
+      R(cx + 4, top + 6, 1, 1, '#f4f1ea');
+    },
+    arm(pose) { const top = bodyTop(82, pose), cx = BOSS_X + pose.sway; thick(cx + 7, top + 22, pose.hand.x, pose.hand.y, 4, '#4d5d6e'); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, '#8b5a3c'); }
+  },
+  robot: {
+    base: 96,
+    draw(pose, nowMs, active) {
+      const cx = BOSS_X, jit = pose.glitch && !reduce ? Math.round(Math.sin(nowMs / 23) * 1.2) : 0, top = 96 + pose.bob + jit;
+      R(cx - 4, 34, 8, top - 34, '#555a5f'); R(cx - 2, 34, 2, top - 34, '#7b8288');
+      R(cx - 14, top, 28, 22, '#9aa1a6'); R(cx - 14, top, 28, 2, '#c3c9cd'); R(cx + 12, top + 2, 2, 20, '#6a7075');
+      R(cx - 14, top + 22, 28, 4, '#6a7075');
+      const r = FX.react, age = nowMs - r.at;
+      let led = C.cyan;
+      if (pose.glitch) led = Math.floor(nowMs / 60) % 2 ? '#ff4a3d' : C.cyan;
+      else if (r.type === 'glance' && age < 700) led = '#ff4a3d';
+      else if (r.type === 'nod' && age < 300) led = C.ok;
+      R(cx - 10, top + 5, 18, 4, '#1b1716'); R(cx - 9, top + 6, 16, 2, led);
+      const sx = cx - 9 + Math.floor((nowMs / 120) % 16); R(sx, top + 6, 2, 2, '#f4f1ea');
+      R(cx - 10, top + 12, 18, 6, '#efe6d2');
+      for (let k = 0; k < 9; k++) R(cx - 9 + k * 2, top + 13, k % 3 === 0 ? 1 : 1, 4, k % 4 === 1 ? '#1b1716' : (k % 2 ? '#1b1716' : '#efe6d2'));
+      R(cx - 12, top + 2, 3, 2, pose.glitch ? '#ff4a3d' : '#f0b429');
+      if (pose.glitch) { g.globalAlpha = 0.35; R(cx - 14 + jit * 3, top, 28, 22, C.cyan); g.globalAlpha = 1; }
+    },
+    arm(pose) {
+      const top = 96 + pose.bob, sx = BOSS_X + 8, sy = top + 24;
+      thick(sx, sy, pose.hand.x, pose.hand.y, 3, '#7b8288');
+      R(pose.hand.x - 3, pose.hand.y - 3, 6, 4, '#6a7075'); R(pose.hand.x - 3, pose.hand.y + 1, 2, 3, '#9aa1a6'); R(pose.hand.x + 1, pose.hand.y + 1, 2, 3, '#9aa1a6');
+    }
+  }
+};
+function drawPartner(pose, nowMs, active) { PARTNERS[L.id].draw(pose, nowMs, active); }
+function drawPartnerArm(pose) { PARTNERS[L.id].arm(pose); }
+
+const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
 function drawPlayer(kick, nowMs) {
-  const px = PLAYER_X, py = PLAYER_FEET, sx = playerShift(kick, nowMs), nod = nowMs - FX.playerNod < 160 ? 2 : 0;
-  const tx = px - 9 + sx, ty = py - 40, face = playerFace(nowMs);
-  layer(BUF.plBody, px - 24, py - 72, Q => {
-    Q(px - 6, py - 18, 5, 18, PP.T); Q(px + 1, py - 18, 5, 18, PP.t);
-    Q(px - 7, py - 3, 6, 3, PP.n); Q(px, py - 3, 6, 3, PP.n); Q(px - 7, py - 1, 6, 1, PP.N); Q(px, py - 1, 6, 1, PP.N);
-    Q(tx + 13, ty - 3, 6, 8, PP.T);
-    drawPlayerHead(Q, tx - 1, ty - 19 + nod, face);
-    Q(tx, ty, 18, 22, PP.t); Q(tx + 2, ty + 2, 14, 16, PP.v); Q(tx + 2, ty + 9, 14, 2, PP.r); Q(tx + 2, ty + 16, 14, 2, PP.V);
-    [[9, 17], [9, 18], [10, 19], [10, 20], [9, 21]].forEach(([a, b]) => Q(tx + a, ty + b, 1, 1, PP.e));
-  });
+  const fl = nowMs - FX.flinch, cx = PLAYER_X + (fl < 160 ? 1 : 0), top = playerTop(kick, nowMs);
+  R(cx - 9, top + 18, 18, 36, C.hoodie);
+  R(cx - 9, top + 20, 18, 22, C.vest2); R(cx - 9, top + 32, 18, 2, C.reflect);
+  R(cx - 7, top + 14, 15, 5, '#264149');
+  R(cx - 6, top + 1, 12, 14, C.skin);
+  R(cx - 7, top - 1, 14, 5, C.hairDark); R(cx + 1, top + 1, 6, 10, C.hairDark);
+  if (fl < 500) { R(cx - 4, top + 6, 2, 3, C.ink); R(cx - 5, top + 5, 3, 1, C.hairDark); R(cx + 6, top + 2 + Math.floor(fl / 120), 2, 3, C.sweat); }
+  else R(cx - 4, top + 7, 2, 2, C.ink);
 }
-function drawPlayerArm(kick, nowMs) {
-  const px = PLAYER_X, py = PLAYER_FEET, sx = playerShift(kick, nowMs), tx = px - 9 + sx, ty = py - 40;
+function drawPlayerArm(kick, nowMs, twoHands) {
+  const top = playerTop(kick, nowMs);
   const gx = 324 - kick * 4, gy = 128;
-  layer(BUF.plArm, px - 40, py - 72, Q => {
-    lineQ(Q, tx + 3, ty + 6, gx + 3, gy + 3, 4, PP.t);
-    Q(gx - 9, gy - 3, 12, 5, PP.g); Q(gx - 1, gy + 2, 3, 6, PP.g); Q(gx - 10, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser); Q(gx, gy + 2, 3, 3, PP.s);
-  });
-}
-// dialog portrait: the same head at 1:1, scaled up by CSS
-const portraitEl = $('portrait'), portraitBuf = mkbuf(24, 24);
-function renderPortrait(who, face) {
-  if (who !== '반장') { portraitEl.hidden = true; return; }
-  const pc = portraitEl.getContext('2d'); pc.clearRect(0, 0, 24, 24);
-  layer(portraitBuf, 0, 0, Q => drawBossHead(Q, 2, 2, face || 'idle'), pc);
-  portraitEl.hidden = false;
+  thick(PLAYER_X - 6, top + 22, gx + 2, gy + 3, 4, C.hoodie);
+  if (twoHands) thick(PLAYER_X - 4, top + 24, gx + 6, gy + 7, 4, C.hoodie);
+  R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33');
+  R(gx - 10, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser);
+  R(gx, gy + 2, 3, 3, C.skin);
+  if (twoHands) R(gx + 4, gy + 6, 3, 3, C.skin);
 }
 
 // belt top doubles as a beat grid: bright paint = beat, mid = 8th, dim = 16th
-function drawBeltTop(time) {
+function drawBeltTop(time, active) {
   R(48, BELT_Y, W - 48, 4, C.belt);
   R(48, BELT_Y, W - 48, 1, '#4a403b');
-  const bp = SPB * SPEED, frac = (((time / SPB) % 1) + 1) % 1, base = SCAN_X + frac * bp;
-  for (let m = -14; m <= 3; m++) {
-    const x = Math.round(base + m * bp / 4);
+  const beat = active ? beatAt(time) : time / SPB;
+  const k0 = Math.floor(beat * 4);
+  for (let m = -56; m <= 12; m++) {
+    const k = k0 + m, q = ((k % 4) + 4) % 4;
+    const tk = active ? timeAt(k / 4) : (k / 4) * SPB;
+    const x = Math.round(SCAN_X + (time - tk) * SPEED);
     if (x < 49 || x >= W) continue;
-    const q = ((m % 4) + 4) % 4;
     if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); }
     else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44');
     else R(x, BELT_Y + 1, 1, 3, C.slat);
@@ -591,16 +790,25 @@ function drawStamp(cx, cy, age, kind) {
 }
 function drawBox(n, cx, bottom, mark, t) {
   const w = n.w, h = n.h, x = Math.round(cx - w / 2), y = Math.round(bottom - h);
+  if (n.ghost && n.state === 'pending') {
+    // partner dozed: only the outline of where the box should be
+    g.globalAlpha = 0.45;
+    for (let k = 0; k < w; k += 3) { R(x + k, y, 2, 1, C.kraftTop); R(x + k, y + h - 1, 2, 1, C.kraftTop); }
+    for (let k = 0; k < h; k += 3) { R(x, y + k, 1, 2, C.kraftTop); R(x + w - 1, y + k, 1, 2, C.kraftTop); }
+    R(x + (w >> 1) - 1, y + (h >> 1) - 1, 3, 3, C.kraftTop);
+    g.globalAlpha = 1; return;
+  }
   R(x + 1, bottom, w, 1, 'rgba(0,0,0,.45)');
   R(x, y, w, h, C.kraft); R(x, y, w, 2, C.kraftTop); R(x + w - 2, y + 2, 2, h - 2, C.kraftDark);
   R(x + (w >> 1) - 1, y, 3, h, C.tape);
-  R(x + 2, y + h - 6, 7, 4, C.label);
-  for (let k = 0; k < 3; k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink);
+  const lw = Math.min(7, w - 4);
+  if (lw >= 3) { R(x + 2, y + h - 6, lw, 4, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink); }
+  if (n.heavy) { R(x + 2, y + 3, w - 4, 4, '#1b1716'); for (let k = 2; k < w - 5; k += 4) R(x + k + 1, y + 4, 2, 2, '#f0b429'); }
   if (mark === 'hit') drawStamp(x + w - 6, y + 5, t - n.hitAt, n.judge);
   if (mark === 'miss') { g.globalAlpha = 0.35; R(x, y, w, h, '#7a1f18'); g.globalAlpha = 1; cross(x + w - 7, y + 3); }
 }
 function drawCrate(n, headX, bottom, t) {
-  const len = n.len * SPB * SPEED, x0 = Math.round(headX - len - 8), w = Math.round(len + 16), h = n.h, y = bottom - h;
+  const len = (n.end - n.arr) * SPEED, x0 = Math.round(headX - len - 8), w = Math.round(len + 16), h = n.h, y = bottom - h;
   R(x0 + 1, bottom, w, 1, 'rgba(0,0,0,.45)');
   R(x0, y, w, h, C.crate); R(x0, y, w, 2, '#cfa676'); R(x0, y + h - 2, w, 2, '#8a6640');
   for (let x = x0 + 8; x < x0 + w - 4; x += 12) R(x, y + 2, 1, h - 4, '#94704a');
@@ -626,7 +834,6 @@ function missFall(n, t) {
   const tLand = Math.sqrt(2 * (landY - BELT_Y) / GRAV), tt = Math.min(tf, tLand);
   return { x: FALL_X + tt * 60, y: BELT_Y + 0.5 * GRAV * tt * tt, rot: Math.min(tt * 9, 1.1), landed: tf >= tLand };
 }
-// rework bin: missed boxes fall in and stay visible
 function drawBin(count, nowMs) {
   const { x, w, h } = BIN, y = BIN.y + (nowMs - FX.binHit < 120 ? 1 : 0);
   for (let k = 0; k < Math.min(count, 6); k++) {
@@ -638,7 +845,6 @@ function drawBin(count, nowMs) {
   R(x + w / 2 - 6, y + 5, 12, 2, '#1c3a57');
   R(x + 4, y + 12, w - 8, 4, '#d8463b'); R(x + 6, y + 13, w - 12, 2, '#f08a7a');
 }
-// finished pallet: every three cleared boxes add one to the stack
 function drawPallet(count) {
   const px = PALLET.x, py = PALLET.y;
   R(px - 2, py, 38, 3, '#6b4a2e'); R(px - 2, py + 3, 38, 2, '#4a3220'); R(px, py + 5, 3, 3, '#4a3220'); R(px + 30, py + 5, 3, 3, '#4a3220');
@@ -649,7 +855,6 @@ function drawPallet(count) {
   }
   if (vis > 0) { R(px + 2, py - 2, 30, 1, '#5fc06c'); }
 }
-// early/late needle under the scanner; the green slot is the 딱 window
 function drawGauge(nowMs) {
   const cx = SCAN_X, y = BELT_Y + 18, span = 20, pz = Math.round(WIN_P / WIN_M * span);
   R(cx - span - 2, y, span * 2 + 5, 5, '#0c0a09');
@@ -683,23 +888,23 @@ function drawScene(t, bt, active, nowMs) {
   if (!reduce && nowMs < FX.shakeUntil) g.translate(Math.round(Math.random() * 2 - 1), Math.round(Math.random() * 2 - 1));
   g.drawImage(bg, 0, 0);
   drawLights(bt, t, active);
-  const pose = bossPose(t, bt, active);
+  const pose = partnerPose(t, bt, active);
   pose.nod = FX.react.type === 'nod' && nowMs - FX.react.at < 130 ? 1 : 0;
   const kick = Math.max(0, 1 - (nowMs - lastPress) / 140);
-  drawBoss(pose, nowMs, active);
+  drawPartner(pose, nowMs, active);
   drawPlayer(kick, nowMs);
   drawScannerBack();
   const beltT = active ? t : bt;
-  drawBeltTop(beltT);
+  drawBeltTop(beltT, active);
   let holding = false, delivered = 0, binned = 0;
   const falling = [];
   if (active) {
     g.save(); g.beginPath(); g.rect(49, 0, W, H); g.clip();
     for (const n of notes) {
       if (t < n.place) break;
-      const cx = SCAN_X + (t - n.arr) * SPEED;
+      let cx = SCAN_X + (t - n.arr) * SPEED;
       if (n.len) {
-        if (cx - n.len * SPB * SPEED - 8 > W) { if (n.state === 'hit') delivered++; else binned++; continue; }
+        if (cx - (n.end - n.arr) * SPEED - 8 > W) { if (n.state === 'hit') delivered++; else binned++; continue; }
         if (n.state === 'holding') holding = true;
         drawCrate(n, cx, BELT_Y, t);
         continue;
@@ -723,7 +928,11 @@ function drawScene(t, bt, active, nowMs) {
       const hop = n.state === 'hit' ? Math.round((n.judge === 'perfect' ? 4 : 2) * Math.exp(-(t - n.hitAt) * 14)) : 0;
       const ja = n.missKind === 'bad' ? t - n.hitAt : 9;
       const jolt = ja < 0.35 ? Math.round(Math.sin(ja * 70) * 2.5 * Math.exp(-ja * 8)) : 0;
-      drawBox(n, cx + jolt, BELT_Y - hop, n.state, t);
+      // glitch box: the drawn position lies until the last third of a beat, then snaps to where it really is
+      let gl = 0;
+      if (n.glitch && n.state === 'pending' && t < n.arr - 0.3 * SPB && !reduce) gl = ((Math.floor(nowMs / 55) % 3) - 1) * 5;
+      drawBox(n, cx + jolt + gl, BELT_Y - hop, n.state, t);
+      if (gl) { g.globalAlpha = 0.3; R(cx - n.w / 2 - gl, BELT_Y - n.h, n.w, n.h, C.cyan); g.globalAlpha = 1; }
     }
     g.restore();
   }
@@ -736,8 +945,8 @@ function drawScene(t, bt, active, nowMs) {
   drawPallet(delivered);
   for (const [n, f] of falling) { g.save(); g.translate(f.x, f.y - n.h / 2); g.rotate(f.rot); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); }
   if (pose.carry) drawBox(pose.carry.n, pose.carry.x, pose.carry.y + pose.carry.n.h / 2, '', t);
-  drawBossArm(pose);
-  drawPlayerArm(kick, nowMs);
+  drawPartnerArm(pose);
+  drawPlayerArm(kick, nowMs, nowMs - lastHeavy < 260);
   rings = rings.filter(r => nowMs - r.at < 420);
   for (const r of rings) {
     const a = (nowMs - r.at) / 420, s = 6 + a * 34;
@@ -781,23 +990,25 @@ function noise(t, type, freq, peak, dec, q = 0.7, dest = mus) {
   s.connect(f); f.connect(gn); gn.connect(dest); s.start(t, Math.random() * 0.5); s.stop(t + dec + 0.05);
 }
 const kick = (t, v = 0.9) => { const o = osc('sine', 150, t, 0.003, v, 0.28); o.frequency.exponentialRampToValueAtTime(42, t + 0.13); };
-const snare = t => { noise(t, 'highpass', 1500, 0.32, 0.14); osc('triangle', 190, t, 0.002, 0.18, 0.08); };
+const snare = (t, v = 0.32) => { noise(t, 'highpass', 1500, v, 0.14); osc('triangle', 190, t, 0.002, v * 0.55, 0.08); };
 const hat = (t, v) => noise(t, 'highpass', 7500, v, 0.035);
 const rim = (t, v) => noise(t, 'bandpass', 2600, v, 0.03, 4);
+const conga = (t, f, v) => { const o = osc('sine', f, t, 0.002, v, 0.12); o.frequency.exponentialRampToValueAtTime(f * 0.7, t + 0.1); };
 const crash = t => noise(t, 'highpass', 4000, 0.22, 1.4);
 const thud = (t, v = 1) => { noise(t, 'lowpass', 380, 0.9 * v, 0.1, 0.7, bus); const o = osc('sine', 90, t, 0.002, 0.35 * v, 0.12, bus); o.frequency.exponentialRampToValueAtTime(52, t + 0.1); };
-function bass(t, f, d) {
+function bass(t, f, d, cut = 520) {
   const o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
-  o.type = 'sawtooth'; o.frequency.value = f; fl.type = 'lowpass'; fl.frequency.value = 520; fl.Q.value = 3;
+  o.type = 'sawtooth'; o.frequency.value = f; fl.type = 'lowpass'; fl.frequency.value = cut; fl.Q.value = 3;
   env(gn, t, 0.01, 0.2, d); o.connect(fl); fl.connect(gn); gn.connect(mus); o.start(t); o.stop(t + d + 0.05);
 }
-function pad(t, fs, d) {
+function pad(t, fs, d, type = 'sawtooth', vol = 0.03) {
   const fl = ctx.createBiquadFilter(), gn = ctx.createGain(); fl.type = 'lowpass'; fl.frequency.value = 1000;
-  gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(0.03, t + 0.3); gn.gain.setValueAtTime(0.03, t + d - 0.3); gn.gain.linearRampToValueAtTime(0, t + d);
+  gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(vol, t + 0.3); gn.gain.setValueAtTime(vol, t + Math.max(0.31, d - 0.3)); gn.gain.linearRampToValueAtTime(0, t + d);
   fl.connect(gn); gn.connect(mus);
-  fs.forEach(f => [-7, 7].forEach(dt => { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = dt; o.connect(fl); o.start(t); o.stop(t + d + 0.05); }));
+  fs.forEach(f => [-7, 7].forEach(dt => { const o = ctx.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = dt; o.connect(fl); o.start(t); o.stop(t + d + 0.05); }));
 }
-const lead = (t, f, d) => osc('triangle', f, t, 0.005, 0.07, d);
+const stab = (t, fs, d) => fs.forEach(f => { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 1800; fl.connect(mus); osc('square', f, t, 0.004, 0.035, d, fl); });
+const lead = (t, f, d, type = 'triangle') => osc(type, f, t, 0.005, 0.07, d);
 const beep = (t, f) => { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 4200; fl.connect(bus); osc('square', f, t, 0.002, 0.09, 0.06, fl); };
 const buzz = t => { osc('sawtooth', 98, t, 0.004, 0.1, 0.18, bus); osc('square', 104, t, 0.004, 0.05, 0.16, bus); };
 const errBeep = t => { osc('square', 330, t, 0.002, 0.07, 0.07, bus); osc('square', 247, t + 0.11, 0.002, 0.07, 0.1, bus); };
@@ -811,30 +1022,77 @@ function muffle() {
   musF.frequency.cancelScheduledValues(t); musF.frequency.setValueAtTime(450, t); musF.frequency.exponentialRampToValueAtTime(20000, t + 0.55);
 }
 
+// one backing track per partner, built from the same primitives. b = beat index, t = its time, s = seconds per beat there.
 function buildEvents() {
-  const ev = [], B = b => b * SPB;
-  const chords = CHORDS;
-  const roots = [110, 87.31, 130.81, 98];
+  const ev = [], chords = L.chords, roots = L.roots, style = L.style;
   const arp = [0, 1, 2, 1, 0, 2, 1, 2];
-  for (let b = 0; b < 80; b++) {
-    const t = B(b), ci = Math.floor(b / 4) % 4, inBar = b % 4, D = b >= 48 && b < 64;
-    if (b < 4) { ev.push([t, T => rim(T, inBar === 0 ? 0.5 : 0.3)]); continue; }
-    if (inBar === 0) ev.push([t, T => pad(T, chords[ci], SPB * 4)]);
-    if (b < 8) { ev.push([t + SPB / 2, T => hat(T, 0.06)]); continue; }
-    ev.push([t, T => kick(T, D ? 0.4 : 0.9)]);
-    if (!D && (inBar === 1 || inBar === 3)) ev.push([t, T => snare(T)]);
-    ev.push([t, T => hat(T, D ? 0.03 : 0.07)]); ev.push([t + SPB / 2, T => hat(T, D ? 0.05 : 0.11)]);
-    if (D) { if (inBar === 0) ev.push([t, T => bass(T, roots[ci], SPB * 3.5)]); }
-    else { ev.push([t, T => bass(T, roots[ci], SPB * 0.4)]); ev.push([t + SPB / 2, T => bass(T, inBar === 3 ? roots[ci] * 2 : roots[ci], SPB * 0.4)]); }
-    // combo layers: a shaker joins at 8 combo, a bell on each bar at 20 combo
-    for (let k = 0; k < 4; k++) ev.push([t + k * SPB / 4, T => { if (stats.combo >= 8) noise(T, 'highpass', 6000, k % 2 ? 0.035 : 0.06, 0.03); }]);
-    if (inBar === 0) ev.push([t, T => { if (stats.combo >= 20) { osc('sine', chords[ci][2] * 4, T, 0.003, 0.05, 0.6); osc('sine', chords[ci][0] * 4, T + SPB / 2, 0.003, 0.035, 0.5); } }]);
-    if ((b >= 24 && b < 40) || (b >= 64 && b < 80)) {
-      for (let k = 0; k < 2; k++) { const f = chords[ci][arp[inBar * 2 + k]] * 2; ev.push([t + k * SPB / 2, T => lead(T, f, SPB * 0.4)]); }
+  const total = L.bars.length * 4;
+  for (let b = 0; b < total; b++) {
+    const t = timeAt(b), s = spbAt(t), ci = Math.floor(b / 4) % 4, inBar = b % 4;
+    const quiet = inRange(b, L.quiet), doze = inRange(b, L.doze), glitch = inRange(b, L.glitch), phone = inRange(b, L.phone);
+    const E = (dt, fn) => ev.push([t + dt, fn]);
+    if (b < 4) { E(0, T => rim(T, inBar === 0 ? 0.5 : 0.3)); continue; }
+    if (b >= total - 4) continue;
+    // combo layers shared by every track
+    for (let k = 0; k < 4; k++) E(k * s / 4, T => { if (stats.combo >= 8) noise(T, 'highpass', 6000, k % 2 ? 0.035 : 0.06, 0.03); });
+    if (inBar === 0) E(0, T => { if (stats.combo >= 20) { osc('sine', chords[ci][2] * 4, T, 0.003, 0.05, 0.6); osc('sine', chords[ci][0] * 4, T + s / 2, 0.003, 0.035, 0.5); } });
+    if (style === 'straight') {
+      if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4));
+      if (b < 8) { E(s / 2, T => hat(T, 0.06)); continue; }
+      E(0, T => kick(T, quiet ? 0.4 : 0.9));
+      if (!quiet && (inBar === 1 || inBar === 3)) E(0, T => snare(T));
+      E(0, T => hat(T, quiet ? 0.03 : 0.07)); E(s / 2, T => hat(T, quiet ? 0.05 : 0.11));
+      if (quiet) { if (inBar === 0) E(0, T => bass(T, roots[ci], s * 3.5)); }
+      else { E(0, T => bass(T, roots[ci], s * 0.4)); E(s / 2, T => bass(T, inBar === 3 ? roots[ci] * 2 : roots[ci], s * 0.4)); }
+      if ((b >= 24 && b < 40) || (b >= 64 && b < 80)) for (let k = 0; k < 2; k++) { const f = chords[ci][arp[inBar * 2 + k]] * 2; E(k * s / 2, T => lead(T, f, s * 0.4)); }
+    } else if (style === 'offbeat') {
+      if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4, 'triangle', 0.05));
+      if (b < 8) { E(0, T => hat(T, 0.05)); E(s / 2, T => hat(T, 0.09)); continue; }
+      if (inBar === 0 || inBar === 2) E(0, T => kick(T, doze ? 0.5 : 0.85));
+      if (inBar === 1 || inBar === 3) E(0, T => snare(T, doze ? 0.15 : 0.3));
+      E(0, T => hat(T, 0.04)); E(s / 2, T => hat(T, doze ? 0.06 : 0.13));
+      E(s / 2, T => stab(T, chords[ci].map(f => f * 2), s * 0.25));
+      E(s / 2, T => bass(T, roots[ci], s * 0.35, 700));
+      if (b >= 56) E(s / 2 + s / 4, T => lead(T, chords[ci][arp[inBar * 2] ] * 4, s * 0.2, 'square'));
+    } else if (style === 'halftime') {
+      if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4, 'sawtooth', 0.025));
+      if (b < 8) { E(0, T => hat(T, 0.05)); continue; }
+      if (inBar === 0) { E(0, T => kick(T, 1)); E(0, T => bass(T, roots[ci], s * 1.8, 380)); }
+      if (inBar === 2) { E(0, T => snare(T, 0.4)); E(0, T => bass(T, roots[ci], s * 1.2, 380)); }
+      E(0, T => hat(T, 0.05)); E(s / 2, T => hat(T, 0.07));
+      if (b >= 40) E(s / 2, T => rim(T, 0.25));
+      if (b >= 56) E(0, T => lead(T, chords[ci][arp[inBar]] * 2, s * 0.6));
+    } else if (style === 'fast') {
+      if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4, 'triangle', 0.04));
+      if (b < 8) { for (let k = 0; k < 4; k++) E(k * s / 4, T => hat(T, k % 2 ? 0.05 : 0.08)); continue; }
+      if (inBar === 0 || inBar === 2) E(0, T => kick(T, phone ? 0.5 : 0.9));
+      if (inBar === 1) E(s / 2, T => kick(T, 0.6));
+      if (inBar === 1 || inBar === 3) E(0, T => snare(T, phone ? 0.15 : 0.32));
+      for (let k = 0; k < 4; k++) E(k * s / 4, T => hat(T, phone ? 0.03 : (k % 2 ? 0.05 : 0.1)));
+      if (!phone) { E(0, T => bass(T, roots[ci], s * 0.2, 800)); E(s / 2, T => bass(T, roots[ci] * (inBar === 3 ? 1.5 : 1), s * 0.2, 800)); }
+      if (b >= 32 && !phone) for (let k = 0; k < 4; k++) { const f = chords[ci][arp[(inBar * 4 + k) % 8]] * 4; E(k * s / 4, T => lead(T, f, s * 0.18, 'square')); }
+    } else if (style === 'six8') {
+      if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4, 'sawtooth', 0.03));
+      if (b < 8) { for (let k = 0; k < 3; k++) E(k * s / 3, T => rim(T, k === 0 ? 0.3 : 0.15)); continue; }
+      if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.8));
+      if (inBar === 1 || inBar === 3) E(0, T => snare(T, 0.22));
+      for (let k = 0; k < 3; k++) { E(k * s / 3, T => hat(T, k === 0 ? 0.09 : 0.05)); if (k) E(k * s / 3, T => conga(T, k === 1 ? 330 : 220, 0.12)); }
+      E(0, T => bass(T, roots[ci], s * 0.9, 450)); E(2 * s / 3, T => bass(T, roots[ci], s * 0.3, 450));
+      if (b >= 32) { const f = chords[ci][arp[inBar * 2]] * 2; E(0, T => lead(T, f, s * 0.5)); E(2 * s / 3, T => lead(T, chords[ci][arp[inBar * 2 + 1]] * 2, s * 0.25)); }
+    } else if (style === 'robot') {
+      if (inBar === 0) E(0, T => stab(T, chords[ci], s * 3.5));
+      if (b < 8) { for (let k = 0; k < 4; k++) E(k * s / 4, T => noise(T, 'highpass', 9000, 0.05, 0.015)); continue; }
+      if (glitch) { for (let k = 0; k < 3; k++) E(k * s / 6, T => kick(T, 0.5)); E(s / 2, T => noise(T, 'bandpass', 1200, 0.2, 0.05, 6)); }
+      else E(0, T => kick(T, 0.9));
+      if (inBar === 1 || inBar === 3) E(0, T => snare(T, glitch ? 0.12 : 0.3));
+      for (let k = 0; k < 4; k++) E(k * s / 4, T => noise(T, 'highpass', 9000, k % 2 ? 0.04 : 0.08, 0.015));
+      for (let k = 0; k < 4; k++) { const f = chords[ci][[0, 2, 1, 2][k]] * (glitch ? 1 : 2); E(k * s / 4, T => { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 2200; fl.connect(mus); osc('square', f, T, 0.002, 0.04, s * 0.15, fl); }); }
+      E(0, T => bass(T, roots[ci], s * 0.45, 600)); E(s / 2, T => bass(T, roots[ci], s * 0.2, 600));
     }
   }
-  ev.push([B(80), T => { kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, 110, SPB * 4); }]);
-  notes.forEach(n => ev.push([n.place, T => thud(T, n.len ? 1.25 : 1)]));
+  const tEnd = timeAt(total - 4);
+  ev.push([tEnd, T => { kick(T); crash(T); pad(T, chords[0], SPB * 6, L.style === 'robot' ? 'square' : 'sawtooth'); bass(T, roots[0], SPB * 4); }]);
+  notes.forEach(n => { if (!n.ghost) ev.push([n.place, T => thud(T, n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1)]); });
   return ev.sort((a, b) => a[0] - b[0]);
 }
 let events = [], evI = 0, T0 = 0;
@@ -856,7 +1114,6 @@ function startHold() {
 }
 function stopHold() { if (holdOsc) { try { holdOsc.stop(); } catch (e) {} holdOsc = null; } }
 
-// audible song time for a given performance.now() timestamp
 function songAt(perfMs) {
   if (!ctx) return -99;
   if (ctx.getOutputTimestamp) {
@@ -867,7 +1124,7 @@ function songAt(perfMs) {
 }
 
 // ---------- game state ----------
-let state = 'title', stats = null, lastPress = -1e9, lastGood = -1e9;
+let state = 'title', stats = null, lastPress = -1e9, lastGood = -1e9, lastHeavy = -1e9, heavyPend = null;
 let offsetMs = 0;
 try { offsetMs = parseInt(localStorage.getItem('belt.offset') || '0', 10) || 0; } catch (e) {}
 const syncVal = $('sync-val');
@@ -876,14 +1133,16 @@ const setSync = v => { offsetMs = Math.max(-200, Math.min(200, v)); showSync(); 
 $('sync-minus').addEventListener('click', () => setSync(offsetMs - 10));
 $('sync-plus').addEventListener('click', () => setSync(offsetMs + 10));
 showSync();
+let progress = {};
+try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}; } catch (e) {}
 
 function resetRun() {
   notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; });
   FX.particles = []; FX.marks = []; FX.react = { type: '', at: -1e9 }; FX.lastMiss = -1e9; FX.missKind = ''; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null;
-  stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, lateHit: 0, missStreak: 0 };
-  rings = [];
+  stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
+  rings = []; heavyPend = null;
 }
-resetRun();
+loadLevel(LEVELS[0]); resetRun();
 
 const judgeEl = $('judge');
 function popJudge(kind, sub = '') {
@@ -905,7 +1164,6 @@ function addCombo() {
   }
   return '';
 }
-// shared failure feedback: judge text, scanner and screen flash, music muffle, reactions
 function failFx(kind, judgeKind, sub, d) {
   const now = performance.now(), lost = stats.combo;
   stats.combo = 0; stats.missStreak++;
@@ -918,43 +1176,71 @@ function failFx(kind, judgeKind, sub, d) {
     if (lost >= 10) comboBreak(ctx.currentTime + 0.06);
   }
   if (lost >= 10) { comboEl.classList.remove('pulse', 'broke'); void comboEl.offsetWidth; comboEl.classList.add('broke'); }
-  if (stats.missStreak === 3) sayNow('괜찮아. 다음 거 봐.');
-  else if (stats.missStreak === 6) sayNow('숨 쉬어. 내 손만 봐.');
+  if (stats.missStreak === 3) sayNow(L.comfort[0]);
+  else if (stats.missStreak === 6) sayNow(L.comfort[1]);
 }
 function registerMiss(sub, d, kind) { stats.miss++; failFx(kind, 'miss', sub, d); }
 function sayNow(text) { FX.bossLine = { text, until: songAt(performance.now()) + 2.6 * SPB }; }
 
-function onHit(ts) {
-  const t = songAt(ts) - offsetMs / 1000;
-  lastPress = performance.now();
-  let target = null;
+function isSpecial(n) {
+  const [, kind, , range] = L.special;
+  return kind === 'range' ? n.beat >= range[0] && n.beat < range[1] : !!n[kind];
+}
+function specialTotal() { return notes.filter(isSpecial).length; }
+
+// closest pending note inside the window, so dense 16th charts never hand a press to the wrong box
+function findTarget(t) {
+  let best = null, bd = Infinity;
   for (const n of notes) {
     if (n.state !== 'pending') continue;
     const d = t - n.arr;
     if (d > WIN_M) continue;
     if (d < -WIN_M) break;
-    target = n; break;
+    if (Math.abs(d) < bd) { bd = Math.abs(d); best = n; }
   }
-  if (!target) { click(ctx.currentTime); return; }
+  return best;
+}
+function judgeNote(target, t) {
   const d = t - target.arr, ad = Math.abs(d);
   target.hitAt = t;
   if (ad <= WIN_G) {
     const j = ad <= WIN_P ? 'perfect' : 'good', now = performance.now();
     target.judge = j; stats[j]++; stats.missStreak = 0;
     const milestone = addCombo();
-    // the scan tone follows the current chord, so a clean run plays a melody
     const tones = CHORDS[Math.floor(Math.max(0, target.beat) / 4) % 4];
     if (j === 'perfect') { const f = tones[stats.combo % 3] * 4; beep(ctx.currentTime, f); osc('triangle', f * 2, ctx.currentTime, 0.002, 0.035, 0.14, bus); }
     else beep(ctx.currentTime, tones[0] * 4);
     lastGood = now; ring(j === 'perfect' ? C.ok : '#ffe9a8');
     spawnBits(j === 'perfect' ? 7 : 3);
     FX.marks.push({ d, at: now, c: j === 'perfect' ? C.ok : '#ffe9a8' });
-    if (target.late) { stats.lateHit++; FX.react = { type: 'relief', at: now }; }
+    if (isSpecial(target)) stats.special++;
+    if (target.late || target.ghost) FX.react = { type: 'relief', at: now };
     else if (j === 'perfect') FX.react = { type: 'nod', at: now };
-    popJudge(j, milestone || (j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''));
+    if (target.heavy) { lastHeavy = now; FX.shakeUntil = now + 90; thud(ctx.currentTime, 0.5); }
+    if (target.ghost) { thud(ctx.currentTime, 0.8); spawn(SCAN_X - 6, BELT_Y - 10, 8, ['#ffe9a8', '#efe6d2'], -40, 40, -70, -20, 200, 500); }
+    popJudge(j, milestone || (target.ghost ? '대신 채움' : target.heavy ? '두 손' : j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''));
     if (target.len) { target.state = 'holding'; startHold(); } else target.state = 'hit';
     if (target.i === notes.length - 1 && j === 'perfect') FX.shakeUntil = now + 220;
   } else { target.state = 'miss'; target.missKind = 'bad'; registerMiss(d < 0 ? '너무 빠름' : '너무 늦음', d, 'bad'); }
+}
+// heavy boxes need two different keys inside a short window; one hand alone drops it
+function onHit(ts, key) {
+  const t = songAt(ts) - offsetMs / 1000;
+  lastPress = performance.now();
+  if (heavyPend) {
+    const hp = heavyPend;
+    if (hp.key !== key && performance.now() - hp.at < 110) { clearTimeout(hp.timer); heavyPend = null; judgeNote(hp.n, hp.t); return; }
+  }
+  const target = findTarget(t);
+  if (!target) { click(ctx.currentTime); return; }
+  if (target.heavy) {
+    if (heavyPend && heavyPend.n === target) return;
+    heavyPend = { n: target, t, key, at: performance.now(), timer: setTimeout(() => {
+      if (heavyPend && heavyPend.n === target && target.state === 'pending') { heavyPend = null; target.state = 'miss'; target.missKind = 'bad'; target.hitAt = t; registerMiss('두 손으로!', null, 'bad'); }
+    }, 110) };
+    return;
+  }
+  judgeNote(target, t);
 }
 function completeHold(n) {
   const now = performance.now();
@@ -978,7 +1264,7 @@ function onRelease(ts) {
 function judgeTick(t) {
   const tt = t - offsetMs / 1000;
   for (const n of notes) {
-    if (n.state === 'pending' && tt - n.arr > WIN_M) { n.state = 'miss'; n.hitAt = tt; n.missKind = 'pass'; registerMiss('지나감', null, 'pass'); }
+    if (n.state === 'pending' && tt - n.arr > WIN_M) { n.state = 'miss'; n.hitAt = tt; n.missKind = 'pass'; registerMiss(n.ghost ? '빈 박 지나감' : '지나감', null, 'pass'); }
     else if (n.state === 'holding' && tt >= n.end) completeHold(n);
   }
 }
@@ -987,19 +1273,26 @@ function judgeTick(t) {
 const hud = $('hud'), clockEl = $('clock'), comboEl = $('combo'), bubble = $('bubble'), hint = $('hint');
 let lastClock = '', lastCombo = -1, lastSay = '', lastHint = '';
 function updateHud(t) {
-  const mins = 12 + Math.max(0, Math.floor(t / SPB / 4));
-  const c = `B동 3번 라인 · 03:${String(mins).padStart(2, '0')}`;
+  const beat = beatAt(t);
+  const [hh, mm] = L.clock.split(':').map(Number);
+  const mins = mm + Math.max(0, Math.floor(beat / 4)), c = `B동 3번 라인 · ${String(hh + Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
   if (c !== lastClock) { clockEl.textContent = c; lastClock = c; }
   if (stats.combo !== lastCombo) { comboEl.textContent = '콤보 ' + stats.combo; comboEl.classList.toggle('hot', stats.combo >= 10); lastCombo = stats.combo; }
-  const beat = t / SPB;
-  const line = SAY.find(([b, , d]) => beat >= b && beat < b + d);
+  const line = L.say.find(([b, , d]) => beat >= b && beat < b + d);
   const s = line ? line[1] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.text : '';
   if (s !== lastSay) { bubble.textContent = s; bubble.hidden = !s; lastSay = s; }
   let h = '';
-  for (const i of TUTORIAL) { const n = notes[i]; if (n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 찍기'; break; } }
-  const fl = notes[FIRST_LONG];
-  if (fl.state === 'pending' && t > fl.place) h = '앞이 닿으면 누르고, 끝까지 유지';
-  if (fl.state === 'holding') h = '유지…';
+  if (L.tutorial) for (let i = 0; i < 3; i++) { const n = notes[i]; if (n && n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 찍기'; break; } }
+  const hintFor = (key, text, holdText) => {
+    const n = firstWith(key); if (!n) return;
+    if (n.state === 'pending' && t > n.place - (key === 'ghost' ? 0 : 0)) h = text;
+    if (holdText && n.state === 'holding') h = holdText;
+  };
+  hintFor('len', '앞이 닿으면 누르고, 끝까지 유지', '유지…');
+  hintFor('ghost', '지우가 졸아요. 빈 자리에 대신 찍기');
+  hintFor('heavy', '중량물: 키 두 개 동시에 (J+F) / 두 손가락');
+  hintFor('glitch', '흔들려도 진짜 자리는 하나. 마지막에 멈춘 곳');
+  if (L.id === 'jiwoo' && notes[4] && notes[4].state === 'pending' && t > notes[4].place) h = '머리 끄덕 다음에 손. 그 사이에 찍기';
   if (h !== lastHint) { hint.textContent = h; hint.hidden = !h; lastHint = h; }
 }
 
@@ -1007,18 +1300,19 @@ const dialogEl = $('dialog'), whoEl = $('who'), textEl = $('dtext');
 let dlg = null, typeTimer = null;
 function runDialog(lines, done) { dlg = { lines, i: 0, done, n: 0, full: '' }; dialogEl.hidden = false; showLine(); }
 function showLine() {
-  const L = dlg.lines[dlg.i];
-  whoEl.textContent = L.who; whoEl.hidden = !L.who; textEl.classList.toggle('narr', !L.who);
-  renderPortrait(L.who, L.face);
-  dlg.full = L.text; dlg.n = 0; clearInterval(typeTimer);
-  if (reduce) { dlg.n = L.text.length; textEl.textContent = L.text; return; }
+  const L_ = dlg.lines[dlg.i], robot = L_.who === 'AS-7';
+  whoEl.textContent = L_.who; whoEl.hidden = !L_.who; whoEl.classList.toggle('robot', robot);
+  textEl.classList.toggle('narr', !L_.who); textEl.classList.toggle('robot', robot);
+  dlg.full = L_.text; dlg.n = 0; clearInterval(typeTimer);
+  if (reduce) { dlg.n = L_.text.length; textEl.textContent = L_.text; return; }
   textEl.textContent = '';
+  const pitch = { '반장': 220, '지우': 392, '박씨': 196, '순자 이모': 440, '하산': 262, 'AS-7': 880 }[L_.who] || 330;
   typeTimer = setInterval(() => {
     if (!dlg) return clearInterval(typeTimer);
     dlg.n++; textEl.textContent = dlg.full.slice(0, dlg.n);
-    if (L.who && dlg.n % 3 === 0) blip(L.who === '반장' ? 220 : 330);
+    if (L_.who && dlg.n % 3 === 0) blip(pitch);
     if (dlg.n >= dlg.full.length) clearInterval(typeTimer);
-  }, 32);
+  }, robot ? 22 : 32);
 }
 function advanceDialog() {
   if (!dlg) return;
@@ -1032,58 +1326,81 @@ $('skip').addEventListener('click', e => {
   clearInterval(typeTimer); const d = dlg.done; dlg = null; dialogEl.hidden = true; d();
 });
 
-function beginShift() {
-  ensureAudio(); $('title').hidden = true; $('result').hidden = true; state = 'intro';
-  runDialog(INTRO, startPlay);
+// attendance board
+const cardsEl = $('cards');
+function buildCards() {
+  cardsEl.innerHTML = '';
+  LEVELS.forEach((lv, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'card'; b.style.setProperty('--tilt', ((i * 7) % 5 - 2) * 0.5 + 'deg');
+    const c = document.createElement('canvas'); c.width = 40; c.height = 64;
+    const info = document.createElement('div'); info.className = 'info';
+    const name = document.createElement('span'); name.className = 'name'; name.textContent = lv.who;
+    const role = document.createElement('span'); role.className = 'role'; role.textContent = lv.role;
+    const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = `${lv.tag} · ${lv.bpm}${lv.tempo ? '+' : ''} BPM`;
+    info.append(name, role, tag);
+    b.append(c, info);
+    if (progress[lv.id] != null) { const best = document.createElement('span'); best.className = 'best'; best.textContent = (progress[lv.id] * 100).toFixed(0) + '%'; b.append(best); }
+    b.addEventListener('click', e => { e.stopPropagation(); beginShift(lv); });
+    cardsEl.append(b);
+    // portrait: the same partner drawing, offset into the small canvas
+    const saved = g; g = c.getContext('2d'); g.fillStyle = '#2a211c'; g.fillRect(0, 0, 40, 64);
+    g.save(); g.translate(20 - BOSS_X, 8 - PARTNERS[lv.id].base);
+    const savedL = L; L = lv;
+    const pose = { hand: { x: BOSS_X + 13, y: PARTNERS[lv.id].base + 44 }, carry: null, wince: false, dip: 0, bob: 0, nod: 0, doze: false, phone: false, sway: 0, glitch: false };
+    PARTNERS[lv.id].draw(pose, 0, false); PARTNERS[lv.id].arm(pose);
+    L = savedL; g.restore(); g = saved;
+  });
+}
+function openBoard() { ensureAudio(); state = 'select'; $('title').hidden = true; $('result').hidden = true; dialogEl.hidden = true; buildCards(); $('select').hidden = false; }
+
+function beginShift(level) {
+  ensureAudio(); loadLevel(level); resetRun();
+  $('title').hidden = true; $('result').hidden = true; $('select').hidden = true; state = 'intro';
+  runDialog(level.intro, startPlay);
 }
 function startPlay() {
   ensureAudio(); resetRun();
-  $('title').hidden = true; $('result').hidden = true;
+  $('title').hidden = true; $('result').hidden = true; $('select').hidden = true;
   events = buildEvents(); evI = 0; T0 = ctx.currentTime + 0.8;
   lastClock = ''; lastCombo = -1; lastSay = ''; lastHint = '';
+  bubble.classList.toggle('robot', !!L.robot);
   musF.frequency.cancelScheduledValues(ctx.currentTime); musF.frequency.setValueAtTime(20000, ctx.currentTime);
   hud.hidden = false; state = 'play'; startHum();
 }
-function accuracy() { return (stats.perfect + stats.good * 0.6 + stats.tailOk) / (notes.length + LONG_COUNT); }
+function accuracy() { return (stats.perfect + stats.good * 0.6 + stats.tailOk) / (notes.length + notes.filter(n => n.len).length); }
 function finishPlay() {
   state = 'outro'; stopHum(); stopHold(); bubble.hidden = true; hint.hidden = true;
-  const acc = accuracy(), caught = stats.lateHit >= 2;
-  const lines = acc >= 0.8 ? [
-    { who:'반장', text:'…괜찮네, 신입.', face:'relief' },
-    { who:'반장', text: caught ? '아까 내가 늦었을 때, 네가 기다려줬지.' : '근데 내가 늦을 땐 음악을 따라가더라. 사람을 봐야지.', face: caught ? 'relief' : 'glance' },
-    { who:'반장', text:'내일도 3번 라인이다. 늦지 마.', face:'raise' },
-    { who:'', text:'퇴근길, 반장님이 자판기 커피를 하나 더 뽑아 내 손에 쥐여줬다.' }
-  ] : [
-    { who:'반장', text:'처음엔 다 그래.', face:'relief' },
-    { who:'반장', text: caught ? '그래도 내가 늦었을 때 맞춰주더라. 그거면 됐어.' : '음악 말고 손을 봐. 내 손이 늦으면 너도 늦어야 돼.', face: caught ? 'relief' : 'glance' },
-    { who:'반장', text:'내일 또 하자.', face:'raise' },
-    { who:'', text:'반장님은 무릎을 한 번 두드리고 먼저 나갔다.' }
-  ];
-  runDialog(lines, showResult);
+  const acc = accuracy();
+  try { if ((progress[L.id] || 0) < acc) { progress[L.id] = acc; localStorage.setItem('belt.progress', JSON.stringify(progress)); } } catch (e) {}
+  runDialog(L.outro(acc >= 0.8, stats.special), showResult);
 }
 let runNo = 0;
 function showResult() {
   state = 'result'; hud.hidden = true; runNo++;
   const acc = accuracy();
-  $('r-no').textContent = 'B03-0312-' + String(runNo).padStart(4, '0');
+  $('r-no').textContent = 'B03-' + L.clock.replace(':', '') + '-' + String(runNo).padStart(4, '0');
+  $('r-title').textContent = L.title;
+  $('r-from').textContent = `${L.who} · 3번 라인`;
   $('r-counts').textContent = `딱 ${stats.perfect} · 좋아 ${stats.good} · 놓침 ${stats.miss + stats.tailBroken}`;
   $('r-combo').textContent = stats.maxCombo;
-  $('r-late').textContent = `${stats.lateHit} / ${LATE_COUNT} 받아냄`;
+  $('r-special-k').textContent = L.special[0];
+  $('r-special').textContent = `${stats.special} / ${specialTotal()} ${L.special[2]}`;
   $('r-acc').textContent = (acc * 100).toFixed(1) + '%';
   $('r-stamp').textContent = acc >= 0.9 ? '완벽 페어' : acc >= 0.75 ? '정상 처리' : acc >= 0.5 ? '재확인' : '재작업';
   $('result').hidden = false;
   $('retry').focus({ preventScroll: true });
 }
-$('start').addEventListener('click', e => { e.stopPropagation(); beginShift(); });
+$('start').addEventListener('click', e => { e.stopPropagation(); openBoard(); });
 $('retry').addEventListener('click', e => { e.stopPropagation(); startPlay(); });
-$('again').addEventListener('click', e => { e.stopPropagation(); beginShift(); });
+$('again').addEventListener('click', e => { e.stopPropagation(); beginShift(L); });
+$('board').addEventListener('click', e => { e.stopPropagation(); openBoard(); });
 
 // ---------- input ----------
 const held = new Set();
-function press(ts) {
-  if (state === 'play') onHit(ts);
+function press(ts, key) {
+  if (state === 'play') onHit(ts, key);
   else if (dlg) advanceDialog();
-  else if (state === 'title') beginShift();
+  else if (state === 'title') openBoard();
 }
 function release(ts) { if (state === 'play') onRelease(ts); }
 const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyD', 'KeyK']);
@@ -1093,13 +1410,13 @@ addEventListener('keydown', e => {
   if (state !== 'play' && onButton) return;
   e.preventDefault();
   if (e.repeat) return;
-  held.add(e.code); press(e.timeStamp);
+  held.add(e.code); press(e.timeStamp, e.code);
 });
 addEventListener('keyup', e => { if (held.delete(e.code) && held.size === 0) release(e.timeStamp); });
 const stage = $('stage');
 stage.addEventListener('pointerdown', e => {
-  if (e.target instanceof Element && e.target.closest('button, .label')) return;
-  e.preventDefault(); held.add('p' + e.pointerId); press(e.timeStamp);
+  if (e.target instanceof Element && e.target.closest('button, .label, .board')) return;
+  e.preventDefault(); held.add('p' + e.pointerId); press(e.timeStamp, 'p' + e.pointerId);
 });
 const up = e => { if (held.delete('p' + e.pointerId) && held.size === 0) release(e.timeStamp); };
 addEventListener('pointerup', up); addEventListener('pointercancel', up);
@@ -1112,7 +1429,7 @@ function frame(now) {
   const t = active ? songAt(now) : -99;
   if (active) {
     schedule(); judgeTick(t); updateHud(t);
-    if (t > END_BEAT * SPB) finishPlay();
+    if (t > timeAt(END_BEAT)) finishPlay();
   }
   drawScene(t, now / 1000, active, now);
 }
