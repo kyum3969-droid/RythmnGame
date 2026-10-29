@@ -62,6 +62,11 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   font-size:clamp(11px,1.9cqw,18px);line-height:1.35;padding:.45em .75em;border-radius:6px;pointer-events:none;box-shadow:0 2px 0 rgba(0,0,0,.45)}
 .bubble.obs{background:#d9d0bd}
 .bubble::after{content:"";position:absolute;left:1.6em;bottom:-.45em;border:.5em solid transparent;border-top-color:var(--paper);border-bottom:0}
+.bubble.loud{font-family:var(--display);font-weight:400;font-size:clamp(15px,3.1cqw,30px);letter-spacing:.02em;background:#fff4e8;color:#b3261e;
+  border:2px solid #d8463b;box-shadow:0 3px 0 rgba(0,0,0,.5),0 0 18px rgba(216,70,59,.45);animation:shout .6s ease-out}
+.bubble.loud::after{border-top-color:#d8463b}
+@keyframes shout{0%{transform:scale(1.7) rotate(-4deg);opacity:0}14%{transform:scale(.92) rotate(2deg);opacity:1}24%{transform:scale(1.06) translateX(-4px) rotate(-1.5deg)}
+  34%{transform:scale(1) translateX(4px) rotate(1deg)}44%{transform:translateX(-3px)}54%{transform:translateX(2px)}66%,100%{transform:none}}
 .bubble.robot{background:#1d2a30;color:#8fe3f0;font-family:var(--mono);font-weight:500;font-size:clamp(10px,1.6cqw,15px);border:1px solid #3d6b78}
 .bubble.robot::after{border-top-color:#1d2a30}
 
@@ -147,6 +152,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .board-foot{margin:1.2cqw 0 0;font-size:clamp(10px,1.5cqw,14px);color:#e9dcc3}
 
 @media (prefers-reduced-motion: reduce){
+  .bubble.loud{animation:none}
   .judge.pop{animation:fade .6s forwards} .dialog .next{animation:none} .hud span.pulse,.hud span.broke{animation:none} .judge.miss.pop{animation:fade .7s forwards}
   @keyframes fade{0%,70%{opacity:1}100%{opacity:0}}
 }
@@ -346,20 +352,20 @@ const LEVELS = [
       'x...x...', 'x.......', 'x...x...', 'h===....', 'x...x...', 'x...x...', 'h===....', 'x...x...', 'x...x...', 'x.......',
       '........', '........'
     ],
-    // [beat, text, beats shown, lane, speaker] speaker 'b' = 반장 watching from behind the belt
+    // [beat, text, beats shown, lane, speaker, style] speaker 'b' = 반장 watching from behind the belt, style 'loud' = shouted bubble
     say: [[1, '(이어폰 꽂고) 쿵, 쿵, 쿵, 쿵.', 5], [30, '이거 제가 만든 곡이에요. 들려요?', 4], [62, '여기서부터 제일 좋아하는 부분이에요.', 4],
-          [72, '(흥얼흥얼)', 4], [82.5, '…야. 손 늦는다.', 3, 0, 'b'], [86, '다다, 다다다…', 5],
-          [100, '이어폰 빼!', 3, 0, 'b'], [104, '…네.', 2], [106, '하나, 둘, 셋, 넷. 벨트 박자.', 6, 0, 'b'], [114, '…벨트 소리로도 되네요.', 3],
-          [120, '(흥얼흥얼… 아, 여기 곧 터지는데…)', 5], [128, '…참자, 참자…', 3], [132, '아, 이 부분만 듣고 뺄게요!', 3.5], [137, '…야!', 2.5, 0, 'b'],
+          [72, '(흥얼흥얼)', 4], [82.5, '…야. 이어폰 빼.', 3, 0, 'b'], [86, '예…? 뭐라고요?', 4],
+          [100, '이어폰 빼.라.고!', 3.5, 0, 'b', 'loud'], [104, '…네.', 2], [106, '옳지. 정박에 그래.', 5, 0, 'b'], [114, '…', 3],
+          [120, '(흥얼흥얼… 아, 여기 곧 터지는데…)', 5], [128, '…참자, 참자…', 3], [132, '아, 반장님! 이 부분은 진짜 못 참겠어요.', 4.5], [137, '…야!', 2.5, 0, 'b'],
           [142, '…허 참.', 3, 0, 'b'], [146, '여기서 곡이 확 바뀌어요! 이거예요 이거!!', 4], [160, '꾹 누르고… 빰!!', 3],
           [174, '(숨 고르고…)', 2.5], [177, '한 번 더 가요!', 2], [196, '반장님도 까딱하시는 거 다 보여요!', 4], [218, '끝! 어땠어요?', 3]],
     comfort: ['괜찮아요! 다시 쿵, 쿵.', '반장님이 손 보래요.'],
     intro: [
-      { who:'', text:'이틀째 밤. 3번 라인. 반장님은 사무실에 불려 갔다.' },
       { who:'지우', text:'안녕하세요! 지우예요. 오늘은 반장님 오실 때까지 제가 페어예요.' },
-      { who:'지우', text:'낮엔 학교, 밤엔 여기, 남는 시간엔 곡 써요. 언젠간 제 곡으로 페스티벌 무대 서는 게 꿈이에요.' },
+      { who:'지우', text:'형은 꿈 있어요? 저는 있어요.' },
+      { who:'지우', text:'언젠가 제 곡으로 페스티벌 무대 서는 게 꿈이에요.' },
       { who:'', text:'지우가 이어폰을 양쪽에 꽂았다.' },
-      { who:'지우', text:'반장님 오시기 전까지만요. 이게 있어야 박자가 맞거든요.' }],
+      { who:'지우', text:'반장님한테 말하시면 안 돼요. 이게 있어야 업무 효율이 늘거든요!' }],
     outro: (good, sp) => good ? [
       { who:'지우', text:'반장님, 어땠어요? 드롭 좋았죠?' },
       { who:'반장', text:'…시끄럽다.' },
@@ -879,10 +885,12 @@ function drawPartnerBody(id, pose, nowMs, active) { PARTNERS[id].draw(pose, nowM
 const OBS_X = 168;
 function drawObserver(t, nowMs, active) {
   if (!L.observer) return;
-  const beat = active ? beatAt(t) : 0, ph = beat - Math.floor(beat);
-  const cue = L.obsCue || {}, point = active && cue.point && beat >= cue.point[0] && beat < cue.point[1], softened = active && cue.soft != null && beat >= cue.soft, frown = active && !softened;
+  // after the song he stays where it left him, through the outro and the result, and the foot keeps tapping on the old tempo
+  const post = !active && (state === 'outro' || state === 'result'), on = active || post;
+  const beat = active ? beatAt(t) : post ? END_BEAT : 0, ph = post ? ((nowMs / 1000) / SPB) % 1 : beat - Math.floor(beat);
+  const cue = L.obsCue || {}, point = active && cue.point && beat >= cue.point[0] && beat < cue.point[1], softened = on && cue.soft != null && beat >= cue.soft, frown = active && !softened;
   // walking in from off-screen right
-  if (cue.enter && (!active || beat < cue.enter[0])) return;
+  if (cue.enter && (!on || beat < cue.enter[0])) return;
   const walking = active && cue.enter && beat < cue.enter[1];
   // through the drop 반장 goes from covering his ears (step 1) to a grudging nod on 1 and 3 (step 2) to the foot tap (soft)
   const hy = active && L.hype && inRange(beat, L.hype) ? hypeStage(beat) : 0, ears = hy === 1, nodding = hy === 2 && Math.floor(beat) % 2 === 0 && ph < 0.2;
@@ -2052,6 +2060,8 @@ function updateHud(t) {
     if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X;
     bubble.style.left = bx == null || bx < 60 ? '3cqw' : (bx / W * 100 - 5).toFixed(1) + '%';
     bubble.classList.toggle('obs', !!(spk && (L.cast ? (spk === 'b') !== (castPlacer(beat) === 'boss') : spk === 'b')));
+    bubble.classList.remove('loud');
+    if (line && line[5] === 'loud') { void bubble.offsetWidth; bubble.classList.add('loud'); FX.shakeUntil = performance.now() + 240; FX.shakeAmp = 2; }
   }
   let h = '';
   if (L.tutorial) for (let i = 0; i < 3; i++) { const n = notes[i]; if (n && n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 터치'; break; } }
