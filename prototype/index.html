@@ -256,6 +256,10 @@ const BLUES = { chords: [[220, 261.63, 329.63, 392], [146.83, 174.61, 220, 261.6
   prog: [0, 0, 0, 0, 1, 1, 0, 0, 2, 1, 0, 2] };
 // a short pentatonic lick with the blue note, played at the end of each 4-bar phrase
 const LICK = [[2, 'C5', 0.5], [2.5, 'D5', 0.5], [3, 'Ds5', 0.25], [3.25, 'E5', 0.5], [3.75, 'C5', 0.25]];
+// 1-2: A-minor EDM, Am | F | C | G, and a pluck hook in the drop (8ths per bar, null = rest)
+const EDM = { chords: [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]], roots: [110, 87.31, 130.81, 98] };
+const EDM_HOOK = [['E5', null, 'E5', 'D5', null, 'C5', null, 'A4'], ['C5', null, 'C5', 'A4', null, 'G4', null, 'A4'],
+  ['G4', null, 'G4', 'A4', null, 'C5', null, 'E5'], ['D5', null, 'D5', 'B4', null, 'G4', null, 'B4']];
 const N_ = { Ds5: 622.25, G4: 392, G5: 783.99, E4: 329.63, F4: 349.23, Gs4: 415.3, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, A5: 880 };
 // chorus hook, 8 bars: [beat offset inside the 8 bars, note, length in beats]
 const HOOK = [
@@ -306,38 +310,42 @@ const LEVELS = [
       { who:'', text:'휴게실 화이트보드에 빨간 글씨가 있었다. "다음 주 화 · 센터장 마감 점검".' }]
   }
   ,{
-    id:'s1-2', stageNo:'1-2', who:'반장', role:'반장 · 96 BPM', tag:'늦은 상자 · 음악이 빠지는 구간', bpm:96, div:2, style:'blues1', lofi:9000, chordShift:2,
-    clock:'02:40', title:'무릎', partners:['boss'], chords: BLUES.chords, roots: BLUES.roots, prog: BLUES.prog,
+    id:'s1-2', stageNo:'1-2', who:'지우', role:'지우 · 116 BPM', tag:'쿵쿵쿵쿵 · 조는 구간 늦은 상자', bpm:116, div:2, style:'edm1', chordShift:2,
+    clock:'02:40', title:'대타', partners:['jiwoo'], chords: EDM.chords, roots: EDM.roots,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
-    quiet: [[56, 104]], special:['늦은 상자', 'late', '받아냄'],
-    // 36 bars: two times round a 12-bar minor blues, then 8 bars of getting back on the beat
-    sections: [[0, 'intro'], [2, 'round1'], [14, 'knee'], [26, 'recover'], [34, 'outro']],
+    doze: [[72, 104]], dim: [[72, 104]], club: [[120, 168]], special:['조는 동안 늦은 상자', 'late', '받아냄'],
+    lateHint: '지우가 졸아요. 손이 늦어요. 손을 봐요',
+    // 44 bars: intro, groove, verse, breakdown (지우 dozes), build-up, drop, outro
+    sections: [[0, 'intro'], [2, 'groove'], [10, 'verse'], [18, 'breakdown'], [26, 'build'], [30, 'drop'], [42, 'outro']],
     bars: [
       '........', '........',
-      'x...x...', 'x.x.x...', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.xx', 'x.x.x...', 'h=..x...', 'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h===..x.', 'x.......',
-      'x...x...', 'x...L...', 'x...x...', 'L...x...', 'x...L...', 'x.......', 'L...L...', 'x...x...', 'L.x.L...', 'x...L...', 'L...x...', 'x.......',
-      'x.x.x.x.', 'x.x.x.xx', 'x.x.L.x.', 'x.x.x...', 'h=..x.xx', 'x.x.x.x.', 'x.x.x.xx', 'x.......',
+      'x.......', 'x...x...', 'x...x...', 'x...x...', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x...',
+      'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h=..x.x.', 'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h===....',
+      'x...x...', 'x...L...', 'x.......', 'L...x...', 'x...L...', '........', 'L...L...', 'x...x...',
+      'x...x...', 'x.x.x.x.', 'x.x.x.x.', 'x.x.xxx.',
+      'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h=..x.xx', 'x.x.x.x.', 'x.xxx.x.', 'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'x.......',
       '........', '........'
     ],
-    say: [[1, '어제처럼. 내 손 봐.', 4], [30, '좋아. 손 안 잊었네.', 3], [52, '…읏.', 2], [57.5, '미안. 무릎이 좀.', 3],
-          [66, '음악 말고 내 손을 봐.', 3.5], [78, '…늦게 올라가는 거, 기다려.', 3.5], [94, '그래, 그렇게.', 3],
-          [103, '…됐다. 다시 맞추자.', 3], [109, '한 번 더 늦는다. 미안.', 3], [134, '수고했다.', 3]],
-    comfort: ['괜찮아. 다음 거 봐.', '내가 늦으면 너도 늦어. 그거면 돼.'],
+    say: [[1, '쿵, 쿵, 쿵, 쿵. 이게 제 박자예요.', 5], [38, '오, 잘하시네요?', 3], [70, '아… 잠깐만요… 눈이…', 3], [74, 'zzZ…', 26],
+          [102, '헉! 안 잤어요! 안 잤어요!', 3], [118, '드롭 간다!', 2.5], [166, '끝! 수고하셨어요!', 3]],
+    comfort: ['괜찮아요, 저도 맨날 틀려요.', '반장님이 그랬어요. 손을 보라고.'],
     intro: [
       { who:'', text:'이틀째 밤. 출근 전 휴게실.' },
-      { who:'반장', text:'…어, 왔냐.' },
-      { who:'', text:'반장님이 무릎에 파스를 한 장 더 붙였다.' },
-      { who:'반장', text:'별거 아니다. 오늘은 내가 좀 늦을 수도 있어.' },
-      { who:'반장', text:'내가 늦으면 너도 늦어. 음악 말고 사람한테 맞추는 거다.' },
-      { who:'', text:'휴게실 구석에서 누군가 이어폰을 낀 채 엎드려 자고 있었다.' }],
+      { who:'반장', text:'…어, 왔냐. 오늘은 내가 라인 못 선다. 무릎이.' },
+      { who:'', text:'반장님 무릎에 파스가 두 장 붙어 있었다.' },
+      { who:'반장', text:'대타 왔다. 지우야, 인사해.' },
+      { who:'지우', text:'안녕하세요! 지우예요. 대학생이고요, 여기 반년 했어요.' },
+      { who:'지우', text:'저는 음악 틀어놓고 해요. 쿵, 쿵, 쿵, 쿵. 이게 제일 편해요.' },
+      { who:'반장', text:'…졸지만 마라.' },
+      { who:'지우', text:'시험기간이라 장담은 못 해요.' }],
     outro: (good, sp) => good ? [
-      { who:'반장', text:'…오늘은 네가 나를 받쳐줬네.' },
-      { who:'반장', text: sp >= 6 ? '늦게 올라간 거, 다 기다려줬지.' : '근데 내가 늦을 땐 음악을 따라가더라. 사람을 봐야지.' },
-      { who:'', text:'반장님은 달력의 다음 주 화요일에 동그라미를 쳤다. 센터장 점검.' },
-      { who:'반장', text:'점검 날은… 무릎 아파도 안 늦는다.' }] : [
-      { who:'반장', text:'내 탓이다. 무릎이.' },
-      { who:'반장', text:'내가 늦으면 너도 같이 늦어주면 돼. 그게 페어야.' },
-      { who:'', text:'반장님은 파스 냄새를 남기고 먼저 나갔다.' }]
+      { who:'지우', text: sp >= 4 ? '와, 저 졸 때도 맞춰주셨어요?' : '저 졸았을 때 좀 꼬였죠. 죄송해요!' },
+      { who:'지우', text:'반장님이 그러셨어요. 박자는 사람이 만드는 거라고. 저는 음악이 만드는 줄 알았는데.' },
+      { who:'', text:'반장님은 의자에 앉아 둘을 보고 있었다. 무릎에 손을 얹은 채로.' },
+      { who:'', text:'휴게실 달력, 다음 주 화요일에 빨간 동그라미. 센터장 점검.' }] : [
+      { who:'지우', text:'아, 제가 졸아서 그래요. 진짜 죄송해요.' },
+      { who:'반장', text:'둘 다 처음이다. 괜찮아.' },
+      { who:'', text:'휴게실 달력, 다음 주 화요일에 빨간 동그라미. 센터장 점검.' }]
   }
 ];
 // the stage board. Locked entries show what is coming.
@@ -454,11 +462,12 @@ function drawLights(bt, t, active) {
     return (inD ? s > 0.9 : s > 1.93) ? 0.15 : 1;
   });
   const ph = active && t > 0 ? beat - Math.floor(beat) : 1;
-  const pulse = Math.max(0, 1 - ph * 5) * 0.06;
+  const club = active && inRange(beat, L.club), dimK = active && inRange(beat, L.dim) ? 0.45 : 1;
+  const pulse = Math.max(0, 1 - ph * (club ? 3 : 5)) * (club ? 0.22 : 0.06);
   g.save(); g.globalCompositeOperation = 'lighter';
   tubes.forEach((x, k) => {
     const grd = g.createLinearGradient(0, 18, 0, 170);
-    grd.addColorStop(0, `rgba(255,236,170,${(0.15 + pulse) * alpha[k]})`); grd.addColorStop(1, 'rgba(255,236,170,0)');
+    grd.addColorStop(0, `rgba(255,236,170,${(0.15 * dimK + pulse) * alpha[k]})`); grd.addColorStop(1, 'rgba(255,236,170,0)');
     g.fillStyle = grd; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 88, 170); g.lineTo(x - 42, 170); g.closePath(); g.fill();
   });
   if (active && stats.combo >= 10) {
@@ -715,10 +724,10 @@ function drawLaserGlow(flash) {
 function drawRingsAt(dy, nowMs) {
   for (const r of rings) {
     if (r.dy !== dy) continue;
-    const a = (nowMs - r.at) / 420, e = 1 - (1 - a) * (1 - a);
-    g.strokeStyle = r.c;
-    g.globalAlpha = (1 - a) * 0.75; g.lineWidth = 2; g.beginPath(); g.ellipse(SCAN_X, BELT_Y - 8, 6 + e * 46, 4 + e * 26, 0, 0, Math.PI * 2); g.stroke();
-    if (a < 0.5) { g.globalAlpha = (0.5 - a) * 1.2; g.lineWidth = 1; g.beginPath(); g.ellipse(SCAN_X, BELT_Y - 8, 3 + e * 24, 2 + e * 14, 0, 0, Math.PI * 2); g.stroke(); }
+    const a = (nowMs - r.at) / 420, e = 1 - (1 - a) * (1 - a), s = 8 + e * 58;
+    g.globalAlpha = (1 - a) * 0.9; g.strokeStyle = r.c; g.lineWidth = 2;
+    g.strokeRect(Math.round(SCAN_X - s) + 0.5, Math.round(BELT_Y - 8 - s * 0.6) + 0.5, Math.round(s * 2), Math.round(s * 1.2));
+    if (a < 0.5) { const s2 = 4 + e * 30; g.globalAlpha = (0.5 - a) * 1.4; g.lineWidth = 1; g.strokeRect(Math.round(SCAN_X - s2) + 0.5, Math.round(BELT_Y - 8 - s2 * 0.6) + 0.5, Math.round(s2 * 2), Math.round(s2 * 1.2)); }
   }
   g.globalAlpha = 1;
 }
@@ -752,7 +761,6 @@ function drawBox(n, cx, bottom, mark, t, sq = 0) {
   const lw = Math.min(7, w - 4);
   if (lw >= 3) { R(x + 2, y + h - 6, lw, 4, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink); }
   if (n.heavy) { R(x + 2, y + 3, w - 4, 4, '#1b1716'); for (let k = 2; k < w - 5; k += 4) R(x + k + 1, y + 4, 2, 2, '#f0b429'); }
-  if (mark === 'hit') drawStamp(x + w / 2 + 2, y + h * 0.42, t - n.hitAt, n.judge);
   if (mark === 'miss') { g.globalAlpha = 0.35; R(x, y, w, h, '#7a1f18'); g.globalAlpha = 1; cross(x + w - 7, y + 3); }
 }
 function drawCrate(n, headX, bottom, t) {
@@ -769,7 +777,7 @@ function drawCrate(n, headX, bottom, t) {
     g.fillStyle = 'rgba(143,214,148,.3)'; g.fillRect(a, y, x0 + w - a, h);
     R(a, y + 1, x0 + w - a, 2, C.tape);
   }
-  if (n.state === 'hit') { g.fillStyle = 'rgba(143,214,148,.25)'; g.fillRect(x0, y, w, h); R(x0, y + 1, w, 2, C.tape); drawStamp(x0 + w - 8, y + 6, t - n.doneAt, 'perfect'); }
+  if (n.state === 'hit') { g.fillStyle = 'rgba(143,214,148,.25)'; g.fillRect(x0, y, w, h); R(x0, y + 1, w, 2, C.tape); }
   if (n.state === 'broken' || n.state === 'miss') {
     g.fillStyle = 'rgba(200,40,30,.32)'; g.fillRect(x0, y, w, h); cross(x0 + w - 8, y + 3);
     for (let k = 0; k < 3; k++) { const cxk = x0 + Math.round(w * (0.25 + k * 0.25)); for (let j = 0; j < h; j++) R(cxk + ((j >> 1) % 2 ? 1 : -1), y + j, 1, 1, '#3a1d12'); }
@@ -1051,6 +1059,26 @@ function bluesLead(t, f, d, vol = 0.05, bend = false) {
   gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(vol, t + 0.01); gn.gain.exponentialRampToValueAtTime(vol * 0.5, t + d * 0.7); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
   o.connect(fl); fl.connect(gn); gn.connect(mus); o.start(t); o.stop(t + d + 0.05);
 }
+const openHat = (t, v = 0.07) => noise(t, 'highpass', 8000, v, 0.09);
+function supersaw(t, fs, d, v = 0.022, cut = 3200) {
+  const fl = ctx.createBiquadFilter(), gn = ctx.createGain(); fl.type = 'lowpass'; fl.frequency.value = cut;
+  gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(1, t + 0.01); gn.gain.setValueAtTime(1, t + Math.max(0.02, d - 0.05)); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  fl.connect(gn); gn.connect(mus);
+  fs.forEach(f => [-14, 0, 14].forEach(dt => { const o = ctx.createOscillator(), og = ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = dt; og.gain.value = v; o.connect(og); og.connect(fl); o.start(t); o.stop(t + d + 0.05); }));
+}
+function pluck(t, f, d, v = 0.05) {
+  const o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
+  o.type = 'sawtooth'; o.frequency.value = f; fl.type = 'lowpass'; fl.frequency.setValueAtTime(4200, t); fl.frequency.exponentialRampToValueAtTime(500, t + d);
+  gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(v, t + 0.005); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(fl); fl.connect(gn); gn.connect(mus); o.start(t); o.stop(t + d + 0.05);
+}
+function riser(t, d, v = 0.08) {
+  const s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
+  s.buffer = nbuf; s.loop = true; fl.type = 'bandpass'; fl.Q.value = 2; fl.frequency.setValueAtTime(400, t); fl.frequency.exponentialRampToValueAtTime(8000, t + d);
+  gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(v, t + d); gn.gain.linearRampToValueAtTime(0, t + d + 0.03);
+  s.connect(fl); fl.connect(gn); gn.connect(mus); s.start(t); s.stop(t + d + 0.06);
+}
+const subDrop = t => { const o = osc('sine', 90, t, 0.005, 0.5, 0.9); o.frequency.exponentialRampToValueAtTime(32, t + 0.8); };
 const tom = (t, f, v = 0.4) => { const o = osc('sine', f, t, 0.002, v, 0.18); o.frequency.exponentialRampToValueAtTime(f * 0.6, t + 0.16); };
 
 // one backing track per partner, built from the same primitives. b = beat index, t = its time, s = seconds per beat there.
@@ -1153,6 +1181,36 @@ function buildEvents() {
       E(s / 2, T => organ(T, chords[ci].slice(1), s * 0.35, full ? 0.03 : 0.025));
       if (inBar === 0 && bar === 26) E(0, T => crash(T));
       if (phraseEnd && inBar === 0) for (const [ob, nm, len] of LICK) E(ob * s, T => bluesLead(T, N_[nm], len * s * 0.95, full ? 0.055 : 0.045, nm === 'E5'));
+    } else if (style === 'edm1') {
+      // house-style EDM: four-on-the-floor kick (that is every 쿵), open hats and bass on the off-beats, claps on 2 and 4.
+      // The breakdown drops the drums while 지우 dozes; the build-up rolls a snare and a riser into the drop.
+      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), hook = EDM_HOOK[ci];
+      if (sec === 'intro') { if (b >= 4 && inBar === 0) E(0, T => supersaw(T, chords[ci], s * 4, 0.01, 1200)); continue; }
+      if (sec === 'outro') continue;
+      if (sec === 'breakdown') {
+        if (inBar === 0) E(0, T => supersaw(T, chords[ci], s * 4, 0.012, 1400));
+        for (let k = 0; k < 2; k++) { const f = chords[ci][(inBar * 2 + k) % chords[ci].length] * 2; E(k * s / 2, T => pluck(T, f, s * 0.4, 0.022)); }
+        continue;
+      }
+      if (sec === 'build') {
+        const bi = bar - 26, per = bi < 2 ? 2 : bi < 3 ? 4 : 8;
+        for (let k = 0; k < per; k++) E(k * s / per, T => snare(T, 0.08 + 0.05 * bi + 0.03 * k / per));
+        if (bi === 0 && inBar === 0) E(0, T => riser(T, timeAt(120) - timeAt(104), 0.06));
+        E(0, T => kick(T, 0.7));
+        if (inBar === 0) E(0, T => supersaw(T, chords[ci], s * 4, 0.013, 1600 + bi * 600));
+        continue;
+      }
+      const drop = sec === 'drop', early = sec === 'groove' && bar < 6;
+      E(0, T => kick(T, drop ? 1 : 0.85));
+      if (!early) { E(0, T => hat(T, 0.03)); E(s / 2, T => openHat(T, drop ? 0.08 : 0.06)); }
+      if ((inBar === 1 || inBar === 3) && sec !== 'groove') E(0, T => clap(T, drop ? 0.26 : 0.2));
+      if (!early) E(s / 2, T => bass(T, roots[ci], s * 0.4, drop ? 900 : 650));
+      if (sec === 'verse') E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.3, 0.008, 2200));
+      if (drop) {
+        E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.4, 0.014, 3500));
+        for (let k = 0; k < 2; k++) { const nm = hook[inBar * 2 + k]; if (nm) E(k * s / 2, T => pluck(T, N_[nm], s * 0.45, 0.05)); }
+        if (inBar === 0 && bar === 30) E(0, T => { crash(T); subDrop(T); });
+      }
     } else if (style === 'duo') {
       if (dark) {
         // power is out: only the partner's thuds, a battery radio hiss and the alarm
@@ -1185,6 +1243,7 @@ function buildEvents() {
   const tEnd = timeAt(total - 4);
   ev.push([tEnd, T => {
     if (L.style === 'night1') { rhodes(T, chords[0], SPB * 6, 0.05); bass(T, roots[0], SPB * 4, 300); whistle(T, N_.C5, SPB * 3, 0.04); forklift(T + SPB * 2, 0.02); return; }
+    if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[0], SPB * 4, 0.016, 2400); return; }
     if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
     kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4);
   }]);
@@ -1392,7 +1451,7 @@ function updateHud(t) {
   };
   hintFor('len', '앞이 닿으면 누르고, 끝까지 유지', '유지…');
   hintFor('heavy', '무거운 상자: 양쪽을 같이');
-  { const fl = firstWith('late'); if (L.id !== 'jiwoo' && fl && fl.state === 'pending' && t > fl.place - SPB) h = '반장님 손이 늦어요. 음악 말고 손을 봐요'; }
+  { const fl = firstWith('late'); if (L.id !== 'jiwoo' && fl && fl.state === 'pending' && t > fl.place - SPB) h = L.lateHint || '반장님 손이 늦어요. 음악 말고 손을 봐요'; }
   if (L.id === 's1-1') {
     const offb = notes.find(n => n.beat % 2 === 1), pair = notes.find(n => n.beat % 1 === 0.5);
     if (offb && offb.state === 'pending' && t > offb.place - SPB) h = '짝: 2박, 4박에도 와요';
