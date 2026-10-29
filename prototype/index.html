@@ -274,6 +274,12 @@ const ANTHEM_LEAD = [
   [8, 'B4', 0.75], [9, 'D5', 1], [10, 'Fs5', 0.5], [10.5, 'G5', 0.5], [11, 'Fs5', 1],
   [12, 'E5', 0.75], [13, 'D5', 0.75], [14, 'B4', 1], [15, 'A4', 1]
 ];
+// 1-3: 지우's new track. E minor (Em | G | D | A) on a 3-3-2 (tresillo) bass; the marimba hook sits on the same three cells
+const TROP = { chords: [[164.81, 196, 246.94], [196, 246.94, 293.66], [146.83, 185, 220], [220, 277.18, 329.63]], roots: [82.41, 98, 73.42, 110] };
+const TROP_HOOK = [['E5', null, null, 'G5', null, null, 'B4', null], ['G5', null, null, 'D5', null, null, 'B4', null],
+  ['Fs5', null, null, 'D5', null, null, 'A4', null], ['E5', null, null, 'Cs5', null, null, 'A4', null]];
+// 반장 humming his blues (two bars), for the last stretch of the slow blues in 1-3
+const HUM = [[0, 'A4', 1], [1, 'C5', 0.5], [1.5, 'D5', 0.5], [2, 'E5', 1.5], [4, 'E5', 1], [5, 'D5', 1], [6, 'C5', 0.5], [6.5, 'A4', 1.5]];
 // chorus hook, 8 bars: [beat offset inside the 8 bars, note, length in beats]
 const HOOK = [
   [0, 'E5', 1.5], [1.5, 'C5', 0.5], [2, 'B4', 1], [3, 'A4', 1],
@@ -373,20 +379,21 @@ const LEVELS = [
       { who:'지우', text:'…다음엔 한쪽만 낄게요.' }]
   }
   ,{
-    id:'s1-3', stageNo:'1-3', who:'지우 → 반장', role:'지우 → 반장 · 120→88→104 BPM', tag:'템포 체인지 · 셔플 · 빠른 엇박', bpm:104,
-    tempo: [[0, 120], [64, 88], [116, 104]], style:'mix13', fxTheme: beat => beat < 64 || beat >= 116 ? 'neon' : 'blues', clock:'03:05', title:'선곡', partners:['jiwoo'],
+    id:'s1-3', stageNo:'1-3', who:'지우 → 반장', role:'지우 → 반장 · 124→88→104 BPM', tag:'셋·셋·둘 · 셔플 · 빠른 엇박', bpm:104,
+    tempo: [[0, 124], [64, 88], [116, 104]], style:'mix13', fxTheme: beat => beat < 64 ? 'trop' : beat >= 116 ? 'neon' : 'blues', tintColors: [[255, 157, 61], [61, 224, 200]], preClub: [[8, 56]], clock:'03:05', title:'선곡', partners:['jiwoo'],
     // cast: 지우 places first while 반장 watches; at beat 56 he walks over, takes an earbud, and they swap places by beat 64
     cast: { swap: 56 },
-    chords: [...EDM.chords, ...BLUES.chords], roots: [...EDM.roots, ...BLUES.roots],
+    chords: [...TROP.chords, ...BLUES.chords], roots: [...TROP.roots, ...BLUES.roots],
     chordAt: bar => bar < 16 ? ((bar - 2) % 4 + 4) % 4 : bar === 16 ? 4 : 4 + BLUES.prog[(((bar - (bar >= 38 ? 38 : bar >= 29 ? 29 : 17)) % 12) + 12) % 12],
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
-    tinny: [[57, 62.5]], lounge: [[68, 116]], club: [[120, 200]], special:['셔플 상자', 'shuffle', '받아냄'],
+    tinny: [[57, 62.5]], lounge: [[68, 116]], club: [[120, 200]], cut: [[151, 152]], special:['셔플 상자', 'shuffle', '받아냄'],
     sections: [[0, 'intro'], [2, 'groove'], [6, 'main'], [14, 'swap'], [16, 'count'], [17, 'blues'], [29, 'fuseIn'], [30, 'fusion'], [38, 'swing'], [50, 'outro']],
     // 8 cells per bar = straight 8ths. 12 cells per bar = triplets: 'x.x' is a shuffle pair (on the beat, then two thirds later)
     bars: [
       '........', '........',
-      'x...x...', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.xx',
-      'x.x.x.x.', 'x.x.x.xx', 'h=..x.x.', 'x.x.x.x.', 'x.xxx.x.', 'x.x.x.xx', 'x.x.x.x.', 'x.......',
+      // 지우's new track rides a 3-3-2: boxes on 1, the 'and' of 2, and 4
+      'x.......', 'x..x....', 'x..x..x.', 'x..x..x.',
+      'x..x..x.', 'x..x..x.', 'x..x..xx', 'h=.x..x.', 'x..x..x.', 'x.x..x..', 'x..x..x.', 'x.......',
       '........', '........',
       '............',
       'x.....x.....', 'x.....x.....', 'x..x..x..x..', 'x..x..x.x...', 'x..x..x..x..', 'x.x...x.x...',
@@ -399,8 +406,8 @@ const LEVELS = [
       '..x...x.x...', 'x.x..x..x..x', '..x..x..x..x', '..x..x..x...', 'x.x..x..x..x', '..x..x..x...',
       '........', '........'
     ],
-    say: [[1, '(이어폰 꽂고) 오늘도 제 곡이에요!', 4, 0, 'j'], [14, '…또 그거냐.', 3, 0, 'b'], [38, '반장님, 이번엔 신곡이에요. 들어보실래요?', 4, 0, 'j'],
-          [52, '…줘봐.', 3, 0, 'b'], [58.5, '…이게 무슨 음악이냐.', 2.5, 0, 'b'], [61, 'EDM이요! 하우스요!', 2, 0, 'j'], [63, '음악은 이런 거다.', 1, 0, 'b'],
+    say: [[1, '(이어폰 꽂고) 반장님! 신곡이에요, 신곡!', 4, 0, 'j'], [8, '이번 건 박자가 달라요. 셋, 셋, 둘!', 4, 0, 'j'], [14, '…또 뭐냐 그건.', 3, 0, 'b'], [38, '어제 밤새 만들었어요. 들어보실래요?', 4, 0, 'j'],
+          [52, '…줘봐.', 3, 0, 'b'], [58.5, '…이게 무슨 음악이냐.', 2.5, 0, 'b'], [61, '트로피컬 하우스요!', 2, 0, 'j'], [63, '음악은 이런 거다.', 1, 0, 'b'],
           [64.2, '하나, 둘, 셋, 넷.', 3.6, 0, 'b'], [70, '…블루스요? 이거 완전 옛날…', 4, 0, 'j'], [84, '쿵-짝. 길게, 짧게. 이게 흔들리는 거다.', 4, 0, 'b'],
           [100, '…어? 근데 이거 좀 좋은데요?', 4, 0, 'j'], [105, '박 사이. 거기가 블루스다.', 4, 0, 'b'],
           [116.3, '잠깐만요! 이거 제 곡에 넣어볼게요!', 3.5, 0, 'j'], [124, '…허 참. 이건 좀 낫네.', 3, 0, 'b'],
@@ -608,7 +615,7 @@ function drawLights(bt, t, active) {
   tubes.forEach((x, k) => { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, alpha[k] > 0.5 ? '#fff3c8' : '#5d5446'); });
   if (active && inRange(beat, L.preClub) && !reduce) {
     // the verse starts to lean toward the drop: colour creeps into the house lights on each beat
-    const k = Math.max(0, 1 - ph * 4) * 0.08, c = Math.floor(beat) % 2 ? [255, 79, 163] : [79, 227, 255];
+    const tc = L.tintColors || [[255, 79, 163], [79, 227, 255]], k = Math.max(0, 1 - ph * 4) * 0.08, c = tc[Math.floor(beat) % 2];
     g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${k})`;
     tubes.forEach(x => { g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 88, 170); g.lineTo(x - 42, 170); g.closePath(); g.fill(); });
     g.restore();
@@ -1455,7 +1462,8 @@ const fxTheme = beat => typeof L.fxTheme === 'function' ? L.fxTheme(beat) : (L.f
 const THEME = {
   warm: { ring: ['#8fd694', '#ffe9a8'], bits: ['#ffe9a8', '#efe6d2', '#efe6d2'], spark: ['#8fd694', '#ffe9a8'], glow: '#8fd694' },
   neon: { ring: ['#ff4fa3', '#4fe3ff'], bits: ['#ff4fa3', '#4fe3ff', '#cfe04a', '#ffffff'], spark: ['#ff4fa3', '#4fe3ff'], glow: '#4fe3ff' },
-  blues: { ring: ['#f0b429', '#ffe9a8'], bits: ['#f0b429', '#ffe9a8', '#efe6d2'], spark: ['#f0b429', '#ff8a3d'], glow: '#f0b429' }
+  blues: { ring: ['#f0b429', '#ffe9a8'], bits: ['#f0b429', '#ffe9a8', '#efe6d2'], spark: ['#f0b429', '#ff8a3d'], glow: '#f0b429' },
+  trop: { ring: ['#ff9d3d', '#3de0c8'], bits: ['#ff9d3d', '#3de0c8', '#ffe9a8', '#ffffff'], spark: ['#3de0c8', '#ff9d3d'], glow: '#3de0c8' }
 };
 function sfxPluck(t, f, v, d) {
   const o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
@@ -1465,7 +1473,11 @@ function sfxPluck(t, f, v, d) {
 }
 function hitSound(j, tones, beat, done) {
   const t = ctx.currentTime, th = fxTheme(beat), f = tones[(stats.combo + (done ? 1 : 0)) % Math.min(3, tones.length)], good = j === 'good';
-  if (th === 'neon') {
+  if (th === 'trop') {
+    // marimba: a sine with a wooden knock, the fifth above it fading fast
+    osc('sine', f * 4, t, 0.002, good ? 0.06 : 0.085, 0.3); osc('triangle', f * 6, t, 0.002, 0.02, 0.08); noise(t, 'bandpass', 1500, 0.12, 0.02, 3, bus);
+    if (done) tones.slice(0, 3).forEach(x => osc('sine', x * 4, t, 0.002, 0.05, 0.5));
+  } else if (th === 'neon') {
     sfxPluck(t, f * 4, good ? 0.05 : 0.075, 0.22);
     if (!good) sfxPluck(t, f * 8, 0.025, 0.12);
     noise(t, 'bandpass', 1900, good ? 0.1 : 0.16, 0.035, 2.5, bus);
@@ -1531,6 +1543,8 @@ function anthem(t, f, d, st = 1) {
     o.detune.value = dt; og.gain.value = v; o.connect(og); og.connect(fl); o.start(t); o.stop(t + d + 0.05);
   });
 }
+// a vocal-chop stand-in: a sine that slides down into the note
+const chop = (t, f, v = 0.04) => { const o = osc('sine', f * 1.12, t, 0.005, v, 0.14); o.frequency.exponentialRampToValueAtTime(f, t + 0.06); };
 // a laser zap that falls fast, for the top step of the drop
 const zap = (t, v = 0.03) => { const o = osc('sawtooth', 1800, t, 0.003, v, 0.09); o.frequency.exponentialRampToValueAtTime(300, t + 0.09); };
 const tom = (t, f, v = 0.4) => { const o = osc('sine', f, t, 0.002, v, 0.18); o.frequency.exponentialRampToValueAtTime(f * 0.6, t + 0.16); };
@@ -1729,11 +1743,18 @@ function buildEvents() {
       if (sec === 'intro') { if (b >= 4 && inBar === 0) E(0, T => supersaw(T, chords[ci], s * 4, 0.01, 1200)); continue; }
       if (sec === 'outro') continue;
       if (sec === 'groove' || sec === 'main' || (sec === 'swap' && b < 62)) {
-        E(0, T => kick(T, 0.9)); E(0, T => hat(T, 0.03)); E(s / 2, T => openHat(T, 0.07));
-        if (inBar === 1 || inBar === 3) E(0, T => clap(T, 0.22));
-        E(s / 2, T => bass(T, roots[ci], s * 0.4, 800));
-        E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.35, sec === 'main' ? 0.013 : 0.008, 3000));
-        if (sec !== 'groove') for (let k = 0; k < 2; k++) { const nm = hook[inBar * 2 + k]; if (nm) E(k * s / 2, T => pluck(T, N_[nm], s * 0.45, 0.045)); }
+        // 지우's new track: four kicks, claps on 2 and 4, shaker 16ths, the bass and the marimba hook on the 3-3-2 cells
+        // (beat 1, the 'and' of 2, beat 4), a vocal chop answering on the second and third cell. Pad pumps with the kick from 'main'.
+        const thook = TROP_HOOK[ci % 4], full = sec !== 'groove';
+        E(0, T => kick(T, full ? 0.9 : 0.75));
+        if (inBar === 1 || inBar === 3) E(0, T => clap(T, full ? 0.22 : 0.15));
+        for (let k = 0; k < 4; k++) E(k * s / 4, T => shaker(T, k % 2 ? 0.035 : 0.05));
+        if (full && inBar === 0) E(0, T => pumpPad(T, chords[ci], s, 0.008));
+        for (let k = 0; k < 2; k++) {
+          const cell = inBar * 2 + k, nm = thook[cell]; if (!nm) continue;
+          E(k * s / 2, T => { bass(T, roots[ci], s * 0.55, 700); pluck(T, N_[nm], s * 0.5, full ? 0.045 : 0.03); });
+          if (full && cell > 0 && b >= 16) E(k * s / 2 + s * 0.25, T => chop(T, N_[nm] / 2, 0.04));
+        }
         if (b === 57) E(0, T => { musHP.frequency.setValueAtTime(1300, T); musF.frequency.setValueAtTime(3200, T); mus.gain.setValueAtTime(0.32, T); });
         continue;
       }
@@ -1748,26 +1769,18 @@ function buildEvents() {
         continue;
       }
       if (sec === 'blues') {
-        // shuffle: everything leans on the beat and the last third of it
-        if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.8));
-        if (inBar === 1 || inBar === 3) E(0, T => snare(T, 0.24));
-        E(0, T => hat(T, 0.05)); E(2 * s / 3, T => hat(T, 0.035));
+        // shuffle: everything leans on the beat and the last third of it. The band builds over the twelve bars:
+        // kick, brushed snare, bass and a held organ first; the hats and comping join at bar 5; at bar 9 반장 hums the tune and the lick answers.
+        const bb = bar - 17;
+        if (inBar === 0 || inBar === 2) E(0, T => kick(T, bb < 4 ? 0.65 : 0.8));
+        if (inBar === 1 || inBar === 3) E(0, T => snare(T, bb < 4 ? 0.16 : 0.24));
         const boogie = [1, 1.189, 1.498, 1.682][inBar];
         E(0, T => bass(T, roots[ci] * boogie, s * 0.6, 380)); E(2 * s / 3, T => bass(T, roots[ci] * boogie, s * 0.3, 380));
+        if (bb < 4) { if (inBar === 0) E(0, T => organ(T, chords[ci], s * 4, 0.018)); E(2 * s / 3, T => roller(T, 0.03)); continue; }
+        E(0, T => hat(T, 0.05)); E(2 * s / 3, T => hat(T, 0.035));
         E(2 * s / 3, T => organ(T, chords[ci].slice(1), s * 0.3, 0.03));
+        if (bb >= 8 && bb < 10 && inBar === 0) for (const [ob, nm, len] of HUM) if (ob >= (bb - 8) * 4 && ob < (bb - 7) * 4) E((ob - (bb - 8) * 4) * s, T => whistle(T, N_[nm], len * s * 0.9, 0.04));
         if (((bar - 17) % 4 + 4) % 4 === 3 && inBar === 0) for (const [ob, nm, len] of LICK) E(ob * s, T => bluesLead(T, N_[nm], len * s * 0.95, 0.05, nm === 'E5'));
-        continue;
-      }
-      if (sec === 'swing') {
-        // phase 2: her four-on-the-floor, but every off-beat swings like his blues. Organ and saw stabs sit on the swung "and".
-        if (bar === 38 && inBar === 0) E(0, T => { crash(T); subDrop(T); });
-        E(0, T => kick(T, 1)); E(0, T => hat(T, 0.035)); E(2 * s / 3, T => openHat(T, 0.08));
-        if (inBar === 1 || inBar === 3) E(0, T => clap(T, 0.25)); else E(2 * s / 3, T => snare(T, 0.06));
-        const boogie = [1, 1.189, 1.498, 1.682][inBar];
-        E(0, T => bass(T, roots[ci] * boogie, s * 0.5, 750)); E(2 * s / 3, T => bass(T, roots[ci] * boogie, s * 0.25, 750));
-        E(2 * s / 3, T => organ(T, chords[ci].slice(1), s * 0.25, 0.032));
-        E(2 * s / 3, T => supersaw(T, chords[ci].slice(0, 3).map(f => f * 2), s * 0.22, 0.008, 3200));
-        if (((bar - 38) % 2 + 2) % 2 === 1 && inBar === 0) for (const [ob, nm, len] of (((bar - 38) >> 1) % 2 ? LICK : LICK_DOWN)) E(ob * s, T => bluesLead(T, N_[nm], len * s * 0.95, 0.055, nm === 'E5' || nm === 'A4'));
         continue;
       }
       if (sec === 'fuseIn') {
@@ -1777,7 +1790,9 @@ function buildEvents() {
       }
       // fusion: her four-on-the-floor under his blues organ and licks
       if (inBar === 0 && bar === 30) E(0, T => { crash(T); subDrop(T); });
-      if (bar === 37 && inBar === 3) for (let k = 0; k < 3; k++) E(k * s / 3, T => tom(T, 210 - k * 35));
+      // tom fill on beat 3, then one beat of nothing (the cut) before phase 2 lands
+      if (bar === 37 && inBar === 2) for (let k = 0; k < 3; k++) E(k * s / 3, T => tom(T, 210 - k * 35));
+      if (bar === 37 && inBar === 3) { E(0, T => mus.gain.setValueAtTime(0.0001, T)); E(s * 0.98, T => mus.gain.setValueAtTime(1, T)); continue; }
       E(0, T => kick(T, 1)); E(0, T => hat(T, 0.03)); E(s / 2, T => openHat(T, 0.075));
       if (inBar === 1 || inBar === 3) E(0, T => clap(T, 0.24));
       const boogie = [1, 1.189, 1.498, 1.682][inBar];
@@ -1910,7 +1925,7 @@ function stopHum() { if (hum) { try { hum.stop(); } catch (e) {} hum = null; } }
 function startHold(beat) {
   stopHold(); holdOsc = ctx.createOscillator(); const gn = ctx.createGain(), lf = ctx.createOscillator(), lg = ctx.createGain();
   const tones = CHORDS[chordIdx(beat || 0)], th = fxTheme(beat || 0);
-  holdOsc.type = th === 'neon' ? 'sawtooth' : 'sine'; holdOsc.frequency.value = tones[0] * 4;
+  holdOsc.type = th === 'neon' ? 'sawtooth' : th === 'trop' ? 'triangle' : 'sine'; holdOsc.frequency.value = tones[0] * 4;
   lf.frequency.value = 6; lg.gain.value = 8; lf.connect(lg); lg.connect(holdOsc.detune); lf.start(); holdOsc._lf = lf;
   const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 2400;
   gn.gain.value = th === 'neon' ? 0.02 : 0.04; holdOsc.connect(fl); fl.connect(gn); gn.connect(bus); holdOsc.start(); holdOsc._gn = gn;
@@ -2141,6 +2156,7 @@ function updateHud(t) {
     if (beat >= 166 && beat < 174) h = '느려져요. 반장님 속도로';
   }
   if (L.id === 's1-3') {
+    if (beat >= 10 && beat < 18) h = '셋·셋·둘: 딴, 딴, 딴';
     if (beat >= 63 && beat < 68) h = '템포가 바뀌어요. 반장님 손을 봐요';
     const sh = firstWith('shuffle'); if (sh && sh.state === 'pending' && t > sh.place - SPB) h = '셔플: 길게, 짧게';
     if (beat >= 104 && beat < 110) h = '엇박: 박과 박 사이에 내려와요';
