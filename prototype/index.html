@@ -440,9 +440,11 @@ const LEVELS = [
       'x..x..x..x..', 'h==...x..x..', 'x....x..x...', 'x..x..x.x...', '..x..x..x...', 'x...........',
       '........',
       // her song comes back at 120 under his guitar: the boxes stay on the slow pulse at first, then pick up her 8ths; two bars of break
-      'x.......', 'x...x...', 'x.......', 'x...x...', 'x...x...', 'x.x.x...', 'x...x...', 'h===....', 'x...x...', 'x.x.x.x.', 'h===....', '........',
-      // the second drop: the off-beats he taught at 60 now sit on her fast 'and'
-      'x...x...', '.x...x..', '.x...x..', 'x....x..', '.x.x....', '.x...x..', '.x.x.x..', 'x...x...', '.x...x.x', '.x.x.x..', '.x...x..', 'x.......',
+      // ('o' inside a hold = a small box riding on the crate: keep holding, tap it with the other hand)
+      'x.......', 'h===....', 'x...h=..', 'h=..x.h=', 'x.x.h===', 'h=o=....', 'x...x...', 'h=..h=..', 'h===o=..', 'x.x.x...',
+      'h=======', '........',
+      // the second drop: his off-beats on her fast 'and', long + short + long, and boxes on the crates
+      'x...x...', '.x.h====', 'h=o=.x..', 'x....x..', '.x.x.h==', 'h=o=o=..', '.x...x..', 'h===.x.x', 'x.x.h=o=', '.x.x.x..', 'h=o=h=o=', 'x.......',
       '........', '........'
     ],
     say: [[1, '(이어폰 꽂고) 반장님! 신곡이에요.', 4, 0, 'j'], [13, '…또 뭐냐 그건.', 2.5, 0, 'b'], [36.5, '들어보실래요? 어제 밤새 만들었어요.', 3, 0, 'j'], [50, '여기서부터 올라가요.', 3, 0, 'j'],
@@ -452,7 +454,7 @@ const LEVELS = [
           [132, '…어? 근데 이거 좀 좋은데요?', 4, 0, 'j'], [137, '박 사이. 거기가 블루스다.', 4, 0, 'b'],
           [148.3, '잠깐만요! 반장님 기타 위에 제 곡 얹어볼게요!', 3.5, 0, 'j'], [153, '(기타가 운다)', 3, 0, 'b'], [158, '…허 참. 내 기타에 니 노래를?', 3.5, 0, 'b'],
           [170, '들리죠? 둘이 같이 가는 거.', 3, 0, 'j'], [192, '반장님 기타… 원래 이렇게 멋있는 거였어요?', 4, 0, 'j'], [196, '…이제야 뭘 좀 아네.', 2.2, 0, 'b'],
-          [198.3, '한 번 더. 세게.', 1.5, 0, 'b'], [214, '(까딱까딱) 이거 몸이 먼저 알아요!', 4, 0, 'j'], [230, '…그래. 흔들려야 블루스지.', 4, 0, 'b'],
+          [198.3, '한 번 더. 세게.', 1.5, 0, 'b'], [204, '반장님 기타, 이제 제 신스로 받을게요!', 3.5, 0, 'j'], [214, '(까딱까딱) 이거 몸이 먼저 알아요!', 4, 0, 'j'], [230, '…그래. 흔들려야 블루스지.', 4, 0, 'b'],
           [242, '반장님 기타에 제 비트. 이거 된다.', 4, 0, 'j']],
     comfort: ['박자는 그대로다. 손이 바뀐 거지.', '내 손 봐.'],
     intro: [
@@ -556,8 +558,8 @@ function loadLevel(level) {
     for (let c = 0; c < bar.length; c++) {
       const ch = bar[c]; if (ch === '.' || ch === '=') continue;
       let len = 0;
-      if (ch === 'h') { let k = c + 1, cnt = 1; while (bar[k] === '=') { cnt++; k++; } len = cnt / div; }
-      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : 0), len, late: ch === 'L', heavy: ch === 'H', shuffle: div === 3 && c % 3 === 2, off: (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1), lane });
+      if (ch === 'h') { let k = c + 1, cnt = 1; while (bar[k] === '=' || bar[k] === 'o') { cnt++; k++; } len = cnt / div; }
+      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : 0), len, late: ch === 'L', heavy: ch === 'H', shuffle: div === 3 && c % 3 === 2, off: (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1), top: ch === 'o', lane });
     }
   }));
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
@@ -565,7 +567,7 @@ function loadLevel(level) {
     n.i = i; n.arr = timeAt(n.beat); n.place = n.arr - TRAVEL * SPB; n.end = timeAt(n.beat + n.len);
     if (n.len) { n.w = Math.round((n.end - n.arr) * SPEED) + 16; n.h = 12; }
     else if (n.heavy) { n.w = 26 + Math.floor(rnd(i, 1) * 5); n.h = 17 + Math.floor(rnd(i, 2) * 4); }
-    else if (level.small) { n.w = 8 + Math.floor(rnd(i, 1) * 5); n.h = 7 + Math.floor(rnd(i, 2) * 4); }
+    else if (level.small || n.top) { n.w = 8 + Math.floor(rnd(i, 1) * 5); n.h = 7 + Math.floor(rnd(i, 2) * 4); }
     else { n.w = 16 + Math.floor(rnd(i, 1) * 6); n.h = 12 + Math.floor(rnd(i, 2) * 5); }
     let prev = null; for (let k = i - 1; k >= 0; k--) if (notes[k].lane === n.lane) { prev = notes[k]; break; }
     const gap = prev ? (n.place - prev.place) / SPB : 2;
@@ -1275,7 +1277,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
       const jolt = ja < 0.35 ? Math.round(Math.sin(ja * 70) * 2.5 * Math.exp(-ja * 8)) : 0;
       boxQ.push([n, cx + jolt, sq]);
     }
-    for (const [n, x, sq] of boxQ) drawBox(n, x, BELT_Y, n.state, t, sq);
+    for (const [n, x, sq] of boxQ) drawBox(n, x, n.top ? BELT_Y - 12 : BELT_Y, n.state, t, sq);
     g.restore();
   }
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160);
@@ -1707,6 +1709,22 @@ function gtrDist(t, f, d, vol = 0.07, bend = false) {
   });
   noise(t, 'highpass', 5000, vol * 0.8, 0.02);
 }
+// the electronic lead that takes the tune over from the guitar in the second drop: a hollow square-and-triangle stack with a
+// bright saw an octave up, a filter that snaps open on the attack, vibrato on the long notes, a 3/16 echo behind it
+function synthLead(t, f, d, vol = 0.045, bend = false) {
+  const fl = ctx.createBiquadFilter(), gn = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+  fl.type = 'lowpass'; fl.Q.value = 2; fl.frequency.setValueAtTime(900, t); fl.frequency.exponentialRampToValueAtTime(4200, t + 0.05); fl.frequency.exponentialRampToValueAtTime(1600, t + Math.max(0.3, d));
+  gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(1, t + 0.01); gn.gain.setValueAtTime(1, t + Math.max(0.02, d - 0.06)); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  const dl = ctx.createDelay(1), fb = ctx.createGain(), dfl = ctx.createBiquadFilter(); dl.delayTime.value = 0.375; fb.gain.value = 0.35; dfl.type = 'lowpass'; dfl.frequency.value = 2500;
+  fl.connect(gn); gn.connect(mus); gn.connect(dl); dl.connect(dfl); dfl.connect(fb); fb.connect(dl); fb.connect(mus);
+  lfo.frequency.value = 5.6; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(d > 0.8 ? 10 : 3, t + Math.min(0.4, d * 0.5)); lfo.connect(lg);
+  [['square', 1, 0, vol * 0.5], ['triangle', 1, 0, vol * 0.6], ['sawtooth', 2, 6, vol * 0.22], ['sawtooth', 2, -6, vol * 0.22]].forEach(([type, mul, dt, v]) => {
+    const o = ctx.createOscillator(), og = ctx.createGain(); o.type = type; o.detune.value = dt;
+    o.frequency.setValueAtTime(f * mul * (bend ? 0.944 : 1), t); if (bend) o.frequency.exponentialRampToValueAtTime(f * mul, t + 0.12);
+    lg.connect(o.detune); og.gain.value = v; o.connect(og); og.connect(fl); o.start(t); o.stop(t + d + 0.05);
+  });
+  lfo.start(t); lfo.stop(t + d + 0.05);
+}
 // a vocal-chop stand-in: a sine that slides down into the note
 const chop = (t, f, v = 0.04) => { const o = osc('sine', f * 1.12, t, 0.005, v, 0.14); o.frequency.exponentialRampToValueAtTime(f, t + 0.06); };
 // a laser zap that falls fast, for the top step of the drop
@@ -1973,7 +1991,7 @@ function buildEvents() {
       const ph2 = sec === 'swing', brk = sec === 'break', pb = bar - 38, st = ph2 ? (bar >= 58 ? 3 : 2) : (bar >= 44 ? 1.5 : 1), rel3 = b - 152;
       if (brk && bar === 49 && inBar === 3) { E(0, T => mus.gain.setValueAtTime(0.0001, T)); E(s * 0.98, T => mus.gain.setValueAtTime(1, T)); continue; }
       if (b === 152) E(0, T => { crash(T); subDrop(T); gtrDist(T, N_.E5, s * 7, 0.085, true); });
-      if (b === 200) E(0, T => { crash(T); subDrop(T); gtrDist(T, N_.B5, s * 3, 0.08, true); });
+      if (b === 200) E(0, T => { crash(T); subDrop(T); synthLead(T, N_.B4, s * 3, 0.05, true); });
       if (inBar === 0) E(0, T => piano(T, chords[ci], s * 1.8, brk ? 0.05 : 0.045 + st * 0.005)); if (inBar === 1) E(s / 2, T => piano(T, chords[ci].slice(1), s * 1.2, 0.035)); if (inBar === 3) E(0, T => piano(T, chords[ci], s * 1.4, 0.04));
       if (brk) {
         if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4, 'sawtooth', 0.03));
@@ -1991,9 +2009,14 @@ function buildEvents() {
         if (st >= 3 && (inBar === 1 || inBar === 3)) E(s / 2, T => clap(T, 0.22));
         if (ph2 && bar > 50 && (bar - 50) % 4 === 0 && inBar === 0) E(0, T => { crash(T); whoosh(T, s * 2, true); });
       }
-      // his guitar over her chords: two four-bar phrases alternating, driven, an octave up for the last four bars
+      // the tune over her chords: two four-bar phrases alternating. Driven guitar through the fusion, clean guitar alone in the break,
+      // then the electronic lead takes it for the second drop (the guitar's edge fights the beat), an octave up for the last four bars
       const phr = Math.floor(rel3 / 16) % 2 ? GLEAD_B : GLEAD_A, rp = rel3 % 16, hi = bar >= 58;
-      if (rel3 >= 7) for (const [ob, nm, len, bend] of phr) if (Math.floor(ob) === rp) E((ob - rp) * s, T => gtrDist(T, N_[nm] * (hi ? 2 : 1), len * s * 0.96, brk ? 0.06 : 0.07 + (st >= 2 ? 0.01 : 0), !!bend));
+      if (rel3 >= 7 && !(b >= 200 && b < 203)) for (const [ob, nm, len, bend] of phr) if (Math.floor(ob) === rp) E((ob - rp) * s, T => {
+        if (ph2) synthLead(T, N_[nm] * (hi ? 2 : 1), len * s * 0.96, hi ? 0.04 : 0.045, !!bend);
+        else if (brk) gtrLead(T, N_[nm], len * s * 0.96, 0.055, !!bend);
+        else gtrDist(T, N_[nm], len * s * 0.96, 0.07 + (st >= 1.5 ? 0.01 : 0), !!bend);
+      });
     } else if (style === 'mix14') {
       // 마감: 반장's shuffle blues at 96, pushed to 112 as the pile grows; 지우 takes the line at 128 with her straight beat;
       // 반장 comes back for the last stretch and it is 1-3's fusion at 128. The yard outside (forklifts, the truck) never stops.
@@ -2341,6 +2364,7 @@ function updateHud(t) {
   };
   hintFor('len', '앞이 닿으면 누르고, 끝까지 유지', '유지…');
   hintFor('heavy', '무거운 상자: 양쪽을 같이');
+  hintFor('top', '긴 화물 위 상자: 누른 채로 다른 손으로 톡');
   { const fl = firstWith('late'); if (L.id !== 'jiwoo' && fl && fl.state === 'pending' && t > fl.place - SPB) h = L.lateHint || '반장님 손이 늦어요. 음악 말고 손을 봐요'; }
   if (L.id === 's1-2' && beat >= 104 && beat < 114) h = '이어폰 뺐어요. 벨트 박자로';
   if (L.id === 's1-2' && beat >= 172 && beat < 179) h = '숨 고르기. 곧 한 번 더';
