@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>벨트 위의 박자</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+/* Layout: the 16:9 game stage is the page; a work-desk panel of notes sits under it. One committed look: a warehouse at 3am under fluorescent tubes. */
+:root{
+  --night:#15110e;
+  --panel:#1f1915;
+  --line:#3a2f28;
+  --ink:#efe6d2;
+  --muted:#a6978a;
+  --paper:#efe6d2;
+  --paper-ink:#1d1815;
+  --paper-muted:#6d6156;
+  --vest:#f07a2a;
+  --vest-dark:#9c4512;
+  --tube:#ffe9a8;
+  --ok:#8fd694;
+  --laser:#ff5a4a;
+  --stamp:#c8372d;
+  --display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+body{background:var(--night);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.page{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 24px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--muted)}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,44px);line-height:1.1;margin:2px 0 0;text-wrap:balance}
+.head p{margin:0;color:var(--muted);max-width:44ch;font-size:14px;min-width:0}
+
+.stage{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;container-type:inline-size;overflow:hidden;border-radius:6px;background:#0d0a09;
+  outline:1px solid var(--line);touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer}
+.stage canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+
+.hud{position:absolute;top:2cqw;left:2.2cqw;right:2.2cqw;display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);
+  font-size:clamp(10px,1.55cqw,15px);letter-spacing:.06em;color:var(--ink);pointer-events:none;font-variant-numeric:tabular-nums}
+.hud span{background:rgba(13,10,9,.62);padding:.25em .6em;border-radius:3px}
+
+.bubble{position:absolute;left:3cqw;bottom:61%;max-width:36cqw;background:var(--paper);color:var(--paper-ink);font-weight:600;
+  font-size:clamp(11px,1.9cqw,18px);line-height:1.35;padding:.45em .75em;border-radius:6px;pointer-events:none;box-shadow:0 2px 0 rgba(0,0,0,.45)}
+.bubble::after{content:"";position:absolute;left:1.6em;bottom:-.45em;border:.5em solid transparent;border-top-color:var(--paper);border-bottom:0}
+
+.judge{position:absolute;left:78.1%;top:29%;transform:translateX(-50%);font-family:var(--display);font-size:clamp(16px,4cqw,40px);line-height:1;
+  text-shadow:0 2px 0 #000,0 0 12px rgba(0,0,0,.7);pointer-events:none;white-space:nowrap;text-align:center;opacity:0}
+.judge small{display:block;font-family:var(--mono);font-size:.36em;letter-spacing:.1em;margin-top:.35em;color:var(--ink)}
+.judge.perfect{color:var(--ok)} .judge.good{color:var(--tube)} .judge.miss{color:var(--laser)}
+.judge.pop{animation:pop .55s ease-out forwards}
+@keyframes pop{0%{opacity:1;transform:translate(-50%,12%) scale(1.25)}20%{transform:translate(-50%,0) scale(1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-35%)}}
+
+.hint{position:absolute;left:78.1%;top:79%;transform:translateX(-50%);font-family:var(--mono);font-size:clamp(10px,1.6cqw,15px);
+  background:var(--vest);color:#1b120c;padding:.2em .6em;border-radius:3px;pointer-events:none;white-space:nowrap}
+
+.dialog{position:absolute;left:3cqw;right:3cqw;bottom:3cqw;background:rgba(17,13,11,.95);border:1px solid var(--line);border-radius:6px;
+  padding:1.4cqw 2.2cqw 1.8cqw;min-height:11cqw}
+.dialog .who{display:inline-block;font-family:var(--display);font-size:clamp(11px,1.8cqw,17px);background:var(--vest);color:#1b120c;
+  padding:.05em .55em;border-radius:3px;margin-bottom:.35em}
+.dialog .text{font-size:clamp(12px,2.25cqw,22px);line-height:1.5;margin:0;min-height:1.5em}
+.dialog .text.narr{color:#cfc3b4}
+.dialog .next{position:absolute;right:2.2cqw;bottom:1.2cqw;font-family:var(--mono);font-size:clamp(10px,1.4cqw,13px);color:var(--muted);animation:blink 1s steps(2) infinite}
+.dialog .skip{position:absolute;top:1.1cqw;right:1.6cqw;font-family:var(--mono);font-size:clamp(10px,1.4cqw,13px);background:transparent;color:var(--muted);
+  border:1px solid var(--line);border-radius:3px;padding:.2em .6em;cursor:pointer}
+.dialog .skip:focus-visible{outline:2px solid var(--tube);outline-offset:2px}
+@keyframes blink{50%{opacity:0}}
+
+.overlay{position:absolute;inset:0;display:grid;place-items:center;background:rgba(10,8,7,.5);padding:3cqw}
+.label{width:min(100%,60cqw);max-height:100%;overflow:auto;background:var(--paper);color:var(--paper-ink);border-radius:4px;
+  box-shadow:0 1cqw 0 rgba(0,0,0,.4);padding:2cqw 2.6cqw 2.2cqw;position:relative;transform:rotate(-1.2deg);cursor:default}
+.label .bar{height:2cqw;min-height:8px;margin-bottom:1.1cqw;
+  background:repeating-linear-gradient(90deg,var(--paper-ink) 0 2px,transparent 2px 4px,var(--paper-ink) 4px 5px,transparent 5px 8px,var(--paper-ink) 8px 11px,transparent 11px 13px,var(--paper-ink) 13px 14px,transparent 14px 17px)}
+.label .kicker{font-family:var(--mono);font-size:clamp(9px,1.35cqw,13px);letter-spacing:.12em;display:flex;justify-content:space-between;gap:8px;
+  border-bottom:2px solid var(--paper-ink);padding-bottom:.35em}
+.label h2{font-family:var(--display);font-weight:400;font-size:clamp(22px,6cqw,58px);line-height:1;margin:.28em 0 .18em;text-wrap:balance}
+.label p{margin:0;font-size:clamp(11px,1.85cqw,17px);line-height:1.45}
+.label .row{display:flex;flex-wrap:wrap;align-items:center;gap:1.2cqw 1.6cqw;margin-top:1.5cqw}
+.keys{font-family:var(--mono);font-size:clamp(9px,1.3cqw,13px);color:var(--paper-muted)}
+.btn{font-family:var(--display);font-size:clamp(13px,2.1cqw,20px);background:var(--vest);color:#1b120c;border:0;border-radius:3px;padding:.42em 1.1em;
+  cursor:pointer;box-shadow:0 3px 0 var(--vest-dark)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--vest-dark)}
+.btn.ghost{background:transparent;color:var(--paper-ink);box-shadow:inset 0 0 0 2px var(--paper-ink)}
+.btn:focus-visible{outline:3px solid var(--vest);outline-offset:3px}
+
+.slip h2{font-size:clamp(18px,4cqw,40px)}
+.slip dl{display:grid;grid-template-columns:auto 1fr;gap:.1em 1.2em;margin:.5em 0 0;font-size:clamp(10px,1.7cqw,16px);line-height:1.45}
+.slip dt{font-family:var(--mono);color:var(--paper-muted);letter-spacing:.04em}
+.slip dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums;min-width:0}
+.stamp{position:absolute;right:3cqw;top:6cqw;border:.35cqw solid var(--stamp);color:var(--stamp);font-family:var(--display);
+  font-size:clamp(14px,3.2cqw,32px);padding:.12em .5em;border-radius:.3em;transform:rotate(-12deg);opacity:.88;pointer-events:none}
+
+.desk{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px 32px;border-top:1px solid var(--line);padding-top:16px}
+.desk section{min-width:0}
+.desk h3{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--muted);font-weight:500;margin:0 0 8px}
+.desk p,.desk li{font-size:14px;color:#d9cfc2;margin:0}
+.desk ol{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.desk .small{font-size:13px;color:var(--muted);margin-top:8px}
+.sync{display:flex;align-items:center;gap:10px}
+.sync button{width:36px;height:36px;border-radius:4px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:18px;cursor:pointer}
+.sync button:focus-visible{outline:2px solid var(--tube);outline-offset:2px}
+.sync output{font-family:var(--mono);min-width:7ch;text-align:center;font-variant-numeric:tabular-nums}
+kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;padding:0 .4em;background:var(--panel);color:var(--ink)}
+@media (prefers-reduced-motion: reduce){
+  .judge.pop{animation:fade .6s forwards} .dialog .next{animation:none}
+  @keyframes fade{0%,70%{opacity:1}100%{opacity:0}}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header class="head">
+    <div>
+      <div class="eyebrow">PROTOTYPE · 1장 · B동 3번 라인</div>
+      <h1>벨트 위의 박자</h1>
+    </div>
+    <p>야간 물류센터 리듬게임 시안. 음악이 아니라 옆에서 같이 일하는 사람의 손에 박자를 맞춥니다.</p>
+  </header>
+
+  <div class="stage" id="stage">
+    <canvas id="cv" width="384" height="216" aria-label="컨베이어 벨트 작업 화면"></canvas>
+    <div class="hud" id="hud" hidden><span id="clock">B동 3번 라인 · 03:12</span><span id="combo">콤보 0</span></div>
+    <div class="bubble" id="bubble" hidden></div>
+    <div class="judge" id="judge"></div>
+    <div class="hint" id="hint" hidden></div>
+
+    <div class="dialog" id="dialog" hidden>
+      <span class="who" id="who"></span>
+      <p class="text" id="dtext"></p>
+      <span class="next">▼ 스페이스 / 탭</span>
+      <button class="skip" id="skip" type="button">건너뛰기</button>
+    </div>
+
+    <div class="overlay" id="title">
+      <div class="label">
+        <div class="bar"></div>
+        <div class="kicker"><span>작업지시서 · 야간조</span><span>No. 0312-3B</span></div>
+        <h2>벨트 위의 박자</h2>
+        <p>반장님이 상자를 벨트에 올립니다. 상자가 스캐너에 닿는 순간 찍으세요.</p>
+        <div class="row">
+          <button class="btn" id="start" type="button">출근하기</button>
+          <span class="keys">스페이스 · J · F · 화면 탭 / 소리 켜고</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="overlay" id="result" hidden>
+      <div class="label slip">
+        <div class="bar"></div>
+        <div class="kicker"><span>근무 확인서</span><span id="r-no">B03-0312-0001</span></div>
+        <h2>첫 야간 근무</h2>
+        <div class="stamp" id="r-stamp">정상 처리</div>
+        <dl>
+          <dt>보내는 분</dt><dd>반장 · 3번 라인</dd>
+          <dt>받는 분</dt><dd>신입 (나)</dd>
+          <dt>처리 내역</dt><dd id="r-counts">딱 0 · 좋아 0 · 놓침 0</dd>
+          <dt>최대 콤보</dt><dd id="r-combo">0</dd>
+          <dt>늦은 상자</dt><dd id="r-late">0 / 3 받아냄</dd>
+          <dt>정확도</dt><dd id="r-acc">0%</dd>
+        </dl>
+        <div class="row">
+          <button class="btn" id="retry" type="button">다시 하기</button>
+          <button class="btn ghost" id="again" type="button">대화부터</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="desk">
+    <section>
+      <h3>이 시안에서 볼 것</h3>
+      <ol>
+        <li>큐는 음악이 아니라 반장님 손이에요. 상자를 내려놓는 "툭" 소리가 기준이에요.</li>
+        <li>중반에 반장님 무릎이 아파서 상자가 반 박 늦게 올라와요. 음악 대신 반장님을 따라가야 맞아요.</li>
+        <li>긴 액자 화물은 앞이 닿을 때 누르고, 끝이 지나갈 때까지 누르고 있어요.</li>
+      </ol>
+    </section>
+    <section>
+      <h3>조작</h3>
+      <p><kbd>Space</kbd> <kbd>J</kbd> <kbd>F</kbd> 또는 화면 탭. 대사는 같은 키로 넘겨요.</p>
+      <h3 style="margin-top:14px">싱크 보정</h3>
+      <div class="sync">
+        <button id="sync-minus" type="button" aria-label="보정값 낮추기">−</button>
+        <output id="sync-val">0 ms</output>
+        <button id="sync-plus" type="button" aria-label="보정값 높이기">+</button>
+      </div>
+      <p class="small">"늦음"이 자주 뜨면 +, "빠름"이 자주 뜨면 − 쪽으로.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+// ---------- constants ----------
+const W = 384, H = 216, BPM = 96, SPB = 60 / BPM, TRAVEL = 2;
+const PLACE_X = 66, SCAN_X = 300, BELT_Y = 146, BOSS_X = 46, PLAYER_X = 340;
+const SPEED = (SCAN_X - PLACE_X) / (TRAVEL * SPB);
+const WIN_P = 0.05, WIN_G = 0.10, WIN_M = 0.16, END_BEAT = 84;
+const $ = id => document.getElementById(id);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const rnd = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
+const lerp = (a, b, p) => a + (b - a) * p;
+const ease = p => p < 0 ? 0 : p > 1 ? 1 : p * p * (3 - 2 * p);
+
+const C = {
+  kraft:'#c48b52', kraftTop:'#d9a468', kraftDark:'#8f6236', tape:'#e6c88f', label:'#efe6d2', ink:'#1b1716',
+  vest:'#f07a2a', reflect:'#ebe5c9', shirt:'#6b7073', cap:'#2c3b57', skin:'#d9a27a', skinDark:'#b98260', hair:'#9a948e',
+  laser:'#ff4a3d', ok:'#8fd694', hoodie:'#2f4f58', vest2:'#cfe04a', hairDark:'#1e1a1a', crate:'#b48a5c', red:'#d8463b',
+  belt:'#38302c', slat:'#2a2320', face:'#171312', metal:'#6a7075'
+};
+
+// ---------- chart (arrival beats) ----------
+const notes = [];
+const N = (beat, o = {}) => notes.push({ beat, len: o.len || 0, late: !!o.late });
+for (let b = 8; b <= 22; b += 2) N(b);
+[24,25,26,28,29,30,32,33,34,36,37,38].forEach(b => N(b));
+N(40, {len:1}); N(42); N(44, {len:1}); N(46); N(47);
+N(48); N(50); N(52.5, {late:true}); N(54); N(56.5, {late:true}); N(58); N(60.5, {late:true}); N(62);
+[64,65,66,67,68,68.5,69,70].forEach(b => N(b));
+N(72, {len:1.5}); N(76); N(77); N(78); N(79);
+notes.forEach((n, i) => {
+  n.i = i; n.arr = n.beat * SPB; n.place = n.arr - TRAVEL * SPB; n.end = n.arr + n.len * SPB;
+  n.w = n.len ? Math.round(n.len * SPB * SPEED) + 16 : 16 + Math.floor(rnd(i, 1) * 6);
+  n.h = n.len ? 12 : 12 + Math.floor(rnd(i, 2) * 5);
+  const prev = notes[i - 1];
+  const gap = prev ? (n.place - prev.place) / SPB : 2;
+  n.carry = Math.min(0.75, Math.max(0.3, gap * 0.8)) * SPB;
+});
+const LONG_COUNT = notes.filter(n => n.len).length;
+const LATE_COUNT = notes.filter(n => n.late).length;
+const TUTORIAL = new Set([0, 1, 2]);
+const FIRST_LONG = notes.find(n => n.len).i;
+
+const SAY = [
+  [2, '자, 간다. 내 손 봐.', 4], [23, '좋아. 손 풀렸지?', 3], [37, '긴 거 온다. 끝까지 잡고 있어.', 3],
+  [49, '…읏.', 1.6], [52.8, '미안. 무릎이 좀.', 2.6], [56.6, '음악 말고 내 손을 봐.', 2.8],
+  [62.4, '…됐다. 다시 맞추자.', 2.4], [80.5, '수고했다.', 3]
+];
+
+const INTRO = [
+  { who:'', text:'새벽 3시 10분. 물류센터 B동, 3번 라인.' },
+  { who:'반장', text:'신입이지? 장갑 껴. 오늘은 내 옆이야.' },
+  { who:'반장', text:'이어폰 빼. 여기선 음악 듣는 거 아니다.' },
+  { who:'반장', text:'내가 상자 올리면, 그게 스캐너에 닿을 때 찍어. 삑 소리 나게.' },
+  { who:'반장', text:'벨트는 일정해. 박자는 사람이 만드는 거고.' },
+  { who:'', text:'반장님 무릎 쪽에서 파스 냄새가 났다.' }
+];
+
+// ---------- static background ----------
+const bg = document.createElement('canvas'); bg.width = W; bg.height = H;
+(() => {
+  const b = bg.getContext('2d');
+  const r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  r(0, 0, W, H, '#231b17');
+  r(0, 0, W, 34, '#191311');
+  for (let x = 0; x < W; x += 48) r(x, 0, 3, 34, '#211915');
+  r(0, 34, W, 2, '#2e241f');
+  for (let x = 24; x < W; x += 64) r(x, 36, 1, 132, '#2a211c');
+  let seed = 1;
+  const bays = [[66, 128], [214, 150]];
+  for (const [x0, w] of bays) {
+    r(x0, 44, 3, 124, '#41332a'); r(x0 + w - 3, 44, 3, 124, '#41332a');
+    for (const y of [64, 100, 136]) {
+      let x = x0 + 5;
+      while (x < x0 + w - 16) {
+        const bw = 9 + Math.floor(rnd(seed, 3) * 12), bh = 8 + Math.floor(rnd(seed, 4) * 16);
+        const c = ['#5b4330', '#4f3a2a', '#66503a'][Math.floor(rnd(seed, 5) * 3)];
+        r(x, y - bh, bw, bh, c); r(x, y - bh, bw, 1, '#76604a'); r(x + (bw >> 1), y - bh, 1, bh, '#6e5a42');
+        x += bw + 2 + Math.floor(rnd(seed, 6) * 5); seed++;
+      }
+      r(x0, y, w, 3, '#4a3a2f'); r(x0, y + 3, w, 1, '#1d1714');
+    }
+  }
+  // lane sign "3"
+  r(186, 36, 1, 8, '#4a4038'); r(200, 36, 1, 8, '#4a4038');
+  r(180, 44, 27, 15, '#d9a520'); r(180, 58, 27, 1, '#8a6a12');
+  const three = ['111', '001', '111', '001', '111'];
+  three.forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') r(190 + x * 2, 46 + y * 2, 2, 2, '#1d1815'); }));
+  // floor
+  r(0, 168, W, 48, '#18120f'); r(0, 168, W, 1, '#2e241f');
+  for (let x = 0; x < W; x += 14) r(x, 200, 8, 3, '#c99a1e');
+  // pallet + box stack beside the boss
+  r(0, 158, 34, 4, '#6b4a2e'); r(0, 162, 34, 2, '#4a3220'); r(2, 164, 4, 4, '#4a3220'); r(28, 164, 4, 4, '#4a3220');
+  const sb = (x, y) => { r(x, y, 15, 13, C.kraft); r(x, y, 15, 2, C.kraftTop); r(x + 13, y + 2, 2, 11, C.kraftDark); r(x + 6, y, 3, 13, C.tape); };
+  sb(1, 145); sb(17, 145); sb(1, 132); sb(17, 132); sb(9, 119);
+})();
+
+// ---------- drawing helpers ----------
+const cv = $('cv'), g = cv.getContext('2d');
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+const thick = (x1, y1, x2, y2, s, c) => {
+  const d = Math.max(1, Math.hypot(x2 - x1, y2 - y1));
+  for (let k = 0; k <= d; k++) { const p = k / d; R(lerp(x1, x2, p) - s / 2, lerp(y1, y2, p) - s / 2, s, s, c); }
+};
+const check = (x, y) => [[0,2],[1,3],[2,4],[3,3],[4,2],[5,1],[6,0]].forEach(([a, b]) => { R(x + a, y + b, 1, 2, C.ok); });
+const cross = (x, y) => { for (let k = 0; k < 5; k++) { R(x + k, y + k, 1, 1, C.red); R(x + 4 - k, y + k, 1, 1, C.red); } };
+
+function drawLights(bt, t, active) {
+  const tubes = [60, 180, 300];
+  const alpha = tubes.map((x, k) => {
+    if (reduce || k !== 1) return 1;
+    const inD = active && t > 48 * SPB && t < 64 * SPB;
+    const s = Math.sin(bt * 37) + Math.sin(bt * 13.3);
+    return (inD ? s > 0.9 : s > 1.93) ? 0.15 : 1;
+  });
+  g.save(); g.globalCompositeOperation = 'lighter';
+  tubes.forEach((x, k) => {
+    const grd = g.createLinearGradient(0, 18, 0, 170);
+    grd.addColorStop(0, `rgba(255,236,170,${0.15 * alpha[k]})`); grd.addColorStop(1, 'rgba(255,236,170,0)');
+    g.fillStyle = grd; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 88, 170); g.lineTo(x - 42, 170); g.closePath(); g.fill();
+  });
+  g.restore();
+  tubes.forEach((x, k) => { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, alpha[k] > 0.5 ? '#fff3c8' : '#5d5446'); });
+}
+
+function bossPose(t, bt, active) {
+  const idle = { x: BOSS_X + 13, y: 134 };
+  const pose = { hand: idle, carry: null, wince: false, dip: 0, bob: 0 };
+  if (!active) { pose.bob = Math.sin(bt * 1.7) > 0.85 ? 1 : 0; return pose; }
+  const ph = t / SPB - Math.floor(t / SPB);
+  pose.bob = t > 0 && ph < 0.18 ? 1 : 0;
+  let cur = null;
+  for (const n of notes) {
+    if (n.late && t > n.place - SPB && t < n.place + 0.4 * SPB) { pose.wince = true; pose.dip = 2; }
+    if (n.place - n.carry <= t) cur = n;
+  }
+  if (!cur) return pose;
+  const push = { x: PLACE_X - 10, y: 140 };
+  if (t <= cur.place) {
+    const p = (t - (cur.place - cur.carry)) / cur.carry;
+    if (cur.len) pose.hand = { x: lerp(idle.x, push.x, ease(p)), y: lerp(idle.y, push.y, ease(p)) };
+    else { const b = carryPos(cur, p); pose.carry = { n: cur, x: b.x, y: b.y }; pose.hand = { x: b.x - cur.w / 2 + 1, y: b.y + 2 }; }
+  } else if (t < cur.place + 0.35 * SPB) {
+    const p = ease((t - cur.place) / (0.35 * SPB));
+    const from = cur.len ? push : { x: PLACE_X - cur.w / 2 + 1, y: BELT_Y - cur.h / 2 + 2 };
+    pose.hand = { x: lerp(from.x, idle.x, p), y: lerp(from.y, idle.y, p) };
+  }
+  return pose;
+}
+function carryPos(n, p) {
+  const q = Math.max(0, Math.min(1, p));
+  return { x: lerp(16, PLACE_X, q), y: lerp(112, BELT_Y - n.h / 2, ease(q)) - Math.sin(Math.PI * q) * 14 };
+}
+
+function drawBoss(pose) {
+  const cx = BOSS_X, top = 90 + pose.dip + pose.bob;
+  R(cx - 11, top + 20, 3, 18, C.shirt);
+  R(cx - 9, top + 18, 18, 40, C.shirt);
+  R(cx - 9, top + 18, 6, 40, C.vest); R(cx + 3, top + 18, 6, 40, C.vest);
+  R(cx - 9, top + 34, 18, 2, C.reflect);
+  R(cx - 2, top + 15, 5, 4, C.skinDark);
+  R(cx - 6, top + 2, 12, 14, C.skin);
+  R(cx - 6, top + 7, 2, 3, C.skinDark);
+  R(cx - 6, top + 4, 3, 5, C.hair);
+  R(cx - 7, top - 1, 14, 5, C.cap); R(cx + 3, top + 3, 9, 2, C.cap);
+  if (pose.wince) { R(cx + 2, top + 8, 4, 1, C.ink); R(cx - 9, top + 5, 2, 3, '#9fd0ff'); }
+  else R(cx + 3, top + 7, 2, 2, C.ink);
+  R(cx + 1, top + 11, 6, 2, C.hair);
+}
+function drawBossArm(pose) {
+  const top = 90 + pose.dip + pose.bob;
+  thick(BOSS_X + 7, top + 22, pose.hand.x, pose.hand.y, 4, C.shirt);
+  R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
+}
+function drawPlayer(kick) {
+  const cx = PLAYER_X, top = 94 - (kick > 0.5 ? 1 : 0);
+  R(cx - 9, top + 18, 18, 36, C.hoodie);
+  R(cx - 9, top + 20, 18, 22, C.vest2); R(cx - 9, top + 32, 18, 2, C.reflect);
+  R(cx - 7, top + 14, 15, 5, '#264149');
+  R(cx - 6, top + 1, 12, 14, C.skin);
+  R(cx - 7, top - 1, 14, 5, C.hairDark); R(cx + 1, top + 1, 6, 10, C.hairDark);
+  R(cx - 4, top + 7, 2, 2, C.ink);
+}
+function drawPlayerArm(kick) {
+  const top = 94 - (kick > 0.5 ? 1 : 0);
+  const gx = 324 - kick * 4, gy = 128;
+  thick(PLAYER_X - 6, top + 22, gx + 2, gy + 3, 4, C.hoodie);
+  R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33');
+  R(gx - 10, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser);
+  R(gx, gy + 2, 3, 3, C.skin);
+}
+
+function drawBeltTop(bt) {
+  R(48, BELT_Y, W - 48, 4, C.belt);
+  const off = (bt * SPEED) % 10;
+  for (let x = 48 + off - 10; x < W; x += 10) if (x >= 48) R(x, BELT_Y, 1, 4, C.slat);
+  R(48, BELT_Y, W - 48, 1, '#4a403b');
+}
+function drawBeltFront(bt) {
+  R(46, BELT_Y + 4, W - 46, 12, C.face);
+  const ro = (bt * SPEED) % 14;
+  for (let x = 50 + ro - 14; x < W; x += 14) if (x >= 48) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); }
+  R(46, BELT_Y + 15, W - 46, 1, '#0c0a09');
+  for (const x of [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422');
+  R(44, BELT_Y - 1, 5, 17, '#3d3431');
+}
+function drawScannerBack() { R(SCAN_X - 11, 108, 4, 40, '#555a5f'); R(SCAN_X - 11, 105, 24, 5, C.metal); R(SCAN_X - 2, 110, 6, 3, '#2b2e31'); }
+function drawScannerFront(flash, holding) {
+  R(SCAN_X + 8, 108, 4, 56, '#7b8288'); R(SCAN_X + 8, 108, 4, 2, '#9aa1a6');
+  const col = flash > 0 || holding ? C.ok : C.laser;
+  g.globalAlpha = 0.25 + (flash > 0 ? 0.3 : 0); R(SCAN_X - 2, 113, 5, 33, col); g.globalAlpha = 1;
+  R(SCAN_X, 113, 1, 33, col);
+  R(SCAN_X + 2, 103, 5, 2, flash > 0 || holding ? C.ok : '#5a2b27');
+}
+function drawBox(n, cx, bottom, mark) {
+  const w = n.w, h = n.h, x = Math.round(cx - w / 2), y = Math.round(bottom - h);
+  R(x + 1, bottom, w, 1, 'rgba(0,0,0,.45)');
+  R(x, y, w, h, C.kraft); R(x, y, w, 2, C.kraftTop); R(x + w - 2, y + 2, 2, h - 2, C.kraftDark);
+  R(x + (w >> 1) - 1, y, 3, h, C.tape);
+  R(x + 2, y + h - 6, 7, 4, C.label);
+  for (let k = 0; k < 3; k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink);
+  if (mark === 'hit') check(x + w - 9, y + 3);
+  if (mark === 'miss') { g.globalAlpha = 0.35; R(x, y, w, h, '#7a1f18'); g.globalAlpha = 1; cross(x + w - 7, y + 3); }
+}
+function drawCrate(n, headX, bottom) {
+  const len = n.len * SPB * SPEED, x0 = Math.round(headX - len - 8), w = Math.round(len + 16), h = n.h, y = bottom - h;
+  R(x0 + 1, bottom, w, 1, 'rgba(0,0,0,.45)');
+  R(x0, y, w, h, C.crate); R(x0, y, w, 2, '#cfa676'); R(x0, y + h - 2, w, 2, '#8a6640');
+  for (let x = x0 + 8; x < x0 + w - 4; x += 12) R(x, y + 2, 1, h - 4, '#94704a');
+  R(x0, y, 3, h, '#7d5a37'); R(x0 + w - 3, y, 3, h, '#7d5a37');
+  for (let x = x0 + 14; x < x0 + w - 22; x += 40) {
+    R(x, y + 4, 16, 4, C.red); R(x + 3, y + 5, 3, 1, '#fff'); R(x + 4, y + 6, 1, 1, '#fff'); R(x + 9, y + 5, 4, 2, '#f3d5cf');
+  }
+  if (n.state === 'holding') { g.fillStyle = 'rgba(143,214,148,.32)'; const a = Math.max(x0, SCAN_X); g.fillRect(a, y, x0 + w - a, h); }
+  if (n.state === 'hit') { g.fillStyle = 'rgba(143,214,148,.28)'; g.fillRect(x0, y, w, h); check(x0 + w - 10, y + 3); }
+  if (n.state === 'broken' || n.state === 'miss') { g.fillStyle = 'rgba(200,40,30,.32)'; g.fillRect(x0, y, w, h); cross(x0 + w - 8, y + 3); }
+}
+
+let rings = [];
+function drawScene(t, bt, active, nowMs) {
+  g.drawImage(bg, 0, 0);
+  drawLights(bt, t, active);
+  const pose = bossPose(t, bt, active);
+  const kick = Math.max(0, 1 - (nowMs - lastPress) / 140);
+  drawBoss(pose);
+  drawPlayer(kick);
+  drawScannerBack();
+  drawBeltTop(bt);
+  let holding = false;
+  if (active) {
+    g.save(); g.beginPath(); g.rect(49, 0, W, H); g.clip();
+    for (const n of notes) {
+      if (t < n.place) break;
+      const cx = SCAN_X + (t - n.arr) * SPEED;
+      if (n.len) { if (cx - n.len * SPB * SPEED - 8 > W) continue; if (n.state === 'holding') holding = true; drawCrate(n, cx, BELT_Y); }
+      else {
+        if (cx - n.w / 2 > W) continue;
+        const hop = n.hitAt != null && n.state === 'hit' ? Math.round(3 * Math.exp(-(t - n.hitAt) * 14)) : 0;
+        drawBox(n, cx, BELT_Y - hop, n.state === 'hit' ? 'hit' : n.state === 'miss' ? 'miss' : '');
+      }
+    }
+    g.restore();
+  }
+  const flash = Math.max(0, 1 - (nowMs - lastGood) / 160);
+  drawScannerFront(flash > 0 ? flash : 0, holding);
+  drawBeltFront(bt);
+  if (pose.carry) drawBox(pose.carry.n, pose.carry.x, pose.carry.y + pose.carry.n.h / 2, '');
+  drawBossArm(pose);
+  drawPlayerArm(kick);
+  rings = rings.filter(r => nowMs - r.at < 420);
+  for (const r of rings) {
+    const a = (nowMs - r.at) / 420, s = 6 + a * 34;
+    g.globalAlpha = 1 - a; g.strokeStyle = r.c; g.lineWidth = 1;
+    g.strokeRect(Math.round(SCAN_X - s) + 0.5, Math.round(BELT_Y - 8 - s * 0.6) + 0.5, Math.round(s * 2), Math.round(s * 1.2));
+    g.globalAlpha = 1;
+  }
+}
+
+// ---------- audio ----------
+let ctx = null, bus = null, nbuf = null, hum = null, holdOsc = null;
+function ensureAudio() {
+  if (!ctx) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const comp = ctx.createDynamicsCompressor();
+    bus = ctx.createGain(); bus.gain.value = 0.7; bus.connect(comp); comp.connect(ctx.destination);
+    nbuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+    const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  if (ctx.state !== 'running') ctx.resume();
+}
+function env(gn, t, a, peak, dec) { gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(peak, t + a); gn.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); }
+function osc(type, f, t, a, peak, dec, dest = bus) {
+  const o = ctx.createOscillator(), gn = ctx.createGain(); o.type = type; o.frequency.setValueAtTime(f, t);
+  env(gn, t, a, peak, dec); o.connect(gn); gn.connect(dest); o.start(t); o.stop(t + a + dec + 0.05); return o;
+}
+function noise(t, type, freq, peak, dec, q = 0.7) {
+  const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), gn = ctx.createGain();
+  s.buffer = nbuf; f.type = type; f.frequency.value = freq; f.Q.value = q; env(gn, t, 0.002, peak, dec);
+  s.connect(f); f.connect(gn); gn.connect(bus); s.start(t, Math.random() * 0.5); s.stop(t + dec + 0.05);
+}
+const kick = (t, v = 0.9) => { const o = osc('sine', 150, t, 0.003, v, 0.28); o.frequency.exponentialRampToValueAtTime(42, t + 0.13); };
+const snare = t => { noise(t, 'highpass', 1500, 0.32, 0.14); osc('triangle', 190, t, 0.002, 0.18, 0.08); };
+const hat = (t, v) => noise(t, 'highpass', 7500, v, 0.035);
+const rim = (t, v) => noise(t, 'bandpass', 2600, v, 0.03, 4);
+const crash = t => noise(t, 'highpass', 4000, 0.22, 1.4);
+const thud = (t, v = 1) => { noise(t, 'lowpass', 380, 0.9 * v, 0.1); const o = osc('sine', 90, t, 0.002, 0.35 * v, 0.12); o.frequency.exponentialRampToValueAtTime(52, t + 0.1); };
+function bass(t, f, d) {
+  const o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
+  o.type = 'sawtooth'; o.frequency.value = f; fl.type = 'lowpass'; fl.frequency.value = 520; fl.Q.value = 3;
+  env(gn, t, 0.01, 0.2, d); o.connect(fl); fl.connect(gn); gn.connect(bus); o.start(t); o.stop(t + d + 0.05);
+}
+function pad(t, fs, d) {
+  const fl = ctx.createBiquadFilter(), gn = ctx.createGain(); fl.type = 'lowpass'; fl.frequency.value = 1000;
+  gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(0.03, t + 0.3); gn.gain.setValueAtTime(0.03, t + d - 0.3); gn.gain.linearRampToValueAtTime(0, t + d);
+  fl.connect(gn); gn.connect(bus);
+  fs.forEach(f => [-7, 7].forEach(dt => { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = dt; o.connect(fl); o.start(t); o.stop(t + d + 0.05); }));
+}
+const lead = (t, f, d) => osc('triangle', f, t, 0.005, 0.07, d);
+const beep = (t, f) => { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 4200; fl.connect(bus); osc('square', f, t, 0.002, 0.09, 0.06, fl); };
+const buzz = t => osc('sawtooth', 98, t, 0.004, 0.08, 0.16);
+const click = t => noise(t, 'bandpass', 1800, 0.12, 0.02, 3);
+const blip = (f) => { if (ctx && ctx.state === 'running') osc('square', f, ctx.currentTime, 0.002, 0.025, 0.025); };
+
+function buildEvents() {
+  const ev = [], B = b => b * SPB;
+  const chords = [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
+  const roots = [110, 87.31, 130.81, 98];
+  const arp = [0, 1, 2, 1, 0, 2, 1, 2];
+  for (let b = 0; b < 80; b++) {
+    const t = B(b), ci = Math.floor(b / 4) % 4, inBar = b % 4, D = b >= 48 && b < 64;
+    if (b < 4) { ev.push([t, T => rim(T, inBar === 0 ? 0.5 : 0.3)]); continue; }
+    if (inBar === 0) ev.push([t, T => pad(T, chords[ci], SPB * 4)]);
+    if (b < 8) { ev.push([t + SPB / 2, T => hat(T, 0.06)]); continue; }
+    ev.push([t, T => kick(T, D ? 0.4 : 0.9)]);
+    if (!D && (inBar === 1 || inBar === 3)) ev.push([t, T => snare(T)]);
+    ev.push([t, T => hat(T, D ? 0.03 : 0.07)]); ev.push([t + SPB / 2, T => hat(T, D ? 0.05 : 0.11)]);
+    if (D) { if (inBar === 0) ev.push([t, T => bass(T, roots[ci], SPB * 3.5)]); }
+    else { ev.push([t, T => bass(T, roots[ci], SPB * 0.4)]); ev.push([t + SPB / 2, T => bass(T, inBar === 3 ? roots[ci] * 2 : roots[ci], SPB * 0.4)]); }
+    if ((b >= 24 && b < 40) || (b >= 64 && b < 80)) {
+      for (let k = 0; k < 2; k++) { const f = chords[ci][arp[inBar * 2 + k]] * 2; ev.push([t + k * SPB / 2, T => lead(T, f, SPB * 0.4)]); }
+    }
+  }
+  ev.push([B(80), T => { kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, 110, SPB * 4); }]);
+  notes.forEach(n => ev.push([n.place, T => thud(T, n.len ? 1.25 : 1)]));
+  return ev.sort((a, b) => a[0] - b[0]);
+}
+let events = [], evI = 0, T0 = 0;
+function schedule() {
+  if (state !== 'play' || !ctx) return;
+  const horizon = ctx.currentTime + 0.2;
+  while (evI < events.length && T0 + events[evI][0] < horizon) { const [st, fn] = events[evI++]; fn(Math.max(T0 + st, ctx.currentTime)); }
+}
+setInterval(schedule, 30);
+function startHum() {
+  const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), gn = ctx.createGain();
+  s.buffer = nbuf; s.loop = true; f.type = 'lowpass'; f.frequency.value = 170; gn.gain.value = 0.06;
+  s.connect(f); f.connect(gn); gn.connect(bus); s.start(); hum = s;
+}
+function stopHum() { if (hum) { try { hum.stop(); } catch (e) {} hum = null; } }
+function startHold() {
+  stopHold(); holdOsc = ctx.createOscillator(); const gn = ctx.createGain();
+  holdOsc.type = 'triangle'; holdOsc.frequency.value = 1320; gn.gain.value = 0.035; holdOsc.connect(gn); gn.connect(bus); holdOsc.start();
+}
+function stopHold() { if (holdOsc) { try { holdOsc.stop(); } catch (e) {} holdOsc = null; } }
+
+// audible song time for a given performance.now() timestamp
+function songAt(perfMs) {
+  if (!ctx) return -99;
+  if (ctx.getOutputTimestamp) {
+    const ts = ctx.getOutputTimestamp();
+    if (ts.contextTime > 0 && ts.performanceTime > 0) return ts.contextTime + (perfMs - ts.performanceTime) / 1000 - T0;
+  }
+  return ctx.currentTime - (ctx.outputLatency || ctx.baseLatency || 0) + (perfMs - performance.now()) / 1000 - T0;
+}
+
+// ---------- game state ----------
+let state = 'title', stats = null, lastPress = -1e9, lastGood = -1e9;
+let offsetMs = 0;
+try { offsetMs = parseInt(localStorage.getItem('belt.offset') || '0', 10) || 0; } catch (e) {}
+const syncVal = $('sync-val');
+const showSync = () => { syncVal.textContent = (offsetMs > 0 ? '+' : '') + offsetMs + ' ms'; };
+const setSync = v => { offsetMs = Math.max(-200, Math.min(200, v)); showSync(); try { localStorage.setItem('belt.offset', String(offsetMs)); } catch (e) {} };
+$('sync-minus').addEventListener('click', () => setSync(offsetMs - 10));
+$('sync-plus').addEventListener('click', () => setSync(offsetMs + 10));
+showSync();
+
+function resetRun() {
+  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; });
+  stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, lateHit: 0 };
+  rings = [];
+}
+resetRun();
+
+const judgeEl = $('judge');
+function popJudge(kind, sub = '') {
+  const map = { perfect: ['딱!', 'perfect'], good: ['좋아', 'good'], miss: ['놓침', 'miss'], done: ['스캔 완료', 'perfect'], broken: ['끊김', 'miss'] };
+  const [txt, cls] = map[kind];
+  judgeEl.className = 'judge ' + cls;
+  judgeEl.innerHTML = '';
+  judgeEl.append(txt);
+  if (sub) { const s = document.createElement('small'); s.textContent = sub; judgeEl.append(s); }
+  void judgeEl.offsetWidth; judgeEl.classList.add('pop');
+}
+function ring(c) { rings.push({ at: performance.now(), c }); }
+function addCombo() { stats.combo++; stats.maxCombo = Math.max(stats.maxCombo, stats.combo); }
+function registerMiss(sub) { stats.miss++; stats.combo = 0; popJudge('miss', sub); if (ctx) buzz(ctx.currentTime); }
+
+function onHit(ts) {
+  const t = songAt(ts) - offsetMs / 1000;
+  lastPress = performance.now();
+  let target = null;
+  for (const n of notes) {
+    if (n.state !== 'pending') continue;
+    const d = t - n.arr;
+    if (d > WIN_M) continue;
+    if (d < -WIN_M) break;
+    target = n; break;
+  }
+  if (!target) { click(ctx.currentTime); return; }
+  const d = t - target.arr, ad = Math.abs(d);
+  target.hitAt = t;
+  if (ad <= WIN_G) {
+    const j = ad <= WIN_P ? 'perfect' : 'good';
+    stats[j]++; addCombo(); if (target.late) stats.lateHit++;
+    beep(ctx.currentTime, j === 'perfect' ? 1760 : 1320);
+    lastGood = performance.now(); ring(j === 'perfect' ? C.ok : '#ffe9a8');
+    popJudge(j, j === 'good' ? (d < 0 ? '빠름' : '늦음') : '');
+    if (target.len) { target.state = 'holding'; startHold(); } else target.state = 'hit';
+  } else { target.state = 'miss'; registerMiss(d < 0 ? '빠름' : '늦음'); }
+}
+function completeHold(n) {
+  n.state = 'hit'; stats.tailOk++; addCombo(); stopHold();
+  beep(ctx.currentTime, 2093); lastGood = performance.now(); ring(C.ok); popJudge('done');
+}
+function onRelease(ts) {
+  const t = songAt(ts) - offsetMs / 1000;
+  for (const n of notes) {
+    if (n.state !== 'holding') continue;
+    if (t >= n.end - 0.12) completeHold(n);
+    else { n.state = 'broken'; stats.tailBroken++; stats.combo = 0; stopHold(); popJudge('broken'); buzz(ctx.currentTime); }
+  }
+}
+function judgeTick(t) {
+  const tt = t - offsetMs / 1000;
+  for (const n of notes) {
+    if (n.state === 'pending' && tt - n.arr > WIN_M) { n.state = 'miss'; registerMiss(''); }
+    else if (n.state === 'holding' && tt >= n.end) completeHold(n);
+  }
+}
+
+// ---------- overlays ----------
+const hud = $('hud'), clockEl = $('clock'), comboEl = $('combo'), bubble = $('bubble'), hint = $('hint');
+let lastClock = '', lastCombo = -1, lastSay = '', lastHint = '';
+function updateHud(t) {
+  const mins = 12 + Math.max(0, Math.floor(t / SPB / 4));
+  const c = `B동 3번 라인 · 03:${String(mins).padStart(2, '0')}`;
+  if (c !== lastClock) { clockEl.textContent = c; lastClock = c; }
+  if (stats.combo !== lastCombo) { comboEl.textContent = '콤보 ' + stats.combo; lastCombo = stats.combo; }
+  const beat = t / SPB;
+  const line = SAY.find(([b, , d]) => beat >= b && beat < b + d);
+  const s = line ? line[1] : '';
+  if (s !== lastSay) { bubble.textContent = s; bubble.hidden = !s; lastSay = s; }
+  let h = '';
+  for (const i of TUTORIAL) { const n = notes[i]; if (n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 찍기'; break; } }
+  const fl = notes[FIRST_LONG];
+  if (fl.state === 'pending' && t > fl.place) h = '앞이 닿으면 누르고, 끝까지 유지';
+  if (fl.state === 'holding') h = '유지…';
+  if (h !== lastHint) { hint.textContent = h; hint.hidden = !h; lastHint = h; }
+}
+
+const dialogEl = $('dialog'), whoEl = $('who'), textEl = $('dtext');
+let dlg = null, typeTimer = null;
+function runDialog(lines, done) { dlg = { lines, i: 0, done, n: 0, full: '' }; dialogEl.hidden = false; showLine(); }
+function showLine() {
+  const L = dlg.lines[dlg.i];
+  whoEl.textContent = L.who; whoEl.hidden = !L.who; textEl.classList.toggle('narr', !L.who);
+  dlg.full = L.text; dlg.n = 0; clearInterval(typeTimer);
+  if (reduce) { dlg.n = L.text.length; textEl.textContent = L.text; return; }
+  textEl.textContent = '';
+  typeTimer = setInterval(() => {
+    if (!dlg) return clearInterval(typeTimer);
+    dlg.n++; textEl.textContent = dlg.full.slice(0, dlg.n);
+    if (L.who && dlg.n % 3 === 0) blip(L.who === '반장' ? 220 : 330);
+    if (dlg.n >= dlg.full.length) clearInterval(typeTimer);
+  }, 32);
+}
+function advanceDialog() {
+  if (!dlg) return;
+  if (dlg.n < dlg.full.length) { clearInterval(typeTimer); dlg.n = dlg.full.length; textEl.textContent = dlg.full; return; }
+  dlg.i++;
+  if (dlg.i >= dlg.lines.length) { const d = dlg.done; dlg = null; dialogEl.hidden = true; d(); }
+  else showLine();
+}
+$('skip').addEventListener('click', e => {
+  e.stopPropagation(); if (!dlg) return;
+  clearInterval(typeTimer); const d = dlg.done; dlg = null; dialogEl.hidden = true; d();
+});
+
+function beginShift() {
+  ensureAudio(); $('title').hidden = true; $('result').hidden = true; state = 'intro';
+  runDialog(INTRO, startPlay);
+}
+function startPlay() {
+  ensureAudio(); resetRun();
+  $('title').hidden = true; $('result').hidden = true;
+  events = buildEvents(); evI = 0; T0 = ctx.currentTime + 0.8;
+  lastClock = ''; lastCombo = -1; lastSay = ''; lastHint = '';
+  hud.hidden = false; state = 'play'; startHum();
+}
+function accuracy() { return (stats.perfect + stats.good * 0.6 + stats.tailOk) / (notes.length + LONG_COUNT); }
+function finishPlay() {
+  state = 'outro'; stopHum(); stopHold(); bubble.hidden = true; hint.hidden = true;
+  const acc = accuracy(), caught = stats.lateHit >= 2;
+  const lines = acc >= 0.8 ? [
+    { who:'반장', text:'…괜찮네, 신입.' },
+    { who:'반장', text: caught ? '아까 내가 늦었을 때, 네가 기다려줬지.' : '근데 내가 늦을 땐 음악을 따라가더라. 사람을 봐야지.' },
+    { who:'반장', text:'내일도 3번 라인이다. 늦지 마.' },
+    { who:'', text:'퇴근길, 반장님이 자판기 커피를 하나 더 뽑아 내 손에 쥐여줬다.' }
+  ] : [
+    { who:'반장', text:'처음엔 다 그래.' },
+    { who:'반장', text: caught ? '그래도 내가 늦었을 때 맞춰주더라. 그거면 됐어.' : '음악 말고 손을 봐. 내 손이 늦으면 너도 늦어야 돼.' },
+    { who:'반장', text:'내일 또 하자.' },
+    { who:'', text:'반장님은 무릎을 한 번 두드리고 먼저 나갔다.' }
+  ];
+  runDialog(lines, showResult);
+}
+let runNo = 0;
+function showResult() {
+  state = 'result'; hud.hidden = true; runNo++;
+  const acc = accuracy();
+  $('r-no').textContent = 'B03-0312-' + String(runNo).padStart(4, '0');
+  $('r-counts').textContent = `딱 ${stats.perfect} · 좋아 ${stats.good} · 놓침 ${stats.miss + stats.tailBroken}`;
+  $('r-combo').textContent = stats.maxCombo;
+  $('r-late').textContent = `${stats.lateHit} / ${LATE_COUNT} 받아냄`;
+  $('r-acc').textContent = (acc * 100).toFixed(1) + '%';
+  $('r-stamp').textContent = acc >= 0.9 ? '완벽 페어' : acc >= 0.75 ? '정상 처리' : acc >= 0.5 ? '재확인' : '재작업';
+  $('result').hidden = false;
+  $('retry').focus({ preventScroll: true });
+}
+$('start').addEventListener('click', e => { e.stopPropagation(); beginShift(); });
+$('retry').addEventListener('click', e => { e.stopPropagation(); startPlay(); });
+$('again').addEventListener('click', e => { e.stopPropagation(); beginShift(); });
+
+// ---------- input ----------
+const held = new Set();
+function press(ts) {
+  if (state === 'play') onHit(ts);
+  else if (dlg) advanceDialog();
+  else if (state === 'title') beginShift();
+}
+function release(ts) { if (state === 'play') onRelease(ts); }
+const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyD', 'KeyK']);
+addEventListener('keydown', e => {
+  if (!KEYS.has(e.code)) return;
+  const onButton = e.target instanceof Element && e.target.closest('button');
+  if (state !== 'play' && onButton) return;
+  e.preventDefault();
+  if (e.repeat) return;
+  held.add(e.code); press(e.timeStamp);
+});
+addEventListener('keyup', e => { if (held.delete(e.code) && held.size === 0) release(e.timeStamp); });
+const stage = $('stage');
+stage.addEventListener('pointerdown', e => {
+  if (e.target instanceof Element && e.target.closest('button, .label')) return;
+  e.preventDefault(); held.add('p' + e.pointerId); press(e.timeStamp);
+});
+const up = e => { if (held.delete('p' + e.pointerId) && held.size === 0) release(e.timeStamp); };
+addEventListener('pointerup', up); addEventListener('pointercancel', up);
+addEventListener('blur', () => { if (held.size) { held.clear(); release(performance.now()); } });
+
+// ---------- loop ----------
+function frame(now) {
+  requestAnimationFrame(frame);
+  const active = state === 'play';
+  const t = active ? songAt(now) : -99;
+  if (active) {
+    schedule(); judgeTick(t); updateHud(t);
+    if (t > END_BEAT * SPB) finishPlay();
+  }
+  drawScene(t, now / 1000, active, now);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
