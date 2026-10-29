@@ -43,11 +43,13 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,44px);l
   outline:1px solid var(--line);touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer}
 .stage canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 
-.hud{position:absolute;top:10.6cqw;left:2.2cqw;right:2.2cqw;display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);
+.hud{position:absolute;top:1.6cqw;left:2.2cqw;right:2.2cqw;display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);
   font-size:clamp(9px,1.5cqw,15px);line-height:1.3;letter-spacing:.06em;color:var(--ink);pointer-events:none;font-variant-numeric:tabular-nums}
 .hud span{display:inline-block;background:rgba(13,10,9,.62);padding:.15em .6em;border-radius:3px;transition:background-color .2s,color .2s}
 .hud span.hot{background:var(--vest);color:#1b120c}
 .hud span.pulse{animation:pulse .35s ease-out}
+.hud span.broke{animation:broke .5s ease-out}
+@keyframes broke{0%{background:var(--laser);color:#1b120c;transform:translateX(-4px)}15%{transform:translateX(4px)}30%{transform:translateX(-3px)}45%{transform:translateX(2px)}70%{background:var(--laser);color:#1b120c}100%{transform:none}}
 @keyframes pulse{0%{transform:scale(1.3)}100%{transform:scale(1)}}
 
 .bubble{position:absolute;left:3cqw;bottom:61%;max-width:36cqw;background:var(--paper);color:var(--paper-ink);font-weight:600;
@@ -59,6 +61,8 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,44px);l
 .judge small{display:block;font-family:var(--mono);font-size:.36em;letter-spacing:.1em;margin-top:.35em;color:var(--ink)}
 .judge.perfect{color:var(--ok)} .judge.good{color:var(--tube)} .judge.miss{color:var(--laser)}
 .judge.pop{animation:pop .55s ease-out forwards}
+.judge.miss.pop{animation:popmiss .7s ease-out forwards}
+@keyframes popmiss{0%{opacity:1;transform:translate(-50%,0) rotate(-7deg) scale(1.2)}12%{transform:translate(calc(-50% + 5px),0) rotate(5deg)}24%{transform:translate(calc(-50% - 4px),0) rotate(-3deg)}36%{transform:translate(-50%,0) rotate(0)}70%{opacity:1;transform:translate(-50%,12%)}100%{opacity:0;transform:translate(-50%,45%)}}
 @keyframes pop{0%{opacity:1;transform:translate(-50%,12%) scale(1.25)}20%{transform:translate(-50%,0) scale(1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-35%)}}
 
 .hint{position:absolute;left:78.1%;top:79%;transform:translateX(-50%);font-family:var(--mono);font-size:clamp(10px,1.6cqw,15px);
@@ -112,7 +116,7 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,44px);l
 .sync output{font-family:var(--mono);min-width:7ch;text-align:center;font-variant-numeric:tabular-nums}
 kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:3px;padding:0 .4em;background:var(--panel);color:var(--ink)}
 @media (prefers-reduced-motion: reduce){
-  .judge.pop{animation:fade .6s forwards} .dialog .next{animation:none} .hud span.pulse{animation:none}
+  .judge.pop{animation:fade .6s forwards} .dialog .next{animation:none} .hud span.pulse,.hud span.broke{animation:none} .judge.miss.pop{animation:fade .7s forwards}
   @keyframes fade{0%,70%{opacity:1}100%{opacity:0}}
 }
 </style>
@@ -184,9 +188,9 @@ kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-b
         <li>큐는 음악이 아니라 반장님 손이에요. 상자를 내려놓는 "툭" 소리가 기준이에요.</li>
         <li>중반에 반장님 무릎이 아파서 상자가 반 박 늦게 올라와요. 음악 대신 반장님을 따라가야 맞아요.</li>
         <li>긴 액자 화물은 앞이 닿을 때 누르고, 끝이 지나갈 때까지 누르고 있어요.</li>
-        <li>화면 위 바코드 띠가 악보예요. 막대가 빨간 판독선을 지날 때가 상자가 스캐너에 닿는 순간이에요. 번진 막대는 늦게 오는 상자, 굵은 막대는 긴 화물이에요.</li>
         <li>벨트의 노란 눈금이 정박이에요. 정박 상자는 눈금 위에, 늦은 상자는 눈금 사이에 실려 와요.</li>
         <li>스캐너 아래 작은 바늘이 빠름과 늦음을 보여줘요. 가운데 초록 칸이 딱이에요.</li>
+        <li>놓치면 음악이 잠깐 먹먹해져요. 연속으로 놓치면 반장님이 한마디 해줘요.</li>
       </ol>
     </section>
     <section>
@@ -311,7 +315,7 @@ const check = (x, y) => [[0,2],[1,3],[2,4],[3,3],[4,2],[5,1],[6,0]].forEach(([a,
 const cross = (x, y) => { for (let k = 0; k < 5; k++) { R(x + k, y + k, 1, 1, C.red); R(x + 4 - k, y + k, 1, 1, C.red); } };
 
 const CHORDS = [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
-const FX = { particles: [], marks: [], react: { type: '', at: -1e9 }, lastMiss: -1e9, shakeUntil: -1e9, playerNod: -1e9 };
+const FX = { particles: [], marks: [], react: { type: '', at: -1e9 }, lastMiss: -1e9, missKind: '', shakeUntil: -1e9, playerNod: -1e9, flinch: -1e9, binHit: -1e9, bossLine: null };
 const BIN = { x: 306, y: 186, w: 38, h: 22 }, PALLET = { x: 348, y: 204 };
 const FALL_X = SCAN_X + 16, GRAV = 520;
 
@@ -405,13 +409,14 @@ function drawBossArm(pose) {
 }
 const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
 function drawPlayer(kick, nowMs) {
-  const cx = PLAYER_X, top = playerTop(kick, nowMs);
+  const fl = nowMs - FX.flinch, cx = PLAYER_X + (fl < 160 ? 1 : 0), top = playerTop(kick, nowMs);
   R(cx - 9, top + 18, 18, 36, C.hoodie);
   R(cx - 9, top + 20, 18, 22, C.vest2); R(cx - 9, top + 32, 18, 2, C.reflect);
   R(cx - 7, top + 14, 15, 5, '#264149');
   R(cx - 6, top + 1, 12, 14, C.skin);
   R(cx - 7, top - 1, 14, 5, C.hairDark); R(cx + 1, top + 1, 6, 10, C.hairDark);
-  R(cx - 4, top + 7, 2, 2, C.ink);
+  if (fl < 500) { R(cx - 4, top + 6, 2, 3, C.ink); R(cx - 5, top + 5, 3, 1, C.hairDark); R(cx + 6, top + 2 + Math.floor(fl / 120), 2, 3, '#9fd0ff'); }
+  else R(cx - 4, top + 7, 2, 2, C.ink);
 }
 function drawPlayerArm(kick, nowMs) {
   const top = playerTop(kick, nowMs);
@@ -489,7 +494,10 @@ function drawCrate(n, headX, bottom, t) {
     R(a, y + 1, x0 + w - a, 2, C.tape);
   }
   if (n.state === 'hit') { g.fillStyle = 'rgba(143,214,148,.25)'; g.fillRect(x0, y, w, h); R(x0, y + 1, w, 2, C.tape); drawStamp(x0 + w - 8, y + 6, t - n.doneAt, 'perfect'); }
-  if (n.state === 'broken' || n.state === 'miss') { g.fillStyle = 'rgba(200,40,30,.32)'; g.fillRect(x0, y, w, h); cross(x0 + w - 8, y + 3); }
+  if (n.state === 'broken' || n.state === 'miss') {
+    g.fillStyle = 'rgba(200,40,30,.32)'; g.fillRect(x0, y, w, h); cross(x0 + w - 8, y + 3);
+    for (let k = 0; k < 3; k++) { const cxk = x0 + Math.round(w * (0.25 + k * 0.25)); for (let j = 0; j < h; j++) R(cxk + ((j >> 1) % 2 ? 1 : -1), y + j, 1, 1, '#3a1d12'); }
+  }
 }
 function missFall(n, t) {
   const cx = SCAN_X + (t - n.arr) * SPEED;
@@ -499,8 +507,8 @@ function missFall(n, t) {
   return { x: FALL_X + tt * 60, y: BELT_Y + 0.5 * GRAV * tt * tt, rot: Math.min(tt * 9, 1.1), landed: tf >= tLand };
 }
 // rework bin: missed boxes fall in and stay visible
-function drawBin(count) {
-  const { x, y, w, h } = BIN;
+function drawBin(count, nowMs) {
+  const { x, w, h } = BIN, y = BIN.y + (nowMs - FX.binHit < 120 ? 1 : 0);
   for (let k = 0; k < Math.min(count, 6); k++) {
     const bx = x + 3 + (k % 3) * 11 + (k > 2 ? 5 : 0), by = y - 4 - (k > 2 ? 3 : 0);
     R(bx, by, 10, 8, '#8f6236'); R(bx, by, 10, 1, '#a8774a'); cross(bx + 3, by + 1);
@@ -534,63 +542,19 @@ function drawGauge(nowMs) {
   }
   g.globalAlpha = 1;
 }
-function spawnBits(count, nowMs) {
-  for (let k = 0; k < count; k++) FX.particles.push({ x: SCAN_X + 1, y: 108, vx: -30 + Math.random() * 90, vy: -95 + Math.random() * 55, at: nowMs, c: k % 3 ? '#efe6d2' : '#ffe9a8' });
+function spawn(x, y, count, colors, vx0, vx1, vy0, vy1, grav = 320, life = 700, size = [2, 1]) {
+  const at = performance.now();
+  for (let k = 0; k < count; k++) FX.particles.push({ x, y, vx: lerp(vx0, vx1, Math.random()), vy: lerp(vy0, vy1, Math.random()), at, c: colors[k % colors.length], grav, life, size });
 }
+function spawnBits(count) { spawn(SCAN_X + 1, 108, count, ['#ffe9a8', '#efe6d2', '#efe6d2'], -30, 60, -95, -40); }
 function drawParticles(nowMs) {
-  FX.particles = FX.particles.filter(p => nowMs - p.at < 700);
+  FX.particles = FX.particles.filter(p => nowMs - p.at < p.life);
   for (const p of FX.particles) {
     const a = (nowMs - p.at) / 1000;
-    g.globalAlpha = 1 - (nowMs - p.at) / 700;
-    R(p.x + p.vx * a, p.y + p.vy * a + 160 * a * a, 2, 1, p.c);
+    g.globalAlpha = 1 - (nowMs - p.at) / p.life;
+    R(p.x + p.vx * a, p.y + p.vy * a + 0.5 * p.grav * a * a, p.size[0], p.size[1], p.c);
   }
   g.globalAlpha = 1;
-}
-
-// barcode tape: the chart printed as bars. It scrolls the same way as the belt,
-// and its red read line sits right above the scanner, so a bar crossing the line
-// is a box reaching the scanner. Future beats are to the left.
-const STRIP = { x0: 12, x1: 380, y: 24, h: 11, ppb: 56 };
-function drawStrip(time, live, nowMs) {
-  const { x0, x1, y, h, ppb } = STRIP, read = SCAN_X;
-  const cur = time / SPB, xOf = b => read + (cur - b) * ppb;
-  R(0, y - 3, x0 + 1, h + 6, '#3a3330'); R(2, y - 1, x0 - 4, h + 2, '#211b18'); R(x0 - 2, y + 2, 2, h - 4, '#c9ad4c');
-  R(x0, y, x1 - x0, h, '#e6dbc3'); R(x0, y, x1 - x0, 1, '#f3ead6'); R(x0, y + h - 1, x1 - x0, 1, '#bfb299');
-  R(x0 + 1, y + h, x1 - x0, 1, 'rgba(0,0,0,.45)');
-  g.save(); g.beginPath(); g.rect(x0, y, x1 - x0, h); g.clip();
-  const bLo = Math.floor(cur - (x1 - read) / ppb) - 1, bHi = Math.ceil(cur + (read - x0) / ppb) + 1;
-  for (let b = bLo; b <= bHi; b++) {
-    const x = Math.round(xOf(b)), bar = ((b % 4) + 4) % 4 === 0;
-    if (bar) R(x, y + 1, 1, h - 2, '#d2c6ad');
-    R(x, y + h - (bar ? 4 : 3), 1, bar ? 3 : 2, '#9d907a');
-  }
-  const top = y + 1, bh = h - 5;
-  for (const n of notes) {
-    if (n.beat < bLo - 2 || n.beat - n.len > bHi + 2) continue;
-    let ink = '#1d1815';
-    if (live) {
-      if (n.state === 'hit' || n.state === 'holding') ink = '#3f9a4c';
-      else if (n.state === 'miss' || n.state === 'broken') ink = '#c8372d';
-    }
-    const xa = Math.round(xOf(n.beat));
-    if (n.len) {
-      const xt = Math.round(xOf(n.beat + n.len));
-      R(xt - 1, top, xa - xt + 2, bh, ink);
-      R(xt + 1, top + 2, xa - xt - 2, 1, '#e6dbc3');
-    } else if (n.late) {
-      // printer slipped: a faint ghost where the beat should be, ink dragged to where the box really lands
-      const xg = Math.round(xOf(n.beat - 0.5));
-      R(xg, top, 1, bh, '#b5a88f');
-      for (let x = xa + 2; x < xg; x += 2) R(x, top + ((x >> 1) % 2), 1, bh - 1, '#8f8370');
-      R(xa - 1, top, 2, bh, ink);
-    } else R(xa - 1, top, 2, bh, ink);
-  }
-  g.restore();
-  const flash = nowMs - lastGood < 160, missF = nowMs - FX.lastMiss < 220;
-  const col = flash ? C.ok : missF ? '#ff2a1a' : C.laser;
-  R(read - 3, y - 4, 7, 3, '#555a5f'); R(read - 3, y + h + 1, 7, 2, '#555a5f');
-  g.globalAlpha = flash || missF ? 0.55 : 0.3; R(read - 1, y - 1, 3, h + 2, col); g.globalAlpha = 1;
-  R(read, y - 1, 1, h + 2, col);
 }
 
 let rings = [];
@@ -599,8 +563,6 @@ function drawScene(t, bt, active, nowMs) {
   if (!reduce && nowMs < FX.shakeUntil) g.translate(Math.round(Math.random() * 2 - 1), Math.round(Math.random() * 2 - 1));
   g.drawImage(bg, 0, 0);
   drawLights(bt, t, active);
-  // outside a run the tape loops through the chart as an attract loop
-  drawStrip(active ? t : (6 + (bt / SPB) % 72) * SPB, active, nowMs);
   const pose = bossPose(t, bt, active);
   pose.nod = FX.react.type === 'nod' && nowMs - FX.react.at < 130 ? 1 : 0;
   const kick = Math.max(0, 1 - (nowMs - lastPress) / 140);
@@ -625,22 +587,32 @@ function drawScene(t, bt, active, nowMs) {
       if (n.state === 'miss') {
         const f = missFall(n, t);
         if (f) {
-          if (f.landed) { binned++; if (!n.binSfx) { n.binSfx = true; if (ctx) thud(ctx.currentTime, 0.45); } }
+          if (f.landed) {
+            binned++;
+            if (!n.binSfx) {
+              n.binSfx = true; FX.binHit = nowMs; FX.shakeUntil = nowMs + 110;
+              if (ctx) thud(ctx.currentTime, 0.6);
+              spawn(BIN.x + BIN.w / 2, BIN.y - 2, 8, ['#8a7a68', '#6d6052', '#efe6d2'], -45, 45, -60, -20, 200, 500);
+            }
+          }
           else falling.push([n, f]);
           continue;
         }
       }
       if (cx - n.w / 2 > W) { if (n.state === 'hit') delivered++; continue; }
       const hop = n.state === 'hit' ? Math.round((n.judge === 'perfect' ? 4 : 2) * Math.exp(-(t - n.hitAt) * 14)) : 0;
-      drawBox(n, cx, BELT_Y - hop, n.state, t);
+      const ja = n.missKind === 'bad' ? t - n.hitAt : 9;
+      const jolt = ja < 0.35 ? Math.round(Math.sin(ja * 70) * 2.5 * Math.exp(-ja * 8)) : 0;
+      drawBox(n, cx + jolt, BELT_Y - hop, n.state, t);
     }
     g.restore();
   }
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160);
-  drawScannerFront(flash, holding, nowMs - FX.lastMiss < 220);
+  const mAge = nowMs - FX.lastMiss;
+  drawScannerFront(flash, holding, FX.missKind === 'pass' ? mAge < 420 && mAge % 210 < 120 : mAge < 220);
   drawBeltFront(beltT);
   drawGauge(nowMs);
-  drawBin(binned);
+  drawBin(binned, nowMs);
   drawPallet(delivered);
   for (const [n, f] of falling) { g.save(); g.translate(f.x, f.y - n.h / 2); g.rotate(f.rot); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); }
   if (pose.carry) drawBox(pose.carry.n, pose.carry.x, pose.carry.y + pose.carry.n.h / 2, '', t);
@@ -654,54 +626,70 @@ function drawScene(t, bt, active, nowMs) {
     g.globalAlpha = 1;
   }
   drawParticles(nowMs);
+  if (mAge < 320) {
+    const a = (1 - mAge / 320) * 0.4;
+    g.fillStyle = `rgba(210,30,20,${a})`;
+    g.fillRect(0, 0, W, 5); g.fillRect(0, H - 5, W, 5); g.fillRect(0, 5, 5, H - 10); g.fillRect(W - 5, 5, 5, H - 10);
+    g.fillStyle = `rgba(210,30,20,${a * 0.45})`;
+    g.fillRect(5, 5, W - 10, 5); g.fillRect(5, H - 10, W - 10, 5); g.fillRect(5, 10, 5, H - 20); g.fillRect(W - 10, 10, 5, H - 20);
+  }
   g.restore();
 }
 
 // ---------- audio ----------
-let ctx = null, bus = null, nbuf = null, hum = null, holdOsc = null;
+let ctx = null, bus = null, mus = null, musF = null, nbuf = null, hum = null, holdOsc = null;
 function ensureAudio() {
   if (!ctx) {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     const comp = ctx.createDynamicsCompressor();
     bus = ctx.createGain(); bus.gain.value = 0.7; bus.connect(comp); comp.connect(ctx.destination);
+    musF = ctx.createBiquadFilter(); musF.type = 'lowpass'; musF.frequency.value = 20000; musF.Q.value = 0.8;
+    mus = ctx.createGain(); mus.connect(musF); musF.connect(bus);
     nbuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
     const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
   }
   if (ctx.state !== 'running') ctx.resume();
 }
 function env(gn, t, a, peak, dec) { gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(peak, t + a); gn.gain.exponentialRampToValueAtTime(0.0001, t + a + dec); }
-function osc(type, f, t, a, peak, dec, dest = bus) {
+function osc(type, f, t, a, peak, dec, dest = mus) {
   const o = ctx.createOscillator(), gn = ctx.createGain(); o.type = type; o.frequency.setValueAtTime(f, t);
   env(gn, t, a, peak, dec); o.connect(gn); gn.connect(dest); o.start(t); o.stop(t + a + dec + 0.05); return o;
 }
-function noise(t, type, freq, peak, dec, q = 0.7) {
+function noise(t, type, freq, peak, dec, q = 0.7, dest = mus) {
   const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), gn = ctx.createGain();
   s.buffer = nbuf; f.type = type; f.frequency.value = freq; f.Q.value = q; env(gn, t, 0.002, peak, dec);
-  s.connect(f); f.connect(gn); gn.connect(bus); s.start(t, Math.random() * 0.5); s.stop(t + dec + 0.05);
+  s.connect(f); f.connect(gn); gn.connect(dest); s.start(t, Math.random() * 0.5); s.stop(t + dec + 0.05);
 }
 const kick = (t, v = 0.9) => { const o = osc('sine', 150, t, 0.003, v, 0.28); o.frequency.exponentialRampToValueAtTime(42, t + 0.13); };
 const snare = t => { noise(t, 'highpass', 1500, 0.32, 0.14); osc('triangle', 190, t, 0.002, 0.18, 0.08); };
 const hat = (t, v) => noise(t, 'highpass', 7500, v, 0.035);
 const rim = (t, v) => noise(t, 'bandpass', 2600, v, 0.03, 4);
 const crash = t => noise(t, 'highpass', 4000, 0.22, 1.4);
-const thud = (t, v = 1) => { noise(t, 'lowpass', 380, 0.9 * v, 0.1); const o = osc('sine', 90, t, 0.002, 0.35 * v, 0.12); o.frequency.exponentialRampToValueAtTime(52, t + 0.1); };
+const thud = (t, v = 1) => { noise(t, 'lowpass', 380, 0.9 * v, 0.1, 0.7, bus); const o = osc('sine', 90, t, 0.002, 0.35 * v, 0.12, bus); o.frequency.exponentialRampToValueAtTime(52, t + 0.1); };
 function bass(t, f, d) {
   const o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
   o.type = 'sawtooth'; o.frequency.value = f; fl.type = 'lowpass'; fl.frequency.value = 520; fl.Q.value = 3;
-  env(gn, t, 0.01, 0.2, d); o.connect(fl); fl.connect(gn); gn.connect(bus); o.start(t); o.stop(t + d + 0.05);
+  env(gn, t, 0.01, 0.2, d); o.connect(fl); fl.connect(gn); gn.connect(mus); o.start(t); o.stop(t + d + 0.05);
 }
 function pad(t, fs, d) {
   const fl = ctx.createBiquadFilter(), gn = ctx.createGain(); fl.type = 'lowpass'; fl.frequency.value = 1000;
   gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(0.03, t + 0.3); gn.gain.setValueAtTime(0.03, t + d - 0.3); gn.gain.linearRampToValueAtTime(0, t + d);
-  fl.connect(gn); gn.connect(bus);
+  fl.connect(gn); gn.connect(mus);
   fs.forEach(f => [-7, 7].forEach(dt => { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = dt; o.connect(fl); o.start(t); o.stop(t + d + 0.05); }));
 }
 const lead = (t, f, d) => osc('triangle', f, t, 0.005, 0.07, d);
 const beep = (t, f) => { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 4200; fl.connect(bus); osc('square', f, t, 0.002, 0.09, 0.06, fl); };
-const buzz = t => osc('sawtooth', 98, t, 0.004, 0.08, 0.16);
-const click = t => noise(t, 'bandpass', 1800, 0.12, 0.02, 3);
-const tear = t => noise(t, 'highpass', 2500, 0.22, 0.12);
-const blip = (f) => { if (ctx && ctx.state === 'running') osc('square', f, ctx.currentTime, 0.002, 0.025, 0.025); };
+const buzz = t => { osc('sawtooth', 98, t, 0.004, 0.1, 0.18, bus); osc('square', 104, t, 0.004, 0.05, 0.16, bus); };
+const errBeep = t => { osc('square', 330, t, 0.002, 0.07, 0.07, bus); osc('square', 247, t + 0.11, 0.002, 0.07, 0.1, bus); };
+const comboBreak = t => { const o = osc('sawtooth', 523, t, 0.005, 0.06, 0.4, bus); o.frequency.exponentialRampToValueAtTime(98, t + 0.4); };
+const glass = t => { noise(t, 'highpass', 5000, 0.28, 0.25, 0.7, bus); for (let k = 0; k < 5; k++) osc('sine', 2400 + Math.random() * 2600, t + k * 0.03, 0.001, 0.04, 0.16, bus); };
+const click = t => noise(t, 'bandpass', 1800, 0.12, 0.02, 3, bus);
+const tear = t => noise(t, 'highpass', 2500, 0.22, 0.12, 0.7, bus);
+const blip = (f) => { if (ctx && ctx.state === 'running') osc('square', f, ctx.currentTime, 0.002, 0.025, 0.025, bus); };
+function muffle() {
+  const t = ctx.currentTime;
+  musF.frequency.cancelScheduledValues(t); musF.frequency.setValueAtTime(450, t); musF.frequency.exponentialRampToValueAtTime(20000, t + 0.55);
+}
 
 function buildEvents() {
   const ev = [], B = b => b * SPB;
@@ -770,16 +758,16 @@ $('sync-plus').addEventListener('click', () => setSync(offsetMs + 10));
 showSync();
 
 function resetRun() {
-  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; });
-  FX.particles = []; FX.marks = []; FX.react = { type: '', at: -1e9 }; FX.lastMiss = -1e9; FX.shakeUntil = -1e9; FX.playerNod = -1e9;
-  stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, lateHit: 0 };
+  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; });
+  FX.particles = []; FX.marks = []; FX.react = { type: '', at: -1e9 }; FX.lastMiss = -1e9; FX.missKind = ''; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null;
+  stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, lateHit: 0, missStreak: 0 };
   rings = [];
 }
 resetRun();
 
 const judgeEl = $('judge');
 function popJudge(kind, sub = '') {
-  const map = { perfect: ['딱!', 'perfect'], good: ['좋아', 'good'], miss: ['놓침', 'miss'], done: ['스캔 완료', 'perfect'], broken: ['끊김', 'miss'] };
+  const map = { perfect: ['딱!', 'perfect'], good: ['좋아', 'good'], miss: ['놓침', 'miss'], done: ['스캔 완료', 'perfect'], broken: ['깨짐', 'miss'] };
   const [txt, cls] = map[kind];
   judgeEl.className = 'judge ' + cls;
   judgeEl.innerHTML = '';
@@ -797,13 +785,24 @@ function addCombo() {
   }
   return '';
 }
-function registerMiss(sub, d) {
-  stats.miss++; stats.combo = 0; popJudge('miss', sub);
-  const now = performance.now();
-  FX.lastMiss = now; FX.react = { type: 'glance', at: now };
+// shared failure feedback: judge text, scanner and screen flash, music muffle, reactions
+function failFx(kind, judgeKind, sub, d) {
+  const now = performance.now(), lost = stats.combo;
+  stats.combo = 0; stats.missStreak++;
+  popJudge(judgeKind, lost >= 10 ? lost + ' 콤보 끊김' : sub);
+  FX.lastMiss = now; FX.missKind = kind; FX.react = { type: 'glance', at: now }; FX.flinch = now;
   if (d != null) FX.marks.push({ d, at: now, c: C.laser });
-  if (ctx) buzz(ctx.currentTime);
+  if (ctx) {
+    if (kind === 'pass') errBeep(ctx.currentTime); else if (kind === 'broken') glass(ctx.currentTime); else buzz(ctx.currentTime);
+    muffle();
+    if (lost >= 10) comboBreak(ctx.currentTime + 0.06);
+  }
+  if (lost >= 10) { comboEl.classList.remove('pulse', 'broke'); void comboEl.offsetWidth; comboEl.classList.add('broke'); }
+  if (stats.missStreak === 3) sayNow('괜찮아. 다음 거 봐.');
+  else if (stats.missStreak === 6) sayNow('숨 쉬어. 내 손만 봐.');
 }
+function registerMiss(sub, d, kind) { stats.miss++; failFx(kind, 'miss', sub, d); }
+function sayNow(text) { FX.bossLine = { text, until: songAt(performance.now()) + 2.6 * SPB }; }
 
 function onHit(ts) {
   const t = songAt(ts) - offsetMs / 1000;
@@ -821,27 +820,27 @@ function onHit(ts) {
   target.hitAt = t;
   if (ad <= WIN_G) {
     const j = ad <= WIN_P ? 'perfect' : 'good', now = performance.now();
-    target.judge = j; stats[j]++;
+    target.judge = j; stats[j]++; stats.missStreak = 0;
     const milestone = addCombo();
     // the scan tone follows the current chord, so a clean run plays a melody
     const tones = CHORDS[Math.floor(Math.max(0, target.beat) / 4) % 4];
-    if (j === 'perfect') { const f = tones[stats.combo % 3] * 4; beep(ctx.currentTime, f); osc('triangle', f * 2, ctx.currentTime, 0.002, 0.035, 0.14); }
+    if (j === 'perfect') { const f = tones[stats.combo % 3] * 4; beep(ctx.currentTime, f); osc('triangle', f * 2, ctx.currentTime, 0.002, 0.035, 0.14, bus); }
     else beep(ctx.currentTime, tones[0] * 4);
     lastGood = now; ring(j === 'perfect' ? C.ok : '#ffe9a8');
-    spawnBits(j === 'perfect' ? 7 : 3, now);
+    spawnBits(j === 'perfect' ? 7 : 3);
     FX.marks.push({ d, at: now, c: j === 'perfect' ? C.ok : '#ffe9a8' });
     if (target.late) { stats.lateHit++; FX.react = { type: 'relief', at: now }; }
     else if (j === 'perfect') FX.react = { type: 'nod', at: now };
     popJudge(j, milestone || (j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''));
     if (target.len) { target.state = 'holding'; startHold(); } else target.state = 'hit';
     if (target.i === notes.length - 1 && j === 'perfect') FX.shakeUntil = now + 220;
-  } else { target.state = 'miss'; registerMiss(d < 0 ? '빠름' : '늦음', d); }
+  } else { target.state = 'miss'; target.missKind = 'bad'; registerMiss(d < 0 ? '너무 빠름' : '너무 늦음', d, 'bad'); }
 }
 function completeHold(n) {
   const now = performance.now();
   n.state = 'hit'; n.doneAt = songAt(now); stats.tailOk++; const milestone = addCombo(); stopHold();
   beep(ctx.currentTime, 2093); tear(ctx.currentTime);
-  lastGood = now; ring(C.ok); spawnBits(10, now); FX.shakeUntil = now + 150; FX.react = { type: 'nod', at: now };
+  lastGood = now; ring(C.ok); spawnBits(10); FX.shakeUntil = now + 150; FX.react = { type: 'nod', at: now };
   popJudge('done', milestone);
 }
 function onRelease(ts) {
@@ -850,15 +849,16 @@ function onRelease(ts) {
     if (n.state !== 'holding') continue;
     if (t >= n.end - 0.12) completeHold(n);
     else {
-      n.state = 'broken'; stats.tailBroken++; stats.combo = 0; stopHold(); popJudge('broken'); buzz(ctx.currentTime);
-      const now = performance.now(); FX.lastMiss = now; FX.react = { type: 'glance', at: now };
+      n.state = 'broken'; n.brokeAt = t; stats.tailBroken++; stopHold();
+      spawn(SCAN_X - 4, BELT_Y - 8, 12, ['#d8eef5', '#ffffff', '#9fc6d4'], -70, 70, -110, -40, 360);
+      failFx('broken', 'broken', '너무 일찍 뗌');
     }
   }
 }
 function judgeTick(t) {
   const tt = t - offsetMs / 1000;
   for (const n of notes) {
-    if (n.state === 'pending' && tt - n.arr > WIN_M) { n.state = 'miss'; n.hitAt = tt; registerMiss(''); }
+    if (n.state === 'pending' && tt - n.arr > WIN_M) { n.state = 'miss'; n.hitAt = tt; n.missKind = 'pass'; registerMiss('지나감', null, 'pass'); }
     else if (n.state === 'holding' && tt >= n.end) completeHold(n);
   }
 }
@@ -873,7 +873,7 @@ function updateHud(t) {
   if (stats.combo !== lastCombo) { comboEl.textContent = '콤보 ' + stats.combo; comboEl.classList.toggle('hot', stats.combo >= 10); lastCombo = stats.combo; }
   const beat = t / SPB;
   const line = SAY.find(([b, , d]) => beat >= b && beat < b + d);
-  const s = line ? line[1] : '';
+  const s = line ? line[1] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.text : '';
   if (s !== lastSay) { bubble.textContent = s; bubble.hidden = !s; lastSay = s; }
   let h = '';
   for (const i of TUTORIAL) { const n = notes[i]; if (n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 찍기'; break; } }
@@ -920,6 +920,7 @@ function startPlay() {
   $('title').hidden = true; $('result').hidden = true;
   events = buildEvents(); evI = 0; T0 = ctx.currentTime + 0.8;
   lastClock = ''; lastCombo = -1; lastSay = ''; lastHint = '';
+  musF.frequency.cancelScheduledValues(ctx.currentTime); musF.frequency.setValueAtTime(20000, ctx.currentTime);
   hud.hidden = false; state = 'play'; startHum();
 }
 function accuracy() { return (stats.perfect + stats.good * 0.6 + stats.tailOk) / (notes.length + LONG_COUNT); }
