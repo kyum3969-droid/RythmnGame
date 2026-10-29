@@ -69,6 +69,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   text-shadow:0 2px 0 #000,0 0 12px rgba(0,0,0,.7);pointer-events:none;white-space:nowrap;text-align:center;opacity:0}
 .judge small{display:block;font-family:var(--mono);font-size:.36em;letter-spacing:.1em;margin-top:.35em;color:var(--ink)}
 .judge.perfect{color:var(--ok)} .judge.good{color:var(--tube)} .judge.miss{color:var(--laser)}
+.judge.hook{color:#4fe3ff;text-shadow:0 3px 0 #000,0 0 14px rgba(79,227,255,.7)}
 .judge.bam{color:#ff4fa3;font-size:clamp(28px,8cqw,80px);text-shadow:0 3px 0 #000,0 0 18px rgba(255,79,163,.8),0 0 40px rgba(79,227,255,.5)}
 .judge.pop{animation:pop .55s ease-out forwards}
 .judge.miss.pop{animation:popmiss .7s ease-out forwards}
@@ -320,7 +321,7 @@ const LEVELS = [
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
     // 지우's own track plays in her earbuds. vibe: she hums along and her hand drifts late. unplug: 반장 makes her take them out,
     // no boxes come while she fumbles, then she plugs back in for "just this part" and the next box lands on the drop.
-    vibe: [[72, 104], [112, 120]], unplug: [[104, 112]], dim: [[104, 120]], club: [[120, 168]], hype: [[120, 168]], special:['흥얼거릴 때 늦은 상자', 'late', '받아냄'],
+    vibe: [[72, 104], [112, 120]], unplug: [[104, 112]], dim: [[104, 119.5]], club: [[119.5, 168]], hype: [[120, 168]], spin: [119, 1], special:['흥얼거릴 때 늦은 상자', 'late', '받아냄'],
     lateHint: '지우가 흥얼거려요. 손이 늦어요. 손을 봐요',
     sections: [[0, 'intro'], [2, 'groove'], [10, 'verse'], [18, 'vibe'], [26, 'unplug'], [30, 'drop'], [42, 'outro']],
     bars: [
@@ -329,7 +330,10 @@ const LEVELS = [
       'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h=..x.x.', 'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h===....',
       'x...x...', 'x...L...', 'x.......', 'L...x...', 'x...L...', '........', 'L...L...', 'x...x...',
       '........', '........', '........', '........',
-      'x.......', 'x...x...', 'x.......', 'x...x...', 'h===....', 'x...x...', 'x.......', 'x...x...', 'x...x...', 'h===....', 'x...x...', 'x.......',
+      // drop: boxes on beats 1 and 3 fire the big 빰, the rest follow the pluck hook (x.xx.x.x) and play its notes
+      'x.......', 'x...x...', 'x.......', 'x...x..x',
+      'x....x..', 'x.x..x..', 'h===.x.x', 'x.xx.x..',
+      'x.xx.x.x', 'x.xx.x.x', 'h===.x.x', 'x.xx.x.x',
       '........', '........'
     ],
     // [beat, text, beats shown, lane, speaker] speaker 'b' = 반장 watching from behind the belt
@@ -1124,8 +1128,17 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   drawPartnerArmOf(pid, pose);
   g.restore();
 }
+// one full turn of the whole screen, shrinking toward the middle and landing exactly on the drop
+function spinAt(t, active) {
+  if (!active || !L.spin || reduce) return null;
+  const p = (beatAt(t) - L.spin[0]) / L.spin[1];
+  return p >= 0 && p < 1 ? p : null;
+}
 function drawScene(t, bt, active, nowMs) {
+  const sp = spinAt(t, active);
+  if (sp != null) { g.fillStyle = '#05030a'; g.fillRect(0, 0, W, H); }
   g.save();
+  if (sp != null) { const a = Math.PI * 2 * sp * sp * (3 - 2 * sp), z = 1 - 0.42 * Math.sin(Math.PI * sp); g.translate(W / 2, H / 2); g.rotate(a); g.scale(z, z); g.translate(-W / 2, -H / 2); }
   if (!reduce && nowMs < FX.shakeUntil) { const a = FX.shakeAmp || 1; g.translate(Math.round((Math.random() * 2 - 1) * a), Math.round((Math.random() * 2 - 1) * a)); } else FX.shakeAmp = 1;
   if (active && !reduce && inRange(beatAt(t), L.club) && hypeStage(beatAt(t)) >= 3) { const ph = beatAt(t) % 1; if (ph < 0.12) g.translate(0, 1); }
   const pa = (nowMs - (FX.punchAt || -1e9)) / 150;
@@ -1376,6 +1389,13 @@ function fadeStop(src, gn, extra) {
   try { src.stop(t + 0.3); if (extra) extra.stop(t + 0.3); } catch (e) {}
 }
 function stopHypeHold() { if (holdRiser) { fadeStop(holdRiser, holdRiser._gn); holdRiser = null; } }
+// 샥: a noise sweep that climbs over one beat
+function whoosh(t, d) {
+  const s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
+  s.buffer = nbuf; fl.type = 'bandpass'; fl.Q.value = 2; fl.frequency.setValueAtTime(300, t); fl.frequency.exponentialRampToValueAtTime(7000, t + d);
+  gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(0.35, t + d * 0.85); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  s.connect(fl); fl.connect(gn); gn.connect(mus); s.start(t); s.stop(t + d + 0.05);
+}
 const tom = (t, f, v = 0.4) => { const o = osc('sine', f, t, 0.002, v, 0.18); o.frequency.exponentialRampToValueAtTime(f * 0.6, t + 0.16); };
 
 // one backing track per partner, built from the same primitives. b = beat index, t = its time, s = seconds per beat there.
@@ -1518,7 +1538,7 @@ function buildEvents() {
           mus.gain.setValueAtTime(0.32, T); mus.gain.linearRampToValueAtTime(1, T1);
         });
         if (!back) E(0, T => noise(T, 'bandpass', 950, 0.09, 0.03, 5, bus));
-        if (bi === 3 && inBar === 3) continue;
+        if (bi === 3 && inBar === 3) { E(0, T => whoosh(T, s)); continue; }
         for (let k = 0; k < per; k++) E(k * s / per, T => snare(T, 0.12 + 0.06 * bi));
         E(0, T => kick(T, back ? 0.9 : 0.8));
         if (inBar === 0) E(0, T => supersaw(T, chords[ci], s * 4, 0.016, back ? 3200 : 2200));
@@ -1535,7 +1555,7 @@ function buildEvents() {
       if (drop) {
         // the band keeps the floor; the big 빰 stabs only happen when the player scans (see hypeHit)
         E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.25, 0.006, 3000));
-        for (let k = 0; k < 2; k++) { const nm = hook[inBar * 2 + k]; if (nm) E(k * s / 2, T => pluck(T, N_[nm], s * 0.45, 0.04)); }
+        for (let k = 0; k < 2; k++) { const nm = hook[inBar * 2 + k]; if (nm) E(k * s / 2, T => pluck(T, N_[nm], s * 0.45, bar >= 34 ? 0.025 : 0.04)); }
         for (let k = 1; k < 4; k += 2) E(k * s / 4, T => hat(T, 0.035));
       }
     } else if (style === 'mix13') {
@@ -1696,7 +1716,7 @@ loadLevel(LEVELS[0]); resetRun();
 
 const judgeEl = $('judge');
 function popJudge(kind, sub = '', lane = 0) {
-  const map = { perfect: ['딱!', 'perfect'], good: ['좋아', 'good'], miss: ['놓침', 'miss'], done: ['스캔 완료', 'perfect'], broken: ['깨짐', 'miss'], bam: ['빰!', 'bam'] };
+  const map = { perfect: ['딱!', 'perfect'], good: ['좋아', 'good'], miss: ['놓침', 'miss'], done: ['스캔 완료', 'perfect'], broken: ['깨짐', 'miss'], bam: ['빰!', 'bam'], hook: ['딱!', 'hook'] };
   const [txt, cls] = map[kind];
   judgeEl.className = 'judge ' + cls;
   judgeEl.style.top = L.lanes === 2 && lane === 0 ? '12%' : '29%';
@@ -1771,7 +1791,7 @@ function judgeNote(target, t) {
     if (target.heavy) { lastHeavy = now; FX.shakeUntil = now + 90; thud(ctx.currentTime, 0.5); }
     const dark = blackout(target.beat);
     const hype = inRange(target.beat, L.hype);
-    popJudge(hype ? 'bam' : j, milestone || (dark ? '소리로' : target.heavy ? '두 손' : j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''), target.lane);
+    popJudge(hype ? (isBam(target) ? 'bam' : 'hook') : j, milestone || (dark ? '소리로' : target.heavy ? '두 손' : j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''), target.lane);
     if (target.len) { target.state = 'holding'; if (inRange(target.beat, L.hype)) { startHypeHold(target.end - target.arr); } else startHold(target.beat); } else target.state = 'hit';
     if (inRange(target.beat, L.hype) && !target.len) hypeHit(target, j === 'perfect' && stats.combo % 4 === 0);
     if (target.i === notes.length - 1 && j === 'perfect') FX.shakeUntil = now + 220;
@@ -1798,7 +1818,19 @@ function onHit(ts, key, lane = 0) {
 }
 const CONFETTI = ['#ff4fa3', '#4fe3ff', '#cfe04a', '#ffe9a8', '#a68bff', '#ff8a3d'];
 const CLUB = [[255, 79, 163], [79, 227, 255], [207, 224, 74], [166, 139, 255]];
+// in a hype section, beats 1 and 3 (and long crates) are the 빰; anything between plays the drop's pluck hook
+const isBam = n => !!n.len || n.beat % 2 === 0;
+function hookHit(n) {
+  const now = performance.now(), st = hypeStage(n.beat), t = ctx.currentTime, ci = chordIdx(n.beat);
+  const nm = EDM_HOOK[ci % 4][Math.round((((n.beat % 4) + 4) % 4) * 2)], f = nm ? N_[nm] : CHORDS[ci][0] * 2;
+  supersaw(t, [f], 0.5, 0.03, 4600, true); sfxPluck(t, f * 2, 0.045, 0.3); noise(t, 'bandpass', 2200, 0.14, 0.03, 2.5, bus);
+  FX.hypeAt = now - 120; FX.shakeUntil = now + 90; FX.shakeAmp = 1 + st * 0.5;
+  FX.punchAt = now; FX.punch = 1 + st * 0.4; FX.react[0] = { type: 'nod', at: now };
+  spawn(SCAN_X, BELT_Y - 10, 6 * st, CONFETTI, -120, 120, -180, -50, 260, 900, [2, 2]);
+  rings.push({ at: now, c: '#4fe3ff', dy: 0 });
+}
 function hypeHit(n, big) {
+  if (!isBam(n)) return hookHit(n);
   const now = performance.now();
   FX.hypeAt = now; FX.hypeBig = big; FX.club = ((FX.club || 0) + 1) % CLUB.length;
   const st = hypeStage(n.beat);
