@@ -239,7 +239,19 @@ const C = {
 const MAJ = [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]];
 // A-minor trot: Am | Dm | E7 | Am. The scale leans on the yonanuki minor (A B C E F) that gives trot its 뽕끼.
 const TROT = { chords: [[220, 261.63, 329.63], [293.66, 349.23, 440], [246.94, 293.66, 329.63, 415.3], [220, 261.63, 329.63]], roots: [110, 146.83, 82.41, 110], fifths: [164.81, 110, 123.47, 164.81] };
-const N_ = { E4: 329.63, F4: 349.23, Gs4: 415.3, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, A5: 880 };
+// 1-1: warm night chords descending Fmaj7 | Em7 | Dm7 | Cmaj7, and a whistled hook on C major pentatonic
+const NIGHT = { chords: [[174.61, 220, 261.63, 329.63], [164.81, 196, 246.94, 293.66], [146.83, 174.61, 220, 261.63], [130.81, 164.81, 196, 246.94]], roots: [87.31, 82.41, 73.42, 65.41] };
+const WHISTLE = [
+  [0, 'A4', 1], [1, 'C5', 1], [2, 'E5', 1.5], [3.5, 'D5', 0.5],
+  [4, 'E5', 1], [5, 'D5', 1], [6, 'B4', 2],
+  [8, 'A4', 1], [9, 'C5', 0.5], [9.5, 'D5', 0.5], [10, 'C5', 2],
+  [12, 'G4', 1], [13, 'A4', 1], [14, 'C5', 2],
+  [16, 'C5', 1], [17, 'E5', 1], [18, 'G5', 1.5], [19.5, 'E5', 0.5],
+  [20, 'D5', 1], [21, 'E5', 0.5], [21.5, 'D5', 0.5], [22, 'B4', 2],
+  [24, 'A4', 1], [25, 'C5', 1], [26, 'D5', 1], [27, 'F5', 1],
+  [28, 'E5', 3]
+];
+const N_ = { G4: 392, G5: 783.99, E4: 329.63, F4: 349.23, Gs4: 415.3, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, A5: 880 };
 // chorus hook, 8 bars: [beat offset inside the 8 bars, note, length in beats]
 const HOOK = [
   [0, 'E5', 1.5], [1.5, 'C5', 0.5], [2, 'B4', 1], [3, 'A4', 1],
@@ -253,8 +265,8 @@ const HOOK = [
 ];
 const LEVELS = [
   {
-    id:'s1-1', stageNo:'1-1', who:'반장', role:'반장 · 92 BPM', tag:'쿵 · 쿵짝 · 긴 화물 · 짝짝', bpm:92, div:2, style:'trot1', lofi:5200, chordShift:2,
-    clock:'02:50', title:'첫 출근', partners:['boss'], chords: TROT.chords, roots: TROT.roots, tutorial:true,
+    id:'s1-1', stageNo:'1-1', who:'반장', role:'반장 · 92 BPM', tag:'쿵 · 쿵짝 · 긴 화물 · 짝짝', bpm:92, div:2, style:'night1', lofi:6500, chordShift:2,
+    clock:'02:50', title:'첫 출근', partners:['boss'], chords: NIGHT.chords, roots: NIGHT.roots, tutorial:true,
     special:['긴 화물', 'len', '끝까지'],
     // song form by bar: intro, practice, verse, bridge, chorus, interlude, verse 2, chorus 2, outro
     sections: [[0, 'intro'], [2, 'practice'], [6, 'verse'], [14, 'bridge'], [18, 'chorus'], [26, 'inter'], [30, 'verse2'], [38, 'chorus2'], [46, 'outro']],
@@ -950,6 +962,21 @@ function trotLead(t, f, d, vol = 0.055) {
 const ep = (t, fs, d, v = 0.04) => fs.forEach(f => { osc('triangle', f, t, 0.004, v, d); osc('sine', f * 2, t, 0.003, v * 0.35, d * 0.5); });
 const clap = (t, v = 0.22) => { noise(t, 'bandpass', 1400, v, 0.06, 1.2); noise(t + 0.012, 'bandpass', 1500, v * 0.8, 0.09, 1.2); };
 const crackle = (t, v) => noise(t, 'highpass', 3500, v, 0.004);
+// warehouse sounds that turn into the beat
+const roller = (t, v = 0.05) => noise(t, 'bandpass', 950, v, 0.025, 5);
+const forklift = (t, v = 0.03) => { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 1600; fl.connect(mus); osc('square', 1046, t, 0.005, v, 0.18, fl); };
+const shaker = (t, v = 0.05) => noise(t, 'highpass', 5500, v, 0.05, 0.7);
+// soft electric piano with a slow tremolo feel, and a whistle with a scoop and a breath
+const rhodes = (t, fs, d, v = 0.04) => fs.forEach((f, i) => { osc('sine', f, t + i * 0.008, 0.006, v, d); osc('triangle', f * 2, t + i * 0.008, 0.003, v * 0.25, d * 0.35); });
+function whistle(t, f, d, vol = 0.05) {
+  const o = ctx.createOscillator(), lfo = ctx.createOscillator(), lg = ctx.createGain(), gn = ctx.createGain();
+  o.type = 'sine'; o.frequency.setValueAtTime(f * 0.97, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.05);
+  lfo.frequency.value = 5; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(d > 0.5 ? 10 : 3, t + Math.min(0.3, d * 0.7));
+  lfo.connect(lg); lg.connect(o.detune);
+  gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(vol, t + 0.03); gn.gain.setValueAtTime(vol, t + Math.max(0.04, d - 0.08)); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(gn); gn.connect(mus); o.start(t); lfo.start(t); o.stop(t + d + 0.05); lfo.stop(t + d + 0.05);
+  noise(t, 'bandpass', f * 1.5, vol * 0.18, Math.min(0.12, d), 6);
+}
 const tom = (t, f, v = 0.4) => { const o = osc('sine', f, t, 0.002, v, 0.18); o.frequency.exponentialRampToValueAtTime(f * 0.6, t + 0.16); };
 
 // one backing track per partner, built from the same primitives. b = beat index, t = its time, s = seconds per beat there.
@@ -1003,28 +1030,32 @@ function buildEvents() {
       for (let k = 0; k < 4; k++) E(k * s / 4, T => hat(T, phone ? 0.03 : (k % 2 ? 0.05 : 0.1)));
       if (!phone) { E(0, T => bass(T, roots[ci], s * 0.2, 800)); E(s / 2, T => bass(T, roots[ci] * (inBar === 3 ? 1.5 : 1), s * 0.2, 800)); }
       if (b >= 32 && !phone) for (let k = 0; k < 4; k++) { const f = chords[ci][arp[(inBar * 4 + k) % 8]] * 4; E(k * s / 4, T => lead(T, f, s * 0.18, 'square')); }
-    } else if (style === 'trot1') {
-      // 로파이 쿵짝: 쿵 = kick and bass on 1 and 3 (root, then fifth), 짝 = electric piano and rim or clap on 2 and 4
-      const sec = sectionAt(Math.floor(b / 4)), big = sec === 'chorus' || sec === 'chorus2', bassF = inBar === 2 ? TROT.fifths[ci] : roots[ci];
-      if (rnd(b, 9) < 0.7) E(rnd(b, 10) * s, T => crackle(T, 0.02 + rnd(b, 11) * 0.03));
-      if (sec === 'intro') { if (inBar % 2 === 1) E(0, T => ep(T, chords[ci], s * 0.6, 0.03)); continue; }
-      if (sec === 'inter') {
-        if (inBar === 0) { E(0, T => bass(T, roots[ci], s * 3, 420)); E(0, T => pad(T, chords[ci], s * 4, 'triangle', 0.035)); }
-        if (inBar % 2 === 1) E(0, T => ep(T, chords[ci], s * 0.5, 0.025));
+    } else if (style === 'night1') {
+      // 현장음 로파이: the warehouse is the band. Belt rollers tick the 8ths, a low thump is 쿵, a dusty snare is 짝.
+      const sec = sectionAt(Math.floor(b / 4)), big = sec === 'chorus' || sec === 'chorus2';
+      if (rnd(b, 9) < 0.6) E(rnd(b, 10) * s, T => crackle(T, 0.015 + rnd(b, 11) * 0.025));
+      if (sec === 'intro' || sec === 'outro') {
+        E(0, T => roller(T, 0.03)); E(s / 2, T => roller(T, 0.02));
+        if (inBar === 0) { E(0, T => forklift(T)); E(s * 0.75, T => forklift(T)); }
+        if (sec === 'outro') { if (inBar === 0) E(0, T => rhodes(T, chords[ci], s * 3.5, 0.03)); if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.45)); }
         continue;
       }
-      if (inBar === 0 || inBar === 2) { E(0, T => kick(T, sec === 'practice' || sec === 'outro' ? 0.6 : 0.85)); E(0, T => bass(T, bassF, s * 0.8, 420)); }
-      if (inBar === 1 || inBar === 3) {
-        E(0, T => ep(T, chords[ci], s * 0.45, big ? 0.05 : 0.04));
-        if (sec !== 'practice') E(0, T => big ? clap(T) : rim(T, 0.22));
+      E(0, T => roller(T, big ? 0.035 : 0.05)); E(s / 2, T => roller(T, big ? 0.03 : 0.04));
+      if (sec === 'practice') { if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.55)); if (inBar === 0) E(0, T => rhodes(T, chords[ci], s * 3.6, 0.025)); continue; }
+      if (sec === 'inter') {
+        if (inBar === 0) { E(0, T => rhodes(T, chords[ci], s * 3.6, 0.04)); E(0, T => bass(T, roots[ci], s * 3, 300)); }
+        continue;
       }
-      if (sec === 'verse' || sec === 'verse2' || sec === 'bridge' || big) { E(0, T => hat(T, 0.035)); E(s / 2, T => hat(T, big ? 0.08 : 0.06)); }
-      if (big) {
-        // disco touch in the chorus: octave bass on the off-beats
-        E(s / 2, T => bass(T, roots[ci] * 2, s * 0.3, 700));
-        if (inBar === 0 && ci === 0) E(0, T => crash(T));
-      }
-      if (sec === 'bridge' && Math.floor(b / 4) === 17 && inBar === 3) { E(0, T => tom(T, 220)); E(s / 3, T => tom(T, 180)); E(2 * s / 3, T => tom(T, 150)); }
+      if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.8));
+      if (inBar === 2 && rnd(b, 12) < 0.5) E(s * 0.75, T => kick(T, 0.45));
+      if (inBar === 1 || inBar === 3) E(0, T => snare(T, big ? 0.24 : 0.2));
+      E(0, T => hat(T, 0.03)); E(s / 2, T => hat(T, 0.055));
+      if (inBar === 0) E(0, T => rhodes(T, chords[ci], s * 1.8, big ? 0.045 : 0.04));
+      if (inBar === 2) E(s / 2, T => rhodes(T, chords[ci].slice(1), s * 1.2, 0.03));
+      if (inBar === 0) E(0, T => bass(T, roots[ci], s * 1.6, 300));
+      if (inBar === 2) E(0, T => bass(T, roots[ci] * 1.5, s * 0.8, 300));
+      if (big) { E(s / 4, T => shaker(T, 0.04)); E(3 * s / 4, T => shaker(T, 0.05)); }
+      if (sec === 'bridge' && Math.floor(b / 4) === 17 && inBar === 3) { E(0, T => tom(T, 200)); E(s / 3, T => tom(T, 165)); E(2 * s / 3, T => tom(T, 135)); }
     } else if (style === 'duo') {
       if (dark) {
         // power is out: only the partner's thuds, a battery radio hiss and the alarm
@@ -1046,15 +1077,18 @@ function buildEvents() {
     ev.push([timeAt(cs) - 0.05, T => { const o = osc('sawtooth', 320, T, 0.01, 0.12, 0.7, bus); o.frequency.exponentialRampToValueAtTime(30, T + 0.7); noise(T, 'lowpass', 300, 0.5, 0.25, 0.7, bus); }]);
     ev.push([timeAt(ce), T => { for (let k = 0; k < 4; k++) noise(T + k * 0.09, 'highpass', 3000, 0.12, 0.03, 0.7, bus); osc('sine', 1760, T + 0.4, 0.005, 0.05, 0.3, bus); }]);
   }
-  if (L.style === 'trot1') {
-    // the hook rides the two choruses; the interlude hums its first half an octave down, quietly
-    for (const [sec, vol, oct, upto] of [['chorus', 0.055, 1, 32], ['chorus2', 0.06, 1, 32], ['inter', 0.035, 0.5, 16]]) {
+  if (L.style === 'night1') {
+    // someone on the line whistles the hook in both choruses; in the interlude it comes back softer, an octave down
+    for (const [sec, vol, oct, upto] of [['chorus', 0.05, 1, 32], ['chorus2', 0.055, 1, 32], ['inter', 0.035, 0.5, 16]]) {
       const bar0 = L.sections.find(x => x[1] === sec)[0];
-      for (const [ob, nm, len] of HOOK) if (ob < upto) ev.push([timeAt(bar0 * 4 + ob), T => trotLead(T, N_[nm] * oct, len * SPB * 0.95, vol)]);
+      for (const [ob, nm, len] of WHISTLE) if (ob < upto) ev.push([timeAt(bar0 * 4 + ob), T => whistle(T, N_[nm] * oct, len * SPB * 0.95, vol)]);
     }
   }
   const tEnd = timeAt(total - 4);
-  ev.push([tEnd, T => { kick(T); crash(T); pad(T, chords[0], SPB * 6, L.style === 'trot1' ? 'triangle' : 'sawtooth', L.style === 'trot1' ? 0.05 : 0.03); bass(T, roots[0], SPB * 4); if (L.style === 'trot1') trotLead(T, N_.A4, SPB * 3, 0.05); }]);
+  ev.push([tEnd, T => {
+    if (L.style === 'night1') { rhodes(T, chords[0], SPB * 6, 0.05); bass(T, roots[0], SPB * 4, 300); whistle(T, N_.C5, SPB * 3, 0.04); forklift(T + SPB * 2, 0.02); return; }
+    kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4);
+  }]);
   notes.forEach(n => ev.push([n.place, T => thud(T, n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1)]));
   return ev.sort((a, b) => a[0] - b[0]);
 }
