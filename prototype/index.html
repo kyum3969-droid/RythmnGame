@@ -889,27 +889,29 @@ function drawActor(id, x, mirrored, pose, nowMs, active, extra) {
   if (extra) extra(bodyTop(PARTNERS[id].base, pose));
   g.restore();
 }
+// after the shift the cast stays where the song left them (반장 on the line, 지우 behind the belt) through the outro and result
+const castBeatAt = (t, active) => active ? beatAt(t) : (state === 'outro' || state === 'result') ? END_BEAT : 0;
 function drawCast(t, nowMs, active, placerPose) {
-  const beat = active ? beatAt(t) : 0, ph = beat - Math.floor(beat), s0 = L.cast.swap, rel = beat - s0;
+  const beat = castBeatAt(t, active), ph = beat - Math.floor(beat), s0 = L.cast.swap, rel = beat - s0;
   const placer = castPlacer(beat), walkBob = ph < 0.5 ? 1 : 0;
   const jx = castX('jiwoo', beat), bx = castX('boss', beat);
   CAST.dx = (placer === 'jiwoo' ? jx : bx) - BOSS_X; CAST.hideArm = active && rel >= 0 && rel < 8;
   // 지우
-  const jPose = placer === 'jiwoo' && !(active && rel >= 0) ? placerPose
-    : { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: (rel >= 4 && rel < 8) ? walkBob : (beat >= 100 && ph < 0.25 ? 1 : 0), nod: 0, doze: false, phone: false,
+  const jPose = placer === 'jiwoo' && !(rel >= 0) ? placerPose
+    : { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: !active ? 0 : (rel >= 4 && rel < 8) ? walkBob : (beat >= 100 && ph < 0.25 ? 1 : 0), nod: 0, doze: false, phone: false,
         vibe: beat >= 116 && beat < 200, unplug: rel >= 2, lane: placer === 'jiwoo' ? 0 : 2 };
   if (placer !== 'jiwoo') FX.react[2] = { type: beat < 96 ? 'glance' : '', at: nowMs };
-  const jMirror = active && rel >= 8;
+  const jMirror = rel >= 8;
   drawActor('jiwoo', jx, jMirror, jPose, nowMs, active, jMirror ? null : (active && rel >= 4 && rel < 8 ? null : null));
   // 반장
   const listening = active && rel >= 2 && rel < 5;
   const bPose = placer === 'boss' && rel >= 8 ? placerPose
     : { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: listening, dip: 0, bob: (rel >= 0 && rel < 2) || (rel >= 5 && rel < 8) ? walkBob : 0, nod: 0, doze: false, phone: false, lane: placer === 'boss' ? 0 : 2 };
   if (placer !== 'boss') FX.react[2] = { type: 'glance', at: nowMs };
-  const bMirror = !(active && rel >= 8);
+  const bMirror = !(rel >= 8);
   drawActor('boss', bx, bMirror, bPose, nowMs, active, top => {
     if (listening) { thick(BOSS_X + 7, top + 22, BOSS_X + 5, top + 9, 4, C.shirt); R(BOSS_X + 3, top + 7, 4, 4, C.skin); R(BOSS_X + 4, top + 8, 2, 2, '#f4f1ea'); }
-    else if (!(active && rel >= 8)) { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); }
+    else if (!(rel >= 8)) { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); }
   });
   // the earbud cord stretched between them while he listens
   if (listening) { const ax = jx + 6, ay = 92, bxe = bx - 3, bye = 99; for (let k = 0; k <= 20; k++) { const p = k / 20; R(lerp(ax, bxe, p), lerp(ay, bye, p) + Math.sin(p * Math.PI) * 6, 1, 1, '#f4f1ea'); } }
@@ -1183,7 +1185,7 @@ function drawScene(t, bt, active, nowMs) {
     drawLane(0, poses[0], t, beltT, active, nowMs, laneFx);
   }
   const lo = L.lanes === 2 ? 1 : 0;
-  if (L.cast) { L.partners[0] = castPlacer(active ? beatAt(t) : 0); drawCast(t, nowMs, active, poses[lo]); }
+  if (L.cast) { L.partners[0] = castPlacer(castBeatAt(t, active)); drawCast(t, nowMs, active, poses[lo]); }
   else { drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); drawObserver(t, nowMs, active); }
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
