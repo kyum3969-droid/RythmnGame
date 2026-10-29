@@ -337,7 +337,8 @@ const LEVELS = [
     // cuts, one bar of nothing (cut), then the drop. Halfway through the drop the drums fall out (break) and it hits a second time.
     vibe: [[72, 104], [132, 136]], unplug: [[104, 132]], dim: [[104, 120]], cut: [[136, 140], [179, 180]],
     club: [[140, 228]], lull: [[172, 180]], hype: [[140, 172], [180, 220]], special:['흥얼거릴 때 늦은 상자', 'late', '받아냄'],
-    lateHint: '지우가 흥얼거려요. 손이 늦어요. 손을 봐요',
+    // no on-screen hints: the player is keeping time and cannot read them
+    hints:false,
     sections: [[0, 'intro'], [2, 'groove'], [10, 'verse'], [18, 'vibe'], [26, 'straight'], [34, 'cut'], [35, 'drop'], [43, 'break'], [45, 'drop'], [55, 'outro']],
     bars: [
       '........', '........',
@@ -358,8 +359,8 @@ const LEVELS = [
           [100, '이어폰 빼.라.고!', 3.5, 0, 'b', 'loud'], [104, '…네.', 2], [106, '옳지. 정박에 그래.', 5, 0, 'b'], [114, '(아, 여기 곧 터지는데…)', 4],
           [120, '(흥얼흥얼…)', 4], [128, '…참자, 참자…', 3], [132, '아, 이 부분만 듣고 뺄게요!', 4], [137, '…야!', 2.5, 0, 'b'],
           [142, '…허 참.', 3, 0, 'b'], [146, '여기서 곡이 확 바뀌어요! 이거예요 이거!!', 4], [160, '꾹 누르고… 빰!!', 3],
-          [174, '(숨 고르고…)', 2.5], [177, '한 번 더 가요!', 2], [196, '반장님도 까딱하시는 거 다 보여요!', 4], [218, '끝! 어땠어요?', 3]],
-    comfort: ['괜찮아요! 다시 쿵, 쿵.', '반장님이 손 보래요.'],
+          [174, '(숨 고르고…)', 2.5], [177, '한 번 더 가요!', 2], [196, '반장님도 까딱하시는 거 다 보여요!', 4], [218, '끝!', 2]],
+    comfort: ['괜찮아요! 다음 거!', '형! 정신 차려요!'],
     intro: [
       { who:'지우', text:'안녕하세요! 지우예요. 오늘은 반장님 오실 때까지 제가 페어예요.' },
       { who:'지우', text:'형은 꿈 있어요? 저는 있어요.' },
@@ -369,8 +370,7 @@ const LEVELS = [
     outro: (good, sp) => good ? [
       { who:'지우', text:'반장님, 어땠어요? 드롭 좋았죠?' },
       { who:'반장', text:'…시끄럽다.' },
-      { who:'', text:'그런데 반장님 발끝이 아직 까딱이고 있었다.' },
-      { who:'지우', text: sp >= 3 ? '제가 흥얼거릴 때 손 늦은 거, 다 받아주셨죠. 고마워요.' : '제가 흥얼거릴 때 좀 꼬였죠. 반장님 말이 맞나 봐요.' }] : [
+      { who:'', text:'그런데 반장님 발끝이 아직 까딱이고 있었다.' }] : [
       { who:'반장', text:'봐라. 이어폰 끼고 하니까 이렇지.' },
       { who:'지우', text:'…다음엔 한쪽만 낄게요.' }]
   }
@@ -2073,8 +2073,6 @@ function updateHud(t) {
   hintFor('len', '앞이 닿으면 누르고, 끝까지 유지', '유지…');
   hintFor('heavy', '무거운 상자: 양쪽을 같이');
   { const fl = firstWith('late'); if (L.id !== 'jiwoo' && fl && fl.state === 'pending' && t > fl.place - SPB) h = L.lateHint || '반장님 손이 늦어요. 음악 말고 손을 봐요'; }
-  if (L.id === 's1-2' && beat >= 104 && beat < 114) h = '이어폰 뺐어요. 벨트 박자로';
-  if (L.id === 's1-2' && beat >= 172 && beat < 179) h = '숨 고르기. 곧 한 번 더';
   if (L.id === 's1-3') {
     if (beat >= 63 && beat < 68) h = '템포가 바뀌어요. 반장님 손을 봐요';
     const sh = firstWith('shuffle'); if (sh && sh.state === 'pending' && t > sh.place - SPB) h = '셔플: 길게, 짧게';
