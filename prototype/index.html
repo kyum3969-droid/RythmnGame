@@ -43,9 +43,9 @@ h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,44px);l
   outline:1px solid var(--line);touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer}
 .stage canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 
-.hud{position:absolute;top:2cqw;left:2.2cqw;right:2.2cqw;display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);
-  font-size:clamp(10px,1.55cqw,15px);letter-spacing:.06em;color:var(--ink);pointer-events:none;font-variant-numeric:tabular-nums}
-.hud span{display:inline-block;background:rgba(13,10,9,.62);padding:.25em .6em;border-radius:3px;transition:background-color .2s,color .2s}
+.hud{position:absolute;top:10.6cqw;left:2.2cqw;right:2.2cqw;display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);
+  font-size:clamp(9px,1.5cqw,15px);line-height:1.3;letter-spacing:.06em;color:var(--ink);pointer-events:none;font-variant-numeric:tabular-nums}
+.hud span{display:inline-block;background:rgba(13,10,9,.62);padding:.15em .6em;border-radius:3px;transition:background-color .2s,color .2s}
 .hud span.hot{background:var(--vest);color:#1b120c}
 .hud span.pulse{animation:pulse .35s ease-out}
 @keyframes pulse{0%{transform:scale(1.3)}100%{transform:scale(1)}}
@@ -184,6 +184,7 @@ kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-b
         <li>큐는 음악이 아니라 반장님 손이에요. 상자를 내려놓는 "툭" 소리가 기준이에요.</li>
         <li>중반에 반장님 무릎이 아파서 상자가 반 박 늦게 올라와요. 음악 대신 반장님을 따라가야 맞아요.</li>
         <li>긴 액자 화물은 앞이 닿을 때 누르고, 끝이 지나갈 때까지 누르고 있어요.</li>
+        <li>화면 위 바코드 띠가 악보예요. 막대가 빨간 판독선을 지날 때가 상자가 스캐너에 닿는 순간이에요. 번진 막대는 늦게 오는 상자, 굵은 막대는 긴 화물이에요.</li>
         <li>벨트의 노란 눈금이 정박이에요. 정박 상자는 눈금 위에, 늦은 상자는 눈금 사이에 실려 와요.</li>
         <li>스캐너 아래 작은 바늘이 빠름과 늦음을 보여줘요. 가운데 초록 칸이 딱이에요.</li>
       </ol>
@@ -546,12 +547,60 @@ function drawParticles(nowMs) {
   g.globalAlpha = 1;
 }
 
+// barcode tape: the chart printed as bars. It scrolls the same way as the belt,
+// and its red read line sits right above the scanner, so a bar crossing the line
+// is a box reaching the scanner. Future beats are to the left.
+const STRIP = { x0: 12, x1: 380, y: 24, h: 11, ppb: 56 };
+function drawStrip(time, live, nowMs) {
+  const { x0, x1, y, h, ppb } = STRIP, read = SCAN_X;
+  const cur = time / SPB, xOf = b => read + (cur - b) * ppb;
+  R(0, y - 3, x0 + 1, h + 6, '#3a3330'); R(2, y - 1, x0 - 4, h + 2, '#211b18'); R(x0 - 2, y + 2, 2, h - 4, '#c9ad4c');
+  R(x0, y, x1 - x0, h, '#e6dbc3'); R(x0, y, x1 - x0, 1, '#f3ead6'); R(x0, y + h - 1, x1 - x0, 1, '#bfb299');
+  R(x0 + 1, y + h, x1 - x0, 1, 'rgba(0,0,0,.45)');
+  g.save(); g.beginPath(); g.rect(x0, y, x1 - x0, h); g.clip();
+  const bLo = Math.floor(cur - (x1 - read) / ppb) - 1, bHi = Math.ceil(cur + (read - x0) / ppb) + 1;
+  for (let b = bLo; b <= bHi; b++) {
+    const x = Math.round(xOf(b)), bar = ((b % 4) + 4) % 4 === 0;
+    if (bar) R(x, y + 1, 1, h - 2, '#d2c6ad');
+    R(x, y + h - (bar ? 4 : 3), 1, bar ? 3 : 2, '#9d907a');
+  }
+  const top = y + 1, bh = h - 5;
+  for (const n of notes) {
+    if (n.beat < bLo - 2 || n.beat - n.len > bHi + 2) continue;
+    let ink = '#1d1815';
+    if (live) {
+      if (n.state === 'hit' || n.state === 'holding') ink = '#3f9a4c';
+      else if (n.state === 'miss' || n.state === 'broken') ink = '#c8372d';
+    }
+    const xa = Math.round(xOf(n.beat));
+    if (n.len) {
+      const xt = Math.round(xOf(n.beat + n.len));
+      R(xt - 1, top, xa - xt + 2, bh, ink);
+      R(xt + 1, top + 2, xa - xt - 2, 1, '#e6dbc3');
+    } else if (n.late) {
+      // printer slipped: a faint ghost where the beat should be, ink dragged to where the box really lands
+      const xg = Math.round(xOf(n.beat - 0.5));
+      R(xg, top, 1, bh, '#b5a88f');
+      for (let x = xa + 2; x < xg; x += 2) R(x, top + ((x >> 1) % 2), 1, bh - 1, '#8f8370');
+      R(xa - 1, top, 2, bh, ink);
+    } else R(xa - 1, top, 2, bh, ink);
+  }
+  g.restore();
+  const flash = nowMs - lastGood < 160, missF = nowMs - FX.lastMiss < 220;
+  const col = flash ? C.ok : missF ? '#ff2a1a' : C.laser;
+  R(read - 3, y - 4, 7, 3, '#555a5f'); R(read - 3, y + h + 1, 7, 2, '#555a5f');
+  g.globalAlpha = flash || missF ? 0.55 : 0.3; R(read - 1, y - 1, 3, h + 2, col); g.globalAlpha = 1;
+  R(read, y - 1, 1, h + 2, col);
+}
+
 let rings = [];
 function drawScene(t, bt, active, nowMs) {
   g.save();
   if (!reduce && nowMs < FX.shakeUntil) g.translate(Math.round(Math.random() * 2 - 1), Math.round(Math.random() * 2 - 1));
   g.drawImage(bg, 0, 0);
   drawLights(bt, t, active);
+  // outside a run the tape loops through the chart as an attract loop
+  drawStrip(active ? t : (6 + (bt / SPB) % 72) * SPB, active, nowMs);
   const pose = bossPose(t, bt, active);
   pose.nod = FX.react.type === 'nod' && nowMs - FX.react.at < 130 ? 1 : 0;
   const kick = Math.max(0, 1 - (nowMs - lastPress) / 140);
