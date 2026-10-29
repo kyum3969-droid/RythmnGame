@@ -312,7 +312,7 @@ const LEVELS = [
   }
   ,{
     id:'s1-2', stageNo:'1-2', who:'지우', role:'지우 · 116 BPM', tag:'쿵쿵쿵쿵 · 흥얼거림 · 이어폰 빼', bpm:116, div:2, style:'edm1', chordShift:2,
-    clock:'02:40', title:'지우의 곡', partners:['jiwoo'], observer:'boss', chords: EDM.chords, roots: EDM.roots,
+    clock:'02:40', title:'지우의 곡', partners:['jiwoo'], observer:'boss', obsCue: { point: [100, 104.5], soft: 152 }, chords: EDM.chords, roots: EDM.roots,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
     // 지우's own track plays in her earbuds. vibe: she hums along and her hand drifts late. unplug: 반장 makes her take them out.
     vibe: [[72, 104]], unplug: [[104, 120]], dim: [[104, 120]], club: [[120, 168]], special:['흥얼거릴 때 늦은 상자', 'late', '받아냄'],
@@ -353,12 +353,58 @@ const LEVELS = [
       { who:'지우', text:'…다음엔 한쪽만 낄게요.' },
       { who:'', text:'휴게실 달력, 다음 주 화요일에 빨간 동그라미. 센터장 점검.' }]
   }
+  ,{
+    id:'s1-3', stageNo:'1-3', who:'지우 → 반장', role:'지우 → 반장 · 120→88→104 BPM', tag:'템포 체인지 · 셔플 · 블루스 하우스', bpm:104,
+    tempo: [[0, 120], [64, 88], [116, 104]], style:'mix13', clock:'03:05', title:'선곡', partners:['jiwoo'],
+    // cast: 지우 places first while 반장 watches; at beat 56 he walks over, takes an earbud, and they swap places by beat 64
+    cast: { swap: 56 },
+    chords: [...EDM.chords, ...BLUES.chords], roots: [...EDM.roots, ...BLUES.roots],
+    chordAt: bar => bar < 16 ? ((bar - 2) % 4 + 4) % 4 : bar === 16 ? 4 : 4 + BLUES.prog[(((bar - (bar >= 29 ? 29 : 17)) % 12) + 12) % 12],
+    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
+    tinny: [[57, 62.5]], club: [[120, 152]], special:['셔플 상자', 'shuffle', '받아냄'],
+    sections: [[0, 'intro'], [2, 'groove'], [6, 'main'], [14, 'swap'], [16, 'count'], [17, 'blues'], [29, 'fuseIn'], [30, 'fusion'], [38, 'outro']],
+    // 8 cells per bar = straight 8ths. 12 cells per bar = triplets: 'x.x' is a shuffle pair (on the beat, then two thirds later)
+    bars: [
+      '........', '........',
+      'x...x...', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.xx',
+      'x.x.x.x.', 'x.x.x.xx', 'h=..x.x.', 'x.x.x.x.', 'x.xxx.x.', 'x.x.x.xx', 'x.x.x.x.', 'x.......',
+      '........', '........',
+      '............',
+      'x.....x.....', 'x.....x.....', 'x..x..x..x..', 'x..x..x.x...', 'x..x..x..x..', 'x.x...x.x...',
+      'x..x..x..x..', 'h==...x..x..', 'x.x...x.x...', 'x..x..x.x...', 'x.x...x.x...', 'x...........',
+      '........',
+      'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h=..x.xx', 'x.x.x.x.', 'x.xxx.x.', 'x.x.x.x.', 'x.......',
+      '........', '........'
+    ],
+    say: [[1, '(이어폰 꽂고) 오늘도 제 곡이에요!', 4, 0, 'j'], [14, '…또 그거냐.', 3, 0, 'b'], [38, '반장님, 이번엔 신곡이에요. 들어보실래요?', 4, 0, 'j'],
+          [52, '…줘봐.', 3, 0, 'b'], [58.5, '…이게 무슨 음악이냐.', 2.5, 0, 'b'], [61, 'EDM이요! 하우스요!', 2, 0, 'j'], [63, '음악은 이런 거다.', 1, 0, 'b'],
+          [64.2, '하나, 둘, 셋, 넷.', 3.6, 0, 'b'], [70, '…블루스요? 이거 완전 옛날…', 4, 0, 'j'], [84, '쿵-짝. 길게, 짧게. 이게 흔들리는 거다.', 4, 0, 'b'],
+          [100, '…어? 근데 이거 좀 좋은데요?', 4, 0, 'j'], [116.3, '잠깐만요! 이거 제 곡에 넣어볼게요!', 3.5, 0, 'j'], [124, '…허 참. 이건 좀 낫네.', 3, 0, 'b'],
+          [148, '반장님 블루스에 제 비트. 이거 된다.', 4, 0, 'j']],
+    comfort: ['템포 바뀌면 손도 바뀐다.', '내 손 봐.'],
+    intro: [
+      { who:'', text:'사흘째 밤. 3번 라인.' },
+      { who:'지우', text:'반장님! 무릎은 좀 괜찮으세요? 그럼 오늘도 제가 먼저 할게요.' },
+      { who:'반장', text:'…이어폰.' },
+      { who:'지우', text:'한쪽만 꼈어요! 반만 들어요, 반만.' },
+      { who:'', text:'반장님은 벨트 뒤에서 팔짱을 꼈다. 오늘은 뭔가 벼르고 온 얼굴이었다.' }],
+    outro: (good, sp) => good ? [
+      { who:'지우', text:'반장님 블루스, 제 곡에 샘플로 써도 돼요?' },
+      { who:'반장', text:'…샘플이 뭔데.' },
+      { who:'지우', text:'반장님 박자를 제 곡에 넣는 거요.' },
+      { who:'반장', text: sp >= 6 ? '…박자 안 흔들리게만 해라. 아니, 흔들려야 되나.' : '박자 안 흔들리게만 해라.' },
+      { who:'', text:'반장님은 지우 이어폰 한쪽을 다시 귀에 꽂아봤다. 이번엔 빼지 않았다.' },
+      { who:'', text:'휴게실 달력, 내일 화요일에 빨간 동그라미. 센터장 점검.' }] : [
+      { who:'반장', text:'템포 바뀌면 사람 손도 바뀐다. 그걸 봐야지.' },
+      { who:'지우', text:'반장님 블루스 너무 느려요…' },
+      { who:'', text:'휴게실 달력, 내일 화요일에 빨간 동그라미. 센터장 점검.' }]
+  }
 ];
 // the stage board. Locked entries show what is coming.
 const STAGE1 = [
   { level: LEVELS[0] },
   { level: LEVELS[1] },
-  { no:'1-3', title:'맞춘 밤', role:'반장 · 104 BPM', tag:'한 마디 필인', pid:'boss' },
+  { level: LEVELS[2] },
   { no:'보스', title:'마감 점검', role:'최 센터장 · 104→128 BPM', tag:'템포 상승 · 라인 증설 · 둘이서', pid:'chief', boss:true }
 ];
 
@@ -381,13 +427,13 @@ function loadLevel(level) {
   const w = level.win || {}; WIN_P = w.p || 0.05; WIN_G = w.g || 0.10; WIN_M = w.m || 0.16; WIN_REL = w.release || 0.12;
   L = level; setTempo(level); SPB = 60 / level.bpm; SPEED = (SCAN_X - PLACE_X) / (TRAVEL * SPB); CHORDS = level.chords;
   notes = [];
-  const div = level.div;
   [level.bars, level.bars2 || []].forEach((bars, lane) => bars.forEach((bar, bi) => {
+    const div = bar.length / 4;
     for (let c = 0; c < bar.length; c++) {
       const ch = bar[c]; if (ch === '.' || ch === '=') continue;
       let len = 0;
       if (ch === 'h') { let k = c + 1, cnt = 1; while (bar[k] === '=') { cnt++; k++; } len = cnt / div; }
-      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : 0), len, late: ch === 'L', heavy: ch === 'H', lane });
+      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : 0), len, late: ch === 'L', heavy: ch === 'H', shuffle: div === 3 && c % 3 === 2, lane });
     }
   }));
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
@@ -468,7 +514,7 @@ function drawLights(bt, t, active) {
     return (inD ? s > 0.9 : s > 1.93) ? 0.15 : 1;
   });
   const ph = active && t > 0 ? beat - Math.floor(beat) : 1;
-  const club = active && inRange(beat, L.club), dimK = active && inRange(beat, L.dim) ? 0.45 : 1;
+  const club = active && inRange(beat, L.club), dimK = active && (inRange(beat, L.dim) || inRange(beat, L.tinny)) ? 0.45 : 1;
   const pulse = Math.max(0, 1 - ph * (club ? 3 : 5)) * (club ? 0.22 : 0.06);
   g.save(); g.globalCompositeOperation = 'lighter';
   tubes.forEach((x, k) => {
@@ -675,7 +721,7 @@ const OBS_X = 168;
 function drawObserver(t, nowMs, active) {
   if (!L.observer) return;
   const beat = active ? beatAt(t) : 0, ph = beat - Math.floor(beat);
-  const point = active && beat >= 100 && beat < 104.5, softened = active && beat >= 152, frown = active && !softened;
+  const cue = L.obsCue || {}, point = active && cue.point && beat >= cue.point[0] && beat < cue.point[1], softened = active && cue.soft != null && beat >= cue.soft, frown = active && !softened;
   FX.react[2] = { type: frown ? 'glance' : '', at: nowMs };
   const pose = { hand: { x: BOSS_X + 22, y: 108 }, carry: null, wince: false, dip: 0, bob: softened && ph < 0.2 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
   g.save(); g.translate(OBS_X, -2); g.scale(-1, 1); g.translate(-BOSS_X, 0);
@@ -686,7 +732,50 @@ function drawObserver(t, nowMs, active) {
   if (point && !reduce) { g.globalAlpha = 0.9; R(BOSS_X + 12, top - 8, 2, 5, '#ff5a4a'); R(BOSS_X + 12, top - 2, 2, 2, '#ff5a4a'); g.globalAlpha = 1; }
   g.restore();
 }
-function drawPartnerArmOf(id, pose) { PARTNERS[id].arm(pose); }
+function drawPartnerArmOf(id, pose) {
+  if (L.cast) { if (CAST.hideArm) return; g.save(); g.translate(CAST.dx, 0); PARTNERS[id].arm(pose); g.restore(); return; }
+  PARTNERS[id].arm(pose);
+}
+// 1-3 cast timeline, in beats from the swap: 반장 walks over (0-2), listens with her earbud (2-5), they trade places (4-8)
+const CAST = { dx: 0, hideArm: false };
+function castX(id, beat) {
+  const s0 = L.cast.swap;
+  if (id === 'jiwoo') return beat < s0 + 4 ? BOSS_X : beat < s0 + 8 ? lerp(BOSS_X, OBS_X, ease((beat - s0 - 4) / 4)) : OBS_X;
+  return beat < s0 ? OBS_X : beat < s0 + 2 ? lerp(OBS_X, 80, ease((beat - s0) / 2)) : beat < s0 + 5 ? 80 : beat < s0 + 8 ? lerp(80, BOSS_X, ease((beat - s0 - 5) / 3)) : BOSS_X;
+}
+const castPlacer = beat => beat < L.cast.swap + 6 ? 'jiwoo' : 'boss';
+function drawActor(id, x, mirrored, pose, nowMs, active, extra) {
+  g.save();
+  if (mirrored) { g.translate(x, 0); g.scale(-1, 1); g.translate(-BOSS_X, 0); } else g.translate(x - BOSS_X, 0);
+  PARTNERS[id].draw(pose, nowMs, active);
+  if (extra) extra(bodyTop(PARTNERS[id].base, pose));
+  g.restore();
+}
+function drawCast(t, nowMs, active, placerPose) {
+  const beat = active ? beatAt(t) : 0, ph = beat - Math.floor(beat), s0 = L.cast.swap, rel = beat - s0;
+  const placer = castPlacer(beat), walkBob = ph < 0.5 ? 1 : 0;
+  const jx = castX('jiwoo', beat), bx = castX('boss', beat);
+  CAST.dx = (placer === 'jiwoo' ? jx : bx) - BOSS_X; CAST.hideArm = active && rel >= 0 && rel < 8;
+  // 지우
+  const jPose = placer === 'jiwoo' && !(active && rel >= 0) ? placerPose
+    : { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: (rel >= 4 && rel < 8) ? walkBob : (beat >= 100 && ph < 0.25 ? 1 : 0), nod: 0, doze: false, phone: false,
+        vibe: beat >= 116 && beat < 152, unplug: rel >= 2, lane: placer === 'jiwoo' ? 0 : 2 };
+  if (placer !== 'jiwoo') FX.react[2] = { type: beat < 96 ? 'glance' : '', at: nowMs };
+  const jMirror = active && rel >= 8;
+  drawActor('jiwoo', jx, jMirror, jPose, nowMs, active, jMirror ? null : (active && rel >= 4 && rel < 8 ? null : null));
+  // 반장
+  const listening = active && rel >= 2 && rel < 5;
+  const bPose = placer === 'boss' && rel >= 8 ? placerPose
+    : { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: listening, dip: 0, bob: (rel >= 0 && rel < 2) || (rel >= 5 && rel < 8) ? walkBob : 0, nod: 0, doze: false, phone: false, lane: placer === 'boss' ? 0 : 2 };
+  if (placer !== 'boss') FX.react[2] = { type: 'glance', at: nowMs };
+  const bMirror = !(active && rel >= 8);
+  drawActor('boss', bx, bMirror, bPose, nowMs, active, top => {
+    if (listening) { thick(BOSS_X + 7, top + 22, BOSS_X + 5, top + 9, 4, C.shirt); R(BOSS_X + 3, top + 7, 4, 4, C.skin); R(BOSS_X + 4, top + 8, 2, 2, '#f4f1ea'); }
+    else if (!(active && rel >= 8)) { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); }
+  });
+  // the earbud cord stretched between them while he listens
+  if (listening) { const ax = jx + 6, ay = 92, bxe = bx - 3, bye = 99; for (let k = 0; k <= 20; k++) { const p = k / 20; R(lerp(ax, bxe, p), lerp(ay, bye, p) + Math.sin(p * Math.PI) * 6, 1, 1, '#f4f1ea'); } }
+}
 
 const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
 function drawPlayer(kick, nowMs) {
@@ -949,8 +1038,8 @@ function drawScene(t, bt, active, nowMs) {
     drawLane(0, poses[0], t, beltT, active, nowMs, laneFx);
   }
   const lo = L.lanes === 2 ? 1 : 0;
-  drawPartnerBody(L.partners[lo], poses[lo], nowMs, active);
-  drawObserver(t, nowMs, active);
+  if (L.cast) { L.partners[0] = castPlacer(active ? beatAt(t) : 0); drawCast(t, nowMs, active, poses[lo]); }
+  else { drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); drawObserver(t, nowMs, active); }
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
   drawGauge(nowMs);
@@ -1108,10 +1197,23 @@ function riser(t, d, v = 0.08) {
   s.connect(fl); fl.connect(gn); gn.connect(mus); s.start(t); s.stop(t + d + 0.06);
 }
 const subDrop = t => { const o = osc('sine', 90, t, 0.005, 0.5, 0.9); o.frequency.exponentialRampToValueAtTime(32, t + 0.8); };
+// a record-scratch and a tape-stop for when 반장 pulls the plug on her song
+function scratch(t) {
+  const s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
+  s.buffer = nbuf; fl.type = 'bandpass'; fl.Q.value = 3;
+  [900, 3200, 700, 2600, 500].forEach((f, k) => fl.frequency.setValueAtTime(f, t + k * 0.05));
+  gn.gain.setValueAtTime(0.3, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+  s.connect(fl); fl.connect(gn); gn.connect(bus); s.start(t); s.stop(t + 0.3);
+}
+function tapeStop(t, fs) {
+  fs.forEach(f => { const o = ctx.createOscillator(), gn = ctx.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * 0.12, t + 0.7);
+    gn.gain.setValueAtTime(0.05, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.75); o.connect(gn); gn.connect(bus); o.start(t); o.stop(t + 0.8); });
+}
 const tom = (t, f, v = 0.4) => { const o = osc('sine', f, t, 0.002, v, 0.18); o.frequency.exponentialRampToValueAtTime(f * 0.6, t + 0.16); };
 
 // one backing track per partner, built from the same primitives. b = beat index, t = its time, s = seconds per beat there.
 function chordIdx(beat) {
+  if (L.chordAt) return L.chordAt(Math.floor(Math.max(0, beat) / 4));
   const bar = Math.floor(Math.max(0, beat) / 4) - (L.chordShift || 0);
   if (L.prog) return L.prog[((bar % L.prog.length) + L.prog.length) % L.prog.length];
   return ((bar % 4) + 4) % 4;
@@ -1243,6 +1345,55 @@ function buildEvents() {
         E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.4, 0.014, 3500));
         for (let k = 0; k < 2; k++) { const nm = hook[inBar * 2 + k]; if (nm) E(k * s / 2, T => pluck(T, N_[nm], s * 0.45, 0.05)); }
       }
+    } else if (style === 'mix13') {
+      // 지우's EDM at 120, then 반장's shuffle blues at 88, then both at once ("blues house") at 104
+      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), hook = EDM_HOOK[ci % 4];
+      if (sec === 'intro') { if (b >= 4 && inBar === 0) E(0, T => supersaw(T, chords[ci], s * 4, 0.01, 1200)); continue; }
+      if (sec === 'outro') continue;
+      if (sec === 'groove' || sec === 'main' || (sec === 'swap' && b < 62)) {
+        E(0, T => kick(T, 0.9)); E(0, T => hat(T, 0.03)); E(s / 2, T => openHat(T, 0.07));
+        if (inBar === 1 || inBar === 3) E(0, T => clap(T, 0.22));
+        E(s / 2, T => bass(T, roots[ci], s * 0.4, 800));
+        E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.35, sec === 'main' ? 0.013 : 0.008, 3000));
+        if (sec !== 'groove') for (let k = 0; k < 2; k++) { const nm = hook[inBar * 2 + k]; if (nm) E(k * s / 2, T => pluck(T, N_[nm], s * 0.45, 0.045)); }
+        if (b === 57) E(0, T => { musHP.frequency.setValueAtTime(1300, T); musF.frequency.setValueAtTime(3200, T); mus.gain.setValueAtTime(0.32, T); });
+        continue;
+      }
+      if (sec === 'swap') {
+        if (b === 62) E(s / 2, T => { scratch(T); tapeStop(T, chords[ci].map(f => f * 2)); mus.gain.setValueAtTime(0.0001, T + 0.05); });
+        continue;
+      }
+      if (sec === 'count') {
+        if (inBar === 0) E(0, T => { musHP.frequency.setValueAtTime(20, T); musF.frequency.setValueAtTime(20000, T); mus.gain.setValueAtTime(1, T); });
+        E(0, T => rim(T, inBar === 0 ? 0.45 : 0.3));
+        if (inBar === 3) E(0, T => bluesLead(T, N_.E5, s * 0.9, 0.05, true));
+        continue;
+      }
+      if (sec === 'blues') {
+        // shuffle: everything leans on the beat and the last third of it
+        if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.8));
+        if (inBar === 1 || inBar === 3) E(0, T => snare(T, 0.24));
+        E(0, T => hat(T, 0.05)); E(2 * s / 3, T => hat(T, 0.035));
+        const boogie = [1, 1.189, 1.498, 1.682][inBar];
+        E(0, T => bass(T, roots[ci] * boogie, s * 0.6, 380)); E(2 * s / 3, T => bass(T, roots[ci] * boogie, s * 0.3, 380));
+        E(2 * s / 3, T => organ(T, chords[ci].slice(1), s * 0.3, 0.03));
+        if (((bar - 17) % 4 + 4) % 4 === 3 && inBar === 0) for (const [ob, nm, len] of LICK) E(ob * s, T => bluesLead(T, N_[nm], len * s * 0.95, 0.05, nm === 'E5'));
+        continue;
+      }
+      if (sec === 'fuseIn') {
+        if (inBar === 0) E(0, T => { riser(T, s * 4, 0.06); organ(T, chords[ci], s * 4, 0.03); });
+        E(0, T => kick(T, 0.4 + inBar * 0.15));
+        continue;
+      }
+      // fusion: her four-on-the-floor under his blues organ and licks
+      if (inBar === 0 && bar === 30) E(0, T => { crash(T); subDrop(T); });
+      E(0, T => kick(T, 1)); E(0, T => hat(T, 0.03)); E(s / 2, T => openHat(T, 0.075));
+      if (inBar === 1 || inBar === 3) E(0, T => clap(T, 0.24));
+      const boogie = [1, 1.189, 1.498, 1.682][inBar];
+      E(0, T => bass(T, roots[ci] * boogie, s * 0.4, 700)); E(s / 2, T => bass(T, roots[ci] * boogie, s * 0.3, 700));
+      E(s / 2, T => organ(T, chords[ci].slice(1), s * 0.35, 0.03));
+      E(s / 2, T => supersaw(T, chords[ci].slice(0, 3).map(f => f * 2), s * 0.3, 0.008, 3000));
+      if (((bar - 30) % 2 + 2) % 2 === 1 && inBar === 0) for (const [ob, nm, len] of LICK) E(ob * s, T => bluesLead(T, N_[nm], len * s * 0.95, 0.055, nm === 'E5'));
     } else if (style === 'duo') {
       if (dark) {
         // power is out: only the partner's thuds, a battery radio hiss and the alarm
@@ -1275,6 +1426,7 @@ function buildEvents() {
   const tEnd = timeAt(total - 4);
   ev.push([tEnd, T => {
     if (L.style === 'night1') { rhodes(T, chords[0], SPB * 6, 0.05); bass(T, roots[0], SPB * 4, 300); whistle(T, N_.C5, SPB * 3, 0.04); forklift(T + SPB * 2, 0.02); return; }
+    if (L.style === 'mix13') { kick(T); crash(T); subDrop(T); organ(T, chords[4], SPB * 6, 0.04); bluesLead(T, N_.A4, SPB * 3, 0.05, true); supersaw(T, chords[4].slice(0, 3), SPB * 4, 0.012, 2400); return; }
     if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[0], SPB * 4, 0.016, 2400); return; }
     if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
     kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4);
@@ -1471,10 +1623,12 @@ function updateHud(t) {
   const s = line ? line[1] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.text : '';
   if (s !== lastSay) {
     bubble.textContent = s; bubble.hidden = !s; lastSay = s;
-    const lane = line ? (line[3] || 0) : 0, boss = line && line[4] === 'b';
+    const lane = line ? (line[3] || 0) : 0, spk = line && line[4];
     bubble.style.bottom = L.lanes === 2 ? (lane === 0 ? '78%' : '58%') : '61%';
-    bubble.style.left = boss ? '38%' : '3cqw';
-    bubble.classList.toggle('obs', boss);
+    let bx = null;
+    if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X;
+    bubble.style.left = bx == null || bx < 60 ? '3cqw' : (bx / W * 100 - 5).toFixed(1) + '%';
+    bubble.classList.toggle('obs', !!(spk && (L.cast ? (spk === 'b') !== (castPlacer(beat) === 'boss') : spk === 'b')));
   }
   let h = '';
   if (L.tutorial) for (let i = 0; i < 3; i++) { const n = notes[i]; if (n && n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 터치'; break; } }
@@ -1487,6 +1641,10 @@ function updateHud(t) {
   hintFor('heavy', '무거운 상자: 양쪽을 같이');
   { const fl = firstWith('late'); if (L.id !== 'jiwoo' && fl && fl.state === 'pending' && t > fl.place - SPB) h = L.lateHint || '반장님 손이 늦어요. 음악 말고 손을 봐요'; }
   if (L.unplug && inRange(beat, L.unplug)) h = '이어폰 뺐어요. 벨트 소리로';
+  if (L.id === 's1-3') {
+    if (beat >= 63 && beat < 68) h = '템포가 바뀌어요. 반장님 손을 봐요';
+    const sh = firstWith('shuffle'); if (sh && sh.state === 'pending' && t > sh.place - SPB) h = '셔플: 길게, 짧게';
+  }
   if (L.id === 's1-1') {
     const offb = notes.find(n => n.beat % 2 === 1), pair = notes.find(n => n.beat % 1 === 0.5);
     if (offb && offb.state === 'pending' && t > offb.place - SPB) h = '짝: 2박, 4박에도 와요';
