@@ -69,6 +69,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   text-shadow:0 2px 0 #000,0 0 12px rgba(0,0,0,.7);pointer-events:none;white-space:nowrap;text-align:center;opacity:0}
 .judge small{display:block;font-family:var(--mono);font-size:.36em;letter-spacing:.1em;margin-top:.35em;color:var(--ink)}
 .judge.perfect{color:var(--ok)} .judge.good{color:var(--tube)} .judge.miss{color:var(--laser)}
+.judge.bam{color:#ff4fa3;font-size:clamp(28px,8cqw,80px);text-shadow:0 3px 0 #000,0 0 18px rgba(255,79,163,.8),0 0 40px rgba(79,227,255,.5)}
 .judge.pop{animation:pop .55s ease-out forwards}
 .judge.miss.pop{animation:popmiss .7s ease-out forwards}
 @keyframes popmiss{0%{opacity:1;transform:translate(-50%,0) rotate(-7deg) scale(1.2)}12%{transform:translate(calc(-50% + 5px),0) rotate(5deg)}24%{transform:translate(calc(-50% - 4px),0) rotate(-3deg)}36%{transform:translate(-50%,0) rotate(0)}70%{opacity:1;transform:translate(-50%,12%)}100%{opacity:0;transform:translate(-50%,45%)}}
@@ -276,6 +277,8 @@ const HOOK = [
 const LEVELS = [
   {
     id:'s1-1', stageNo:'1-1', who:'반장', role:'반장 · 88 BPM', tag:'쿵 · 쿵짝 · 긴 화물', bpm:88, div:2, style:'night1', lofi:6500, chordShift:2,
+    // the last bars slow down into the final chord, which lands on the last box
+    tempo: [[0, 88], [92, 84], [94, 78], [96, 72]], endAt: 96,
     clock:'02:50', title:'첫 출근', partners:['boss'], chords: NIGHT.chords, roots: NIGHT.roots, tutorial:true,
     // the tutorial forgives more: wider timing windows and a more patient release on long crates
     win: { p: 0.065, g: 0.125, m: 0.19, release: 0.2 },
@@ -288,7 +291,7 @@ const LEVELS = [
       'x...x...', 'x...x.x.', 'x.x.x.x.', 'x.x.x...',
       'h=..x...', 'h=..x...', 'h===....', 'x...x...',
       'x.x.x.x.', 'x...x.x.', 'x.x.x.x.', 'x.x.x...', 'x.x.x.x.', 'x...x.xx', 'x.x.x.x.', 'x.......',
-      'x...x...', 'x.......', '........', '........'
+      'x...x...', 'x.x.x...', 'x.......', '........'
     ],
     say: [[1, '자, 간다. 내 손 봐.', 5], [6, '올리고, 하나, 둘, 삑.', 4], [22, '쿵, 쿵짝. 이제 짝도 넣는다.', 4],
           [38, '긴 거 온다. 액자야. 끝까지 잡아.', 4], [54, '좋아. 그 박자야.', 3], [73, '끝에 짝짝, 두 번.', 3], [90, '수고했다, 신입.', 4]],
@@ -315,7 +318,7 @@ const LEVELS = [
     clock:'02:40', title:'지우의 곡', partners:['jiwoo'], observer:'boss', obsCue: { point: [100, 104.5], soft: 152 }, chords: EDM.chords, roots: EDM.roots,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
     // 지우's own track plays in her earbuds. vibe: she hums along and her hand drifts late. unplug: 반장 makes her take them out.
-    vibe: [[72, 104]], unplug: [[104, 120]], dim: [[104, 120]], club: [[120, 168]], special:['흥얼거릴 때 늦은 상자', 'late', '받아냄'],
+    vibe: [[72, 104]], unplug: [[104, 120]], dim: [[104, 120]], club: [[120, 168]], hype: [[120, 168]], special:['흥얼거릴 때 늦은 상자', 'late', '받아냄'],
     lateHint: '지우가 흥얼거려요. 손이 늦어요. 손을 봐요',
     sections: [[0, 'intro'], [2, 'groove'], [10, 'verse'], [18, 'vibe'], [26, 'unplug'], [30, 'drop'], [42, 'outro']],
     bars: [
@@ -324,7 +327,7 @@ const LEVELS = [
       'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h=..x.x.', 'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h===....',
       'x...x...', 'x...L...', 'x.......', 'L...x...', 'x...L...', '........', 'L...L...', 'x...x...',
       'x...x...', 'x...x...', 'x.x.x.x.', 'x.x.x.x.',
-      'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h=..x.xx', 'x.x.x.x.', 'x.xxx.x.', 'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'x.......',
+      'x.......', 'x...x...', 'x.......', 'x...x...', 'h===....', 'x...x...', 'x.......', 'x...x...', 'x...x...', 'h===....', 'x...x...', 'x.......',
       '........', '........'
     ],
     // [beat, text, beats shown, lane, speaker] speaker 'b' = 반장 watching from behind the belt
@@ -332,7 +335,7 @@ const LEVELS = [
           [30, '반장님, 이거 제가 만든 곡이에요!', 4], [46, '…', 2, 0, 'b'], [62, '여기서부터 제일 좋아하는 부분이에요.', 4],
           [74, '(흥얼흥얼)', 6], [82, '야. 손 늦는다.', 3, 0, 'b'], [92, '다다, 다다다…', 5],
           [100, '이어폰 빼!', 3, 0, 'b'], [104, '…네.', 2], [106, '하나, 둘, 셋, 넷. 벨트 박자.', 7, 0, 'b'],
-          [116, '반장님, 딱 한 번만 크게 들어보세요!', 3.5], [121, '…허 참.', 3, 0, 'b'], [166, '끝! 어땠어요?', 3]],
+          [116, '반장님, 딱 한 번만 크게 들어보세요!', 3.5], [121, '…허 참.', 3, 0, 'b'], [126, '이거예요 이거!!', 3], [140, '꾹 누르고… 빰!!', 3], [166, '끝! 어땠어요?', 3]],
     comfort: ['괜찮아요! 다시 쿵, 쿵.', '반장님이 손 보래요.'],
     intro: [
       { who:'', text:'이틀째 밤. 3번 라인.' },
@@ -529,6 +532,26 @@ function drawLights(bt, t, active) {
   }
   g.restore();
   tubes.forEach((x, k) => { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, alpha[k] > 0.5 ? '#fff3c8' : '#5d5446'); });
+  if (club) drawClub(bt, beat, ph);
+}
+function drawClub(bt, beat, ph) {
+  const now = performance.now(), sinceHype = (now - (FX.hypeAt || -1e9)) / 1000;
+  g.save();
+  g.fillStyle = 'rgba(10,4,20,.38)'; g.fillRect(0, 0, W, H);
+  g.globalCompositeOperation = 'lighter';
+  const hit = Math.max(0, 1 - sinceHype * 3.2), beatK = Math.max(0, 1 - ph * 3);
+  for (let k = 0; k < 5; k++) {
+    const c = CLUB[(FX.club + k) % CLUB.length], ox = 30 + k * 80, ang = Math.sin(bt * (1.1 + k * 0.27) + k) * 0.55;
+    const a = 0.07 + 0.12 * beatK + 0.25 * hit, len = 230, wd = 20 + 18 * hit;
+    const ex = ox + Math.sin(ang) * len, ey = 8 + Math.cos(ang) * len;
+    const grd = g.createLinearGradient(ox, 8, ex, ey);
+    grd.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${a})`); grd.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
+    g.fillStyle = grd; g.beginPath(); g.moveTo(ox - 2, 8); g.lineTo(ox + 2, 8); g.lineTo(ex + wd, ey); g.lineTo(ex - wd, ey); g.closePath(); g.fill();
+    R(ox - 3, 4, 6, 4, `rgb(${c[0]},${c[1]},${c[2]})`);
+  }
+  const c0 = CLUB[FX.club];
+  g.fillStyle = `rgba(${c0[0]},${c0[1]},${c0[2]},${0.06 + 0.1 * hit})`; g.fillRect(0, 0, W, H);
+  g.restore();
 }
 // blackout: the concept flips. Boxes are only visible inside the scanner's glow, so the partner's "thud" is the cue.
 const blackout = beat => inRange(beat, L.crazy);
@@ -553,7 +576,8 @@ function partnerPose(t, bt, active, lane = 0) {
   const beat = beatAt(t), ph = beat - Math.floor(beat);
   pose.beat = beat;
   pose.bob = t > 0 && ph < 0.18 ? 1 : 0;
-  pose.doze = inRange(beat, L.doze); pose.phone = inRange(beat, L.phone); pose.vibe = inRange(beat, L.vibe); pose.unplug = inRange(beat, L.unplug);
+  pose.doze = inRange(beat, L.doze); pose.phone = inRange(beat, L.phone); pose.vibe = inRange(beat, L.vibe); pose.unplug = inRange(beat, L.unplug); pose.hype = inRange(beat, L.hype);
+  if (pose.hype) pose.bob = ph < 0.22 ? -3 : ph < 0.4 ? -1 : 0;
   if (pose.vibe) pose.bob = ph < 0.3 || (ph > 0.5 && ph < 0.7) ? 2 : 0;
   if (pose.doze) pose.bob = 0;
   let cur = null;
@@ -650,7 +674,12 @@ const PARTNERS = {
       R(cx - 8, top + 8, 2, 2, '#f4f1ea');
       if (!pose.doze && active && pose.bob) R(cx - 9, top + 6, 2, 1, hoodD);
     },
-    arm(pose) { const top = bodyTop(84, pose); thick(BOSS_X + 5, top + 23, pose.hand.x, pose.hand.y, 4, '#6b2f3f'); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin); }
+    arm(pose) {
+      const top = bodyTop(84, pose);
+      const free = pose.hype && !pose.carry && Math.abs(pose.hand.x - (BOSS_X + 13)) < 2 && Math.abs(pose.hand.y - 134) < 2;
+      if (free) { const up = pose.bob < 0 ? -6 : 0; thick(BOSS_X + 5, top + 23, BOSS_X + 8, top + 4 + up, 4, '#6b2f3f'); R(BOSS_X + 6, top + 1 + up, 5, 5, C.skin); return; }
+      thick(BOSS_X + 5, top + 23, pose.hand.x, pose.hand.y, 4, '#6b2f3f'); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
+    }
   },
   park: {
     base: 92,
@@ -1022,7 +1051,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
 }
 function drawScene(t, bt, active, nowMs) {
   g.save();
-  if (!reduce && nowMs < FX.shakeUntil) g.translate(Math.round(Math.random() * 2 - 1), Math.round(Math.random() * 2 - 1));
+  if (!reduce && nowMs < FX.shakeUntil) { const a = FX.shakeAmp || 1; g.translate(Math.round((Math.random() * 2 - 1) * a), Math.round((Math.random() * 2 - 1) * a)); } else FX.shakeAmp = 1;
   const pa = (nowMs - (FX.punchAt || -1e9)) / 150;
   if (!reduce && pa >= 0 && pa < 1) { const z = 1 + 0.03 * (FX.punch || 1) * (1 - pa) * (1 - pa), px = SCAN_X, py = BELT_Y - 10; g.translate(px, py); g.scale(z, z); g.translate(-px, -py); }
   g.drawImage(bg, 0, 0);
@@ -1069,6 +1098,9 @@ function drawScene(t, bt, active, nowMs) {
     g.fillStyle = `rgba(220,30,20,${pulse * dark})`; g.fillRect(0, 0, W, H);
     R(170, 2, 44, 3, `rgba(255,60,40,${(0.5 + 0.5 * Math.sin(nowMs / 160)) * dark})`);
   }
+  // strobe on each 빰
+  const sh = (nowMs - (FX.hypeAt || -1e9)) / 1000;
+  if (active && !reduce && sh < 0.14) { g.fillStyle = `rgba(255,255,255,${(0.14 - sh) / 0.14 * (FX.hypeBig ? 0.55 : 0.38)})`; g.fillRect(0, 0, W, H); }
   const mAge = nowMs - FX.lastMiss;
   if (mAge < 320) {
     const a = (1 - mAge / 320) * 0.4;
@@ -1209,6 +1241,23 @@ function tapeStop(t, fs) {
   fs.forEach(f => { const o = ctx.createOscillator(), gn = ctx.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * 0.12, t + 0.7);
     gn.gain.setValueAtTime(0.05, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.75); o.connect(gn); gn.connect(bus); o.start(t); o.stop(t + 0.8); });
 }
+// 빰: a huge chord stab fired by the player's own scan in a hype section
+function bam(t, fs, big) {
+  supersaw(t, fs.map(f => f * 2), big ? 0.9 : 0.55, big ? 0.03 : 0.024, 5200);
+  supersaw(t, fs, big ? 0.9 : 0.55, 0.02, 2600);
+  const o = osc('sine', 110, t, 0.003, 0.6, 0.35); o.frequency.exponentialRampToValueAtTime(40, t + 0.3);
+  noise(t, 'highpass', 3000, big ? 0.3 : 0.2, big ? 1.2 : 0.6);
+}
+// held crate in a hype section: a white-noise sweep that climbs while you hold
+let holdRiser = null;
+function startHypeHold(d) {
+  stopHypeHold();
+  const s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), gn = ctx.createGain(), t = ctx.currentTime;
+  s.buffer = nbuf; s.loop = true; fl.type = 'bandpass'; fl.Q.value = 3; fl.frequency.setValueAtTime(500, t); fl.frequency.exponentialRampToValueAtTime(9000, t + d);
+  gn.gain.setValueAtTime(0.02, t); gn.gain.exponentialRampToValueAtTime(0.14, t + d);
+  s.connect(fl); fl.connect(gn); gn.connect(bus); s.start(t); holdRiser = s;
+}
+function stopHypeHold() { if (holdRiser) { try { holdRiser.stop(); } catch (e) {} holdRiser = null; } }
 const tom = (t, f, v = 0.4) => { const o = osc('sine', f, t, 0.002, v, 0.18); o.frequency.exponentialRampToValueAtTime(f * 0.6, t + 0.16); };
 
 // one backing track per partner, built from the same primitives. b = beat index, t = its time, s = seconds per beat there.
@@ -1271,10 +1320,24 @@ function buildEvents() {
       // 현장음 로파이: the warehouse is the band. Belt rollers tick the 8ths, a low thump is 쿵, a dusty snare is 짝.
       const sec = sectionAt(Math.floor(b / 4)), big = sec === 'chorus' || sec === 'chorus2';
       if (rnd(b, 9) < 0.6) E(rnd(b, 10) * s, T => crackle(T, 0.015 + rnd(b, 11) * 0.025));
-      if (sec === 'intro' || sec === 'outro') {
+      const bar1 = Math.floor(b / 4);
+      if (sec === 'outro' && bar1 >= 24) continue;   // the final chord (endAt) and the warehouse tail
+      if (sec === 'intro') {
         E(0, T => roller(T, 0.03)); E(s / 2, T => roller(T, 0.02));
         if (inBar === 0) { E(0, T => forklift(T)); E(s * 0.75, T => forklift(T)); }
-        if (sec === 'outro') { if (inBar === 0) E(0, T => rhodes(T, chords[ci], s * 3.5, 0.03)); if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.45)); }
+        continue;
+      }
+      if (sec === 'outro') {
+        // the band plays the closing phrase while the whistle sings the last line, then a fill into the final chord
+        const OUT = { 88: ['A4', 1], 89: ['C5', 1], 90: ['D5', 1], 91: ['F5', 1], 92: ['E5', 2.5], 94.5: ['D5', 1.5] };
+        if (OUT[b]) E(0, T => whistle(T, N_[OUT[b][0]], OUT[b][1] * s * 0.95, 0.05));
+        if (OUT[b + 0.5]) E(s / 2, T => whistle(T, N_[OUT[b + 0.5][0]], OUT[b + 0.5][1] * s * 0.95, 0.05));
+        E(0, T => roller(T, 0.03)); E(s / 2, T => roller(T, 0.025));
+        if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.75));
+        if (inBar === 1 || (inBar === 3 && bar1 === 22)) E(0, T => snare(T, 0.22));
+        E(0, T => hat(T, 0.03)); E(s / 2, T => hat(T, 0.05));
+        if (inBar === 0) { E(0, T => rhodes(T, chords[ci], s * 3.5, 0.045)); E(0, T => bass(T, roots[ci], s * 1.8, 300)); }
+        if (bar1 === 23 && inBar === 3) { E(0, T => tom(T, 200)); E(s / 3, T => tom(T, 165)); E(2 * s / 3, T => tom(T, 135)); }
         continue;
       }
       E(0, T => roller(T, big ? 0.035 : 0.05)); E(s / 2, T => roller(T, big ? 0.03 : 0.04));
@@ -1342,8 +1405,10 @@ function buildEvents() {
       if (!early) E(s / 2, T => bass(T, roots[ci], s * 0.4, drop ? 900 : 650));
       if (sec === 'verse') E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.3, 0.008, 2200));
       if (drop) {
-        E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.4, 0.014, 3500));
-        for (let k = 0; k < 2; k++) { const nm = hook[inBar * 2 + k]; if (nm) E(k * s / 2, T => pluck(T, N_[nm], s * 0.45, 0.05)); }
+        // the band keeps the floor; the big 빰 stabs only happen when the player scans (see hypeHit)
+        E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.25, 0.006, 3000));
+        for (let k = 0; k < 2; k++) { const nm = hook[inBar * 2 + k]; if (nm) E(k * s / 2, T => pluck(T, N_[nm], s * 0.45, 0.04)); }
+        for (let k = 1; k < 4; k += 2) E(k * s / 4, T => hat(T, 0.035));
       }
     } else if (style === 'mix13') {
       // 지우's EDM at 120, then 반장's shuffle blues at 88, then both at once ("blues house") at 104
@@ -1423,9 +1488,9 @@ function buildEvents() {
       for (const [ob, nm, len] of WHISTLE) if (ob < upto) ev.push([timeAt(bar0 * 4 + ob), T => whistle(T, N_[nm] * oct, len * SPB * 0.95, vol)]);
     }
   }
-  const tEnd = timeAt(total - 4);
+  const tEnd = timeAt(L.endAt != null ? L.endAt : total - 4);
   ev.push([tEnd, T => {
-    if (L.style === 'night1') { rhodes(T, chords[0], SPB * 6, 0.05); bass(T, roots[0], SPB * 4, 300); whistle(T, N_.C5, SPB * 3, 0.04); forklift(T + SPB * 2, 0.02); return; }
+    if (L.style === 'night1') { kick(T, 0.8); crash(T); rhodes(T, NIGHT.chords[3], SPB * 7, 0.055); rhodes(T, NIGHT.chords[3].map(f => f * 2), SPB * 5, 0.02); bass(T, NIGHT.roots[3], SPB * 5, 300); whistle(T, N_.C5, SPB * 4, 0.05); forklift(T + SPB * 5, 0.02); forklift(T + SPB * 5.75, 0.02); return; }
     if (L.style === 'mix13') { kick(T); crash(T); subDrop(T); organ(T, chords[4], SPB * 6, 0.04); bluesLead(T, N_.A4, SPB * 3, 0.05, true); supersaw(T, chords[4].slice(0, 3), SPB * 4, 0.012, 2400); return; }
     if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[0], SPB * 4, 0.016, 2400); return; }
     if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
@@ -1451,7 +1516,7 @@ function startHold() {
   stopHold(); holdOsc = ctx.createOscillator(); const gn = ctx.createGain();
   holdOsc.type = 'triangle'; holdOsc.frequency.value = 1320; gn.gain.value = 0.035; holdOsc.connect(gn); gn.connect(bus); holdOsc.start();
 }
-function stopHold() { if (holdOsc) { try { holdOsc.stop(); } catch (e) {} holdOsc = null; } }
+function stopHold() { if (holdOsc) { try { holdOsc.stop(); } catch (e) {} holdOsc = null; } stopHypeHold(); }
 
 function songAt(perfMs) {
   if (!ctx) return -99;
@@ -1477,7 +1542,7 @@ try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}
 
 function resetRun() {
   notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; });
-  FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9;
+  FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
   rings = []; heavyPend = null;
 }
@@ -1485,7 +1550,7 @@ loadLevel(LEVELS[0]); resetRun();
 
 const judgeEl = $('judge');
 function popJudge(kind, sub = '', lane = 0) {
-  const map = { perfect: ['딱!', 'perfect'], good: ['좋아', 'good'], miss: ['놓침', 'miss'], done: ['스캔 완료', 'perfect'], broken: ['깨짐', 'miss'] };
+  const map = { perfect: ['딱!', 'perfect'], good: ['좋아', 'good'], miss: ['놓침', 'miss'], done: ['스캔 완료', 'perfect'], broken: ['깨짐', 'miss'], bam: ['빰!', 'bam'] };
   const [txt, cls] = map[kind];
   judgeEl.className = 'judge ' + cls;
   judgeEl.style.top = L.lanes === 2 && lane === 0 ? '12%' : '29%';
@@ -1559,8 +1624,10 @@ function judgeNote(target, t) {
     else if (j === 'perfect') FX.react[target.lane] = { type: 'nod', at: now };
     if (target.heavy) { lastHeavy = now; FX.shakeUntil = now + 90; thud(ctx.currentTime, 0.5); }
     const dark = blackout(target.beat);
-    popJudge(j, milestone || (dark ? '소리로' : target.heavy ? '두 손' : j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''), target.lane);
-    if (target.len) { target.state = 'holding'; startHold(); } else target.state = 'hit';
+    const hype = inRange(target.beat, L.hype);
+    popJudge(hype ? 'bam' : j, milestone || (dark ? '소리로' : target.heavy ? '두 손' : j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''), target.lane);
+    if (target.len) { target.state = 'holding'; if (inRange(target.beat, L.hype)) { startHypeHold(target.end - target.arr); } else startHold(); } else target.state = 'hit';
+    if (inRange(target.beat, L.hype) && !target.len) hypeHit(target, j === 'perfect' && stats.combo % 4 === 0);
     if (target.i === notes.length - 1 && j === 'perfect') FX.shakeUntil = now + 220;
   } else { target.state = 'miss'; target.missKind = 'bad'; registerMiss(d < 0 ? '너무 빠름' : '너무 늦음', d, 'bad', target.lane); }
 }
@@ -1583,8 +1650,21 @@ function onHit(ts, key, lane = 0) {
   }
   judgeNote(target, t);
 }
+const CONFETTI = ['#ff4fa3', '#4fe3ff', '#cfe04a', '#ffe9a8', '#a68bff', '#ff8a3d'];
+const CLUB = [[255, 79, 163], [79, 227, 255], [207, 224, 74], [166, 139, 255]];
+function hypeHit(n, big) {
+  const now = performance.now();
+  FX.hypeAt = now; FX.hypeBig = big; FX.club = ((FX.club || 0) + 1) % CLUB.length;
+  FX.shakeUntil = now + (big ? 320 : 200); FX.shakeAmp = big ? 4 : 3;
+  FX.punchAt = now; FX.punch = big ? 3.4 : 2.4;
+  FX.react[0] = { type: 'nod', at: now };
+  spawn(SCAN_X, BELT_Y - 10, big ? 46 : 28, CONFETTI, -170, 170, -230, -60, 260, 1100, [2, 2]);
+  for (let k = 0; k < (big ? 30 : 16); k++) spawn(20 + Math.random() * (W - 40), -4, 1, [CONFETTI[k % CONFETTI.length]], -25, 25, 30, 90, 90, 1600, [2, 3]);
+  bam(ctx.currentTime, CHORDS[chordIdx(n.beat)], big);
+}
 function completeHold(n) {
   const now = performance.now();
+  if (inRange(n.beat, L.hype)) { stopHold(); n.state = 'hit'; n.doneAt = songAt(now); stats.tailOk++; const m = addCombo(); lastGood = now; FX.goodLane = n.lane; ring(C.ok, n.lane); hypeHit(n, true); popJudge('bam', m || '촤라락', n.lane); return; }
   n.state = 'hit'; n.doneAt = songAt(now); stats.tailOk++; const milestone = addCombo(); stopHold();
   beep(ctx.currentTime, 2093); tear(ctx.currentTime);
   lastGood = now; FX.goodLane = n.lane; ring(C.ok, n.lane); spawnBits(16); FX.punchAt = now; FX.punch = 1.4; FX.shakeUntil = now + 150; FX.react[n.lane] = { type: 'nod', at: now };
