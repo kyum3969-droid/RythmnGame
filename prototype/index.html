@@ -435,9 +435,9 @@ const LEVELS = [
       'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h=..x.x.',
       '........', '........',
       '............',
-      // slow blues at 60: quarter notes, then the shuffle pairs, the off-beats creeping in over the last four bars
-      'x.....x.....', 'x.....x.....', 'x..x..x..x..', 'x..x..x.x...', 'x..x..x..x..', 'x.x...x.x...',
-      'x..x..x..x..', 'h==...x..x..', 'x....x..x...', 'x..x..x.x...', '..x..x..x...', 'x...........',
+      // slow blues at 60: quarter notes and long crates first, then the shuffle pairs, the off-beats creeping in over the last four bars
+      'x.....x.....', 'h=====x.....', 'x..x..x..x..', 'h==...x.x...', 'x..x..h=====', 'x.x...x.x...',
+      'h==...x..x..', 'x..x..h==...', 'x....x..x...', 'h=====..x...', '..x..x..x...', 'h==.........',
       '........',
       // her song comes back at 120 under his guitar: the boxes stay on the slow pulse at first, then pick up her 8ths; two bars of break
       // ('o' inside a hold = a box riding on the crate: keep holding, tap it with the other hand). Holds get a beat of air after them.
@@ -1611,7 +1611,7 @@ function gtr(t, fs, d, v = 0.03) {
   const top = ctx.createBiquadFilter(), gn = ctx.createGain(); top.type = 'lowpass'; top.frequency.value = 3200; top.connect(gn); gn.connect(mus);
   gn.gain.setValueAtTime(v * 2.2, t); gn.gain.setValueAtTime(v * 2.2, t + Math.max(0.02, d - 0.06)); gn.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.15);
   fs.forEach((f, i) => {
-    if (gsPlay('clean', t + i * 0.014, f, d, 3.5, false, top, 0)) return;
+    if (gsPlay('clean', t + i * 0.014, f, d, 2.2, false, top, 0)) return;
     const src = ctx.createBufferSource(); src.buffer = ksBuf(f, d + 0.2, { a: 0.5, decay: 0.03 }); src.connect(top); src.start(t + i * 0.014); src.stop(t + i * 0.014 + d + 0.2);
   });
 }
@@ -1684,10 +1684,11 @@ function gsPlay(kind, t, f, d, vol, bend, dest, vib) {
 // clean lead guitar: the sample (or the string) into a body resonance and a warm top, a touch of room behind it
 function gtrLead(t, f, d, vol = 0.05, bend = false) {
   const body = ctx.createBiquadFilter(), top = ctx.createBiquadFilter(), gn = ctx.createGain();
-  body.type = 'peaking'; body.frequency.value = 230; body.Q.value = 1.2; body.gain.value = 3; top.type = 'lowpass'; top.frequency.value = 4800;
-  const dl = ctx.createDelay(1), fb = ctx.createGain(), dfl = ctx.createBiquadFilter(); dl.delayTime.value = 0.27; fb.gain.value = 0.28; dfl.type = 'lowpass'; dfl.frequency.value = 2200;
-  body.connect(top); top.connect(gn); gn.connect(mus); gn.connect(dl); dl.connect(dfl); dfl.connect(fb); fb.connect(dl); fb.connect(mus);
-  if (gsPlay('clean', t, f, d, vol * 32, bend, body, d > 0.8 ? 14 : 4)) { gn.gain.value = 1; return; }
+  body.type = 'peaking'; body.frequency.value = 230; body.Q.value = 1.2; body.gain.value = 2; top.type = 'lowpass'; top.frequency.value = 3600;
+  const dl = ctx.createDelay(1), fb = ctx.createGain(), dfl = ctx.createBiquadFilter(); dl.delayTime.value = 0.27; fb.gain.value = 0.3; dfl.type = 'lowpass'; dfl.frequency.value = 1800;
+  const rm = ctx.createDelay(1), rg = ctx.createGain(); rm.delayTime.value = 0.083; rg.gain.value = 0.35;
+  body.connect(top); top.connect(gn); gn.connect(mus); gn.connect(dl); dl.connect(dfl); dfl.connect(fb); fb.connect(dl); fb.connect(mus); gn.connect(rm); rm.connect(rg); rg.connect(mus);
+  if (gsPlay('clean', t, f, d, vol * 17, bend, body, d > 0.8 ? 12 : 3)) { gn.gain.value = 1; return; }
   const src = ctx.createBufferSource(); src.buffer = ksBuf(f, d + 0.25, { bend, vib: d > 0.8 ? 0.007 : 0.002, a: 0.42, decay: 0.03 });
   gn.gain.setValueAtTime(vol * 2.4, t); gn.gain.setValueAtTime(vol * 2.4, t + Math.max(0.02, d - 0.08)); gn.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.2);
   src.connect(body); src.start(t); src.stop(t + d + 0.25);
@@ -1698,11 +1699,11 @@ function gtrDist(t, f, d, vol = 0.07, bend = false) {
   if (!distCurve) { distCurve = new Float32Array(2048); for (let i = 0; i < 2048; i++) { const x = i / 1023.5 - 1; distCurve[i] = Math.tanh(x * 9) / Math.tanh(9); } }
   const ws = ctx.createWaveShaper(), pre = ctx.createGain(), cab = ctx.createBiquadFilter(), mid = ctx.createBiquadFilter(), gn = ctx.createGain();
   ws.curve = distCurve; ws.oversample = '2x'; pre.gain.value = 3.2;
-  cab.type = 'lowpass'; cab.frequency.value = 3600; cab.Q.value = 0.9; mid.type = 'peaking'; mid.frequency.value = 1500; mid.Q.value = 1; mid.gain.value = 3;
+  cab.type = 'lowpass'; cab.frequency.value = 2900; cab.Q.value = 0.8; mid.type = 'peaking'; mid.frequency.value = 1200; mid.Q.value = 1; mid.gain.value = 2;
   gn.gain.setValueAtTime(vol * 1.3, t); gn.gain.setValueAtTime(vol * 1.3, t + Math.max(0.02, d - 0.1)); gn.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.15);
   pre.connect(ws); ws.connect(cab); cab.connect(mid); mid.connect(gn); gn.connect(mus);
   // the sampled distortion guitar goes straight to the speaker filter (it is already driven)
-  if (Object.keys(GBUF.drive).length) { const g2 = ctx.createGain(); g2.gain.value = 0.9; g2.connect(cab); if (gsPlay('drive', t, f, d, vol * 12, bend, g2, d > 0.8 ? 24 : 6)) { gn.gain.cancelScheduledValues(t); gn.gain.setValueAtTime(1, t); noise(t, 'highpass', 5000, vol * 0.6, 0.02); return; } }
+  if (Object.keys(GBUF.drive).length) { const g2 = ctx.createGain(); g2.gain.value = 0.9; g2.connect(cab); const rm = ctx.createDelay(1), rg = ctx.createGain(); rm.delayTime.value = 0.11; rg.gain.value = 0.3; gn.connect(rm); rm.connect(rg); rg.connect(mus); if (gsPlay('drive', t, f, d, vol * 7, bend, g2, d > 0.8 ? 18 : 5)) { gn.gain.cancelScheduledValues(t); gn.gain.setValueAtTime(1, t); noise(t, 'highpass', 5000, vol * 0.6, 0.02); return; } }
   [[f, 1], [f * 1.0015, 0.6]].forEach(([fr, v]) => {
     const src = ctx.createBufferSource(), g = ctx.createGain(); src.buffer = ksBuf(fr, d + 0.2, { bend, vib: d > 0.8 ? 0.012 : 0.004, a: 0.35, decay: 0.08 });
     g.gain.value = v; src.connect(g); g.connect(pre); src.start(t); src.stop(t + d + 0.2);
@@ -1971,7 +1972,7 @@ function buildEvents() {
         E(0, T => bass(T, roots[ci] * walk, s * 0.85, 300));
         E(2 * s / 3, T => gtr(T, chords[ci].slice(1), s * 0.5, 0.022));
         if (inBar === 0) E(0, T => organ(T, chords[ci], s * 4, 0.012));
-        for (const [ob, nm, len, bend] of GLEAD) if (Math.floor(ob) === rel) E((ob - rel) * s, T => gtrLead(T, N_[nm], len * s * 0.96, 0.05, !!bend));
+        for (const [ob, nm, len, bend] of GLEAD) if (Math.floor(ob) === rel) E((ob - rel) * s, T => gtrLead(T, N_[nm], len * s * 0.96, 0.045, !!bend));
         continue;
       }
       if (sec === 'fuseIn') {
@@ -1990,7 +1991,7 @@ function buildEvents() {
       const ph2 = sec === 'swing', brk = sec === 'break', pb = bar - 38, st = ph2 ? (bar >= 58 ? 3 : 2) : (bar >= 44 ? 1.5 : 1), rel2 = b - 152;
       const half = pb % 2, walk = [1, 1.189, 1.498, 1.682][half * 2 + (inBar >> 1)];
       if (brk && bar === 49 && inBar === 3) { E(0, T => mus.gain.setValueAtTime(0.0001, T)); E(s * 0.98, T => mus.gain.setValueAtTime(1, T)); continue; }
-      if (b === 152) E(0, T => { crash(T); subDrop(T); gtrDist(T, N_.E5, s * 7, 0.08, true); });
+      if (b === 152) E(0, T => { crash(T); subDrop(T); gtrDist(T, N_.E5, s * 7, 0.065, true); });
       if (b === 200) E(0, T => { crash(T); subDrop(T); synthLead(T, N_.E5, s * 3, 0.045); });
       // her piano figure (1, the 'and' of 2, 4) on his chords
       if (inBar === 0) E(0, T => piano(T, chords[ci], s * 1.8, brk ? 0.045 : 0.03 + st * 0.006)); if (inBar === 1) E(s / 2, T => piano(T, chords[ci].slice(1), s * 1.2, 0.028)); if (inBar === 3) E(0, T => piano(T, chords[ci], s * 1.4, 0.03));
@@ -2019,7 +2020,7 @@ function buildEvents() {
       if (rel2 >= 7 && !(b >= 200 && b < 203)) for (const [ob, nm, len, bend] of GLEAD) if (Math.floor(ob * 2) === rel2) E((ob * 2 - rel2) * s, T => {
         if (ph2) synthLead(T, N_[nm] * (hi ? 2 : 1), len * 2 * s * 0.96, hi ? 0.036 : 0.042);
         else if (brk) gtrLead(T, N_[nm], len * 2 * s * 0.96, 0.055, !!bend);
-        else gtrDist(T, N_[nm], len * 2 * s * 0.96, 0.065, !!bend);
+        else gtrDist(T, N_[nm], len * 2 * s * 0.96, 0.055, !!bend);
       });
     } else if (style === 'mix14') {
       // 마감: 반장's shuffle blues at 96, pushed to 112 as the pile grows; 지우 takes the line at 128 with her straight beat;
