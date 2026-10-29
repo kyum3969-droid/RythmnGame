@@ -290,7 +290,7 @@ const LEVELS = [
     id:'s1-1', stageNo:'1-1', who:'반장', role:'반장 · 88 BPM', tag:'쿵 · 쿵짝 · 긴 화물', bpm:88, div:2, style:'night1', lofi:6500, chordShift:2,
     // the last bars slow down into the final chord, which lands on the last box
     tempo: [[0, 88], [92, 84], [94, 78], [96, 72]], endAt: 96,
-    clock:'02:50', title:'첫 출근', partners:['boss'], chords: NIGHT.chords, roots: NIGHT.roots, tutorial:true,
+    clock:'02:50', title:'첫 출근', partners:['boss'], chords: NIGHT.chords, roots: NIGHT.roots, tutorial:true, hints:false,
     // the tutorial forgives more: wider timing windows and a more patient release on long crates
     win: { p: 0.065, g: 0.125, m: 0.19, release: 0.2 },
     special:['긴 화물', 'len', '끝까지'],
@@ -304,9 +304,9 @@ const LEVELS = [
       'x.x.x.x.', 'x...x.x.', 'x.x.x.x.', 'x.x.x...', 'x.x.x.x.', 'x...x.xx', 'x.x.x.x.', 'x.......',
       'x...x...', 'x.x.x...', 'x.......', '........'
     ],
-    say: [[1, '자, 간다. 내 손 봐.', 5], [6, '올리고, 하나, 둘, 삑.', 4], [22, '쿵, 쿵짝. 이제 짝도 넣는다.', 4],
-          [38, '긴 거 온다. 액자야. 끝까지 잡아.', 4], [54, '좋아. 그 박자야.', 3], [73, '끝에 짝짝, 두 번.', 3], [90, '수고했다, 신입.', 4]],
-    comfort: ['괜찮아. 다음 거 봐.', '음악 말고 내 손.'],
+    say: [[1, '자, 간다. 내 손 봐.', 5], [6, '올리고, 하나, 둘, 삑.', 4], [22, '이제 좀 바빠진다.', 3],
+          [38, '긴 거 온다. 액자야. 끝까지 잡아.', 4], [54, '좋아. 그 박자야.', 3], [90, '수고했다, 신입.', 4]],
+    comfort: ['괜찮아. 다음 거 봐.', '신입! 집중 안 해?'],
     // scene 1: the office by the line door, 반장 alone in the middle. scene 2: the belt, after he walks over to his spot
     intro: [
       { who:'', text:'새벽 2시 50분. 물류센터 B동. 첫 출근.', scene:'office' },
@@ -315,12 +315,8 @@ const LEVELS = [
       { who:'반장', text:'장갑 껴.' },
       { who:'반장', text:'내가 상자 올리면, 빨간 선에 닿을 때 찍어. 삑 소리 나게.' }],
     outro: (good) => good ? [
-      { who:'반장', text:'…첫날치곤 괜찮네.' },
-      { who:'반장', text:'벨트가 빨라도 박자는 네가 정하는 거다. 내 손 보고.' },
-      { who:'', text:'퇴근길, 반장님이 자판기에 동전을 두 개 넣었다. 하나는 내 거였다.' }] : [
-      { who:'반장', text:'처음엔 다 그래.' },
-      { who:'반장', text:'음악 말고 손을 봐. 내일 또 하자.' },
-      { who:'', text:'반장님은 무릎을 한 번 두드리고 먼저 나갔다.' }]
+      { who:'반장', text:'…첫날치곤 괜찮네.' }] : [
+      { who:'반장', text:'…내일 또 하자.' }]
   }
   ,{
     id:'s1-2', stageNo:'1-2', who:'지우', role:'지우 · 116 BPM', tag:'쿵쿵쿵쿵 · 흥얼거림 · 이어폰 빼', bpm:116, div:2, style:'edm1',
@@ -2089,6 +2085,7 @@ function updateHud(t) {
     if (f1 && f1.state === 'pending' && t > f1.place) h = '연두 = 오른쪽';
     if (blackout(beat)) h = '정전! 소리로';
   }
+  if (L.hints === false) h = '';
   if (h !== lastHint) { hint.textContent = h; hint.hidden = !h; lastHint = h; }
 }
 
