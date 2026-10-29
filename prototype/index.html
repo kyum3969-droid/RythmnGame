@@ -1197,7 +1197,7 @@ const SCENE = { kind: 'line', trans: null, walk: null };
 const OFFICE_X = 192, WALK_FROM = 200;
 function sceneReset(kind = 'line') { SCENE.kind = kind; SCENE.trans = null; SCENE.walk = null; }
 function sceneCut(to, done) {
-  const now = performance.now(), out = reduce ? 200 : 320, walk = reduce ? 0 : 1100;
+  const now = performance.now(), out = reduce ? 200 : 320, walk = reduce ? 0 : 2600;
   SCENE.trans = { at: now, out, to, done, swapped: false, walk };
 }
 function sceneTick(nowMs) {
@@ -1207,7 +1207,8 @@ function sceneTick(nowMs) {
     tr.swapped = true; SCENE.kind = tr.to;
     if (tr.walk) {
       SCENE.walk = { at: nowMs, dur: tr.walk };
-      if (ctx) { const t0 = ctx.currentTime; thud(t0, 0.35); for (let k = 0; k < 4; k++) noise(t0 + 0.25 + k * 0.26, 'lowpass', 420, 0.18, 0.07, 0.7, bus); }
+      // one footstep every 0.38s for the length of the walk, in time with the body bob
+      if (ctx) { const t0 = ctx.currentTime, steps = Math.floor((tr.walk / 1000 - 0.3) / 0.38); thud(t0, 0.35); for (let k = 0; k < steps; k++) noise(t0 + 0.3 + k * 0.38, 'lowpass', 420, 0.16, 0.07, 0.7, bus); }
     }
   }
   if (tr.swapped && age >= tr.out + tr.walk) { SCENE.trans = null; SCENE.walk = null; tr.done(); }
@@ -1235,8 +1236,9 @@ function drawOffice(nowMs) {
 }
 // on the line, during the walk: 반장 crosses behind the belt from the middle to his place, facing the way he walks
 function drawWalkingBoss(nowMs) {
-  const w = SCENE.walk, p = ease((nowMs - w.at) / w.dur), x = lerp(WALK_FROM, BOSS_X, p);
-  const bob = p < 1 && Math.floor((nowMs - w.at) / 130) % 2 === 0 ? 1 : 0;
+  // an unhurried walk: mostly even pace, easing only a little at the start and the stop
+  const w = SCENE.walk, q = Math.min(1, (nowMs - w.at) / w.dur), p = lerp(q, ease(q), 0.5), x = lerp(WALK_FROM, BOSS_X, p);
+  const bob = p < 1 && Math.floor((nowMs - w.at) / 190) % 2 === 0 ? 1 : 0;
   if (p >= 1) { drawActor('boss', BOSS_X, false, standPose(0), nowMs, false); return; }
   drawActor('boss', x, true, standPose(bob), nowMs, false);
 }
