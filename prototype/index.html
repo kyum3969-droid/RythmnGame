@@ -251,7 +251,12 @@ const WHISTLE = [
   [24, 'A4', 1], [25, 'C5', 1], [26, 'D5', 1], [27, 'F5', 1],
   [28, 'E5', 3]
 ];
-const N_ = { G4: 392, G5: 783.99, E4: 329.63, F4: 349.23, Gs4: 415.3, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, A5: 880 };
+// 1-2: 12-bar minor blues in A. i = Am7, iv = Dm7, v = E7
+const BLUES = { chords: [[220, 261.63, 329.63, 392], [146.83, 174.61, 220, 261.63], [164.81, 207.65, 246.94, 293.66]], roots: [110, 73.42, 82.41],
+  prog: [0, 0, 0, 0, 1, 1, 0, 0, 2, 1, 0, 2] };
+// a short pentatonic lick with the blue note, played at the end of each 4-bar phrase
+const LICK = [[2, 'C5', 0.5], [2.5, 'D5', 0.5], [3, 'Ds5', 0.25], [3.25, 'E5', 0.5], [3.75, 'C5', 0.25]];
+const N_ = { Ds5: 622.25, G4: 392, G5: 783.99, E4: 329.63, F4: 349.23, Gs4: 415.3, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, A5: 880 };
 // chorus hook, 8 bars: [beat offset inside the 8 bars, note, length in beats]
 const HOOK = [
   [0, 'E5', 1.5], [1.5, 'C5', 0.5], [2, 'B4', 1], [3, 'A4', 1],
@@ -300,11 +305,45 @@ const LEVELS = [
       { who:'', text:'반장님은 무릎을 한 번 두드리고 먼저 나갔다.' },
       { who:'', text:'휴게실 화이트보드에 빨간 글씨가 있었다. "다음 주 화 · 센터장 마감 점검".' }]
   }
+  ,{
+    id:'s1-2', stageNo:'1-2', who:'반장', role:'반장 · 96 BPM', tag:'늦은 상자 · 음악이 빠지는 구간', bpm:96, div:2, style:'blues1', lofi:9000, chordShift:2,
+    clock:'02:40', title:'무릎', partners:['boss'], chords: BLUES.chords, roots: BLUES.roots, prog: BLUES.prog,
+    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
+    quiet: [[56, 104]], special:['늦은 상자', 'late', '받아냄'],
+    // 36 bars: two times round a 12-bar minor blues, then 8 bars of getting back on the beat
+    sections: [[0, 'intro'], [2, 'round1'], [14, 'knee'], [26, 'recover'], [34, 'outro']],
+    bars: [
+      '........', '........',
+      'x...x...', 'x.x.x...', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.xx', 'x.x.x...', 'h=..x...', 'x.x.x.x.', 'x.x.x.xx', 'x.x.x.x.', 'h===..x.', 'x.......',
+      'x...x...', 'x...L...', 'x...x...', 'L...x...', 'x...L...', 'x.......', 'L...L...', 'x...x...', 'L.x.L...', 'x...L...', 'L...x...', 'x.......',
+      'x.x.x.x.', 'x.x.x.xx', 'x.x.L.x.', 'x.x.x...', 'h=..x.xx', 'x.x.x.x.', 'x.x.x.xx', 'x.......',
+      '........', '........'
+    ],
+    say: [[1, '어제처럼. 내 손 봐.', 4], [30, '좋아. 손 안 잊었네.', 3], [52, '…읏.', 2], [57.5, '미안. 무릎이 좀.', 3],
+          [66, '음악 말고 내 손을 봐.', 3.5], [78, '…늦게 올라가는 거, 기다려.', 3.5], [94, '그래, 그렇게.', 3],
+          [103, '…됐다. 다시 맞추자.', 3], [109, '한 번 더 늦는다. 미안.', 3], [134, '수고했다.', 3]],
+    comfort: ['괜찮아. 다음 거 봐.', '내가 늦으면 너도 늦어. 그거면 돼.'],
+    intro: [
+      { who:'', text:'이틀째 밤. 출근 전 휴게실.' },
+      { who:'반장', text:'…어, 왔냐.' },
+      { who:'', text:'반장님이 무릎에 파스를 한 장 더 붙였다.' },
+      { who:'반장', text:'별거 아니다. 오늘은 내가 좀 늦을 수도 있어.' },
+      { who:'반장', text:'내가 늦으면 너도 늦어. 음악 말고 사람한테 맞추는 거다.' },
+      { who:'', text:'휴게실 구석에서 누군가 이어폰을 낀 채 엎드려 자고 있었다.' }],
+    outro: (good, sp) => good ? [
+      { who:'반장', text:'…오늘은 네가 나를 받쳐줬네.' },
+      { who:'반장', text: sp >= 6 ? '늦게 올라간 거, 다 기다려줬지.' : '근데 내가 늦을 땐 음악을 따라가더라. 사람을 봐야지.' },
+      { who:'', text:'반장님은 달력의 다음 주 화요일에 동그라미를 쳤다. 센터장 점검.' },
+      { who:'반장', text:'점검 날은… 무릎 아파도 안 늦는다.' }] : [
+      { who:'반장', text:'내 탓이다. 무릎이.' },
+      { who:'반장', text:'내가 늦으면 너도 같이 늦어주면 돼. 그게 페어야.' },
+      { who:'', text:'반장님은 파스 냄새를 남기고 먼저 나갔다.' }]
+  }
 ];
 // the stage board. Locked entries show what is coming.
 const STAGE1 = [
   { level: LEVELS[0] },
-  { no:'1-2', title:'무릎', role:'반장 · 96 BPM', tag:'늦은 상자', pid:'boss' },
+  { level: LEVELS[1] },
   { no:'1-3', title:'맞춘 밤', role:'반장 · 104 BPM', tag:'한 마디 필인', pid:'boss' },
   { no:'보스', title:'마감 점검', role:'최 센터장 · 104→128 BPM', tag:'템포 상승 · 라인 증설 · 둘이서', pid:'chief', boss:true }
 ];
@@ -631,10 +670,10 @@ function drawGun(gx, gy, kick) {
 }
 function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
   const top = playerTop(kick, nowMs);
-  const gx = 324 - kick * 4, gy = 128;
+  const gx = 324 - kick * 4, gy = 117;
   if (L.lanes === 2) {
     // left hand works the upper belt, right hand the lower one
-    const ux = 326 - upperKick * 4, uy = 100;
+    const ux = 326 - upperKick * 4, uy = 87;
     thick(PLAYER_X - 5, top + 20, ux + 2, uy + 3, 4, C.hoodie); drawGun(ux, uy, upperKick);
   }
   thick(PLAYER_X - 6, top + 22, gx + 2, gy + 3, 4, C.hoodie);
@@ -667,37 +706,53 @@ function drawBeltFront(time) {
   for (const x of [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422');
   R(44, BELT_Y - 1, 5, 17, '#3d3431');
 }
+function drawLaserGlow(flash) {
+  g.globalAlpha = 0.22 + 0.4 * flash;
+  const gw = 5 + Math.round(flash * 12);
+  R(SCAN_X - Math.floor(gw / 2), 113, gw, 33, flash > 0 ? C.ok : C.laser);
+  g.globalAlpha = 1;
+}
+function drawRingsAt(dy, nowMs) {
+  for (const r of rings) {
+    if (r.dy !== dy) continue;
+    const a = (nowMs - r.at) / 420, e = 1 - (1 - a) * (1 - a);
+    g.strokeStyle = r.c;
+    g.globalAlpha = (1 - a) * 0.75; g.lineWidth = 2; g.beginPath(); g.ellipse(SCAN_X, BELT_Y - 8, 6 + e * 46, 4 + e * 26, 0, 0, Math.PI * 2); g.stroke();
+    if (a < 0.5) { g.globalAlpha = (0.5 - a) * 1.2; g.lineWidth = 1; g.beginPath(); g.ellipse(SCAN_X, BELT_Y - 8, 3 + e * 24, 2 + e * 14, 0, 0, Math.PI * 2); g.stroke(); }
+  }
+  g.globalAlpha = 1;
+}
 function drawScannerBack(dy = 0) { R(SCAN_X - 11, 108 + dy, 4, 40, '#555a5f'); R(SCAN_X - 11, 105 + dy, 24, 5, C.metal); R(SCAN_X - 2, 110 + dy, 6, 3, '#2b2e31'); }
 function drawScannerFront(flash, holding, missFlash, dy = 0) {
   R(SCAN_X + 8, 108 + dy, 4, 56 - (dy ? 28 : 0), '#7b8288'); R(SCAN_X + 8, 108 + dy, 4, 2, '#9aa1a6');
   const green = flash > 0 || holding;
   const col = green ? C.ok : C.laser;
-  g.globalAlpha = 0.25 + (flash > 0 ? 0.45 * flash : 0) + (missFlash ? 0.4 : 0);
-  const gw = missFlash ? 9 : 5 + Math.round(flash * 10);
-  R(SCAN_X - Math.floor(gw / 2), 113 + dy, gw, 33, missFlash ? '#ff2a1a' : col);
-  if (flash > 0.4 && !missFlash) { g.globalAlpha = (flash - 0.4) * 0.9; R(SCAN_X - 1, 104 + dy, 3, 46, '#f4fff0'); }
-  g.globalAlpha = 1;
+  if (missFlash) { g.globalAlpha = 0.6; R(SCAN_X - 4, 113 + dy, 9, 33, '#ff2a1a'); g.globalAlpha = 1; }
+  if (flash > 0.4 && !missFlash) { g.globalAlpha = (flash - 0.4) * 0.9; R(SCAN_X - 1, 104 + dy, 3, 46, '#f4fff0'); g.globalAlpha = 1; }
   R(SCAN_X, 113 + dy, 1, 33, missFlash ? '#ffd0c8' : col);
   R(SCAN_X + 2, 103 + dy, 5, 2, green ? C.ok : missFlash ? '#ff4a3d' : '#5a2b27');
 }
+// inspection seal: a 7px ink ring with a tick, pressed onto the box face. It lands big and settles in 80 ms.
+const SEAL = ['..xxx..', '.x...x.', 'x.....x', 'x.....x', 'x.....x', '.x...x.', '..xxx..'];
+const TICK = [[1, 3], [2, 4], [3, 3], [4, 2], [5, 1]];
 function drawStamp(cx, cy, age, kind) {
-  const s = age < 0.1 ? lerp(3.4, 1.25, age / 0.1) : 1.25;
-  g.save(); g.translate(Math.round(cx), Math.round(cy)); g.rotate(kind === 'good' ? 0.4 : -0.12); g.scale(s, s);
-  g.globalAlpha = age < 0.1 ? 0.8 : 1;
-  g.fillStyle = kind === 'good' ? '#e0c45a' : '#5fc06c';
-  g.fillRect(-5, -4, 10, 1); g.fillRect(-5, 3, 10, 1); g.fillRect(-5, -4, 1, 8); g.fillRect(4, -4, 1, 8);
-  [[-3,-1],[-2,0],[-1,1],[0,0],[1,-1],[2,-2]].forEach(([a, b]) => g.fillRect(a, b, 1, 1));
+  const s = age < 0.08 ? lerp(2, 1, age / 0.08) : 1;
+  g.save(); g.translate(Math.round(cx), Math.round(cy)); g.rotate(kind === 'good' ? 0.28 : -0.1); g.scale(s, s);
+  g.globalAlpha = age < 0.08 ? 0.55 + 0.45 * age / 0.08 : 0.9;
+  g.fillStyle = kind === 'good' ? '#9a6a12' : '#1f6b34';
+  SEAL.forEach((row, j) => { for (let i = 0; i < 7; i++) if (row[i] === 'x') g.fillRect(i - 3.5, j - 3.5, 1, 1); });
+  TICK.forEach(([i, j]) => g.fillRect(i - 3.5, j - 3.5, 1, 1));
   g.restore();
 }
-function drawBox(n, cx, bottom, mark, t) {
-  const w = n.w, h = n.h, x = Math.round(cx - w / 2), y = Math.round(bottom - h);
+function drawBox(n, cx, bottom, mark, t, sq = 0) {
+  const w = n.w + Math.round(sq * 2), h = n.h - Math.round(sq * 2), x = Math.round(cx - w / 2), y = Math.round(bottom - h);
   R(x + 1, bottom, w, 1, 'rgba(0,0,0,.45)');
   R(x, y, w, h, C.kraft); R(x, y, w, 2, C.kraftTop); R(x + w - 2, y + 2, 2, h - 2, C.kraftDark);
   R(x + (w >> 1) - 1, y, 3, h, L.lanes === 2 ? (n.lane === 0 ? C.vest : C.vest2) : C.tape);
   const lw = Math.min(7, w - 4);
   if (lw >= 3) { R(x + 2, y + h - 6, lw, 4, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink); }
   if (n.heavy) { R(x + 2, y + 3, w - 4, 4, '#1b1716'); for (let k = 2; k < w - 5; k += 4) R(x + k + 1, y + 4, 2, 2, '#f0b429'); }
-  if (mark === 'hit') drawStamp(x + w - 6, y + 5, t - n.hitAt, n.judge);
+  if (mark === 'hit') drawStamp(x + w / 2 + 2, y + h * 0.42, t - n.hitAt, n.judge);
   if (mark === 'miss') { g.globalAlpha = 0.35; R(x, y, w, h, '#7a1f18'); g.globalAlpha = 1; cross(x + w - 7, y + 3); }
 }
 function drawCrate(n, headX, bottom, t) {
@@ -780,8 +835,8 @@ function drawParticles(nowMs) {
 
 let rings = [];
 // hit-stop: only the scanned box pauses; the belt, the music and the next boxes keep their time
-const HITSTOP = reduce ? 0 : 0.085, CATCHUP = 0.28;
-function hitLag(dt, hs) { if (dt <= 0) return 0; if (dt < hs) return dt; return hs * Math.max(0, 1 - (dt - hs) / CATCHUP); }
+const HITSTOP = reduce ? 0 : 0.085;
+function hitLag(dt, hs) { return Math.max(0, Math.min(dt, hs)); }
 const LANE_DY = [-30, 0];
 const darkBuf = document.createElement('canvas'); darkBuf.width = W; darkBuf.height = H;
 // one belt: grid, boxes, scanner, front face, the partner's carried box and arm. dy lifts the upper belt.
@@ -792,7 +847,10 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   drawBeltTop(beltT, active);
   let holding = false;
   if (active) {
+    drawRingsAt(dy, nowMs);
+    drawLaserGlow(FX.goodLane === lane ? Math.max(0, 1 - (nowMs - lastGood) / 160) : 0);
     g.save(); g.beginPath(); g.rect(49, -dy, W, H); g.clip();
+    const boxQ = [];
     for (const n of notes) {
       if (n.lane !== lane) continue;
       if (t < n.place) break;
@@ -820,11 +878,14 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
         }
       }
       if (cx - n.w / 2 > W) { if (n.state === 'hit') laneFx.delivered++; continue; }
-      const hop = n.state === 'hit' ? Math.round((n.judge === 'perfect' ? 7 : 4) * Math.exp(-(t - n.hitAt) * 11)) : 0;
+      // a scanned box squashes on the belt and springs back; it never leaves the belt
+      const ha = n.state === 'hit' ? t - n.hitAt : 9;
+      const sq = ha < 0.16 ? Math.sin(ha / 0.16 * Math.PI) * (n.judge === 'perfect' ? 1 : 0.6) * (ha < 0.08 ? 1 : -0.5) : 0;
       const ja = n.missKind === 'bad' ? t - n.hitAt : 9;
       const jolt = ja < 0.35 ? Math.round(Math.sin(ja * 70) * 2.5 * Math.exp(-ja * 8)) : 0;
-      drawBox(n, cx + jolt, BELT_Y - hop, n.state, t);
+      boxQ.push([n, cx + jolt, sq]);
     }
+    for (const [n, x, sq] of boxQ) drawBox(n, x, BELT_Y, n.state, t, sq);
     g.restore();
   }
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160);
@@ -842,6 +903,7 @@ function drawScene(t, bt, active, nowMs) {
   if (!reduce && pa >= 0 && pa < 1) { const z = 1 + 0.03 * (FX.punch || 1) * (1 - pa) * (1 - pa), px = SCAN_X, py = BELT_Y - 10; g.translate(px, py); g.scale(z, z); g.translate(-px, -py); }
   g.drawImage(bg, 0, 0);
   drawLights(bt, t, active);
+  rings = rings.filter(r => nowMs - r.at < 420);
   const lanes = L.lanes === 2 ? [0, 1] : [0];
   const poses = lanes.map(lane => { const p = partnerPose(t, bt, active, lane); p.nod = FX.react[lane].type === 'nod' && nowMs - FX.react[lane].at < 130 ? 1 : 0; return p; });
   const kick = Math.max(0, 1 - (nowMs - lastPress) / 140), upperKick = Math.max(0, 1 - (nowMs - lastPressUpper) / 140);
@@ -860,14 +922,6 @@ function drawScene(t, bt, active, nowMs) {
   drawPallet(laneFx.delivered);
   for (const [n, f, dy] of laneFx.falling) { g.save(); g.translate(f.x, f.y + dy - n.h / 2); g.rotate(f.rot); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); }
   drawPlayerArm(kick, nowMs, nowMs - lastHeavy < 260, upperKick);
-  rings = rings.filter(r => nowMs - r.at < 420);
-  for (const r of rings) {
-    const a = (nowMs - r.at) / 420, e = 1 - (1 - a) * (1 - a), s = 8 + e * 58;
-    g.globalAlpha = (1 - a) * 0.9; g.strokeStyle = r.c; g.lineWidth = 2;
-    g.strokeRect(Math.round(SCAN_X - s) + 0.5, Math.round(BELT_Y + r.dy - 8 - s * 0.6) + 0.5, Math.round(s * 2), Math.round(s * 1.2));
-    if (a < 0.5) { const s2 = 4 + e * 30; g.globalAlpha = (0.5 - a) * 1.4; g.lineWidth = 1; g.strokeRect(Math.round(SCAN_X - s2) + 0.5, Math.round(BELT_Y + r.dy - 8 - s2 * 0.6) + 0.5, Math.round(s2 * 2), Math.round(s2 * 1.2)); }
-    g.globalAlpha = 1;
-  }
   drawParticles(nowMs);
   // blackout overlay: darkness with holes where the scanners glow and a faint one around each partner
   const dark = active ? blackoutAmount(t) : 0;
@@ -988,10 +1042,23 @@ function whistle(t, f, d, vol = 0.05) {
   o.connect(gn); gn.connect(mus); o.start(t); lfo.start(t); o.stop(t + d + 0.05); lfo.stop(t + d + 0.05);
   noise(t, 'bandpass', f * 1.5, vol * 0.18, Math.min(0.12, d), 6);
 }
+const organ = (t, fs, d, v = 0.03) => { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 1500; fl.connect(mus);
+  fs.forEach(f => { osc('sine', f, t, 0.01, v, d, fl); osc('square', f, t, 0.01, v * 0.3, d, fl); osc('sine', f * 2, t, 0.01, v * 0.4, d, fl); }); };
+function bluesLead(t, f, d, vol = 0.05, bend = false) {
+  const o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
+  o.type = 'sawtooth'; o.frequency.setValueAtTime(bend ? f * 0.944 : f, t); if (bend) o.frequency.exponentialRampToValueAtTime(f, t + Math.min(0.12, d * 0.6));
+  fl.type = 'lowpass'; fl.frequency.value = 1700; fl.Q.value = 2;
+  gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(vol, t + 0.01); gn.gain.exponentialRampToValueAtTime(vol * 0.5, t + d * 0.7); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(fl); fl.connect(gn); gn.connect(mus); o.start(t); o.stop(t + d + 0.05);
+}
 const tom = (t, f, v = 0.4) => { const o = osc('sine', f, t, 0.002, v, 0.18); o.frequency.exponentialRampToValueAtTime(f * 0.6, t + 0.16); };
 
 // one backing track per partner, built from the same primitives. b = beat index, t = its time, s = seconds per beat there.
-function chordIdx(beat) { return (((Math.floor(Math.max(0, beat) / 4) - (L.chordShift || 0)) % 4) + 4) % 4; }
+function chordIdx(beat) {
+  const bar = Math.floor(Math.max(0, beat) / 4) - (L.chordShift || 0);
+  if (L.prog) return L.prog[((bar % L.prog.length) + L.prog.length) % L.prog.length];
+  return ((bar % 4) + 4) % 4;
+}
 function sectionAt(bar) { let s = ''; for (const [b0, name] of (L.sections || [])) if (bar >= b0) s = name; return s; }
 function buildEvents() {
   const ev = [], chords = L.chords, roots = L.roots, style = L.style;
@@ -1067,6 +1134,25 @@ function buildEvents() {
       if (inBar === 2) E(0, T => bass(T, roots[ci] * 1.5, s * 0.8, 300));
       if (big) { E(s / 4, T => shaker(T, 0.04)); E(3 * s / 4, T => shaker(T, 0.05)); }
       if (sec === 'bridge' && sectionAt(Math.floor(b / 4) + 1) !== 'bridge' && inBar === 3) { E(0, T => tom(T, 200)); E(s / 3, T => tom(T, 165)); E(2 * s / 3, T => tom(T, 135)); }
+    } else if (style === 'blues1') {
+      // minor blues: kick 1 and 3, snare 2 and 4, a boogie bass (root, minor third, fifth, sixth), organ on the off-beats.
+      // In the knee section the band drops out and only a bass note, a soft kick and the organ stay, so the boss's thuds lead.
+      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), phraseEnd = ((bar - 2) % 4 + 4) % 4 === 3;
+      if (sec === 'intro') { if (b >= 4 && inBar === 0) E(0, T => organ(T, chords[ci], s * 4, 0.025)); continue; }
+      if (sec === 'outro') continue;
+      if (sec === 'knee') {
+        if (inBar === 0) { E(0, T => kick(T, 0.3)); E(0, T => bass(T, roots[ci], s * 2.5, 200)); E(0, T => organ(T, chords[ci], s * 4, 0.011)); }
+        continue;
+      }
+      const full = sec === 'recover';
+      if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.85));
+      if (inBar === 1 || inBar === 3) E(0, T => snare(T, full ? 0.28 : 0.24));
+      E(0, T => hat(T, 0.04)); E(s / 2, T => hat(T, 0.07));
+      const boogie = [1, 1.189, 1.498, 1.682][inBar];
+      E(0, T => bass(T, roots[ci] * boogie, s * 0.45, 380)); E(s / 2, T => bass(T, roots[ci] * boogie, s * 0.3, 380));
+      E(s / 2, T => organ(T, chords[ci].slice(1), s * 0.35, full ? 0.03 : 0.025));
+      if (inBar === 0 && bar === 26) E(0, T => crash(T));
+      if (phraseEnd && inBar === 0) for (const [ob, nm, len] of LICK) E(ob * s, T => bluesLead(T, N_[nm], len * s * 0.95, full ? 0.055 : 0.045, nm === 'E5'));
     } else if (style === 'duo') {
       if (dark) {
         // power is out: only the partner's thuds, a battery radio hiss and the alarm
@@ -1099,6 +1185,7 @@ function buildEvents() {
   const tEnd = timeAt(total - 4);
   ev.push([tEnd, T => {
     if (L.style === 'night1') { rhodes(T, chords[0], SPB * 6, 0.05); bass(T, roots[0], SPB * 4, 300); whistle(T, N_.C5, SPB * 3, 0.04); forklift(T + SPB * 2, 0.02); return; }
+    if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
     kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4);
   }]);
   notes.forEach(n => ev.push([n.place, T => thud(T, n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1)]));
@@ -1305,6 +1392,7 @@ function updateHud(t) {
   };
   hintFor('len', '앞이 닿으면 누르고, 끝까지 유지', '유지…');
   hintFor('heavy', '무거운 상자: 양쪽을 같이');
+  { const fl = firstWith('late'); if (L.id !== 'jiwoo' && fl && fl.state === 'pending' && t > fl.place - SPB) h = '반장님 손이 늦어요. 음악 말고 손을 봐요'; }
   if (L.id === 's1-1') {
     const offb = notes.find(n => n.beat % 2 === 1), pair = notes.find(n => n.beat % 1 === 0.5);
     if (offb && offb.state === 'pending' && t > offb.place - SPB) h = '짝: 2박, 4박에도 와요';
