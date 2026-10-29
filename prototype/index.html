@@ -265,7 +265,15 @@ const LICK_DOWN = [[1.667, 'G5', 0.333], [2, 'E5', 0.667], [2.667, 'D5', 0.333],
 const EDM = { chords: [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]], roots: [110, 87.31, 130.81, 98] };
 const EDM_HOOK = [['E5', null, 'E5', 'D5', null, 'C5', null, 'A4'], ['C5', null, 'C5', 'A4', null, 'G4', null, 'A4'],
   ['G4', null, 'G4', 'A4', null, 'C5', null, 'E5'], ['D5', null, 'D5', 'B4', null, 'G4', null, 'B4']];
-const N_ = { Ds5: 622.25, G4: 392, G5: 783.99, E4: 329.63, F4: 349.23, Gs4: 415.3, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, A5: 880 };
+const N_ = { Fs5: 739.99, Cs5: 554.37, B5: 987.77, Ds5: 622.25, G4: 392, G5: 783.99, E4: 329.63, F4: 349.23, Gs4: 415.3, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, A5: 880 };
+// 1-2 drop: the song turns over into D major (D | A | Bm | G) with a lead line that could be sung
+const ANTHEM = { chords: [[293.66, 369.99, 440], [220, 277.18, 329.63], [246.94, 293.66, 369.99], [196, 246.94, 293.66]], roots: [146.83, 110, 123.47, 98] };
+const ANTHEM_LEAD = [
+  [0, 'Fs5', 0.75], [1, 'A5', 1], [2, 'G5', 0.5], [2.5, 'Fs5', 0.5], [3, 'E5', 1],
+  [4, 'E5', 0.75], [5, 'Cs5', 0.75], [6, 'E5', 1], [7, 'A4', 1],
+  [8, 'B4', 0.75], [9, 'D5', 1], [10, 'Fs5', 0.5], [10.5, 'G5', 0.5], [11, 'Fs5', 1],
+  [12, 'E5', 0.75], [13, 'D5', 0.75], [14, 'B4', 1], [15, 'A4', 1]
+];
 // chorus hook, 8 bars: [beat offset inside the 8 bars, note, length in beats]
 const HOOK = [
   [0, 'E5', 1.5], [1.5, 'C5', 0.5], [2, 'B4', 1], [3, 'A4', 1],
@@ -315,13 +323,16 @@ const LEVELS = [
       { who:'', text:'반장님은 무릎을 한 번 두드리고 먼저 나갔다.' }]
   }
   ,{
-    id:'s1-2', stageNo:'1-2', who:'지우', role:'지우 · 116 BPM', tag:'쿵쿵쿵쿵 · 흥얼거림 · 이어폰 빼', bpm:116, div:2, style:'edm1', chordShift:2,
+    id:'s1-2', stageNo:'1-2', who:'지우', role:'지우 · 116 BPM', tag:'쿵쿵쿵쿵 · 흥얼거림 · 이어폰 빼', bpm:116, div:2, style:'edm1',
     clock:'02:40', title:'지우의 곡', partners:['jiwoo'], observer:'boss', obsCue: { enter: [76, 82], point: [100, 104.5], soft: 160 },
-    fxTheme: 'neon', preClub: [[40, 72]], hypePhases: [144, 160], chords: EDM.chords, roots: EDM.roots,
+    fxTheme: 'neon', preClub: [[40, 72]], hypePhases: [144, 160],
+    // A minor until the drop, then the song turns over into D major (chords 4-7)
+    chords: [...EDM.chords, ...ANTHEM.chords], roots: [...EDM.roots, ...ANTHEM.roots],
+    chordAt: bar => bar < 32 ? ((bar + 2) % 4 + 4) % 4 : 4 + (bar - 32) % 4,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
     // 지우's own track plays in her earbuds. vibe: she hums along and her hand drifts late. unplug: 반장 makes her take them out,
     // no boxes come while she fumbles (4 bars), then she plugs back in for "just this part" (2 bars) and the next box lands on the drop.
-    vibe: [[72, 104], [120, 128]], unplug: [[104, 120]], dim: [[104, 128]], club: [[128, 176]], hype: [[128, 176]], special:['흥얼거릴 때 늦은 상자', 'late', '받아냄'],
+    vibe: [[72, 104], [120, 128]], unplug: [[104, 120]], dim: [[104, 128]], club: [[128, 184]], hype: [[128, 176]], special:['흥얼거릴 때 늦은 상자', 'late', '받아냄'],
     lateHint: '지우가 흥얼거려요. 손이 늦어요. 손을 봐요',
     sections: [[0, 'intro'], [2, 'groove'], [10, 'verse'], [18, 'vibe'], [26, 'unplug'], [32, 'drop'], [44, 'outro']],
     bars: [
@@ -337,7 +348,7 @@ const LEVELS = [
     say: [[1, '(이어폰 꽂고) 쿵, 쿵, 쿵, 쿵.', 5], [30, '이거 제가 만든 곡이에요. 들려요?', 4], [62, '여기서부터 제일 좋아하는 부분이에요.', 4],
           [72, '(흥얼흥얼)', 4], [82.5, '…야. 손 늦는다.', 3, 0, 'b'], [86, '다다, 다다다…', 5],
           [100, '이어폰 빼!', 3, 0, 'b'], [104, '아, 네, 네… 잠깐만요…', 4], [109, '하나, 둘, 셋, 넷. 벨트 박자.', 7, 0, 'b'],
-          [118, '아, 이 부분만 듣고 뺄게요!', 3.5], [122, '…야!', 2, 0, 'b'], [129, '…허 참.', 3, 0, 'b'], [134, '이거예요 이거!!', 3], [148, '꾹 누르고… 빰!!', 3], [162, '반장님도 까딱하시는 거 다 보여요!', 4], [174, '끝! 어땠어요?', 3]],
+          [118, '아, 이 부분만 듣고 뺄게요!', 3.5], [122, '…야!', 2, 0, 'b'], [129, '…허 참.', 3, 0, 'b'], [133, '여기서 곡이 확 바뀌어요! 이거예요 이거!!', 4], [148, '꾹 누르고… 빰!!', 3], [162, '반장님도 까딱하시는 거 다 보여요!', 4], [174, '끝! 어땠어요?', 3]],
     comfort: ['괜찮아요! 다시 쿵, 쿵.', '반장님이 손 보래요.'],
     intro: [
       { who:'', text:'이틀째 밤. 3번 라인. 반장님은 사무실에 불려 갔다.' },
@@ -562,11 +573,14 @@ function drawLounge(bt, beat, ph) {
   }
   g.restore();
 }
+// the club lights fade over the last four beats of the club range instead of cutting
+function clubFade(beat) { const r = (L.club || []).find(([a, z]) => beat >= a && beat < z); return r ? Math.min(1, (r[1] - beat) / 4) : 1; }
 const hypeStage = beat => !L.hypePhases ? 1 : beat < L.hypePhases[0] ? 1 : beat < L.hypePhases[1] ? 2 : 3;
 // club lighting grows in three steps through the drop
 function drawClub(bt, beat, ph) {
   const now = performance.now(), sinceHype = (now - (FX.hypeAt || -1e9)) / 1000, st = hypeStage(beat);
   const hit = Math.max(0, 1 - sinceHype * 3.2), beatK = Math.max(0, 1 - ph * 3);
+  g.save(); g.globalAlpha = clubFade(beat);
   g.save();
   g.fillStyle = `rgba(10,4,20,${0.32 + st * 0.06})`; g.fillRect(0, 0, W, H);
   // dancers behind the racks: two from step 2, four with arms up at step 3
@@ -618,20 +632,21 @@ function drawClub(bt, beat, ph) {
     R(bx - 6, by - 6, 12, 12, '#9aa1a6');
     for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) if ((i + j + Math.floor(rot * 4)) % 3 === 0) R(bx - 6 + i * 3, by - 6 + j * 3, 2, 2, '#f4f4f4');
   }
+  g.restore();
 }
 // lasers and sparkle that sit in front of everyone at the top step
 function drawClubFront(t, nowMs) {
   const beat = beatAt(t), st = hypeStage(beat); if (st < 3 || reduce) return;
   const ph = beat - Math.floor(beat), bt = nowMs / 1000;
-  g.save(); g.globalCompositeOperation = 'lighter';
+  g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = clubFade(beat);
   for (let k = 0; k < 4; k++) {
     const from = k % 2 ? [W, 6] : [0, 6], ang = (k % 2 ? Math.PI - 0.25 : 0.25) + Math.sin(bt * 1.8 + k) * 0.35, len = 460;
     const col = k < 2 ? 'rgba(80,255,140,' : 'rgba(255,60,90,';
-    g.strokeStyle = col + (0.35 + 0.35 * Math.max(0, 1 - ph * 3)) + ')'; g.lineWidth = 1;
+    g.strokeStyle = col + (0.35 + 0.35 * Math.max(0, 1 - ph * 3)) * clubFade(beat) + ')'; g.lineWidth = 1;
     g.beginPath(); g.moveTo(from[0], from[1]); g.lineTo(from[0] + Math.cos(ang) * len, from[1] + Math.sin(ang) * len); g.stroke();
   }
   g.restore();
-  if (ph < 0.06) spawn(Math.random() * W, -4, 3, CONFETTI, -20, 20, 40, 90, 80, 1800, [2, 3]);
+  if (ph < 0.06 && clubFade(beat) >= 1) spawn(Math.random() * W, -4, 3, CONFETTI, -20, 20, 40, 90, 80, 1800, [2, 3]);
 }// blackout: the concept flips. Boxes are only visible inside the scanner's glow, so the partner's "thud" is the cue.
 const blackout = beat => inRange(beat, L.crazy);
 const BLACK_FADE = 0.6;
@@ -833,13 +848,16 @@ function drawObserver(t, nowMs, active) {
   // walking in from off-screen right
   if (cue.enter && (!active || beat < cue.enter[0])) return;
   const walking = active && cue.enter && beat < cue.enter[1];
+  // through the drop 반장 goes from covering his ears (step 1) to a grudging nod on 1 and 3 (step 2) to the foot tap (soft)
+  const hy = active && L.hype && inRange(beat, L.hype) ? hypeStage(beat) : 0, ears = hy === 1, nodding = hy === 2 && Math.floor(beat) % 2 === 0 && ph < 0.2;
   const ox = walking ? lerp(W + 20, OBS_X, ease((beat - cue.enter[0]) / (cue.enter[1] - cue.enter[0]))) : OBS_X;
   FX.react[2] = { type: frown ? 'glance' : '', at: nowMs };
-  const pose = { hand: { x: BOSS_X + 22, y: 108 }, carry: null, wince: false, dip: 0, bob: walking ? (ph < 0.5 ? 1 : 0) : softened && ph < 0.2 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
+  const pose = { hand: { x: BOSS_X + 22, y: 108 }, carry: null, wince: false, dip: 0, bob: walking ? (ph < 0.5 ? 1 : 0) : (softened && ph < 0.2) || nodding ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
   g.save(); g.translate(ox, -2); g.scale(-1, 1); g.translate(-BOSS_X, 0);
   PARTNERS[L.observer].draw(pose, nowMs, active);
   const top = bodyTop(90, pose);
   if (point) { thick(BOSS_X + 7, top + 22, BOSS_X + 24, top + 14, 4, C.shirt); R(BOSS_X + 22, top + 12, 4, 4, C.skin); R(BOSS_X + 25, top + 13, 3, 1, C.skin); }
+  else if (ears) { thick(BOSS_X - 7, top + 24, BOSS_X - 8, top + 9, 4, C.shirt); thick(BOSS_X + 7, top + 24, BOSS_X + 8, top + 9, 4, C.shirt); R(BOSS_X - 10, top + 5, 4, 5, C.skin); R(BOSS_X + 6, top + 5, 4, 5, C.skin); }
   else { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); }
   if (point && !reduce) { g.globalAlpha = 0.9; R(BOSS_X + 12, top - 8, 2, 5, '#ff5a4a'); R(BOSS_X + 12, top - 2, 2, 2, '#ff5a4a'); g.globalAlpha = 1; }
   g.restore();
@@ -1138,7 +1156,7 @@ function drawScene(t, bt, active, nowMs) {
   if (!reduce && nowMs < FX.shakeUntil) { const a = FX.shakeAmp || 1; g.translate(Math.round((Math.random() * 2 - 1) * a), Math.round((Math.random() * 2 - 1) * a)); } else FX.shakeAmp = 1;
   if (active && !reduce && inRange(beatAt(t), L.club)) {
     // the room thumps with the kick: a drop on every beat, a sideways jitter from step 2, a small zoom pulse from step 3
-    const bt0 = beatAt(t), st = hypeStage(bt0), k = Math.max(0, 1 - (bt0 % 1) * 4);
+    const bt0 = beatAt(t), st = hypeStage(bt0), k = Math.max(0, 1 - (bt0 % 1) * 4) * clubFade(bt0);
     g.translate(st >= 2 ? Math.round((Math.random() * 2 - 1) * k * (st - 1) * 0.9) : 0, Math.round(k * (0.8 + st * 0.8)));
     if (st >= 3) { const z = 1 + 0.012 * k; g.translate(W / 2, BELT_Y); g.scale(z, z); g.translate(-W / 2, -BELT_Y); }
   }
@@ -1406,6 +1424,19 @@ function pumpPad(t, fs, s, vol = 0.012) {
   gn.gain.exponentialRampToValueAtTime(0.0001, t + s * 4);
   fs.forEach(f => [-9, 9].forEach(dt => { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = dt; o.connect(fl); o.start(t); o.stop(t + s * 4 + 0.05); }));
 }
+// the drop's lead: detuned saws with a sub octave, a small scoop into each note, brighter and doubled an octave up at the top step
+function anthem(t, f, d, st = 1) {
+  const fl = ctx.createBiquadFilter(), gn = ctx.createGain(); fl.type = 'lowpass'; fl.Q.value = 1.2;
+  fl.frequency.setValueAtTime(1500 + st * 500, t); fl.frequency.exponentialRampToValueAtTime(900, t + d);
+  gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(1, t + 0.02); gn.gain.setValueAtTime(1, t + Math.max(0.03, d - 0.06)); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  fl.connect(gn); gn.connect(mus);
+  const layers = [[f, -12, 0.02], [f, 12, 0.02], [f, 0, 0.016], [f / 2, 0, 0.012]];
+  if (st >= 3) layers.push([f * 2, 7, 0.007], [f * 2, -7, 0.007]);
+  layers.forEach(([fr, dt, v]) => {
+    const o = ctx.createOscillator(), og = ctx.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(fr * 0.97, t); o.frequency.exponentialRampToValueAtTime(fr, t + 0.05);
+    o.detune.value = dt; og.gain.value = v; o.connect(og); og.connect(fl); o.start(t); o.stop(t + d + 0.05);
+  });
+}
 // a laser zap that falls fast, for the top step of the drop
 const zap = (t, v = 0.03) => { const o = osc('sawtooth', 1800, t, 0.003, v, 0.09); o.frequency.exponentialRampToValueAtTime(300, t + 0.09); };
 const tom = (t, f, v = 0.4) => { const o = osc('sine', f, t, 0.002, v, 0.18); o.frequency.exponentialRampToValueAtTime(f * 0.6, t + 0.16); };
@@ -1572,16 +1603,18 @@ function buildEvents() {
       if (!early) E(s / 2, T => bass(T, roots[ci], s * 0.4, drop ? 900 : 650));
       if (sec === 'verse') E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.3, 0.008, 2200));
       if (drop) {
-        // the band keeps the floor; the big 빰 stabs only happen when the player scans (see hypeHit).
-        // Under it: a pad that pumps with the kick, the pluck hook with a tempo echo, rolling bass from step 2, zaps from step 3,
+        // the drop is a different song: D major instead of A minor, a soaring saw lead instead of the pluck, a clicked kick.
+        // The big 빰 stabs still only happen when the player scans (see hypeHit). Under it: a pad that pumps with the kick,
+        // rolling bass and a layered snare from step 2, 16th hats, an octave double on the lead and zaps from step 3,
         // a snare build at the end of every four bars, a crash and a falling sweep every eight, and a riser into each step-up.
-        const st = hypeStage(b), ph4 = ((bar - 32) % 4 + 4) % 4, ph8 = ((bar - 32) % 8 + 8) % 8;
+        const st = hypeStage(b), ph4 = ((bar - 32) % 4 + 4) % 4, ph8 = ((bar - 32) % 8 + 8) % 8, rel = (b - 128) % 16;
         if (inBar === 0) E(0, T => pumpPad(T, chords[ci], s, 0.009 + st * 0.003));
+        E(0, T => noise(T, 'highpass', 2500, 0.12, 0.02));
+        for (const [ob, nm, len] of ANTHEM_LEAD) if (Math.floor(ob) === rel) E((ob - rel) * s, T => anthem(T, N_[nm], len * s * 0.92, st));
         E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.25, 0.006, 3000));
-        for (let k = 0; k < 2; k++) { const nm = hook[inBar * 2 + k]; if (nm) E(k * s / 2, T => { pluck(T, N_[nm], s * 0.45, 0.04); pluck(T + s * 0.75, N_[nm], s * 0.3, 0.014); pluck(T + s * 1.5, N_[nm], s * 0.25, 0.006); }); }
         for (let k = 1; k < 4; k += 2) E(k * s / 4, T => hat(T, st >= 2 ? 0.05 : 0.035));
-        if (st >= 2) { E(s / 4, T => bass(T, roots[ci] * 2, s * 0.2, 1100)); E(3 * s / 4, T => bass(T, roots[ci] * 2, s * 0.2, 1100)); }
-        if (st >= 3 && (inBar === 1 || inBar === 3)) E(s / 2, T => zap(T, 0.028));
+        if (st >= 2) { E(s / 4, T => bass(T, roots[ci] * 2, s * 0.2, 1100)); E(3 * s / 4, T => bass(T, roots[ci] * 2, s * 0.2, 1100)); if (inBar === 1 || inBar === 3) E(0, T => snare(T, 0.2)); }
+        if (st >= 3) { for (let k = 0; k < 4; k++) E(k * s / 4 + s / 8, T => hat(T, 0.03)); if (inBar === 1 || inBar === 3) E(s / 2, T => zap(T, 0.028)); }
         if (ph4 === 3 && inBar === 2) { E(0, T => snare(T, 0.14)); E(s / 2, T => snare(T, 0.16)); }
         if (ph4 === 3 && inBar === 3) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.16 + k * 0.05));
         if (ph8 === 0 && inBar === 0 && bar > 32) E(0, T => { crash(T); whoosh(T, s * 2, true); });
@@ -1683,7 +1716,7 @@ function buildEvents() {
   ev.push([tEnd, T => {
     if (L.style === 'night1') { kick(T, 0.8); crash(T); rhodes(T, NIGHT.chords[3], SPB * 7, 0.055); rhodes(T, NIGHT.chords[3].map(f => f * 2), SPB * 5, 0.02); bass(T, NIGHT.roots[3], SPB * 5, 300); whistle(T, N_.C5, SPB * 4, 0.05); forklift(T + SPB * 5, 0.02); forklift(T + SPB * 5.75, 0.02); return; }
     if (L.style === 'mix13') { kick(T); crash(T); subDrop(T); organ(T, chords[4], SPB * 6, 0.04); bluesLead(T, N_.A4, SPB * 3, 0.05, true); supersaw(T, chords[4].slice(0, 3), SPB * 4, 0.012, 2400); return; }
-    if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[0], SPB * 4, 0.016, 2400); return; }
+    if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[4], SPB * 4, 0.016, 2400); anthem(T, N_.D5, SPB * 3, 2); return; }
     if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
     kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4);
   }]);
@@ -1851,7 +1884,7 @@ const CLUB = [[255, 79, 163], [79, 227, 255], [207, 224, 74], [166, 139, 255]];
 const isBam = n => !!n.len || n.beat % 2 === 0;
 function hookHit(n) {
   const now = performance.now(), st = hypeStage(n.beat), t = ctx.currentTime, ci = chordIdx(n.beat);
-  const nm = EDM_HOOK[ci % 4][Math.round((((n.beat % 4) + 4) % 4) * 2)], f = nm ? N_[nm] : CHORDS[ci][0] * 2;
+  const nm = ci < 4 ? EDM_HOOK[ci][Math.round((((n.beat % 4) + 4) % 4) * 2)] : null, f = nm ? N_[nm] : CHORDS[ci][1] * 2;
   supersaw(t, [f], 0.5, 0.03, 4600, true); sfxPluck(t, f * 2, 0.045, 0.3); noise(t, 'bandpass', 2200, 0.14, 0.03, 2.5, bus);
   FX.hypeAt = now - 120; FX.shakeUntil = now + 90; FX.shakeAmp = 1 + st * 0.5;
   FX.punchAt = now; FX.punch = 1 + st * 0.4; FX.react[0] = { type: 'nod', at: now };
