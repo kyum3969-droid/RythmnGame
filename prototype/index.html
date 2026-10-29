@@ -426,8 +426,9 @@ const LEVELS = [
   ,{
     id:'s1-4', stageNo:'1-4', who:'반장 → 지우 → 반장', role:'반장 → 지우 → 반장 · 96→112→128 BPM', tag:'무거운 상자 · 템포 상승 · 마감', bpm:128,
     tempo: [[0, 96], [56, 112], [96, 128]], style:'mix14', fxTheme: beat => beat >= 96 && beat < 152 ? 'neon' : 'blues', clock:'03:40', title:'마감', partners:['boss'],
-    // cast: 반장 places from the start; 지우 takes the line at 88 when his hands start to shake, and he takes it back at 144 for the last push
-    cast: { first: 'boss', seq: [[88, 'jiwoo'], [144, 'boss']] },
+    // cast: 반장 places from the start; 지우 takes the line at 88 when his hands start to shake; at 144 he sends her off to her show
+    // and takes the line back for the last push, just the two of us
+    cast: { first: 'boss', seq: [[88, 'jiwoo'], [144, 'boss', 'exit']] },
     chords: [...EDM.chords, ...BLUES.chords], roots: [...EDM.roots, ...BLUES.roots],
     chordAt: bar => bar < 2 ? 4 : bar < 22 ? 4 + BLUES.prog[(bar - 2) % 12] : bar < 24 ? 4 : bar < 36 ? (bar - 24) % 4 : bar < 38 ? 0 : bar < 46 ? 4 + BLUES.prog[(bar - 38) % 12] : 4,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
@@ -447,29 +448,31 @@ const LEVELS = [
       'x.xx.x..', 'x.x.x.xx', 'H...H...', 'x.......',
       '........', '........',
       'x.....x.....', 'x..x..x.....', 'x..x..x..x..', 'H.....x.x...',
-      'x..x..x..x..', 'x.x...x.x...', 'H..x..H..x..', 'x...........',
+      'x..x..L..x..', 'x.x...x.x...', 'H..x..H..x..', 'x...........',
       '........', '........'
     ],
     say: [[4, '자. 오늘은 쉴 틈 없다.', 3, 0, 'b'], [12, '무거운 건 두 손. 알지?', 3, 0, 'b'], [40, '…많네.', 2.5, 0, 'b'], [56, '속도 올린다.', 2, 0, 'b'],
           [72, '(숨) …괜찮다.', 3, 0, 'b'], [80, '반장님, 손 떨려요.', 2.5, 0, 'j'], [84, '…괜찮다니까.', 2, 0, 'b'],
           [88, '제가 할게요! 반장님은 뒤에서 세 주세요.', 4, 0, 'j'], [96, '하나, 둘, 셋, 넷!', 3, 0, 'j'], [112, '빠르죠? 이게 제 속도예요.', 3, 0, 'j'],
-          [128, '(뒤에서) …손 안 늦네.', 3, 0, 'b'], [140, '반장님?', 1.5, 0, 'j'], [144, '…마무리는 내가 한다.', 3.5, 0, 'b'],
-          [152, '하나, 둘, 셋, 넷! 반장님 가요!', 3, 0, 'j'], [168, '(이 악물고) …', 2, 0, 'b'], [180, '마지막!', 2, 0, 'j'], [186, '(트럭 경적)', 3]],
+          [124, '(뒤에서) …손 안 늦네.', 3, 0, 'b'], [132, '지우야. 몇 시라고 했지, 공연.', 3.5, 0, 'b'], [136, '…저녁 일곱 시요. 왜요?', 3, 0, 'j'],
+          [140, '가라. 가서 자고 가.', 3, 0, 'b'], [143.5, '반장님, 아직…', 2, 0, 'j'], [146, '여긴 둘이 된다. 가.', 3, 0, 'b'],
+          [152, '(혼자) 하나, 둘, 셋, 넷.', 3.5, 0, 'b'], [168, '…거의 다 왔다.', 2.5, 0, 'b'], [180, '마지막!', 2, 0, 'b'], [186, '(트럭 경적)', 3]],
     comfort: ['괜찮다. 다음 거.', '두 손. 두 손으로.'],
     intro: [
       { who:'', text:'나흘째 밤. 금요일. 트럭이 새벽 4시 40분에 뜬다.' },
       { who:'반장', text:'물량이 평소 두 배다. 오늘은 셋이 한 라인이다.' },
-      { who:'지우', text:'(이어폰 한쪽만) 반장님, 저 내일 공연이… 아니에요. 아무것도.' },
+      { who:'지우', text:'(이어폰 한쪽만) 반장님, 저 오늘 저녁에 공연이에요. 첫 공연. 끝나고 바로 가요.' },
+      { who:'반장', text:'…그래.' },
       { who:'', text:'반장님이 벨트를 한 번 두드렸다. 퇴근 전에 하는 버릇인데, 오늘은 출근길에 했다.' }],
     outro: (good, sp) => good ? [
       { who:'', text:'트럭이 떴다. 04:38.' },
-      { who:'반장', text: sp >= 10 ? '…두 손, 잘 쓰더라. 내일 회식이다. 빠지지 마라.' : '…내일 회식이다. 빠지지 마라.' },
-      { who:'지우', text:'네? 저 내일 공연… 아니에요. 갈게요.' },
-      { who:'', text:'반장님 주머니에서 접힌 종이 한 장이 떨어졌다. 지우가 주워서 돌려줬다. 둘 다 아무 말도 하지 않았다.' }] : [
+      { who:'반장', text: sp >= 10 ? '…두 손, 잘 쓰더라. 수고했다.' : '…수고했다.' },
+      { who:'반장', text:'회식은 다음 주에 하자. 걔 공연 끝나고.' },
+      { who:'', text:'반장님은 벨트를 한 번 두드렸다. 그리고 주머니에서 접힌 종이를 꺼내 한참 보다가, 다시 넣었다.' },
+      { who:'', text:'지우한테서 문자가 왔다. "반장님 괜찮으세요? 저 리허설 가요. 고맙습니다."' }] : [
       { who:'', text:'트럭이 떴다. 04:52. 12분 늦었다.' },
-      { who:'반장', text:'…내일 회식이다. 빠지지 마라.' },
-      { who:'지우', text:'…네.' },
-      { who:'', text:'반장님은 벨트를 한 번 두드리고 나갔다. 소리가 평소보다 작았다.' }]
+      { who:'반장', text:'…회식은 다음 주. 오늘은 그냥 가자.' },
+      { who:'', text:'반장님은 벨트를 두드리지 않고 나갔다.' }]
   }
 ];
 // the stage board. Locked entries show what is coming.
@@ -934,16 +937,18 @@ const castPlacer = beat => L.cast.seq ? seqPlacer(beat) : beat < L.cast.swap + 6
 // generic cast: cast.first places from the start; each [beat, id] in cast.seq hands the line to id over eight beats
 // (the incoming worker walks to the line over 0-6, the outgoing one walks to the back over 2-8, the line changes hands at 4)
 function seqPlacer(beat) { let p = L.cast.first; for (const [b0, id] of L.cast.seq) if (beat >= b0 + 4) p = id; return p; }
-function seqSwap(beat) { for (const [b0, id] of L.cast.seq) if (beat >= b0 && beat < b0 + 8) return { rel: beat - b0, to: id }; return null; }
+function seqSwap(beat) { for (const [b0, id, mode] of L.cast.seq) if (beat >= b0 && beat < b0 + 8) return { rel: beat - b0, to: id, exit: mode === 'exit' }; return null; }
+function seqGone(beat, id) { return L.cast.seq.some(([b0, to, mode]) => mode === 'exit' && to !== id && beat >= b0 + 8); }
 function drawCast2(t, nowMs, active, placerPose) {
   const beat = castBeatAt(t, active), ph = beat - Math.floor(beat), placer = seqPlacer(beat), sw = seqSwap(beat), walkBob = ph < 0.5 ? 1 : 0;
   const xs = {};
-  for (const id of ['boss', 'jiwoo']) xs[id] = sw ? (id === sw.to ? lerp(OBS_X, BOSS_X, ease(sw.rel / 6)) : lerp(BOSS_X, OBS_X, ease((sw.rel - 2) / 6))) : id === placer ? BOSS_X : OBS_X;
+  for (const id of ['boss', 'jiwoo']) xs[id] = sw ? (id === sw.to ? lerp(OBS_X, BOSS_X, ease(sw.rel / 6)) : lerp(BOSS_X, sw.exit ? W + 30 : OBS_X, ease((sw.rel - 2) / 6))) : id === placer ? BOSS_X : seqGone(beat, id) ? W + 30 : OBS_X;
   CAST.dx = xs[placer] - BOSS_X; CAST.hideArm = !!sw;
   for (const id of ['boss', 'jiwoo']) {
+    if (xs[id] >= W + 20) continue;
     const atLine = !sw && id === placer, mirror = sw ? id === sw.to : id !== placer, tired = id === 'boss' && !atLine && beat >= 88 && beat < 144;
     const pose = atLine ? placerPose : { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: tired, dip: 0, bob: !active ? 0 : sw ? walkBob : (id === 'jiwoo' && ph < 0.25 ? 1 : 0),
-      nod: 0, doze: false, phone: false, vibe: id === 'jiwoo' && !sw && beat >= 152, unplug: id === 'jiwoo', lane: atLine ? 0 : 2 };
+      nod: 0, doze: false, phone: false, vibe: false, unplug: id === 'jiwoo', lane: atLine ? 0 : 2 };
     if (!atLine) FX.react[2] = { type: '', at: nowMs };
     drawActor(id, xs[id], mirror, pose, nowMs, active, top => {
       if (id === 'boss' && !atLine && !sw) { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); }
@@ -2110,7 +2115,7 @@ function updateHud(t) {
   if (L.id === 's1-2' && beat >= 172 && beat < 179) h = '숨 고르기. 곧 한 번 더';
   if (L.id === 's1-4') {
     if (beat >= 90 && beat < 100) h = '템포 올라가요. 지우 손을 봐요';
-    if (beat >= 146 && beat < 156) h = '반장님이 돌아왔어요. 더 빨라요';
+    if (beat >= 148 && beat < 158) h = '둘이 남았어요. 반장님 손을 봐요';
   }
   if (L.id === 's1-3') {
     if (beat >= 63 && beat < 68) h = '템포가 바뀌어요. 반장님 손을 봐요';
