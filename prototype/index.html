@@ -169,6 +169,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
     <div class="hud" id="hud" hidden><span id="clock">B동 3번 라인 · 03:12</span><span id="combo">콤보 0</span></div>
     <div class="bubble" id="bubble" hidden></div>
     <div class="judge" id="judge"></div>
+    <div class="judge" id="judge2"></div>
     <div class="hint" id="hint" hidden></div>
 
     <div class="dialog" id="dialog" hidden>
@@ -486,31 +487,32 @@ const LEVELS = [
   }
   ,{
     id:'s1-4', stageNo:'1-4', who:'반장 + 하은', role:'반장 · 하은 · 100 BPM · 벨트 둘', tag:'벨트 둘 · 버튼 하나 · 양쪽 한 번에', bpm:100, style:'duo14',
-    // 반장 feeds both belts while 하은 scans the upper gate above you. Her belt keeps running dry and she calls him on it three times,
-    // and the song gets faster each time he answers (100, 104, 108): from her gate, knocking on it (13), again after a look at her
-    // watch (24); then she calls and calls (31.5, 33) and nothing comes, so she walks over and taps the empty belt in front of him
-    // (37). He goes for a heavy box to fill it and his back gives (40); the line falls to 78. The truck's driver climbs down into
-    // the dock door to hurry them (45-56), and she
-    // takes the upper belt from him without a word, and from her count-in you scan both belts with one button: a press goes to
-    // whichever gate has a box at it, and two boxes landing on the same beat are scanned together. In the rush she spends her speed
-    // on her own belt instead (her fever, 144-176).
-    lanes: 2, partners: ['haeun', 'boss'], onePlacer: true, handover: [52, 56], coScanner: 'haeun', autoLane: 0, autoUntil: 60, oneButton: true,
-    haeunCross: [34.8, 37], knock: [14.5, 15], haeunWatch: [[22.5, 23.75], [34.1, 34.8]], tapBelt: [37, 37.35], lift: [38, 40], hurt: [[40, 52]],
-    driver: [45, 56.3],
-    haeunLook: [[128.5, 131.5]], fever: [[144, 176]], rummage: [[13.4, 15.4], [24.3, 25.7], [35.4, 37.9]],
-    fxTheme: 'blues', clock:'03:40', title:'합류',
-    tempo: [[0, 100], [16, 104], [28, 108], [40, 88], [44, 78], [52, 84], [60, 100]], endAt: 188, offTilt: true,
+    // 반장 feeds both belts while 하은 scans the upper gate above you. Her belt keeps running dry and she calls him on it, with room
+    // to breathe between each call, and the song gets faster each time he answers (100, 104, 108): a knock on her gate and a call
+    // (25-26), his answer while he digs in the stack (29); a look at her watch and a call (41-43), his answer (46) and a burst of
+    // boxes; then she calls and calls (53.5, 57) and nothing comes, so she checks her watch, walks over and taps the empty belt in
+    // front of him (65). He goes for the heavy box at his feet and his back gives (72); the line falls to 78. The truck's driver
+    // climbs down into the dock door to hurry them (77-88), she takes the upper belt from him, and from her count-in (92) you scan
+    // both belts with one button: a press goes to whichever gate has a box at it, and two boxes landing on the same beat are
+    // scanned together. In the rush she spends her speed on her own belt instead (her fever, 176-208).
+    lanes: 2, partners: ['haeun', 'boss'], onePlacer: true, handover: [84, 88], coScanner: 'haeun', autoLane: 0, autoUntil: 92, oneButton: true,
+    haeunCross: [62, 65], knock: [25, 25.5], haeunWatch: [[41, 42.4], [60.4, 61.6]], tapBelt: [65.3, 65.65], lift: [69, 72], hurt: [[72, 84]],
+    driver: [77, 88.3], hurt2: [[160, 176]],
+    haeunLook: [[160.5, 163.5]], fever: [[176, 208]], rummage: [[28.5, 30.5], [45.3, 46.9], [63, 66.8]],
+    fxTheme: 'blues', clock:'03:43', title:'합류',
+    tempo: [[0, 100], [32, 104], [48, 108], [72, 88], [76, 78], [84, 84], [92, 100]], endAt: 220, offTilt: true,
     chords: BLUES.chords, roots: BLUES.roots, chordAt: bar => bar < 2 ? 0 : BLUES.prog[(bar - 2) % 12],
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 },
-    // no on-screen hints (as in 1-1 to 1-3); the dock, the departure board and the beacons carry the Friday rush
-    hints: false, dock: true, dim: [[40, 60]],
-    phone: [[88, 90]], phoneLane: 0, lateHint: '반장님 허리… 손이 늦어요. 손을 봐요', special:['양쪽 동시에 찍은 상자', 'pair2', '한 번에'],
-    sections: [[0, 'intro'], [2, 'boss'], [10, 'knee'], [13, 'walk'], [15, 'count'], [16, 'open'], [24, 'both'], [32, 'knee2'], [36, 'rush'], [44, 'final'], [48, 'outro']],
+    // no on-screen hints (as in 1-1 to 1-3); the dock, the departure board, the beacons and the light on the belts carry it
+    hints: false, dock: true, dim: [[72, 92]],
+    phone: [[120, 122]], phoneLane: 0, lateHint: '반장님 허리… 손이 늦어요. 손을 봐요', special:['양쪽 동시에 찍은 상자', 'pair2', '한 번에'],
+    sections: [[0, 'intro'], [2, 'boss'], [18, 'knee'], [21, 'walk'], [23, 'count'], [24, 'open'], [32, 'both'], [40, 'knee2'], [44, 'rush'], [52, 'final'], [56, 'outro']],
     // upper belt: 반장's shuffle (12 cells), running dry before his back goes, then 하은's straight 16ths (16 cells): trading two-bar phrases, then both,
     // 8ths in the rush, every beat with him at the end
     bars: [
       '............', '............',
-      'x.....x.....', 'x...........', '......x..x..', 'x.....x.....', '............', 'x..x..x.....', '............', '............',
+      'x.....x.....', 'x.....x.....', 'x.....x.....', 'x.....x.....', '............', '............', 'x.....x.....', 'x.....x.....',
+      '............', '............', 'x..x..x.....', '............', '............', '............', '............', '............',
       '............', '............', '............', '............', '............', '............',
       'x...x...x...x...', 'x...x...x.x.x...', '................', '................', 'x...x...x...x...', 'x.x.x...x.x.x...', '................', '................',
       'x...x...x...x...', 'x...x...x...x...', 'x.......x.......', 'x...x...x...x...', 'x.x.x...x.......', 'x...x...x...x...', 'x.......x.......', '................',
@@ -522,7 +524,8 @@ const LEVELS = [
     // lower belt: 반장's shuffle all the way (12 cells), every beat once she pushes him, late boxes where his back catches him
     bars2: [
       '............', '............',
-      '............', 'x.....x.....', '......x.....', 'x..x..x.....', 'x.....x.....', 'x..x..x..x..', 'x..x..x.....', 'x...........',
+      '............', 'x.....x.....', 'x.....x.....', 'x..x..x.....', 'x.....x.....', 'x...........', '......x.....', 'x.....x.....',
+      'x..x..x.....', 'x.....x.....', '......x..x..', 'x..x..x..x..', 'x..x..x..x..', 'x..x..x.....', 'x...........', '............',
       '......L.....', 'L...........', '......x.....', 'x.....x.....', 'x...........', '............',
       '............', '............', 'x.....x.....', 'x..x..x.....', '............', '............', 'x.....x.....', 'x..x..x..x..',
       'x.....x.....', 'x..x..x.....', 'x.....x.x...', 'x...........', 'x.....x.....', 'x..x..x..x..', 'x.....x.x...', 'h=====......',
@@ -534,20 +537,20 @@ const LEVELS = [
     // [beat, text, beats shown, lane, speaker, style]: 반장 between the belts (lane 0) until his back goes, at the lower belt (lane 1) after;
     // 'h' = 하은, at the upper gate beside you, then at the upper belt's loading end
     say: [[3, '위아래 다 내가 싣는다. 위는 하은이가 찍고, 너는 아래.', 4.5, 0], [8, '네. 위는 제가요.', 2, 0, 'h'],
-          [13, '반장님! 제 쪽 없어요.', 2.5, 0, 'h'], [15.5, '어? 그래 잠시만', 2, 0],
-          [24, '반장님! 또 끊겼어요.', 2.5, 0, 'h'], [26.5, '빨리 하마.', 2, 0],
-          [31.5, '반장님!', 1.5, 0, 'h'], [33, '반장님!!', 1.3, 0, 'h'],
-          [37, '반장님!', 1, 0, 'h'], [38, '기다려봐!', 1.8, 0],
-          [40, '아이고 악!!', 1.8, 0, null, 'loud'], [42, '…허리가. 잠깐만.', 2.5, 0],
-          [44.5, '(작게) …반장님.', 2, 0, 'h'],
-          [47, '저기요! 4시 40분 출발인데 반도 안 찼어요!', 3.5, 0, 'd'], [50.5, '…금방 됩니다.', 1.8, 0], [52.3, '빨리 좀 해 주세요!', 2, 0, 'd'],
-          [54.3, '위는 제가 실을게요. 반장님은 아래만.', 3.2, 0, 'h'], [57.5, '신입. 양쪽 다, 할 수 있지?', 2.5, 0, 'h'],
-          [60, '하나, 둘, 셋, 넷!', 3.5, 0, 'h'],
-          [66, '…미안하다. 아래는 내가 간다.', 3, 1], [84, '벨트 둘. 닿는 쪽을 찍어.', 3, 1],
-          [96, '둘 다 온다. 같이 닿으면 한 번에.', 3.5, 1], [116, '…손 빠르네.', 2, 0, 'h'],
-          [128, '…윽.', 1.5, 1], [133, '…괜찮다.', 2, 1],
-          [142.5, '…올려.', 2.5, 1], [160, '하은이 소리 말고. 둘 다 네 손이다.', 3.5, 1],
-          [176, '마지막. 같이 간다!', 2.5, 1], [179, '네!', 1.5, 0, 'h'], [192, '(트럭 경적)', 3, 1]],
+          [26, '반장님! 제 쪽 없어요.', 2.5, 0, 'h'], [29, '어? 그래 잠시만', 2.5, 0],
+          [43, '반장님! 또 끊겼어요.', 2.5, 0, 'h'], [46, '빨리 하마.', 2.2, 0],
+          [53.5, '반장님!', 1.6, 0, 'h'], [57, '반장님!!', 1.6, 0, 'h'],
+          [65.3, '반장님!', 1.4, 0, 'h'], [67, '기다려봐!', 2, 0],
+          [72, '아이고 악!!', 1.8, 0, null, 'loud'], [74, '…허리가. 잠깐만.', 2.5, 0],
+          [76.5, '(작게) …반장님.', 2, 0, 'h'],
+          [79, '저기요! 4시 40분 출발인데 반도 안 찼어요!', 3.5, 0, 'd'], [82.5, '…금방 됩니다.', 1.8, 0], [84.3, '빨리 좀 해 주세요!', 2, 0, 'd'],
+          [86.3, '위는 제가 실을게요. 반장님은 아래만.', 3.2, 0, 'h'], [89.5, '신입. 양쪽 다, 할 수 있지?', 2.5, 0, 'h'],
+          [92, '하나, 둘, 셋, 넷!', 3.5, 0, 'h'],
+          [98, '…미안하다. 아래는 내가 간다.', 3, 1], [116, '벨트 둘. 닿는 쪽을 찍어.', 3, 1],
+          [128, '둘 다 온다. 같이 닿으면 한 번에.', 3.5, 1], [148, '…손 빠르네.', 2, 0, 'h'],
+          [160, '…윽.', 1.5, 1], [165, '…괜찮다.', 2, 1],
+          [174.5, '…올려.', 2.5, 1], [192, '하은이 소리 말고. 둘 다 네 손이다.', 3.5, 1],
+          [208, '마지막. 같이 간다!', 2.5, 1], [211, '네!', 1.5, 0, 'h'], [224, '(트럭 경적)', 3, 1]],
     comfort: ['괜찮아. 다음 거 봐.', '양쪽 다 네 손이다. 내 손 봐.'],
     intro: [
       { who:'', text:'닷새째 밤. 금요일. 트럭이 새벽 4시 40분에 뜬다. 라인을 합쳐서 벨트가 둘이다.' },
@@ -1399,8 +1402,8 @@ function drawDriver(beat, nowMs) {
   // arms: pointing up at the board, hands on hips, waving them on (fast), or swinging as he walks
   const shirt = fl, hand = (x, y) => R(x - 2, y - 2, 4, 4, skin);
   if (walking) { const sw = step ? 3 : -3; thick(cx - 6, top + 20, cx - 8 + sw, top + 33, 4, shirt); hand(cx - 8 + sw, top + 34); }
-  else if (beat < 50.5) { thick(cx - 6, top + 20, cx - 12, top - 6, 4, shirt); hand(cx - 12, top - 8); }
-  else if (beat < 52.3) { thick(cx - 7, top + 20, cx - 11, top + 28, 4, shirt); thick(cx - 11, top + 28, cx - 7, top + 34, 4, shirt); hand(cx - 7, top + 34); }
+  else if (beat < L.driver[0] + 5.5) { thick(cx - 6, top + 20, cx - 12, top - 6, 4, shirt); hand(cx - 12, top - 8); }
+  else if (beat < L.driver[0] + 7.3) { thick(cx - 7, top + 20, cx - 11, top + 28, 4, shirt); thick(cx - 11, top + 28, cx - 7, top + 34, 4, shirt); hand(cx - 7, top + 34); }
   else { const wv = Math.sin(nowMs / 70) * 5; thick(cx - 6, top + 20, cx - 14, top + 8 + wv, 4, shirt); hand(cx - 15, top + 7 + wv); }
   thick(cx + 6, top + 20, cx + 9, top + 31, 4, shirt); hand(cx + 9, top + 32);
 }
@@ -1651,25 +1654,33 @@ function drawFeverBack(beat, nowMs) {
   const hx = BOSS_X + LANE_DX[0], rg = g.createRadialGradient(hx, 74, 4, hx, 74, 60 + 14 * e); rg.addColorStop(0, `rgba(120,200,255,${(0.2 + 0.15 * e) * env})`); rg.addColorStop(1, 'rgba(120,200,255,0)'); g.fillStyle = rg; g.fillRect(hx - 80, 0, 160, 168);
   g.restore();
 }
-// a belt with nothing coming falls into shadow, its loader with it, as if the lamp over it had dimmed; it eases in and out.
-// The scanning end stops short of you (x 322), so the player is never shaded.
+// light, not boxes: the room sits in a dim ambient and each belt you can scan has a work light over it, a soft pool along the
+// belt that takes in whoever is feeding it. A belt you cannot scan (hers before the count-in) or with nothing coming has its
+// light off, so it and its loader fall back into the dark; your own gate always has its lamp. Her light comes on at the count-in
+// with a fluorescent stutter. Built at quarter size: ambient dark, then the pools cut out of it with radial falloff.
 const IDLE = { k: [0, 0], last: 0 };
-const IDLE_ZONES = [[[58, 34, 264, 90]], [[28, 84, 46, 86], [74, 124, 248, 46]]], GATE_ZONE = [322, 30, 32, 62];
+const POOLS = [[[200, 82, 170, 52], [82, 74, 40, 46]], [[190, 142, 185, 40], [52, 118, 42, 54]]], GATE_POOL = [340, 130, 52, 46];
 const shadeBuf = document.createElement('canvas'); shadeBuf.width = W / 4; shadeBuf.height = H / 4;
 function drawIdleShade(t, nowMs, active) {
   const dt = Math.min(0.1, Math.max(0, (nowMs - IDLE.last) / 1000)), beat = active ? beatAt(t) : -1; IDLE.last = nowMs;
-  const sc = shadeBuf.getContext('2d'); sc.clearRect(0, 0, shadeBuf.width, shadeBuf.height); let any = false;
   for (const lane of [0, 1]) {
-    // her belt is in shade until you can scan it (the count-in); after that whichever belt has nothing coming
     const want = active && ((lane === 0 && beat < L.autoUntil) || (DUO.mode === 'two' && beat >= L.autoUntil && laneIdle(lane, t))) ? 1 : 0;
     IDLE.k[lane] += (want - IDLE.k[lane]) * Math.min(1, dt * 5);
-    const k = IDLE.k[lane]; if (k < 0.01) continue;
-    const zones = lane === 0 && L.haeunCross && beat < L.haeunCross[0] ? [...IDLE_ZONES[0], GATE_ZONE] : IDLE_ZONES[lane];
-    sc.globalAlpha = k; sc.fillStyle = '#06050a'; sc.beginPath(); for (const [x, y, w, h] of zones) sc.rect(x / 4, y / 4, w / 4, h / 4); sc.fill(); any = true;
   }
-  if (!any) return;
-  // drawn at quarter size and stretched with smoothing: the union of the patches gets soft edges and no seams
-  const sm = g.imageSmoothingEnabled; g.imageSmoothingEnabled = true; g.globalAlpha = 0.46; g.drawImage(shadeBuf, 0, 0, W, H); g.globalAlpha = 1; g.imageSmoothingEnabled = sm;
+  // her lamp stutters on at the count-in
+  const sp = beat - L.autoUntil, stutter = !reduce && sp >= 0 && sp < 0.9 ? [1, 0.2, 1, 0.5, 1, 0][Math.floor(sp * 6.6)] ?? 0 : 0;
+  const dark = Math.max(IDLE.k[0], IDLE.k[1]); if (dark < 0.01) return;
+  const sc = shadeBuf.getContext('2d'); sc.globalCompositeOperation = 'source-over'; sc.clearRect(0, 0, W / 4, H / 4);
+  sc.fillStyle = `rgba(5,4,10,${0.56 * dark})`; sc.fillRect(0, 0, W / 4, H / 4);
+  sc.globalCompositeOperation = 'destination-out';
+  const pool = ([x, y, rx, ry], a) => { if (a <= 0) return; sc.save(); sc.translate(x / 4, y / 4); sc.scale(rx / ry, 1); const gr = sc.createRadialGradient(0, 0, 0, 0, 0, ry / 4); gr.addColorStop(0, `rgba(0,0,0,${a})`); gr.addColorStop(0.55, `rgba(0,0,0,${0.8 * a})`); gr.addColorStop(1, 'rgba(0,0,0,0)'); sc.fillStyle = gr; sc.beginPath(); sc.arc(0, 0, ry / 4, 0, Math.PI * 2); sc.fill(); sc.restore(); };
+  pool(GATE_POOL, 1);
+  for (const lane of [0, 1]) { const a = Math.max(0, 1 - IDLE.k[lane] - (lane === 0 ? stutter * 0.8 : 0)); for (const P of POOLS[lane]) pool(P, a); }
+  const sm = g.imageSmoothingEnabled; g.imageSmoothingEnabled = true; g.drawImage(shadeBuf, 0, 0, W, H); g.imageSmoothingEnabled = sm;
+  // the work light's warm cast on the lit belt
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (const lane of [0, 1]) { const a = (1 - IDLE.k[lane]) * dark * 0.07; if (a < 0.005) continue; const [x, y, rx, ry] = POOLS[lane][0]; g.save(); g.translate(x, y); g.scale(rx / ry, 1); const gr = g.createRadialGradient(0, 0, 0, 0, 0, ry); gr.addColorStop(0, `rgba(255,214,150,${a})`); gr.addColorStop(1, 'rgba(255,214,150,0)'); g.fillStyle = gr; g.fillRect(-ry, -ry, ry * 2, ry * 2); g.restore(); }
+  g.restore();
 }
 function laneIdle(lane, t) { const beat = beatAt(t); return !notes.some(n => n.lane === lane && n.beat > beat - 2 && n.beat < beat + 3); }
 function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
@@ -1738,9 +1749,10 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
 // whose turn it is on the belts (the music's own split): 하은 above, 반장 below, both from bar 24
 function duoTurn(beat) {
   const bar = Math.floor(beat / 4);
-  if (bar < 15) return 'boss'; if (bar < 16) return 'count';
-  if (bar < 24) return (((bar - 16) >> 1) % 2) ? 'boss' : 'haeun';
-  return bar < 48 ? 'both' : 'out';
+  const c = L.autoUntil / 4;
+  if (bar < c) return 'boss'; if (bar < c + 1) return 'count';
+  if (bar < c + 9) return (((bar - c - 1) >> 1) % 2) ? 'boss' : 'haeun';
+  return bar < c + 33 ? 'both' : 'out';
 }
 const DIGITS = { 0: ['111', '101', '101', '101', '111'], 1: ['010', '110', '010', '010', '111'], 2: ['111', '001', '111', '100', '111'], 3: ['111', '001', '111', '001', '111'], 4: ['101', '101', '111', '001', '001'],
   5: ['111', '100', '111', '001', '111'], 6: ['111', '100', '111', '101', '111'], 7: ['111', '001', '010', '010', '010'], 8: ['111', '101', '111', '101', '111'], 9: ['111', '101', '111', '001', '111'], ':': ['0', '1', '0', '1', '0'], '>': ['100', '010', '001', '010', '100'] };
@@ -1754,7 +1766,7 @@ function dockProgress() {
 // behind everyone: the dock on the right with the truck backed in (its load is your work) and the departure board over it
 const DOCK = { x: 282, y: 44, w: 88, h: 64 };
 function drawDockBack(beat, nowMs, active) {
-  const { x, y, w, h } = DOCK, rush = beat >= 144 && beat < 192;
+  const { x, y, w, h } = DOCK, E0 = L.endAt, rush = beat >= L.fever[0][0] && beat < E0 + 4;
   R(272, 36, 112, 110, '#26221e'); R(272, 36, 112, 2, '#34302a');
   R(x - 4, y - 4, w + 8, h + 8, '#3a3d44'); R(x - 4, y - 4, w + 8, 2, '#4d5158');
   // inside the trailer: dark walls closing in, the floor, your boxes stacked from the floor up
@@ -1767,37 +1779,37 @@ function drawDockBack(beat, nowMs, active) {
   // the trailer's tail lights at the door edges, pulsing on the beat in the rush
   const tl = rush ? Math.max(0.35, 1 - (beat % 1) * 2.5) : 0.4;
   for (const lx of [x - 3, x + w]) { R(lx, y + h - 16, 3, 6, `rgba(255,60,50,${tl})`); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,50,40,${0.12 * tl})`; g.fillRect(lx - 8, y + h - 24, 19, 22); g.restore(); }
-  // the shutter: rolled up on its drum, and it comes down on the last pair (188)
-  const close = beat >= 188 ? Math.min(1, (beat - 188) / 1) : 0;
+  // the shutter: rolled up on its drum, and it comes down on the last pair (endAt)
+  const close = beat >= E0 ? Math.min(1, (beat - E0) / 1) : 0;
   R(x - 4, y - 10, w + 8, 7, '#4a4d52'); for (let k = 0; k < w + 8; k += 6) R(x - 4 + k, y - 9, 1, 5, '#3a3d42');
   if (close > 0) { const sh = Math.round(h * ease(close)); for (let yy = 0; yy < sh; yy += 4) { R(x, y + yy, w, 3, '#6b6f75'); R(x, y + yy + 3, w, 1, '#53575d'); } }
   // the departure board: the time now, an arrow, 04:40. Red from the rush; green once the truck is loaded. It hangs off to the
   // right so the far gate's judgement pops clear of it
   R(324, 22, 48, 12, '#0c0d10'); R(324, 22, 48, 1, '#2a2d33');
-  const done = beat >= 188, col = done ? (Math.floor(nowMs / 300) % 2 ? '#7fe08a' : '#3f7a46') : rush ? (Math.floor(nowMs / 250) % 2 ? '#ff5a4a' : '#c23b2e') : '#f0b429';
-  pixText(`${clockAt(Math.min(beat, 188))}>04:40`, 328, 25, col);
-  if (!done) { const p = Math.min(1, Math.max(0, beat) / 188); R(328, 31, Math.round(40 * p), 1, col); }
-  // a light passing over the back wall as the truck pulls away (192)
-  if (beat >= 192 && beat < 196 && !reduce) { const p = (beat - 192) / 4, cx = lerp(W + 40, -80, p); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(cx - 50, 0, cx + 50, 0); gr.addColorStop(0, 'rgba(255,240,200,0)'); gr.addColorStop(0.5, `rgba(255,240,200,${0.22 * Math.sin(Math.PI * p)})`); gr.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = gr; g.fillRect(cx - 50, 36, 100, 110); g.restore(); }
+  const done = beat >= E0, col = done ? (Math.floor(nowMs / 300) % 2 ? '#7fe08a' : '#3f7a46') : rush ? (Math.floor(nowMs / 250) % 2 ? '#ff5a4a' : '#c23b2e') : '#f0b429';
+  pixText(`${clockAt(Math.min(beat, E0))}>04:40`, 328, 25, col);
+  if (!done) { const p = Math.min(1, Math.max(0, beat) / E0); R(328, 31, Math.round(40 * p), 1, col); }
+  // a light passing over the back wall as the truck pulls away (endAt + 4)
+  if (beat >= E0 + 4 && beat < E0 + 8 && !reduce) { const p = (beat - E0 - 4) / 4, cx = lerp(W + 40, -80, p); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(cx - 50, 0, cx + 50, 0); gr.addColorStop(0, 'rgba(255,240,200,0)'); gr.addColorStop(0.5, `rgba(255,240,200,${0.22 * Math.sin(Math.PI * p)})`); gr.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = gr; g.fillRect(cx - 50, 36, 100, 110); g.restore(); }
 }
 // the beacons: one on each scanner, one on a post halfway down each belt. 하은 counts them on one by one (60 to 63);
 // they spin for whoever is feeding the belt, both in the 'both' stretch, faster in the rush, stuttering when his back catches again, only hers in her fever
 const BEACONS = [
-  { lane: 0, x: farX(200), y: farY(122), post: [farY(124), farY(146)], c: '120,200,255', on: 60 },
-  { lane: 0, x: farX(SCAN_X + 10), y: farY(101), post: null, c: '120,200,255', on: 61 },
-  { lane: 1, x: 200, y: 122, post: [124, 146], c: '255,170,60', on: 62 },
-  { lane: 1, x: SCAN_X + 10, y: 101, post: null, c: '255,170,60', on: 63 }];
+  { lane: 0, x: farX(200), y: farY(122), post: [farY(124), farY(146)], c: '120,200,255', on: 0 },
+  { lane: 0, x: farX(SCAN_X + 10), y: farY(101), post: null, c: '120,200,255', on: 1 },
+  { lane: 1, x: 200, y: 122, post: [124, 146], c: '255,170,60', on: 2 },
+  { lane: 1, x: SCAN_X + 10, y: 101, post: null, c: '255,170,60', on: 3 }];
 function beaconSpin(B, beat) {
-  if (beat < B.on || beat >= 192) return 0;
+  const on = L.autoUntil + B.on; if (beat < on || beat >= L.endAt + 4) return 0;
   const turn = duoTurn(beat), mine = turn === 'both' || (turn === 'haeun' && B.lane === 0) || (turn === 'boss' && B.lane === 1);
-  if (beat < 64) return 0.6;
-  if (beat >= 128 && beat < 144 && Math.floor(beat * 4) % 3 === 0) return 0.15;
+  if (beat < L.autoUntil + 4) return 0.6;
+  if (inRange(beat, L.hurt2) && Math.floor(beat * 4) % 3 === 0) return 0.15;
   if (inRange(beat, L.fever)) return B.lane === 0 ? 1 : 0.2;
   return mine ? 1 : 0.25;
 }
 function drawBeaconPosts(beat) { for (const B of BEACONS) if (B.post) R(B.x, B.post[0], 2, B.post[1] - B.post[0], '#2b2e33'); }
 function drawDockFront(beat, t, nowMs, active) {
-  const rushK = beat >= 144 && beat < 192 ? 1.8 : 1;
+  const rushK = beat >= L.fever[0][0] && beat < L.endAt + 4 ? 1.8 : 1;
   // 하은's fever (the rush): on top of the room (drawFeverBack), her belt glows on her eighths
   if (active && inRange(beat, L.fever)) {
     const [f0, f1] = L.fever.find(([a, z]) => beat >= a && beat < z), env = Math.min(1, beat - f0, f1 - beat), e = reduce ? 0.3 : Math.max(0, 1 - ((beat * 2) % 1) * 3);
@@ -1808,7 +1820,7 @@ function drawDockFront(beat, t, nowMs, active) {
   }
   // beacon domes and their sweeping beams
   for (const B of BEACONS) {
-    const on = active ? beaconSpin(B, beat) : 0, lit = active && beat >= B.on && beat < 192;
+    const on = active ? beaconSpin(B, beat) : 0, lit = active && beat >= L.autoUntil + B.on && beat < L.endAt + 4;
     R(B.x - 2, B.y + 2, 6, 2, '#3a3d44'); R(B.x - 1, B.y - 1, 4, 3, lit ? `rgb(${B.c})` : '#4a4440');
     if (!lit || on <= 0) continue;
     const ang = reduce ? 0 : (t * Math.PI * 1.4 * rushK + B.x * 0.05) % (Math.PI * 2), face = Math.max(0, Math.cos(ang));
@@ -2518,7 +2530,7 @@ function haeunHit(t, tones, j, done) {
 }
 function hitSound(j, tones, beat, done, lane = -1) {
   const t = ctx.currentTime, th = fxTheme(beat), f = tones[(stats.combo + (done ? 1 : 0)) % Math.min(3, tones.length)], good = j === 'good';
-  if (L.dock && lane === 0 && beat >= 60) { haeunHit(t, tones, j, done); return; }
+  if (L.dock && lane === 0 && beat >= L.autoUntil) { haeunHit(t, tones, j, done); return; }
   if (phase3(beat) && beat >= 200) { climaxHit(t, tones, j, done, beat); return; }
   if (phase3(beat)) { if (done) gtr(t, tones.slice(0, 3).map(x => x * 2), 0.9, 0.04); else gtrLead(t, f * 2, good ? 0.3 : 0.42, good ? 0.034 : 0.044, false); return; }
   if (th === 'chill') {
@@ -3038,23 +3050,23 @@ function buildEvents() {
       // into the root, vinyl crackle and rhodes stabs in her bars; his walking bass, organ and licks ride the same drums in his bars;
       // everything when both belts run, 16th hats in the rush, a crash on every bar at the end.
       const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4);
-      const openTurn = br => (((br - 16) >> 1) % 2) ? 'boss' : 'haeun';
+      const oB = L.autoUntil / 4 + 1, openTurn = br => (((br - oB) >> 1) % 2) ? 'boss' : 'haeun';
       const turn = sec === 'boss' || sec === 'knee' || sec === 'walk' ? 'boss' : sec === 'open' ? openTurn(bar) : (sec === 'both' || sec === 'knee2' || sec === 'rush' || sec === 'final') ? 'both' : '';
       if (sec === 'intro') { E(0, T => roller(T, 0.03)); E(s / 2, T => roller(T, 0.02)); if (inBar === 0) { E(0, T => forklift(T)); E(s * 0.75, T => forklift(T)); } if (b === 2) E(0, T => thud(T, 1.1)); continue; }
-      if (sec === 'outro') { if (b === 192) E(0, T => truckHorn(T)); E(0, T => roller(T, 0.03)); continue; }
+      if (sec === 'outro') { if (b === L.endAt + 4) E(0, T => truckHorn(T)); E(0, T => roller(T, 0.03)); continue; }
       if (sec === 'count') { E(0, T => rim(T, 0.35)); E(0, T => hat(T, 0.03)); E(s / 2, T => hat(T, 0.02)); if (inBar === 3) { E(s / 2, T => rim(T, 0.22)); E(s / 2, T => scratch(T)); } continue; }
       const walk = [1, 1.189, 1.498, 1.682][inBar], blues = turn === 'boss' || turn === 'both', funk = turn === 'haeun' || turn === 'both', both = turn === 'both';
-      const hurt = sec === 'knee' || sec === 'walk', rush = sec === 'rush' || sec === 'final', hip = bar >= 16, sw = s / 4 * 0.2, fever = inRange(b, L.fever);
+      const hurt = sec === 'knee' || sec === 'walk', rush = sec === 'rush' || sec === 'final', hip = bar >= oB, sw = s / 4 * 0.2, fever = inRange(b, L.fever);
       // 하은 pushing: two knocks of her gun on the gate, two taps on the empty belt; then his back goes, the drums drop out and the
       // heavy box lands behind the belt
       const knock = T => { noise(T, 'bandpass', 1900, 0.16, 0.05, 6, bus); osc('sine', 430, T, 0.002, 0.07, 0.05, bus); };
       const tapB = T => { noise(T, 'lowpass', 520, 0.14, 0.07, 0.8, bus); osc('sine', 120, T, 0.002, 0.08, 0.09, bus); };
       if (L.knock) for (const k of L.knock) if (Math.floor(k) === b) E((k - b) * s, knock);
       if (L.tapBelt) for (const k of L.tapBelt) if (Math.floor(k) === b) E((k - b) * s, tapB);
-      if (b === 40) E(0, T => { thud(T, 1.2); noise(T, 'lowpass', 260, 0.5, 0.35, 0.7, bus); noise(T + 0.12, 'lowpass', 500, 0.3, 0.12, 0.7, bus); });
+      if (b === L.lift[1]) E(0, T => { thud(T, 1.2); noise(T, 'lowpass', 260, 0.5, 0.35, 0.7, bus); noise(T + 0.12, 'lowpass', 500, 0.3, 0.12, 0.7, bus); });
       if (L.driver && b === L.driver[0]) E(0, T => { noise(T, 'bandpass', 900, 0.3, 0.18, 3, bus); osc('square', 95, T, 0.003, 0.06, 0.12, bus); noise(T + 0.09, 'lowpass', 400, 0.2, 0.15, 0.7, bus); });
-      if (b === 40) E(s * 0.75, T => { noise(T, 'lowpass', 300, 0.4, 0.25, 0.7, bus); osc('sine', 70, T, 0.003, 0.18, 0.2, bus); });
-      if (inBar === 0 && ((sec === 'open' && turn === 'haeun' && (bar - 16) % 2 === 0) || bar === 24 || bar === 36 || sec === 'final')) E(0, T => crash(T));
+      if (b === L.lift[1]) E(s * 0.75, T => { noise(T, 'lowpass', 300, 0.4, 0.25, 0.7, bus); osc('sine', 70, T, 0.003, 0.18, 0.2, bus); });
+      if (inBar === 0 && ((sec === 'open' && turn === 'haeun' && (bar - oB) % 2 === 0) || bar === oB + 8 || bar === oB + 20 || sec === 'final')) E(0, T => crash(T));
       // trading phrases: a scratch hands over to 하은, a rim count hands back to 반장
       if (inBar === 3 && sec === 'open' && openTurn(bar + 1) !== turn) { if (openTurn(bar + 1) === 'haeun') E(s / 2, T => scratch(T)); else { E(0, T => rim(T, 0.3)); E(s / 2, T => rim(T, 0.3)); } }
       if (!hip) {
@@ -3096,8 +3108,8 @@ function buildEvents() {
         E(2 * s / 3, T => organ(T, chords[ci].slice(1), s * 0.22, fever ? 0.01 : both ? 0.02 : 0.026));
         if ((inBar === 1 || inBar === 3) && !fever) E(2 * s / 3, T => gtr(T, chords[ci].slice(1, 3), s * 0.2, 0.014));
         if (inBar === 0) E(0, T => organ(T, chords[ci], s * 4, 0.011));
-        if (sec !== 'knee2' && ((bar - 16) % 4) === 3 && inBar === 0) for (const [ob, nm, len] of LICK) E(ob * s, T => gtrLead(T, N_[nm], len * s * 0.95, 0.045, nm === 'E5'));
-        if (both && !fever && sec !== 'knee2' && ((bar - 24) % 2) === 1 && inBar === 1) for (const [ob, nm, len] of LICK_DOWN) E((ob - 1.667) * s, T => gtrLead(T, N_[nm], len * s * 0.9, 0.045, nm === 'A4'));
+        if (sec !== 'knee2' && ((bar - oB) % 4) === 3 && inBar === 0) for (const [ob, nm, len] of LICK) E(ob * s, T => gtrLead(T, N_[nm], len * s * 0.95, 0.045, nm === 'E5'));
+        if (both && !fever && sec !== 'knee2' && ((bar - oB - 8) % 2) === 1 && inBar === 1) for (const [ob, nm, len] of LICK_DOWN) E((ob - 1.667) * s, T => gtrLead(T, N_[nm], len * s * 0.9, 0.045, nm === 'A4'));
       }
       // the rush: the warehouse joins the band (a forklift's reversing beep on the 'and' of 2 and 4, the truck's air brake every four
       // bars) and an 808 roll into every bar. The last four bars: a 32nd hat roll into each bar, the shutter's clank on the last pair,
@@ -3109,8 +3121,8 @@ function buildEvents() {
       }
       if (sec === 'final') {
         if (inBar === 3) for (let k = 0; k < 8; k++) E(k * s / 8, T => hat(T, 0.02 + k * 0.006));
-        if (bar === 44 && inBar === 0) for (const [ob, nm, len] of WHISTLE) if (ob < 16) E(ob * s, T => whistle(T, N_[nm], len * s * 0.95, 0.055));
-        if (b === 188) E(0, T => { noise(T, 'bandpass', 700, 0.32, 0.22, 1.5, bus); osc('square', 140, T, 0.003, 0.07, 0.12, bus); noise(T + 0.06, 'lowpass', 420, 0.2, 0.5, 0.7, bus); });
+        if (bar === oB + 28 && inBar === 0) for (const [ob, nm, len] of WHISTLE) if (ob < 16) E(ob * s, T => whistle(T, N_[nm], len * s * 0.95, 0.055));
+        if (b === L.endAt) E(0, T => { noise(T, 'bandpass', 700, 0.32, 0.22, 1.5, bus); osc('square', 140, T, 0.003, 0.07, 0.12, bus); noise(T + 0.06, 'lowpass', 420, 0.2, 0.5, 0.7, bus); });
       }
     } else if (style === 'duo') {
       if (dark) {
@@ -3206,7 +3218,15 @@ function resetRun() {
 }
 loadLevel(LEVELS[0]); resetRun();
 
-const judgeEl = $('judge');
+const judgeEl = $('judge'), judge2El = $('judge2');
+// a pair: each gate shows its own plain judgement, one above the other, like the gates themselves
+function popPair(a, b) {
+  for (const [el, n] of [[judgeEl, b], [judge2El, a]]) {
+    const [txt, cls] = n.judge === 'perfect' ? ['딱!', 'perfect'] : ['좋아', 'good'];
+    el.className = 'judge ' + cls; el.style.top = n.lane === 0 ? '12%' : '29%'; el.innerHTML = ''; el.append(txt);
+    void el.offsetWidth; el.classList.add('pop');
+  }
+}
 function popJudge(kind, sub = '', lane = 0) {
   const map = { perfect: ['딱!', 'perfect'], good: ['좋아', 'good'], miss: ['놓침', 'miss'], done: ['스캔 완료', 'perfect'], broken: ['깨짐', 'miss'], bam: ['빰!', 'bam'], hook: ['딱!', 'hook'], both: ['양쪽!', 'both'] };
   const [txt, cls] = map[kind];
@@ -3321,7 +3341,7 @@ function pairFx(a, b) {
   ring('#ffffff', 0); ring('#ffffff', 1);
   spawn(SCAN_X, BELT_Y - 10, both ? 24 : 14, th.spark, -170, 170, -220, -60, 300, 900, [2, 2]);
   spawn(farX(SCAN_X), farY(BELT_Y - 10), both ? 18 : 10, th.spark, -140, 140, -180, -50, 300, 800, [2, 2]);
-  popJudge('both', both ? '둘 다 딱!' : '', 1);
+  popPair(a.lane === 0 ? a : b, a.lane === 0 ? b : a);
   thud(tc, 1.3); organ(tc, fs.map(f => f * 2), 0.45, 0.06); noise(tc, 'highpass', 2600, 0.22, 0.14, 0.8, bus);
   if (L.dock) haeunHit(tc, fs, both ? 'perfect' : 'good', false);
   osc('sine', 1480, tc, 0.003, 0.06, 0.1, bus); osc('sine', 1976, tc + 0.03, 0.003, 0.05, 0.1, bus);
