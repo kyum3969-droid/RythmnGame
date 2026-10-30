@@ -1492,6 +1492,15 @@ function drawBeltFront(time) {
   for (const x of [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422');
   R(44, BELT_Y - 1, 5, 17, '#3d3431');
 }
+// the upper belt (drawn in its own perspective) is a level further back: its legs run all the way down behind the lower belt to
+// the floor with a rail across them, and the space under it is in shade, so it stands instead of hanging in the air
+function drawBeltLegs() {
+  const gr = g.createLinearGradient(0, BELT_Y + 16, 0, BELT_Y + 50); gr.addColorStop(0, 'rgba(6,5,8,.55)'); gr.addColorStop(1, 'rgba(6,5,8,0)');
+  g.fillStyle = gr; g.fillRect(46, BELT_Y + 16, W - 46, 34);
+  for (const x of [70, 150, 230, 352]) { R(x, BELT_Y + 16, 4, 52, '#2b2422'); R(x, BELT_Y + 16, 1, 52, '#3d3431'); R(x - 2, BELT_Y + 66, 8, 2, '#1c1716'); }
+  R(46, BELT_Y + 44, W - 46, 3, '#2b2422'); R(46, BELT_Y + 44, W - 46, 1, '#3d3431');
+  for (const [a, b] of [[70, 150], [150, 230], [230, 352]]) { thick(a + 4, BELT_Y + 18, b, BELT_Y + 43, 1, '#241e1c'); }
+}
 function drawLaserGlow(flash) {
   g.globalAlpha = 0.22 + 0.4 * flash;
   const gw = 5 + Math.round(flash * 12);
@@ -1810,7 +1819,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160);
   const mAge = nowMs - FX.lastMiss, missF = FX.missLane === lane && (FX.missKind === 'pass' ? mAge < 420 && mAge % 210 < 120 : mAge < 220);
   drawScannerFront(mine ? flash : 0, holding, missF, 0);
-  drawBeltFront(beltT);
+  drawBeltFront(beltT); if (far) drawBeltLegs();
   if (pose.carry) drawBox(pose.carry.n, pose.carry.x, pose.carry.y + pose.carry.n.h / 2, '', t);
   if (!far) drawPartnerArmOf(pid, pose, lane);
   g.restore();
@@ -3386,10 +3395,10 @@ function findTarget(t, lane) {
   return best;
 }
 function judgeNote(target, t) {
-  const d = t - target.arr, ad = Math.abs(d);
+  const d = t - target.arr, ad = Math.abs(d), fev = L.oneButton && inFever(target.beat);
   target.hitAt = t;
-  if (ad <= WIN_G) {
-    const j = ad <= WIN_P ? 'perfect' : 'good', now = performance.now();
+  if (fev ? d >= -FEVER_EARLY && d <= FEVER_LATE : ad <= WIN_G) {
+    const j = ad <= (fev ? FEVER_PERFECT : WIN_P) ? 'perfect' : 'good', now = performance.now();
     target.judge = j; stats[j]++; stats.missStreak = 0;
     const milestone = addCombo();
     const tones = CHORDS[chordIdx(target.beat)];
@@ -3414,13 +3423,18 @@ function judgeNote(target, t) {
   } else { target.state = 'miss'; target.missKind = 'bad'; registerMiss(d < 0 ? '너무 빠름' : '너무 늦음', d, 'bad', target.lane); }
 }
 // one button for both belts (1-4): a press goes to whichever gate has a box at it; two boxes on the same beat are scanned together
+// In her fever (eighths 0.3 s apart) the nearest box is the wrong rule: a press a little late lands in the next box's early edge,
+// spoils it, leaves the one you meant to be missed, and every press after it is off by one. There the oldest box still in reach
+// wins, a late press counts up to 0.2 s, and a press more than 0.15 s early is just a click.
+const FEVER_LATE = 0.2, FEVER_EARLY = 0.15, FEVER_PERFECT = 0.08;
 function findTargetAny(t) {
   let best = null, bd = Infinity;
   for (const n of notes) {
     if (n.state !== 'pending' || isAuto(n)) continue;
-    const d = t - n.arr;
-    if (d > WIN_M) continue;
+    const d = t - n.arr, fev = inFever(n.beat);
+    if (d > (fev ? FEVER_LATE : WIN_M)) continue;
     if (d < -WIN_M) break;
+    if (fev) { if (d >= -FEVER_EARLY) return best || n; continue; }
     if (Math.abs(d) < bd) { bd = Math.abs(d); best = n; }
   }
   return best;
