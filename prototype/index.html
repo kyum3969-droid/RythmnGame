@@ -518,7 +518,7 @@ const LEVELS = [
       'x...x...x...x...', 'x...x...x.x.x...', '................', '................', 'x...x...x...x...', 'x.x.x...x.x.x...', '................', '................',
       'x...x...x...x...', 'x...x...x...x...', 'x.......x.......', 'x...x...x...x...', 'x.x.x...x.......', 'x...x...x...x...', 'x.......x.......', '................',
       '................', 'x...............', '................', 'x...x...x...x...',
-      'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...........',
+      'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.........',
       'x...x...x...x...', 'x...x...x...x...', 'x.x.x...x.x.x...', 'x...............',
       '............', '............'
     ],
@@ -1744,11 +1744,12 @@ const shadeBuf = document.createElement('canvas'); shadeBuf.width = W / 4; shade
 function drawIdleShade(t, nowMs, active) {
   const dt = Math.min(0.1, Math.max(0, (nowMs - IDLE.last) / 1000)), beat = active ? beatAt(t) : -1; IDLE.last = nowMs;
   for (const lane of [0, 1]) {
-    const want = active && ((lane === 0 && beat < L.autoUntil) || (DUO.mode === 'two' && beat >= L.autoUntil && laneIdle(lane, t))) ? 1 : 0;
+    const want = active && ((lane === 0 && beat < L.autoUntil) || (DUO.mode === 'two' && beat >= L.autoUntil + 4 && laneIdle(lane, t))) ? 1 : 0;
     IDLE.k[lane] += (want - IDLE.k[lane]) * Math.min(1, dt * 5);
+    if (lane === 0 && active && beat >= L.autoUntil && beat < L.autoUntil + 4) IDLE.k[0] = 0;   // hers is switched on, not faded
   }
   // her lamp stutters on at the count-in
-  const sp = beat - L.autoUntil, stutter = !reduce && sp >= 0 && sp < 0.9 ? [1, 0.2, 1, 0.5, 1, 0][Math.floor(sp * 6.6)] ?? 0 : 0;
+  const sp = beat - L.autoUntil, stutter = !reduce && sp >= 0 && sp < 0.5 ? [1, 0.3, 1, 0][Math.floor(sp * 8)] ?? 0 : 0;
   // the lamps stutter for a moment when his back goes
   const hd = L.lift ? beat - L.lift[1] : -1, flick = !reduce && hd >= 0 && hd < 0.5 ? [0.55, 0, 0.35, 0][Math.floor(hd * 8)] || 0 : 0;
   if (flick) { g.fillStyle = `rgba(4,3,8,${flick})`; g.fillRect(0, 0, W, H); }
@@ -1758,7 +1759,7 @@ function drawIdleShade(t, nowMs, active) {
   sc.globalCompositeOperation = 'destination-out';
   const pool = ([x, y, rx, ry], a) => { if (a <= 0) return; sc.save(); sc.translate(x / 4, y / 4); sc.scale(rx / ry, 1); const gr = sc.createRadialGradient(0, 0, 0, 0, 0, ry / 4); gr.addColorStop(0, `rgba(0,0,0,${a})`); gr.addColorStop(0.55, `rgba(0,0,0,${0.8 * a})`); gr.addColorStop(1, 'rgba(0,0,0,0)'); sc.fillStyle = gr; sc.beginPath(); sc.arc(0, 0, ry / 4, 0, Math.PI * 2); sc.fill(); sc.restore(); };
   pool(GATE_POOL, 1);
-  if (active && L.driver && beat >= L.driver[0] && beat < L.driver[1]) pool([driverAt(beat).x, 118, 34, 44], 1);
+  if (active && L.driver && beat >= L.driver[0] && beat < L.driver[1]) pool([driverAt(beat).x, 120, 9, 30], 1);
   for (const lane of [0, 1]) { const a = Math.max(0, 1 - IDLE.k[lane] - (lane === 0 ? stutter * 0.8 : 0)); for (const P of POOLS[lane]) pool(P, a); }
   const sm = g.imageSmoothingEnabled; g.imageSmoothingEnabled = true; g.drawImage(shadeBuf, 0, 0, W, H); g.imageSmoothingEnabled = sm;
   // the work light's warm cast on the lit belt
@@ -2617,11 +2618,11 @@ function haeunHit(t, tones, j, done) {
   tones.slice(0, 3).forEach((f, i) => { const ff = f * 2, t0 = t + i * 0.008; osc('sine', ff, t0, 0.004, v, d, fl); osc('triangle', ff * 2, t0, 0.003, v * 0.3, d * 0.4, fl); });
   noise(t, 'highpass', 3800, 0.08, 0.025, 0.7, bus); noise(t + 0.01, 'bandpass', 1200, 0.05, 0.04, 2, bus);
 }
-// 하은's hook: sixteen notes in A minor pentatonic, one per upper-belt box (one a beat) in her fever, so the hits play her tune (a missed box
+// 하은's hook: sixteen eighths in A minor pentatonic, one per upper-belt box in her fever, so the hits play her tune (a missed box
 // leaves its note out). Rhodes with a soft square on top; from the fever's fifth bar an octave doubles it.
 const HOOK14 = ['E5', 'G5', 'A5', 'G5', 'E5', 'D5', 'E5', 'G5', 'A5', 'C6', 'A5', 'G5', 'E5', 'D5', 'C5', 'D5'].map(n => n === 'C6' ? 1046.5 : N_[n]);
 function feverHit(t, beat, j) {
-  const fr = L.fever[0], i = Math.round(beat - fr[0]), f = HOOK14[((i % 16) + 16) % 16], fb = Math.floor((beat - fr[0]) / 4), v = j === 'good' ? 0.045 : 0.06;
+  const fr = L.fever[0], i = Math.round((beat - fr[0]) * 2), f = HOOK14[((i % 16) + 16) % 16], fb = Math.floor((beat - fr[0]) / 4), v = j === 'good' ? 0.045 : 0.06;
   const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 3000; fl.connect(bus);
   osc('sine', f, t, 0.004, v, 0.32, fl); osc('triangle', f * 2, t, 0.003, v * 0.22, 0.14, fl); osc('square', f, t, 0.003, v * 0.18, 0.12, fl);
   if (fb >= 4) osc('sine', f * 2, t, 0.004, v * 0.4, 0.22, fl);
