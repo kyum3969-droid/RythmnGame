@@ -29,12 +29,14 @@ ul{color:var(--muted);font-size:13px;margin:8px 0 0 18px}
 <h1>1-5 첫 회식 · 애니매틱</h1>
 <p>벨트 도입 → 매치 컷 → 초밥 세 벨트 → 소주잔과 취기 → 지하철 → 걷기(노래) → 병원(리듬닥터 오마주) → 병실 심장박동 → 새벽. 약 1분 40초. 재생을 누르면 소리도 납니다(롤러, 딱, 쏙, 짠, 발소리, 차임, 노래, 심장박동).</p>
 <canvas id="cv" width="384" height="216"></canvas>
-<div class="bar"><button id="play">▶ 재생</button><input id="seek" type="range" min="0" max="100" step="0.05" value="0"><span id="lbl"></span><select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
+<div class="bar"><button id="play">▶ 재생</button><input id="seek" type="range" min="0" max="100" step="0.05" value="0"><span id="lbl"></span><button id="midi">♩ 가창용 MIDI 내려받기</button><select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
 <div class="jumps" id="jumps"></div>
+<details open><summary>노래 "Keep Time" (G장조, 70 BPM) · 가사</summary><pre id="lyrics" style="white-space:pre-wrap;color:var(--ink);font:13px/1.6 system-ui;margin:6px 0 0"></pre></details>
 <ul>
 <li>조작은 없고 타임라인만 흐릅니다. 게임 안에서는 벨트·초밥·병실 구간이 플레이, 지하철·걷기·병원 입구가 컷씬.</li>
 <li>초밥집 접시 넷 중 하나는 신입이 안 집고 지나가서 하은이 받아 쌓입니다. 소주잔 구간은 취기가 시간으로 오르고 하은만 선명합니다.</li>
 <li>병실은 심박 58에서 시작해 64로 고르게, 일곱 번째 박마다 "7".</li>
+<li>노래는 지하철 문이 열리는 순간 시작해 걷기 구간에 1절과 후렴, 병원 입구에 간주, 병실은 심장박동만, 새벽에 마지막 두 줄. 지금 목소리는 모음으로 부르는 합성음(자리 표시용)이고, MIDI에는 음마다 가사가 들어 있어서 Synthesizer V나 가수에게 그대로 넘길 수 있습니다. 2절은 MIDI에만.</li>
 </ul>
 </div>
 <script>
@@ -571,13 +573,14 @@ function drawSubway(u) {
   fadeBlack(u > 8 ? (u - 8) : 0);
 }
 // ---------- 4. 걷기 ----------
-const STREET = 3 * W;
+const STREET = 7 * W;
+const WALK_DUR = 55;
 function drawWalk(u) {
-  const dawn = clamp(u / 12, 0, 1), scroll = Math.min(u * 42, STREET - W);
+  const dawn = clamp(u / WALK_DUR, 0, 1), scroll = Math.min(u * 42, STREET - W);
   const sky = g.createLinearGradient(0, 0, 0, 150); sky.addColorStop(0, mix('#1a2440', '#5a7aa8', dawn)); sky.addColorStop(0.6, mix('#3a4a70', '#9ab4d0', dawn)); sky.addColorStop(1, mix('#c97a4a', '#ffd8a0', dawn)); g.fillStyle = sky; g.fillRect(0, 0, W, 150);
   g.globalAlpha = 1 - dawn; for (let k = 0; k < 14; k++) R((k * 53) % W, (k * 29) % 70, 1, 1, '#ffffff'); g.globalAlpha = 1;
   g.save(); g.translate(-Math.round(scroll), 0);
-  const BLD = [[0, 60, 80], [70, 40, 60], [120, 70, 96], [200, 50, 70], [262, 60, 50], [340, 80, 88], [440, 50, 64], [500, 90, 100], [610, 60, 56], [690, 70, 80], [780, 40, 60], [840, 90, 92], [950, 60, 70]];
+  const BLD = [[0, 60, 80], [70, 40, 60], [120, 70, 96], [200, 50, 70], [262, 60, 50], [340, 80, 88], [440, 50, 64], [500, 90, 100], [610, 60, 56], [690, 70, 80], [780, 40, 60], [840, 90, 92], [950, 60, 70], [1040, 70, 84], [1130, 50, 60], [1200, 90, 96], [1310, 60, 72], [1390, 80, 58], [1490, 50, 88], [1560, 70, 66], [1650, 90, 100], [1760, 60, 60], [1840, 70, 80], [1930, 50, 70], [2000, 80, 92], [2100, 60, 64], [2180, 70, 76], [2270, 50, 58]];
   for (const [x, w, h] of BLD) { R(x, 150 - h, w, h, mix('#2a3350', '#6a7a98', dawn)); for (let y = 150 - h + 8; y < 142; y += 12) for (let xx = x + 6; xx < x + w - 6; xx += 12) if ((xx + y) % 5 === 0) R(xx, y, 4, 5, '#ffd890'); }
   const hx = STREET - 84; R(hx, 40, 84, 110, '#dfe6ea'); R(hx, 40, 84, 3, '#b9c4c8'); for (let y = 52; y < 140; y += 14) for (let x = hx + 8; x < hx + 80; x += 14) R(x, y, 8, 9, (x + y) % 3 ? '#2f3a4a' : '#ffe9a8');
   R(hx + 36, 20, 12, 30, '#d8463b'); R(hx + 27, 29, 30, 12, '#d8463b'); text('○○대학병원', hx + 42, 56, '#1b1716', 6, 'center', true);
@@ -586,14 +589,13 @@ function drawWalk(u) {
   g.restore();
   // 하은 walking in place (the street moves), lit when a lamp is near
   const wx = 150; drawHaeunAt(wx, 94 + (Math.floor(u / 0.18) % 2 ? 0 : 1), 0, { step: Math.floor(u / 0.18) % 2, mirror: true }); R(wx - 10, 128, 12, 14, '#3a3f45');
-  const near = Math.min(...Array.from({ length: 12 }, (_, i) => Math.abs(30 + i * 110 - scroll - wx))); const lit = clamp(1 - near / 60, 0, 1) * (1 - dawn * 0.6);
+  const near = Math.min(...Array.from({ length: 26 }, (_, i) => Math.abs(30 + i * 110 - scroll - wx))); const lit = clamp(1 - near / 60, 0, 1) * (1 - dawn * 0.6);
   if (lit > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,200,120,${0.18 * lit})`; g.fillRect(wx - 14, 88, 30, 60); g.restore(); }
-  // the song: a note every beat, drifting up
-  const beat = 1.0; for (let k = 0; k < 8; k++) { const t0 = 1 + k * beat * 1.5; if (u < t0 || u > t0 + 2.4) continue; const p = (u - t0) / 2.4; text('♪', 170 + k * 9 - p * 10, 70 - p * 36, k % 2 ? `rgba(242,166,200,${0.8 * (1 - p)})` : `rgba(255,233,168,${0.8 * (1 - p)})`, 8 + (k % 3)); }
-  const MEL = [329.6, 392, 493.9, 440, 392, 329.6, 293.7, 329.6, 392, 493.9, 587.3, 493.9, 440, 392, 329.6, 293.7]; for (let k = 0; k < MEL.length; k++) { const t0 = 1 + k * 0.7; if (u >= t0) cue('mel' + k, () => SND.note(MEL[k], 1.4, 0.06)); }
-  for (let k = 0; k < 4; k++) { const t0 = 1 + k * 2.8; if (u >= t0) cue('chord' + k, () => { [164.8, 196, 246.9].forEach((f, i) => SND.note(f * (k % 2 ? 1 : 0.75), 2.6, 0.03)); }); }
+  // notes drift up from her on every sung syllable
+  for (const e of ARR.lyr) { const a = SONG_T - e.t; if (a < 0 || a > 2) continue; text('♪', wx + 20 + a * 8 + (e.t * 7 % 10), 80 - a * 30, (e.l % 2 ? 'rgba(242,166,200,' : 'rgba(255,233,168,') + (0.9 * (1 - a / 2)).toFixed(2) + ')', 8); }
+  drawLyric(SONG_T);
   cue('walk-quiet', () => rollerOn(false));
-  fadeBlack(u < 0.6 ? 1 - u / 0.6 : u > 11.3 ? (u - 11.3) / 0.7 : 0);
+  fadeBlack(u < 0.6 ? 1 - u / 0.6 : u > WALK_DUR - 0.7 ? (u - (WALK_DUR - 0.7)) / 0.7 : 0);
 }
 // ---------- 5. 병원 입구 ----------
 function hospitalHall() {
@@ -620,7 +622,7 @@ function drawDoctor(u) {
   say(u, 0.6, 4.2, '어머님 리듬이 오늘 좀 흔들려요. 일곱 번째에 맞춰요.', 20, 50, 190, { size: 7 });
   say(u, 4.4, 5.8, '…일곱.', 240, 58, 34, { bg: '#d9d0bd' });
   for (let k = 0; k < 7; k++) { const t0 = 1.2 + k * 0.4, on = u >= t0, seven = k === 6; if (on) cue('cnt' + k, seven ? SND.beep : SND.rim); const x = 100 + k * 22; R(x - 6, 136, 12, 12, on ? (seven ? '#8fd694' : '#f7f7f2') : '#dfe6ea'); R(x - 6, 136, 12, 1, on ? (seven ? '#cfe04a' : '#ffffff') : '#b9c4c8'); text(String(k + 1), x, 138, on ? '#1b1716' : '#9aa0a6', 7, 'center', seven && on); }
-  fadeBlack(u < 0.5 ? 1 - u / 0.5 : u > 5.6 ? (u - 5.6) / 0.4 : 0);
+  fadeBlack(u < 0.5 ? 1 - u / 0.5 : u > 13.2 ? (u - 13.2) / 0.5 : 0);
 }
 // ---------- 6·7. 병실 ----------
 function drawWard(u, dawnK, playing) {
@@ -641,7 +643,9 @@ function drawWard(u, dawnK, playing) {
   const mon = 1 - dawnK * 0.7;
   R(140, 30, 110, 46, '#1b1716'); R(143, 33, 104, 40, mix('#06140c', '#0a1a10', dawnK)); g.globalAlpha = mon; text(String(Math.round(bpm)), 244, 35, '#8fd694', 8, 'right'); text('SpO₂ 9' + (k > 0.6 ? 4 : 1), 147, 35, '#5ad7e8', 6);
   g.save(); g.beginPath(); g.rect(146, 36, 98, 34); g.clip();
-  for (let j = beatNo - 1; j <= beatNo + 8; j++) { const x = 238 + (u - j * per) * (pxPerBeat / per); if (x < 140 || x > 250) continue; const seventh = ((j % 7) + 7) % 7 === 6; const c = seventh ? '#ffffff' : '#8fd694'; for (let d = -7; d <= 6; d++) { const xx = Math.round(x + d); const y = d === 0 ? 50 : d === 1 ? 60 : d === 2 ? 55 : 58; R(xx, y, 1, 1, c); } if (seventh) text('7', x, 64, '#ffffff', 6, 'center', true); else text(String(((j % 7) + 7) % 7 + 1), x, 64, '#4a8a5a', 6, 'center'); }
+  for (let j = beatNo - 1; j <= beatNo + 8; j++) { const x = 238 + (u - j * per) * (pxPerBeat / per); if (x < 140 || x > 250) continue; const seventh = ((j % 7) + 7) % 7 === 6; const c = seventh ? '#ffffff' : '#8fd694'; for (let d = -7; d <= 6; d++) { const xx = Math.round(x + d); const y = d === 0 ? 50 : d === 1 ? 60 : d === 2 ? 55 : 58; R(xx, y, 1, 1, c); } }
+  // the count sits at the gate and climbs 1 to 7 as the spikes arrive
+  text(String(((beatNo % 7) + 7) % 7 + 1), 232, 62, ((beatNo % 7) + 7) % 7 === 6 ? '#ffffff' : '#4a8a5a', 8, 'right', ((beatNo % 7) + 7) % 7 === 6);
   g.restore(); g.globalAlpha = 1;
   R(238, 36, 1, 38, `rgba(255,74,61,${0.6 * mon})`);
   R(140, 76, 110, 4, '#2b2e31'); R(193, 80, 4, 30, '#2b2e31');
@@ -664,22 +668,23 @@ const TL = [
   { id: 'sushi1', name: '초밥', dur: 18, draw: u => { drawSushi(u, 1); fadeBlack(0); } },
   { id: 'sushi2', name: '소주잔', dur: 18, draw: u => { const lv = drawSushi(u, 2); drunkFx(lv, u, () => { haeunBeside({ eat: (u % 1.4) < 0.7 ? (u % 1.4) / 0.7 : 1 - ((u % 1.4) - 0.7) / 0.7 }); plateStack(362, 172, 10 + Math.min(6, Math.floor(u / 2.5))); }); fadeBlack(u > 16.6 ? (u - 16.6) / 1.4 : 0); if (u > 16.6) cue('sushi-off', () => rollerOn(false)); } },
   { id: 'subway', name: '지하철', dur: 9, draw: u => drawSubway(u) },
-  { id: 'walk', name: '걷기', dur: 12, draw: u => drawWalk(u) },
-  { id: 'doctor', name: '병원', dur: 6, draw: u => drawDoctor(u) },
+  { id: 'walk', name: '걷기', dur: WALK_DUR, draw: u => drawWalk(u) },
+  { id: 'doctor', name: '병원', dur: 13.7, draw: u => drawDoctor(u) },
   { id: 'ward', name: '병실', dur: 19, draw: u => { drawWard(u, 0, true); fadeBlack(u < 0.5 ? 1 - u / 0.5 : 0); } },
-  { id: 'end', name: '새벽', dur: 9, draw: u => { drawWard(19 + u, clamp(u / 6, 0, 1), false); if (u > 6.5) { const a = clamp((u - 6.5) / 1.5, 0, 1); fadeBlack(a); text('— 스테이지 1 끝 —', W / 2, 100, `rgba(239,230,210,${a})`, 10, 'center'); } for (let k = 0; k < 6; k++) { const t0 = 0.5 + k * 0.7; if (u >= t0) cue('end-mel' + k, () => SND.note([329.6, 392, 493.9, 440, 392, 329.6][k], 1.6, 0.05)); } if (u >= 0.2) cue('end-bird', () => { [2600, 3100, 2800].forEach((f, i) => oscS('sine', f, ac.currentTime + 2 + i * 0.12, 0.03, 0.12, f * 1.2)); }); } }
+  { id: 'end', name: '새벽', dur: 16, draw: u => { drawWard(19 + u, clamp(u / 8, 0, 1), false); drawLyric(SONG_T); if (u > 13.5) { const a = clamp((u - 13.5) / 1.5, 0, 1); fadeBlack(a); text('— 스테이지 1 끝 —', W / 2, 100, `rgba(239,230,210,${a})`, 10, 'center'); } if (u >= 0.2) cue('end-bird', () => { [2600, 3100, 2800].forEach((f, i) => oscS('sine', f, ac.currentTime + 1 + i * 0.12, 0.03, 0.12, f * 1.2)); }); } }
 ];
 const TOTAL = TL.reduce((a, s) => a + s.dur, 0);
-let T = 0, playing = false, lastNow = 0, speed = 1;
+let T = 0, playing = false, lastNow = 0, speed = 1, SONG_T = -1;
+function songTimeAt(t) { const sub = TL.findIndex(s => s.id === 'subway'); let acc = 0; for (let i = 0; i < sub; i++) acc += TL[i].dur; const start = acc + 5.2; const ward = TL.findIndex(s => s.id === 'ward'); let wacc = 0; for (let i = 0; i < ward; i++) wacc += TL[i].dur; const played = SONG_LEN.intro + SONG_LEN.verse + SONG_LEN.chorus + SONG_LEN.tag; if (t < start) return -1; const st = t - start; if (st <= played) return st; if (t < wacc + TL[ward].dur) return played; return played + SONG_LEN.gap + (t - wacc - TL[ward].dur); }
 function sceneAt(t) { let acc = 0; for (const s of TL) { if (t < acc + s.dur) return { s, u: t - acc, start: acc }; acc += s.dur; } const s = TL[TL.length - 1]; return { s, u: s.dur, start: TOTAL - s.dur }; }
 const cv = document.getElementById('cv'); g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
 const seekEl = document.getElementById('seek'), lbl = document.getElementById('lbl');
-function seek(t) { T = clamp(t, 0, TOTAL); fired.clear(); rollerOn(false); }
+function seek(t) { T = clamp(t, 0, TOTAL); fired.clear(); rollerOn(false); songLast = -1; }
 function frame(now) {
   requestAnimationFrame(frame);
   if (playing) { T += Math.min(0.1, (now - lastNow) / 1000) * speed; if (T >= TOTAL) { T = TOTAL; playing = false; rollerOn(false); } }
   lastNow = now;
-  const { s, u } = sceneAt(T);
+  const { s, u } = sceneAt(T); SONG_T = songTimeAt(T); if (playing) songTick(SONG_T); else songLast = SONG_T;
   g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H);
   try { s.draw(u); } catch (e) { text(String(e), 4, 4, '#ff4a3d', 7); }
   seekEl.value = T; lbl.textContent = `${s.name} · ${u.toFixed(1)}s / ${T.toFixed(0)}s`;
@@ -688,7 +693,111 @@ requestAnimationFrame(frame);
 seekEl.max = TOTAL; seekEl.addEventListener('input', () => seek(+seekEl.value));
 document.getElementById('play').addEventListener('click', () => { audioOn(); if (ac && ac.state === 'suspended') ac.resume(); playing = !playing; if (T >= TOTAL) seek(0); document.getElementById('play').textContent = playing ? '❚❚ 일시정지' : '▶ 재생'; if (!playing) rollerOn(false); });
 document.getElementById('speed').addEventListener('change', e => { speed = +e.target.value; });
+document.getElementById('midi').addEventListener('click', downloadMidi);
 const jumps = document.getElementById('jumps'); let acc = 0; for (const s of TL) { const b = document.createElement('button'); b.textContent = s.name; const at = acc; b.addEventListener('click', () => { audioOn(); seek(at); }); jumps.append(b); acc += s.dur; }
+
+// ---------- "Keep Time": the song from the subway doors on ----------
+// G major with the verse sitting on E minor, 70 BPM, 4/4. Piano, strings, a soft bass, and a placeholder voice (formant synth) that
+// sings the melody on vowels until a real vocal replaces it. The MIDI export carries the melody with the lyric on every note.
+const SONG = { bpm: 70, title: 'Keep Time' };
+const SB = 60 / SONG.bpm;
+const NOTE = { C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, Fs4: 369.99, G4: 392, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, G3: 196, A3: 220, B3: 246.94, E3: 164.81, D3: 146.83, C3: 130.81, G2: 98, E2: 82.41, C2: 65.41, D2: 73.42, A2: 110 };
+const CH = { Em: ['E3', 'G3', 'B3', 'E4'], C: ['C3', 'E3', 'G3', 'C4'], G: ['G3', 'B3', 'D4', 'G4'], D: ['D3', 'Fs4', 'A3', 'D4'], Am: ['A3', 'C4', 'E4', 'A4'] };
+const ROOT = { Em: 'E2', C: 'C2', G: 'G2', D: 'D2', Am: 'A2' };
+// sections: bars of chords, and the melody as [beat in section, dur, note, syllable, line]
+const INTRO = { chords: ['Em', 'C', 'G', 'D'], mel: [] };
+const VERSE1 = { chords: ['Em', 'C', 'G', 'D', 'Em', 'C', 'G', 'D'], mel: [
+  [0, 1, 'B3', 'First', 0], [1, 1, 'E4', 'train', 0], [2, 1.5, 'G4', 'out,', 0],
+  [4, .5, 'G4', 'the', 0], [4.5, .5, 'A4', 'ci-', 0], [5, .5, 'G4', 'ty\'s', 0], [5.5, .5, 'E4', 'still', 0], [6, 1, 'D4', 'a-', 0], [7, 1, 'E4', 'sleep', 0],
+  [8, .5, 'D4', 'I', 1], [8.5, 1, 'G4', 'count', 1], [9.5, 1, 'B4', 'the', 1], [10.5, 1.5, 'A4', 'stops', 1],
+  [12, .5, 'A4', 'the', 1], [12.5, .5, 'B4', 'way', 1], [13, .5, 'A4', 'I', 1], [13.5, .5, 'G4', 'count', 1], [14, 1, 'Fs4', 'my', 1], [15, 1, 'D4', 'pay', 1],
+  [16, .5, 'B3', 'You\'re', 2], [16.5, .5, 'E4', 'dream-', 2], [17, 1, 'G4', 'ing', 2], [18, .5, 'G4', 'in', 2], [18.5, .5, 'A4', 'the', 2], [19, 1, 'B4', 'seat', 2],
+  [20, 1, 'C5', 'where', 2], [21, .5, 'B4', 'I', 2], [21.5, .5, 'A4', 'was', 2], [22, 1, 'G4', 'sit-', 2], [23, 1, 'E4', 'ting', 2],
+  [24, .5, 'D4', 'I', 3], [24.5, .5, 'G4', 'did-', 3], [25, 1, 'B4', 'n\'t', 3], [26, 1, 'A4', 'wake', 3], [27, 1, 'G4', 'you,', 3],
+  [28, 1, 'A4', 'no-', 3], [29, .5, 'G4', 'thing', 3], [29.5, .5, 'Fs4', 'left', 3], [30, 1, 'E4', 'to', 3], [31, 1, 'D4', 'say', 3]] };
+const VERSE2 = { chords: VERSE1.chords, mel: VERSE1.mel.map(([b, d, n, , l]) => [b, d, n, '', l]) };
+['Free', 'meal,', 'a', 'stack', 'of', 'plates,', 'I', 'ate', 'for', 'two', 'The', 'watch', 'says', 'half', 'past', 'five,', 'she\'ll', 'be', 'a-', 'wake', 'The', 'doc-', 'tor', 'counts', 'to', 'se-', 'ven,', 'so', 'do', 'I', 'I', 'learned', 'to', 'keep', 'a', 'beat', 'for', 'some-', 'one\'s', 'sake'].forEach((s, i) => { VERSE2.mel[i][3] = s; });
+const CHORUS = { chords: ['C', 'G', 'Am', 'D', 'C', 'G', 'Em', 'D'], mel: [
+  [0, .5, 'E4', 'So', 4], [0.5, .5, 'G4', 'I', 4], [1, 1.5, 'C5', 'walk', 4], [2.5, 1.5, 'B4', 'on', 4],
+  [4, .5, 'B4', 'un-', 4], [4.5, .5, 'A4', 'der', 4], [5, .5, 'G4', 'the', 4], [5.5, .5, 'A4', 'last', 4], [6, 1, 'B4', 'street-', 4], [7, 1, 'G4', 'light', 4],
+  [8, .5, 'A4', 'One', 5], [8.5, .5, 'C5', 'more', 5], [9, .5, 'C5', 'day', 5], [9.5, .5, 'B4', 'I\'m', 5], [10, .5, 'A4', 'hold-', 5], [10.5, .5, 'G4', 'ing', 5], [11, 1, 'A4', 'on', 5],
+  [12, 2, 'Fs4', 'for', 5], [14, 2, 'D4', 'you', 5],
+  [16, .5, 'E4', 'The', 6], [16.5, .5, 'G4', 'sun', 6], [17, 1.5, 'C5', 'comes', 6], [18.5, 1.5, 'B4', 'up', 6],
+  [20, .5, 'B4', 'like', 6], [20.5, .5, 'A4', 'it\'s', 6], [21, .5, 'G4', 'got', 6], [21.5, .5, 'A4', 'no-', 6], [22, .5, 'B4', 'where', 6], [22.5, .5, 'D5', 'to', 6], [23, 1, 'B4', 'be', 6],
+  [24, .5, 'G4', 'And', 7], [24.5, .5, 'B4', 'I', 7], [25, 1.5, 'E5', 'keep', 7], [26.5, 1.5, 'D5', 'time,', 7],
+  [28, 1, 'B4', '\'cause', 7], [29, .5, 'A4', 'some-', 7], [29.5, .5, 'G4', 'one', 7], [30, 1, 'Fs4', 'has', 7], [31, 1, 'G4', 'to', 7]] };
+const TAG = { chords: ['C', 'G', 'Em', 'D'], mel: [] };
+const CODA = { chords: ['Em', 'D', 'C', 'G'], mel: [[0, .5, 'G4', 'And', 7], [0.5, .5, 'B4', 'I', 7], [1, 1.5, 'E5', 'keep', 7], [2.5, 1.5, 'D5', 'time,', 7], [4, 1, 'B4', '\'cause', 7], [5, .5, 'A4', 'some-', 7], [5.5, .5, 'G4', 'one', 7], [6, 1, 'Fs4', 'has', 7], [7, 4, 'G4', 'to.', 7]] };
+const LINES = ['First train out, the city\'s still asleep', 'I count the stops the way I count my pay', 'You\'re dreaming in the seat where I was sitting', 'I didn\'t wake you, nothing left to say', 'So I walk on, under the last streetlight', 'One more day I\'m holding on for you', 'The sun comes up like it\'s got nowhere to be', 'And I keep time, \'cause someone has to'];
+const LINES2 = ['Free meal, a stack of plates, I ate for two', 'The watch says half past five, she\'ll be awake', 'The doctor counts to seven, so do I', 'I learned to keep a beat for someone\'s sake'];
+// the arrangement that plays in the animatic: intro at the subway doors, verse and chorus on the walk, the tag under the doctor,
+// nothing in the ward, and the coda at dawn. Each part is laid at a bar offset; the ward gap is left empty.
+function build(parts) { const ev = [], lyr = []; let bar = 0; for (const [sec, gapBars] of parts) { if (gapBars) { bar += gapBars; continue; } sec.chords.forEach((c, i) => ev.push({ t: (bar + i) * 4 * SB, kind: 'chord', c, bar: bar + i })); for (const [b, d, n, s, l] of sec.mel) { ev.push({ t: (bar * 4 + b) * SB, kind: 'note', n, d: d * SB, s, l, sec }); lyr.push({ t: (bar * 4 + b) * SB, d: d * SB, s, l, sec }); } bar += sec.chords.length; } return { ev: ev.sort((a, b) => a.t - b.t), lyr, bars: bar }; }
+const ARR = build([[INTRO], [VERSE1], [CHORUS], [TAG], [null, 5], [CODA]]);
+const SONG_LEN = { intro: 4 * 4 * SB, verse: 8 * 4 * SB, chorus: 8 * 4 * SB, tag: 4 * 4 * SB, gap: 5 * 4 * SB, coda: 4 * 4 * SB };
+// ---- the band
+const vowelOf = s => { const v = (s.toLowerCase().match(/[aeiou]+/) || ['a'])[0]; return /oo|ou|o|u/.test(v) ? 'oo' : /ee|i|e|y/.test(v) ? 'ee' : 'ah'; };
+function voice(t, f, d, vowel) {
+  if (!ac) return;
+  const o1 = ac.createOscillator(), o2 = ac.createOscillator(), lfo = ac.createOscillator(), lg = ac.createGain(), sum = ac.createGain(), out = ac.createGain();
+  o1.type = 'sawtooth'; o2.type = 'sawtooth'; o1.frequency.value = f; o2.frequency.value = f * 1.004;
+  lfo.frequency.value = 5.2; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(f * 0.012, t + 0.25); lfo.connect(lg); lg.connect(o1.frequency); lg.connect(o2.frequency);
+  const F = vowel === 'oo' ? [320, 800, 2300] : vowel === 'ee' ? [330, 2000, 2800] : [700, 1100, 2700];
+  sum.gain.value = 0.5; o1.connect(sum); o2.connect(sum);
+  out.gain.setValueAtTime(0.0001, t); out.gain.linearRampToValueAtTime(0.1, t + 0.05); out.gain.setValueAtTime(0.1, Math.max(t + 0.05, t + d - 0.1)); out.gain.linearRampToValueAtTime(0.0001, t + d + 0.02);
+  F.forEach((fc, i) => { const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = fc; bp.Q.value = 7; const bg = ac.createGain(); bg.gain.value = [1, 0.45, 0.2][i]; sum.connect(bp); bp.connect(bg); bg.connect(out); });
+  noiseS(t, 'bandpass', 1800, 0.02, 0.06, 1);
+  out.connect(master); [o1, o2, lfo].forEach(o => { o.start(t); o.stop(t + d + 0.1); });
+}
+function pianoChord(t, names, d, v = 0.05) { names.forEach((n, i) => { const f = NOTE[n]; oscS('triangle', f, t + i * 0.03, v, d); oscS('sine', f * 2, t + i * 0.03, v * 0.3, d * 0.6); }); }
+function strings(t, names, d, v = 0.018) { if (!ac) return; names.forEach(n => { const o = ac.createOscillator(), fl = ac.createBiquadFilter(), gn = ac.createGain(); o.type = 'sawtooth'; o.frequency.value = NOTE[n]; fl.type = 'lowpass'; fl.frequency.value = 1200; gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(v, t + 0.6); gn.gain.setValueAtTime(v, t + d - 0.5); gn.gain.linearRampToValueAtTime(0.0001, t + d); o.connect(fl); fl.connect(gn); gn.connect(master); o.start(t); o.stop(t + d + 0.05); }); }
+function bassS(t, n, d) { oscS('sine', NOTE[n], t, 0.12, d); }
+// schedule everything due between the last tick and now (song time), a little ahead
+let songLast = -1;
+function songTick(st, lead = 0.12) {
+  if (!ac || st < 0) { songLast = st; return; }
+  if (songLast < 0 || st < songLast) songLast = st - 0.001;
+  const t0 = ac.currentTime;
+  for (const e of ARR.ev) {
+    if (e.t <= songLast || e.t > st + lead) continue;
+    const at = t0 + (e.t - st);
+    if (e.kind === 'chord') { const d = 4 * SB; pianoChord(at, CH[e.c], d * 0.9); strings(at, CH[e.c].slice(0, 3), d + 0.3); bassS(at, ROOT[e.c], d * 0.8); if (e.sec !== INTRO) oscS('triangle', NOTE[CH[e.c][2]] * 2, at + 2 * SB, 0.03, SB * 0.8); }
+    else voice(at, NOTE[e.n], e.d * 0.95, vowelOf(e.s));
+  }
+  songLast = st + lead;
+}
+// karaoke line for the song time: the line text, with the syllables sung so far
+function lyricAt(st) {
+  const cur = ARR.lyr.filter(x => x.t <= st && x.t + 0.05 > -1); const last = cur.length ? cur[cur.length - 1] : null; if (!last || st > last.t + last.d + 1.6) return null;
+  const line = last.sec === VERSE2 ? LINES2[last.l] : LINES[last.l];
+  const sung = ARR.lyr.filter(x => x.l === last.l && x.sec === last.sec && x.t <= st).map(x => x.s.replace(/-$/, '')).join(' ');
+  return { line, sung: sung.length };
+}
+function drawLyric(st, y = 190) {
+  const L = lyricAt(st); if (!L) return;
+  R(0, y - 8, W, 26, 'rgba(0,0,0,.55)');
+  g.font = 'bold 9px "Apple SD Gothic Neo","Malgun Gothic",sans-serif'; const wAll = g.measureText(L.line).width, x0 = W / 2 - wAll / 2;
+  // sung part in warm white, the rest dim; syllables are matched by character count
+  let n = 0; const words = L.line.split(' '); let x = x0;
+  for (const w of words) { const ww = g.measureText(w + ' ').width; const sungW = n + w.length <= L.sung + words.indexOf(w) ? true : false; text(w, x, y, sungW ? '#ffe9a8' : '#8a8a8a', 9, 'left', true); x += ww; n += w.length; }
+}
+// ---- MIDI export: format 1, 480 ppq; track 1 melody with a lyric on every note, track 2 chords, track 3 bass
+function midiBytes() {
+  const vlq = n => { const b = [n & 0x7f]; n >>= 7; while (n) { b.unshift((n & 0x7f) | 0x80); n >>= 7; } return b; };
+  const str = s => [...new TextEncoder().encode(s)];
+  const PPQ = 480, midiNum = nm => { const m = nm.match(/^([A-G])(s?)(\d)$/); const base = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[m[1]] + (m[2] ? 1 : 0); return 12 * (+m[3] + 1) + base; };
+  const track = (events) => { events.sort((a, b) => a.t - b.t || a.p - b.p); const out = []; let last = 0; for (const e of events) { out.push(...vlq(Math.round(e.t * PPQ) - last)); last = Math.round(e.t * PPQ); out.push(...e.d); } out.push(0, 0xff, 0x2f, 0); return [...str('MTrk'), ...[(out.length >>> 24) & 255, (out.length >>> 16) & 255, (out.length >>> 8) & 255, out.length & 255], ...out]; };
+  const full = build([[INTRO], [VERSE1], [CHORUS], [VERSE2], [CHORUS], [TAG], [CODA]]);
+  const tempo = Math.round(60e6 / SONG.bpm);
+  const t0 = [{ t: 0, p: 0, d: [0xff, 0x51, 3, (tempo >> 16) & 255, (tempo >> 8) & 255, tempo & 255] }, { t: 0, p: 0, d: [0xff, 0x58, 4, 4, 2, 24, 8] }, { t: 0, p: 0, d: [0xff, 0x59, 2, 1, 0] }, { t: 0, p: 0, d: [0xff, 0x03, ...vlq(SONG.title.length), ...str(SONG.title)] }];
+  const mel = [{ t: 0, p: 0, d: [0xff, 0x03, 5, ...str('Vocal')] }, { t: 0, p: 0, d: [0xc0, 52] }], chords = [{ t: 0, p: 0, d: [0xff, 0x03, 5, ...str('Piano')] }, { t: 0, p: 0, d: [0xc1, 0] }], bass = [{ t: 0, p: 0, d: [0xff, 0x03, 4, ...str('Bass')] }, { t: 0, p: 0, d: [0xc2, 33] }];
+  for (const e of full.ev) { const beat = e.t / SB; if (e.kind === 'note') { const s = str(e.s); mel.push({ t: beat, p: 0, d: [0xff, 0x05, ...vlq(s.length), ...s] }); mel.push({ t: beat, p: 1, d: [0x90, midiNum(e.n), 96] }); mel.push({ t: beat + e.d / SB * 0.95, p: 2, d: [0x80, midiNum(e.n), 0] }); } else { for (const n of CH[e.c]) { chords.push({ t: beat, p: 1, d: [0x91, midiNum(n), 70] }); chords.push({ t: beat + 3.8, p: 2, d: [0x81, midiNum(n), 0] }); } bass.push({ t: beat, p: 1, d: [0x92, midiNum(ROOT[e.c]), 80] }); bass.push({ t: beat + 3.6, p: 2, d: [0x82, midiNum(ROOT[e.c]), 0] }); } }
+  const head = [...str('MThd'), 0, 0, 0, 6, 0, 1, 0, 4, (PPQ >> 8) & 255, PPQ & 255];
+  return new Uint8Array([...head, ...track(t0), ...track(mel), ...track(chords), ...track(bass)]);
+}
+function downloadMidi() { const b = new Blob([midiBytes()], { type: 'audio/midi' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'keep-time.mid'; a.click(); }
+
+document.getElementById('lyrics').textContent = ['[Verse 1]  Em · C · G · D', ...LINES.slice(0, 4), '', '[Chorus]  C · G · Am · D · C · G · Em · D', ...LINES.slice(4), '', '[Verse 2]', ...LINES2, '', '[Chorus] (반복)', '', '[Coda, 새벽]  Em · D · C · G', LINES[7]].join('\n');
 </script>
 </body>
 </html>
