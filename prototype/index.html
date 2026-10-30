@@ -485,9 +485,9 @@ const LEVELS = [
     // box at it, and two boxes landing on the same beat are scanned together.
     lanes: 2, partners: ['haeun', 'boss'], onePlacer: true, handover: [52, 57], coScanner: 'haeun', autoLane: 0, autoUntil: 60, oneButton: true,
     fxTheme: 'blues', clock:'03:40', title:'합류',
-    tempo: [[0, 100], [40, 88], [44, 78], [52, 84], [60, 104]], endAt: 188,
+    tempo: [[0, 100], [40, 88], [44, 78], [52, 84], [60, 100]], endAt: 188, offTilt: true,
     chords: BLUES.chords, roots: BLUES.roots, chordAt: bar => bar < 2 ? 0 : BLUES.prog[(bar - 2) % 12],
-    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 },
     phone: [[88, 90]], phoneLane: 0, lateHint: '반장님 무릎… 손이 늦어요. 손을 봐요', special:['양쪽 동시에 찍은 상자', 'pair2', '한 번에'],
     sections: [[0, 'intro'], [2, 'boss'], [10, 'knee'], [13, 'walk'], [15, 'count'], [16, 'open'], [24, 'both'], [32, 'knee2'], [36, 'rush'], [44, 'final'], [48, 'outro']],
     // upper belt: 반장's shuffle (12 cells) until the knee, then 하은's straight 16ths (16 cells): trading two-bar phrases, then both,
@@ -497,10 +497,10 @@ const LEVELS = [
       'x.....x.....', 'x.....x.....', 'x..x..x.....', 'x.....x..x..', 'x.....x.....', 'x..x..x..x..', 'x.....x.x...', 'x...........',
       '............', '............', '............', '............', '............', '............',
       'x...x...x...x...', 'x...x...x.x.x...', '................', '................', 'x...x...x...x...', 'x.x.x...x.x.x...', '................', '................',
-      'x...x...x...x...', 'x...x...x.x.x...', 'x.......x.......', 'x...x...x...x...', 'x.x.x...x.x.x...', 'x...x...x...x...', 'x.......x.x.....', 'x...............',
+      'x...x...x...x...', 'x...x...x...x...', 'x.......x.......', 'x...x...x...x...', 'x.x.x...x.......', 'x...x...x...x...', 'x.......x.......', '................',
       'x.......x.......', 'x.......x.......', 'x...x...x...x...', 'x.......x.......',
-      'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x...x.x.x...', 'x...x...x...x...', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x...x.x.x...x.x.', 'x.x.x.x.........',
-      'x...x...x...x...', 'x.x.x.x.x.x.x.x.', 'x...x...x...x...', 'x...............',
+      'x.x.x...x.x.x...', 'x...x...x...x...', 'x.x.x.x.x.......', 'x...x...x...x...', 'x.x.x...x.x.x...', 'x...x...x...x...', 'x.x.x.x.x.x.x.x.', 'x.x.x...........',
+      'x...x...x...x...', 'x...x...x...x...', 'x.x.x...x.x.x...', 'x...............',
       '............', '............'
     ],
     // lower belt: 반장's shuffle all the way (12 cells), late boxes where the knee catches him
@@ -509,10 +509,10 @@ const LEVELS = [
       '............', 'x.....x.....', 'x.....x.....', 'x..x..x.....', 'x.....x.....', 'h=====......', 'x..x..x.....', 'x.....x.....',
       'x.....L.....', 'L...........', '......x.....', 'x.....x.....', 'x...........', '............',
       '............', '............', 'x.....x.....', 'x..x..x.....', '............', '............', 'x.....x.....', 'x..x..x..x..',
-      'x.....x.....', 'x..x..x.....', 'x.....x.x...', 'x...........', 'x.....x.....', 'x..x..x..x..', 'x.....x.....', 'h=====......',
-      'L...........', '......L.....', 'x...........', 'L.....x.....',
-      'x.....x.....', 'x..x..x..x..', 'x.....x.....', 'x.....x.x...', 'x.....x.....', 'x..x..x.....', 'x.....x.x...', '......h===..',
-      'x..x..x..x..', 'x..x..x..x..', 'x..x..x..x..', 'x...........',
+      'x.....x.....', 'x..x..x.....', 'x.....x.x...', 'x...........', 'x.....x.....', 'x..x..x..x..', 'x.....x.x...', 'h=====......',
+      'L...........', '......L.....', 'x...........', '......x.....',
+      'x.....x.....', 'x..x..x..x..', '......x.....', 'x.....x.....', 'x.....x.....', 'x..x..x.....', 'x.....x.....', '......h===..',
+      'x.....x.....', 'x..x..x..x..', 'x.....x.....', 'x...........',
       '............', '............'
     ],
     // [beat, text, beats shown, lane, speaker, style]: 반장 between the belts (lane 0) until the knee, at the lower belt (lane 1) after;
@@ -537,7 +537,7 @@ const LEVELS = [
       { who:'하은', text:'(작게) 반장님 무릎 안 좋아. 손 느려지면 말해.' }],
     outro: (good, sp) => good ? [
       { who:'', text:'트럭이 떴다. 04:38.' },
-      { who:'하은', text: sp >= 35 ? '…양쪽 다 받네. 야간 처음 맞아?' : '…됐다. 수고.' },
+      { who:'하은', text: sp >= 30 ? '…양쪽 다 받네. 야간 처음 맞아?' : '…됐다. 수고.' },
       { who:'반장', text:'무릎은 괜찮다. 아무한테도 말하지 마.' },
       { who:'', text:'반장님이 무릎을 한 번 두드리고, 벨트를 한 번 두드렸다.' },
       { who:'하은', text:'(시계를 본다) 먼저 갈게.' },
@@ -580,7 +580,7 @@ function loadLevel(level) {
       const ch = bar[c]; if (ch === '.' || ch === '=') continue;
       let len = 0;
       if (ch === 'h') { let k = c + 1, cnt = 1; while (bar[k] === '=' || bar[k] === 'o') { cnt++; k++; } len = cnt / div; }
-      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : 0), len, late: ch === 'L', heavy: ch === 'H', shuffle: div === 3 && c % 3 === 2, off: (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1), top: ch === 'o', lane });
+      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : 0), len, late: ch === 'L', heavy: ch === 'H', shuffle: div === 3 && c % 3 === 2, off: (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane });
     }
   }));
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
@@ -1271,7 +1271,7 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
   // or nothing (the loading arm is drawn with the belt). The other hand stays in a pocket.
   if (o.watch) { thick(cx - 6, top + 22, cx - 2, top + 30, 4, shirt); R(cx - 4, top + 28, 4, 4, glove); R(cx - 3, top + 26, 3, 3, '#d8dde0'); R(cx - 2, top + 27, 1, 1, C.ink); }
   else if (o.gun != null) {
-    const gx = 312 + kick * 3, gy = 84;
+    const gx = 330 + kick * 3, gy = 84;
     thick(cx - 6, top + 22, gx + 6, gy + 3, 4, shirt);
     R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33'); R(gx - 10, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser); R(gx, gy + 2, 3, 3, glove);
   }
@@ -1312,7 +1312,7 @@ function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
   const gx = 324 - kick * 4, gy = 117;
   if (L.lanes === 2 && (!L.coScanner || DUO.mode !== 'one')) {
     // the left hand works the upper (far) gate, the right hand the lower one
-    const ux = 304 - upperKick * 4, uy = 86;
+    const ux = 320 - upperKick * 4, uy = 86;
     thick(PLAYER_X - 5, top + 20, ux + 2, uy + 3, 4, C.hoodie); drawGun(ux, uy, upperKick);
   }
   thick(PLAYER_X - 6, top + 22, gx + 2, gy + 3, 4, C.hoodie);
@@ -1387,7 +1387,8 @@ function drawBox(n, cx, bottom, mark, t, sq = 0) {
   const w = n.w + Math.round(sq * 2), h = n.h - Math.round(sq * 2), x = Math.round(cx - w / 2), y = Math.round(bottom - h);
   R(x + 1, bottom, w, 1, 'rgba(0,0,0,.45)');
   R(x, y, w, h, C.kraft); R(x, y, w, 2, C.kraftTop); R(x + w - 2, y + 2, 2, h - 2, C.kraftDark);
-  R(x + (w >> 1) - 1, y, 3, h, L.lanes === 2 ? (n.lane === 0 ? C.vest : C.vest2) : C.tape);
+  R(x + (w >> 1) - 1, y, 3, h, n.off && L.offTilt ? '#d8463b' : L.lanes === 2 ? (n.lane === 0 ? C.vest : C.vest2) : C.tape);
+  if (n.pair && L.oneButton) R(x, y, w, 2, '#ffe9a8');
   const lw = Math.min(7, w - 4);
   if (lw >= 3) { R(x + 2, y + h - 6, lw, 4, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink); }
   if (n.heavy) { R(x + 2, y + 3, w - 4, 4, '#1b1716'); for (let k = 2; k < w - 5; k += 4) R(x + k + 1, y + 4, 2, 2, '#f0b429'); }
@@ -1476,13 +1477,14 @@ let rings = [];
 // hit-stop: only the scanned box pauses; the belt, the music and the next boxes keep their time
 const HITSTOP = reduce ? 0 : 0.085;
 function hitLag(dt, hs) { return Math.max(0, Math.min(dt, hs)); }
-const LANE_DY = [-36, 0], LANE_DX = [-26, 6];
+const LANE_DY = [-36, 0], LANE_DX = [14, 6];
 // the upper belt is the far one: drawn smaller, converging on the middle of the screen
 const FAR = { k: 0.82 };
-const farX = x => W / 2 + FAR.k * (x - W / 2), farY = y => LANE_DY[0] + BELT_Y + FAR.k * (y - BELT_Y);
-function farXform() { g.translate(W / 2, BELT_Y); g.scale(FAR.k, FAR.k); g.translate(-W / 2, -BELT_Y); }
+// the far belt is scaled about the scan line: both gates sit on the same vertical, so two boxes due on the same beat arrive stacked
+const farX = x => SCAN_X + FAR.k * (x - SCAN_X), farY = y => LANE_DY[0] + BELT_Y + FAR.k * (y - BELT_Y);
+function farXform() { g.translate(SCAN_X, BELT_Y); g.scale(FAR.k, FAR.k); g.translate(-SCAN_X, -BELT_Y); }
 // one partner feeding both belts stands between them
-const ONE = { dx: -12, dy: -14 };
+const ONE = { dx: 0, dy: -14 };
 // 1-4: who feeds the upper belt. 'one' = 반장 feeds both while 하은 scans the upper gate; 'walk' = 하은 crossing over to load it;
 // 'two' = each belt has its own loader and you scan both. DUO is worked out once a frame from the beat the scene is showing.
 const DUO = { mode: 'two', p: 0 };
@@ -1549,7 +1551,11 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
       const jolt = ja < 0.35 ? Math.round(Math.sin(ja * 70) * 2.5 * Math.exp(-ja * 8)) : 0;
       boxQ.push([n, cx + jolt, sq]);
     }
-    for (const [n, x, sq] of boxQ) drawBox(n, x, n.top ? BELT_Y - 12 : BELT_Y, n.state, t, sq);
+    for (const [n, x, sq] of boxQ) {
+      // an off-beat box was set down crooked: it leans, and its tape is red
+      if (n.off && L.offTilt && !n.top) { g.save(); g.translate(x, BELT_Y); g.rotate((n.i % 2 ? 1 : -1) * 0.12); drawBox(n, 0, 0, n.state, t, sq); g.restore(); }
+      else drawBox(n, x, n.top ? BELT_Y - 12 : BELT_Y, n.state, t, sq);
+    }
     g.restore();
   }
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160);
@@ -1892,6 +1898,18 @@ function drawAlleyFront(al, t) {
   }
 }
 
+function drawPairLinks(t) {
+  g.save(); g.setLineDash([2, 3]); g.lineWidth = 1;
+  for (const n of notes) {
+    if (!n.pair2 || n.state !== 'pending' || t < n.place) continue;
+    const m = notes.find(q => q.lane === 0 && q.state === 'pending' && Math.abs(q.beat - n.beat) < 1e-6); if (!m) continue;
+    const xl = SCAN_X + (t - n.arr) * SPEED; if (xl < 60 || xl > W) continue;
+    const xu = farX(xl), near = Math.max(0, 1 - Math.abs(t - n.arr) / 1.2);
+    g.strokeStyle = `rgba(255,233,168,${0.3 + 0.55 * near})`;
+    g.beginPath(); g.moveTo(Math.round(xu) + 0.5, farY(BELT_Y - m.h)); g.lineTo(Math.round(xl) + 0.5, BELT_Y - n.h); g.stroke();
+  }
+  g.restore();
+}
 function drawScene(t, bt, active, nowMs) {
   g.save();
   if (!reduce && nowMs < FX.shakeUntil) { const a = FX.shakeAmp || 1; g.translate(Math.round((Math.random() * 2 - 1) * a), Math.round((Math.random() * 2 - 1) * a)); } else FX.shakeAmp = 1;
@@ -1937,6 +1955,7 @@ function drawScene(t, bt, active, nowMs) {
   drawBin(laneFx.binned, nowMs);
   drawPallet(laneFx.delivered);
   for (const [n, f, dy] of laneFx.falling) { g.save(); g.translate(f.x, f.y + dy - n.h / 2); g.rotate(f.rot); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); }
+  if (L.oneButton && active) drawPairLinks(t);
   drawPlayerArm(kick, nowMs, nowMs - lastHeavy < 260, upperKick);
   drawParticles(nowMs);
   if (al) { drawAlleyLight(al, t, nowMs); drawBeltString(al, t, nowMs); drawPuddleMirror(al, t, nowMs); }
