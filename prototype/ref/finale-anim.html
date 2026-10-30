@@ -30,7 +30,7 @@ ul{color:var(--muted);font-size:13px;margin:8px 0 0 18px}
 <body>
 <div class="wrap">
 <h1>1-5 첫 회식 · 애니매틱</h1>
-<p>벨트 도입 → 매치 컷 → 초밥 세 벨트 → 소주잔과 취기, 그리고 하은의 밤: 창 → 문 → 계단 → 가로등 → 횡단보도 → 웅덩이 → 복도 → 손 → 병실 → 새벽 → 탁자. 약 2분 49초. 하은의 밤은 컷마다 카메라가 다릅니다(인서트, 마주 본 투숏, 스크린도어 너머, 계단을 따라 오르는 스테디캠, 나란히 따라가는 트래킹, 머리 위 부감, 바닥 높이에서 올려다보는 틸트, 숄더 샷과 역방향 컷, 손 클로즈업). 박자 모티프가 레일 이음매 소리 → 터널 불빛 → 신호음과 발 아래 줄 → 복도의 일곱 등 → 심전도로 이어집니다. 지금은 소리 없이 화면만 봅니다.</p>
+<p>벨트 도입 → 매치 컷 → 초밥 세 벨트 → 소주잔과 취기, 그리고 하은의 밤: 창 → 문 → 계단 → 가로등 → 횡단보도 → 웅덩이 → 복도 → 손 → 병실 → 새벽 → 탁자. 약 2분 47초. 하은의 밤은 컷마다 카메라가 다릅니다(인서트, 마주 본 투숏, 스크린도어 너머, 계단을 따라 오르는 스테디캠, 나란히 따라가는 트래킹, 머리 위 부감, 바닥 높이에서 올려다보는 틸트, 숄더 샷과 역방향 컷, 손 클로즈업). 박자 모티프가 레일 이음매 소리 → 터널 불빛 → 신호음과 발 아래 줄 → 복도의 일곱 등 → 심전도로 이어집니다. 지금은 소리 없이 화면만 봅니다.</p>
 <canvas id="cv" width="384" height="216"></canvas>
 <div class="bar"><button id="play">▶ 재생</button><input id="seek" type="range" min="0" max="100" step="0.05" value="0"><span id="lbl"></span><select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
 <div class="jumps" id="jumps"></div>
@@ -589,7 +589,7 @@ function buildTL() {
     { id: 'sushi1', name: '초밥', dur: 18, draw: u => { drawSushi(u, 1); fadeBlack(0); } },
     { id: 'sushi2', name: '소주잔', dur: 18, draw: u => { const lv = drawSushi(u, 2); drunkFx(lv, u, () => drawHaeunCounter(u, 2, THROWS[1])); fadeBlack(u > 16.6 ? (u - 16.6) / 1.4 : 0); if (u > 16.6) cue('sushi-off', () => rollerOn(false)); } },
     { id: 'train', name: '창', dur: 15.4, draw: u => shotWindow(u) },
-    { id: 'door', name: '문', dur: 9.6, draw: u => shotDoor(u) },
+    { id: 'door', name: '문', dur: 7.4, draw: u => shotDoor(u) },
     { id: 'stairs', name: '계단', dur: 6, draw: u => shotStairs(u) },
     { id: 'lamp', name: '가로등', dur: 8, draw: u => shotLamp(u) },
     { id: 'cross', name: '횡단보도', dur: 8, draw: u => shotCross(u) },
@@ -1064,11 +1064,11 @@ const HAIR = {
   // 하은's snapback, pulled down: brim and its shadow hide the eyes; turned = the brim swings toward her left (screen right)
   cap(cx, top, turned) {
     const d = turned ? 2 : 0, red = '#d8463b', redD = '#a83328';
-    if (turned) { R(cx - 9, top - 1, 2, 9, '#4a3328'); R(cx - 9, top + 3, 1, 5, '#6b4a3a'); }
+    if (turned) { R(cx - 8, top, 2, 8, '#4a3328'); R(cx - 8, top + 3, 1, 5, '#6b4a3a'); }
     R(cx - 7, top + 4, 1, 4, '#4a3328'); R(cx + 6, top + 4, 1, 3, '#4a3328');
-    R(cx - 5, top - 6, 10, 1, redD); R(cx - 7, top - 5, 14, 7, red); R(cx - 7, top - 5, 1, 7, redD); R(cx + 6, top - 5, 1, 7, redD); R(cx - 4, top - 5, 3, 1, '#ef6a55');
-    R(cx - 3 + d, top - 4, 6, 4, '#f4f1ea'); R(cx - 2 + d, top - 3, 4, 2, red); R(cx - 2 + d, top - 3, 4, 1, '#f4f1ea');
-    R(cx - 8 + d, top + 2, 16, 1, '#3a3236'); R(cx - 8 + d, top + 3, 16, 1, '#1e1a1a');
+    R(cx - 4, top - 3, 8, 1, redD); R(cx - 6, top - 2, 12, 4, red); R(cx - 6, top - 2, 1, 4, redD); R(cx + 5, top - 2, 1, 4, redD); R(cx - 3, top - 2, 2, 1, '#ef6a55');
+    R(cx - 2 + d, top - 2, 4, 3, '#f4f1ea'); R(cx - 1 + d, top - 1, 2, 1, red);
+    R(cx - 7 + d, top + 2, 14, 1, '#3a3236'); R(cx - 7 + d, top + 3, 14, 1, '#1e1a1a');
     R(cx - 6, top + 4, 12, 3, '#8a5e44'); R(cx - 6, top + 4, 12, 1, '#6b4631');
   }
 };
@@ -1270,52 +1270,7 @@ function trainTwoShot(t) {
 //    the foreground and, over her shoulder, him asleep against the pole inside; the doors close between them and the train
 //    goes, its windows strobing across her; then flat and wide, the empty platform, the clock, her second watch
 function shotDoor(u) {
-  if (u < 2.6) doorCloseUp(u); else if (u < 6.8) doorBust(u - 2.6); else platformWide(u - 6.8);
-}
-// 하은 standing, from the front, feet at feetY; step = 0/1 for a stride frame
-function haeunStand(cx, feetY, o = {}) {
-  const pants = '#3a3f45', pd = '#2a2e33', sk = '#d9a27a', legTop = feetY - 22, top = legTop - 18 + (o.step != null ? (o.step ? -1 : 0) : 0);
-  const lu = o.step === 1 ? 2 : 0, ru = o.step === 0 ? 2 : 0;
-  R(cx - 6, legTop, 5, 20 - lu, pants); R(cx + 1, legTop, 5, 20 - ru, pants); R(cx - 2, legTop, 1, 20 - lu, pd); R(cx + 1, legTop, 1, 20 - ru, pd);
-  R(cx - 7, feetY - 2 - lu, 6, 2, '#1e1a1a'); R(cx + 1, feetY - 2 - ru, 6, 2, '#1e1a1a'); R(cx - 7, feetY - lu, 6, 1, '#3a3236'); R(cx + 1, feetY - ru, 6, 1, '#3a3236');
-  R(cx - 7, top, 14, 1, '#1e1a1a'); R(cx - 8, top + 1, 16, 17, '#1e1a1a'); R(cx - 6, top + 3, 1, 14, '#121010'); R(cx + 5, top + 3, 1, 14, '#121010'); HAEUN_DRESS(cx, top); R(cx - 2, top - 1, 4, 2, '#b98260');
-  faceF(cx, top - 14, { eyes: 'hidden' }); HAIR.cap(cx, top - 14, o.turned);
-  thick(cx - 7, top + 3, cx - 8, top + 16, 3, '#1e1a1a'); R(cx - 9, top + 16, 3, 3, sk);
-  thick(cx + 7, top + 3, cx + 8, top + 14, 3, '#1e1a1a'); R(cx + 6, top + 14, 4, 3, sk); bagAt(cx + 7, top + 15);
-  return top;
-}
-// the inside of the car behind an open door: wall, the bench, the pole, him asleep against it
-function carInside(x, y, w, h, sinipX, seatY, t) {
-  R(x, y, w, h, '#d6dbe1'); R(x, y, w, 6, '#c3c8d0'); light(x + w / 2, y + 4, w, '255,246,226', 0.18);
-  R(x, seatY - 24, w, 24, '#2f5f8a'); dfill(x, seatY - 23, w, 22, '#3a6d9a', 0.32); R(x, seatY - 24, w, 2, '#4a82b4');
-  R(x, seatY, w, 3, '#3f7fb0'); R(x, seatY + 3, w, 4, '#244766'); R(x, seatY + 7, w, 4, '#8e979f'); R(x, seatY + 11, w, h - (seatY + 11 - y), '#6b7279');
-  R(sinipX + 15, y, 3, h, '#b8bec4'); R(sinipX + 16, y, 1, h, '#eef1f3');
-  sinipLean(sinipX, seatY, 0.24, 0.32, t);
-}
-function doorCloseUp(u) {
-  const open = ease(clamp((u - 0.4) / 0.8, 0, 1)), out = clamp((u - 1.2) / 1.4, 0, 1);
-  shot(2, (w, h) => {
-    // the car side fills the frame; the doorway in the middle
-    R(0, 0, w, h, '#e3e7eb'); R(0, 0, w, 3, '#c9ced3'); R(0, 74, w, 4, '#2f6f8a'); R(0, 78, w, 1, '#7fb4c8'); dfill(0, 3, w, 70, '#d6dbe0', 0.2);
-    const dx0 = 50, dx1 = 142, dy0 = 14, dy1 = 98;
-    R(dx0 - 4, dy0 - 4, dx1 - dx0 + 8, dy1 - dy0 + 4, '#b9c0c7'); R(dx0 - 1, dy0 - 1, dx1 - dx0 + 2, dy1 - dy0 + 1, '#2b2e33');
-    R(88, 6, 16, 5, '#2b2e33'); R(90, 7, 12, 3, open > 0 && Math.floor(u * 4) % 2 ? '#ff8a3d' : '#5a2a1a');
-    g.save(); g.beginPath(); g.rect(dx0, dy0, dx1 - dx0, dy1 - dy0); g.clip();
-    carInside(dx0, dy0, dx1 - dx0, dy1 - dy0, 112, 72, u);
-    // 하은 inside, then stepping out toward us
-    const feet = Math.round(lerp(86, 104, ease(out))), cx = 82;
-    if (out < 1) haeunStand(cx, feet, { step: out > 0 && out < 1 ? Math.floor(u / 0.3) % 2 : null });
-    // the two panels slide into their pockets
-    const pw = Math.round(46 * (1 - open));
-    for (const [x, s] of [[dx0, 1], [dx1, -1]]) { if (pw <= 0) continue; const px = s > 0 ? x : x - pw; R(px, dy0, pw, dy1 - dy0, '#d3d8dd'); R(px, dy0, pw, 1, '#eef1f3'); R(s > 0 ? px + pw - 2 : px, dy0, 2, dy1 - dy0, '#2b2e33'); if (pw > 12) { R(px + 5, dy0 + 8, pw - 10, 30, '#2b2e33'); g.save(); g.beginPath(); g.rect(px + 6, dy0 + 9, pw - 12, 28); g.clip(); carInside(dx0, dy0, dx1 - dx0, dy1 - dy0, 112, 72, u); haeunStand(82, 86, {}); shade(px + 6, dy0 + 9, pw - 12, 28, '200,215,225', 0.3); R(px + 8, dy0 + 30, 10, 1, 'rgba(255,255,255,.4)'); g.restore(); } R(px + 3, dy0 + 50, Math.max(0, pw - 6), 1, '#9aa0a8'); }
-    g.restore();
-    // the yellow sill at the bottom; the platform's light on the train
-    R(dx0 - 4, 96, dx1 - dx0 + 8, 2, '#f2d35a');
-    if (out > 0.5) { haeunStand(82, Math.round(lerp(86, 104, ease(out))), { step: Math.floor(u / 0.3) % 2 }); }
-    vig(w, h, 0.4);
-  });
-  bars();
-  blackout(W, H, u < 0.3 ? 1 - u / 0.3 : 0);
+  if (u < 4.6) doorBust(u); else platformWide(u - 4.6);
 }
 // a tiny 신입 for the far background: slumped against the pole with his head over on it
 function sinipFar(x, seatY, t) {
@@ -1352,35 +1307,49 @@ function haeunBust(cx, by, t, look) {
   for (let x = -19; x <= 19; x++) { const yy = by + Math.round((x / 19) * (x / 19) * 2); R(cx + x + d, yy - 1, 1, 1, '#3a3236'); R(cx + x + d, yy, 1, 2, '#1e1a1a'); }
 }
 function doorBust(t) {
-  const close = ease(clamp((t - 1.3) / 0.9, 0, 1)), dep = Math.max(0, t - 2.5), tx = -Math.round(dep * dep * 26), look = t > 0.4 && t < 1.8 ? -ease(clamp((t - 0.4) / 0.4, 0, 1)) * (t > 1.4 ? 1 - (t - 1.4) / 0.4 : 1) : 0;
+  // 0-0.4 she stands just inside, seen through the door's glass; 0.4-1.1 the doors open; 1.2 she steps out (a dip and she is
+  // a little lower and nearer); 1.5-2.3 she glances back; 2.4-3.2 the doors close behind her on him; 3.3 the train goes
+  const open = ease(clamp((t - 0.4) / 0.7, 0, 1)), step = clamp((t - 1.2) / 0.4, 0, 1), dip = step > 0 && step < 1 ? Math.round(Math.sin(step * Math.PI) * 2) : 0;
+  const close = ease(clamp((t - 2.4) / 0.8, 0, 1)), dep = Math.max(0, t - 3.3), tx = -Math.round(dep * dep * 30);
+  const look = t > 1.5 && t < 2.5 ? -ease(clamp((t - 1.5) / 0.35, 0, 1)) * (t > 2.15 ? 1 - (t - 2.15) / 0.35 : 1) : 0;
+  const D0 = 30, D1 = 106;
+  const panels = (amount, front) => {   // the two door panels, closed by `amount`; in front of her they are glass she shows through
+    const pw = Math.round(38 * amount); if (pw <= 0) return;
+    for (const [x, s] of [[D0, 1], [D1, -1]]) {
+      const px = s > 0 ? x : x - pw, wx = px + 4, ww = pw - 8;
+      if (front) { R(px, 0, pw, 6, '#d3d8dd'); R(px, 34, pw, 24, '#d3d8dd'); R(px, 6, 4, 28, '#d3d8dd'); R(px + pw - 4, 6, 4, 28, '#d3d8dd'); if (ww > 0) { R(wx - 1, 5, ww + 2, 1, '#2b2e33'); R(wx - 1, 34, ww + 2, 1, '#2b2e33'); shade(wx, 6, ww, 28, '190,208,220', 0.28); g.save(); g.globalAlpha = 0.25; for (let k = 0; k < 14; k++) R(wx + 2 + k, 32 - k * 2, 3, 1, '#ffffff'); g.restore(); } }
+      else { R(px, 0, pw, 58, '#d3d8dd'); if (ww > 0) { R(wx - 1, 6, ww + 2, 26, '#2b2e33'); g.save(); g.beginPath(); g.rect(wx, 7, ww, 24); g.clip(); R(D0, 7, D1 - D0, 4, '#d6dbe1'); R(D0, 10, D1 - D0, 15, '#1a1f28'); R(D0, 25, D1 - D0, 6, '#2f5f8a'); R(60, 0, 2, 58, '#b8bec4'); sinipFar(55, 40, t); shade(wx, 7, ww, 24, '180,200,212', 0.3); g.restore(); } }
+      R(s > 0 ? px + pw - 1 : px, 0, 1, 58, '#2b2e33');
+    }
+  };
   shot(3, (w, h) => {
     // once the train is gone: the far wall across the tracks
     R(0, 0, w, h, '#2a2f36'); R(0, 10, w, 50, '#cfd8d4'); for (let x = 0; x < w; x += 6) R(x, 10, 1, 50, '#c0c9c5'); R(0, 44, w, 3, '#2f6f8a');
     g.save(); g.translate(tx, 0);
     // the car side around the doorway, with the sheen of its panels
     R(-20, 0, 200, 64, '#d9dee3'); for (let k = 0; k < 9; k++) for (let j = 0; j < 30; j++) R(-14 + k * 22 + j, 62 - j * 2, 2, 1, '#cdd3d8');
-    const D0 = 30, D1 = 106;
     R(D0 - 3, 0, 3, 64, '#2b2e33'); R(D1, 0, 3, 64, '#2b2e33'); R(D0, 58, D1 - D0, 3, '#f2d35a');
     // inside: the far wall and its window, the bench, the floor, the pole, him asleep against it
     g.save(); g.beginPath(); g.rect(D0, 0, D1 - D0, 58); g.clip();
     R(D0, 0, D1 - D0, 58, '#d6dbe1'); R(D0, 10, D1 - D0, 15, '#1a1f28'); R(D0, 25, D1 - D0, 2, '#9aa1a8'); R(D0, 27, D1 - D0, 13, '#2f5f8a'); R(D0, 27, D1 - D0, 1, '#4a82b4'); R(D0, 40, D1 - D0, 3, '#3f7fb0'); R(D0, 43, D1 - D0, 15, '#8a9198');
     light(64, 4, 50, '255,244,220', 0.25);
     R(60, 0, 2, 58, '#b8bec4'); R(60, 0, 1, 58, '#eef1f3'); sinipFar(55, 40, t);
-    // the doors slide shut from their pockets; he stays behind the glass
-    const pw = Math.round(38 * close);
-    for (const [x, s] of [[D0, 1], [D1, -1]]) { if (pw <= 0) continue; const px = s > 0 ? x : x - pw; R(px, 0, pw, 58, '#d3d8dd'); R(s > 0 ? px + pw - 1 : px, 0, 1, 58, '#2b2e33'); if (pw > 10) { const wx = px + 4, ww = pw - 8; R(wx - 1, 6, ww + 2, 26, '#2b2e33'); g.save(); g.beginPath(); g.rect(wx, 7, ww, 24); g.clip(); R(D0, 7, D1 - D0, 4, '#d6dbe1'); R(D0, 10, D1 - D0, 15, '#1a1f28'); R(D0, 25, D1 - D0, 6, '#2f5f8a'); R(60, 0, 2, 58, '#b8bec4'); sinipFar(55, 40, t); shade(wx, 7, ww, 24, '180,200,212', 0.3); g.restore(); } }
+    panels(close, false);
     g.restore();
     g.restore();
-    // the platform behind her, low
     R(0, 60, w, 12, '#9ea7a5'); R(0, 60, w, 2, '#e8c34a');
-    // the train's windows strobing as it goes
-    if (dep > 0) for (let k = 0; k < 4; k++) { const x = ((k * 42 - dep * dep * 34) % 190 + 190) % 190 - 30; g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,190,${0.13 * Math.min(1, dep * 1.5)})`; g.fillRect(x, 0, 22, h); g.restore(); }
-    // her, close, in front of it all
-    haeunBust(82, 12, t, look);
+    if (dep > 0) for (let k = 0; k < 4; k++) { const x = ((k * 42 - dep * dep * 40) % 190 + 190) % 190 - 30; g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,190,${0.13 * Math.min(1, dep * 1.5)})`; g.fillRect(x, 0, 22, h); g.restore(); }
+    // her: just inside at first (a pixel higher and smaller in the frame's depth), then out on the platform
+    // still inside the car, the car body hides whatever of her is outside the doorway
+    if (step < 0.5) { g.save(); g.beginPath(); g.rect(D0, 0, D1 - D0, 58); g.clip(); }
+    haeunBust(82, 12 + (step < 1 ? -1 : 0) + dip, t, look);
+    if (step < 0.5) g.restore();
+    // the doors in front of her before they open
+    if (open < 1) { g.save(); g.beginPath(); g.rect(D0, 0, D1 - D0, 58); g.clip(); panels(1 - open, true); g.restore(); R(D0, 58, D1 - D0, 3, '#f2d35a'); }
     vig(w, h, 0.5);
   });
   bars();
-  blackout(W, H, t < 0.12 ? 1 - t / 0.12 : t > 3.8 ? (t - 3.8) / 0.4 : 0);
+  blackout(W, H, t < 0.3 ? 1 - t / 0.3 : t > 4.2 ? (t - 4.2) / 0.4 : 0);
 }
 function platformWide(t) {
   shot(1, (w, h) => {
