@@ -474,13 +474,14 @@ const LEVELS = [
   }
   ,{
     id:'s1-4', stageNo:'1-4', who:'반장 + 하은', role:'반장 · 하은 · 100 BPM · 벨트 둘', tag:'벨트 둘 · 주고받기 · 양손 겹침', bpm:100, style:'duo14',
-    lanes: 2, partners: ['boss', 'haeun'], fxTheme: 'blues', clock:'03:40', title:'합류',
+    // 반장 alone loads both belts; 하은 scans the upper belt beside you (your left hand is her trigger), you scan the lower one
+    lanes: 2, partners: ['boss', 'boss'], onePlacer: true, coScanner: 'haeun', fxTheme: 'blues', clock:'03:40', title:'합류',
     // 반장's shuffle blues on the upper belt (left hand), 하은's straight funk on the lower one (right hand). They trade phrases,
     // four bars, then two, with one box each where a phrase hands over; at the end both belts run and each hand keeps its own feel.
     chords: BLUES.chords, roots: BLUES.roots, chordAt: bar => bar < 2 ? 0 : BLUES.prog[(bar - 2) % 12],
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
     // the second belt rolls in from the right with 하은 on it
-    beltIn: [36, 40], phone: [[88, 90]], phoneLane: 1, special:['양손 상자', 'pair', '받아냄'],
+    beltIn: [36, 40], phone: [[88, 90]], special:['양손 상자', 'pair', '받아냄'],
     sections: [[0, 'intro'], [2, 'boss'], [10, 'haeun'], [18, 'trade4'], [34, 'trade2'], [42, 'both'], [50, 'outro']],
     // upper belt, 12 cells = shuffle triplets
     bars: [
@@ -504,19 +505,19 @@ const LEVELS = [
       'x...x...........', '..x...x.x.......', 'x.......x.......', '..x.x...x.......', 'x...x...........', 'x.x...x.x.......', 'x.......x...x...', 'x...............',
       '................', '................'
     ],
-    // [beat, text, beats shown, lane]: lane 0 = 반장 (upper), lane 1 = 하은 (lower)
+    // [beat, text, beats shown, lane, speaker]: 반장 at the belts; 'h' = 하은 at the upper scanner, beside you
     say: [[4, '지우는 오늘 공연이라 뺐다. 대타 온다.', 3.5, 0], [12, '그 전까진 나랑 둘이다.', 3, 0],
-          [36, '(벨트가 하나 더 들어온다)', 3, 0], [41, '하은이에요. 여기 시급 그대로죠?', 3.5, 1], [45, '…그대로다.', 2, 0],
-          [49, '너도 야간 처음이지? 난 2년.', 3.5, 1], [60, '오른손. 내 거 봐.', 3, 1],
-          [72, '자, 주고받는다. 내가 먼저.', 3, 0], [88, '(시계 봄) …아직 네 시간.', 2.5, 1], [104, '넘어갈 땐 양손.', 3, 0],
-          [136, '빨라진다. 두 손 다 써라.', 3, 0], [152, '제 거 안 흔들려요. 반장님 거나 보세요.', 3.5, 1],
-          [168, '같이 간다!', 2, 0], [170, '네.', 1.5, 1], [184, '(위는 흔들고, 아래는 똑바로)', 3, 0], [200, '(트럭 경적)', 3, 0]],
-    comfort: ['한 손씩. 위는 나, 아래는 하은.', '손을 봐.'],
+          [36, '(벨트가 하나 더 들어온다)', 3, 0], [41, '하은이에요. 위 벨트는 제가 찍을게요.', 3.5, 0, 'h'], [45, '여기 시급 그대로죠?', 2.5, 0, 'h'], [48, '…그대로다. 위아래 다 내가 싣는다.', 3, 0],
+          [52, '너도 야간 처음이지? 난 2년.', 3.5, 0, 'h'], [60, '2번 라인은 이 속도예요. 왼손, 저랑 같이.', 3.5, 0, 'h'],
+          [72, '자, 위아래 번갈아 싣는다. 위부터.', 3, 0], [88, '(시계 봄) …아직 네 시간.', 2.5, 0, 'h'], [104, '넘어갈 땐 양손.', 3, 0],
+          [136, '빨라진다. 두 손 다 써라.', 3, 0], [152, '저 안 늦어요. 반장님 손이나 보세요.', 3.5, 0, 'h'],
+          [168, '같이 간다!', 2, 0], [170, '네!', 1.5, 0, 'h'], [184, '(위는 흔들고, 아래는 똑바로)', 3, 0], [200, '(트럭 경적)', 3, 0]],
+    comfort: ['한 손씩. 왼손은 하은이랑, 오른손은 너.', '내 손을 봐.'],
     intro: [
       { who:'', text:'닷새째 밤. 금요일. 트럭이 새벽 4시 40분에 뜬다.' },
       { who:'반장', text:'지우는 오늘 공연이라 뺐다. 2번 라인에서 대타가 온다.' },
       { who:'', text:'라인을 합친다는 공지가 붙었다. 벨트가 하나 더 들어온다고 했다.' },
-      { who:'반장', text:'왼손은 내 벨트, 오른손은 걔 벨트. 둘 다 보지 말고 손을 봐.' }],
+      { who:'반장', text:'싣는 건 위아래 다 내가 한다. 찍는 건 둘이서. 벨트 말고 내 손을 봐.' }],
     outro: (good, sp) => good ? [
       { who:'', text:'트럭이 떴다. 04:38.' },
       { who:'하은', text:'회식? 저도요?' },
@@ -1012,6 +1013,7 @@ function drawObserver(t, nowMs, active) {
 }
 function drawPartnerArmOf(id, pose, lane = 0) {
   if (L.cast) { if (CAST.hideArm) return; g.save(); g.translate(CAST.dx, 0); PARTNERS[id].arm(pose); g.restore(); return; }
+  if (L.onePlacer) { const dy = LANE_DY[lane], sx = ONE.dx, sy = ONE.dy - dy; g.save(); g.translate(sx, sy); PARTNERS[id].arm({ ...pose, hand: { x: pose.hand.x - sx, y: pose.hand.y - sy } }); g.restore(); return; }
   if (L.lanes === 2) { const dx = LANE_DX[lane]; g.save(); g.translate(dx, 0); PARTNERS[id].arm({ ...pose, hand: { x: pose.hand.x - dx, y: pose.hand.y } }); g.restore(); return; }
   PARTNERS[id].arm(pose);
 }
@@ -1082,6 +1084,35 @@ function drawCast(t, nowMs, active, placerPose) {
   if (listening) { const ax = jx + 6, ay = 92, bxe = bx - 3, bye = 99; for (let k = 0; k <= 20; k++) { const p = k / 20; R(lerp(ax, bxe, p), lerp(ay, bye, p) + Math.sin(p * Math.PI) * 6, 1, 1, '#f4f1ea'); } }
 }
 
+// 하은, the co-scanner on the upper belt: a big round head under a mint beanie with a pom, side tail, big eyes, pink cheeks.
+// She stands on the far side of the upper gate facing it; your left hand fires her gun.
+const HAEUN_X = 272;
+function drawHaeun(t, kick, nowMs, active) {
+  const beat = active ? beatAt(t) : (state === 'outro' || state === 'result') ? END_BEAT : -1;
+  if (L.beltIn && beat < L.beltIn[0]) return;
+  const walkP = L.beltIn && beat < L.beltIn[1] ? ease((beat - L.beltIn[0]) / (L.beltIn[1] - L.beltIn[0])) : 1;
+  const cx = Math.round(lerp(W + 30, HAEUN_X, walkP)), ph = beat - Math.floor(beat), watch = active && inRange(beat, L.phone);
+  const bob = walkP < 1 ? (ph < 0.5 ? 1 : 0) : (active && ph < 0.18 ? 1 : 0), top = 64 + bob + (kick > 0.5 ? 1 : 0);
+  const beanie = '#7fd8c8', beanieD = '#4fb3a1', hoodie = '#f3e7d3', hair = '#3b2a26', cheek = '#f2a0a8';
+  R(cx - 6, top + 40, 5, 10, '#3a3f45'); R(cx + 1, top + 40, 5, 10, '#3a3f45'); R(cx - 7, top + 49, 6, 2, '#1e1a1a'); R(cx + 1, top + 49, 6, 2, '#1e1a1a');
+  R(cx - 7, top + 16, 14, 25, hoodie); R(cx - 7, top + 19, 14, 12, C.vest2); R(cx - 7, top + 25, 14, 2, C.reflect);
+  R(cx - 8, top + 1, 16, 14, C.skin); R(cx - 7, top, 14, 1, C.skin); R(cx - 7, top + 15, 14, 1, C.skin);
+  R(cx - 8, top + 1, 16, 3, hair); R(cx + 5, top + 4, 3, 4, hair); R(cx - 9, top + 4, 3, 10, hair); R(cx - 11, top + 10, 3, 8, hair);
+  R(cx - 9, top - 4, 18, 6, beanie); R(cx - 9, top + 1, 18, 1, beanieD); R(cx - 1, top - 7, 4, 4, '#ffffff');
+  if (watch) {
+    // eyes down at the wrist, the arm bent in front
+    R(cx - 1, top + 9, 2, 1, C.ink); R(cx + 4, top + 9, 2, 1, C.ink);
+    thick(cx + 6, top + 22, cx + 2, top + 30, 4, hoodie); R(cx, top + 28, 4, 4, '#2a2d31'); R(cx + 1, top + 26, 3, 3, '#d8dde0');
+  } else {
+    R(cx - 1, top + 7, 2, 3, C.ink); R(cx + 4, top + 7, 2, 3, C.ink); R(cx, top + 7, 1, 1, '#ffffff'); R(cx + 5, top + 7, 1, 1, '#ffffff');
+    if (nowMs % 3400 < 120) { R(cx - 1, top + 7, 2, 3, C.skin); R(cx + 4, top + 7, 2, 3, C.skin); R(cx - 1, top + 9, 2, 1, C.ink); R(cx + 4, top + 9, 2, 1, C.ink); }
+    // her gun into the upper gate, kicking back when your left hand fires
+    const gx = cx + 18 - kick * 3, gy = 87;
+    thick(cx + 6, top + 22, gx - 2, gy + 3, 4, hoodie);
+    R(gx - 3, gy - 3, 12, 5, '#2d2f33'); R(gx - 2, gy + 2, 3, 6, '#2d2f33'); R(gx + 8, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser); R(gx - 3, gy + 2, 3, 3, '#2a2d31');
+  }
+  R(cx - 7, top + 11, 2, 1, cheek); R(cx + 5, top + 11, 2, 1, cheek); R(cx + 1, top + 12, 3, 1, '#b2565a');
+}
 const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
 function drawPlayer(kick, nowMs) {
   const fl = nowMs - FX.flinch, cx = PLAYER_X + (fl < 160 ? 1 : 0), top = playerTop(kick, nowMs);
@@ -1101,7 +1132,7 @@ function drawGun(gx, gy, kick) {
 function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
   const top = playerTop(kick, nowMs);
   const gx = 324 - kick * 4, gy = 117;
-  if (L.lanes === 2) {
+  if (L.lanes === 2 && !L.coScanner) {
     // left hand works the upper belt, right hand the lower one
     const ux = 326 - upperKick * 4, uy = 87;
     thick(PLAYER_X - 5, top + 20, ux + 2, uy + 3, 4, C.hoodie); drawGun(ux, uy, upperKick);
@@ -1268,6 +1299,8 @@ let rings = [];
 const HITSTOP = reduce ? 0 : 0.085;
 function hitLag(dt, hs) { return Math.max(0, Math.min(dt, hs)); }
 const LANE_DY = [-30, 0], LANE_DX = [-26, 6];
+// one partner feeding both belts stands between them
+const ONE = { dx: -12, dy: -14 };
 const darkBuf = document.createElement('canvas'); darkBuf.width = W; darkBuf.height = H;
 // one belt: grid, boxes, scanner, front face, the partner's carried box and arm. dy lifts the upper belt.
 // the second belt slides in from the right over L.beltIn
@@ -1355,12 +1388,14 @@ function drawScene(t, bt, active, nowMs) {
   const beltT = active ? t : bt;
   const laneFx = { delivered: 0, binned: 0, falling: [] };
   if (L.lanes === 2) {
-    g.save(); g.translate(LANE_DX[0], LANE_DY[0]); drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore();
+    if (L.onePlacer) { g.save(); g.translate(ONE.dx, ONE.dy); drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); }
+    else { g.save(); g.translate(LANE_DX[0], LANE_DY[0]); drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); }
     drawLane(0, poses[0], t, beltT, active, nowMs, laneFx);
+    if (L.coScanner) drawHaeun(t, upperKick, nowMs, active);
   }
   const lo = L.lanes === 2 ? 1 : 0;
   if (L.cast) { L.partners[0] = castPlacer(castBeatAt(t, active)); drawCast(t, nowMs, active, poses[lo]); }
-  else { g.save(); g.translate(laneSlide(lo, t, active) + (L.lanes === 2 ? LANE_DX[1] : 0), 0); drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); g.restore(); drawObserver(t, nowMs, active); }
+  else if (!L.onePlacer) { g.save(); g.translate(laneSlide(lo, t, active) + (L.lanes === 2 ? LANE_DX[1] : 0), 0); drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); g.restore(); drawObserver(t, nowMs, active); }
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
   drawGauge(nowMs);
@@ -2367,7 +2402,7 @@ function updateHud(t) {
     const lane = line ? (line[3] || 0) : 0, spk = line && line[4];
     bubble.style.bottom = L.lanes === 2 ? (lane === 0 ? '78%' : '58%') : '61%';
     let bx = null;
-    if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X;
+    if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X; else if (spk === 'h') { bx = HAEUN_X - 24; bubble.style.bottom = '84%'; }
     bubble.style.left = bx == null || bx < 60 ? '3cqw' : (bx / W * 100 - 5).toFixed(1) + '%';
     bubble.classList.toggle('obs', !!(spk && (L.cast ? (spk === 'b') !== (castPlacer(beat) === 'boss') : spk === 'b')));
   }
@@ -2385,7 +2420,7 @@ function updateHud(t) {
   if (L.id === 's1-2' && beat >= 104 && beat < 114) h = '이어폰 뺐어요. 벨트 박자로';
   if (L.id === 's1-2' && beat >= 172 && beat < 179) h = '숨 고르기. 곧 한 번 더';
   if (L.id === 's1-4') {
-    if (beat >= 36 && beat < 44) h = '벨트가 하나 더: 왼손은 위, 오른손은 아래';
+    if (beat >= 36 && beat < 44) h = '벨트가 하나 더: 왼손은 위(하은), 오른손은 아래(나)';
     { const pr = notes.find(n => n.pair && n.state === 'pending'); if (pr && t > pr.place - SPB && t < pr.place + SPB) h = '넘어갈 때: 양손 같이'; }
     if (beat >= 168 && beat < 176) h = '위는 흔들고, 아래는 똑바로. 손마다 따로';
   }
@@ -2408,8 +2443,8 @@ function updateHud(t) {
   if (L.id === 'sunja') { const n = notes.find(x => x.beat % 1 === 0.25 || x.beat % 1 === 0.75); if (n && n.state === 'pending' && t > n.place - 0.3) h = '탁탁: 손목으로 두 번'; }
   if (L.lanes === 2) {
     const f1 = notes.find(n => n.lane === 1);
-    if (notes[0].state === 'pending' && t > notes[0].place) h = '주황 벨트 = 왼손';
-    if (f1 && f1.state === 'pending' && t > f1.place) h = '연두 벨트 = 오른손';
+    if (notes[0].state === 'pending' && t > notes[0].place) h = L.coScanner ? '주황 벨트 = 왼손, 하은이 찍어요' : '주황 벨트 = 왼손';
+    if (f1 && f1.state === 'pending' && t > f1.place) h = L.coScanner ? '연두 벨트 = 오른손, 내가 찍어요' : '연두 벨트 = 오른손';
     if (blackout(beat)) h = '정전! 소리로';
   }
   if (h !== lastHint) { hint.textContent = h; hint.hidden = !h; lastHint = h; }
