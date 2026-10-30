@@ -1102,20 +1102,21 @@ function drawHaeun(t, kick, nowMs, active) {
   // bob behind the face, then the face with its corners knocked off
   R(cx - 8, top + 2, 16, 14, hair); R(cx - 8, top + 14, 3, 4, hairD); R(cx + 5, top + 14, 3, 4, hairD);
   R(cx - 5, top + 3, 10, 13, C.skin); R(cx - 6, top + 4, 12, 11, C.skin);
-  // bangs peeking out under the cap, sideburns
-  R(cx - 6, top + 6, 2, 2, hair); R(cx - 2, top + 6, 2, 1, hair); R(cx + 2, top + 6, 3, 2, hair);
-  R(cx - 7, top + 5, 2, 8, hair); R(cx + 5, top + 5, 2, 8, hair);
-  // the snapback pulled down low: the crown covers the forehead, the flat brim sits right over the eyes and shades them
-  R(cx - 8, top + 1, 16, 5, cap); R(cx - 7, top, 14, 1, cap); R(cx - 8, top + 5, 16, 1, capD);
-  R(cx + 5, top + 5, 10, 2, brim); R(cx + 5, top + 7, 10, 1, '#9fb030');
-  R(cx - 4, top + 7, 10, 1, C.skinDark);
-  R(cx - 2, top + 2, 3, 2, '#ffffff'); R(cx - 1, top + 2, 1, 1, cap);
-  // face: dot eyes low, blush, a small mouth; blinks now and then
+  R(cx - 7, top + 6, 2, 7, hair); R(cx + 5, top + 6, 2, 7, hair);   // sideburns
+  // the snapback pulled right down: a tall flat front panel with a seam and a button, the brim over the eyes with a lit edge
+  // and a dark underside, the snap at the back. Under the brim the top of the face is in shadow and the eyes are all but gone.
+  R(cx - 8, top + 1, 16, 6, cap); R(cx - 7, top, 14, 1, cap); R(cx - 6, top - 1, 12, 1, cap);
+  R(cx - 8, top + 1, 1, 6, capD); R(cx + 1, top, 1, 7, capD); R(cx - 1, top - 2, 2, 1, capD);   // seam and button
+  R(cx - 8, top + 6, 16, 1, capD);
+  R(cx - 9, top + 3, 2, 2, '#2a2d31'); R(cx - 9, top + 4, 1, 1, '#9aa1a6');   // the snap strap at the back
+  R(cx + 4, top + 6, 11, 2, brim); R(cx + 4, top + 6, 11, 1, '#e4f27a'); R(cx + 4, top + 8, 11, 1, '#5f6e1c'); R(cx + 14, top + 6, 1, 3, '#9fb030');
+  R(cx - 3, top + 2, 6, 3, '#ffffff'); R(cx - 2, top + 3, 4, 1, cap); R(cx - 3, top + 2, 1, 1, '#d8dde0');   // the patch
+  // shadow under the brim: the upper face goes dark and the eyes are a hint, lit up only when she scans
+  R(cx - 6, top + 7, 12, 4, '#a8785a'); R(cx - 5, top + 7, 10, 1, '#8e6248');
   const blink = nowMs % 3400 < 120;
-  if (watch) { R(cx - 4, top + 11, 2, 2, C.ink); R(cx + 1, top + 11, 2, 2, C.ink); }
-  else if (blink) { R(cx - 4, top + 10, 2, 1, C.ink); R(cx + 1, top + 10, 2, 1, C.ink); }
-  else if (kick > 0.4) { R(cx - 4, top + 10, 1, 1, C.ink); R(cx - 3, top + 9, 1, 1, C.ink); R(cx + 1, top + 10, 1, 1, C.ink); R(cx + 2, top + 9, 1, 1, C.ink); }
-  else { R(cx - 4, top + 9, 2, 2, C.ink); R(cx + 1, top + 9, 2, 2, C.ink); }
+  if (kick > 0.4) { R(cx - 4, top + 9, 2, 1, '#f4f1ea'); R(cx + 1, top + 9, 2, 1, '#f4f1ea'); }
+  else if (watch) { R(cx - 4, top + 10, 2, 1, C.ink); R(cx + 1, top + 10, 2, 1, C.ink); }
+  else if (!blink) { R(cx - 4, top + 9, 2, 2, C.ink); R(cx + 1, top + 9, 2, 2, C.ink); R(cx - 4, top + 9, 1, 1, '#6a4a3a'); R(cx + 1, top + 9, 1, 1, '#6a4a3a'); }
   R(cx - 6, top + 12, 2, 1, cheek); R(cx + 3, top + 12, 2, 1, cheek); R(cx - 1, top + 13, 2, 1, '#b2565a');
   // arms: the gun into the upper gate (kicks back when your left hand fires), or the watch check
   if (watch) { thick(cx + 6, top + 22, cx + 2, top + 30, 4, shirt); R(cx, top + 28, 4, 4, glove); R(cx + 1, top + 26, 3, 3, '#d8dde0'); R(cx + 2, top + 27, 1, 1, C.ink); }
