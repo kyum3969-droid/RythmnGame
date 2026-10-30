@@ -486,55 +486,59 @@ const LEVELS = [
   }
   ,{
     id:'s1-4', stageNo:'1-4', who:'반장 + 하은', role:'반장 · 하은 · 100 BPM · 벨트 둘', tag:'벨트 둘 · 버튼 하나 · 양쪽 한 번에', bpm:100, style:'duo14',
-    // 반장 feeds both belts while 하은 scans the upper gate beside you. At bar 10 his knee goes and the line slows; 하은 crosses over to
-    // feed the upper belt herself, and from her count-in you scan both belts with one button: a press goes to whichever gate has a
-    // box at it, and two boxes landing on the same beat are scanned together.
-    lanes: 2, partners: ['haeun', 'boss'], onePlacer: true, handover: [52, 57], coScanner: 'haeun', autoLane: 0, autoUntil: 60, oneButton: true,
+    // 반장 feeds both belts while 하은 scans the upper gate above you. Her belt keeps running dry and she pushes him, three times, and
+    // each time the song gets faster (100, 104, 108): she knocks on her gate (14.5), checks her watch (21.5), then walks over and taps
+    // the empty belt in front of him (35). He goes for a heavy box to fill it and his back gives (40); the line falls to 78. She
+    // takes the upper belt from him without a word, and from her count-in you scan both belts with one button: a press goes to
+    // whichever gate has a box at it, and two boxes landing on the same beat are scanned together. In the rush she spends her speed
+    // on her own belt instead (her fever, 144-176).
+    lanes: 2, partners: ['haeun', 'boss'], onePlacer: true, handover: [46, 50], coScanner: 'haeun', autoLane: 0, autoUntil: 60, oneButton: true,
+    haeunCross: [30, 35], knock: [14.5, 15], haeunWatch: [[21.5, 23]], tapBelt: [35, 35.5], lift: [37, 40], hurt: [[40, 46]],
+    haeunLook: [[128.5, 131.5]], fever: [[144, 176]],
     fxTheme: 'blues', clock:'03:40', title:'합류',
-    tempo: [[0, 100], [40, 88], [44, 78], [52, 84], [60, 100]], endAt: 188, offTilt: true,
+    tempo: [[0, 100], [16, 104], [24, 108], [40, 88], [44, 78], [52, 84], [60, 100]], endAt: 188, offTilt: true,
     chords: BLUES.chords, roots: BLUES.roots, chordAt: bar => bar < 2 ? 0 : BLUES.prog[(bar - 2) % 12],
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 },
     // no on-screen hints (as in 1-1 to 1-3); the dock, the departure board and the beacons carry the Friday rush
     hints: false, dock: true, dim: [[40, 60]],
-    phone: [[88, 90]], phoneLane: 0, haeunWatch: [[42.5, 45.25]], lateHint: '반장님 무릎… 손이 늦어요. 손을 봐요', special:['양쪽 동시에 찍은 상자', 'pair2', '한 번에'],
+    phone: [[88, 90]], phoneLane: 0, lateHint: '반장님 허리… 손이 늦어요. 손을 봐요', special:['양쪽 동시에 찍은 상자', 'pair2', '한 번에'],
     sections: [[0, 'intro'], [2, 'boss'], [10, 'knee'], [13, 'walk'], [15, 'count'], [16, 'open'], [24, 'both'], [32, 'knee2'], [36, 'rush'], [44, 'final'], [48, 'outro']],
-    // upper belt: 반장's shuffle (12 cells) until the knee, then 하은's straight 16ths (16 cells): trading two-bar phrases, then both,
+    // upper belt: 반장's shuffle (12 cells), running dry before his back goes, then 하은's straight 16ths (16 cells): trading two-bar phrases, then both,
     // 8ths in the rush, every beat with him at the end
     bars: [
       '............', '............',
-      'x.....x.....', 'x.....x.....', 'x..x..x.....', 'x.....x..x..', 'x.....x.....', 'x..x..x..x..', 'x.....x.x...', 'x...........',
+      'x.....x.....', 'x...........', 'x.....x.....', 'x...........', 'x..x..x..x..', 'x...........', '............', '............',
       '............', '............', '............', '............', '............', '............',
       'x...x...x...x...', 'x...x...x.x.x...', '................', '................', 'x...x...x...x...', 'x.x.x...x.x.x...', '................', '................',
       'x...x...x...x...', 'x...x...x...x...', 'x.......x.......', 'x...x...x...x...', 'x.x.x...x.......', 'x...x...x...x...', 'x.......x.......', '................',
-      'x.......x.......', 'x.......x.......', 'x...x...x...x...', 'x.......x.......',
+      '................', 'x...............', 'x.......x.......', 'x.......x.......',
       'x.x.x...x.x.x...', 'x...x...x...x...', 'x.x.x.x.x.......', 'x...x...x...x...', 'x.x.x...x.x.x...', 'x...x...x...x...', 'x.x.x.x.x.x.x.x.', 'x.x.x...........',
       'x...x...x...x...', 'x...x...x...x...', 'x.x.x...x.x.x...', 'x...............',
       '............', '............'
     ],
-    // lower belt: 반장's shuffle all the way (12 cells), late boxes where the knee catches him
+    // lower belt: 반장's shuffle all the way (12 cells), every beat once she pushes him, late boxes where his back catches him
     bars2: [
       '............', '............',
-      '............', 'x.....x.....', 'x.....x.....', 'x..x..x.....', 'x.....x.....', 'h=====......', 'x..x..x.....', 'x.....x.....',
-      'x.....L.....', 'L...........', '......x.....', 'x.....x.....', 'x...........', '............',
+      '............', 'x.....x.....', 'x.....x.....', 'x..x..x.....', 'x..x..x..x..', 'x..x..x..x..', 'x..x..x.....', 'x...........',
+      '......L.....', 'L...........', '......x.....', 'x.....x.....', 'x...........', '............',
       '............', '............', 'x.....x.....', 'x..x..x.....', '............', '............', 'x.....x.....', 'x..x..x..x..',
       'x.....x.....', 'x..x..x.....', 'x.....x.x...', 'x...........', 'x.....x.....', 'x..x..x..x..', 'x.....x.x...', 'h=====......',
       'L...........', '......L.....', 'x...........', '......x.....',
-      'x.....x.....', 'x..x..x..x..', '......x.....', 'x.....x.....', 'x.....x.....', 'x..x..x.....', 'x.....x.....', '......h===..',
+      'x.....x.....', 'x.....x.....', '......x.....', 'x.....x.....', 'x.....x.....', 'x.....x.....', 'x.....x.....', '......h===..',
       'x.....x.....', 'x..x..x..x..', 'x.....x.....', 'x...........',
       '............', '............'
     ],
-    // [beat, text, beats shown, lane, speaker, style]: 반장 between the belts (lane 0) until the knee, at the lower belt (lane 1) after;
+    // [beat, text, beats shown, lane, speaker, style]: 반장 between the belts (lane 0) until his back goes, at the lower belt (lane 1) after;
     // 'h' = 하은, at the upper gate beside you, then at the upper belt's loading end
     say: [[3, '위아래 다 내가 싣는다. 위는 하은이가 찍고, 너는 아래.', 4.5, 0], [8, '네. 위는 제가요.', 2, 0, 'h'],
-          [20, '좋아. 그 박자.', 2.5, 0], [28, '너도 야간 처음이지? 난 2년.', 3.5, 0, 'h'],
-          [40, '윽…!', 1.5, 0, null, 'loud'], [42, '…무릎이. 잠깐만.', 3, 0],
-          [45.5, '반장님, 괜찮으세요?', 2.5, 0, 'h'], [48, '…이러면 물량 못 쳐요. 빨리 쳐야 돈 더 받는데.', 4, 0, 'h'],
-          [52, '위는 제가 실을게요. 반장님은 아래만.', 4, 0, 'h'], [57, '신입. 양쪽 다, 할 수 있지?', 3, 0, 'h'],
+          [40, '윽…!', 1.5, 0, null, 'loud'], [42, '…허리가. 잠깐만.', 3, 0],
+          [45, '(작게) …반장님.', 2.5, 0, 'h'],
+          [50, '위는 제가 실을게요. 반장님은 아래만.', 4, 0, 'h'], [55.5, '신입. 양쪽 다, 할 수 있지?', 3, 0, 'h'],
           [60, '하나, 둘, 셋, 넷!', 3.5, 0, 'h'],
           [66, '…미안하다. 아래는 내가 간다.', 3, 1], [84, '벨트 둘. 닿는 쪽을 찍어.', 3, 1],
           [96, '둘 다 온다. 같이 닿으면 한 번에.', 3.5, 1], [116, '…손 빠르네.', 2, 0, 'h'],
-          [128, '…윽.', 1.5, 1], [130, '반장님, 손!', 2, 0, 'h'], [133, '…안다. 간다.', 2, 1],
-          [144, '속도 올려요. 트럭 뜨기 전에.', 3, 0, 'h'], [160, '하은이 소리 말고. 둘 다 네 손이다.', 3.5, 1],
+          [128, '…윽.', 1.5, 1], [133, '…괜찮다.', 2, 1],
+          [142.5, '…올려.', 2.5, 1], [160, '하은이 소리 말고. 둘 다 네 손이다.', 3.5, 1],
           [176, '마지막. 같이 간다!', 2.5, 1], [179, '네!', 1.5, 0, 'h'], [192, '(트럭 경적)', 3, 1]],
     comfort: ['괜찮아. 다음 거 봐.', '양쪽 다 네 손이다. 내 손 봐.'],
     intro: [
@@ -542,18 +546,18 @@ const LEVELS = [
       { who:'반장', text:'지우는 오늘 오디션이라 뺐다. 2번 라인에서 온 하은이다.' },
       { who:'하은', text:'하은. 2년 차. 위는 내가 찍을게. 너는 아래.' },
       { who:'반장', text:'싣는 건 위아래 다 내가 한다. 벨트 말고 내 손 봐.' },
-      { who:'하은', text:'(작게) 반장님 무릎 안 좋아. 손 느려지면 말해.' }],
+      { who:'하은', text:'(작게) 반장님 허리 안 좋아. 무거운 거 들면 말해.' }],
     outro: (good, sp) => good ? [
       { who:'', text:'트럭이 떴다. 04:38.' },
       { who:'하은', text: sp >= 30 ? '…양쪽 다 받네. 야간 처음 맞아?' : '…됐다. 수고.' },
-      { who:'반장', text:'무릎은 괜찮다. 아무한테도 말하지 마.' },
-      { who:'', text:'반장님이 무릎을 한 번 두드리고, 벨트를 한 번 두드렸다.' },
-      { who:'', text:'하은은 계수기 숫자를 휴대폰 메모에 옮겨 적었다.' },
+      { who:'반장', text:'허리는 괜찮다. 아무한테도 말하지 마.' },
+      { who:'', text:'하은이 말없이 반장님 허리에 파스를 한 장 붙였다.' },
+      { who:'', text:'반장님이 벨트를 한 번 두드렸다.' },
       { who:'하은', text:'(시계를 본다) 먼저 갈게.' },
       { who:'', text:'지우한테서 문자. "붙었어요!!! 반장님 기타 넣은 그 곡으로요!! 내일 다 얘기할게요!!"' }] : [
       { who:'', text:'트럭이 떴다. 04:52. 12분 늦었다.' },
       { who:'하은', text:'…시급은 같은데.' },
-      { who:'반장', text:'내 무릎 탓이다. 내일 또 하자.' }]
+      { who:'반장', text:'내 허리 탓이다. 내일 또 하자.' }]
   }
 ];
 // the stage board. Locked entries show what is coming.
@@ -954,6 +958,43 @@ function blackoutAmount(t) {
 // ---------- partner pose (shared by every coworker) ----------
 const IDLE_HAND = { x: BOSS_X + 13, y: 134 };
 function partnerPose(t, bt, active, lane = 0) {
+  const pose = basePose(t, bt, active, lane);
+  if (!active || L.lanes !== 2) return pose;
+  const beat = pose.beat;
+  const lifting = L.lift && beat >= L.lift[0] && beat < L.lift[1], hurt = inRange(beat, L.hurt);
+  if (lane === 1 && lifting) liftPose(pose, beat);
+  if (hurt) { pose.wince = true; pose.dip = Math.max(pose.dip, 3); pose.bob = 0; pose.wave = false; if (lane === 1 && !pose.carry) pose.hand = { x: BOSS_X - 5, y: 112 }; }
+  // his far hand while she has left her gate (in screen space, mapped back through the upper belt's perspective): at his side,
+  // on the heavy box with the other, then on his back
+  if (lane === 0 && L.haeunCross && beat >= L.haeunCross[0] - 1 && beat < L.handover[0]) {
+    let p = { x: BOSS_X + 12, y: 118 };
+    if (lifting) { const L0 = liftAt(beat), grip = { x: L0.x - LIFT_BOX.w / 2 + 1, y: L0.y + 2 }; p = L0.grip < 1 ? { x: lerp(p.x, grip.x, ease(L0.grip)), y: lerp(p.y, grip.y, ease(L0.grip)) } : grip; }
+    if (hurt) p = { x: BOSS_X - 6, y: 108 };
+    pose.hand = { x: SCAN_X + (p.x - SCAN_X) / FAR.k, y: BELT_Y + (p.y - LANE_DY[0] - BELT_Y) / FAR.k }; pose.wave = false; pose.carry = null;
+  }
+  if (lane === 0) { pose.look = inRange(beat, L.haeunLook); if (inRange(beat, L.fever)) pose.bob = (beat * 2) % 1 < 0.3 ? 1 : 0; }
+  return pose;
+}
+// 1-4: pushed for the upper belt, 반장 goes for the heavy box by the pallet: bends to it (a beat), heaves it up toward the upper
+// belt, strains at the top, and at 40 his back goes and it drops behind the belt (drawLiftDrop)
+const LIFT_BOX = { w: 22, h: 16, lane: 1, heavy: true, off: false, pair: false };
+function liftAt(beat) {
+  const [a, z] = L.lift, bend = Math.min(1, (beat - a) / 1), up = ease(Math.max(0, Math.min(1, (beat - a - 1) / (z - a - 1.4))));
+  const strain = beat > z - 0.5 && !reduce ? Math.round(Math.sin(beat * 60)) : 0;
+  return { x: lerp(28, 60, up) + strain, y: lerp(140 - LIFT_BOX.h / 2, 104, up), dip: Math.round(lerp(0, 6, ease(bend)) * (1 - up) - up), grip: bend };
+}
+function liftPose(pose, beat) {
+  const L0 = liftAt(beat), grip = { x: L0.x + LIFT_BOX.w / 2 - 1, y: L0.y + 2 };
+  pose.dip = L0.dip; pose.bob = 0; pose.wave = false;
+  if (L0.grip < 1) { pose.hand = { x: lerp(IDLE_HAND.x, grip.x, ease(L0.grip)), y: lerp(IDLE_HAND.y, grip.y, ease(L0.grip)) }; pose.carry = { n: LIFT_BOX, x: 28, y: 140 - LIFT_BOX.h / 2 }; }
+  else { pose.hand = grip; pose.carry = { n: LIFT_BOX, x: L0.x, y: L0.y }; }
+}
+function drawLiftDrop(beat, t) {
+  if (!L.lift || beat < L.lift[1] || beat >= L.lift[1] + 0.8) return;
+  const p = (beat - L.lift[1]) / 0.8, top = liftAt(L.lift[1] - 0.01);
+  g.save(); g.translate(top.x + p * 6, lerp(top.y + LIFT_BOX.h / 2, 190, p * p)); g.rotate(p * 0.7); drawBox(LIFT_BOX, 0, 0, '', t); g.restore();
+}
+function basePose(t, bt, active, lane = 0) {
   const pose = { hand: IDLE_HAND, carry: null, wince: false, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: false, beat: 0, lane };
   if (!active) { pose.bob = Math.sin(bt * 1.7 + lane) > 0.85 ? 1 : 0; return pose; }
   const beat = beatAt(t), ph = beat - Math.floor(beat);
@@ -1076,7 +1117,7 @@ const PARTNERS = {
     base: 86,
     draw(pose, nowMs, active) {
       const top = bodyTop(86, pose) + (pose.bob ? 1 : 0);
-      drawHaeunAt(BOSS_X, top, nowMs, { mirror: true, watch: pose.phone, load: true, bob: 0, tally: active && L.coScanner });
+      drawHaeunAt(BOSS_X, top, nowMs, { mirror: !pose.look, watch: pose.phone, load: true, bob: 0, rest: pose.look, eyes: active && inRange(pose.beat, L.fever) });
     },
     arm(pose) {
       const top = bodyTop(86, pose), shirt = '#1e1a1a', glove = '#2a2d31';
@@ -1278,71 +1319,49 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
   R(cx - 16, top + 3, 10, 2, brim); R(cx - 16, top + 3, 10, 1, '#3a3236'); R(cx - 16, top + 5, 10, 1, '#0d0b0b');
   // under the brim: shadow instead of eyes; a scan lights two pinpoints in it for a moment
   R(cx - 6, top + 4, 12, 5, '#8a5e44'); R(cx - 6, top + 4, 12, 2, '#6b4631'); R(cx - 6, top + 8, 12, 1, '#b08366');
-  if (kick > 0.4) { R(cx - 4, top + 6, 1, 1, '#f4f1ea'); R(cx + 1, top + 6, 1, 1, '#f4f1ea'); }
+  if (kick > 0.4 || o.eyes) { R(cx - 4, top + 6, 1, 1, o.eyes ? '#bfe9ff' : '#f4f1ea'); R(cx + 1, top + 6, 1, 1, o.eyes ? '#bfe9ff' : '#f4f1ea'); }
   R(cx - 3, top + 11, 2, 1, '#b2565a');
   // front arm: the gun on the upper gate (kicks back toward her when a scan fires there), the watch check, a swing while walking,
   // or nothing (the loading arm is drawn with the belt). The other hand stays in a pocket.
   if (o.watch) { thick(cx - 6, top + 22, cx - 2, top + 30, 4, shirt); R(cx - 4, top + 28, 4, 4, glove); R(cx - 3, top + 26, 3, 3, '#d8dde0'); R(cx - 2, top + 27, 1, 1, C.ink); }
   else if (o.gun != null) {
-    const gx = cx - 14 + kick * 3, gy = top + 24;
+    const gx = cx - 14 + kick * 3 - Math.round((o.knock || 0) * 7), gy = top + 24;
     thick(cx - 6, top + 22, gx + 6, gy + 3, 4, shirt);
     R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33'); R(gx - 10, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser); R(gx, gy + 2, 3, 3, glove);
   }
   else if (o.step != null) { const st = o.step ? 4 : -2; thick(cx - 6, top + 22, cx - 9 + st, top + 33, 4, shirt); R(cx - 11 + st, top + 32, 4, 3, glove); }
+  else if (o.tap != null) { const hy = top + 30 + Math.round(o.tap * 6); thick(cx - 6, top + 22, cx - 15, hy, 4, shirt); R(cx - 17, hy - 1, 4, 3, glove); }
+  else if (o.rest) { thick(cx - 6, top + 22, cx - 8, top + 34, 4, shirt); R(cx - 10, top + 33, 4, 3, glove); }
   thick(cx + 6, top + 22, cx + 8, top + 32, 4, shirt); R(cx + 6, top + 31, 4, 3, glove);
-  // the tally counter in that hand: the thumb clicks it for every box of hers that goes through
-  const ck = nowMs - TALLY.at < 90 ? 1 : 0;
-  R(cx + 6, top + 29, 5, 5, '#b9bec4'); R(cx + 6, top + 33, 5, 1, '#7d8288'); R(cx + 7, top + 30, 3, 2, '#1d2226');
-  R(cx + 7, top + 27 + ck, 2, 2 - ck, '#d9dde1');
-  g.restore();
-  if (o.tally) drawTallyPop(o.mirror ? cx - 9 : cx + 9, top + 24, nowMs);
-}
-// 하은 counts her boxes all night (2번 라인 pays by the piece): the number pops over her hand at each click, red and unmoved when
-// one of hers is missed, and gold when it turns over 1000 (the last box of the night, if every one of hers went through)
-const TALLY = { base: 872, n: -1, miss: -1, at: -1e9, missAt: -1e9 };
-function updateTally(nowMs) {
-  let n = 0, m = 0;
-  for (const x of notes) if (x.lane === 0) { if (x.state === 'hit' || x.state === 'holding') n++; else if (x.state === 'miss' || x.state === 'broken') m++; }
-  if (TALLY.n >= 0 && n > TALLY.n) TALLY.at = nowMs;
-  if (TALLY.miss >= 0 && m > TALLY.miss) TALLY.missAt = nowMs;
-  TALLY.n = n; TALLY.miss = m;
-}
-function drawTallyPop(hx, y, nowMs) {
-  const v = TALLY.base + TALLY.n, big = v >= 1000, age = nowMs - TALLY.at, mage = nowMs - TALLY.missAt;
-  const life = big ? 1600 : 520, missed = mage < 520 && mage < age;
-  const a = missed ? 1 - mage / 520 : age < life ? 1 - age / life : 0;
-  if (a <= 0) return;
-  const txt = String(v).padStart(4, '0'), sc = big && !missed ? 2 : 1, w = (txt.length * 4 - 1) * sc;
-  const rise = Math.round((missed ? 0 : Math.min(1, age / 200)) * 5), jit = missed && !reduce ? Math.round(Math.sin(mage / 18) * 1.5) : 0;
-  const x0 = Math.round(Math.min(W - w - 1, Math.max(1, hx - w / 2))) + jit, y0 = y - 6 * sc - rise;
-  const col = missed ? '#ff5a4a' : big ? '#f4d35e' : '#7ec8e3';
-  g.save(); g.globalAlpha = Math.min(1, a * 1.6);
-  g.fillStyle = 'rgba(8,10,14,.55)'; g.fillRect(x0 - 1, y0 - 1, w + 2, 5 * sc + 2);
-  if (sc === 1) pixText(txt, x0, y0, col);
-  else { g.translate(x0, y0); g.scale(2, 2); pixText(txt, 0, 0, col); }
   g.restore();
 }
-// beside you at the gates, facing the belts the way you do: her gun scans the upper gate in 1-4's first stretch
-function drawHaeun(t, kick, nowMs, active) {
-  const beat = active ? beatAt(t) : (state === 'outro' || state === 'result') ? END_BEAT : -1;
-  const ph = beat - Math.floor(beat), watch = active && inRange(beat, L.haeunWatch) && DUO.mode === 'one';
-  const bob = active && ph < 0.18 ? 1 : 0, top = HAEUN_TOP + bob + (kick > 0.5 ? 1 : 0);
-  drawHaeunAt(HAEUN_X, top, nowMs, { gun: watch ? null : kick, watch, tally: active });
+// 하은 before she takes the upper belt: at her gate (knocking on it, checking her watch), crossing behind the upper belt to 반장,
+// tapping the empty belt in front of him, then facing him, frozen when his back goes, and turning to the belt as she takes it
+const pulseAt = (b, hits, len = 0.25) => { let v = 0; for (const h of hits || []) { const d = b - h; if (d >= 0 && d < len) v = Math.max(v, Math.sin(Math.PI * d / len)); } return v; };
+function haeunSpot(beat) { const c = L.haeunCross; return !c || beat < c[0] ? 'gate' : beat < c[1] ? 'cross' : 'side'; }
+function drawHaeunScene(beat, kick, nowMs, active) {
+  const ph = beat - Math.floor(beat), bob = active && ph < 0.18 ? 1 : 0, spot = active ? haeunSpot(beat) : 'gate';
+  if (spot === 'gate') {
+    const watch = active && inRange(beat, L.haeunWatch), knock = active ? pulseAt(beat, L.knock) : 0;
+    drawHaeunAt(HAEUN_X, HAEUN_TOP + bob + (kick > 0.5 ? 1 : 0), nowMs, { gun: watch ? null : kick, watch, knock });
+  } else if (spot === 'cross') {
+    const { x, top } = haeunWalkPos((beat - L.haeunCross[0]) / (L.haeunCross[1] - L.haeunCross[0]));
+    drawHaeunAt(x, top, nowMs, { step: Math.floor(nowMs / 150) % 2 });
+  } else {
+    const tapping = L.tapBelt && beat < L.tapBelt[1] + 0.45, taking = beat >= L.handover[0], frozen = inRange(beat, L.hurt);
+    drawHaeunAt(BOSS_X + LANE_DX[0], 50 + (frozen ? 0 : bob), nowMs, { mirror: tapping || taking, tap: tapping ? pulseAt(beat, L.tapBelt, 0.3) : null, rest: !tapping });
+  }
 }
 // crossing to the upper belt's loading end in a hurry, along behind the upper belt
 function haeunWalkPos(p) {
   const e = lerp(p, ease(p), 0.5);
   return { x: Math.round(lerp(HAEUN_X, BOSS_X + LANE_DX[0], e)), top: Math.round(lerp(HAEUN_TOP, 50, e)) };
 }
-function drawHaeunWalk(nowMs) {
-  const { x, top } = haeunWalkPos(DUO.p);
-  drawHaeunAt(x, top, nowMs, { step: DUO.p < 1 ? Math.floor(nowMs / 150) % 2 : null });
-}
 // where her head is at a beat, for her speech bubble: beside you, on the way, or at the upper belt's loading end
 function haeunHead(beat) {
-  const m = duoMode(beat);
-  if (m === 'one') return { x: HAEUN_X, y: HAEUN_TOP - 4 };
-  if (m === 'walk') { const w = haeunWalkPos(Math.max(0, Math.min(1, (beat - L.handover[0]) / (L.handover[1] - L.handover[0])))); return { x: w.x, y: w.top - 4 }; }
+  const spot = haeunSpot(beat);
+  if (spot === 'gate') return { x: HAEUN_X, y: HAEUN_TOP - 4 };
+  if (spot === 'cross') { const w = haeunWalkPos((beat - L.haeunCross[0]) / (L.haeunCross[1] - L.haeunCross[0])); return { x: w.x, y: w.top - 4 }; }
   return { x: BOSS_X + LANE_DX[0], y: 46 };
 }
 const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
@@ -1670,7 +1689,7 @@ function drawDockBack(beat, nowMs, active) {
   if (beat >= 192 && beat < 196 && !reduce) { const p = (beat - 192) / 4, cx = lerp(W + 40, -80, p); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(cx - 50, 0, cx + 50, 0); gr.addColorStop(0, 'rgba(255,240,200,0)'); gr.addColorStop(0.5, `rgba(255,240,200,${0.22 * Math.sin(Math.PI * p)})`); gr.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = gr; g.fillRect(cx - 50, 36, 100, 110); g.restore(); }
 }
 // the beacons: one on each scanner, one on a post halfway down each belt. 하은 counts them on one by one (60 to 63);
-// they spin for whoever is feeding the belt, both in the 'both' stretch, faster in the rush, stuttering when the knee goes again
+// they spin for whoever is feeding the belt, both in the 'both' stretch, faster in the rush, stuttering when his back catches again, only hers in her fever
 const BEACONS = [
   { lane: 0, x: farX(200), y: farY(122), post: [farY(124), farY(146)], c: '120,200,255', on: 60 },
   { lane: 0, x: farX(SCAN_X + 10), y: farY(101), post: null, c: '120,200,255', on: 61 },
@@ -1681,6 +1700,7 @@ function beaconSpin(B, beat) {
   const turn = duoTurn(beat), mine = turn === 'both' || (turn === 'haeun' && B.lane === 0) || (turn === 'boss' && B.lane === 1);
   if (beat < 64) return 0.6;
   if (beat >= 128 && beat < 144 && Math.floor(beat * 4) % 3 === 0) return 0.15;
+  if (inRange(beat, L.fever)) return B.lane === 0 ? 1 : 0.2;
   return mine ? 1 : 0.25;
 }
 function drawBeaconPosts(beat) { for (const B of BEACONS) if (B.post) R(B.x, B.post[0], 2, B.post[1] - B.post[0], '#2b2e33'); }
@@ -1693,6 +1713,14 @@ function drawDockFront(beat, t, nowMs, active) {
     g.save(); g.globalCompositeOperation = 'lighter';
     if (turn === 'haeun') { g.fillStyle = `rgba(120,200,255,${k})`; g.fillRect(farX(48), farY(BELT_Y - 40), W - farX(48), farY(BELT_Y + 16) - farY(BELT_Y - 40)); }
     else { g.fillStyle = `rgba(255,170,60,${k})`; g.fillRect(48, BELT_Y - 40, W - 48, 56); }
+    g.restore();
+  }
+  // 하은's fever (the rush): her sky blue fills the floor and pulses on her eighths, strongest over her belt
+  if (active && inRange(beat, L.fever)) {
+    const [f0, f1] = L.fever.find(([a, z]) => beat >= a && beat < z), env = Math.min(1, beat - f0, f1 - beat), e = reduce ? 0.3 : Math.max(0, 1 - ((beat * 2) % 1) * 3);
+    g.save(); g.globalCompositeOperation = 'lighter';
+    g.fillStyle = `rgba(120,200,255,${(0.05 + 0.06 * e) * env})`; g.fillRect(0, 0, W, H);
+    g.fillStyle = `rgba(120,200,255,${(0.08 + 0.13 * e) * env})`; g.fillRect(farX(48), farY(BELT_Y - 40), W - farX(48), farY(BELT_Y + 16) - farY(BELT_Y - 40));
     g.restore();
   }
   // beacon domes and their sweeping beams
@@ -2125,16 +2153,15 @@ function drawScene(t, bt, active, nowMs) {
   const beltT = active ? t : bt;
   const laneFx = { delivered: 0, binned: 0, falling: [] };
   if (L.lanes === 2) {
-    if (L.coScanner) updateTally(nowMs);
     const mb = castBeatAt(t, active); DUO.mode = duoMode(mb); DUO.p = L.handover ? Math.max(0, Math.min(1, (mb - L.handover[0]) / (L.handover[1] - L.handover[0]))) : 1;
-    if (DUO.mode === 'walk' && L.coScanner) drawHaeunWalk(nowMs);
+    if (DUO.mode !== 'two' && L.coScanner) drawHaeunScene(mb, upperKick, nowMs, active);
     if (DUO.mode === 'two') { g.save(); g.translate(LANE_DX[0], LANE_DY[0]); drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); }
     else {
       // one loader between the belts: his body follows whichever belt is busy
       const o = placerOff(1), bp = { ...poses[1], wince: poses[0].wince || poses[1].wince, dip: Math.max(poses[0].dip, poses[1].dip), nod: Math.max(poses[0].nod, poses[1].nod) };
       g.save(); g.translate(o.dx, o.dy); drawPartnerBody(L.partners[1], bp, nowMs, active); g.restore();
+      if (active) drawLiftDrop(mb, t);
     }
-    if (DUO.mode === 'one' && L.coScanner) drawHaeun(t, upperKick, nowMs, active);
     drawLane(0, poses[0], t, beltT, active, nowMs, laneFx);
   }
   const lo = L.lanes === 2 ? 1 : 0;
@@ -2920,7 +2947,7 @@ function buildEvents() {
       });
     } else if (style === 'duo14') {
       // 반장's straight four (kick 1 and 3, snare 2 and 4, even hats, a root on every beat, organ, a guitar lick every fourth bar)
-      // until his knee goes and the band thins to bass, organ and hats. 하은 counts the line back in and from bar 16 it is boom bap
+      // sped up each time 하은 pushes (104, 108) until his back goes and the band thins to bass, organ and hats. 하은 counts the line back in and from bar 16 it is boom bap
       // at 100: a deep short kick on 1 and the 'and' of 2, snare and clap on 2 and 4 with ghosts, lightly swung hats, an 808 sliding
       // into the root, vinyl crackle and rhodes stabs in her bars; his walking bass, organ and licks ride the same drums in his bars;
       // everything when both belts run, 16th hats in the rush, a crash on every bar at the end.
@@ -2931,9 +2958,15 @@ function buildEvents() {
       if (sec === 'outro') { if (b === 192) E(0, T => truckHorn(T)); E(0, T => roller(T, 0.03)); continue; }
       if (sec === 'count') { E(0, T => rim(T, 0.35)); E(0, T => hat(T, 0.03)); E(s / 2, T => hat(T, 0.02)); if (inBar === 3) { E(s / 2, T => rim(T, 0.22)); E(s / 2, T => scratch(T)); } continue; }
       const walk = [1, 1.189, 1.498, 1.682][inBar], blues = turn === 'boss' || turn === 'both', funk = turn === 'haeun' || turn === 'both', both = turn === 'both';
-      const hurt = sec === 'knee' || sec === 'walk', rush = sec === 'rush' || sec === 'final', hip = bar >= 16, sw = s / 4 * 0.2;
-      // the knee: a stumble, and the drums drop out
+      const hurt = sec === 'knee' || sec === 'walk', rush = sec === 'rush' || sec === 'final', hip = bar >= 16, sw = s / 4 * 0.2, fever = inRange(b, L.fever);
+      // 하은 pushing: two knocks of her gun on the gate, two taps on the empty belt; then his back goes, the drums drop out and the
+      // heavy box lands behind the belt
+      const knock = T => { noise(T, 'bandpass', 1900, 0.16, 0.05, 6, bus); osc('sine', 430, T, 0.002, 0.07, 0.05, bus); };
+      const tapB = T => { noise(T, 'lowpass', 520, 0.14, 0.07, 0.8, bus); osc('sine', 120, T, 0.002, 0.08, 0.09, bus); };
+      if (L.knock) for (const k of L.knock) if (Math.floor(k) === b) E((k - b) * s, knock);
+      if (L.tapBelt) for (const k of L.tapBelt) if (Math.floor(k) === b) E((k - b) * s, tapB);
       if (b === 40) E(0, T => { thud(T, 1.2); noise(T, 'lowpass', 260, 0.5, 0.35, 0.7, bus); noise(T + 0.12, 'lowpass', 500, 0.3, 0.12, 0.7, bus); });
+      if (b === 40) E(s * 0.75, T => { noise(T, 'lowpass', 300, 0.4, 0.25, 0.7, bus); osc('sine', 70, T, 0.003, 0.18, 0.2, bus); });
       if (inBar === 0 && ((sec === 'open' && turn === 'haeun' && (bar - 16) % 2 === 0) || bar === 24 || bar === 36 || sec === 'final')) E(0, T => crash(T));
       // trading phrases: a scratch hands over to 하은, a rim count hands back to 반장
       if (inBar === 3 && sec === 'open' && openTurn(bar + 1) !== turn) { if (openTurn(bar + 1) === 'haeun') E(s / 2, T => scratch(T)); else { E(0, T => rim(T, 0.3)); E(s / 2, T => rim(T, 0.3)); } }
@@ -2961,16 +2994,23 @@ function buildEvents() {
         if (inBar === 0) E(0, T => vinyl(T, s * 4));
         if (inBar === 1 || inBar === 3) E(s / 2 + sw, T => rhodes(T, chords[ci].slice(0, 3), s * 0.45, both ? 0.028 : 0.036));
         if (rush && inBar === 2) E(s / 2, T => chop(T, chords[ci][2] * 2, 0.035));
+        // her fever: the 808 on every beat, a chop on every 'and', rhodes on 1 and 3 too
+        if (fever) {
+          if (inBar === 2 || inBar === 3) E(0, T => sub808(T, roots[ci], s * 0.8));
+          if (inBar !== 2) E(s / 2, T => chop(T, chords[ci][(inBar + 1) % 3] * 2, 0.03));
+          if (inBar === 0 || inBar === 2) E(s / 2 + sw, T => rhodes(T, chords[ci].slice(0, 3), s * 0.35, 0.026));
+        }
       }
       if (blues) {
         // 반장: the walking bass in his bars, organ comp on the 'and', the lick at the end of every fourth bar
         if (!both) { E(0, T => bass(T, roots[ci] * walk, s * 0.5, 320)); E(2 * s / 3, T => bass(T, roots[ci] * walk, s * 0.3, 320)); }
         // his comp sits on the shuffle 'and' (two thirds in), so his swing is heard against her straight hats: three against two
-        E(2 * s / 3, T => organ(T, chords[ci].slice(1), s * 0.22, both ? 0.02 : 0.026));
-        if (inBar === 1 || inBar === 3) E(2 * s / 3, T => gtr(T, chords[ci].slice(1, 3), s * 0.2, 0.014));
+        // (in her fever he steps back: the comp drops to a whisper and the guitar sits out)
+        E(2 * s / 3, T => organ(T, chords[ci].slice(1), s * 0.22, fever ? 0.01 : both ? 0.02 : 0.026));
+        if ((inBar === 1 || inBar === 3) && !fever) E(2 * s / 3, T => gtr(T, chords[ci].slice(1, 3), s * 0.2, 0.014));
         if (inBar === 0) E(0, T => organ(T, chords[ci], s * 4, 0.011));
         if (sec !== 'knee2' && ((bar - 16) % 4) === 3 && inBar === 0) for (const [ob, nm, len] of LICK) E(ob * s, T => gtrLead(T, N_[nm], len * s * 0.95, 0.045, nm === 'E5'));
-        if (both && sec !== 'knee2' && ((bar - 24) % 2) === 1 && inBar === 1) for (const [ob, nm, len] of LICK_DOWN) E((ob - 1.667) * s, T => gtrLead(T, N_[nm], len * s * 0.9, 0.045, nm === 'A4'));
+        if (both && !fever && sec !== 'knee2' && ((bar - 24) % 2) === 1 && inBar === 1) for (const [ob, nm, len] of LICK_DOWN) E((ob - 1.667) * s, T => gtrLead(T, N_[nm], len * s * 0.9, 0.045, nm === 'A4'));
       }
       // the rush: the warehouse joins the band (a forklift's reversing beep on the 'and' of 2 and 4, the truck's air brake every four
       // bars) and an 808 roll into every bar. The last four bars: a 32nd hat roll into each bar, the shutter's clank on the last pair,
@@ -3075,7 +3115,7 @@ function resetRun() {
   notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; });
   FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.splashes = []; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9; FX.goodBoth = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
-  rings = []; heavyPend = null; TALLY.n = TALLY.miss = -1; TALLY.at = TALLY.missAt = -1e9;
+  rings = []; heavyPend = null;
 }
 loadLevel(LEVELS[0]); resetRun();
 
