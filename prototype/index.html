@@ -424,7 +424,9 @@ const LEVELS = [
     // phase 3 (bars 38-61) runs at double time over the same 12-bar blues, so a blues chord lasts two of them
     chordAt: bar => bar < 22 ? ((bar - 2) % 4 + 4) % 4 : bar < 25 ? 4 : bar < 38 ? 4 + BLUES.prog[(bar - 25) % 12] : bar < 62 ? 4 + BLUES.prog[((bar - 38) >> 1) % 12] : 4,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
-    tinny: [[89, 94.5]], lounge: [[100, 256]], cut: [[199, 200]], special:['엇박 상자', 'off', '받아냄'],
+    tinny: [[89, 94.5]], lounge: [[100, 256]], cut: [[199, 200]],
+    // 반장's memory: the warehouse flickers out after the tape stop, the count-in builds a rainy alley, the outro wakes back up
+    alley: { dark: 94.5, reveal: 96, out: 248 }, special:['엇박 상자', 'off', '받아냄'],
     sections: [[0, 'intro'], [2, 'verse'], [10, 'build'], [18, 'drop'], [22, 'swap'], [24, 'count'], [25, 'blues'], [37, 'fuseIn'], [38, 'fusion'], [48, 'break'], [50, 'swing'], [62, 'outro']],
     // 8 cells per bar = straight 8ths. 12 cells per bar = triplets: 'x.x' is a shuffle pair (on the beat, then two thirds later)
     bars: [
@@ -650,6 +652,55 @@ const bgOffice = document.createElement('canvas'); bgOffice.width = W; bgOffice.
   r(358, 136, 7, 18, '#c23b2e'); r(359, 133, 5, 3, '#2b2e31'); r(356, 154, 11, 2, '#2b2e31');
 })();
 
+// 1-3: 반장's memory of his guitar days, a rainy alley. Painted once in four layers that the count-in reveals one per rim:
+// ground (darkness and wet street), wall (brick, fire escape, back door with an awning, a bin), lamp (the street lamp). The neon
+// signs, reflections, rain and drips are drawn live.
+const ALLEY_BG = ['ground', 'wall', 'lamp'].reduce((o, k) => { const c = document.createElement('canvas'); c.width = W; c.height = H; o[k] = c; return o; }, {});
+const SIGN = { x: 136, y: 44 }, NOTE_SIGN = { x: 194, y: 32 }, DRIP = { x: 259, y0: 90, y1: 141 }, PUDDLE = { x: 110, y: 142 }, PUDDLE2 = { x: 206, y: 142 }, LAMP = { x: 33, y: 33 };
+(() => {
+  let b = ALLEY_BG.ground.getContext('2d');
+  let r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  r(0, 0, W, H, '#07080b');
+  r(0, 134, W, 12, '#16181f'); r(0, 134, W, 1, '#22252e');
+  r(0, 162, W, 54, '#101116'); r(0, 162, W, 2, '#272a32');
+  for (const [x, y, w] of [[40, 186, 60], [150, 178, 80], [250, 196, 44], [120, 206, 70]]) { b.fillStyle = '#171b26'; b.beginPath(); b.ellipse(x, y, w / 2, 3, 0, 0, Math.PI * 2); b.fill(); }
+  for (const [x, w] of [[PUDDLE.x, 34], [PUDDLE2.x, 26], [DRIP.x, 20]]) { b.fillStyle = '#1b2030'; b.beginPath(); b.ellipse(x, 142, w / 2, 2.2, 0, 0, Math.PI * 2); b.fill(); }
+  b = ALLEY_BG.wall.getContext('2d');
+  r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  // two buildings with a strip of night sky between them at the top
+  r(0, 0, W, 134, '#22130f');
+  for (let row = 0, y = 0; y < 134; row++, y += 5) for (let x = -(row % 2) * 6; x < W; x += 12) {
+    const c = ['#4a2620', '#55302a', '#43211c', '#5c3329'][Math.floor(rnd(row * 41 + x, 7) * 4)];
+    r(x, y, 11, 4, c);
+  }
+  r(118, 0, 92, 16, '#0c1220'); r(118, 16, 92, 1, '#1d2433'); r(117, 0, 1, 17, '#2a1712'); r(210, 0, 1, 17, '#2a1712');
+  for (let k = 0; k < 9; k++) r(122 + k * 10, 2 + (k * 5) % 11, 1, 3, '#2a3550');
+  // darker toward the top, as if the lamp only reaches so far
+  const gr = b.createLinearGradient(0, 0, 0, 134); gr.addColorStop(0, 'rgba(5,4,8,.55)'); gr.addColorStop(1, 'rgba(5,4,8,0)'); b.fillStyle = gr; b.fillRect(0, 0, W, 134);
+  // a lit window up on the left with a blind half down
+  r(58, 12, 22, 20, '#1a1210'); r(60, 14, 18, 16, '#7a5532'); r(60, 14, 18, 7, '#3a2a1e'); r(68, 14, 1, 16, '#1a1210');
+  // drainpipe
+  r(224, 0, 3, 134, '#33363c'); r(224, 128, 7, 3, '#33363c');
+  // back door, a small bulb, the awning the drips fall from
+  r(232, 92, 32, 42, '#2b2d33'); r(235, 95, 26, 39, '#22252b'); r(256, 113, 3, 4, '#5a5d63');
+  r(244, 82, 6, 3, '#3a3d44'); r(246, 85, 2, 2, '#ffd890');
+  r(228, 86, 40, 4, '#1d3832'); r(228, 90, 40, 1, '#2f5a50');
+  // fire escape: two landings, railings, a stair between
+  for (const y of [30, 70]) { r(278, y, 96, 3, '#2a2d33'); for (let x = 280; x < 372; x += 6) r(x, y - 10, 1, 10, '#2a2d33'); r(278, y - 10, 96, 1, '#2a2d33'); }
+  for (let k = 0; k < 40; k++) r(292 + k * 1.4, 70 - k, 3, 1, '#2a2d33');
+  r(300, 73, 2, 61, '#24272c'); r(360, 33, 2, 101, '#24272c');
+  // trash bin and a wooden pallet against the wall
+  r(74, 116, 22, 18, '#26332c'); r(72, 113, 26, 4, '#30403a'); r(80, 111, 10, 2, '#30403a'); for (let x = 77; x < 94; x += 4) r(x, 119, 1, 13, '#1d2822');
+  r(98, 128, 26, 3, '#6b4a2e'); r(98, 131, 26, 1, '#4a3220'); r(100, 132, 3, 2, '#4a3220'); r(119, 132, 3, 2, '#4a3220');
+  // backing board for the sign
+  r(SIGN.x - 4, SIGN.y - 4, 48, 18, '#121519'); r(SIGN.x + 8, SIGN.y - 10, 1, 6, '#2a2d33'); r(SIGN.x + 32, SIGN.y - 10, 1, 6, '#2a2d33');
+  b = ALLEY_BG.lamp.getContext('2d');
+  r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  r(10, 26, 3, 134, '#2b2e33'); r(8, 158, 7, 3, '#2b2e33'); r(10, 26, 24, 2, '#2b2e33'); r(28, 28, 11, 4, '#3a3d44'); r(30, 32, 7, 1, '#ffd890');
+})();
+const BLUES_FONT = { B: ['110', '101', '110', '101', '110'], L: ['100', '100', '100', '100', '111'], U: ['101', '101', '101', '101', '111'], E: ['111', '100', '110', '100', '111'], S: ['111', '100', '111', '001', '111'] };
+const NOTE_PIX = ['..xx..', '..x.x.', '..x..x', '..x...', '..x...', 'xxx...', 'xxx...'];
+
 // ---------- drawing helpers ----------
 const cv = $('cv');
 let g = cv.getContext('2d');
@@ -665,7 +716,7 @@ const FX = { particles: [], marks: [], react: [{ type: '', at: -1e9 }, { type: '
 const BIN = { x: 306, y: 186, w: 38, h: 22 }, PALLET = { x: 348, y: 204 };
 const FALL_X = SCAN_X + 16, GRAV = 520;
 
-function drawLights(bt, t, active) {
+function drawLights(bt, t, active, al = null) {
   const tubes = [60, 180, 300];
   const beat = active ? beatAt(t) : 0;
   const dark = active && blackout(beat);
@@ -676,6 +727,7 @@ function drawLights(bt, t, active) {
     const s = Math.sin(bt * 37 + k) + Math.sin(bt * 13.3);
     return (inD ? s > 0.9 : s > 1.93) ? 0.15 : 1;
   });
+  if (al) for (let k = 0; k < alpha.length; k++) alpha[k] *= al.tube;
   const ph = active && t > 0 ? beat - Math.floor(beat) : 1;
   const club = active && inRange(beat, L.club), lounge = active && inRange(beat, L.lounge), dimK = active && inRange(beat, L.cut) ? 0.1 : active && (inRange(beat, L.dim) || inRange(beat, L.tinny) || lounge) ? 0.45 : 1;
   const pulse = Math.max(0, 1 - ph * (club ? 3 : 5)) * (club ? 0.22 : 0.06);
@@ -691,8 +743,8 @@ function drawLights(bt, t, active) {
     g.fillStyle = grd; g.fillRect(49, BELT_Y - 10, W - 49, 14);
   }
   g.restore();
-  tubes.forEach((x, k) => { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, alpha[k] > 0.5 ? '#fff3c8' : '#5d5446'); });
-  if (active && inRange(beat, L.preClub) && !reduce) {
+  if (!al || (al.out ? al.wall < 0.5 : al.ground === 0)) tubes.forEach((x, k) => { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, alpha[k] > 0.5 ? '#fff3c8' : '#5d5446'); });
+  if (active && inRange(beat, L.preClub) && !reduce && !(al && al.wall > 0)) {
     // the verse starts to lean toward the drop: colour creeps into the house lights on each beat
     const tc = L.tintColors || [[255, 79, 163], [79, 227, 255]], k = Math.max(0, 1 - ph * 4) * 0.08, c = tc[Math.floor(beat) % 2];
     g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${k})`;
@@ -1425,6 +1477,122 @@ function drawWalkingBoss(nowMs) {
   drawActor('boss', x, true, standPose(bob), nowMs, false);
 }
 
+// ---------- 1-3 alley (반장's memory) ----------
+// L.alley = { dark, reveal, out }: the warehouse flickers out at dark, the count-in reveals the alley a layer per beat from reveal,
+// and from out the rain stops (two beats) and the fluorescent tubes flicker the warehouse back (two more).
+function alleyState(beat) {
+  const A = L.alley; if (!A || beat < A.dark || beat >= A.out + 4) return null;
+  const lay = k => beat < A.reveal + k ? 0 : Math.min(1, (beat - A.reveal - k) / 0.25);
+  const flick = b => Math.floor(b * 8) % 3 !== 1 ? 1 : 0;
+  let fade = 1, rainK = 1, tube = 0;
+  if (beat < A.reveal) tube = beat < A.reveal - 0.75 ? flick(beat) : 0;
+  if (beat >= A.out) { rainK = Math.max(0, 1 - (beat - A.out) / 2); if (beat >= A.out + 2) { const p = (beat - A.out - 2) / 2; tube = p > 0.6 ? 1 : flick(beat); fade = Math.max(0, 1 - p) * (tube ? 0.5 : 1); } }
+  // rain: steady in the blues, heavier into the fusion, thin in the break, a downpour in the second drop
+  const inten = beat < 148 ? 1 : beat < 152 ? 1.4 : beat < 192 ? 1.1 : beat < 199 ? 0.45 : beat < 200 ? 0 : beat < 232 ? 2 : 2.4;
+  return { beat, tube, ground: lay(0) * fade, wall: lay(1) * fade, neon: lay(2) * fade, lamp: lay(3) * fade, rain: lay(0) * rainK * inten, out: beat >= A.out };
+}
+// how hard the guitar just played: the street reflections shiver on each lead note (GLEAD beats, doubled in phase 3)
+function guitarGlint(beat) {
+  let rel = -1, mul = 1; if (beat >= 100 && beat < 148) rel = beat - 100; else if (beat >= 152 && beat < 248) { rel = beat - 152; mul = 2; }
+  if (rel < 0) return 0;
+  for (const [ob] of GLEAD) { const d = rel - ob * mul; if (d >= 0 && d < 0.4) return 1 - d / 0.4; }
+  return 0;
+}
+function neonLevels(al, nowMs) {
+  const b = al.beat;
+  let blues = al.neon, note = b >= 152 && b < 248 ? al.neon : 0;
+  if (!reduce && Math.sin(nowMs / 41) + Math.sin(nowMs / 13.7) > 1.9) blues *= 0.2;   // the old sign stutters now and then
+  if (b >= 148 && b < 152) blues *= Math.floor(b * 4) % 2 ? 0.25 : 1;                    // 16ths into the fusion
+  if (b >= 176 && b < 192) { const on = Math.floor(b) % 2; blues *= on ? 1 : 0.3; note *= on ? 0.3 : 1; }   // the two signs trade beats
+  if (b >= 192 && b < 199) { blues *= 0.25; note *= 0.15; }                                // the break: only the lamp
+  if (b >= 199 && b < 200) { blues = 0; note = 0; }
+  if (b >= 200 && b < 248) { const k = Math.max(0, 1 - (b % 1) * 3); blues = Math.min(1, blues * (0.85 + 0.3 * k)); note = Math.min(1, note * (0.85 + 0.3 * k)); }
+  if (b >= 152 && b < 153) note *= Math.min(1, (b - 152) * 3);
+  return { blues, note };
+}
+function neonPix(rows, x0, y0, sc, col, glow, a) {
+  if (a <= 0) return;
+  g.save(); g.globalCompositeOperation = 'lighter';
+  rows.forEach((row, j) => [...row].forEach((v, i) => { if (v !== '.' && v !== '0') { g.fillStyle = `rgba(${glow},${0.12 * a})`; g.fillRect(x0 + i * sc - 2, y0 + j * sc - 2, sc + 4, sc + 4); } }));
+  g.restore();
+  rows.forEach((row, j) => [...row].forEach((v, i) => { if (v !== '.' && v !== '0') { g.globalAlpha = 0.35 + 0.65 * a; R(x0 + i * sc, y0 + j * sc, sc, sc, a > 0.5 ? col : '#2a3640'); g.globalAlpha = 1; } }));
+}
+function drawAlleyBack(al, t, nowMs) {
+  if (al.out) g.drawImage(bg, 0, 0); else { g.fillStyle = '#000'; g.fillRect(0, 0, W, H); }
+  if (!al.out && al.ground === 0) { g.globalAlpha = al.tube ? 1 : 0; g.drawImage(bg, 0, 0); g.globalAlpha = 1; return; }
+  for (const [k, a] of [['ground', al.ground], ['wall', al.wall], ['lamp', al.lamp]]) if (a > 0) { g.globalAlpha = a; g.drawImage(ALLEY_BG[k], 0, 0); }
+  g.globalAlpha = 1;
+  const nv = neonLevels(al, nowMs), glint = guitarGlint(al.beat);
+  // the street lamp's pool of light
+  if (al.lamp > 0) {
+    g.save(); g.globalCompositeOperation = 'lighter';
+    const lg = g.createRadialGradient(LAMP.x, LAMP.y, 1, LAMP.x, LAMP.y + 40, 70); lg.addColorStop(0, `rgba(255,200,120,${0.32 * al.lamp})`); lg.addColorStop(1, 'rgba(255,200,120,0)');
+    g.fillStyle = lg; g.fillRect(0, 0, 120, 170);
+    g.restore();
+  }
+  // signs: his blue BLUES, and from the fusion her lilac note across the alley
+  const letters = 'BLUES'.split('').map(ch => BLUES_FONT[ch]);
+  letters.forEach((rows, i) => neonPix(rows, SIGN.x + i * 8, SIGN.y, 2, '#bff3ff', '57,198,255', nv.blues));
+  if (al.wall > 0 && al.beat >= 152) neonPix(NOTE_PIX, NOTE_SIGN.x, NOTE_SIGN.y, 3, '#f3e8ff', '190,150,255', nv.note);
+  // reflections on the wet street, shivering when the guitar plays
+  g.save(); g.globalCompositeOperation = 'lighter';
+  const refl = (x0, w, c, a) => { if (a <= 0) return; for (let x = x0; x < x0 + w; x += 2) { const s = 0.55 + 0.45 * Math.sin(nowMs / (reduce ? 1e9 : 110) + x * 0.7) + glint * 0.6; g.fillStyle = `rgba(${c},${0.16 * a * s})`; g.fillRect(x + Math.round(glint * Math.sin(x + nowMs / 40)), 136, 1, 9); } };
+  refl(SIGN.x, 40, '57,198,255', nv.blues); refl(LAMP.x - 12, 26, '255,200,120', al.lamp); refl(NOTE_SIGN.x, 18, '190,150,255', nv.note);
+  g.restore();
+}
+// rain behind the belt only, so it never hides a box; drips from the awning land on the groove's off-beat grid
+function drawAlleyRain(al, t, nowMs) {
+  const b = al.beat, ts = reduce ? 12.3 : nowMs / 1000;
+  if (al.rain > 0) {
+    const n = Math.round(60 * al.rain), thick = al.rain > 1.6 ? 2 : 1, a = Math.min(0.42, 0.18 + 0.08 * al.rain);
+    g.save(); g.beginPath(); g.rect(0, 0, W, BELT_Y); g.clip();
+    g.fillStyle = `rgba(175,195,225,${a})`;
+    for (let i = 0; i < n; i++) {
+      const sp = 230 + rnd(i, 1) * 80, x0 = rnd(i, 2) * (W + 40), y0 = rnd(i, 3) * 170;
+      const y = ((y0 + ts * sp) % 170) - 20, x = ((x0 - ts * sp * 0.22) % (W + 40) + W + 40) % (W + 40) - 20;
+      for (let k = 0; k < 7; k++) g.fillRect(Math.round(x - k * 0.22 * 1.2), Math.round(y + k * 1.2), thick, 1);
+    }
+    g.restore();
+  }
+  if (al.ground <= 0 || b >= 248) return;
+  // drips: on the beat and two thirds into it through the slow blues, on the beat and the 'and' at double time
+  const grid = b >= 100 && b < 148 ? [0, 2 / 3] : b >= 148 && b < 199 || b >= 200 && b < 248 ? [0, 0.5] : null;
+  if (grid && !reduce) for (let bb = Math.floor(b) - 1; bb <= Math.floor(b) + 1; bb++) for (const f of grid) {
+    const tl = timeAt(bb + f), dt = t - tl;
+    if (dt < -0.28 || dt > 0.5) continue;
+    if (dt < 0) { const y = lerp(DRIP.y0, DRIP.y1, 1 + dt / 0.28); R(DRIP.x, y, 1, 2, '#cfe6ff'); }
+    else { const rr = 2 + dt * 18; g.strokeStyle = `rgba(200,225,255,${0.8 * (1 - dt / 0.5)})`; g.lineWidth = 1; g.beginPath(); g.ellipse(DRIP.x, DRIP.y1 + 1, rr, rr * 0.25, 0, 0, Math.PI * 2); g.stroke(); }
+  }
+  // puddles: the blues ripple on 1 and 3; from the fusion her kick ripples lilac on every beat
+  const ripple = (P, c, beatList, w) => { for (const bb of beatList) { const dt = t - timeAt(bb); if (dt < 0 || dt > 0.6) continue; const rr = 3 + dt * w; g.strokeStyle = `rgba(${c},${0.7 * (1 - dt / 0.6)})`; g.beginPath(); g.ellipse(P.x, P.y, rr, rr * 0.22, 0, 0, Math.PI * 2); g.stroke(); } };
+  if (!reduce) {
+    const fb = Math.floor(b), recent = [fb - 1, fb];
+    if (b >= 100 && b < 148) ripple(PUDDLE, '255,214,160', recent.filter(x => x % 2 === 0), 26);
+    if (b >= 152 && b < 199 || b >= 200 && b < 248) ripple(PUDDLE2, '200,170,255', recent, 22);
+    if (b >= 200 && b < 248) ripple(PUDDLE, '220,235,255', recent, 34);
+  }
+  // splashes on the kick in the second drop
+  if (b >= 200 && b < 248 && !reduce && FX.alleyBeat !== Math.floor(b)) {
+    FX.alleyBeat = Math.floor(b);
+    for (const P of [PUDDLE, PUDDLE2]) spawn(P.x, P.y - 1, 6, ['#cfe6ff', '#9fb8d8'], -40, 40, -90, -40, 360, 420, [1, 1]);
+  }
+}
+// in front of everything: the blackout before the count-in, the dark beat before the second drop, and lightning
+const LIGHTNING = [152, 200, 216, 232, 236, 240, 244];
+function drawAlleyFront(al, t) {
+  const b = al.beat, A = L.alley;
+  let dark = 0;
+  if (b >= A.reveal - 0.75 && b < A.reveal) dark = 0.92; else if (b >= A.reveal && b < A.reveal + 0.25) dark = 0.92 * (1 - (b - A.reveal) / 0.25);
+  if (b >= 199 && b < 200) dark = 0.85;
+  if (dark > 0) { g.fillStyle = `rgba(0,0,0,${dark})`; g.fillRect(0, 0, W, H); }
+  if (reduce) return;
+  for (const lb of LIGHTNING) {
+    const age = t - timeAt(lb); if (age < 0 || age > 0.4) continue;
+    const a = age < 0.07 ? 0.55 : age < 0.11 ? 0.1 : age < 0.16 ? 0.4 * (1 - (age - 0.11) / 0.05) : 0.12 * (1 - (age - 0.16) / 0.24);
+    g.fillStyle = `rgba(235,240,255,${Math.max(0, a)})`; g.fillRect(0, 0, W, H);
+  }
+}
+
 function drawScene(t, bt, active, nowMs) {
   g.save();
   if (!reduce && nowMs < FX.shakeUntil) { const a = FX.shakeAmp || 1; g.translate(Math.round((Math.random() * 2 - 1) * a), Math.round((Math.random() * 2 - 1) * a)); } else FX.shakeAmp = 1;
@@ -1436,8 +1604,12 @@ function drawScene(t, bt, active, nowMs) {
   }
   const pa = (nowMs - (FX.punchAt || -1e9)) / 150;
   if (!reduce && pa >= 0 && pa < 1) { const z = 1 + 0.03 * (FX.punch || 1) * (1 - pa) * (1 - pa), px = SCAN_X, py = BELT_Y - 10; g.translate(px, py); g.scale(z, z); g.translate(-px, -py); }
-  g.drawImage(bg, 0, 0);
-  drawLights(bt, t, active);
+  const al = active ? alleyState(beatAt(t)) : null;
+  // the downpour thumps with the kick, one pixel
+  if (al && !reduce && al.beat >= 200 && al.beat < 248) g.translate(0, Math.round(Math.max(0, 1 - (al.beat % 1) * 4)));
+  if (al) drawAlleyBack(al, t, nowMs); else g.drawImage(bg, 0, 0);
+  drawLights(bt, t, active, al);
+  if (al) drawAlleyRain(al, t, nowMs);
   rings = rings.filter(r => nowMs - r.at < 420);
   const lanes = L.lanes === 2 ? [0, 1] : [0];
   const poses = lanes.map(lane => { const p = partnerPose(t, bt, active, lane); p.nod = FX.react[lane].type === 'nod' && nowMs - FX.react[lane].at < 130 ? 1 : 0; return p; });
@@ -1485,6 +1657,7 @@ function drawScene(t, bt, active, nowMs) {
   // strobe on each 빰
   const sh = (nowMs - (FX.hypeAt || -1e9)) / 1000;
   if (active && !reduce && sh < 0.14) { g.fillStyle = `rgba(255,255,255,${(0.14 - sh) / 0.14 * (FX.hypeBig ? 0.55 : 0.38)})`; g.fillRect(0, 0, W, H); }
+  if (al) drawAlleyFront(al, t);
   const mAge = nowMs - FX.lastMiss;
   if (mAge < 320) {
     const a = (1 - mAge / 320) * 0.4;
