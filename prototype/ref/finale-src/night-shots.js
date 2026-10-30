@@ -323,7 +323,8 @@ const HAEUN_DRESS_HD = (x, y) => {
 function haeunHD(cx, pose, o = {}) {
   const seat = o.seat, pants = '#3a3f45', pd = '#2a2e33', blk = '#1e1a1a';
   const torso = (top, h = 36) => { polyFill([[cx - 12, top], [cx + 12, top], [cx + 16, top + 5], [cx + 16, top + h], [cx - 16, top + h], [cx - 16, top + 5]], blk); R(cx - 4, top - 3, 8, 4, SKD); HAEUN_DRESS_HD(cx, top); };
-  const head = top => { faceHD(cx, top, { eyes: 'hidden' }); HAIRHD.cap(cx, top, o.turned); };
+  // her head a size smaller than the others': the cap adds to it
+  const head = top => rotated(0, cx, top + 26, cx, top + 26, () => { faceHD(cx, top, { eyes: 'hidden' }); HAIRHD.cap(cx, top, o.turned); }, 0.82);
   const shins = () => { for (const x of [cx - 12, cx + 2]) { R(x, seat + 6, 10, 24, pants); R(x + (x < cx ? 9 : 0), seat + 6, 1, 24, pd); R(x, seat + 6, 10, 2, '#4a5058'); polyFill([[x - 1, seat + 30], [x + 11, seat + 30], [x + 12, seat + 33], [x + 12, seat + 35], [x - 2, seat + 35], [x - 2, seat + 32]], blk); R(x - 2, seat + 35, 14, 2, '#e9e3d6'); } };
   const lap = (y0, hgt) => { polyFill([[cx - 15, y0], [cx + 15, y0], [cx + 16, y0 + hgt], [cx - 16, y0 + hgt]], pants); R(cx - 15, y0, 30, 1, '#545a62'); R(cx, y0 + 1, 1, hgt - 1, pd); };
   if (pose === 'sit') { shins(); lap(seat - 2, 9); torso(seat - 36); head(seat - 62); return seat - 36; }
@@ -355,11 +356,11 @@ function sinipTorsoHD(cx, hip) {
   R(cx - 15, top + 6, 2, 20, '#b5c43a'); R(cx + 13, top + 6, 2, 20, '#b5c43a'); R(cx - 6, top - 2, 12, 4, '#213840'); R(cx - 18, top + 6, 3, 30, '#213840'); R(cx + 15, top + 6, 3, 30, '#213840');
   for (const e of [-1, 1]) limb(cx + e * 16, top + 6, 8, cx + e * 12, top + 34, 7, '#284650');
 }
-// draw rotated about (px, py), placed at (x, y): every rectangle and polygon goes through the turn as a shape, so the
+// draw rotated (and scaled by k) about (px, py), placed at (x, y): every rectangle and polygon goes through the turn as a shape, so the
 // one-pixel detail stays crisp instead of being resampled
 let XF = null;
-function rotated(ang, px, py, x, y, draw) {
-  const cs = Math.cos(ang), sn = Math.sin(ang), T = (u, v) => [x + cs * (u - px) - sn * (v - py), y + sn * (u - px) + cs * (v - py)];
+function rotated(ang, px, py, x, y, draw, k = 1) {
+  const cs = Math.cos(ang) * k, sn = Math.sin(ang) * k, T = (u, v) => [x + cs * (u - px) - sn * (v - py), y + sn * (u - px) + cs * (v - py)];
   const hook = (rx, ry, rw, rh, c) => {
     if (rw <= 0 || rh <= 0) return;
     if (rw < 1.5 || rh < 1.5) { const n = Math.max(1, Math.round(Math.max(rw, rh))); g.fillStyle = c; for (let i = 0; i < n; i++) { const [qx, qy] = rw >= rh ? T(rx + i + 0.5, ry + 0.5) : T(rx + 0.5, ry + i + 0.5); g.fillRect(Math.floor(qx), Math.floor(qy), 1, 1); } return; }
@@ -508,7 +509,7 @@ function trainTwoShot(t) {
 function shotDoor(u) { doorBust(u); }
 // a filled ellipse, crisp
 function ellFill(cx, cy, rx, ry, c, yMin = -Infinity, yMax = Infinity) { if (XF) { const pts = []; for (let i = 0; i < 24; i++) { const a = Math.PI * 2 * i / 24; pts.push([cx + Math.cos(a) * rx, Math.max(yMin, Math.min(yMax, cy + Math.sin(a) * ry))]); } return polyFill(pts, c); } for (let y = Math.ceil(cy - ry); y <= Math.floor(cy + ry); y++) { if (y < yMin || y > yMax) continue; const d = (y + 0.5 - cy) / ry, half = rx * Math.sqrt(Math.max(0, 1 - d * d)); R(Math.round(cx - half), y, Math.round(half * 2), 1, c); } }
-function clipPoly(pts) { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.clip(); }
+function clipPoly(pts) { if (XF) pts = pts.map(([a, b]) => XF(a, b)); g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.clip(); }
 function dotLine(x0, y0, x1, y1, c, gap = 3) { const n = Math.max(1, Math.round(Math.hypot(x1 - x0, y1 - y0) / gap)); for (let i = 0; i <= n; i++) R(Math.round(lerp(x0, x1, i / n)), Math.round(lerp(y0, y1, i / n)), 1, 1, c); }
 // 하은 as a bust at full resolution (the game's pixel size): the snapback's crown with its seams and stitching, the patch,
 // the brim with its highlight; the brim's shadow over the eyes; nose, lips, ears, the hair under the cap; the neck; the
@@ -638,7 +639,7 @@ function doorBust(t) {
 // 3. 계단 — close and from the side on her legs: one sneaker planted on a tread, the knee comes up and the other lands on the
 //    next; the camera climbs the slope with her. Then from behind at the waist, the exit's sky opening over her cap
 function shotStairs(u) {
-  if (u < 3.2) stairsKnee(u); else stairsBack(u - 3.2);
+  if (u < 2.2) stairsKnee(u); else stairsBack(u - 2.2);
 }
 // crisp polygon fill (no anti-aliasing): scanline spans at pixel centres
 function polyFill(pts, c) {
@@ -889,16 +890,22 @@ function stairsBack(t) {
   blackout(W, H, t < 0.1 ? 1 - t / 0.1 : t > 2.7 ? (t - 2.7) / 0.5 : 0);
 }
 
-// 4. 가로등 — tracking beside her along the shutters at the blue hour; the parallax layers pass at their own speeds;
-//    the one streetlight left on dies as she passes beneath it
+// 4. 가로등 — tracking beside her along the shutters at the blue hour before sunrise: the last stars and a thin moon, the
+//    horizon going pink, haze off the street, a few kitchen windows coming on, rubbish bags out for collection, crates at the
+//    store, a delivery scooter, sparrows on the wire, her breath in the cold; the one streetlight left on dies as she passes
 function shotLamp(u) {
-  const cam = u * 30, dawn = Math.round(clamp(u / 8, 0, 1) * 16) / 16;
+  const cam = u * 30, dawn = Math.round((0.25 + 0.75 * clamp(u / 8, 0, 1)) * 16) / 16;
   shot(1, (w, h) => {
-    dgrad(0, 0, w, 150, [mix('#141a33', '#24305a', dawn), mix('#2a3463', '#4a5a8e', dawn), mix('#5a4e7e', '#8a7aa4', dawn), mix('#b06e6e', '#e2a07e', dawn)]);
-    for (let k = 0; k < 18; k++) { const sx = (k * 97) % w, sy = 26 + (k * 37) % 50; if ((1 - dawn) > rnd(k, 3)) R(sx, sy, 1, 1, '#c9d2f0'); }
-    // far blocks, slow
-    for (let k = 0; k < 9; k++) { const bw = 40 + (k * 13) % 26, bh = 40 + (k * 29) % 40, x = Math.round(k * 56 - cam * 0.15) - 20; R(x, 128 - bh, bw, bh + 10, mix('#141a30', '#3a4466', dawn)); for (let j = 0; j < Math.floor(bh / 6); j++) for (let i = 0; i < Math.floor(bw / 6); i++) if (rnd(k * 31 + i, j) < 0.12) R(x + 3 + i * 6, 128 - bh + 4 + j * 6, 2, 2, '#ffd890'); }
-    // the shop row, mid speed: shutters, signs, one convenience store still lit
+    // the sky before sunrise: deep blue overhead, a band of lilac and a pink-orange rim low down, the last stars, a thin
+    // waning moon
+    dgrad(0, 0, w, 150, [mix('#141a33', '#1f2a52', dawn), mix('#24305a', '#3a4a80', dawn), mix('#4a4a7e', '#7a74a6', dawn), mix('#8a5e7a', '#c48a9a', dawn), mix('#b06e6e', '#f0b088', dawn)]);
+    for (let k = 0; k < 22; k++) { const sx = (k * 97 + 13) % w, sy = 26 + (k * 37) % 46; if ((1 - dawn) * 1.3 > rnd(k, 3)) R(sx, sy, 1, 1, rnd(k, 5) < 0.3 ? '#ffffff' : '#c9d2f0'); }
+    { const mx = 300 - cam * 0.05, my = 40; ellFill(mx, my, 5, 5, mix('#e8e6f0', '#c9c8dc', dawn)); ellFill(mx + 2.5, my - 1, 4.5, 5, mix('#1f2a52', '#33447a', dawn)); light(mx, my, 18, '220,220,255', 0.12 * (1.2 - dawn)); }
+    // far blocks, slow: their windows mostly dark now, a few kitchens lighting up as people wake; the horizon's glow on
+    // their roofs, and haze rising off the street between them and the shops
+    for (let k = 0; k < 9; k++) { const bw = 40 + (k * 13) % 26, bh = 40 + (k * 29) % 40, x = Math.round(k * 56 - cam * 0.15) - 20; R(x, 128 - bh, bw, bh + 10, mix('#141a30', '#3a4466', dawn)); R(x, 128 - bh, bw, 1, mix('#2a3050', '#8a7aa0', dawn)); for (let j = 0; j < Math.floor(bh / 6); j++) for (let i = 0; i < Math.floor(bw / 6); i++) { const r0 = rnd(k * 31 + i, j); if (r0 < 0.05 || (r0 < 0.09 && u > 1 + rnd(j, k * 31 + i) * 6)) R(x + 3 + i * 6, 128 - bh + 4 + j * 6, 2, 2, r0 < 0.05 ? '#ffd890' : '#fff0c8'); } if (k % 3 === 1) { R(x + bw / 2, 128 - bh - 8, 1, 8, '#1a1e30'); R(x + bw / 2 - 1, 128 - bh - 9, 3, 1, Math.floor(u * 1.5) % 2 ? '#ff5a4a' : '#5a2a2a'); } }
+    { const hz = g.createLinearGradient(0, 84, 0, 132); hz.addColorStop(0, 'rgba(190,180,215,0)'); hz.addColorStop(1, `rgba(190,180,215,${0.22 + 0.12 * dawn})`); g.fillStyle = hz; g.fillRect(0, 84, w, 48); }
+  // the shop row, mid speed: shutters, signs, one convenience store still lit
     const mx = cam * 0.55;
     for (let k = -1; k < 10; k++) {
       const x = Math.round(k * 74 - (mx % 74)), idx = k + Math.floor(mx / 74);
@@ -906,11 +913,15 @@ function shotLamp(u) {
       if (idx % 4 === 2) { R(x + 4, 112, 64, 48, '#f2e6b8'); light(x + 36, 136, 60, '255,236,180', 0.3); R(x + 4, 104, 64, 7, '#2f8a5a'); R(x + 8, 106, 20, 3, '#efe6d2'); for (let s = 0; s < 3; s++) R(x + 10 + s * 18, 120, 12, 30, '#d9cfa0'); }
       else { for (let yy = 112; yy < 160; yy += 3) R(x + 4, yy, 64, 2, '#3a3d46'); R(x + 4, 104, 64, 7, ['#8a3a2a', '#2c3b57', '#8a5a34', '#5a2a5a'][(idx % 4 + 4) % 4]); R(x + 8, 106, 24, 3, '#efe6d2'); }
       R(x + 72, 100, 2, 60, '#14161c');
+      if (idx % 4 === 2) { for (let c = 0; c < 2; c++) { R(x + 50, 148 - c * 7, 16, 7, ['#3a6aa0', '#d8a03a'][c]); R(x + 50, 148 - c * 7, 16, 1, '#ffffff'); for (let i = 0; i < 4; i++) R(x + 52 + i * 4, 150 - c * 7, 2, 3, '#1e2030'); } }
+      else if (idx % 3 === 0) { for (const [bx, bw, bh, c, cd] of [[4, 16, 13, '#d9d5c8', '#aeaa9e'], [24, 14, 11, '#22232a', '#16171c'], [14, 15, 15, '#d9d5c8', '#aeaa9e']]) { const bcx = x + bx + bw / 2; ellFill(bcx, 160 - bh / 2, bw / 2, bh / 2, c); ellFill(bcx + bw * 0.15, 160 - bh / 2 + 1, bw * 0.35, bh * 0.4, cd); polyFill([[bcx - 2, 160 - bh + 1], [bcx + 2, 160 - bh + 1], [bcx + 3, 160 - bh - 3], [bcx, 160 - bh - 1], [bcx - 3, 160 - bh - 3]], c); if (c !== '#22232a') R(bcx - 4, 160 - bh / 2, 6, 2, '#6a8ac0'); } }
+      else if (idx % 5 === 1) { const sx = x + 30; R(sx, 146, 26, 3, '#2a2d34'); ellFill(sx + 3, 154, 4, 4, '#14161c'); ellFill(sx + 23, 154, 4, 4, '#14161c'); R(sx + 10, 140, 14, 8, '#b33a2a'); R(sx + 10, 140, 14, 1, '#d85a4a'); R(sx + 2, 140, 2, 8, '#2a2d34'); R(sx, 139, 6, 1, '#3a3d44'); }
     }
     // power lines
     for (let x = 0; x < w; x++) { R(x, 52 + Math.round(Math.sin((x + cam * 0.55) / 50) * 3), 1, 1, '#121420'); R(x, 58 + Math.round(Math.sin((x + cam * 0.55) / 50 + 1) * 3), 1, 1, '#121420'); }
+    for (let k = 0; k < 4; k++) { const bx0 = 180 + k * 9 - cam * 0.55, by0 = 56 + Math.round(Math.sin((bx0 + cam * 0.55) / 50) * 3) - 2, go = u > 5.2 + k * 0.12, f = go ? (u - 5.2 - k * 0.12) : 0, bx = bx0 + f * 40, by = by0 - f * 26, fl = Math.floor(u * 10 + k) % 2; if (bx < -4) continue; R(bx, by, 3, 2, '#2a2430'); R(bx + 3, by, 1, 1, '#2a2430'); if (go) { R(bx - 2, by - fl, 2, 1, '#2a2430'); R(bx + 3, by - fl, 2, 1, '#2a2430'); } }
     // the sidewalk, at her speed
-    R(0, 160, w, 26, mix('#6a6a74', '#9a9aa4', dawn)); for (let x = -((cam) % 24); x < w; x += 24) R(Math.round(x), 160, 1, 26, mix('#56565e', '#86868e', dawn)); R(0, 172, w, 1, mix('#5e5e66', '#8e8e96', dawn)); R(0, 186, w, 6, mix('#4a4a52', '#76767e', dawn));
+    R(0, 160, w, 26, mix('#6a6a74', '#9a9aa4', dawn)); for (let x = -((cam) % 24); x < w; x += 24) R(Math.round(x), 160, 1, 26, mix('#56565e', '#86868e', dawn)); R(0, 172, w, 1, mix('#5e5e66', '#8e8e96', dawn)); R(0, 186, w, 6, mix('#4a4a52', '#76767e', dawn)); g.save(); g.globalAlpha = 0.18; R(0, 161, w, 3, mix('#8a7aa4', '#e2a07e', dawn)); for (let x = -((cam) % 90); x < w; x += 90) R(Math.round(x + 20), 176, 26, 2, mix('#6a6a96', '#c9a0b0', dawn)); g.restore();
     // the streetlight
     const lx = Math.round(246 - cam), off = u > 4.3, flick = u > 3.4 && u < 4.3 && (Math.floor(u * 16) % 3 === 0 || (u > 4.0 && Math.floor(u * 30) % 2 === 0)), on = !off && !flick;
     R(lx - 2, 50, 4, 112, '#202228'); R(lx - 2, 50, 1, 112, '#3a3d44'); R(lx - 2, 48, 30, 3, '#202228'); R(lx + 18, 50, 12, 4, '#2a2d34'); R(lx + 19, 54, 10, 2, on ? '#fff3c8' : '#3a3d44');
@@ -919,6 +930,7 @@ function shotLamp(u) {
     const hx = 150, st = Math.floor(u / 0.27) % 2;
     if (on) { const d = hx - (lx + 24), L = Math.min(44, 8 + Math.abs(d) * 0.5); g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(hx + Math.sign(d) * L * 0.6, 173, L, 2, 0, 0, Math.PI * 2); g.fill(); }
     haeunWalkSide(hx, 174, u, { mirror: true, pace: 0.27 });
+    { const bp = (u % 1.35) / 1.35; if (bp < 0.6) { g.save(); g.globalAlpha = 0.45 * (1 - bp / 0.6); ellFill(hx + 10 + bp * 12, 128 - bp * 4, 1.5 + bp * 4, 1 + bp * 2.5, '#e8ecf4'); g.restore(); } }
     if (on && Math.abs(hx - lx - 24) < 50) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,200,120,${0.2 * (1 - Math.abs(hx - lx - 24) / 50)})`; g.fillRect(hx - 16, 118, 32, 56); g.restore(); }
     // the foreground, fast and dark: a bollard, a pole
     for (const [wx, kind] of [[120, 0], [260, 1], [420, 0]]) { const x = Math.round(wx - cam * 1.8); if (kind) { R(x, 0, 14, 192, '#08090c'); R(x + 13, 0, 1, 192, '#1a1c24'); } else { R(x, 150, 12, 42, '#0a0b0e'); R(x, 150, 12, 3, '#1c1e26'); } }
@@ -930,7 +942,7 @@ function shotLamp(u) {
   blackout(W, H, fadeIO(u, 8, 0.5, 0.5));
 }
 // 5. 횡단보도 — an insert of the signal turning green, then straight down from above: one step per beep, each on the next
-//    white bar, and the bar she steps on lights up and stays lit a moment, a rhythm track drawn on the road
+//    white bar, the bar she steps on a little brighter for a moment; it cuts as she passes the middle of the road
 function shotCross(u) {
   if (u < 1.6) return signalInsert(u);
   crossTop(u - 1.6);
@@ -941,7 +953,7 @@ function signalInsert(u) {
     dgrad(0, 0, w, h, ['#1a2238', '#2a3456', '#4a4a6e']);
     light(300, 60, 140, '255,190,150', 0.12);
     R(128, 40, 4, 160, '#3a3d44');
-    // the housing: two lamps stacked, each a grid of LEDs, the countdown beside
+    // the housing: two lamps stacked, each a grid of LEDs
     const box = (y, on, col, glow, shape) => {
       R(150, y, 84, 70, '#16181c'); R(150, y, 84, 2, '#2c2f36'); R(146, y - 4, 92, 6, '#202227');
       R(158, y + 8, 68, 56, '#060708');
@@ -952,51 +964,69 @@ function signalInsert(u) {
     const walk = (i, j) => { const x = i - 11, y = j; if (y >= 1 && y <= 3) return (x + 1) * (x + 1) + (y - 2) * (y - 2) <= 3; if (y >= 4 && y <= 10) return Math.abs(x) <= 2 || (y === 5 && x >= -6 && x <= -3) || (y === 6 && x >= -7 && x <= -6) || (y === 6 && x >= 3 && x <= 5) || (y === 7 && x === 6); if (y > 10) { const k = y - 10; return (Math.abs(x + 1 + k * 0.7) <= 1.2) || (Math.abs(x - 1 - k * 0.6) <= 1.2); } return false; };
     box(32, !green, '#ff4a3d', '255,74,61', man);
     box(108, green && !blink, '#3fe08a', '63,224,138', walk);
-    // the countdown
-    R(242, 112, 34, 40, '#16181c'); R(246, 116, 26, 32, '#060708'); if (green) digits('9', 250, 120, '#ff8a3d', 6);
     vig(w, h, 0.5);
   });
   bars();
   if (u > 0.55) cue('sig-on', () => { oscS('sine', 1200, now(), 0.05, 0.08); oscS('sine', 1200, now() + 0.25, 0.05, 0.08); });
   blackout(W, H, u < 0.3 ? 1 - u / 0.3 : 0);
 }
+// a car from above at 1x: the body with its rounded corners, bonnet and boot creases, the windscreen and rear window, the
+// roof, the mirrors, head- and tail-lights. Facing right unless flip
+function carTop(x, y, c, flip) {
+  const L = 64, Wd = 32, cd = mix(c, '#000000', 0.3), cl = mix(c, '#ffffff', 0.18);
+  g.save(); if (flip) { g.translate(x * 2 + L, 0); g.scale(-1, 1); }
+  polyFill([[x + 3, y], [x + L - 5, y], [x + L, y + 4], [x + L, y + Wd - 4], [x + L - 5, y + Wd], [x + 3, y + Wd], [x, y + Wd - 3], [x, y + 3]], c);
+  R(x + 3, y, L - 8, 1, cl); R(x + 3, y + Wd - 1, L - 8, 1, cd);
+  polyFill([[x + 18, y + 3], [x + 44, y + 3], [x + 48, y + 6], [x + 48, y + Wd - 6], [x + 44, y + Wd - 3], [x + 18, y + Wd - 3], [x + 14, y + Wd - 6], [x + 14, y + 6]], '#1c2430');
+  polyFill([[x + 22, y + 5], [x + 40, y + 5], [x + 40, y + Wd - 5], [x + 22, y + Wd - 5]], cd); R(x + 22, y + 5, 18, 1, mix(cd, '#ffffff', 0.15));
+  polyFill([[x + 41, y + 5], [x + 47, y + 7], [x + 47, y + Wd - 7], [x + 41, y + Wd - 5]], '#6f8ea4'); R(x + 43, y + 9, 1, 8, '#a9c4d4');
+  polyFill([[x + 15, y + 7], [x + 21, y + 5], [x + 21, y + Wd - 5], [x + 15, y + Wd - 7]], '#4a5e70');
+  R(x + 52, y + 4, 1, Wd - 8, cd); R(x + 8, y + 4, 1, Wd - 8, cd); R(x + 40, y - 2, 4, 2, cd); R(x + 40, y + Wd, 4, 2, cd);
+  R(x + L - 2, y + 4, 2, 5, '#fff3c8'); R(x + L - 2, y + Wd - 9, 2, 5, '#fff3c8'); R(x, y + 4, 2, 4, '#d8463b'); R(x, y + Wd - 8, 2, 4, '#d8463b');
+  g.restore();
+}
+// 하은 from straight above, walking down the frame: her shadow, the shoes stepping out ahead and behind, the swinging
+// sleeves and hands, the shoulders in the vest with its band and the bag strap, the ponytail behind, the cap's crown with
+// its seams and button and the brim ahead of her face
+function haeunTop(x, y, ph, step) {
+  const sw = Math.sin(ph * Math.PI) * (step ? 1 : -1), foot = 6 * Math.cos(ph * Math.PI) * (step ? 1 : -1);
+  g.fillStyle = 'rgba(0,0,0,.33)'; g.beginPath(); g.ellipse(x + 5, y + 6, 15, 11, 0, 0, Math.PI * 2); g.fill();
+  for (const [fx, d] of [[-6, foot], [5, -foot]]) { polyFill([[fx - 3, y + 2 + d], [fx + 3, y + 2 + d], [fx + 3.5, y + 13 + d], [fx + 1.5, y + 15 + d], [fx - 1.5, y + 15 + d], [fx - 3.5, y + 13 + d]].map(([a, b]) => [x + a, b]), '#1e1a1a'); R(x + fx - 2, y + 14 + d, 4, 1, '#e9e3d6'); R(x + fx - 1, y + 5 + d, 2, 4, '#3a3a42'); }
+  for (const [sx, d] of [[-14, sw * 4], [14, -sw * 4]]) { limb(x + sx * 0.9, y - 4, 7, x + sx, y + 8 + d, 6, '#1e1a1a'); limb(x + sx * 0.9, y - 4, 7, x + sx, y + 8 + d, 6, '#2c2829', 2, sx < 0 ? 1 : -1); ellFill(x + sx, y + 11 + d, 3, 3, SK); }
+  ellFill(x, y - 2, 14, 8, '#1e1a1a'); ellFill(x, y - 2, 10, 7, '#7ec8e3'); ellFill(x - 2, y - 3, 6, 4, '#a8e0f2');
+  R(x - 10, y + 3, 20, 2, '#e6e1cc'); R(x - 9, y - 8, 18, 1, '#e6e1cc'); limb(x + 9, y - 7, 3, x - 8, y + 4, 3, '#2f3237');
+  const tail = Math.round(sw * 2); limb(x, y - 10, 5, x + tail, y - 22, 3, '#4a3328'); dotLine(x, y - 11, x + tail, y - 21, '#6b4a3a', 2);
+  ellFill(x, y - 4, 9, 9, '#a83328'); ellFill(x - 0.5, y - 4.5, 8, 8, '#d8463b'); polyFill([[x - 8, y], [x + 8, y], [x + 7, y + 6], [x + 3, y + 8], [x - 3, y + 8], [x - 7, y + 6]], '#b8382e'); R(x - 6, y + 1, 12, 1, '#8e2c25');
+  for (const a of [0.5, 1.55, 2.6, 3.65, 4.7, 5.75]) dotLine(x, y - 4, x + Math.cos(a) * 7.5, y - 4 + Math.sin(a) * 7.5, '#a83328', 1);
+  R(x - 4, y - 9, 3, 2, '#ef6a55'); R(x - 1, y - 5, 2, 2, '#a83328');
+}
 function crossTop(t) {
-  const beat = 0.5, start = 0.6, steps = Math.floor((t - start) / beat), ph = ((t - start) / beat) % 1, hurry = t > 5.2;
-  shot(2, (w, h) => {
-    // asphalt with grain, the kerbs and their tactile paving, the double centre line, the stop line, the crossing's bars
-    g.drawImage(layer('asphalt', w, h, () => { R(0, 0, w, h, '#2e2f36'); for (let y = 0; y < h; y += 2) for (let x = (y / 2) % 2; x < w; x += 3) if (rnd(x, y) < 0.18) R(x, y, 1, 1, rnd(y, x) < 0.5 ? '#383a42' : '#26272d'); }), 0, 0);
-    R(0, 12, w, 14, '#8d8f96'); dfill(0, 12, w, 14, '#9da0a6', 0.3); R(0, 26, w, 2, '#6a6c72'); R(0, 82, w, 2, '#6a6c72'); R(0, 84, w, 12, '#8d8f96'); dfill(0, 84, w, 12, '#9da0a6', 0.3);
-    for (let x = 74; x < 120; x += 3) { R(x, 22, 2, 2, '#d9b84a'); R(x, 86, 2, 2, '#d9b84a'); }
-    for (let x = 0; x < w; x += 1) if (x < 66 || x > 126) { R(x, 53, 1, 1, '#d9a83a'); R(x, 56, 1, 1, '#d9a83a'); }
-    R(64, 30, 2, 22, '#d9d4c6'); R(126, 58, 2, 22, '#d9d4c6');
-    const bars0 = []; for (let y = 31; y < 80; y += 8) bars0.push(y);
-    bars0.forEach(y => { R(74, y, 46, 4, '#d4cfc1'); for (let k = 0; k < 10; k++) if (rnd(y, k) < 0.5) R(74 + Math.floor(rnd(k, y) * 44), y + Math.floor(rnd(y * 3, k) * 4), 2, 1, '#b2ad9f'); });
-    // the bars she has stepped on, still glowing
-    bars0.forEach((y, i) => { const at = start + i * beat + beat, age = t - at; if (age >= 0) { const a = Math.max(0, 0.55 - age * 0.18); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,233,168,${a})`; g.fillRect(74, y, 46, 4); g.restore(); if (age < 0.25) light(97, y + 2, 30, '255,233,168', 0.4 * (1 - age / 0.25)); } });
-    // a car at the stop line, from above, its headlights across the road
-    const car = (x, y, c, flip) => { g.save(); if (flip) { g.translate(x * 2 + 30, 0); g.scale(-1, 1); } R(x, y, 30, 16, c); R(x + 1, y - 1, 28, 1, c); R(x + 1, y + 16, 28, 1, c); R(x + 8, y + 2, 16, 12, mix(c, '#000000', 0.25)); R(x + 19, y + 2, 5, 12, '#9fb8c8'); R(x + 8, y + 2, 3, 12, '#6f8898'); R(x + 29, y + 1, 2, 3, '#fff3c8'); R(x + 29, y + 12, 2, 3, '#fff3c8'); R(x - 1, y + 1, 1, 3, '#d8463b'); R(x - 1, y + 12, 1, 3, '#d8463b'); g.restore(); };
-    car(30, 33, '#3a4a6a', false); g.save(); g.globalCompositeOperation = 'lighter'; const hl = g.createLinearGradient(60, 0, 120, 0); hl.addColorStop(0, 'rgba(255,240,200,.22)'); hl.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = hl; g.beginPath(); g.moveTo(60, 34); g.lineTo(120, 28); g.lineTo(120, 54); g.lineTo(60, 48); g.closePath(); g.fill(); g.restore();
-    car(140, 60, '#8a3a2a', true);
-    // the signal pole on the far kerb, its green glow on the ground, blinking at the end
-    const on = !hurry || Math.floor(t / 0.25) % 2 === 0;
-    g.fillStyle = '#4a4d54'; g.beginPath(); g.arc(128.5, 89.5, 2.5, 0, Math.PI * 2); g.fill(); if (on) light(128, 89, 14, '63,224,138', 0.45);
-    // 하은 from above: shadow, shoulders and vest, the swinging arms, the cap and brim, the ponytail
-    const prog = clamp((t - start) / beat, 0, 10.2), y = Math.round(16 + prog * 8 - (ph < 0.5 ? 0 : 0)), x = 97, step = steps % 2;
-    g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(x + 3, y + 3, 7, 5, 0, 0, Math.PI * 2); g.fill();
-    const sw = Math.sin(ph * Math.PI) * (step ? 1 : -1), foot = Math.round(4 * Math.cos(ph * Math.PI));
-    R(x - 4, y + 2 + (step ? foot : -foot), 3, 4, '#1e1a1a'); R(x + 1, y + 2 + (step ? -foot : foot), 3, 4, '#1e1a1a');
-    R(x - 7, y - 3 + Math.round(sw * 2), 3, 6, '#1e1a1a'); R(x - 7, y + 3 + Math.round(sw * 2), 3, 2, '#2a2d31'); R(x + 4, y - 3 - Math.round(sw * 2), 3, 6, '#1e1a1a'); R(x + 4, y + 3 - Math.round(sw * 2), 3, 2, '#2a2d31');
-    R(x - 5, y - 4, 10, 7, '#1e1a1a'); R(x - 4, y - 4, 8, 6, '#7ec8e3'); R(x - 4, y - 1, 8, 1, '#ebe5c9'); R(x - 1, y - 4, 2, 6, '#5aa6c4');
-    R(x - 1, y - 11 + Math.round(sw), 2, 6, '#4a3328'); R(x, y - 11 + Math.round(sw), 1, 5, '#6b4a3a');
-    g.fillStyle = '#a83328'; g.beginPath(); g.arc(x + 0.5, y - 3.5, 4.5, 0, Math.PI * 2); g.fill(); g.fillStyle = '#d8463b'; g.beginPath(); g.arc(x + 0.5, y - 4, 3.6, 0, Math.PI * 2); g.fill(); R(x - 1, y - 6, 2, 2, '#ef6a55'); R(x, y - 4, 1, 1, '#a83328');
-    R(x - 3, y + 1, 7, 2, '#1e1a1a'); R(x - 2, y + 3, 5, 1, '#1e1a1a');
-    vig(w, h, 0.35);
+  const beat = 0.5, start = 0.6, steps = Math.floor((t - start) / beat), ph = (((t - start) / beat) % 1 + 1) % 1;
+  shot(1, (w, h) => {
+    // asphalt with grain, the kerbs and their tactile paving, the double centre line, the stop lines, the crossing's bars
+    g.drawImage(layer('asphalt1', w, h, () => { R(0, 0, w, h, '#2e2f36'); for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (rnd(x, y) < 0.09) R(x, y, 1, 1, rnd(y, x) < 0.5 ? '#383a42' : '#26272d'); for (let k = 0; k < 6; k++) { const cx = rnd(k, 9) * w, cy = 60 + rnd(9, k) * 100; for (let i = 0; i < 30; i++) R(cx + i * 1.3, cy + Math.sin(i * 0.4 + k) * 2, 1, 1, '#25262c'); } }), 0, 0);
+    g.drawImage(layer('kerbs1', w, h, () => {
+      for (const [y0, y1] of [[24, 52], [168, 192]]) { R(0, y0, w, y1 - y0, '#8d8f96'); for (let x = 0; x < w; x += 16) for (let y = y0; y < y1; y += 8) { R(x, y, 15, 7, rnd(x, y) < 0.5 ? '#94969d' : '#898b92'); } }
+      R(0, 52, w, 3, '#6a6c72'); R(0, 52, w, 1, '#a9abb1'); R(0, 165, w, 3, '#6a6c72'); R(0, 165, w, 1, '#a9abb1');
+      for (const y0 of [42, 170]) { R(148, y0, 92, 10, '#c9a63a'); for (let x = 150; x < 240; x += 4) for (let y = y0 + 2; y < y0 + 10; y += 4) R(x, y, 2, 2, '#e8c34a'); }
+      for (let x = 0; x < w; x++) if (x < 130 || x > 254) { R(x, 106, 1, 2, '#d9a83a'); R(x, 112, 1, 2, '#d9a83a'); }
+      R(128, 58, 4, 46, '#d9d4c6'); R(252, 116, 4, 46, '#d9d4c6');
+      for (let y = 60; y < 166; y += 16) { R(148, y, 92, 8, '#d4cfc1'); R(148, y, 92, 1, '#e4dfd1'); for (let k = 0; k < 26; k++) if (rnd(y, k) < 0.6) R(148 + Math.floor(rnd(k, y) * 90), y + 1 + Math.floor(rnd(y * 3, k) * 6), 2, 1, '#b2ad9f'); }
+    }), 0, 0);
+    // the bars she has stepped on stay a little brighter for a moment (no glow round her)
+    for (let i = 0, y = 60; y < 166; y += 16, i++) { const age = t - (start + i * beat + beat * 0.5); if (age >= 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,190,${Math.max(0, 0.22 - age * 0.06)})`; g.fillRect(148, y, 92, 8); g.restore(); } }
+    // the cars waiting at the stop lines, one headlight beam across the road
+    carTop(60, 64, '#3a4a6a', false); g.save(); g.globalCompositeOperation = 'lighter'; const hl = g.createLinearGradient(124, 0, 220, 0); hl.addColorStop(0, 'rgba(255,240,200,.16)'); hl.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = hl; g.beginPath(); g.moveTo(124, 66); g.lineTo(220, 56); g.lineTo(220, 106); g.lineTo(124, 96); g.closePath(); g.fill(); g.restore();
+    carTop(264, 122, '#8a3a2a', true);
+    // the signal pole on the far kerb
+    ellFill(258, 178, 5, 5, '#3a3d44'); ellFill(257, 177, 3, 3, '#5a5d64');
+    // 하은, one bar per beat; the shot cuts as she passes the middle of the road
+    const prog = clamp((t - start) / beat, 0, 10), y = Math.round(34 + prog * 16);
+    haeunTop(194, y, ph, steps % 2);
+    vig(w, h, 0.32);
   });
   bars();
-  for (let k = 0; k < 16; k++) { const at = 0.6 + k * 0.5; if (t >= at && (k < 11)) cue('beep' + k, () => oscS('sine', 1200, now(), 0.045, 0.07)); }
-  if (t > 5.2) for (let k = 0; k < 6; k++) if (t >= 5.2 + k * 0.25) cue('beepf' + k, () => oscS('sine', 1500, now(), 0.04, 0.05));
-  for (let k = 0; k < 11; k++) if (t >= 0.6 + k * 0.5 + 0.5) cue('cstep' + k, () => noiseS(now(), 'lowpass', 520, 0.06, 0.06));
-  blackout(W, H, t > 5.9 ? (t - 5.9) / 0.5 : 0);
+  for (let k = 0; k < 8; k++) { const at = 0.6 + k * 0.5; if (t >= at) cue('beep' + k, () => oscS('sine', 1200, now(), 0.045, 0.07)); }
 }
 
 // 6. 웅덩이 — low on the wet road: the hospital upside down in a puddle, her shoe breaks it, the camera tilts up to the real thing
