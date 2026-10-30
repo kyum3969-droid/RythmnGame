@@ -1249,12 +1249,11 @@ function drawCast(t, nowMs, active, placerPose) {
   if (listening) { const ax = jx + 6, ay = 92, bxe = bx - 3, bye = 99; for (let k = 0; k <= 20; k++) { const p = k / 20; R(lerp(ax, bxe, p), lerp(ay, bye, p) + Math.sin(p * Math.PI) * 6, 1, 1, '#f4f1ea'); } }
 }
 
-// 하은, the co-scanner on the upper belt. Same head as the rest of the cast (a 12x14 face under a 14-wide cap). She stands in line
-// with you, on your right at the same height (not behind you and a level up: the two read as one body), her gun raised past you
-// toward the upper gate.
+// 하은, the co-scanner on the upper belt. Same head as the rest of the cast (a 12x14 face under a 14-wide cap). She stands at the
+// upper belt's gate the way you stand at yours, straight above you, the upper belt's front hiding her legs, her gun on that gate.
 // Red snapback pulled low (the brim's shadow where her eyes would be), a high ponytail out the back that swings when she scans,
 // a black long sleeve under the sky-blue vest of 2번 라인, weight on one leg, the free hand in a pocket.
-const HAEUN_X = 368, HAEUN_TOP = 94;
+const HAEUN_X = Math.round(SCAN_X + 0.82 * (PLAYER_X - SCAN_X)), HAEUN_TOP = 56;
 // o.gun = your scan kick while she works the upper gate; o.watch = checking the time; o.step = walking (which leg is forward);
 // o.load = she is a belt's loader and the arm is drawn with the box; o.mirror = facing right (at the loading end)
 function drawHaeunAt(cx, top, nowMs, o = {}) {
@@ -1285,7 +1284,7 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
   // or nothing (the loading arm is drawn with the belt). The other hand stays in a pocket.
   if (o.watch) { thick(cx - 6, top + 22, cx - 2, top + 30, 4, shirt); R(cx - 4, top + 28, 4, 4, glove); R(cx - 3, top + 26, 3, 3, '#d8dde0'); R(cx - 2, top + 27, 1, 1, C.ink); }
   else if (o.gun != null) {
-    const gx = cx - 10 + kick * 3, gy = top + 8;
+    const gx = cx - 14 + kick * 3, gy = top + 24;
     thick(cx - 6, top + 22, gx + 6, gy + 3, 4, shirt);
     R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33'); R(gx - 10, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser); R(gx, gy + 2, 3, 3, glove);
   }
@@ -1330,10 +1329,10 @@ function drawHaeun(t, kick, nowMs, active) {
   const bob = active && ph < 0.18 ? 1 : 0, top = HAEUN_TOP + bob + (kick > 0.5 ? 1 : 0);
   drawHaeunAt(HAEUN_X, top, nowMs, { gun: watch ? null : kick, watch, tally: active });
 }
-// crossing to the upper belt's loading end in a hurry: a step back behind the far belt first, then left along it
+// crossing to the upper belt's loading end in a hurry, along behind the upper belt
 function haeunWalkPos(p) {
-  const back = Math.min(1, p / 0.2), q = Math.max(0, (p - 0.2) / 0.8), e = lerp(q, ease(q), 0.5);
-  return { x: Math.round(lerp(lerp(HAEUN_X, HAEUN_X - 12, back), BOSS_X + LANE_DX[0], e)), top: Math.round(lerp(lerp(HAEUN_TOP, 60, ease(back)), 50, e)) };
+  const e = lerp(p, ease(p), 0.5);
+  return { x: Math.round(lerp(HAEUN_X, BOSS_X + LANE_DX[0], e)), top: Math.round(lerp(HAEUN_TOP, 50, e)) };
 }
 function drawHaeunWalk(nowMs) {
   const { x, top } = haeunWalkPos(DUO.p);
@@ -2135,8 +2134,8 @@ function drawScene(t, bt, active, nowMs) {
       const o = placerOff(1), bp = { ...poses[1], wince: poses[0].wince || poses[1].wince, dip: Math.max(poses[0].dip, poses[1].dip), nod: Math.max(poses[0].nod, poses[1].nod) };
       g.save(); g.translate(o.dx, o.dy); drawPartnerBody(L.partners[1], bp, nowMs, active); g.restore();
     }
-    drawLane(0, poses[0], t, beltT, active, nowMs, laneFx);
     if (DUO.mode === 'one' && L.coScanner) drawHaeun(t, upperKick, nowMs, active);
+    drawLane(0, poses[0], t, beltT, active, nowMs, laneFx);
   }
   const lo = L.lanes === 2 ? 1 : 0;
   if (L.cast) { L.partners[0] = castPlacer(castBeatAt(t, active)); drawCast(t, nowMs, active, poses[lo]); }
