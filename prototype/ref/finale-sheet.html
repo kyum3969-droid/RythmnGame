@@ -22,7 +22,7 @@ ul{margin:0 0 12px 18px;color:var(--ink)} li{margin:2px 0}
 </head>
 <body>
 <h1>1-5 첫 회식 · 연출 시안</h1>
-<p>게임 화면 크기(384×216) 그대로 그린 장면 목업. 위에서 아래로 한 밤의 흐름: 벨트(지우의 합격) → 회전초밥집 → 취기 → 노래방 → 문 → 지하철 → 병실 → 새벽. 색이 따뜻해졌다가 식어 가는 곡선이 이 레벨의 연출 축.</p>
+<p>게임 화면 크기(384×216) 그대로 그린 장면 목업. 한 밤의 흐름: 벨트(지우의 합격) → 회전초밥집 두 페이즈(초밥 → 소주잔) → 지하철 → 걷기 컷씬 → 병원(리듬닥터 오마주) → 병실 심장박동 → 새벽. 색이 따뜻해졌다가 식어 가는 곡선이 이 레벨의 연출 축.</p>
 <div class="row" id="rows"></div>
 <script>
 const rnd = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
@@ -275,19 +275,17 @@ function drawGun(gx, gy, kick) {
 }
 
 // ---------- 1-5 연출 시안: 장면 그리기 (chars.js의 캐릭터 코드를 그대로 씀) ----------
-const W = 384, H = 216, BOSS_X_ = 46;
+const W = 384, H = 216;
 let g = null;
 const FX = { react: [{ type: '', at: -1e9 }, { type: '', at: -1e9 }, { type: '', at: -1e9 }], playerNod: -1e9, flinch: -1e9 };
 const stats = { combo: 0 }, SPB = 0.6, BOSS_X = 46, PLAYER_X = 340, state = 'play';
 const ease = p => p < 0 ? 0 : p > 1 ? 1 : p * p * (3 - 2 * p);
 const IDLE = () => ({ hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: 0, nod: 0, doze: false, phone: false, lane: 0 });
-// a cast member at x, body and arm together. hand is in screen coords.
 function actor(id, x, pose, mirrored = false, extra = null) {
   g.save();
   if (mirrored) { g.translate(x, 0); g.scale(-1, 1); g.translate(-BOSS_X, 0); } else g.translate(x - BOSS_X, 0);
   const p = { ...IDLE(), ...pose };
-  if (p.hand) p.hand = { x: p.hand.x - (mirrored ? 0 : x - BOSS_X), y: p.hand.y };
-  if (mirrored && p.hand) p.hand = { x: 2 * x - p.hand.x - (x - BOSS_X), y: p.hand.y };
+  if (p.hand && !mirrored) p.hand = { x: p.hand.x - (x - BOSS_X), y: p.hand.y };
   PARTNERS[id].draw(p, 0, true);
   if (!p.noArm) PARTNERS[id].arm(p);
   if (extra) extra(bodyTop(PARTNERS[id].base, p));
@@ -296,72 +294,109 @@ function actor(id, x, pose, mirrored = false, extra = null) {
 function text(s, x, y, c = '#efe6d2', size = 8, align = 'left', bold = false) { g.font = `${bold ? 'bold ' : ''}${size}px "Apple SD Gothic Neo","Malgun Gothic","Noto Sans CJK KR",sans-serif`; g.textAlign = align; g.textBaseline = 'top'; g.fillStyle = c; g.fillText(s, x, y); }
 function bubble(s, x, y, w, opts = {}) {
   const h = opts.h || 14, bg = opts.bg || '#f2ead6', ink = opts.ink || '#1b1716', shake = opts.shake || 0;
-  g.save(); if (shake) g.translate(Math.round(Math.sin(x * 3) * shake), Math.round(Math.cos(y * 7) * shake)); if (opts.rot) g.rotate(opts.rot);
+  g.save(); if (shake) g.translate(Math.round(Math.sin(x * 3) * shake), Math.round(Math.cos(y * 7) * shake));
   R(x, y, w, h, bg); R(x + 1, y + h, 3, 2, bg); R(x + 2, y + h + 2, 1, 1, bg);
   if (opts.loud) { R(x, y, w, 1, '#d8463b'); R(x, y + h - 1, w, 1, '#d8463b'); R(x, y, 1, h, '#d8463b'); R(x + w - 1, y, 1, h, '#d8463b'); }
   text(s, x + 3, y + 3, ink, opts.size || 7, 'left', !!opts.loud); g.restore();
 }
 function judge(s, x, y, c, size = 14, sub = '') { g.save(); g.shadowColor = '#000'; g.shadowOffsetY = 2; text(s, x, y, c, size, 'center', true); g.restore(); if (sub) text(sub, x, y + size + 2, '#efe6d2', 6, 'center'); }
-function hud(clock, combo) { R(10, 8, 72, 11, 'rgba(0,0,0,.55)'); text(clock, 13, 10, '#efe6d2', 7); R(W - 46, 8, 36, 11, 'rgba(0,0,0,.55)'); text(combo, W - 28, 10, '#efe6d2', 7, 'center'); }
+function hud(clock, combo) { R(10, 8, 72, 11, 'rgba(0,0,0,.55)'); text(clock, 13, 10, '#efe6d2', 7); if (combo) { R(W - 46, 8, 36, 11, 'rgba(0,0,0,.55)'); text(combo, W - 28, 10, '#efe6d2', 7, 'center'); } }
 function vignette(a) { const gr = g.createRadialGradient(W / 2, H / 2, 70, W / 2, H / 2, 240); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, `rgba(0,0,0,${a})`); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
+function caption(a, b) { R(0, 176, W, 40, 'rgba(0,0,0,.6)'); text(a, 12, 184, '#efe6d2', 7); if (b) text(b, 12, 198, '#b8a998', 7); }
 
-// ---------- 소품 ----------
-const soju = (x, y, c = '#bfe3d2') => { R(x, y - 14, 5, 14, c); R(x + 1, y - 18, 3, 5, c); R(x + 1, y - 19, 3, 1, '#2f6f4a'); R(x, y - 10, 5, 1, 'rgba(255,255,255,.35)'); };
-const glass = (x, y, fill = 0.6, c = '#e9f3f6') => { R(x, y - 7, 7, 7, 'rgba(230,240,245,.55)'); R(x, y - 7, 7, 1, c); R(x, y - 7, 1, 7, c); R(x + 6, y - 7, 1, 7, c); R(x + 1, y - Math.round(6 * fill), 5, Math.round(6 * fill), 'rgba(255,255,255,.55)'); };
-const plate = (x, y, c = '#d9d4c6') => { R(x, y - 2, 14, 2, c); R(x + 2, y - 4, 10, 2, '#9a2f22'); R(x + 4, y - 5, 6, 1, '#c0452f'); };
-const grill = (x, y) => { R(x, y - 6, 34, 6, '#2a2a2e'); for (let k = 0; k < 7; k++) R(x + 2 + k * 5, y - 5, 1, 4, '#444a52'); for (let k = 0; k < 4; k++) R(x + 4 + k * 8, y - 4, 4, 2, k % 2 ? '#ff7a3d' : '#ffb14a'); R(x + 6, y - 9, 8, 3, '#8a3a2a'); R(x + 18, y - 9, 9, 3, '#a04a33'); };
-const tambourine = (x, y, up) => { g.save(); g.translate(x, y); if (up) g.rotate(-0.4); R(-7, -2, 14, 3, '#d9a520'); for (let k = 0; k < 4; k++) R(-6 + k * 4, -4, 2, 2, '#efe6d2'); g.restore(); };
-const mic = (x, y) => { R(x, y, 2, 7, '#2b2e31'); R(x - 1, y - 3, 4, 4, '#6a7075'); R(x - 1, y - 3, 4, 1, '#9aa0a6'); };
-const smoke = (x, y, n, a) => { for (let k = 0; k < n; k++) { const p = k / n; g.fillStyle = `rgba(230,220,200,${a * (1 - p)})`; g.beginPath(); g.ellipse(x + Math.sin(k * 1.7) * 6, y - p * 40, 6 + p * 10, 3 + p * 4, 0, 0, Math.PI * 2); g.fill(); } };
-
-// ---------- 회전초밥집 ----------
-// the belt stays a belt: sushi plates come out of the kitchen hatch on the left and run past 지우, 반장 and 하은 to the player's seat
+// ---------- 벨트와 소품 ----------
+const BELT_Y = 146, SCAN_X = 300, SPEED = 60;
+function beltAt(y, x0 = 48, dark = 1) {
+  R(x0, y, W - x0, 4, C.belt); R(x0, y, W - x0, 1, '#4a403b'); for (let x = x0 + 4; x < W; x += 14) R(x, y + 1, 1, 3, C.slat); for (let x = x0 + 12; x < W; x += 48) { R(x - 1, y, 3, 4, '#a08a3c'); R(x - 1, y, 3, 1, '#c9ad4c'); }
+  R(x0 - 2, y + 4, W - x0 + 2, 8, C.face); for (let x = x0 + 2; x < W; x += 14) R(x, y + 6, 8, 3, '#2b2422');
+  if (dark < 1) { g.fillStyle = `rgba(8,6,10,${1 - dark})`; g.fillRect(x0 - 2, y, W, 12); }
+}
+function gate(x, y, h, on) { R(x - 11, y - h, 4, h, '#555a5f'); R(x - 11, y - h - 3, 24, 5, C.metal); R(x + 8, y - h, 4, h + 10, '#7b8288'); R(x, y - h + 5, 1, h - 5, on ? C.laser : '#5a2b27'); }
+function boxS(x, bottom, w = 18, h = 14) { R(x - w / 2 + 1, bottom, w, 1, 'rgba(0,0,0,.45)'); R(x - w / 2, bottom - h, w, h, C.kraft); R(x - w / 2, bottom - h, w, 2, C.kraftTop); R(x + w / 2 - 2, bottom - h + 2, 2, h - 2, C.kraftDark); R(x - 1, bottom - h, 3, h, C.tape); R(x - w / 2 + 2, bottom - 6, 7, 4, C.label); }
+function playerS() { drawPlayer(0, 0); thick(PLAYER_X - 6, 116, 326, 120, 4, C.hoodie); drawGun(324, 117, 0); }
+function haeunBeside(o = {}) { drawHaeunAt(354, 60, 0, { load: true, ...o }); if (!o.watch) { thick(348, 82, 346, 94, 4, '#1e1a1a'); R(344, 93, 4, 3, '#2a2d31'); } }
 const PLATE = { red: ['#d8463b', '1,500'], blue: ['#2f6f8a', '2,500'], gold: ['#d9a520', '4,000'], black: ['#2b2e31', '6,000'] };
-function sushiPlate(x, y, col, kind = 0) {
-  R(x - 9, y - 2, 18, 2, '#efe6d2'); R(x - 10, y - 3, 20, 1, PLATE[col][0]); R(x - 8, y - 4, 16, 1, '#f7f1e2');
-  R(x - 6, y - 7, 12, 3, '#f7f1e2'); R(x - 5, y - 8, 10, 1, '#f7f1e2');
-  const fish = ['#f08a5d', '#e04a3a', '#f3d5a0', '#c9c9c9'][kind]; R(x - 7, y - 10, 14, 3, fish); if (kind === 1) R(x - 7, y - 10, 14, 1, '#f7c0b0'); if (kind === 3) R(x - 6, y - 11, 12, 1, '#1e2a1a');
+function sushiPlate(x, y, col, kind = 0, sc = 1) {
+  g.save(); g.translate(x, y); g.scale(sc, sc);
+  R(-9, -2, 18, 2, '#efe6d2'); R(-10, -3, 20, 1, PLATE[col][0]); R(-8, -4, 16, 1, '#f7f1e2'); R(-6, -7, 12, 3, '#f7f1e2'); R(-5, -8, 10, 1, '#f7f1e2');
+  const fish = ['#f08a5d', '#e04a3a', '#f3d5a0', '#c9c9c9'][kind]; R(-7, -10, 14, 3, fish); if (kind === 1) R(-7, -10, 14, 1, '#f7c0b0'); if (kind === 3) R(-6, -11, 12, 1, '#1e2a1a');
+  g.restore();
 }
-const sake = (x, y) => { R(x, y - 6, 6, 6, '#f7f1e2'); R(x, y - 6, 6, 1, '#c9c2b0'); R(x + 1, y - 4, 4, 3, 'rgba(230,240,245,.6)'); };
+function sojuGlass(x, y, sc = 1, fill = 0.7) { g.save(); g.translate(x, y); g.scale(sc, sc); R(-3, -8, 7, 8, 'rgba(230,240,245,.55)'); R(-3, -8, 7, 1, '#e9f3f6'); R(-3, -8, 1, 8, '#e9f3f6'); R(3, -8, 1, 8, '#e9f3f6'); R(-2, -Math.round(7 * fill), 5, Math.round(7 * fill), 'rgba(255,255,255,.6)'); g.restore(); }
+const soju = (x, y) => { R(x, y - 14, 5, 14, '#bfe3d2'); R(x + 1, y - 18, 3, 5, '#bfe3d2'); R(x + 1, y - 19, 3, 1, '#2f6f4a'); R(x, y - 10, 5, 1, 'rgba(255,255,255,.35)'); };
 function plateStack(x, base, n) { for (let k = 0; k < n; k++) { const c = ['red', 'blue', 'red', 'gold', 'red', 'blue'][k % 6]; R(x - 9, base - k * 3 - 2, 18, 2, '#efe6d2'); R(x - 10, base - k * 3 - 3, 20, 1, PLATE[c][0]); } }
-function drawSushi(drunk) {
-  // the room: cream wall, a wood band, paper lamps, the price board, the kitchen hatch with the chef in it
-  R(0, 0, W, H, '#f0e6d2'); R(0, 0, W, 30, '#2a1d16'); R(0, 30, W, 2, '#8a5a34'); R(0, 96, W, 50, '#c9b48a'); R(0, 96, W, 2, '#8a5a34'); for (let x = 0; x < W; x += 20) R(x, 98, 1, 48, '#b9a47a');
-  for (let k = 0; k < 4; k++) { const x = 70 + k * 84; R(x, 30, 1, 6, '#3a2a20'); R(x - 7, 36, 15, 10, '#f2d35a'); R(x - 7, 36, 15, 1, '#fff3c8'); R(x - 6, 46, 13, 1, '#b8762e'); text('寿', x - 3, 37, '#9a2f22', 6); }
-  R(240, 42, 100, 40, '#f7f1e2'); R(240, 42, 100, 2, '#8a5a34'); text('접시 가격', 290, 45, '#1b1716', 6, 'center', true);
-  Object.entries(PLATE).forEach(([k, [c, won]], i) => { R(246 + (i % 2) * 48, 55 + Math.floor(i / 2) * 12, 14, 2, c); R(246 + (i % 2) * 48, 53 + Math.floor(i / 2) * 12, 14, 1, '#efe6d2'); text(won, 263 + (i % 2) * 48, 51 + Math.floor(i / 2) * 12, '#1b1716', 6); });
-  R(10, 40, 70, 56, '#3a2a20'); R(14, 44, 62, 48, '#1a120e'); R(14, 44, 62, 10, '#efe6d2'); text('주방', 45, 45, '#1b1716', 6, 'center');
-  R(36, 62, 18, 22, '#f7f1e2'); R(38, 56, 14, 8, '#d9a27a'); R(36, 52, 18, 5, '#ffffff'); R(37, 49, 16, 3, '#ffffff'); R(40, 59, 2, 1, C.ink); R(46, 59, 2, 1, C.ink);   // the chef, white hat
-  R(54, 76, 10, 3, '#f7f1e2'); R(56, 73, 6, 3, '#f08a5d');   // a plate being set on the belt
-  // the belt: the same slats as the line, a glass guard above it, the counter in front
-  R(48, BELT_Y, W - 48, 4, C.belt); R(48, BELT_Y, W - 48, 1, '#4a403b'); for (let x = 52; x < W; x += 14) { R(x, BELT_Y + 1, 1, 3, C.slat); } for (let x = 60; x < W; x += 48) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); }
-  R(46, BELT_Y + 4, W - 46, 8, C.face); for (let x = 50; x < W; x += 14) R(x, BELT_Y + 6, 8, 3, '#2b2422');
-  R(46, BELT_Y - 30, W - 46, 1, 'rgba(255,255,255,.35)'); R(46, BELT_Y - 30, 1, 30, 'rgba(255,255,255,.35)');   // the sneeze guard
-  R(0, 158, W, 58, '#d9b98a'); R(0, 158, W, 3, '#8a5a34'); R(0, 176, W, 40, '#1a1210'); for (let x = 0; x < W; x += 36) R(x, 178, 1, 38, '#231a15');
-  for (let x = 20; x < W; x += 24) R(x, 172, 2, 2, x % 48 === 20 ? '#ffe9a8' : '#b07a48');   // the beat grid on the counter edge
-  for (const x of [104, 168, 236, 326]) { R(x, 150, 6, 8, '#6a7075'); R(x + 1, 148, 4, 2, '#9aa1a6'); R(x - 10, 160, 10, 7, '#2f6f4a'); R(x - 9, 158, 8, 2, '#5a9a6a'); }   // tea taps and tea cups
-  R(297, 118, 2, 28, 'rgba(255,74,61,.7)');   // the player's reach: a plate that gets here is his
-  // cast along the counter
-  actor('jiwoo', 104, { hand: { x: 120, y: 128 }, wince: !drunk, bob: drunk ? -2 : 0, unplug: true });
-  bubble(drunk ? '반장님 기타, 진짜 샘플로 썼어요!' : '회식인데 웬 회전초밥이에요…', 84, 54, drunk ? 118 : 112, { shake: drunk ? 1 : 0 });
-  actor('boss', 168, { hand: { x: 188, y: 136 } }, false, top => { R(184, top + 44, 6, 1, '#efe6d2'); sake(194, 142); });
-  bubble(drunk ? '…다음 달까지만 나온다.' : '…고기는 비싸.', 150, 74, drunk ? 92 : 60);
-  drawHaeunAt(236, 90, 0, { mirror: true, load: true });
-  thick(241, 113, 247, 102, 4, '#1e1a1a'); R(245, 98, 4, 4, '#2a2d31'); R(248, 94, 1, 6, '#efe6d2'); R(250, 94, 1, 6, '#efe6d2'); R(247, 91, 6, 2, '#f08a5d');   // chopsticks, sushi on the way in
-  if (drunk) bubble('(우물우물)', 214, 60, 48, { bg: '#d9d0bd' });
-  // her plates, stacked on the counter in front of her: four, then a tower
-  plateStack(236, 172, drunk ? 14 : 4);
-  // the player: hoodie, chopsticks instead of the scanner, one plate in front of him
-  drawPlayer(0, 0); thick(PLAYER_X - 6, 116, 314, 134, 4, C.hoodie); R(312, 132, 4, 4, C.skin); R(311, 126, 1, 8, '#efe6d2'); R(313, 126, 1, 8, '#efe6d2');
-  plateStack(326, 172, drunk ? 5 : 1);
-  // plates and cups coming down the belt toward him
-  const items = drunk ? [[100, 'red', 0], [136, 'sake'], [190, 'blue', 1], [222, 'red', 2], [262, 'gold', 3], [296, 'red', 1], [346, 'sake']] : [[112, 'red', 0], [200, 'blue', 1], [296, 'red', 2]];
-  for (const [x, k, kind] of items) k === 'sake' ? sake(x, BELT_Y) : sushiPlate(x, BELT_Y, k, kind);
-  if (drunk) { for (let k = 0; k < 3; k++) R(372 - k * 6, 158 - 7, 5, 7, 'rgba(247,241,226,.9)'); }
-  hud('회전초밥 · 23:40', drunk ? '콤보 24' : '콤보 3');
-  if (drunk) judge('쏙!!', 300, 72, '#ffe9a8', 22, '24 콤보'); else judge('쏙', 300, 84, '#8fd694', 14);
+
+// ---------- 도입: 벨트에서 ----------
+function warehouse() {
+  g.drawImage(bg, 0, 0);
+  for (const x of [60, 180, 300]) { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, '#fff3c8'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, 18, 0, 150); gr.addColorStop(0, 'rgba(255,236,170,.14)'); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 86, 150); g.lineTo(x - 40, 150); g.closePath(); g.fill(); g.restore(); }
 }
-// 취기: the picture goes warm, blooms, leans, blurs at the edges, and doubles for a moment
+function drawOpening(phase) {
+  warehouse(); gate(SCAN_X, BELT_Y, 38, true);
+  if (phase === 0) {
+    actor('jiwoo', 46, { bob: -7, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 14, top + 2, 4, '#6b2f3f'); R(BOSS_X + 13, top - 2, 5, 5, C.skin); thick(BOSS_X - 7, top + 23, BOSS_X - 16, top + 4, 4, '#6b2f3f'); R(BOSS_X - 19, top, 5, 5, C.skin); });
+    g.save(); g.translate(28, 150); g.rotate(-0.3); boxS(0, 0); g.restore();
+    beltAt(BELT_Y); boxS(338, BELT_Y);
+    bubble('붙었어요!!!!', 56, 44, 78, { loud: true, size: 10, h: 18, shake: 1 });
+    for (let k = 0; k < 4; k++) text('♪', 70 + k * 14, 70 + (k % 2) * 8, k % 2 ? '#f2a6c8' : '#5ad7e8', 9);
+    playerS(); haeunBeside(); bubble('…?', 320, 44, 18, { bg: '#d9d0bd' });
+    judge('딱!', 300, 84, '#8fd694', 14); hud('3번 라인 · 04:10', '콤보 18');
+  } else if (phase === 1) {
+    actor('jiwoo', 46, { bob: -2, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 14, top + 2, 4, '#6b2f3f'); R(BOSS_X + 13, top - 2, 5, 5, C.skin); });
+    g.save(); g.translate(28, 150); g.rotate(-0.3); boxS(0, 0); g.restore();
+    beltAt(BELT_Y);
+    actor('boss', 150, { bob: 1, noArm: true }, true, top => { R(BOSS_X + 2, top + 6, 5, 1, C.hair); R(BOSS_X + 1, top + 5, 2, 1, C.hair); R(BOSS_X - 8, top + 4, 2, 3, C.sweat); thick(BOSS_X + 7, top + 22, BOSS_X + 28, top + 14, 4, C.shirt); R(BOSS_X + 27, top + 11, 5, 5, C.skin); });
+    bubble('…야! 벨트가 왜 비어!', 104, 64, 92, { loud: true, size: 8, h: 15 });
+    bubble('반장님! 저 붙었어요! 반장님 기타 넣은 곡으로요!', 2, 28, 184, { size: 7 });
+    playerS(); haeunBeside(); hud('3번 라인 · 04:11', '콤보 18');
+    text('(벨트는 돌지만 상자가 안 온다. 롤러 소리만.)', 60, 190, 'rgba(239,230,210,.75)', 6);
+  } else {
+    actor('jiwoo', 46, { bob: -1, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 13, top + 30, 4, '#6b2f3f'); R(BOSS_X + 12, top + 29, 4, 4, C.skin); });
+    beltAt(BELT_Y);
+    actor('boss', 150, { nod: 1, noArm: true }, true, top => { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); });
+    bubble('…회식이다. 오늘. 다 와.', 92, 50, 96, { size: 8, h: 15 });
+    playerS(); haeunBeside({ watch: true }); bubble('저도요? …밥은 공짜죠?', 270, 40, 90, { bg: '#d9d0bd' });
+    hud('3번 라인 · 04:12', '');
+    text('(상자는 끝까지 안 온다. 롤러만 돈다. 형광등 하나가 깜빡.)', 60, 190, 'rgba(239,230,210,.75)', 6);
+  }
+}
+
+// ---------- 회전초밥집: 벨트 셋, 반장이 뿌린다 ----------
+const LANES = [{ y: 110, k: 0.7 }, { y: 128, k: 0.85 }, { y: 146, k: 1 }];
+const laneX = (x, k) => SCAN_X + k * (x - SCAN_X);
+function sushiRoom() {
+  R(0, 0, W, H, '#f0e6d2'); R(0, 0, W, 30, '#2a1d16'); R(0, 30, W, 2, '#8a5a34'); R(0, 80, W, 66, '#c9b48a'); R(0, 80, W, 2, '#8a5a34'); for (let x = 0; x < W; x += 20) R(x, 82, 1, 64, '#b9a47a');
+  for (let k = 0; k < 4; k++) { const x = 70 + k * 84; R(x, 30, 1, 6, '#3a2a20'); R(x - 7, 36, 15, 10, '#f2d35a'); R(x - 7, 36, 15, 1, '#fff3c8'); R(x - 6, 46, 13, 1, '#b8762e'); text('寿', x - 3, 37, '#9a2f22', 6); }
+  R(240, 40, 100, 36, '#f7f1e2'); R(240, 40, 100, 2, '#8a5a34'); text('접시 가격', 290, 43, '#1b1716', 6, 'center', true);
+  Object.entries(PLATE).forEach(([k, [c, won]], i) => { R(246 + (i % 2) * 48, 53 + Math.floor(i / 2) * 11, 14, 2, c); R(246 + (i % 2) * 48, 51 + Math.floor(i / 2) * 11, 14, 1, '#efe6d2'); text(won, 263 + (i % 2) * 48, 49 + Math.floor(i / 2) * 11, '#1b1716', 6); });
+  R(0, 158, W, 58, '#d9b98a'); R(0, 158, W, 3, '#8a5a34'); R(0, 176, W, 40, '#1a1210'); for (let x = 0; x < W; x += 36) R(x, 178, 1, 38, '#231a15');
+  for (let x = 20; x < W; x += 24) R(x, 172, 2, 2, x % 48 === 20 ? '#ffe9a8' : '#b07a48');
+}
+function drawSushi(phase) {
+  const drunk = phase === 2;
+  sushiRoom();
+  actor('jiwoo', 232, { hand: { x: 248, y: 104 }, wince: !drunk, bob: drunk ? -2 : 0, unplug: true, dip: -14 }, false, top => { if (drunk) sojuGlass(248, 102); });
+  bubble(drunk ? '반장님 기타, 진짜 샘플로 썼어요!' : '회식인데 웬 회전초밥이에요…', 118, 58, drunk ? 118 : 112, { shake: drunk ? 1 : 0 });
+  const items = drunk ? [[[150, 'g'], [250, 'g']], [[200, 'g']], [[120, 'g'], [296, 'g'], [346, 's']]] : [[[140, 'red', 0], [250, 'blue', 1]], [[190, 'gold', 2]], [[112, 'red', 0], [296, 'red', 1], [346, 'black', 3]]];
+  LANES.forEach((L, i) => {
+    const x0 = laneX(48, L.k); beltAt(L.y, Math.round(x0), 0.75 + i * 0.125);
+    for (const [x, kind, f] of items[i]) { const sx = laneX(x, L.k); if (kind === 'g') sojuGlass(sx, L.y, L.k); else if (kind === 's') soju(sx, L.y); else sushiPlate(sx, L.y, kind, f, L.k); }
+    gate(SCAN_X, L.y, i === 2 ? 38 : 16, true);
+  });
+  actor('boss', 46, { hand: { x: 78, y: 86 }, bob: drunk ? 1 : 0, noArm: true }, false, top => { thick(BOSS_X + 7, top + 22, BOSS_X + 30, top - 2, 4, C.shirt); R(BOSS_X + 29, top - 5, 5, 5, C.skin); });
+  if (drunk) { sojuGlass(92, 74, 0.8); sojuGlass(104, 88, 0.9); sojuGlass(96, 112, 1); soju(20, 146); soju(28, 146); } else { sushiPlate(92, 76, 'red', 0, 0.8); sushiPlate(106, 92, 'blue', 1, 0.9); sushiPlate(98, 114, 'red', 2, 1); }
+  for (let k = 0; k < 3; k++) { g.strokeStyle = 'rgba(255,233,168,.5)'; g.setLineDash([2, 3]); g.beginPath(); g.moveTo(80, 86); g.quadraticCurveTo(110, 60 + k * 18, laneX(150, LANES[k].k), LANES[k].y - 6); g.stroke(); g.setLineDash([]); }
+  bubble(drunk ? '…다음 달까지만 나온다.' : '…고기는 비싸. 받아라.', 6, 50, 92);
+  drawPlayer(0, 0); thick(PLAYER_X - 6, 116, 316, 136, 4, C.hoodie); R(314, 134, 4, 4, C.skin); R(313, 128, 1, 8, '#efe6d2'); R(315, 128, 1, 8, '#efe6d2');
+  thick(PLAYER_X - 5, 114, 318, 104, 4, C.hoodie); R(316, 102, 4, 4, C.skin);
+  if (drunk) { R(PLAYER_X + 6, 98, 2, 3, '#e07070'); R(PLAYER_X - 8, 98, 2, 3, '#e07070'); }
+  haeunSharp(drunk);
+  plateStack(326, 172, drunk ? 3 : 1);
+  if (drunk) for (let k = 0; k < 3; k++) sojuGlass(296 + k * 8, 172, 0.9, 0);
+  hud(drunk ? '회전초밥 · 00:30' : '회전초밥 · 23:40', drunk ? '콤보 24' : '콤보 6');
+  judge(drunk ? '짠!!' : '쏙', 300, drunk ? 84 : 96, drunk ? '#ffe9a8' : '#8fd694', drunk ? 22 : 14, drunk ? '24 콤보' : '');
+}
+function haeunSharp(drunk) { haeunBeside({ watch: false }); thick(348, 82, 342, 70, 4, '#1e1a1a'); R(340, 68, 4, 4, '#2a2d31'); R(343, 64, 1, 6, '#efe6d2'); R(345, 64, 1, 6, '#efe6d2'); R(342, 62, 6, 2, '#f08a5d'); plateStack(362, 172, drunk ? 14 : 4); if (drunk) bubble('(우물우물)', 326, 44, 48, { bg: '#d9d0bd' }); }
 function drunkFx(src, level, sharp) {
   const k = level;
   g.save(); g.translate(W / 2, H / 2); g.rotate(0.02 * k); g.translate(-W / 2, -H / 2); g.drawImage(src, 0, 0); g.restore();
@@ -372,189 +407,119 @@ function drunkFx(src, level, sharp) {
   vignette(0.25 * k);
 }
 
-// ---------- 노래방 ----------
-function drawNoraebang(opts = {}) {
-  R(0, 0, W, H, '#120a16'); for (let x = 0; x < W; x += 16) for (let y = 0; y < 150; y += 16) if ((x + y) % 32 === 0) R(x, y, 16, 16, '#160c1c');
-  // the screen with the lyrics
-  R(14, 36, 96, 62, '#1b1716'); R(17, 39, 90, 56, '#101a40'); R(20, 44, 84, 30, '#1a2a60'); for (let k = 0; k < 5; k++) R(24 + k * 16, 48 + (k % 2) * 8, 10, 10, ['#f07a2a', '#5ad7e8', '#ff4fa3', '#cfe04a', '#a68bff'][k]);
-  R(20, 78, 84, 12, '#0b1230'); text('반장님 기타 위에', 23, 80, '#5ad7e8', 7); text('내 비트', 76, 80, '#ff4fa3', 7);
-  // sofa along the back wall, a low table, the mirror ball and its spots, two coloured lights
-  R(130, 96, 230, 30, '#5a1f2a'); R(130, 96, 230, 3, '#7a2f3a'); R(130, 126, 230, 6, '#3a1118');
-  R(150, 140, 120, 8, '#3a2a2a'); R(150, 148, 120, 2, '#241a1a'); for (let k = 0; k < 3; k++) glass(160 + k * 22, 140, 0.4); tambourine(236, 136, false);
-  R(190, 0, 1, 10, '#777'); g.fillStyle = '#c9ccd2'; g.beginPath(); g.arc(190, 16, 7, 0, Math.PI * 2); g.fill(); for (let k = 0; k < 10; k++) R(185 + (k * 3) % 11, 11 + (k * 5) % 11, 1, 1, '#fff');
-  g.save(); g.globalCompositeOperation = 'lighter';
-  for (let k = 0; k < 18; k++) { const x = (k * 71) % W, y = 20 + (k * 37) % 120; g.fillStyle = `rgba(255,255,255,${0.12 + (k % 3) * 0.06})`; g.fillRect(x, y, 4, 3); }
-  const sp = (x, c) => { const gr = g.createLinearGradient(0, 0, 0, 170); gr.addColorStop(0, c.replace('A', '.34')); gr.addColorStop(1, c.replace('A', '0')); g.fillStyle = gr; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 70, 170); g.lineTo(x - 70, 170); g.closePath(); g.fill(); };
-  sp(120, 'rgba(255,79,163,A)'); sp(290, 'rgba(79,227,255,A)');
-  g.restore();
-  // the door at the right, 하은 near it
-  R(344, 40, 36, 108, '#3a2a2a'); R(348, 44, 28, 104, '#2a1c1c'); R(352, 54, 20, 16, '#4a3a3a'); R(370, 100, 3, 4, '#c9ccd2');
-  // cast: 반장 dozing on the sofa, 지우 with the mic, jumping; 신입 with the tambourine; 하은 at the door with her watch
-  actor('boss', 158, { doze: true, dip: 6, noArm: true }, false, top => { thick(BOSS_X + 7, top + 24, BOSS_X + 14, top + 40, 4, C.shirt); R(BOSS_X + 12, top + 39, 5, 4, C.skin); });
-  actor('jiwoo', 216, { bob: -3, hand: { x: 230, y: 96 }, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 11, top + 6, 4, '#6b2f3f'); R(BOSS_X + 10, top + 2, 4, 4, C.skin); mic(BOSS_X + 11, top + 4); });
-  drawPlayer(0, 0); thick(PLAYER_X - 6, 116, PLAYER_X - 14, 96, 4, C.hoodie); tambourine(PLAYER_X - 16, 92, true);
-  for (let k = 0; k < 6; k++) R(PLAYER_X - 30 + (k * 7) % 20, 80 + (k * 11) % 14, 1, 1, '#ffe9a8');
-  drawHaeunAt(300, 60, 0, { watch: true });
-  bubble('먼저 갈게요. 첫차.', 254, 44, 76, { bg: '#d9d0bd' });
-  // the lyric bar along the bottom, syllables lit in time
-  R(0, 176, W, 40, 'rgba(0,0,0,.75)');
-  const ly = ['반', '장', '님', ' ', '기', '타', ' ', '위', '에', ' ', '내', ' ', '비', '트', ' ', '얹', '어', '서']; let x = 24;
-  ly.forEach((ch, i) => { const on = i < 9; text(ch, x, 184, on ? '#5ad7e8' : '#8a8a8a', 11, 'left', on); if (i === 8) R(x + 8, 198, 2, 2, '#ff4fa3'); x += ch === ' ' ? 6 : 13; });
-  text('♪ 지우 · 오디션 곡 (블루스 믹스) · 노래방 반주', 24, 203, '#b8a998', 6);
-  hud('노래방 · 01:10', '콤보 41'); judge('탬버린!', 250, 30, '#ff4fa3', 16);
-}
-
-// ---------- 전환: 문이 닫히고 소리가 먹먹해진다 ----------
-function drawDoor() {
-  // the corridor outside: a cold strip light, the room's colour leaking through the closing door, 하은 walking away
-  R(0, 0, W, H, '#1a1b22'); R(0, 150, W, 66, '#111216'); for (let x = 0; x < W; x += 40) R(x, 152, 1, 64, '#1a1b22');
-  R(60, 0, 120, 3, '#dfe6f0'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, 0, 0, 150); gr.addColorStop(0, 'rgba(200,220,255,.18)'); gr.addColorStop(1, 'rgba(200,220,255,0)'); g.fillStyle = gr; g.fillRect(50, 0, 140, 150); g.restore();
-  R(260, 30, 90, 122, '#2a1c1c'); R(264, 34, 40, 118, '#3a2a2a');   // the door, half closed
-  g.save(); g.globalCompositeOperation = 'lighter'; const gr2 = g.createLinearGradient(304, 0, 230, 0); gr2.addColorStop(0, 'rgba(255,79,163,.45)'); gr2.addColorStop(0.5, 'rgba(79,227,255,.2)'); gr2.addColorStop(1, 'rgba(79,227,255,0)'); g.fillStyle = gr2; g.beginPath(); g.moveTo(304, 34); g.lineTo(304, 152); g.lineTo(230, 170); g.lineTo(230, 20); g.closePath(); g.fill(); g.restore();
-  R(304, 34, 46, 118, '#120a16'); for (let k = 0; k < 8; k++) R(308 + (k * 13) % 40, 40 + (k * 29) % 100, 3, 2, 'rgba(255,255,255,.25)');
-  text('♪', 326, 60, 'rgba(255,79,163,.6)', 10); text('♪', 316, 90, 'rgba(79,227,255,.5)', 8);
-  drawHaeunAt(150, 90, 0, { step: 1 });
-  R(0, 0, W, H, 'rgba(10,10,16,.35)');
-  // the sound going under: a waveform that flattens left to right
-  for (let x = 20; x < 360; x += 4) { const a = x < 200 ? 10 : Math.max(1, 10 - (x - 200) / 16); R(x, 196 - a / 2, 2, a, x < 200 ? '#ff4fa3' : '#5a6070'); }
-  text('소리: 로우패스 + 음량 ↓ (1-2 이어폰 처리)', 24, 203, '#b8a998', 6);
-}
-
 // ---------- 지하철 ----------
-function drawSubway() {
+function subwayCar() {
   R(0, 0, W, H, '#d9dde3'); R(0, 0, W, 26, '#c3c8d0'); R(0, 26, W, 2, '#9aa0a8');
-  // the route strip above the windows, the station we are coming to lit
-  R(40, 8, 300, 10, '#f2f4f6'); for (let k = 0; k < 9; k++) { R(52 + k * 36, 11, 4, 4, k === 5 ? '#d8463b' : '#2f6f8a'); } R(44, 12, 292, 2, '#2f6f8a');
-  text('○○대학병원', 240, 0, '#d8463b', 6, 'center', true);
-  // windows: black outside, light streaks passing (the beat), the next-station sign sliding in like a box
+  R(40, 8, 300, 10, '#f2f4f6'); for (let k = 0; k < 9; k++) R(52 + k * 36, 11, 4, 4, k === 5 ? '#d8463b' : '#2f6f8a'); R(44, 12, 292, 2, '#2f6f8a');
   for (let k = 0; k < 3; k++) { const x = 30 + k * 120; R(x, 34, 100, 54, '#0a0c12'); R(x - 2, 32, 104, 2, '#8d939a'); R(x - 2, 88, 104, 2, '#8d939a'); for (let j = 0; j < 4; j++) R(x + 10 + j * 24 + k * 7, 50 + (j % 2) * 14, 14, 2, j % 2 ? '#ffd890' : '#8fb8e0'); }
-  R(154, 46, 56, 20, '#1d3a2a'); R(156, 48, 52, 16, '#245a3a'); text('다음역', 182, 49, '#efe6d2', 5, 'center'); text('○○대학병원', 182, 56, '#ffffff', 6, 'center', true);
-  R(297, 30, 2, 60, 'rgba(216,70,59,.55)');   // the gate: a sign that reaches it is 'scanned' with the door chime
-  // handles, seats, the floor
   for (let k = 0; k < 7; k++) { const x = 40 + k * 50; R(x, 28, 1, 14, '#6a7075'); R(x - 4, 42, 9, 6, '#f2f4f6'); R(x - 3, 44, 7, 2, '#c3c8d0'); }
   R(0, 110, W, 36, '#2f5f8a'); R(0, 110, W, 3, '#3f7fb0'); for (let x = 0; x < W; x += 46) R(x, 112, 1, 34, '#244a6e'); R(0, 146, W, 70, '#8d939a'); R(0, 146, W, 2, '#6a7075'); R(0, 200, W, 3, '#f2d35a');
-  // 하은 standing, holding the strap, the car otherwise empty but for one sleeper
-  drawHaeunAt(190, 70, 0, { load: true }); thick(184, 92, 188, 44, 4, '#1e1a1a'); R(186, 42, 4, 4, '#2a2d31');
-  hud('첫차 · 05:12', ''); R(W - 46, 8, 36, 11, '#d9dde3');
-  judge('띵', 300, 92, '#2f6f8a', 11);
-  R(0, 176, W, 40, 'rgba(0,0,0,.55)'); text('덜컹, 덜컹 — 두 박이 리듬. 상자 자리에 역이 온다. 판정 글자는 작게, 콤보는 끔.', 12, 184, '#efe6d2', 7);
-  text('집에 가는 길처럼 보이다가, 내리는 역 이름이 병원.', 12, 198, '#b8a998', 7);
 }
-
-// ---------- 병실 ----------
+function drawSubway() {
+  subwayCar();
+  // 신입 slumped on the seat, asleep, cheeks red; 하은 up with her bag, a hand on the strap, about to step off
+  // slumped on the seat: drawn lower, the seat front and floor hiding his legs
+  g.save(); g.translate(0, 26); drawPlayer(0, 0); R(PLAYER_X + 6, 102, 2, 3, '#e07070'); R(PLAYER_X - 8, 102, 2, 3, '#e07070'); R(PLAYER_X - 4, 101, 3, 1, C.ink); g.restore();
+  R(PLAYER_X - 26, 146, 52, 24, '#8d939a'); R(PLAYER_X - 26, 146, 52, 2, '#6a7075'); zzz(PLAYER_X + 12, 112, 420);
+  drawHaeunAt(210, 70, 0, { load: true }); thick(204, 92, 208, 44, 4, '#1e1a1a'); R(206, 42, 4, 4, '#2a2d31');
+  R(216, 104, 12, 14, '#3a3f45'); R(217, 100, 10, 5, '#2a2d31');
+  bubble('…이제 내려요.', 150, 50, 62, { bg: '#d9d0bd' });
+  bubble('zZ…', 352, 96, 24, { size: 6 });
+  hud('첫차 · 05:12', '');
+  caption('조작 없음. 하은이 일어서고 신입은 자고 있다. 문이 열리고, 하은만 내린다.', '창 너머로 자는 신입을 두고 열차가 떠난다. 여기서부터 하은의 길.');
+}
+// ---------- 걷기 컷씬: 역에서 병원까지 ----------
+function drawWalk() {
+  const sky = g.createLinearGradient(0, 0, 0, 150); sky.addColorStop(0, '#1a2440'); sky.addColorStop(0.6, '#3a4a70'); sky.addColorStop(1, '#c97a4a'); g.fillStyle = sky; g.fillRect(0, 0, W, 150);
+  for (let k = 0; k < 14; k++) R((k * 53) % W, (k * 29) % 70, 1, 1, '#ffffff');
+  for (const [x, w, h, c] of [[0, 60, 80, '#2a3350'], [70, 40, 60, '#303a58'], [120, 70, 96, '#2a3350'], [200, 50, 70, '#303a58'], [262, 60, 50, '#2a3350']]) { R(x, 150 - h, w, h, c); for (let y = 150 - h + 8; y < 142; y += 12) for (let xx = x + 6; xx < x + w - 6; xx += 12) if ((xx + y) % 5 === 0) R(xx, y, 4, 5, '#ffd890'); }
+  R(300, 40, 84, 110, '#dfe6ea'); R(300, 40, 84, 3, '#b9c4c8'); for (let y = 52; y < 140; y += 14) for (let x = 308; x < 380; x += 14) R(x, y, 8, 9, (x + y) % 3 ? '#2f3a4a' : '#ffe9a8');
+  R(336, 20, 12, 30, '#d8463b'); R(327, 29, 30, 12, '#d8463b'); text('○○대학병원', 342, 56, '#1b1716', 6, 'center', true);
+  R(0, 150, W, 66, '#3a3a40'); R(0, 150, W, 2, '#6a6a70'); for (let x = 0; x < W; x += 28) R(x, 182, 16, 3, '#9a9a90');
+  for (let x = 30; x < W; x += 110) { R(x, 96, 3, 54, '#2b2e31'); R(x - 6, 92, 15, 5, '#3a3d44'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x + 1, 98, 2, x + 1, 120, 50); gr.addColorStop(0, 'rgba(255,200,120,.3)'); gr.addColorStop(1, 'rgba(255,200,120,0)'); g.fillStyle = gr; g.fillRect(x - 50, 90, 100, 80); g.restore(); }
+  drawHaeunAt(150, 94, 0, { step: 1, mirror: true }); R(140, 128, 12, 14, '#3a3f45');
+  for (let k = 0; k < 5; k++) text('♪', 120 + k * 26, 60 + (k % 2) * 10 - k * 3, k % 2 ? 'rgba(242,166,200,.7)' : 'rgba(255,233,168,.7)', 8 + (k % 3));
+  caption('리듬 없음, 컷씬. 역에서 나와 병원까지 걷는 동안 감미로운 노래가 시작된다(피아노와 현, 느린 템포).', '카메라가 하은을 따라 옆으로 흐르고(1-3 거리 걷기 재료), 가로등 아래를 지날 때마다 밝아졌다 어두워진다. 새벽이 밝아오기 시작.');
+}
+// ---------- 병원: 리듬닥터 오마주 ----------
+function hospitalHall() {
+  R(0, 0, W, H, '#e4ece6'); R(0, 0, W, 24, '#c9d6cc'); R(0, 150, W, 66, '#c9cfc9'); R(0, 150, W, 2, '#8a948c'); R(0, 100, W, 3, '#8fb0a0');
+  for (let x = 0; x < W; x += 96) { R(x + 20, 40, 48, 110, '#b9c9bd'); R(x + 24, 44, 40, 106, '#dfe6ea'); R(x + 28, 50, 32, 22, '#9fb8c8'); R(x + 36, 36, 16, 6, '#8fd694'); }
+  R(0, 4, W, 14, '#dfe6ea'); for (let x = 30; x < W; x += 140) R(x, 6, 36, 10, '#fff3c8');
+}
+function drawDoctor() {
+  hospitalHall();
+  const cx = 150, top = 90;
+  R(cx - 5, top + 38, 5, 16, '#3a3f45'); R(cx + 2, top + 38, 5, 16, '#3a3f45'); R(cx - 6, top + 53, 6, 3, '#1e1a1a'); R(cx + 2, top + 53, 6, 3, '#1e1a1a');
+  R(cx - 8, top + 16, 16, 24, '#f7f7f2'); R(cx - 3, top + 16, 6, 12, '#2b2e31'); R(cx - 8, top + 16, 2, 24, '#dfe6ea'); R(cx + 6, top + 16, 2, 24, '#dfe6ea');
+  R(cx - 6, top + 1, 12, 14, C.skin); R(cx - 7, top - 1, 14, 5, '#3a2a20'); R(cx - 7, top + 3, 2, 5, '#3a2a20');
+  R(cx - 5, top + 6, 4, 3, '#1b1716'); R(cx + 1, top + 6, 4, 3, '#1b1716'); R(cx - 1, top + 7, 2, 1, '#1b1716'); R(cx - 4, top + 7, 2, 1, '#9fd0ff'); R(cx + 2, top + 7, 2, 1, '#9fd0ff');
+  for (let k = 0; k < 10; k++) R(cx - 6 + (k < 5 ? 0 : 12), top + 16 + (k % 5) * 3, 1, 2, '#2b2e31'); R(cx - 6, top + 30, 13, 3, '#2b2e31'); R(cx + 5, top + 33, 3, 3, '#6a7075');
+  thick(cx + 6, top + 22, cx + 14, top + 34, 4, '#f7f7f2'); R(cx + 11, top + 28, 10, 13, '#c9b48a'); R(cx + 12, top + 30, 8, 1, '#1b1716'); R(cx + 12, top + 33, 6, 1, '#1b1716'); R(cx + 12, top + 36, 7, 1, '#1b1716');
+  thick(cx - 6, top + 22, cx - 10, top + 36, 4, '#f7f7f2'); R(cx - 12, top + 35, 4, 4, C.skin);
+  drawHaeunAt(250, 90, 0, { load: true }); thick(244, 112, 240, 124, 4, '#1e1a1a'); R(238, 123, 4, 3, '#2a2d31'); R(256, 124, 12, 14, '#3a3f45');
+  bubble('어머님 리듬이 오늘 좀 흔들려요. 일곱 번째에 맞춰요.', 20, 50, 190, { size: 7 });
+  bubble('…일곱.', 240, 58, 34, { bg: '#d9d0bd' });
+  for (let k = 0; k < 7; k++) { const x = 100 + k * 22, on = k === 6; R(x - 6, 136, 12, 12, on ? '#8fd694' : '#dfe6ea'); R(x - 6, 136, 12, 1, on ? '#cfe04a' : '#b9c4c8'); text(String(k + 1), x, 138, on ? '#1b1716' : '#6a7075', 7, 'center', on); }
+  caption('병원 입구에서 흰 가운의 의사가 기다린다(리듬닥터 오마주: 동그란 안경, 클립보드, 청진기).', '"일곱 번째에 맞춰요." 이 레벨의 마지막 조작 규칙을 한 줄로.');
+}
+// ---------- 병실: 어머니의 심장박동 ----------
 function drawWard(dawn) {
   const wall = dawn ? '#dfe8dc' : '#b9c9bd', floor = dawn ? '#cfd4cf' : '#9aa89e';
   R(0, 0, W, H, wall); R(0, 150, W, 66, floor); R(0, 150, W, 2, '#7a8a7e'); R(0, 96, W, 2, dawn ? '#c9d6c8' : '#9fb0a3');
-  // the window at the right: night going to morning
   R(290, 20, 80, 90, '#2b2b2b'); const sky = g.createLinearGradient(0, 24, 0, 106); if (dawn) { sky.addColorStop(0, '#9ec5e8'); sky.addColorStop(1, '#ffe2b0'); } else { sky.addColorStop(0, '#0e1a33'); sky.addColorStop(0.7, '#2a3858'); sky.addColorStop(1, '#c97a4a'); }
   g.fillStyle = sky; g.fillRect(294, 24, 72, 82); R(329, 24, 2, 82, '#2b2b2b'); R(294, 64, 72, 2, '#2b2b2b'); for (let k = 0; k < 5; k++) R(298 + k * 13, 86 + (k % 2) * 6, 8, 20, dawn ? '#8fb0c8' : '#1a2238');
-  // the bed, the mother under the blanket with the mask, the IV stand, the monitor
   drawHaeunAt(130, 94, 0, { load: true, mirror: true });
   R(60, 118, 200, 36, '#e9eef0'); R(60, 118, 200, 3, '#c9d2d6'); R(56, 110, 8, 50, '#9aa0a6'); R(256, 110, 8, 50, '#9aa0a6');
   R(66, 122, 190, 28, dawn ? '#cfe0f0' : '#b9cde0'); for (let x = 70; x < 250; x += 18) R(x, 134, 12, 1, dawn ? '#b9cde0' : '#a0b4c8');
-  R(76, 104, 28, 18, '#f5f1ea'); R(82, 108, 18, 14, '#d9b59a'); R(80, 106, 22, 4, '#8a8a8a'); R(84, 115, 12, 6, '#dfe6ea'); R(84, 115, 12, 1, '#b9c4c8'); R(100, 117, 10, 1, '#dfe6ea');   // pillow, face, grey hair, oxygen mask with its tube
+  R(76, 104, 28, 18, '#f5f1ea'); R(82, 108, 18, 14, '#d9b59a'); R(80, 106, 22, 4, '#8a8a8a'); R(84, 115, 12, 6, '#dfe6ea'); R(84, 115, 12, 1, '#b9c4c8'); R(100, 117, 10, 1, '#dfe6ea');
   R(240, 60, 2, 60, '#9aa0a6'); R(236, 118, 10, 2, '#9aa0a6'); R(236, 56, 10, 22, '#dfe6ea'); R(238, 58, 6, 14, '#bfe3d2'); R(241, 78, 1, 42, '#dfe6ea');
-  R(150, 34, 60, 40, '#1b1716'); R(153, 37, 54, 34, '#06140c'); text(dawn ? '64' : '58', 198, 39, '#8fd694', 8, 'right'); text('SpO₂ 91', 157, 39, '#5ad7e8', 6);
-  // the ECG trace is the beat grid: a flat line with a spike every beat, the one at the gate bright
-  for (let x = 156; x < 204; x++) { const ph = (x - 156) % 12; const y = ph === 4 ? 52 : ph === 5 ? 60 : ph === 6 ? 56 : 59; R(x, y, 1, 1, ph >= 4 && ph <= 6 && x > 190 ? '#ffffff' : '#8fd694'); }
-  R(150, 74, 60, 4, '#2b2e31'); R(178, 78, 4, 30, '#2b2e31');
-  // 하은 on the stool by the bed, cap off in her lap, holding the hand
+  R(140, 30, 110, 46, '#1b1716'); R(143, 33, 104, 40, '#06140c'); text(dawn ? '64' : '58', 244, 35, '#8fd694', 8, 'right'); text('SpO₂ 91', 147, 35, '#5ad7e8', 6);
+  for (let x = 146; x < 244; x++) { const ph = (x - 146) % 14; const y = ph === 5 ? 50 : ph === 6 ? 60 : ph === 7 ? 55 : 58; const seventh = Math.floor((x - 146) / 14) === 6; R(x, y, 1, 1, seventh && ph >= 5 && ph <= 7 ? '#ffffff' : '#8fd694'); }
+  if (!dawn) for (let k = 0; k < 7; k++) text(String(k + 1), 153 + k * 14, 64, k === 6 ? '#ffffff' : '#4a8a5a', 6, 'center', k === 6);
+  R(238, 36, 1, 38, 'rgba(255,74,61,.6)');
+  R(140, 76, 110, 4, '#2b2e31'); R(193, 80, 4, 30, '#2b2e31');
   thick(135, 117, 112, 126, 4, '#1e1a1a'); R(108, 124, 6, 4, '#d9b59a'); R(104, 123, 4, 6, '#d9b59a');
-  // the bedside table: the bill, her watch set down
   R(16, 126, 34, 24, '#c9bfae'); R(16, 126, 34, 2, '#e0d8c8'); R(20, 118, 20, 9, '#f7f1e2'); R(23, 120, 14, 1, '#8a8a8a'); R(23, 123, 10, 1, '#8a8a8a'); text('납부', 24, 124, '#d8463b', 4); R(42, 122, 6, 4, '#d8dde0');
-  if (!dawn) { R(0, 0, W, H, 'rgba(10,20,30,.28)'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(180, 55, 4, 180, 55, 90); gr.addColorStop(0, 'rgba(143,214,148,.22)'); gr.addColorStop(1, 'rgba(143,214,148,0)'); g.fillStyle = gr; g.fillRect(80, 0, 220, 150); g.restore(); }
+  if (!dawn) { R(0, 0, W, H, 'rgba(10,20,30,.28)'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(195, 55, 4, 195, 55, 90); gr.addColorStop(0, 'rgba(143,214,148,.22)'); gr.addColorStop(1, 'rgba(143,214,148,0)'); g.fillStyle = gr; g.fillRect(90, 0, 220, 150); g.restore(); }
   else { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(366, 0, 200, 0); gr.addColorStop(0, 'rgba(255,226,176,.4)'); gr.addColorStop(1, 'rgba(255,226,176,0)'); g.fillStyle = gr; g.fillRect(160, 0, 220, 216); g.restore(); }
-  if (!dawn) { bubble('…밥은 먹었니.', 22, 98, 56, { bg: '#f2ead6', size: 6 }); bubble('회식. 공짜.', 96, 76, 48, { bg: '#d9d0bd', size: 6 }); judge('·', 182, 44, '#ffffff', 10); }
-  R(0, 176, W, 40, 'rgba(0,0,0,.55)');
-  if (!dawn) { text('모니터 삑 소리가 마지막 박자. 교대 시간에 맞춰 시계를 본다(= 세 번째 시계).', 12, 184, '#efe6d2', 7); text('말로 하지 않는다: 납부서 한 장, 간호사와의 눈인사, 익숙한 손놀림.', 12, 198, '#b8a998', 7); }
-  else { text('엔딩: 창이 밝아오고 모니터는 어두워진다. 하은 시점에서 끝. 결과 화면 없이 타이틀로.', 12, 184, '#efe6d2', 7); text('마지막 소리: 모니터 삑 하나, 그리고 새 소리.', 12, 198, '#b8a998', 7); }
-}
-
-
-// ---------- 도입: 벨트에서 ----------
-const BELT_Y = 146, SCAN_X = 300, SPEED = 60;
-function beltS(time) {
-  R(48, BELT_Y, W - 48, 4, C.belt); R(48, BELT_Y, W - 48, 1, '#4a403b');
-  for (let k = -40; k <= 10; k++) { const x = Math.round(SCAN_X + (time - k * 0.15) * SPEED), q = ((k % 4) + 4) % 4; if (x < 49 || x >= W) continue; if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); } else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44'); else R(x, BELT_Y + 1, 1, 3, C.slat); }
-  R(46, BELT_Y + 4, W - 46, 12, C.face); for (let x = 50; x < W; x += 14) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); }
-  R(46, BELT_Y + 15, W - 46, 1, '#0c0a09'); for (const x of [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422'); R(44, BELT_Y - 1, 5, 17, '#3d3431');
-}
-function scannerS(on) { R(SCAN_X - 11, 108, 4, 40, '#555a5f'); R(SCAN_X - 11, 105, 24, 5, C.metal); R(SCAN_X - 2, 110, 6, 3, '#2b2e31'); R(SCAN_X + 8, 108, 4, 56, '#7b8288'); R(SCAN_X + 8, 108, 4, 2, '#9aa1a6'); R(SCAN_X, 113, 1, 33, on ? C.laser : '#5a2b27'); R(SCAN_X + 2, 103, 5, 2, on ? '#ff4a3d' : '#5a2b27'); }
-function boxS(x, bottom, w = 18, h = 14) { R(x - w / 2 + 1, bottom, w, 1, 'rgba(0,0,0,.45)'); R(x - w / 2, bottom - h, w, h, C.kraft); R(x - w / 2, bottom - h, w, 2, C.kraftTop); R(x + w / 2 - 2, bottom - h + 2, 2, h - 2, C.kraftDark); R(x - 1, bottom - h, 3, h, C.tape); R(x - w / 2 + 2, bottom - 6, 7, 4, C.label); }
-function playerS(aim) { drawPlayer(0, 0); const top = 94; thick(PLAYER_X - 6, top + 22, 326, 120, 4, C.hoodie); drawGun(324, 117, aim ? 0 : 0); }
-function haeunBeside(o = {}) { drawHaeunAt(354, 60, 0, { load: true, ...o }); if (!o.watch) { thick(348, 82, 346, 94, 4, '#1e1a1a'); R(344, 93, 4, 3, '#2a2d31'); } }
-function drawOpening(phase) {
-  g.drawImage(bg, 0, 0);
-  // the house lights, three tubes
-  for (const x of [60, 180, 300]) { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, '#fff3c8'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, 18, 0, 150); gr.addColorStop(0, 'rgba(255,236,170,.14)'); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 86, 150); g.lineTo(x - 40, 150); g.closePath(); g.fill(); g.restore(); }
-  scannerS(true);
-  if (phase === 0) {
-    // 지우 jumping with both arms up, the box she was carrying on the floor, the last box already past the gate
-    actor('jiwoo', 46, { bob: -7, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 14, top + 2, 4, '#6b2f3f'); R(BOSS_X + 13, top - 2, 5, 5, C.skin); thick(BOSS_X - 7, top + 23, BOSS_X - 16, top + 4, 4, '#6b2f3f'); R(BOSS_X - 19, top, 5, 5, C.skin); });
-    g.save(); g.translate(28, 150); g.rotate(-0.3); boxS(0, 0); g.restore();
-    beltS(0); boxS(338, BELT_Y);
-    bubble('붙었어요!!!!', 56, 44, 78, { loud: true, size: 10, h: 18, shake: 1 });
-    for (let k = 0; k < 4; k++) text('♪', 70 + k * 14, 70 + (k % 2) * 8, k % 2 ? '#f2a6c8' : '#5ad7e8', 9);
-    playerS(true); haeunBeside();
-    bubble('…?', 320, 44, 18, { bg: '#d9d0bd' });
-    judge('딱!', 300, 84, '#8fd694', 14);
-    hud('3번 라인 · 04:10', '콤보 18');
-  } else if (phase === 1) {
-    // 반장 storming in from the right, the belt empty, 지우 still bouncing
-    actor('jiwoo', 46, { bob: -2, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 14, top + 2, 4, '#6b2f3f'); R(BOSS_X + 13, top - 2, 5, 5, C.skin); });
-    g.save(); g.translate(28, 150); g.rotate(-0.3); boxS(0, 0); g.restore();
-    beltS(0);
-    actor('boss', 150, { bob: 1, noArm: true }, true, top => { R(BOSS_X + 2, top + 6, 5, 1, C.hair); R(BOSS_X + 1, top + 5, 2, 1, C.hair); R(BOSS_X - 8, top + 4, 2, 3, C.sweat); thick(BOSS_X + 7, top + 22, BOSS_X + 28, top + 14, 4, C.shirt); R(BOSS_X + 27, top + 11, 5, 5, C.skin); });
-    bubble('…야! 벨트가 왜 비어!', 104, 64, 92, { loud: true, size: 8, h: 15 });
-    bubble('반장님! 저 붙었어요! 반장님 기타 넣은 곡으로요!', 2, 28, 184, { size: 7 });
-    playerS(false); haeunBeside();
-    hud('3번 라인 · 04:11', '콤보 18');
-    text('(벨트는 돌지만 상자가 안 온다. 롤러 소리만.)', 60, 190, 'rgba(239,230,210,.75)', 6);
-  } else {
-    actor('jiwoo', 46, { bob: -1, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 13, top + 30, 4, '#6b2f3f'); R(BOSS_X + 12, top + 29, 4, 4, C.skin); });
-    beltS(0);
-    actor('boss', 150, { nod: 1, noArm: true }, true, top => { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); });   // arms folded
-    bubble('…회식이다. 오늘. 다 와.', 92, 50, 96, { size: 8, h: 15 });
-    playerS(false); haeunBeside({ watch: true });
-    bubble('저도요? …밥은 공짜죠?', 270, 40, 90, { bg: '#d9d0bd' });
-    hud('3번 라인 · 04:12', '');
-    R(W - 46, 8, 36, 11, '#231b17');
-    text('(상자는 끝까지 안 온다. 롤러만 돈다. 형광등 하나가 깜빡.)', 60, 190, 'rgba(239,230,210,.75)', 6);
-  }
+  if (!dawn) { bubble('…밥은 먹었니.', 22, 98, 56, { bg: '#f2ead6', size: 6 }); bubble('회식. 공짜.', 96, 76, 48, { bg: '#d9d0bd', size: 6 }); judge('7', 238, 20, '#ffffff', 12); }
+  if (!dawn) caption('리듬닥터 오마주: 모니터가 벨트. 심장박동이 1·2·3·4·5·6·7, 일곱 번째 박에 누른다. 일곱 박이 한 상자.', '맞추면 심박이 고르게, 놓치면 한 마디 흔들린다(부정맥 모양, 소리도). 판정 글자는 숫자 7 하나.');
+  else caption('엔딩: 창이 밝아오고 모니터는 어두워진다. 하은 시점에서 끝. 결과 화면 없이 타이틀로.', '마지막 소리: 모니터 삑 하나, 그리고 새 소리. 감미로운 노래가 다시 한 소절.');
 }
 
 // ---------- 시트 ----------
 const SCENES = [
   { id: 'open1', title: '0-1. 벨트: 지우가 뛴다', sub: '평소처럼 지우의 상자를 받다가, 지우가 갑자기 점프하면서 소리를 지른다. 오디션에 붙었다.', draw: () => drawOpening(0),
-    notes: ['레벨은 1-2 그루브로 시작(지우 곡, 116). 8마디쯤 받다가 상자 하나가 지우 손에서 바닥에 떨어지고, 지우가 뛴다. 외침 말풍선(1-2의 "이어폰 빼.라.고!"와 같은 빨간 테두리)과 화면 흔들림.', '그 순간부터 벨트에 상자가 안 온다. 롤러 소리만 남고 음악은 멈춘다(테이프 스톱 아님: 그냥 끊김). 플레이어는 스캐너를 들고 서 있고, 판정은 아무것도 안 뜸.', '하은은 1-4 자리(신입 뒤 오른쪽 한 단 위)에 그대로.'] },
+    notes: ['레벨은 1-2 그루브로 시작(지우 곡, 116). 8마디쯤 받다가 상자 하나가 지우 손에서 바닥에 떨어지고, 지우가 뛴다. 외침 말풍선과 화면 흔들림.', '그 순간부터 벨트에 상자가 안 온다. 롤러 소리만 남고 음악은 끊긴다. 플레이어는 스캐너를 들고 서 있고, 판정은 아무것도 안 뜸.', '하은은 1-4 자리(신입 뒤 오른쪽 한 단 위)에 그대로.'] },
   { id: 'open2', title: '0-2. 반장이 뿔나서 온다', sub: '빈 벨트를 보고 반장이 오른쪽에서 걸어 들어온다. "벨트가 왜 비어!" 지우는 아직 뛰고 있다.', draw: () => drawOpening(1),
-    notes: ['반장은 1-2처럼 화면 오른쪽 밖에서 걸어 들어와 지우 앞에 선다(1-1 인트로의 걷기 재료). 땀 한 방울, 눈썹.', '지우 "반장님! 저 붙었어요! 반장님 기타 넣은 곡으로요!" 반장이 멈춘다. 한 박 정적(상자 없음, 롤러만).', '조작 없음 구간이지만 플레이어는 계속 스캐너를 들고 있음: 손이 놀고 있다는 느낌 자체가 연출.'] },
+    notes: ['반장은 1-2처럼 화면 오른쪽 밖에서 걸어 들어와 지우 앞에 선다. 땀 한 방울, 눈썹.', '지우 "반장님! 저 붙었어요! 반장님 기타 넣은 곡으로요!" 반장이 멈춘다. 한 박 정적.', '조작 없음 구간이지만 플레이어는 계속 스캐너를 들고 있음: 손이 놀고 있다는 느낌 자체가 연출.'] },
   { id: 'open3', title: '0-3. "회식이다."', sub: '반장이 팔짱을 끼고 한참 있다가 "…회식이다. 오늘. 다 와." 신입 옆의 하은까지 합류.', draw: () => drawOpening(2),
-    notes: ['반장의 뿔이 풀리는 걸 말이 아니라 자세로: 삿대질 → 팔짱 → 고개 한 번 끄덕.', '하은 "저도요? …밥은 공짜죠?" 반장 "공짜다." 하은이 시계를 보고 따라나선다(첫 번째 시계).', '벨트가 그 자리에서 초밥 벨트로 바뀜(매치 컷). 롤러 소리가 그대로 이어지고 첫 상자 자리에 첫 접시.'] },
-  { id: 'sushi1', title: '1. 회전초밥집 (맑음)', sub: '벨트는 그대로 벨트. 주방에서 나온 접시가 지우, 반장, 하은을 지나 신입 자리까지 흐르고, 닿으면 집는다("쏙").', draw: () => drawSushi(0),
-    notes: ['매치 컷: 창고 벨트가 그 자리에서 초밥 벨트가 된다. 같은 슬랫, 같은 박자 격자, 선반이 주방 창으로. 롤러 소리가 그대로 이어지고 첫 상자 자리에 첫 접시.', '지우 "회식인데 웬 회전초밥이에요…" 반장 "…고기는 비싸."(반장이 내는 밥값. 은퇴 복선과 같은 결)', '접시 색이 상자 종류: 빨강 보통, 파랑 늦은 접시(지우가 투덜대며 밀어 보냄), 금색 두 손, 검정 긴 화물(장어 한 줄). 사케 잔은 반장과 "짠".', '하은은 말없이 먹는다. 접시가 벨트에서 하은 앞을 지나다 사라지고(그녀가 집어감) 그녀 앞에 쌓인다. 신입에게 오는 접시가 그만큼 줄어든다.'] },
-  { id: 'sushi2', title: '2. 회전초밥집 (취기 2단계)', sub: '같은 장면에 취기 효과: 따뜻한 색, 블룸, 기울기, 가장자리 흐림, 잔상, 말풍선 겹침. 하은 앞에는 접시 탑.', draw: () => { const off = document.createElement('canvas'); off.width = W; off.height = H; const g0 = g; g = off.getContext('2d'); drawSushi(1); g = g0; drunkFx(off, 2, () => { drawHaeunAt(236, 90, 0, { mirror: true, load: true }); thick(241, 113, 247, 102, 4, '#1e1a1a'); R(245, 98, 4, 4, '#2a2d31'); R(248, 94, 1, 6, '#efe6d2'); R(250, 94, 1, 6, '#efe6d2'); R(247, 91, 6, 2, '#f08a5d'); plateStack(236, 172, 14); bubble('(우물우물)', 214, 60, 48, { bg: '#d9d0bd' }); }); },
-    notes: ['취기는 콤보가 아니라 시간으로 올라감(0 → 1 → 2 → 3단계, 마디마다). 놓치면 한 단계 내려가지 않음: 취기는 되돌아가지 않는다.', '1단계 색 온도, 2단계 블룸과 느린 기울기(±1.5도, 4마디 주기), 3단계 잔상(한 번 더 2~3px 옮겨 그림)과 말풍선 흔들림. **하은만 블룸과 잔상에서 뺀다**: 화면이 흐려질수록 하은 혼자 또렷하다.', '하은의 접시 탑이 취기와 같이 자란다. 신입의 접시는 다섯 장, 하은은 열네 장. 지우 "…하은 씨, 그거 다 먹은 거예요?" 하은 "(우물우물)". 그녀 말풍선은 끝까지 작고 흔들리지 않는다.', '하은이 시계를 볼 때마다 소리가 반 박 가라앉는다(로우패스). 후반의 먹먹함을 미리 맛보게 하는 복선.', '소리: 웃음, 잔, 접시 집는 소리가 박자 안으로 들어오고 리버브가 길어짐. 움직임 줄이기 설정에서는 색 온도만.'] },
-  { id: 'nore', title: '3. 노래방 (절정)', sub: '지우가 오디션 곡을 노래방 반주로. 탬버린이 상자, 가사 자막이 박자로 켜짐, 미러볼과 두 색 조명.', draw: drawNoraebang,
-    notes: ['1-3 합주(블루스 위 지우 비트)를 노래방 팔레트로: 1-2 클럽 재료(미러볼, 두 색 빔)를 여기서는 일부러 씀. 지우의 곡이 돌아온 자리.', '가사 자막의 글자가 박자마다 켜지고, 켜진 글자 아래 점이 상자 역할도 함(탬버린과 겹치지 않게 글자는 보기만).', '반장은 소파에서 졸고(zzz), 지우는 뛰고, 신입은 탬버린. 하은은 문 옆에서 시계.', '취기 최대: 잔상 한 번, 킥마다 화면 쿵. 곡 중간에 하은이 일어나는 순간 모든 효과가 반 박 멈춤(히트 스톱).'] },
-  { id: 'door', title: '4. 전환 (문이 닫힌다)', sub: '하은이 나가는 순간 화면이 따라간다. 문이 닫히며 노래방 소리가 먹먹해지고 색이 빠진다.', draw: drawDoor,
-    notes: ['소리: 1-2의 이어폰 처리(로우패스 + 음량)를 문이 닫히는 1초에 걸어서, 복도에 서면 지우 노래가 벽 너머 웅웅거림으로만.', '화면: 노래방의 분홍·하늘 빛이 문틈으로만 새고, 복도는 차가운 형광등. 색이 빠지는 게 시점이 바뀌었다는 신호.', '여기서부터 하은이 플레이어. 조작은 같고 상자만 바뀐다.'] },
-  { id: 'subway', title: '5. 새벽 첫 지하철 (하은 시점)', sub: '거의 빈 차량. 창밖 불빛이 박자로 지나가고, 상자 자리에 역 안내판이 온다. 판정음은 안내 방송 차임.', draw: drawSubway,
-    notes: ['리듬: 덜컹-덜컹 두 박(60~70 BPM). 역 안내판이 창 위 띠를 따라 흘러와 빨간 선에 닿으면 "띵". 상자 드문드문, 가장 조용한 구간.', '노선도 위 다음 역이 빨갛게 켜지는데 글자는 처음엔 안 읽히다가(멀리) 닿을 때 "○○대학병원". 집에 가는 길처럼 연출하는 게 핵심이라 그 전까지 병원 단서는 없음.', '판정 글자는 작게, 콤보 표시는 끔. 놓쳐도 아무도 반응하지 않는다(반장 곁눈질 없음).', '하은의 두 번째 시계(손잡이 잡은 손목).'] },
-  { id: 'ward', title: '6. 병실', sub: '어머니가 위독하다. 모니터의 삑 소리가 마지막 박자. 돈을 모으는 이유를 말로 하지 않는다.', draw: () => drawWard(false),
-    notes: ['모니터 심전도 선이 박자 격자. 박마다 스파이크가 하나씩 오고 게이트(오른쪽 끝)에 닿는 스파이크가 상자. 판정 글자는 점 하나.', '대사 둘뿐: 어머니 "…밥은 먹었니." 하은 "회식. 공짜." 그리고 손을 잡는다.', '탁자 위 납부서, 벗어 둔 손목시계(교대 시간을 보던 이유). 간병인과 교대하는 동작은 복도 컷에서 짧게.', '조명: 초록 모니터 빛 + 창의 새벽. 효과는 전부 끔. 1-1 정전 구간처럼 소리로만.'] },
+    notes: ['반장의 뿔이 풀리는 걸 말이 아니라 자세로: 삿대질 → 팔짱 → 고개 한 번 끄덕.', '하은 "저도요? …밥은 공짜죠?" 반장 "공짜다." 하은이 시계를 보고 따라나선다(첫 번째 시계).', '벨트가 그 자리에서 초밥 벨트 셋으로 바뀜(매치 컷). 롤러 소리가 그대로 이어지고 첫 상자 자리에 첫 접시.'] },
+  { id: 'sushi1', title: '1. 회전초밥집 1페이즈: 벨트 셋, 반장이 초밥을 뿌린다', sub: '세 벨트가 1-4처럼 원근으로 겹치고 게이트는 한 수직선 위. 반장이 싣는 자리에서 접시를 세 벨트에 던져 넣고, 닿는 쪽을 집는다("쏙").', draw: () => drawSushi(1),
+    notes: ['버튼 하나(1-4 그대로). 세 벨트 중 닿아 있는 접시를 집고, 둘이나 셋이 같은 박에 닿으면 한 번에("양쪽!" → "세 개!").', '반장이 접시를 뿌리는 동작은 1-1부터의 "상자 올리기" 팔 그대로. 점선 궤적은 시안용이고 게임에서는 접시가 포물선으로 날아 벨트에 "탁" 하고 앉는다.', '접시 색이 상자 종류: 빨강 보통, 파랑 늦은 접시, 금색 두 손(큰 접시), 검정 긴 화물(장어 한 줄).', '지우는 먼 벨트 뒤에서 "회식인데 웬 회전초밥이에요…" 반장 "…고기는 비싸. 받아라." 하은은 신입 옆(1-4 자리)에서 말없이 먹고, 접시가 쌓이기 시작한다.'] },
+  { id: 'sushi2', title: '2. 회전초밥집 2페이즈: 소주잔을 뿌린다', sub: '접시 대신 소주잔이 세 벨트를 타고 온다. 잔이 닿으면 "짠". 취기가 오르고, 하은만 선명하다.', draw: () => { const off = document.createElement('canvas'); off.width = W; off.height = H; const g0 = g; g = off.getContext('2d'); drawSushi(2); g = g0; drunkFx(off, 2, () => haeunSharp(true)); },
+    notes: ['2페이즈 전환: 반장이 접시 대신 소주잔을 집어 던지기 시작한다. 첫 잔이 벨트에 앉는 순간 음악이 바뀌고, 잔이 닿을 때마다 "짠"과 함께 취기 한 칸.', '취기는 시간으로 올라가고 되돌아가지 않는다: 1단계 색 온도, 2단계 블룸과 느린 기울기(±1.5도), 3단계 잔상과 말풍선 겹침·흔들림. 신입 볼이 붉어진다.', '하은만 블룸과 잔상에서 뺀다: 화면이 흐려질수록 하은 혼자 또렷하고, 소주잔은 안 받고 접시만 계속 쌓인다(열네 장). 그녀의 말풍선은 끝까지 작고 흔들리지 않는다.', '하은이 시계를 볼 때마다 소리가 반 박 가라앉는다. 반장 "…다음 달까지만 나온다." 지우 "반장님 기타, 진짜 샘플로 썼어요!"', '끝: 화면이 완전히 뭉개지면서 암전. 다음 컷이 지하철.'] },
+  { id: 'subway', title: '3. 새벽 첫 지하철: "…이제 내려요."', sub: '취한 신입이 하은 옆자리에서 잔다. 하은이 일어서서 "이제 내려요" 하고 혼자 내린다. 조작 없음.', draw: drawSubway,
+    notes: ['노래방은 뺌. 초밥집 암전에서 바로 지하철. 신입은 하은 옆에 기대 자고 있고(볼 붉음, zZ), 하은은 가방을 들고 일어선다.', '"…이제 내려요." 신입은 못 듣는다. 문이 열리고 하은만 내린다. 창 너머로 자는 신입을 두고 열차가 떠나면서 시점이 완전히 하은에게.', '다음 역 표시는 아직 병원이라고 보여주지 않는다(노선도의 빨간 점만).'] },
+  { id: 'walk', title: '4. 걷기 컷씬: 역에서 병원까지, 노래가 시작된다', sub: '리듬 없음. 하은이 새벽 거리를 걷는 동안 매우 감미로운 노래가 시작된다. 길 끝에 병원.', draw: drawWalk,
+    notes: ['이 레벨에서 처음 나오는 "들려주기만 하는" 음악. 피아노와 현, 느린 템포, 가사 없음(1-3 지우 곡의 선율을 느리게 변주하면 전체가 한 곡으로 묶임).', '카메라가 하은을 따라 옆으로 흐르고(1-3 거리 걷기 재료 재활용), 가로등 아래를 지날 때마다 밝아졌다 어두워진다. 하늘이 밝아오기 시작.', '병원 간판이 보이는 순간까지 어디로 가는지 말하지 않는다. 건물의 빨간 십자가가 먼저 보이고, 이름은 가까이 가서야.', '길이: 노래 한 절(30초 안팎). 플레이어는 보기만 한다. 건너뛰기 없음.'] },
+  { id: 'doctor', title: '5. 병원: 리듬닥터 오마주', sub: '입구에서 흰 가운의 의사가 기다린다. "어머님 리듬이 오늘 좀 흔들려요. 일곱 번째에 맞춰요."', draw: drawDoctor,
+    notes: ['리듬닥터의 주인공 풍 의사: 동그란 안경, 흰 가운, 클립보드, 청진기. 우리 그림체(4등신, 무외곽선)로 다시 그림. 이름은 부르지 않는다.', '"일곱 번째에 맞춰요"가 다음 장면의 조작 규칙 전부. 공중에 1~7 카운트가 떠서 일곱 번째만 켜진다.', '하은은 단골처럼 고개만 끄덕인다. "…일곱."', '복도에서 간병인과 교대(짧게, 대사 없음). 하은이 시계를 본다(두 번째 시계).'] },
+  { id: 'ward', title: '6. 병실: 어머니의 심장박동으로 리듬', sub: '모니터가 벨트. 심장박동 1·2·3·4·5·6·7, 일곱 번째 박에 누른다. 맞추면 심박이 고르게, 놓치면 한 마디 흔들린다.', draw: () => drawWard(false),
+    notes: ['리듬닥터 오마주의 핵심: 박 하나가 상자 하나가 아니라 일곱 박이 한 상자. 심전도 스파이크가 왼쪽에서 오른쪽으로 흐르고 일곱 번째가 게이트에 닿을 때 누른다. 템포는 어머니 심박(58 → 맞출수록 64로 고르게).', '놓치면 심전도가 한 마디 부정맥 모양으로 흔들리고 모니터가 한 번 삑삑거린다. 반장 곁눈질 같은 건 없다. 판정 글자는 숫자 7 하나.', '대사 둘뿐: 어머니 "…밥은 먹었니." 하은 "회식. 공짜." 손을 잡는다. 탁자 위 납부서, 벗어 둔 시계(세 번째 시계).', '여기서 돈을 악착같이 모으는 이유가 설명된다. 말로 하지 않는다.', '길이: 16마디 안팎(일곱 박 묶음 × 9~10번). 짧고 조용하게. 효과는 전부 끔, 1-1 정전 구간처럼 소리로만.'] },
   { id: 'end', title: '7. 엔딩', sub: '창이 밝아오고 모니터는 어두워진다. 하은 시점에서 끝. 결과 화면 없이 타이틀로.', draw: () => drawWard(true),
-    notes: ['마지막 상자 = 마지막 삑. 그 뒤 4마디는 상자 없이 창만 밝아짐.', '신입 시점으로 돌아오지 않는다. 스테이지 1 완료 표시만. 스테이지 2 예고는 여기서 하지 않음.', '정할 것: 하은 구간을 플레이어가 조작할지(추천: 조작, 거의 빈 차트), 반장 송별 고백을 초밥집에서 할지, 노래방 곡 길이.'] }
+    notes: ['마지막 상자 = 마지막 일곱 번째 삑. 그 뒤 4마디는 상자 없이 창만 밝아지고, 걷기 컷씬의 노래가 한 소절 돌아온다.', '신입 시점으로 돌아오지 않는다. 지하철에서 자던 신입이 어디서 깼는지는 보여주지 않는다(스테이지 2 첫 장면 후보).', '정할 것: 초밥집 두 페이즈의 길이(각 16마디?), 2페이즈 음악, 병실 리듬의 길이, 반장 송별 고백을 초밥집에서 할지.'] }
 ];
 function render() {
-const rows = document.getElementById('rows');
-for (const sc of SCENES) {
-  const card = document.createElement('div'); card.className = 'card';
-  card.innerHTML = `<h2>${sc.title}</h2><small>${sc.sub}</small><canvas width="${W}" height="${H}"></canvas><ul>${sc.notes.map(n => `<li>${n}</li>`).join('')}</ul>`;
-  rows.append(card);
-  g = card.querySelector('canvas').getContext('2d'); g.imageSmoothingEnabled = false;
-  sc.draw();
-}
+  const rows = document.getElementById('rows');
+  for (const sc of SCENES) {
+    const card = document.createElement('div'); card.className = 'card';
+    card.innerHTML = `<h2>${sc.title}</h2><small>${sc.sub}</small><canvas width="${W}" height="${H}"></canvas><ul>${sc.notes.map(n => `<li>${n}</li>`).join('')}</ul>`;
+    rows.append(card);
+    g = card.querySelector('canvas').getContext('2d'); g.imageSmoothingEnabled = false;
+    sc.draw();
+  }
 }
 
 const bg = document.createElement('canvas'); bg.width = W; bg.height = H;
