@@ -417,7 +417,7 @@ const LEVELS = [
     // 반장's slow Chicago blues (after the second: ~57 BPM, A minor, a guitar lead the whole way) at 60; then her kick at double time (120)
     // under the same blues and the guitar comes in driven
     tempo: [[0, 115], [96, 60], [152, 120]], style:'mix13', fxTheme: beat => beat < 96 ? 'chill' : 'blues', tintColors: [[157, 180, 255], [120, 220, 255]], preClub: [[40, 88], [152, 256]],
-    clock:'03:05', title:'선곡', partners:['jiwoo'],
+    clock:'03:05', title:'선곡', partners:['jiwoo'], hints:false,
     // cast: 지우 places first while 반장 watches; at beat 88 he walks over, takes an earbud, and they swap places by beat 96
     cast: { swap: 88 },
     chords: [...CHILL.chords, ...BLUES.chords], roots: [...CHILL.roots, ...BLUES.roots],
@@ -2479,13 +2479,6 @@ function updateHud(t) {
     if (beat >= 36 && beat < 44) h = '벨트가 하나 더: 왼손은 위, 오른손은 아래';
     { const pr = notes.find(n => n.pair && n.state === 'pending'); if (pr && t > pr.place - SPB && t < pr.place + SPB) h = '넘어갈 때: 양손 같이'; }
     if (beat >= 168 && beat < 176) h = '위는 흔들고, 아래는 똑바로. 손마다 따로';
-  }
-  if (L.id === 's1-3') {
-    if (beat >= 95 && beat < 100) h = '느려져요. 반장님 손을 봐요';
-    if (beat >= 150 && beat < 158) h = '지우 곡이 돌아왔어요. 손은 반장님';
-    const sh = firstWith('shuffle'); if (sh && sh.state === 'pending' && t > sh.place - SPB) h = '셔플: 길게, 짧게';
-    if (beat >= 136 && beat < 142) h = '엇박: 박과 박 사이에 내려와요';
-    if (beat >= 200 && beat < 208) h = '빨라져도 박 사이 그대로';
   }
   if (L.id === 's1-1') {
     const offb = notes.find(n => n.beat % 2 === 1), pair = notes.find(n => n.beat % 1 === 0.5);
