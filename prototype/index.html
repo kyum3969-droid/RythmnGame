@@ -1701,6 +1701,8 @@ function drawAlleyRain(al, t, nowMs) {
     if (b >= 152 && b < 199 || b >= 200 && b < 248) ripple(PUDDLE2, '200,170,255', recent, 22);
     if (b >= 200 && b < 248) ripple(PUDDLE, '220,235,255', recent, 34);
   }
+  // the climax bursts leave a ring where they land on the ground
+  if (FX.splashes && FX.splashes.length) { g.lineWidth = 1; for (const p of FX.splashes) { const age = (nowMs - p.at) / 1000; if (age < 0 || age > 0.5) continue; if (age < 0.08) { g.fillStyle = `rgba(240,248,255,${0.9 * (1 - age / 0.08)})`; g.fillRect(p.x + ox - 2, p.y - 3, 5, 3); } if (!p.ring) continue; const rr = 3 + age * 40; g.strokeStyle = `rgba(220,235,255,${0.8 * (1 - age / 0.5)})`; g.beginPath(); g.ellipse(p.x + ox, p.y, rr, rr * 0.24, 0, 0, Math.PI * 2); g.stroke(); } }
   // splashes on the kick in the second drop
   if (b >= 200 && b < 248 && !reduce && FX.alleyBeat !== Math.floor(b)) {
     FX.alleyBeat = Math.floor(b);
@@ -1798,14 +1800,35 @@ function alleyHit(j, beat) {
   FX.pluckAt = now; FX.pluckAmp = j === 'perfect' ? 1 : 0.6;
   FX.shakeUntil = 0;
   if (beat >= 200 && beat < 248) {
-    // the climax: the view punches in on the scanner and the rain bursts off it
+    // the climax: the view punches in, and the rain bursts up off wet surfaces all over the alley (the scanner keeps its usual hit)
     const top = beat >= 232 ? 1.3 : 1;
     FX.punchAt = now; FX.punch = (j === 'perfect' ? 2.2 : 1.4) * top;
-    spawn(SCAN_X, BELT_Y - 8, Math.round(24 * top), ['#eef6ff', '#a8d8ff', '#ffffff'], -210, 210, -280, -70, 620, 650, [2, 2]);
-    spawn(SCAN_X, BELT_Y - 1, Math.round(14 * top), ['#cfe6ff', '#9fd0ff'], -320, 320, -90, -20, 380, 450, [3, 1]);
-    spawn(SCAN_X, BELT_Y - 20, Math.round(8 * top), ['#ffffff'], -120, 120, -160, -40, 500, 360, [1, 3]);
-    rings.push({ at: now, c: '#cfe6ff', dy: 0 });
+    alleySplashes(now, (j === 'perfect' ? 4 : 3) + (beat >= 232 ? 1 : 0));
   } else { FX.punchAt = -1e9; if (j === 'perfect') FX.freezeAt = now; }
+}
+// wet surfaces the climax splashes burst from: puddles and the street, the belt top, the awning edge, under the sign, the fire
+// escape rails. Each burst picks a few at random (never the scanner), throws droplets coloured by the light nearest it, and the
+// ones on the ground leave a ring.
+const SPLASH_SURF = [
+  { x0: 60, x1: 270, y: 142, ring: 1 }, { x0: 80, x1: 260, y: BELT_Y - 1, ring: 0 }, { x0: 230, x1: 266, y: 90, ring: 0 },
+  { x0: 122, x1: 182, y: 58, ring: 0 }, { x0: 282, x1: 372, y: 30, ring: 0 }, { x0: 282, x1: 372, y: 70, ring: 0 }, { x0: 20, x1: 250, y: 176, ring: 1 }];
+function alleySplashes(now, count) {
+  FX.splashes = (FX.splashes || []).filter(p => now - p.at < 600);
+  const used = [];
+  for (let k = 0; k < count; k++) {
+    let x = 0, y = 0, ring = 0;
+    for (let tries = 0; tries < 6; tries++) {
+      const S = SPLASH_SURF[Math.floor(Math.random() * SPLASH_SURF.length)];
+      x = Math.round(S.x0 + Math.random() * (S.x1 - S.x0)); y = S.y; ring = S.ring;
+      if (!used.some(u => Math.abs(u - x) < 40)) break;
+    }
+    used.push(x);
+    const blue = x > 110 && x < 196 && y < 120, lilac = x > 186 && x < 226 && y < 110, warm = y < 40;
+    const cols = blue ? ['#bfe9ff', '#7fd0ff', '#ffffff'] : lilac ? ['#e6d9ff', '#c4a8ff', '#ffffff'] : warm ? ['#ffe6b8', '#ffd08a', '#ffffff'] : ['#eef6ff', '#a8d8ff', '#ffffff'];
+    spawn(x, y - 1, 12 + Math.floor(Math.random() * 5), cols, -110, 110, -230, -70, 600, 560, [2, 2]);
+    spawn(x, y - 1, 6, cols, -170, 170, -70, -15, 420, 380, [2, 1]);
+    FX.splashes.push({ x, y, at: now + k * 12, ring });
+  }
 }
 function alleyMiss() {
   if (!(FX.lit > 0)) return;
@@ -2718,7 +2741,7 @@ try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}
 
 function resetRun() {
   notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; });
-  FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9;
+  FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.splashes = []; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
   rings = []; heavyPend = null;
 }
