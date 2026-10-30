@@ -254,11 +254,11 @@ function trainTwoShot(t) {
       bagAt(62, 84);
       // the near hand stays in her lap; the far arm: shoulder, elbow in front of her chest, hand to the side of his head
       R(HX + 1, SEAT - 3, 4, 3, '#d9a27a'); R(HX + 1, SEAT - 1, 4, 1, '#b98260');
-      // she only pushes while her arm can reach; once it is straight she lets go and he tips the rest of the way himself
-      const a = lean + tilt - Math.PI / 2, txh = headX + Math.cos(a) * 6, tyh = headY + Math.sin(a) * 6 + 2, rr = reach * clamp((29 - Math.hypot(txh - (HX - 6), tyh - (hTop + 3))) / 4, 0, 1);
-      const hx = lerp(HX - 3, txh, rr), hy = lerp(SEAT - 2, tyh, rr);
-      const ex = lerp(HX - 7, HX + 2, rr), ey = lerp(SEAT - 7, hTop + 5, rr);
-      thick(HX - 6, hTop + 3, ex, ey, 3, '#1e1a1a'); thick(ex, ey, hx, hy, 3, '#1e1a1a'); R(Math.round(hx) - 1, Math.round(hy) - 1, 3, 3, '#d9a27a'); R(Math.round(hx) - 1, Math.round(hy) + 2, 3, 1, '#b98260');
+      // the arm never stretches: an 8-pixel upper arm and an 8-pixel forearm, the elbow solved between them; she pushes while
+      // his head is within reach, then lets go and he tips the rest of the way onto the pole himself
+      const a = lean + tilt - Math.PI / 2, txh = headX + Math.cos(a) * 6, tyh = headY + Math.sin(a) * 6 + 2, sx0 = HX - 6, sy0 = hTop + 3;
+      const rr = reach * clamp((16.5 - Math.hypot(txh - sx0, tyh - sy0)) / 1.5, 0, 1);
+      arm(sx0, sy0, lerp(HX - 3, txh, rr), lerp(SEAT - 2, tyh, rr), '#1e1a1a', '#d9a27a', 1);
     } else if (t < WALK) {
       const r = t - RISE, pose = r < 0.45 ? 'lean' : r < 0.9 ? 'half' : 'stand';
       haeunFront(HX, pose, { turned: r > 1.35 });
@@ -278,68 +278,100 @@ function trainTwoShot(t) {
   bars();
 }
 
-// 2. 문 — from the platform, through the screen doors: she steps out, turns back; two layers of glass close on him; the train
-//    pulls out in a strobe of its windows; then flat and wide, the empty platform, the hanging clock, her second watch
+// 2. 문 — close on the train door from the platform: it opens, she comes out toward us; then her chest and shoulder close in
+//    the foreground and, over her shoulder, him asleep against the pole inside; the doors close between them and the train
+//    goes, its windows strobing across her; then flat and wide, the empty platform, the clock, her second watch
 function shotDoor(u) {
-  if (u < 7.4) doorClose(u); else platformWide(u - 7.4);
+  if (u < 3.4) doorCloseUp(u); else if (u < 8.8) doorOTS(u - 3.4); else platformWide(u - 8.8);
 }
-function trainSide(x0, inside) {   // the car as seen from the platform, its left end at x0 (buffer coords)
-  R(x0, 16, 260, 70, '#e3e7eb'); R(x0, 16, 260, 2, '#c9ced3'); R(x0, 58, 260, 4, '#2f6f8a'); R(x0, 62, 260, 1, '#7fb4c8'); R(x0, 80, 260, 6, '#5a6065');
-  for (const wx of [8, 160, 210]) { R(x0 + wx, 24, 40, 26, '#2b2e33'); R(x0 + wx + 1, 25, 38, 24, '#e8eef0'); R(x0 + wx + 1, 37, 38, 12, '#3f7fb0'); R(x0 + wx + 1, 37, 38, 1, '#5b97c6'); for (let k = 0; k < 3; k++) R(x0 + wx + 6 + k * 12, 25, 1, 4, '#c9ced3'); }
-  inside(x0);
+// 하은 standing, from the front, feet at feetY; step = 0/1 for a stride frame
+function haeunStand(cx, feetY, o = {}) {
+  const pants = '#3a3f45', pd = '#2a2e33', sk = '#d9a27a', legTop = feetY - 22, top = legTop - 18 + (o.step != null ? (o.step ? -1 : 0) : 0);
+  const lu = o.step === 1 ? 2 : 0, ru = o.step === 0 ? 2 : 0;
+  R(cx - 6, legTop, 5, 20 - lu, pants); R(cx + 1, legTop, 5, 20 - ru, pants); R(cx - 2, legTop, 1, 20 - lu, pd); R(cx + 1, legTop, 1, 20 - ru, pd);
+  R(cx - 7, feetY - 2 - lu, 6, 2, '#1e1a1a'); R(cx + 1, feetY - 2 - ru, 6, 2, '#1e1a1a'); R(cx - 7, feetY - lu, 6, 1, '#3a3236'); R(cx + 1, feetY - ru, 6, 1, '#3a3236');
+  R(cx - 7, top, 14, 1, '#1e1a1a'); R(cx - 8, top + 1, 16, 17, '#1e1a1a'); R(cx - 6, top + 3, 1, 14, '#121010'); R(cx + 5, top + 3, 1, 14, '#121010'); HAEUN_DRESS(cx, top); R(cx - 2, top - 1, 4, 2, '#b98260');
+  faceF(cx, top - 14, { eyes: 'hidden' }); HAIR.cap(cx, top - 14, o.turned);
+  thick(cx - 7, top + 3, cx - 8, top + 16, 3, '#1e1a1a'); R(cx - 9, top + 16, 3, 3, sk);
+  thick(cx + 7, top + 3, cx + 8, top + 14, 3, '#1e1a1a'); R(cx + 6, top + 14, 4, 3, sk); bagAt(cx + 7, top + 15);
+  return top;
 }
-function doorClose(u) {
-  const open = clamp((u - 0.5) / 0.8, 0, 1) * (1 - clamp((u - 4.4) / 0.9, 0, 1)), dep = Math.max(0, u - 5.9), tx = -Math.round(dep * dep * 46);
+// the inside of the car behind an open door: wall, the bench, the pole, him asleep against it
+function carInside(x, y, w, h, sinipX, seatY, t) {
+  R(x, y, w, h, '#d6dbe1'); R(x, y, w, 6, '#c3c8d0'); light(x + w / 2, y + 4, w, '255,246,226', 0.18);
+  R(x, seatY - 24, w, 24, '#2f5f8a'); dfill(x, seatY - 23, w, 22, '#3a6d9a', 0.32); R(x, seatY - 24, w, 2, '#4a82b4');
+  R(x, seatY, w, 3, '#3f7fb0'); R(x, seatY + 3, w, 4, '#244766'); R(x, seatY + 7, w, 4, '#8e979f'); R(x, seatY + 11, w, h - (seatY + 11 - y), '#6b7279');
+  R(sinipX + 15, y, 3, h, '#b8bec4'); R(sinipX + 16, y, 1, h, '#eef1f3');
+  sinipLean(sinipX, seatY, 0.24, 0.32, t);
+}
+function doorCloseUp(u) {
+  const open = ease(clamp((u - 0.7) / 0.8, 0, 1)), out = clamp((u - 1.6) / 1.8, 0, 1);
   shot(2, (w, h) => {
-    // behind the train: the far wall across the tracks, with the station's name and a clock (seen once it leaves)
-    R(0, 0, w, h, '#1d2328'); R(0, 22, w, 50, '#d5ddd9'); for (let x = 0; x < w; x += 6) R(x, 22, 1, 50, '#c4ccc8'); for (let y = 22; y < 72; y += 5) R(0, y, w, 1, '#c4ccc8');
-    R(46, 32, 70, 16, '#1e2a33'); R(48, 34, 66, 12, '#2f3a4a'); R(48, 46, 66, 1, '#8fd694'); R(52, 37, 3, 6, '#e9eef0'); R(57, 37, 3, 6, '#e9eef0'); for (let k = 0; k < 4; k++) R(64 + k * 10, 36, 7, 8, '#e9eef0');
-    R(132, 34, 26, 12, '#141414'); R(133, 35, 24, 10, '#06140c'); digits('05:14', 135, 37, '#8fd694');
-    R(0, 72, w, 12, '#2a2622');
-    // the train: body, livery, the door, what is inside; she is inside it until she steps out
-    trainSide(tx - 34, x0 => {
-      // the same passengers, through the windows
-      g.save(); g.beginPath(); g.rect(x0 + 9, 25, 38, 24); g.rect(x0 + 161, 25, 38, 24); g.rect(x0 + 211, 25, 38, 24); g.clip();
-      for (const [px, f, hair, top] of [[x0 + 19, 'salary', '#3a3e48', 42], [x0 + 38, 'student', '#9a9488', 42], [x0 + 178, 'long', '#c9b089', 38], [x0 + 228, 'buzz', '#2a3a6a', 36]]) { R(px - 8, top, 16, 14, top === 42 ? hair : hair); faceF(px, top - 14, { eyes: f === 'long' ? 'open' : 'closed', look: f === 'long' || f === 'student' ? 'down' : '' }); HAIR[f](px, top - 14); }
-      R(x0 + 172, 38, 6, 6, '#1b1716'); R(x0 + 173, 39, 4, 4, '#9fd8ec');
-      g.restore();
-      const dx = x0 + 104;   // the train door, 44 wide
-      R(dx, 20, 44, 66, '#2b2e33'); R(dx + 1, 21, 42, 64, '#f2efe6'); R(dx + 1, 21, 42, 30, '#e8eef0'); R(dx + 1, 51, 42, 18, '#3f7fb0'); R(dx + 1, 51, 42, 1, '#5b97c6'); R(dx + 1, 69, 42, 16, '#8a9198');
-      R(dx + 36, 21, 2, 64, '#b8bec4'); R(dx + 36, 21, 1, 64, '#eef1f3');
-      // 신입 against the pole inside, asleep
-      sinipAsleep(dx + 22, 63, 0.62, u);
-      light(dx + 22, 40, 40, '255,240,210', 0.25);
-      const dw = Math.round(21 * (1 - open)); R(dx + 1, 21, dw, 64, '#d3d8dd'); R(dx + 43 - dw, 21, dw, 64, '#d3d8dd');
-      if (dw > 6) { R(dx + 4, 27, dw - 6, 24, '#2b2e33'); R(dx + 5, 28, dw - 8, 22, '#cfe0e8'); R(dx + 43 - dw + 2, 27, dw - 6, 24, '#2b2e33'); R(dx + 43 - dw + 3, 28, dw - 8, 22, '#cfe0e8'); }
-      if (dw > 0) { R(dx + dw, 21, 1, 64, '#2b2e33'); R(dx + 43 - dw, 21, 1, 64, '#2b2e33'); }
-      if (dw > 12) { g.save(); g.beginPath(); g.rect(dx + 5, 28, dw - 8, 22); g.rect(dx + 43 - dw + 3, 28, dw - 8, 22); g.clip(); sinipAsleep(dx + 22, 63, 0.62, u); shade(dx, 21, 44, 64, '207,224,232', 0.35); g.restore(); }
-    });
-    // the windows streak past as it leaves; their light strobes across the platform
-    if (dep > 0) { const sp = dep * 92; for (let k = 0; k < 6; k++) { const x = ((k * 70 - sp * 1.6) % 420 + 420) % 420 - 60; g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,190,${Math.min(0.16, dep * 0.12)})`; g.fillRect(x, 84, 40, 12); g.restore(); } }
-    // the platform screen doors: header, frames, glass that reflects, the sliding panels
-    R(0, 12, w, 9, '#2a2f36'); R(0, 20, w, 1, '#4a525c'); R(88, 14, 22, 5, '#111'); digits('4-2', 91, 14, '#ff8a3d'); R(140, 14, 30, 5, '#111'); R(142, 15, 26, 3, '#2f6f4a');
-    const pw = Math.round(22 * (1 - open));
-    for (const [x0, x1] of [[0, 74], [126, w]]) { R(x0, 21, x1 - x0, 63, 'rgba(180,205,215,0.18)'); }
-    const post = x => { R(x, 21, 4, 63, '#9aa3ab'); R(x, 21, 1, 63, '#d5dade'); R(x + 3, 21, 1, 63, '#6f777e'); };
-    for (const x of [0, 30, 74, 122, 160]) post(x);
-    R(78, 21, pw, 63, 'rgba(190,215,225,0.22)'); R(122 - pw, 21, pw, 63, 'rgba(190,215,225,0.22)'); if (pw > 0) { R(78 + pw - 1, 21, 1, 63, '#9aa3ab'); R(122 - pw, 21, 1, 63, '#9aa3ab'); R(78, 21, pw, 1, '#c9d0d4'); R(122 - pw, 21, pw, 1, '#c9d0d4'); }
-    g.save(); g.globalAlpha = 0.12; for (let k = 0; k < 18; k++) R(34 + k * 2, 80 - k * 3, 6, 1, '#ffffff'); for (let k = 0; k < 18; k++) R(164 + k, 80 - k * 3, 6, 1, '#ffffff'); g.restore();
-    R(34, 40, 26, 30, '#f2a6c8'); R(36, 42, 22, 26, '#fff3c8'); R(38, 45, 12, 2, '#1b1716'); R(38, 50, 18, 1, '#1b1716'); R(38, 53, 10, 1, '#1b1716'); R(40, 58, 14, 8, '#d8463b');
-    // the platform floor: granite, the yellow tactile strip
-    R(0, 84, w, 12, '#aab3b1'); dfill(0, 84, w, 12, '#bcc5c3', 0.3); R(0, 84, w, 3, '#e8c34a'); for (let x = 1; x < w; x += 3) R(x, 85, 1, 1, '#c9a63a');
-    // 하은: out of the door, a few steps right, she turns back to look
-    if (u > 1.2) {
-      const p = clamp((u - 1.3) / 1.8, 0, 1), x = Math.round(lerp(126, 152, ease(p))), feet = Math.round(lerp(86, 95, clamp(p * 2.5, 0, 1)));
-      if (u > 1.3 && p < 1) haeunWalkSide(x, feet, u, { mirror: true, pace: 0.22 });
-      else haeunWalkSide(x, 95, u, { stand: true, mirror: u < 3.5 });
-    }
-    light(100, 50, 70, '255,240,210', 0.12 * (1 - clamp(dep, 0, 1)));
+    // the car side fills the frame; the doorway in the middle
+    R(0, 0, w, h, '#e3e7eb'); R(0, 0, w, 3, '#c9ced3'); R(0, 74, w, 4, '#2f6f8a'); R(0, 78, w, 1, '#7fb4c8'); dfill(0, 3, w, 70, '#d6dbe0', 0.2);
+    const dx0 = 50, dx1 = 142, dy0 = 14, dy1 = 98;
+    R(dx0 - 4, dy0 - 4, dx1 - dx0 + 8, dy1 - dy0 + 4, '#b9c0c7'); R(dx0 - 1, dy0 - 1, dx1 - dx0 + 2, dy1 - dy0 + 1, '#2b2e33');
+    R(88, 6, 16, 5, '#2b2e33'); R(90, 7, 12, 3, open > 0 && Math.floor(u * 4) % 2 ? '#ff8a3d' : '#5a2a1a');
+    g.save(); g.beginPath(); g.rect(dx0, dy0, dx1 - dx0, dy1 - dy0); g.clip();
+    carInside(dx0, dy0, dx1 - dx0, dy1 - dy0, 112, 72, u);
+    // 하은 inside, then stepping out toward us
+    const feet = Math.round(lerp(86, 104, ease(out))), cx = 82;
+    if (out < 1) haeunStand(cx, feet, { step: out > 0 && out < 1 ? Math.floor(u / 0.3) % 2 : null });
+    // the two panels slide into their pockets
+    const pw = Math.round(46 * (1 - open));
+    for (const [x, s] of [[dx0, 1], [dx1, -1]]) { if (pw <= 0) continue; const px = s > 0 ? x : x - pw; R(px, dy0, pw, dy1 - dy0, '#d3d8dd'); R(px, dy0, pw, 1, '#eef1f3'); R(s > 0 ? px + pw - 2 : px, dy0, 2, dy1 - dy0, '#2b2e33'); if (pw > 12) { R(px + 5, dy0 + 8, pw - 10, 30, '#2b2e33'); g.save(); g.beginPath(); g.rect(px + 6, dy0 + 9, pw - 12, 28); g.clip(); carInside(dx0, dy0, dx1 - dx0, dy1 - dy0, 112, 72, u); haeunStand(82, 86, {}); shade(px + 6, dy0 + 9, pw - 12, 28, '200,215,225', 0.3); R(px + 8, dy0 + 30, 10, 1, 'rgba(255,255,255,.4)'); g.restore(); } R(px + 3, dy0 + 50, Math.max(0, pw - 6), 1, '#9aa0a8'); }
+    g.restore();
+    // the yellow sill at the bottom; the platform's light on the train
+    R(dx0 - 4, 96, dx1 - dx0 + 8, 2, '#f2d35a');
+    if (out > 0.5) { haeunStand(82, Math.round(lerp(86, 104, ease(out))), { step: Math.floor(u / 0.3) % 2 }); }
     vig(w, h, 0.4);
   });
   bars();
-  if (u >= 0.5) cue('d-open', () => { SND.chime(); SND.door(); }); if (u >= 4.4) cue('d-close', () => { SND.door(); noiseS(now() + 0.6, 'lowpass', 300, 0.12, 0.08); });
-  if (u >= 5.9) { cue('d-go', () => rollerOn(true, 0.08)); clacks('d-go', dep * dep * 46, 40); } else rollerOn(true, 0.015);
   blackout(W, H, u < 0.3 ? 1 - u / 0.3 : 0);
+}
+// a tiny 신입 for the far background: slumped against the pole with his head over on it
+function sinipFar(x, seatY, t) {
+  R(x - 3, seatY + 1, 2, 5, '#33415a'); R(x + 1, seatY + 1, 2, 5, '#33415a'); R(x - 4, seatY - 1, 8, 2, '#33415a');
+  R(x - 4, seatY - 4, 8, 3, '#2f4f58'); R(x - 3, seatY - 8, 8, 4, '#2f4f58'); R(x - 2, seatY - 8, 6, 4, '#cfe04a'); R(x - 2, seatY - 5, 6, 1, '#ebe5c9');
+  R(x + 1, seatY - 13, 5, 5, '#d9a27a'); R(x + 1, seatY - 14, 5, 2, '#1e1a1a'); R(x + 5, seatY - 13, 1, 3, '#1e1a1a'); R(x + 1, seatY - 12, 1, 3, '#1e1a1a'); R(x + 2, seatY - 10, 1, 1, '#e07070');
+  if (Math.floor(t / 0.8) % 2) R(x + 5, seatY - 18, 2, 1, '#e9e4da');
+}
+function doorOTS(t) {
+  const close = ease(clamp((t - 1.4) / 0.9, 0, 1)), dep = Math.max(0, t - 3.0), tx = -Math.round(dep * dep * 22);
+  shot(3, (w, h) => {
+    // behind her: the train side and its open door, the lit car inside, him at the pole; when it goes, the far wall
+    R(0, 0, w, h, '#1d2328'); R(0, 14, w, 40, '#cfd8d4'); for (let x = 0; x < w; x += 5) R(x, 14, 1, 40, '#c0c9c5'); R(0, 40, w, 3, '#2f6f8a'); R(16, 22, 30, 7, '#1e2a33'); R(17, 23, 28, 5, '#2f3a4a'); R(17, 27, 28, 1, '#8fd694');
+    g.save(); g.translate(tx, 0);
+    R(-80, 6, 260, 52, '#e3e7eb'); R(-80, 6, 260, 1, '#c9ced3'); R(-80, 46, 260, 3, '#2f6f8a'); R(-80, 54, 260, 4, '#5a6065');
+    for (const wx of [-70, 66, 100]) { R(wx, 12, 28, 18, '#2b2e33'); R(wx + 1, 13, 26, 16, '#e8eef0'); R(wx + 1, 21, 26, 8, '#3f7fb0'); }
+    const dx = 18, dw = 34;
+    R(dx - 1, 9, dw + 2, 47, '#2b2e33'); R(dx, 10, dw, 46, '#d6dbe1'); R(dx, 10, dw, 3, '#c3c8d0'); R(dx, 30, dw, 12, '#2f5f8a'); R(dx, 30, dw, 1, '#4a82b4'); R(dx, 42, dw, 2, '#3f7fb0'); R(dx, 44, dw, 12, '#8e979f');
+    R(dx + 22, 10, 2, 46, '#b8bec4'); R(dx + 22, 10, 1, 46, '#eef1f3'); sinipFar(dx + 17, 42, t); light(dx + 17, 20, 22, '255,240,210', 0.25);
+    const pw = Math.round(17 * close); if (pw > 0) { R(dx, 10, pw, 46, '#d3d8dd'); R(dx + dw - pw, 10, pw, 46, '#d3d8dd'); R(dx + pw - 1, 10, 1, 46, '#2b2e33'); R(dx + dw - pw, 10, 1, 46, '#2b2e33'); if (pw > 6) { for (const wx of [dx + 2, dx + dw - pw + 2]) { R(wx - 1, 14, pw - 2, 24, '#2b2e33'); g.save(); g.beginPath(); g.rect(wx, 15, pw - 4, 22); g.clip(); R(dx, 10, dw, 20, '#d6dbe1'); R(dx, 30, dw, 12, '#2f5f8a'); R(dx + 22, 10, 2, 46, '#b8bec4'); sinipFar(dx + 17, 42, t); shade(wx, 15, pw - 4, 22, '170,190,205', 0.3); R(wx + 1, 33, 4, 1, 'rgba(255,255,255,.35)'); g.restore(); } } }
+    g.restore();
+    shade(0, 0, w, 58, '20,26,34', 0.18);
+    R(0, 58, w, 14, '#9ea7a5'); R(0, 58, w, 2, '#e8c34a');
+    // the windows' light sweeping across as it pulls out
+    if (dep > 0 && dep < 2.2) for (let k = 0; k < 4; k++) { const x = ((k * 40 - dep * dep * 22 * 1.3) % 180 + 180) % 180 - 30; g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,190,${0.12 * Math.min(1, dep)})`; g.fillRect(x, 0, 20, h); g.restore(); }
+    // her, close: sloped shoulders and the long black sleeves, the sky-blue vest (zip, collar, the reflective band), a crossbody
+    // strap; the cap with the platform's light on its crown; she turns her head toward the door once, then back
+    const turned = t > 0.6 && t < 2.6, cx = 92, top = 37, breath = Math.round(Math.sin(t * 1.6) * 0.6);
+    const sh = (y, half) => R(cx - half, top + y + breath, half * 2, 1, '#1e1a1a');
+    sh(0, 4); sh(1, 7); sh(2, 9); sh(3, 10); R(cx - 11, top + 4 + breath, 22, 30, '#1e1a1a');
+    R(cx - 10, top + 2 + breath, 4, 1, '#3a3436'); R(cx + 6, top + 2 + breath, 4, 1, '#3a3436'); R(cx - 11, top + 4 + breath, 1, 6, '#3a3436'); R(cx + 10, top + 4 + breath, 1, 6, '#3a3436');
+    R(cx - 7, top + 3 + breath, 14, 31, '#7ec8e3'); R(cx - 7, top + 3 + breath, 1, 31, '#5aa6c4'); R(cx + 6, top + 3 + breath, 1, 31, '#5aa6c4'); R(cx - 6, top + 3 + breath, 4, 1, '#b4e6f4');
+    g.fillStyle = '#1e1a1a'; g.beginPath(); g.moveTo(cx - 3, top + 2 + breath); g.lineTo(cx + 3, top + 2 + breath); g.lineTo(cx, top + 9 + breath); g.closePath(); g.fill();
+    R(cx, top + 9 + breath, 1, 25, '#4a8fb0'); R(cx + 1, top + 9 + breath, 1, 25, '#9fd8ec');
+    R(cx - 7, top + 15 + breath, 14, 3, '#ebe5c9'); R(cx - 7, top + 18 + breath, 14, 1, '#c9c2a8'); R(cx - 6, top + 24 + breath, 4, 1, '#5aa6c4'); R(cx + 3, top + 24 + breath, 4, 1, '#5aa6c4');
+    R(cx - 11, top + 10 + breath, 1, 24, '#121010'); R(cx + 10, top + 10 + breath, 1, 24, '#121010'); R(cx - 8, top + 10 + breath, 1, 24, '#121010'); R(cx + 7, top + 10 + breath, 1, 24, '#121010');
+    for (let k = 0; k < 26; k++) R(Math.round(cx + 8 - k * 0.62), top + 2 + k + breath, 2, 1, '#2f3237');
+    R(cx - 2, top - 2, 4, 3, '#b98260'); faceF(cx, top - 15, { eyes: 'hidden' }); HAIR.cap(cx, top - 15, turned);
+    if (!turned) { R(cx + 7, top - 13, 2, 9, '#4a3328'); R(cx + 7, top - 13, 1, 9, '#6b4a3a'); }
+    R(cx - 5, top - 21, 9, 1, '#ffb8a8'); R(cx - 10, top + 1 + breath, 4, 1, '#d9e2e6'); R(cx + 6, top + 1 + breath, 4, 1, '#d9e2e6');
+    vig(w, h, 0.5);
+  });
+  bars();
+  blackout(W, H, t > 4.9 ? (t - 4.9) / 0.5 : 0);
 }
 function platformWide(t) {
   shot(1, (w, h) => {
@@ -365,7 +397,7 @@ function platformWide(t) {
   });
   bars();
   rollerOn(true, Math.max(0, 0.06 - t * 0.03));
-  blackout(W, H, Math.max(t < 0.15 ? 1 - t / 0.15 : 0, t > 2.0 ? (t - 2.0) / 0.6 : 0));
+  blackout(W, H, Math.max(t < 0.3 ? 1 - t / 0.3 : 0, t > 3.1 ? (t - 3.1) / 0.6 : 0));
 }
 
 // 3. 계단 — a steadicam behind her up the exit stairs: the treads roll under the camera, the opening of sky grows, she steps out
