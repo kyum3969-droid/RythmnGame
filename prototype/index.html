@@ -62,6 +62,11 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   font-size:clamp(11px,1.9cqw,18px);line-height:1.35;padding:.45em .75em;border-radius:6px;pointer-events:none;box-shadow:0 2px 0 rgba(0,0,0,.45)}
 .bubble.obs{background:#d9d0bd}
 .bubble::after{content:"";position:absolute;left:1.6em;bottom:-.45em;border:.5em solid transparent;border-top-color:var(--paper);border-bottom:0}
+.bubble.loud{font-family:var(--display);font-weight:400;font-size:clamp(15px,3.1cqw,30px);letter-spacing:.02em;background:#fff4e8;color:#b3261e;
+  border:2px solid #d8463b;box-shadow:0 3px 0 rgba(0,0,0,.5),0 0 18px rgba(216,70,59,.45);animation:shout .6s ease-out}
+.bubble.loud::after{border-top-color:#d8463b}
+@keyframes shout{0%{transform:scale(1.7) rotate(-4deg);opacity:0}14%{transform:scale(.92) rotate(2deg);opacity:1}24%{transform:scale(1.06) translateX(-4px) rotate(-1.5deg)}
+  34%{transform:scale(1) translateX(4px) rotate(1deg)}44%{transform:translateX(-3px)}54%{transform:translateX(2px)}66%,100%{transform:none}}
 .bubble.robot{background:#1d2a30;color:#8fe3f0;font-family:var(--mono);font-weight:500;font-size:clamp(10px,1.6cqw,15px);border:1px solid #3d6b78}
 .bubble.robot::after{border-top-color:#1d2a30}
 
@@ -147,6 +152,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .board-foot{margin:1.2cqw 0 0;font-size:clamp(10px,1.5cqw,14px);color:#e9dcc3}
 
 @media (prefers-reduced-motion: reduce){
+  .bubble.loud{animation:none}
   .judge.pop{animation:fade .6s forwards} .dialog .next{animation:none} .hud span.pulse,.hud span.broke{animation:none} .judge.miss.pop{animation:fade .7s forwards}
   @keyframes fade{0%,70%{opacity:1}100%{opacity:0}}
 }
@@ -327,7 +333,7 @@ const LEVELS = [
     id:'s1-1', stageNo:'1-1', who:'반장', role:'반장 · 88 BPM', tag:'쿵 · 쿵짝 · 긴 화물', bpm:88, div:2, style:'night1', lofi:6500, chordShift:2,
     // the last bars slow down into the final chord, which lands on the last box
     tempo: [[0, 88], [92, 84], [94, 78], [96, 72]], endAt: 96,
-    clock:'02:50', title:'첫 출근', partners:['boss'], chords: NIGHT.chords, roots: NIGHT.roots, tutorial:true,
+    clock:'02:50', title:'첫 출근', partners:['boss'], chords: NIGHT.chords, roots: NIGHT.roots, tutorial:true, hints:false,
     // the tutorial forgives more: wider timing windows and a more patient release on long crates
     win: { p: 0.065, g: 0.125, m: 0.19, release: 0.2 },
     special:['긴 화물', 'len', '끝까지'],
@@ -341,23 +347,19 @@ const LEVELS = [
       'x.x.x.x.', 'x...x.x.', 'x.x.x.x.', 'x.x.x...', 'x.x.x.x.', 'x...x.xx', 'x.x.x.x.', 'x.......',
       'x...x...', 'x.x.x...', 'x.......', '........'
     ],
-    say: [[1, '자, 간다. 내 손 봐.', 5], [6, '올리고, 하나, 둘, 삑.', 4], [22, '쿵, 쿵짝. 이제 짝도 넣는다.', 4],
-          [38, '긴 거 온다. 액자야. 끝까지 잡아.', 4], [54, '좋아. 그 박자야.', 3], [73, '끝에 짝짝, 두 번.', 3], [90, '수고했다, 신입.', 4]],
-    comfort: ['괜찮아. 다음 거 봐.', '음악 말고 내 손.'],
+    say: [[1, '자, 간다. 내 손 봐.', 5], [6, '올리고, 하나, 둘, 삑.', 4], [22, '이제 좀 바빠진다.', 3],
+          [38, '긴 거 온다. 액자야. 끝까지 잡아.', 4], [54, '좋아. 그 박자야.', 3], [90, '수고했다, 신입.', 4]],
+    comfort: ['괜찮아. 다음 거 봐.', '신입! 집중 안 해?'],
+    // scene 1: the office by the line door, 반장 alone in the middle. scene 2: the belt, after he walks over to his spot
     intro: [
-      { who:'', text:'새벽 2시 50분. 물류센터 B동. 첫 출근.' },
-      { who:'반장', text:'신입? 김이다. 다들 반장이라고 부른다.' },
-      { who:'반장', text:'장갑 껴. 이어폰은 빼고.' },
-      { who:'', text:'이어폰을 주머니에 넣었다. 줄이 조금 삐져나왔다.' },
-      { who:'반장', text:'내가 상자 올리면, 빨간 선에 닿을 때 찍어. 삑 소리 나게.' },
-      { who:'반장', text:'벨트는 일정해. 박자는 사람이 만드는 거고.' }],
+      { who:'', text:'새벽 2시 50분. 물류센터 B동. 첫 출근.', scene:'office' },
+      { who:'반장', text:'네가 신입이냐? 나는 3라인 반장이다.', scene:'office' },
+      { who:'반장', text:'이리 따라와. 바로 작업할 수 있지?', scene:'office' },
+      { who:'반장', text:'장갑 껴.' },
+      { who:'반장', text:'내가 상자 올리면, 빨간 선에 닿을 때 찍어. 삑 소리 나게.' }],
     outro: (good) => good ? [
-      { who:'반장', text:'…첫날치곤 괜찮네.' },
-      { who:'반장', text:'벨트가 빨라도 박자는 네가 정하는 거다. 내 손 보고.' },
-      { who:'', text:'퇴근길, 반장님이 자판기에 동전을 두 개 넣었다. 하나는 내 거였다.' }] : [
-      { who:'반장', text:'처음엔 다 그래.' },
-      { who:'반장', text:'음악 말고 손을 봐. 내일 또 하자.' },
-      { who:'', text:'반장님은 무릎을 한 번 두드리고 먼저 나갔다.' }]
+      { who:'반장', text:'…첫날치곤 괜찮네.' }] : [
+      { who:'반장', text:'…내일 또 하자.' }]
   }
   ,{
     id:'s1-2', stageNo:'1-2', who:'지우', role:'지우 · 116 BPM', tag:'쿵쿵쿵쿵 · 흥얼거림 · 이어폰 빼', bpm:116, div:2, style:'edm1',
@@ -372,7 +374,8 @@ const LEVELS = [
     // cuts, one bar of nothing (cut), then the drop. Halfway through the drop the drums fall out (break) and it hits a second time.
     vibe: [[72, 104], [132, 136]], unplug: [[104, 132]], dim: [[104, 120]], cut: [[136, 140], [179, 180]],
     club: [[140, 228]], lull: [[172, 180]], hype: [[140, 172], [180, 220]], special:['흥얼거릴 때 늦은 상자', 'late', '받아냄'],
-    lateHint: '지우가 흥얼거려요. 손이 늦어요. 손을 봐요',
+    // no on-screen hints: the player is keeping time and cannot read them
+    hints:false,
     sections: [[0, 'intro'], [2, 'groove'], [10, 'verse'], [18, 'vibe'], [26, 'straight'], [34, 'cut'], [35, 'drop'], [43, 'break'], [45, 'drop'], [55, 'outro']],
     bars: [
       '........', '........',
@@ -387,25 +390,24 @@ const LEVELS = [
       'x...x...', 'x.......', 'x...x...', 'h===....', 'x...x...', 'x...x...', 'h===....', 'x...x...', 'x...x...', 'x.......',
       '........', '........'
     ],
-    // [beat, text, beats shown, lane, speaker] speaker 'b' = 반장 watching from behind the belt
+    // [beat, text, beats shown, lane, speaker, style] speaker 'b' = 반장 watching from behind the belt, style 'loud' = shouted bubble
     say: [[1, '(이어폰 꽂고) 쿵, 쿵, 쿵, 쿵.', 5], [30, '이거 제가 만든 곡이에요. 들려요?', 4], [62, '여기서부터 제일 좋아하는 부분이에요.', 4],
-          [72, '(흥얼흥얼)', 4], [82.5, '…야. 손 늦는다.', 3, 0, 'b'], [86, '다다, 다다다…', 5],
-          [100, '이어폰 빼!', 3, 0, 'b'], [104, '…네.', 2], [106, '하나, 둘, 셋, 넷. 벨트 박자.', 6, 0, 'b'], [114, '…벨트 소리로도 되네요.', 3],
-          [120, '(흥얼흥얼… 아, 여기 곧 터지는데…)', 5], [128, '…참자, 참자…', 3], [132, '아, 이 부분만 듣고 뺄게요!', 3.5], [137, '…야!', 2.5, 0, 'b'],
+          [72, '(흥얼흥얼)', 4], [82.5, '…야. 이어폰 빼.', 3, 0, 'b'], [86, '예…? 뭐라고요?', 4],
+          [100, '이어폰 빼.라.고!', 3.5, 0, 'b', 'loud'], [104, '…네.', 2], [106, '옳지. 정박에 그래.', 5, 0, 'b'], [114, '(아, 여기 곧 터지는데…)', 4],
+          [120, '(흥얼흥얼…)', 4], [128, '…참자, 참자…', 3], [132, '아, 이 부분만 듣고 뺄게요!', 4], [137, '…야!', 2.5, 0, 'b'],
           [142, '…허 참.', 3, 0, 'b'], [146, '여기서 곡이 확 바뀌어요! 이거예요 이거!!', 4], [160, '꾹 누르고… 빰!!', 3],
-          [174, '(숨 고르고…)', 2.5], [177, '한 번 더 가요!', 2], [196, '반장님도 까딱하시는 거 다 보여요!', 4], [218, '끝! 어땠어요?', 3]],
-    comfort: ['괜찮아요! 다시 쿵, 쿵.', '반장님이 손 보래요.'],
+          [174, '(숨 고르고…)', 2.5], [177, '한 번 더 가요!', 2], [196, '반장님도 까딱하시는 거 다 보여요!', 4], [218, '끝!', 2]],
+    comfort: ['괜찮아요! 다음 거!', '형! 정신 차려요!'],
     intro: [
-      { who:'', text:'이틀째 밤. 3번 라인. 반장님은 사무실에 불려 갔다.' },
       { who:'지우', text:'안녕하세요! 지우예요. 오늘은 반장님 오실 때까지 제가 페어예요.' },
-      { who:'지우', text:'낮엔 학교, 밤엔 여기, 남는 시간엔 곡 써요. 언젠간 제 곡으로 페스티벌 무대 서는 게 꿈이에요.' },
+      { who:'지우', text:'형은 꿈 있어요? 저는 있어요.' },
+      { who:'지우', text:'언젠가 제 곡으로 페스티벌 무대 서는 게 꿈이에요.' },
       { who:'', text:'지우가 이어폰을 양쪽에 꽂았다.' },
-      { who:'지우', text:'반장님 오시기 전까지만요. 이게 있어야 박자가 맞거든요.' }],
+      { who:'지우', text:'반장님한테 말하시면 안 돼요. 이게 있어야 업무 효율이 늘거든요!' }],
     outro: (good, sp) => good ? [
       { who:'지우', text:'반장님, 어땠어요? 드롭 좋았죠?' },
       { who:'반장', text:'…시끄럽다.' },
-      { who:'', text:'그런데 반장님 발끝이 아직 까딱이고 있었다.' },
-      { who:'지우', text: sp >= 3 ? '제가 흥얼거릴 때 손 늦은 거, 다 받아주셨죠. 고마워요.' : '제가 흥얼거릴 때 좀 꼬였죠. 반장님 말이 맞나 봐요.' }] : [
+      { who:'', text:'그런데 반장님 발끝이 아직 까딱이고 있었다.' }] : [
       { who:'반장', text:'봐라. 이어폰 끼고 하니까 이렇지.' },
       { who:'지우', text:'…다음엔 한쪽만 낄게요.' }]
   }
@@ -415,14 +417,16 @@ const LEVELS = [
     // 반장's slow Chicago blues (after the second: ~57 BPM, A minor, a guitar lead the whole way) at 60; then her kick at double time (120)
     // under the same blues and the guitar comes in driven
     tempo: [[0, 115], [96, 60], [152, 120]], style:'mix13', fxTheme: beat => beat < 96 ? 'chill' : 'blues', tintColors: [[157, 180, 255], [120, 220, 255]], preClub: [[40, 88], [152, 256]],
-    clock:'03:05', title:'선곡', partners:['jiwoo'],
+    clock:'03:05', title:'선곡', partners:['jiwoo'], hints:false,
     // cast: 지우 places first while 반장 watches; at beat 88 he walks over, takes an earbud, and they swap places by beat 96
     cast: { swap: 88 },
     chords: [...CHILL.chords, ...BLUES.chords], roots: [...CHILL.roots, ...BLUES.roots],
     // phase 3 (bars 38-61) runs at double time over the same 12-bar blues, so a blues chord lasts two of them
     chordAt: bar => bar < 22 ? ((bar - 2) % 4 + 4) % 4 : bar < 25 ? 4 : bar < 38 ? 4 + BLUES.prog[(bar - 25) % 12] : bar < 62 ? 4 + BLUES.prog[((bar - 38) >> 1) % 12] : 4,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
-    tinny: [[89, 94.5]], lounge: [[100, 256]], cut: [[199, 200]], special:['엇박 상자', 'off', '받아냄'],
+    tinny: [[89, 94.5]], lounge: [[100, 256]], cut: [[199, 200]],
+    // 반장's memory: the warehouse flickers out after the tape stop, the count-in builds a rainy alley, the outro wakes back up
+    alley: { dark: 94.5, reveal: 96, out: 248 }, special:['엇박 상자', 'off', '받아냄'],
     sections: [[0, 'intro'], [2, 'verse'], [10, 'build'], [18, 'drop'], [22, 'swap'], [24, 'count'], [25, 'blues'], [37, 'fuseIn'], [38, 'fusion'], [48, 'break'], [50, 'swing'], [62, 'outro']],
     // 8 cells per bar = straight 8ths. 12 cells per bar = triplets: 'x.x' is a shuffle pair (on the beat, then two thirds later)
     bars: [
@@ -444,7 +448,8 @@ const LEVELS = [
       'x.......', 'h===..x.', 'x...x...', 'h=o=....', 'x.x.x...', 'h=o=o=..', 'x...x...', 'h===....', 'x.x.....', 'h=o=..x.',
       'h=======', '........',
       // the second drop: his off-beats on her fast 'and', with holds between, two or three boxes riding one crate
-      'x...x...', '.x...x..', 'h=o=o=..', 'x....x..', '.x.x....', 'h===..x.', '.x...x..', 'h=o=....', '.x.x.x..', 'h=o=o=o=', '........', 'x.......',
+      // (no box on 200: it would cross the screen during the dark beat before the drop)
+      '....x...', '.x...x..', 'h=o=o=..', 'x....x..', '.x.x....', 'h===..x.', '.x...x..', 'h=o=....', '.x.x.x..', 'h=o=o=o=', '........', 'x.......',
       '........', '........'
     ],
     say: [[1, '(이어폰 꽂고) 반장님! 신곡이에요.', 4, 0, 'j'], [13, '…또 뭐냐 그건.', 2.5, 0, 'b'], [36.5, '들어보실래요? 어제 밤새 만들었어요.', 3, 0, 'j'], [50, '여기서부터 올라가요.', 3, 0, 'j'],
@@ -617,6 +622,148 @@ const bg = document.createElement('canvas'); bg.width = W; bg.height = H;
   sb(1, 145); sb(17, 145); sb(1, 132); sb(17, 132); sb(9, 119);
 })();
 
+// the 1-1 intro opens in the B동 office by the line door: time clock, vending machine, notice board, door to 3라인
+const bgOffice = document.createElement('canvas'); bgOffice.width = W; bgOffice.height = H;
+(() => {
+  const b = bgOffice.getContext('2d');
+  const r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  r(0, 0, W, H, '#2c2521'); r(0, 0, W, 34, '#1c1613'); r(0, 34, W, 2, '#3a302a');
+  r(0, 112, W, 2, '#4a3c30'); r(0, 114, W, 54, '#33291f');
+  for (let x = 0; x < W; x += 96) r(x, 36, 1, 132, '#241d19');
+  r(0, 168, W, 48, '#18120f'); r(0, 168, W, 1, '#2e241f');
+  for (let x = 0; x < W; x += 32) r(x, 169, 1, 47, '#1f1814');
+  // one fluorescent tube over the middle of the room
+  r(174, 0, 1, 13, '#3a332c'); r(211, 0, 1, 13, '#3a332c'); r(168, 13, 50, 2, '#3a332c'); r(170, 15, 46, 3, '#fff3c8');
+  // time clock and the card rack under it
+  r(60, 54, 30, 20, '#6c6f73'); r(62, 56, 26, 8, '#1e2a22'); r(64, 58, 12, 4, '#49b36b'); r(66, 68, 18, 2, '#2b2e31');
+  r(58, 80, 34, 16, '#4a3a2f'); for (let k = 0; k < 6; k++) r(60 + k * 5, 82, 3, 12, k % 3 === 1 ? '#4a3a2f' : '#e9e4da');
+  // vending machine: the coffee comes from here at the end of the night
+  r(8, 84, 44, 84, '#8a2f2a'); r(8, 84, 44, 3, '#a9413a'); r(12, 90, 36, 34, '#f1d58b'); r(12, 90, 36, 2, '#fff3c8');
+  for (let k = 0; k < 3; k++) { r(15 + k * 11, 96, 7, 10, ['#d8463b', '#2f4f58', '#c99a1e'][k]); r(15 + k * 11, 112, 7, 10, ['#6b7073', '#d8463b', '#2f4f58'][k]); }
+  r(12, 128, 36, 8, '#5a1e1a'); r(40, 130, 5, 4, '#1b1716'); r(14, 130, 10, 4, '#c23b2e');
+  r(14, 148, 32, 12, '#1b1716'); r(16, 150, 28, 2, '#3a3d44');
+  // notice board behind 반장
+  r(146, 50, 92, 54, '#5a4328'); r(149, 53, 86, 48, '#8d6a3f');
+  for (const [x, y, w, h] of [[153, 57, 22, 18], [179, 58, 26, 14], [209, 56, 22, 22], [155, 79, 30, 18], [189, 76, 40, 22]]) { r(x, y, w, h, '#e9e4da'); r(x + 3, y + 4, w - 6, 1, '#9a948e'); r(x + 3, y + 7, w - 8, 1, '#9a948e'); r(x + (w >> 1) - 1, y - 1, 2, 2, '#d8463b'); }
+  // door to the line, with the 3라인 sign and an arrow pointing at it
+  r(298, 56, 50, 112, '#4a3a2f'); r(302, 60, 42, 108, '#5b5e63'); r(308, 66, 30, 22, '#1d2a33'); r(310, 68, 26, 18, '#243640');
+  r(306, 118, 34, 4, '#9a948e'); r(336, 124, 4, 6, '#2b2e31');
+  r(300, 40, 46, 13, '#d9a520'); r(300, 52, 46, 1, '#8a6a12');
+  ['111', '001', '111', '001', '111'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') r(306 + x * 2, 42 + y * 2, 2, 2, '#1d1815'); }));
+  r(318, 46, 14, 2, '#1d1815'); r(330, 44, 2, 2, '#1d1815'); r(332, 46, 2, 2, '#1d1815'); r(330, 48, 2, 2, '#1d1815');
+  r(358, 136, 7, 18, '#c23b2e'); r(359, 133, 5, 3, '#2b2e31'); r(356, 154, 11, 2, '#2b2e31');
+})();
+
+// 1-3: 반장's memory of his guitar days, a rainy alley. Painted once, four screens wide, in three layers the count-in reveals:
+// ground (darkness and wet street), wall (the buildings), lamp (the street lamps). Through phase 2 the view walks along the street
+// (the alley he knew, a record shop, a jazz club under the 'L' tracks, a mural, the opening onto the avenue) and rewinds to the
+// start for phase 3. Every sign on the street is dead until then. The lit signs, reflections, rain and drips are drawn live.
+const SW = W * 4;
+const BULBS = Array.from({ length: 16 }, (_, i) => { const x = 6 + i * 14; return { x, y: Math.round(19 + 7 * Math.sin(Math.PI * x / 222)) }; });
+// lanterns hung under the fire escape rails, and the order hits light the street in phase 3: one string bulb, one lantern, and so on
+const FE_BULBS = [...Array.from({ length: 8 }, (_, i) => ({ x: 284 + i * 12, y: 22 })), ...Array.from({ length: 8 }, (_, i) => ({ x: 284 + i * 12, y: 62 }))];
+const LIT_SPOTS = BULBS.flatMap((p, i) => [p, FE_BULBS[(i * 5) % 16]]);
+// phase 3 starts dark and every hit lights one more piece: C, H, I, C, A, G, O, the guitar neon, her note, the light on the hung
+// guitars, then the bulbs and lanterns. A miss puts the latest one out.
+const UNIT_POS = [...Array.from({ length: 7 }, (_, i) => ({ x: 127 + i * 8, y: 49 })), { x: 109, y: 45 }, { x: 203, y: 42 }, { x: 252, y: 58 }, ...LIT_SPOTS];
+const U_GTR = 7, U_NOTE = 8, U_SPOT = 9, U_BULB = 10;
+const unitOn = k => FX.lit > k;
+const unitFlare = (k, nowMs) => Math.max(0, 1 - (nowMs - (FX.litAt[k] || -1e9)) / 300);
+const ALLEY_BG = ['ground', 'wall', 'lamp'].reduce((o, k) => { const c = document.createElement('canvas'); c.width = SW; c.height = H; o[k] = c; return o; }, {});
+const SIGN = { x: 124, y: 44 }, NEON_GTR_AT = { x: 104, y: 34 }, GUITARS = { x: 252, y: 58 }, NOTE_SIGN = { x: 194, y: 32 }, PUDDLE = { x: 110, y: 142 }, PUDDLE2 = { x: 206, y: 142 };
+// in street coordinates: lamp heads, drip sources (awning edges), puddles
+const LAMPS = [10, 560, 1040, 1380].map(x => ({ x: x + 23, y: 33 }));
+const DRIPS = [{ x: 259, y0: 90 }, { x: 541, y0: 68 }, { x: 983, y0: 82 }, { x: 1331, y0: 82 }];
+const PUDDLES = [PUDDLE, PUDDLE2, { x: 259, y: 142 }, { x: 470, y: 142 }, { x: 541, y: 142 }, { x: 700, y: 142 }, { x: 900, y: 142 }, { x: 983, y: 142 }, { x: 1120, y: 142 }, { x: 1250, y: 142 }, { x: 1331, y: 142 }, { x: 1470, y: 142 }];
+(() => {
+  let b = ALLEY_BG.ground.getContext('2d');
+  let r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  r(0, 0, SW, H, '#07080b');
+  r(0, 134, SW, 12, '#16181f'); r(0, 134, SW, 1, '#22252e');
+  r(0, 162, SW, 54, '#101116'); r(0, 162, SW, 2, '#272a32');
+  for (let x = 40; x < SW; x += 110) { b.fillStyle = '#171b26'; b.beginPath(); b.ellipse(x + rnd(x, 1) * 40, 176 + rnd(x, 2) * 30, 20 + rnd(x, 3) * 25, 3, 0, 0, Math.PI * 2); b.fill(); }
+  for (const P of PUDDLES) { b.fillStyle = '#1b2030'; b.beginPath(); b.ellipse(P.x, 142, 10 + rnd(P.x, 4) * 8, 2.2, 0, 0, Math.PI * 2); b.fill(); }
+  b = ALLEY_BG.wall.getContext('2d');
+  r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  // bricks the whole way, a different building every screen: his red brick, a brown shopfront, sooty brick under the tracks, red again
+  const PAL = [['#4a2620', '#55302a', '#43211c', '#5c3329'], ['#4a3a2e', '#54443a', '#3f3128', '#5a4a3c'], ['#2e2622', '#382e29', '#29211d', '#3a302a'], ['#4e2a22', '#58322a', '#46241e', '#5e3a30']];
+  r(0, 0, SW, 134, '#22130f');
+  for (let row = 0, y = 0; y < 134; row++, y += 5) for (let x = -(row % 2) * 6; x < SW; x += 12) {
+    const pal = PAL[Math.min(3, Math.max(0, Math.floor((x + 6) / W)))];
+    r(x, y, 11, 4, pal[Math.floor(rnd(row * 41 + x, 7) * 4)]);
+  }
+  for (const x of [W, W * 2, W * 3]) { r(x - 2, 0, 4, 134, '#1a100c'); r(x + 2, 0, 1, 134, '#2c1c16'); }
+  const sky = (x, w, h) => { r(x, 0, w, h, '#0c1220'); r(x, h, w, 1, '#1d2433'); for (let k = 0; k < w / 10; k++) r(x + 4 + k * 10, 2 + (k * 5) % (h - 4), 1, 3, '#2a3550'); };
+  sky(118, 92, 16); sky(640, 60, 12);
+  const win = (x, y, lit) => { r(x, y, 16, 18, '#1a1210'); r(x + 2, y + 2, 12, 14, lit ? '#7a5532' : '#121418'); if (lit) r(x + 2, y + 2, 12, 5, '#3a2a1e'); r(x + 7, y + 2, 1, 14, '#1a1210'); };
+  const deadTube = (pts) => pts.forEach(([x, y, w, h]) => r(x, y, w, h, '#2b3238'));
+  // --- screen 1: his alley ---
+  r(58, 12, 22, 20, '#1a1210'); r(60, 14, 18, 16, '#7a5532'); r(60, 14, 18, 7, '#3a2a1e'); r(68, 14, 1, 16, '#1a1210');
+  r(224, 0, 3, 134, '#33363c'); r(224, 128, 7, 3, '#33363c');
+  r(232, 92, 32, 42, '#2b2d33'); r(235, 95, 26, 39, '#22252b'); r(256, 113, 3, 4, '#5a5d63');
+  r(244, 82, 6, 3, '#3a3d44'); r(246, 85, 2, 2, '#ffd890');
+  r(228, 86, 40, 4, '#1d3832'); r(228, 90, 40, 1, '#2f5a50');
+  for (const y of [30, 70]) { r(278, y, 96, 3, '#2a2d33'); for (let x = 280; x < 372; x += 6) r(x, y - 10, 1, 10, '#2a2d33'); r(278, y - 10, 96, 1, '#2a2d33'); }
+  for (let k = 0; k < 40; k++) r(292 + k * 1.4, 70 - k, 3, 1, '#2a2d33');
+  r(300, 73, 2, 61, '#24272c'); r(360, 33, 2, 101, '#24272c');
+  r(74, 116, 22, 18, '#26332c'); r(72, 113, 26, 4, '#30403a'); r(80, 111, 10, 2, '#30403a'); for (let x = 77; x < 94; x += 4) r(x, 119, 1, 13, '#1d2822');
+  r(98, 128, 26, 3, '#6b4a2e'); r(98, 131, 26, 1, '#4a3220'); r(100, 132, 3, 2, '#4a3220'); r(119, 132, 3, 2, '#4a3220');
+  r(SIGN.x - 4, SIGN.y - 4, 64, 18, '#121519'); r(SIGN.x + 10, SIGN.y - 10, 1, 6, '#2a2d33'); r(SIGN.x + 46, SIGN.y - 10, 1, 6, '#2a2d33');
+  const guitar = (x, y, body, burst, head) => {
+    r(x + 6, y - 4, 2, 4, '#3a3d44'); r(x + 5, y, 4, 6, head);
+    for (const [dx, dy] of [[4, 1], [9, 1], [4, 4], [9, 4]]) r(x + dx, y + dy, 1, 1, '#c9c2b0');
+    r(x + 6, y + 6, 2, 17, '#6a4a2c'); for (let k = 0; k < 5; k++) r(x + 6, y + 8 + k * 3, 2, 1, '#8a7a5a');
+    r(x + 2, y + 22, 10, 6, body); r(x + 3, y + 28, 8, 2, body); r(x + 1, y + 30, 12, 9, body); r(x + 2, y + 39, 10, 2, body);
+    r(x + 4, y + 31, 6, 6, burst); r(x + 4, y + 24, 6, 2, '#1b1716'); r(x + 4, y + 33, 6, 2, '#1b1716'); r(x + 5, y + 36, 4, 1, '#c9c2b0');
+    r(x + 7, y + 6, 1, 31, 'rgba(230,225,210,.45)');
+  };
+  guitar(236, 38, '#5a1f12', '#c8742a', '#2a1a12');
+  guitar(254, 42, '#1d1f24', '#d9d4c6', '#1d1f24');
+  const poster = (x, y, c, ink) => { r(x, y, 14, 19, c); r(x + 2, y + 3, 10, 8, ink); r(x + 2, y + 13, 9, 1, ink); r(x + 2, y + 15, 6, 1, ink); };
+  poster(98, 66, '#bfa880', '#3a2a1e'); poster(115, 70, '#8a3a2a', '#e0c9a0');
+  BULBS.forEach((p, i) => { if (i) { const q = BULBS[i - 1]; for (let k = 0; k <= 14; k++) r(q.x + k, Math.round(q.y + (p.y - q.y) * k / 14) - 1, 1, 1, '#141210'); } r(p.x, p.y, 2, 3, '#3a3530'); });
+  FE_BULBS.forEach(p => { r(p.x, p.y - 2, 1, 2, '#141210'); r(p.x - 1, p.y, 3, 3, '#3a3530'); });
+  // --- screen 2: a record shop, flats above ---
+  r(416, 64, 128, 70, '#2a1e18'); r(420, 52, 120, 10, '#121519');
+  r(424, 72, 64, 52, '#141820'); r(424, 100, 64, 24, '#2e2016');
+  for (const [x, y, c] of [[438, 92, '#c8742a'], [456, 88, '#2f6f8a'], [474, 94, '#c23b2e']]) { b.fillStyle = '#0c0c0e'; b.beginPath(); b.arc(x, y, 7, 0, Math.PI * 2); b.fill(); r(x - 1, y - 1, 3, 3, c); }
+  r(424, 72, 64, 1, '#3a4250');
+  r(494, 72, 44, 62, '#22252b'); r(500, 78, 32, 20, '#182028'); r(531, 104, 3, 4, '#5a5d63');
+  r(490, 64, 54, 4, '#3a1d1a'); r(490, 68, 54, 1, '#5a2d28');
+  b.strokeStyle = '#2b3238'; b.lineWidth = 2; b.beginPath(); b.arc(452, 57, 3, 0, Math.PI * 2); b.stroke(); deadTube([[460, 55, 40, 2], [460, 59, 30, 1]]);
+  win(560, 14, 1); win(584, 14, 0); win(712, 14, 1); win(736, 14, 0); win(712, 42, 0); win(736, 42, 1);
+  r(600, 112, 14, 22, '#2f4f8a'); r(602, 116, 10, 6, '#9fb8d8'); r(600, 110, 14, 3, '#24406e');
+  r(684, 124, 6, 10, '#c23b2e'); r(683, 122, 8, 3, '#a8302a'); r(682, 127, 10, 2, '#a8302a');
+  r(760, 0, 3, 134, '#33363c');
+  // --- screen 3: the 'L' tracks overhead, a jazz club under them ---
+  r(772, 4, 392, 5, '#16181d'); r(772, 18, 392, 5, '#16181d');
+  for (let x = 772; x < 1160; x += 14) { for (let k = 0; k < 9; k++) r(x + k, 9 + k, 2, 1, '#1f2228'); r(x, 9, 2, 9, '#1f2228'); }
+  for (let x = 774; x < 1160; x += 7) { r(x, 5, 1, 1, '#3a3d44'); r(x, 19, 1, 1, '#3a3d44'); }
+  for (const x of [800, 1100]) { r(x, 23, 7, 111, '#1d2026'); r(x - 3, 130, 13, 4, '#1d2026'); for (let y = 30; y < 126; y += 12) r(x + 1, y, 5, 1, '#2a2d33'); }
+  r(776, 23, 384, 20, 'rgba(4,4,8,.45)');
+  r(900, 64, 100, 70, '#1e1416'); r(924, 84, 44, 50, '#2a0d12'); r(928, 88, 36, 46, '#3a0f14'); for (let x = 930; x < 962; x += 4) r(x, 88, 1, 46, '#2a0a10');
+  r(912, 74, 74, 8, '#2a1a14'); r(912, 82, 74, 1, '#4a2e22'); for (let x = 914; x < 984; x += 5) r(x, 76, 2, 2, '#3a3530');
+  r(992, 30, 14, 48, '#121519'); deadTube([[996, 34, 6, 2], [995, 40, 2, 10], [1001, 40, 2, 10], [996, 52, 6, 2], [998, 58, 2, 14]]);
+  poster(860, 82, '#c9b48a', '#2a1a12'); poster(878, 86, '#3a5a6a', '#d9d4c6'); poster(1016, 80, '#8a3a2a', '#e0c9a0');
+  win(1060, 50, 1); win(1084, 50, 0);
+  // --- screen 4: a mural of a guitar player, a fire escape, and the alley opening onto the avenue ---
+  b.fillStyle = '#6a3a2a'; b.beginPath(); b.arc(1212, 70, 30, 0, Math.PI * 2); b.fill();
+  b.fillStyle = '#2a1410'; b.beginPath(); b.arc(1212, 50, 7, 0, Math.PI * 2); b.fill();
+  r(1204, 57, 16, 34, '#2a1410'); r(1200, 91, 8, 34, '#2a1410'); r(1216, 91, 8, 34, '#2a1410');
+  for (let k = 0; k < 30; k++) r(1192 + k, 78 - k * 0.55, 3, 2, '#2a1410'); b.beginPath(); b.ellipse(1206, 82, 10, 7, -0.5, 0, Math.PI * 2); b.fill();
+  for (const y of [28, 66]) { r(1262, y, 96, 3, '#2a2d33'); for (let x = 1264; x < 1356; x += 6) r(x, y - 10, 1, 10, '#2a2d33'); r(1262, y - 10, 96, 1, '#2a2d33'); }
+  for (let k = 0; k < 38; k++) r(1276 + k * 1.4, 66 - k, 3, 1, '#2a2d33'); r(1262, 82, 96, 2, '#2a2d33');
+  r(1440, 0, SW - 1440, 134, '#0c1220');
+  for (const [x, w, h] of [[1444, 22, 70], [1468, 30, 96], [1500, 18, 60], [1520, 16, 84]]) { r(x, 134 - h, w, h, '#141a28'); for (let y = 134 - h + 4; y < 128; y += 7) for (let xx = x + 3; xx < x + w - 2; xx += 5) if (rnd(xx, y) > 0.55) r(xx, y, 2, 3, rnd(xx, y + 1) > 0.5 ? '#c9a45a' : '#5a8ab8'); }
+  r(1438, 0, 3, 134, '#1a100c');
+  b = ALLEY_BG.lamp.getContext('2d');
+  r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  for (const L0 of LAMPS) { const x = L0.x - 23; r(x, 26, 3, 134, '#2b2e33'); r(x - 2, 158, 7, 3, '#2b2e33'); r(x, 26, 24, 2, '#2b2e33'); r(x + 18, 28, 11, 4, '#3a3d44'); r(x + 20, 32, 7, 1, '#ffd890'); }
+})();
+const SIGN_FONT = { C: ['111', '100', '100', '100', '111'], H: ['101', '101', '111', '101', '101'], I: ['111', '010', '010', '010', '111'], A: ['010', '101', '111', '101', '101'], G: ['111', '100', '101', '101', '111'], O: ['111', '101', '101', '101', '111'] };
+const NEON_GTR = ['....x', '...x.', '..x..', '..x..', '.xxx.', 'x...x', 'x...x', '.x.x.', 'x...x', 'x...x', '.xxx.'];
+const NOTE_PIX = ['..xx..', '..x.x.', '..x..x', '..x...', '..x...', 'xxx...', 'xxx...'];
+
 // ---------- drawing helpers ----------
 const cv = $('cv');
 let g = cv.getContext('2d');
@@ -632,7 +779,7 @@ const FX = { particles: [], marks: [], react: [{ type: '', at: -1e9 }, { type: '
 const BIN = { x: 306, y: 186, w: 38, h: 22 }, PALLET = { x: 348, y: 204 };
 const FALL_X = SCAN_X + 16, GRAV = 520;
 
-function drawLights(bt, t, active) {
+function drawLights(bt, t, active, al = null) {
   const tubes = [60, 180, 300];
   const beat = active ? beatAt(t) : 0;
   const dark = active && blackout(beat);
@@ -643,6 +790,7 @@ function drawLights(bt, t, active) {
     const s = Math.sin(bt * 37 + k) + Math.sin(bt * 13.3);
     return (inD ? s > 0.9 : s > 1.93) ? 0.15 : 1;
   });
+  if (al) for (let k = 0; k < alpha.length; k++) alpha[k] *= al.tube;
   const ph = active && t > 0 ? beat - Math.floor(beat) : 1;
   const club = active && inRange(beat, L.club), lounge = active && inRange(beat, L.lounge), dimK = active && inRange(beat, L.cut) ? 0.1 : active && (inRange(beat, L.dim) || inRange(beat, L.tinny) || lounge) ? 0.45 : 1;
   const pulse = Math.max(0, 1 - ph * (club ? 3 : 5)) * (club ? 0.22 : 0.06);
@@ -658,8 +806,8 @@ function drawLights(bt, t, active) {
     g.fillStyle = grd; g.fillRect(49, BELT_Y - 10, W - 49, 14);
   }
   g.restore();
-  tubes.forEach((x, k) => { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, alpha[k] > 0.5 ? '#fff3c8' : '#5d5446'); });
-  if (active && inRange(beat, L.preClub) && !reduce) {
+  if (!al || (al.out ? al.wall < 0.5 : al.ground === 0)) tubes.forEach((x, k) => { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, alpha[k] > 0.5 ? '#fff3c8' : '#5d5446'); });
+  if (active && inRange(beat, L.preClub) && !reduce && !(al && al.wall > 0)) {
     // the verse starts to lean toward the drop: colour creeps into the house lights on each beat
     const tc = L.tintColors || [[255, 79, 163], [79, 227, 255]], k = Math.max(0, 1 - ph * 4) * 0.08, c = tc[Math.floor(beat) % 2];
     g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${k})`;
@@ -667,11 +815,11 @@ function drawLights(bt, t, active) {
     g.restore();
   }
   if (club) drawClub(bt, beat, ph);
-  if (lounge) drawLounge(bt, beat, ph);
+  if (lounge) { const m = al ? 1 - Math.max(al.ground, al.wall) : 1; if (m > 0) drawLounge(bt, beat, ph, m); }
 }
 // 1-3 deep blues: the house lights sink to blue, an amber spot finds 반장 and a softer one 지우, and smoke drifts
-function drawLounge(bt, beat, ph) {
-  const [b0, b1] = L.lounge.find(([a, z]) => beat >= a && beat < z), k = Math.min(1, (beat - b0) / 4, (b1 - beat) / 2);
+function drawLounge(bt, beat, ph, mul = 1) {
+  const [b0, b1] = L.lounge.find(([a, z]) => beat >= a && beat < z), k = mul * Math.min(1, (beat - b0) / 4, (b1 - beat) / 2);
   const swing = Math.max(0, 1 - ph * 3) * 0.06 + (ph > 0.6 && ph < 0.75 ? 0.04 : 0);
   g.save();
   g.fillStyle = `rgba(6,12,34,${0.38 * k})`; g.fillRect(0, 0, W, H);
@@ -992,10 +1140,12 @@ function drawPartnerBody(id, pose, nowMs, active) { PARTNERS[id].draw(pose, nowM
 const OBS_X = 168;
 function drawObserver(t, nowMs, active) {
   if (!L.observer) return;
-  const beat = active ? beatAt(t) : 0, ph = beat - Math.floor(beat);
-  const cue = L.obsCue || {}, point = active && cue.point && beat >= cue.point[0] && beat < cue.point[1], softened = active && cue.soft != null && beat >= cue.soft, frown = active && !softened;
+  // after the song he stays where it left him, through the outro and the result, and the foot keeps tapping on the old tempo
+  const post = !active && (state === 'outro' || state === 'result'), on = active || post;
+  const beat = active ? beatAt(t) : post ? END_BEAT : 0, ph = post ? ((nowMs / 1000) / SPB) % 1 : beat - Math.floor(beat);
+  const cue = L.obsCue || {}, point = active && cue.point && beat >= cue.point[0] && beat < cue.point[1], softened = on && cue.soft != null && beat >= cue.soft, frown = active && !softened;
   // walking in from off-screen right
-  if (cue.enter && (!active || beat < cue.enter[0])) return;
+  if (cue.enter && (!on || beat < cue.enter[0])) return;
   const walking = active && cue.enter && beat < cue.enter[1];
   // through the drop 반장 goes from covering his ears (step 1) to a grudging nod on 1 and 3 (step 2) to the foot tap (soft)
   const hy = active && L.hype && inRange(beat, L.hype) ? hypeStage(beat) : 0, ears = hy === 1, nodding = hy === 2 && Math.floor(beat) % 2 === 0 && ph < 0.2;
@@ -1012,6 +1162,7 @@ function drawObserver(t, nowMs, active) {
   g.restore();
 }
 function drawPartnerArmOf(id, pose, lane = 0) {
+  if (SCENE.walk) return;
   if (L.cast) { if (CAST.hideArm) return; g.save(); g.translate(CAST.dx, 0); PARTNERS[id].arm(pose); g.restore(); return; }
   if (L.onePlacer) { const dy = LANE_DY[lane], sx = ONE.dx, sy = ONE.dy - dy; g.save(); g.translate(sx, sy); PARTNERS[id].arm({ ...pose, hand: { x: pose.hand.x - sx, y: pose.hand.y - sy } }); g.restore(); return; }
   if (L.lanes === 2) { const dx = LANE_DX[lane]; g.save(); g.translate(dx, 0); PARTNERS[id].arm({ ...pose, hand: { x: pose.hand.x - dx, y: pose.hand.y } }); g.restore(); return; }
@@ -1383,6 +1534,335 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   // the arm to the far belt is drawn in screen space so it stays on the body; only the hand goes through the perspective
   if (far && L.onePlacer) { const h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(ONE.dx, ONE.dy); PARTNERS[pid].arm({ ...pose, hand: { x: h.x - ONE.dx, y: h.y - ONE.dy } }); g.restore(); }
 }
+// ---------- intro scenes ----------
+// A dialog line can carry scene:'office'. When the next line sits in a different scene the box hides, the screen goes dark,
+// and on the line 반장 walks from the middle of the room over to his spot behind the belt before the next line shows.
+const SCENE = { kind: 'line', trans: null, walk: null };
+const OFFICE_X = 192, WALK_FROM = 200;
+function sceneReset(kind = 'line') { SCENE.kind = kind; SCENE.trans = null; SCENE.walk = null; }
+function sceneCut(to, done) {
+  const now = performance.now(), out = reduce ? 200 : 320, walk = reduce ? 0 : 2600;
+  SCENE.trans = { at: now, out, to, done, swapped: false, walk };
+}
+function sceneTick(nowMs) {
+  const tr = SCENE.trans; if (!tr) return;
+  const age = nowMs - tr.at;
+  if (!tr.swapped && age >= tr.out) {
+    tr.swapped = true; SCENE.kind = tr.to;
+    if (tr.walk) {
+      SCENE.walk = { at: nowMs, dur: tr.walk };
+      // one footstep every 0.38s for the length of the walk, in time with the body bob
+      if (ctx) { const t0 = ctx.currentTime, steps = Math.floor((tr.walk / 1000 - 0.3) / 0.38); thud(t0, 0.35); for (let k = 0; k < steps; k++) noise(t0 + 0.3 + k * 0.38, 'lowpass', 420, 0.16, 0.07, 0.7, bus); }
+    }
+  }
+  if (tr.swapped && age >= tr.out + tr.walk) { SCENE.trans = null; SCENE.walk = null; tr.done(); }
+}
+const sceneFade = nowMs => { const tr = SCENE.trans; if (!tr) return 0; const a = (nowMs - tr.at) / tr.out; return a < 1 ? a : Math.max(0, 1 - (a - 1)); };
+function drawSceneFade(nowMs) { const a = sceneFade(nowMs); if (a > 0) { g.fillStyle = `rgba(4,2,2,${a})`; g.fillRect(0, 0, W, H); } }
+const standPose = bob => ({ hand: { x: BOSS_X + 9, y: 138 }, carry: null, wince: false, dip: 0, bob, nod: 0, doze: false, phone: false, lane: 0 });
+// 반장 standing in the room: legs and shoes under the vest, both arms down
+function drawStandingBoss(x, nowMs, bob) {
+  g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(x, 169, 16, 3, 0, 0, Math.PI * 2); g.fill();
+  drawActor('boss', x, false, standPose(bob), nowMs, false, top => {
+    R(BOSS_X - 8, top + 58, 7, 18, '#3a3f49'); R(BOSS_X + 1, top + 58, 7, 18, '#3a3f49');
+    R(BOSS_X - 9, top + 75, 9, 4, '#1b1716'); R(BOSS_X + 1, top + 75, 9, 4, '#1b1716');
+    thick(BOSS_X + 7, top + 22, BOSS_X + 9, top + 48, 4, C.shirt); R(BOSS_X + 7, top + 47, 4, 4, C.skin);
+  });
+}
+function drawOffice(nowMs) {
+  g.drawImage(bgOffice, 0, 0);
+  g.save(); g.globalCompositeOperation = 'lighter';
+  const grd = g.createLinearGradient(0, 18, 0, 170); grd.addColorStop(0, 'rgba(255,236,170,.16)'); grd.addColorStop(1, 'rgba(255,236,170,0)');
+  g.fillStyle = grd; g.beginPath(); g.moveTo(170, 19); g.lineTo(216, 19); g.lineTo(258, 170); g.lineTo(128, 170); g.closePath(); g.fill();
+  g.restore();
+  drawStandingBoss(OFFICE_X, nowMs, Math.sin(nowMs / 1000 * 1.7) > 0.85 ? 1 : 0);
+  drawSceneFade(nowMs);
+}
+// on the line, during the walk: 반장 crosses behind the belt from the middle to his place, facing the way he walks
+function drawWalkingBoss(nowMs) {
+  // an unhurried walk: mostly even pace, easing only a little at the start and the stop
+  const w = SCENE.walk, q = Math.min(1, (nowMs - w.at) / w.dur), p = lerp(q, ease(q), 0.5), x = lerp(WALK_FROM, BOSS_X, p);
+  const bob = p < 1 && Math.floor((nowMs - w.at) / 190) % 2 === 0 ? 1 : 0;
+  if (p >= 1) { drawActor('boss', BOSS_X, false, standPose(0), nowMs, false); return; }
+  drawActor('boss', x, true, standPose(bob), nowMs, false);
+}
+
+// ---------- 1-3 alley (반장's memory) ----------
+// L.alley = { dark, reveal, out }: the warehouse flickers out at dark, the count-in reveals the alley a layer per beat from reveal,
+// and from out the rain stops (two beats) and the fluorescent tubes flicker the warehouse back (two more).
+function alleyState(beat) {
+  const A = L.alley; if (!A || beat < A.dark || beat >= A.out + 4) return null;
+  const lay = k => beat < A.reveal + k ? 0 : Math.min(1, (beat - A.reveal - k) / 0.25);
+  const flick = b => Math.floor(b * 8) % 3 !== 1 ? 1 : 0;
+  let fade = 1, rainK = 1, tube = 0;
+  if (beat < A.reveal) tube = beat < A.reveal - 0.75 ? flick(beat) : 0;
+  if (beat >= A.out) { rainK = Math.max(0, 1 - (beat - A.out) / 2); if (beat >= A.out + 2) { const p = (beat - A.out - 2) / 2; tube = p > 0.6 ? 1 : flick(beat); fade = Math.max(0, 1 - p) * (tube ? 0.5 : 1); } }
+  // rain: steady in the blues, heavier into the fusion, thin in the break, a downpour in the second drop
+  const inten = beat < 148 ? 1 : beat < 152 ? 1.4 : beat < 192 ? 1.1 : beat < 199 ? 0.45 : beat < 200 ? 0 : beat < 232 ? 2 : 2.4;
+  return { beat, tube, ground: lay(0) * fade, wall: lay(1) * fade, neon: lay(2) * fade, lamp: lay(3) * fade, rain: lay(0) * rainK * inten, out: beat >= A.out };
+}
+// how hard the guitar just played: the street reflections shiver on each lead note (GLEAD beats, doubled in phase 3)
+function guitarGlint(beat) {
+  let rel = -1, mul = 1; if (beat >= 100 && beat < 148) rel = beat - 100; else if (beat >= 152 && beat < 248) { rel = beat - 152; mul = 2; }
+  if (rel < 0) return 0;
+  for (const [ob] of GLEAD) { const d = rel - ob * mul; if (d >= 0 && d < 0.4) return 1 - d / 0.4; }
+  return 0;
+}
+// the signs and the decorations stay dark through the slow blues, sputter in the entry bar, and all come on with phase 3 (152)
+function neonLevels(al, nowMs) {
+  const b = al.beat;
+  let on = b >= 152 && b < 248 ? 1 : 0;
+  if (b >= 148 && b < 152) { const k = (b - 148) / 4; on = rnd(Math.floor(b * 4), 9) < 0.15 + k * 0.7 ? 0.25 + 0.45 * k : 0; }
+  let sign = on, gtr = on, bulbs = on, note = b >= 152 && b < 248 ? 1 : 0;
+  if (!reduce && b >= 152 && Math.sin(nowMs / 41) + Math.sin(nowMs / 13.7) > 1.9) sign *= 0.35;   // the old sign still stutters now and then
+  if (b >= 176 && b < 192) { const o = Math.floor(b) % 2; sign *= o ? 1 : 0.3; note *= o ? 0.3 : 1; }   // his sign and her note trade beats
+  if (b >= 192 && b < 199) { sign *= 0.25; note *= 0.15; gtr *= 0.3; bulbs *= 0.35; }                // the break: the lamp carries it
+  if (b >= 199 && b < 200) sign = note = gtr = bulbs = 0;
+  if (b >= 200 && b < 248) { const k = Math.max(0, 1 - (b % 1) * 3); sign = Math.min(1, sign * (0.85 + 0.3 * k)); note = Math.min(1, note * (0.85 + 0.3 * k)); }
+  const w = al.wall; return { sign: sign * w, gtr: gtr * w, bulbs: bulbs * w, note: note * w, k: b >= 200 && b < 248 ? Math.max(0, 1 - (b % 1) * 3) : 0 };
+}
+function neonPix(rows, x0, y0, sc, col, glow, a, vis = 1) {
+  const each = fn => rows.forEach((row, j) => [...row].forEach((v, i) => { if (v !== '.' && v !== '0') fn(x0 + i * sc, y0 + j * sc); }));
+  if (vis > 0) { g.globalAlpha = vis; each((x, y) => R(x, y, sc, sc, '#2b3238')); g.globalAlpha = 1; }
+  if (a <= 0) return;
+  g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${glow},${0.12 * a})`;
+  each((x, y) => g.fillRect(x - 2, y - 2, sc + 4, sc + 4)); g.restore();
+  g.globalAlpha = Math.min(1, a * 1.4); each((x, y) => R(x, y, sc, sc, col)); g.globalAlpha = 1;
+}
+// how far along the street the view has walked: 22 px a beat through the slow blues (100-148), rewound over the entry bar (148-152)
+const WALK_PX = 22;
+function alleyScroll(beat) {
+  if (reduce || beat < 100 || beat >= 152) return 0;
+  const far = 48 * WALK_PX;
+  if (beat < 148) return (beat - 100) * WALK_PX;
+  return far * (1 - ease((beat - 148) / 4));
+}
+const alleyBob = beat => !reduce && beat >= 100 && beat < 148 ? Math.round(Math.abs(Math.sin(Math.PI * beat * 2))) : 0;
+function drawAlleyBack(al, t, nowMs) {
+  if (al.out) g.drawImage(bg, 0, 0); else { g.fillStyle = '#000'; g.fillRect(0, 0, W, H); }
+  if (!al.out && al.ground === 0) { g.globalAlpha = al.tube ? 1 : 0; g.drawImage(bg, 0, 0); g.globalAlpha = 1; return; }
+  const ox = Math.round(alleyScroll(al.beat)), rewind = al.beat >= 148 && al.beat < 152 && !reduce;
+  g.save(); g.translate(-ox, alleyBob(al.beat));
+  for (const [k, a] of [['ground', al.ground], ['wall', al.wall], ['lamp', al.lamp]]) if (a > 0) { g.globalAlpha = a; g.drawImage(ALLEY_BG[k], 0, 0); }
+  // rewinding: smear the street a little in the direction it is flying
+  if (rewind) { const sp = Math.min(18, Math.round(48 * WALK_PX * 6 * ((al.beat - 148) / 4) * (1 - (al.beat - 148) / 4) / 4 / 30)); for (const d of [sp, sp * 2]) if (d > 0) { g.globalAlpha = 0.22; g.drawImage(ALLEY_BG.wall, -d, 0); } }
+  g.globalAlpha = 1;
+  const nv = neonLevels(al, nowMs), glint = guitarGlint(al.beat);
+  // each street lamp's pool of light
+  if (al.lamp > 0) {
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (const P of LAMPS) {
+      if (P.x - ox < -80 || P.x - ox > W + 80) continue;
+      const lg = g.createRadialGradient(P.x, P.y, 1, P.x, P.y + 40, 70); lg.addColorStop(0, `rgba(255,200,120,${0.32 * al.lamp})`); lg.addColorStop(1, 'rgba(255,200,120,0)');
+      g.fillStyle = lg; g.fillRect(P.x - 60, 0, 120, 170);
+    }
+    g.restore();
+  }
+  // signs: his blue BLUES, and from the fusion her lilac note across the alley
+  const letterRun = al.beat >= 200 && al.beat < 248 ? Math.floor(al.beat * 2) % 7 : -1, gate = k => al.beat < 152 ? 1 : unitOn(k) ? 1 : 0;
+  'CHICAGO'.split('').forEach((ch, i) => neonPix(SIGN_FONT[ch], SIGN.x + i * 8, SIGN.y, 2, '#bff3ff', '57,198,255', nv.sign * gate(i) * (letterRun < 0 ? 1 : i === letterRun ? 1.15 : 0.7) + unitFlare(i, nowMs), al.wall));
+  neonPix(NEON_GTR, NEON_GTR_AT.x, NEON_GTR_AT.y, 2, '#ffe0b0', '255,170,80', nv.gtr * gate(U_GTR) * (0.8 + 0.2 * glint) + unitFlare(U_GTR, nowMs), al.wall);
+  if (al.wall > 0 && al.beat >= 152) neonPix(NOTE_PIX, NOTE_SIGN.x, NOTE_SIGN.y, 3, '#f3e8ff', '190,150,255', nv.note * gate(U_NOTE) + unitFlare(U_NOTE, nowMs), al.wall * 0.8);
+  // window and the bulb over the door (the third rim of the count-in)
+  if (al.neon > 0) {
+    g.save(); g.globalCompositeOperation = 'lighter';
+    g.fillStyle = `rgba(255,190,110,${0.18 * al.neon})`; g.fillRect(58, 12, 22, 20);
+    const dg = g.createRadialGradient(247, 86, 1, 247, 92, 26); dg.addColorStop(0, `rgba(255,210,140,${0.3 * al.neon})`); dg.addColorStop(1, 'rgba(255,210,140,0)'); g.fillStyle = dg; g.fillRect(220, 70, 56, 50);
+    g.restore();
+  }
+  // phase 3: a warm light finds the hanging guitars, and the bulb string lights (pulsing with the kick in the second drop)
+  const spot = nv.gtr * (unitOn(U_SPOT) ? 1 : 0) + unitFlare(U_SPOT, nowMs) * 0.6;
+  if (spot > 0) {
+    g.save(); g.globalCompositeOperation = 'lighter';
+    const sg = g.createRadialGradient(GUITARS.x, GUITARS.y - 10, 2, GUITARS.x, GUITARS.y, 34); sg.addColorStop(0, `rgba(255,200,130,${(0.3 + 0.15 * glint) * spot})`); sg.addColorStop(1, 'rgba(255,200,130,0)');
+    g.fillStyle = sg; g.fillRect(GUITARS.x - 40, GUITARS.y - 50, 80, 90);
+    g.fillStyle = `rgba(255,240,210,${0.35 * glint * spot})`; g.fillRect(243, 44, 1, 31); g.fillRect(261, 48, 1, 31);
+    g.restore();
+  }
+  const nb = Math.max(0, FX.lit - U_BULB);
+  if (nv.bulbs > 0 && nb > 0) {
+    const chase = al.beat >= 200 && al.beat < 248 ? Math.floor(al.beat * 2) % 4 : -1;
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < nb; i++) {
+      const p = LIT_SPOTS[i], flare = unitFlare(U_BULB + i, nowMs), a = nv.bulbs * (0.7 + 0.3 * (i % 4 === chase ? 1 : 0)) + flare;
+      g.fillStyle = `rgba(255,200,110,${0.22 * a})`; g.fillRect(p.x - 3 - flare * 4, p.y - 2 - flare * 4, 8 + flare * 8, 8 + flare * 8);
+    }
+    g.restore();
+    for (let i = 0; i < nb; i++) { const p = LIT_SPOTS[i]; g.globalAlpha = Math.min(1, nv.bulbs * 1.3); R(p.x - (i % 2), p.y, 2 + (i % 2), 3, '#ffd88a'); g.globalAlpha = 1; }
+  }
+  // reflections on the wet street, shivering when the guitar plays
+  g.save(); g.globalCompositeOperation = 'lighter';
+  const refl = (x0, w, c, a) => { if (a <= 0) return; for (let x = x0; x < x0 + w; x += 2) { const s = 0.55 + 0.45 * Math.sin(nowMs / (reduce ? 1e9 : 110) + x * 0.7) + glint * 0.6; g.fillStyle = `rgba(${c},${0.16 * a * s})`; g.fillRect(x + Math.round(glint * Math.sin(x + nowMs / 40)), 136, 1, 9); } };
+  refl(SIGN.x, 56, '57,198,255', nv.sign); refl(NEON_GTR_AT.x, 10, '255,170,80', nv.gtr); refl(NOTE_SIGN.x, 18, '190,150,255', nv.note);
+  for (const P of LAMPS) if (P.x - ox > -40 && P.x - ox < W + 40) refl(P.x - 12, 26, '255,200,120', al.lamp);
+  g.restore();
+  g.restore();
+}
+// rain behind the belt only, so it never hides a box; drips from the awning land on the groove's off-beat grid
+function drawAlleyRain(al, t, nowMs) {
+  const b = al.beat, ts = reduce ? 12.3 : nowMs / 1000;
+  if (al.rain > 0) {
+    const n = Math.round(60 * al.rain), thick = al.rain > 1.6 ? 2 : 1, a = Math.min(0.42, 0.18 + 0.08 * al.rain);
+    g.save(); g.beginPath(); g.rect(0, 0, W, BELT_Y); g.clip();
+    const nv = neonLevels(al, nowMs), fz = !reduce && nowMs - FX.freezeAt < 200, tf = FX.freezeAt / 1000;
+    for (let i = 0; i < n; i++) {
+      const sp = 230 + rnd(i, 1) * 80, x0 = rnd(i, 2) * (W + 40), y0 = rnd(i, 3) * 170;
+      const at = tt => ({ y: ((y0 + tt * sp) % 170) - 20, x: ((x0 - tt * sp * 0.22) % (W + 40) + W + 40) % (W + 40) - 20 });
+      let { x, y } = at(ts), held = false;
+      if (fz) { const q = at(tf); if (Math.hypot(q.x - SCAN_X, (q.y - (BELT_Y - 30)) * 1.4) < 72) { x = q.x; y = q.y; held = true; } }
+      // drops falling through a lit sign's glow take its colour
+      const lit = b < 152 ? 1 : Math.min(7, FX.lit) / 7, sg = nv.sign * lit > 0 && x > 100 && x < 200 && y < 120 ? nv.sign * lit : 0, nt = nv.note > 0 && (b < 152 || unitOn(U_NOTE)) && x > 184 && x < 228 && y < 110 ? nv.note : 0;
+      g.fillStyle = held ? `rgba(235,245,255,${Math.min(0.9, a + 0.35)})` : sg ? `rgba(130,215,255,${a + 0.12 * sg})` : nt ? `rgba(210,180,255,${a + 0.12 * nt})` : `rgba(175,195,225,${a})`;
+      if (held) { g.fillRect(Math.round(x), Math.round(y), thick, 3); continue; }
+      for (let k = 0; k < 7; k++) g.fillRect(Math.round(x - k * 0.22 * 1.2), Math.round(y + k * 1.2), thick, 1);
+    }
+    g.restore();
+  }
+  if (al.ground <= 0 || b >= 248) return;
+  const ox = Math.round(alleyScroll(b)), vis = P => P.x - ox > -30 && P.x - ox < W + 30;
+  g.save(); g.translate(-ox, alleyBob(b));
+  // drips: on the beat and two thirds into it through the slow blues, on the beat and the 'and' at double time
+  const grid = b >= 100 && b < 148 ? [0, 2 / 3] : b >= 148 && b < 199 || b >= 200 && b < 248 ? [0, 0.5] : null;
+  if (grid && !reduce) for (let bb = Math.floor(b) - 1; bb <= Math.floor(b) + 1; bb++) for (const f of grid) {
+    const tl = timeAt(bb + f), dt = t - tl;
+    if (dt < -0.28 || dt > 0.5) continue;
+    for (const D of DRIPS) {
+      if (!vis(D)) continue;
+      if (dt < 0) { const y = lerp(D.y0, 141, 1 + dt / 0.28); R(D.x, y, 1, 2, '#cfe6ff'); }
+      else { const rr = 2 + dt * 18; g.strokeStyle = `rgba(200,225,255,${0.8 * (1 - dt / 0.5)})`; g.lineWidth = 1; g.beginPath(); g.ellipse(D.x, 142, rr, rr * 0.25, 0, 0, Math.PI * 2); g.stroke(); }
+    }
+  }
+  // puddles: the blues ripple on 1 and 3; from the fusion her kick ripples lilac on every beat
+  const ripple = (P, c, beatList, w) => { for (const bb of beatList) { const dt = t - timeAt(bb); if (dt < 0 || dt > 0.6) continue; const rr = 3 + dt * w; g.strokeStyle = `rgba(${c},${0.7 * (1 - dt / 0.6)})`; g.beginPath(); g.ellipse(P.x, P.y, rr, rr * 0.22, 0, 0, Math.PI * 2); g.stroke(); } };
+  if (!reduce) {
+    const fb = Math.floor(b), recent = [fb - 1, fb];
+    if (b >= 100 && b < 148) for (const P of PUDDLES) if (vis(P) && !DRIPS.some(D => D.x === P.x)) ripple(P, '255,214,160', recent.filter(x => x % 2 === 0), 26);
+    if (b >= 152 && b < 199 || b >= 200 && b < 248) ripple(PUDDLE2, '200,170,255', recent, 22);
+    if (b >= 200 && b < 248) ripple(PUDDLE, '220,235,255', recent, 34);
+  }
+  // splashes on the kick in the second drop
+  if (b >= 200 && b < 248 && !reduce && FX.alleyBeat !== Math.floor(b)) {
+    FX.alleyBeat = Math.floor(b);
+    for (const P of [PUDDLE, PUDDLE2]) spawn(P.x, P.y - 1, 6, ['#cfe6ff', '#9fb8d8'], -40, 40, -90, -40, 360, 420, [1, 1]);
+  }
+  g.restore();
+}
+// the alley lights the people and the belt too: a night shade over the whole picture with holes where the street's own lights
+// are (lamps, windows, the bulb over the door; from phase 3 the neon, the guitar spot and the bulb string), their colour spilling
+// onto whoever stands under them and a glint on the belt below. The scanner keeps its work light so the boxes always read.
+const lightBuf = document.createElement('canvas'); lightBuf.width = W; lightBuf.height = H;
+const STREET_GLOWS = [[69, 22, 40, '255,180,100'], [568, 23, 34, '255,180,100'], [720, 23, 34, '255,180,100'], [744, 51, 34, '255,180,100'], [1068, 59, 34, '255,180,100'],
+  [456, 110, 52, '255,170,90'], [946, 110, 52, '210,60,70'], [1490, 100, 80, '120,150,220']];
+function alleyLightList(al, nowMs) {
+  const ox = Math.round(alleyScroll(al.beat)), nv = neonLevels(al, nowMs), glint = guitarGlint(al.beat), out = [];
+  for (const P of LAMPS) out.push({ x: P.x - ox, y: P.y + 14, r: 100, a: al.lamp, c: '255,190,110', belt: 1 });
+  out.push({ x: 247 - ox, y: 88, r: 62, a: al.neon * 0.85, c: '255,205,140', belt: 0.7 });
+  for (const [x, y, r, c] of STREET_GLOWS) out.push({ x: x - ox, y, r, a: al.neon * 0.6, c, belt: 0.4 });
+  const pre = al.beat < 152, letters = pre ? 1 : Math.min(7, FX.lit) / 7, on = k => pre ? 1 : unitOn(k) ? 1 : 0;
+  out.push({ x: SIGN.x + 28, y: SIGN.y + 6, r: 95, a: nv.sign * letters, c: '57,198,255', belt: 0.8 });
+  out.push({ x: NEON_GTR_AT.x + 5, y: NEON_GTR_AT.y + 11, r: 50, a: nv.gtr * on(U_GTR), c: '255,170,80', belt: 0.4 });
+  out.push({ x: GUITARS.x, y: GUITARS.y, r: 66, a: nv.gtr * on(U_SPOT) * (0.8 + 0.2 * glint), c: '255,200,130', belt: 0.6 });
+  out.push({ x: NOTE_SIGN.x + 9, y: NOTE_SIGN.y + 10, r: 70, a: nv.note * on(U_NOTE), c: '190,150,255', belt: 0.7 });
+  const nb = Math.max(0, FX.lit - U_BULB), litStr = LIT_SPOTS.slice(0, nb).filter((p, i) => i % 2 === 0).length / 16, litFe = LIT_SPOTS.slice(0, nb).filter((p, i) => i % 2 === 1).length / 16;
+  out.push({ x: 110, y: 26, r: 130, a: nv.bulbs * 0.75 * litStr, c: '255,200,110', belt: 0.5 });
+  out.push({ x: 326, y: 44, r: 110, a: nv.bulbs * 0.7 * litFe, c: '255,200,110', belt: 0.5 });
+  return out.filter(l => l.a > 0.01 && l.x > -l.r && l.x < W + l.r);
+}
+function drawAlleyLight(al, t, nowMs) {
+  const shade = 0.5 * Math.max(al.ground, al.wall); if (shade <= 0) return;
+  const lights = alleyLightList(al, nowMs), d = lightBuf.getContext('2d');
+  d.globalCompositeOperation = 'source-over'; d.clearRect(0, 0, W, H);
+  d.fillStyle = `rgba(6,8,20,${shade})`; d.fillRect(0, 0, W, H);
+  d.globalCompositeOperation = 'destination-out';
+  const hole = (x, y, r, a) => { const gr = d.createRadialGradient(x, y, 2, x, y, r); gr.addColorStop(0, `rgba(0,0,0,${Math.min(1, a)})`); gr.addColorStop(0.6, `rgba(0,0,0,${0.55 * Math.min(1, a)})`); gr.addColorStop(1, 'rgba(0,0,0,0)'); d.fillStyle = gr; d.fillRect(x - r, y - r, r * 2, r * 2); };
+  // a lamp throws its light down: one hole at the head and a wider one where it lands on the people and the belt
+  for (const l of lights) { hole(l.x, l.y, l.r, l.a); hole(l.x, BELT_Y - 14, l.r * 0.9, l.a * 0.7); }
+  hole(SCAN_X, BELT_Y - 10, 60, 0.9);
+  g.drawImage(lightBuf, 0, 0);
+  // their colour on the people, and a glint along the belt top and its front edge below each one
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (const l of lights) {
+    const gr = g.createRadialGradient(l.x, l.y + 30, 4, l.x, l.y + 30, l.r); gr.addColorStop(0, `rgba(${l.c},${0.12 * l.a})`); gr.addColorStop(1, `rgba(${l.c},0)`);
+    g.fillStyle = gr; g.fillRect(l.x - l.r, l.y + 30 - l.r, l.r * 2, l.r * 2);
+    const half = Math.round(l.r * 0.55);
+    for (let dx = -half; dx <= half; dx++) {
+      const x = l.x + dx; if (x < 48 || x >= W) continue;
+      const k = (1 - Math.abs(dx) / half) * l.a * l.belt;
+      g.fillStyle = `rgba(${l.c},${0.4 * k})`; g.fillRect(x, BELT_Y, 1, 1);
+      g.fillStyle = `rgba(${l.c},${0.14 * k})`; g.fillRect(x, BELT_Y + 4, 1, 3);
+    }
+  }
+  g.restore();
+}
+// phase 3: the belt's top edge is a guitar string. His lead notes set it humming end to end; each hit plucks it at the scanner and
+// the wave runs back up the belt.
+const phase3 = beat => !!L.alley && beat >= 152 && beat < 248;
+function drawBeltString(al, t, nowMs) {
+  if (!phase3(al.beat) && !(al.beat >= 248 && al.beat < 250)) return;
+  const glint = guitarGlint(al.beat), age = (nowMs - FX.pluckAt) / 1000, pl = age < 0.9 ? FX.pluckAmp * Math.exp(-age * 4) : 0;
+  const hum = glint * 0.8, a = 0.35 + 0.4 * Math.max(glint, pl);
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (let x = 48; x < W; x++) {
+    const u = (x - 48) / (W - 48), d = Math.abs(x - SCAN_X);
+    let dy = hum * Math.sin(Math.PI * u * 3) * Math.sin(nowMs / 18);
+    if (pl > 0) dy += pl * 1.6 * Math.exp(-Math.pow((d - age * 420) / 26, 2)) * Math.sin(d / 5 - age * 40);
+    const y = BELT_Y + (reduce ? 0 : Math.round(dy));
+    g.fillStyle = `rgba(255,210,150,${a * (0.6 + 0.4 * Math.exp(-d / 160))})`; g.fillRect(x, y, 1, 1);
+  }
+  g.restore();
+}
+function drawPuddleMirror(al, t, nowMs) {
+  const b = al.beat; if (!L.alley || b < 231 || b >= 250) return;
+  const fade = b < 232 ? b - 231 : b >= 248 ? 1 - (b - 248) / 2 : 1, kick = Math.max(0, 1 - (b % 1) * 3);
+  const top = BELT_Y + 18, rows = H - top;
+  g.save(); g.globalAlpha = 0.3 * fade;
+  for (let k = 0; k < rows; k++) {
+    const sy = Math.round(BELT_Y + 14 - k * 2.2); if (sy < 20) break;
+    const dx = reduce ? 0 : Math.round(Math.sin(k * 0.55 + nowMs / 140) * (0.6 + kick * 2.2) * (0.4 + k / rows));
+    g.drawImage(cv, 0, sy, W, 1, dx, top + k, W, 1);
+  }
+  g.restore();
+  g.fillStyle = `rgba(10,14,30,${0.25 * fade})`; g.fillRect(0, top, W, rows);
+}
+// a hit in phase 3 lights the next light on the street and plucks the string; a perfect holds the rain for a breath.
+// No zoom or shake here: that is 1-2's language.
+function alleyHit(j, beat) {
+  const now = performance.now();
+  if (FX.lit < UNIT_POS.length) { FX.litAt[FX.lit] = now; FX.lit++; }
+  FX.pluckAt = now; FX.pluckAmp = j === 'perfect' ? 1 : 0.6;
+  FX.shakeUntil = 0;
+  if (beat >= 200 && beat < 248) {
+    // the climax: the view punches in on the scanner and the rain bursts off it
+    const top = beat >= 232 ? 1.3 : 1;
+    FX.punchAt = now; FX.punch = (j === 'perfect' ? 2.2 : 1.4) * top;
+    spawn(SCAN_X, BELT_Y - 8, Math.round(34 * top), ['#eef6ff', '#a8d8ff', '#ffffff'], -210, 210, -280, -70, 620, 700, [2, 2]);
+    spawn(SCAN_X, BELT_Y - 1, Math.round(20 * top), ['#cfe6ff', '#9fd0ff'], -320, 320, -90, -20, 380, 480, [3, 1]);
+    spawn(SCAN_X, BELT_Y - 20, Math.round(12 * top), ['#ffffff'], -120, 120, -160, -40, 500, 380, [1, 3]);
+    rings.push({ at: now, c: '#cfe6ff', dy: 0 });
+  } else { FX.punchAt = -1e9; if (j === 'perfect') FX.freezeAt = now; }
+}
+function alleyMiss() {
+  if (!(FX.lit > 0)) return;
+  const i = --FX.lit, p = UNIT_POS[i];
+  spawn(p.x, p.y + 2, 7, ['#ffd88a', '#fff3c8', '#ff9a4a'], -45, 45, -70, 10, 320, 420, [1, 1]);
+  if (ctx) { noise(ctx.currentTime, 'bandpass', 3200, 0.12, 0.03, 3, bus); noise(ctx.currentTime + 0.02, 'highpass', 5000, 0.06, 0.08, 0.7, bus); }
+}
+// in front of everything: the blackout before the count-in, the dark beat before the second drop, and lightning
+const LIGHTNING = [152, 200, 216, 232, 236, 240, 244];
+function drawAlleyFront(al, t) {
+  const b = al.beat, A = L.alley;
+  let dark = 0;
+  if (b >= A.reveal - 0.75 && b < A.reveal) dark = 0.92; else if (b >= A.reveal && b < A.reveal + 0.25) dark = 0.92 * (1 - (b - A.reveal) / 0.25);
+  if (b >= 199 && b < 200) dark = 0.85;
+  if (dark > 0) { g.fillStyle = `rgba(0,0,0,${dark})`; g.fillRect(0, 0, W, H); }
+  if (reduce) return;
+  for (const lb of LIGHTNING) {
+    const age = t - timeAt(lb); if (age < 0 || age > 0.4) continue;
+    const a = age < 0.07 ? 0.55 : age < 0.11 ? 0.1 : age < 0.16 ? 0.4 * (1 - (age - 0.11) / 0.05) : 0.12 * (1 - (age - 0.16) / 0.24);
+    g.fillStyle = `rgba(235,240,255,${Math.max(0, a)})`; g.fillRect(0, 0, W, H);
+  }
+}
+
 function drawScene(t, bt, active, nowMs) {
   g.save();
   if (!reduce && nowMs < FX.shakeUntil) { const a = FX.shakeAmp || 1; g.translate(Math.round((Math.random() * 2 - 1) * a), Math.round((Math.random() * 2 - 1) * a)); } else FX.shakeAmp = 1;
@@ -1394,8 +1874,12 @@ function drawScene(t, bt, active, nowMs) {
   }
   const pa = (nowMs - (FX.punchAt || -1e9)) / 150;
   if (!reduce && pa >= 0 && pa < 1) { const z = 1 + 0.03 * (FX.punch || 1) * (1 - pa) * (1 - pa), px = SCAN_X, py = BELT_Y - 10; g.translate(px, py); g.scale(z, z); g.translate(-px, -py); }
-  g.drawImage(bg, 0, 0);
-  drawLights(bt, t, active);
+  const al = active ? alleyState(beatAt(t)) : null;
+  // the downpour thumps with the kick, one pixel
+  if (al && !reduce && al.beat >= 200 && al.beat < 248) g.translate(0, Math.round(Math.max(0, 1 - (al.beat % 1) * 4)));
+  if (al) drawAlleyBack(al, t, nowMs); else g.drawImage(bg, 0, 0);
+  drawLights(bt, t, active, al);
+  if (al) drawAlleyRain(al, t, nowMs);
   rings = rings.filter(r => nowMs - r.at < 420);
   const lanes = L.lanes === 2 ? [0, 1] : [0];
   const poses = lanes.map(lane => { const p = partnerPose(t, bt, active, lane); p.nod = FX.react[lane].type === 'nod' && nowMs - FX.react[lane].at < 130 ? 1 : 0; return p; });
@@ -1410,6 +1894,7 @@ function drawScene(t, bt, active, nowMs) {
   }
   const lo = L.lanes === 2 ? 1 : 0;
   if (L.cast) { L.partners[0] = castPlacer(castBeatAt(t, active)); drawCast(t, nowMs, active, poses[lo]); }
+  else if (SCENE.walk && !active) drawWalkingBoss(nowMs);
   else if (!L.onePlacer) { g.save(); g.translate(laneSlide(lo, t, active) + (L.lanes === 2 ? LANE_DX[1] : 0), 0); drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); g.restore(); drawObserver(t, nowMs, active); }
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
@@ -1419,6 +1904,7 @@ function drawScene(t, bt, active, nowMs) {
   for (const [n, f, dy] of laneFx.falling) { g.save(); g.translate(f.x, f.y + dy - n.h / 2); g.rotate(f.rot); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); }
   drawPlayerArm(kick, nowMs, nowMs - lastHeavy < 260, upperKick);
   drawParticles(nowMs);
+  if (al) { drawAlleyLight(al, t, nowMs); drawBeltString(al, t, nowMs); drawPuddleMirror(al, t, nowMs); }
   // blackout overlay: darkness with holes where the scanners glow and a faint one around each partner
   const dark = active ? blackoutAmount(t) : 0;
   if (dark > 0) {
@@ -1444,6 +1930,7 @@ function drawScene(t, bt, active, nowMs) {
   // strobe on each 빰
   const sh = (nowMs - (FX.hypeAt || -1e9)) / 1000;
   if (active && !reduce && sh < 0.14) { g.fillStyle = `rgba(255,255,255,${(0.14 - sh) / 0.14 * (FX.hypeBig ? 0.55 : 0.38)})`; g.fillRect(0, 0, W, H); }
+  if (al) drawAlleyFront(al, t);
   const mAge = nowMs - FX.lastMiss;
   if (mAge < 320) {
     const a = (1 - mAge / 320) * 0.4;
@@ -1592,6 +2079,24 @@ function scratch(t) {
   gn.gain.setValueAtTime(0.3, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
   s.connect(fl); fl.connect(gn); gn.connect(bus); s.start(t); s.stop(t + 0.3);
 }
+// a cassette rewinding: hiss that rises as the reels spin up, garbled squeaks of the music going backwards, the motor whine,
+// and the clunk when it reaches the start. It speeds up and slows down like the picture does (an ease over d seconds).
+function tapeRewind(t, d) {
+  const hs = ctx.createBufferSource(), hf = ctx.createBiquadFilter(), hg = ctx.createGain();
+  hs.buffer = nbuf; hs.loop = true; hf.type = 'bandpass'; hf.Q.value = 1.1;
+  hf.frequency.setValueAtTime(500, t); hf.frequency.exponentialRampToValueAtTime(4200, t + d * 0.55); hf.frequency.exponentialRampToValueAtTime(1500, t + d);
+  hg.gain.setValueAtTime(0.0001, t); hg.gain.exponentialRampToValueAtTime(0.16, t + d * 0.3); hg.gain.setValueAtTime(0.16, t + d * 0.75); hg.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  hs.connect(hf); hf.connect(hg); hg.connect(bus); hs.start(t); hs.stop(t + d + 0.05);
+  const o = ctx.createOscillator(), of = ctx.createBiquadFilter(), og = ctx.createGain(); o.type = 'sawtooth'; of.type = 'bandpass'; of.frequency.value = 1700; of.Q.value = 2.2;
+  for (let tt = t; tt < t + d - 0.08;) { const p = (tt - t) / d, sp = Math.sin(Math.PI * p); o.frequency.setValueAtTime(300 + Math.random() * (500 + 1600 * sp), tt); tt += 0.09 - 0.06 * sp; }
+  og.gain.setValueAtTime(0.0001, t); og.gain.exponentialRampToValueAtTime(0.028, t + d * 0.3); og.gain.setValueAtTime(0.028, t + d * 0.75); og.gain.exponentialRampToValueAtTime(0.0001, t + d - 0.04);
+  o.connect(of); of.connect(og); og.connect(bus); o.start(t); o.stop(t + d + 0.05);
+  const m = ctx.createOscillator(), mf = ctx.createBiquadFilter(), mg = ctx.createGain(); m.type = 'square'; mf.type = 'lowpass'; mf.frequency.value = 1100;
+  m.frequency.setValueAtTime(70, t); m.frequency.exponentialRampToValueAtTime(380, t + d * 0.55); m.frequency.exponentialRampToValueAtTime(110, t + d);
+  mg.gain.setValueAtTime(0.0001, t); mg.gain.exponentialRampToValueAtTime(0.018, t + d * 0.3); mg.gain.setValueAtTime(0.018, t + d * 0.8); mg.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  m.connect(mf); mf.connect(mg); mg.connect(bus); m.start(t); m.stop(t + d + 0.05);
+  noise(t + d - 0.05, 'lowpass', 700, 0.45, 0.07, 0.7, bus); noise(t + d - 0.045, 'bandpass', 2600, 0.15, 0.02, 3, bus);
+}
 function tapeStop(t, fs) {
   fs.forEach(f => { const o = ctx.createOscillator(), gn = ctx.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * 0.12, t + 0.7);
     gn.gain.setValueAtTime(0.05, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.75); o.connect(gn); gn.connect(bus); o.start(t); o.stop(t + 0.8); });
@@ -1613,6 +2118,7 @@ function sfxPluck(t, f, v, d) {
 }
 function hitSound(j, tones, beat, done) {
   const t = ctx.currentTime, th = fxTheme(beat), f = tones[(stats.combo + (done ? 1 : 0)) % Math.min(3, tones.length)], good = j === 'good';
+  if (phase3(beat)) { if (done) gtr(t, tones.slice(0, 3).map(x => x * 2), 0.9, 0.034); else gtrLead(t, f * 2, good ? 0.3 : 0.42, good ? 0.028 : 0.036, false); return; }
   if (th === 'chill') {
     // a soft piano note: triangle with its octave, a little felt in the attack
     osc('triangle', f * 4, t, 0.004, good ? 0.05 : 0.07, 0.45, bus); osc('sine', f * 8, t, 0.004, 0.018, 0.25, bus); noise(t, 'lowpass', 900, 0.05, 0.015, 0.7, bus);
@@ -2073,12 +2579,8 @@ function buildEvents() {
         continue;
       }
       if (sec === 'fuseIn') {
-        // her kick doubles the pulse under his band, the snare splits into 16ths, a riser, and the guitar bends up into the drop
-        if (inBar === 0) E(0, T => { riser(T, s * 4, 0.06); organ(T, chords[ci], s * 4, 0.02); });
-        E(0, T => kick(T, 0.7)); E(s / 2, T => kick(T, 0.8));
-        E(0, T => bass(T, roots[ci], s * 0.8, 300));
-        for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.1 + inBar * 0.03 + k * 0.01));
-        if (inBar === 2) E(0, T => gtrLead(T, N_.D5, s * 2, 0.05, true));
+        // the street rewinds to where the walk began: a tape spooling back over the whole bar, and the beat comes in at 152
+        if (inBar === 0) E(0, T => tapeRewind(T, s * 4));
         continue;
       }
       // phase 3: his blues, with her beat on it. The chords stay the 12-bar blues (a blues bar = two bars at 120) and the guitar
@@ -2239,7 +2741,7 @@ try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}
 
 function resetRun() {
   notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; });
-  FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1;
+  FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
   rings = []; heavyPend = null;
 }
@@ -2269,6 +2771,7 @@ function addCombo() {
 function failFx(kind, judgeKind, sub, d, lane = 0) {
   const now = performance.now(), lost = stats.combo;
   stats.combo = 0; stats.missStreak++;
+  if (L.alley && ctx && phase3(beatAt(songAt(now)))) alleyMiss();
   popJudge(judgeKind, lost >= 10 ? lost + ' 콤보 끊김' : sub, lane);
   FX.lastMiss = now; FX.missKind = kind; FX.missLane = lane; FX.react[lane] = { type: 'glance', at: now }; FX.flinch = now;
   if (d != null) FX.marks.push({ d, at: now, c: C.laser });
@@ -2312,10 +2815,12 @@ function judgeNote(target, t) {
     const tones = CHORDS[chordIdx(target.beat)];
     const th = THEME[fxTheme(target.beat)];
     if (!inRange(target.beat, L.hype)) hitSound(j, tones, target.beat, false);
+    const lightUp = phase3(target.beat);
     lastGood = now; FX.goodLane = target.lane; FX.glow = th.glow; ring(th.ring[(stats.combo + (j === 'good' ? 1 : 0)) % 2], target.lane);
     spawnBits(j === 'perfect' ? 14 : 6, th);
     FX.punchAt = now; FX.punch = milestone ? 1.6 : j === 'perfect' ? 1 : 0.5;
     FX.marks.push({ d, at: now, c: j === 'perfect' ? th.ring[0] : th.ring[1] });
+    if (lightUp) alleyHit(j, target.beat);
     if (isSpecial(target)) stats.special++;
     if (target.late) FX.react[target.lane] = { type: 'relief', at: now };
     else if (j === 'perfect') FX.react[target.lane] = { type: 'nod', at: now };
@@ -2380,6 +2885,7 @@ function completeHold(n) {
   n.state = 'hit'; n.doneAt = songAt(now); stats.tailOk++; const milestone = addCombo(); stopHold();
   hitSound('perfect', CHORDS[chordIdx(n.beat)], n.beat, true); tear(ctx.currentTime);
   lastGood = now; FX.goodLane = n.lane; ring(C.ok, n.lane); spawnBits(16); FX.punchAt = now; FX.punch = 1.4; FX.shakeUntil = now + 150; FX.react[n.lane] = { type: 'nod', at: now };
+  if (phase3(n.beat)) alleyHit('perfect', n.beat);
   popJudge('done', milestone, n.lane);
 }
 function onRelease(ts, lane = 0) {
@@ -2430,6 +2936,8 @@ function updateHud(t) {
     if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X; else if (spk === 'h') { bx = HAEUN_X - 70; bubble.style.bottom = '84%'; }
     bubble.style.left = bx == null || bx < 60 ? '3cqw' : (bx / W * 100 - 5).toFixed(1) + '%';
     bubble.classList.toggle('obs', !!(spk && (L.cast ? (spk === 'b') !== (castPlacer(beat) === 'boss') : spk === 'b')));
+    bubble.classList.remove('loud');
+    if (line && line[5] === 'loud') { void bubble.offsetWidth; bubble.classList.add('loud'); FX.shakeUntil = performance.now() + 240; FX.shakeAmp = 2; }
   }
   let h = '';
   if (L.tutorial) for (let i = 0; i < 3; i++) { const n = notes[i]; if (n && n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 터치'; break; } }
@@ -2442,19 +2950,10 @@ function updateHud(t) {
   hintFor('heavy', '무거운 상자: 양쪽을 같이');
   hintFor('top', '긴 화물 위 상자: 누른 채로 다른 손으로 톡');
   { const fl = firstWith('late'); if (L.id !== 'jiwoo' && fl && fl.state === 'pending' && t > fl.place - SPB) h = L.lateHint || '반장님 손이 늦어요. 음악 말고 손을 봐요'; }
-  if (L.id === 's1-2' && beat >= 104 && beat < 114) h = '이어폰 뺐어요. 벨트 박자로';
-  if (L.id === 's1-2' && beat >= 172 && beat < 179) h = '숨 고르기. 곧 한 번 더';
   if (L.id === 's1-4') {
     if (beat >= 2 && beat < 10) h = '위 벨트는 하은이 알아서 찍어요. 나는 아래만';
     { const pr = notes.find(n => n.pair && n.state === 'pending'); if (pr && t > pr.place - SPB && t < pr.place + SPB) h = '하은이랑 같은 박: 같이 찍어요'; }
     if (beat >= 168 && beat < 176) h = '위는 하은이 흔들고, 아래는 내가 똑바로. 하은 소리에 흔들리지 말고';
-  }
-  if (L.id === 's1-3') {
-    if (beat >= 95 && beat < 100) h = '느려져요. 반장님 손을 봐요';
-    if (beat >= 150 && beat < 158) h = '지우 곡이 돌아왔어요. 손은 반장님';
-    const sh = firstWith('shuffle'); if (sh && sh.state === 'pending' && t > sh.place - SPB) h = '셔플: 길게, 짧게';
-    if (beat >= 136 && beat < 142) h = '엇박: 박과 박 사이에 내려와요';
-    if (beat >= 200 && beat < 208) h = '빨라져도 박 사이 그대로';
   }
   if (L.id === 's1-1') {
     const offb = notes.find(n => n.beat % 2 === 1), pair = notes.find(n => n.beat % 1 === 0.5);
@@ -2472,6 +2971,7 @@ function updateHud(t) {
     if (f1 && f1.state === 'pending' && t > f1.place) h = L.autoLane === 0 ? '연두 벨트 = 내 손' : L.coScanner ? '연두 벨트 = 오른손, 내가 찍어요' : '연두 벨트 = 오른손';
     if (blackout(beat)) h = '정전! 소리로';
   }
+  if (L.hints === false) h = '';
   if (h !== lastHint) { hint.textContent = h; hint.hidden = !h; lastHint = h; }
 }
 
@@ -2479,6 +2979,8 @@ const dialogEl = $('dialog'), whoEl = $('who'), textEl = $('dtext');
 let dlg = null, typeTimer = null;
 function runDialog(lines, done) { dlg = { lines, i: 0, done, n: 0, full: '' }; dialogEl.hidden = false; showLine(); }
 function showLine() {
+  const sc = dlg.lines[dlg.i].scene || 'line';
+  if (sc !== SCENE.kind) { dialogEl.hidden = true; sceneCut(sc, () => { if (dlg) { dialogEl.hidden = false; showLine(); } }); return; }
   const L_ = dlg.lines[dlg.i], robot = L_.who === 'AS-7';
   whoEl.textContent = L_.who; whoEl.hidden = !L_.who; whoEl.classList.toggle('robot', robot);
   textEl.classList.toggle('narr', !L_.who); textEl.classList.toggle('robot', robot);
@@ -2494,7 +2996,7 @@ function showLine() {
   }, robot ? 22 : 32);
 }
 function advanceDialog() {
-  if (!dlg) return;
+  if (!dlg || SCENE.trans) return;
   if (dlg.n < dlg.full.length) { clearInterval(typeTimer); dlg.n = dlg.full.length; textEl.textContent = dlg.full; return; }
   dlg.i++;
   if (dlg.i >= dlg.lines.length) { const d = dlg.done; dlg = null; dialogEl.hidden = true; d(); }
@@ -2502,7 +3004,7 @@ function advanceDialog() {
 }
 $('skip').addEventListener('click', e => {
   e.stopPropagation(); if (!dlg) return;
-  clearInterval(typeTimer); const d = dlg.done; dlg = null; dialogEl.hidden = true; d();
+  clearInterval(typeTimer); const d = dlg.done; dlg = null; dialogEl.hidden = true; sceneReset(); d();
 });
 
 // attendance board
@@ -2532,15 +3034,16 @@ function buildCards() {
     g = saved;
   });
 }
-function openBoard() { ensureAudio(); state = 'select'; $('title').hidden = true; $('result').hidden = true; dialogEl.hidden = true; buildCards(); $('select').hidden = false; }
+function openBoard() { ensureAudio(); sceneReset(); state = 'select'; $('title').hidden = true; $('result').hidden = true; dialogEl.hidden = true; buildCards(); $('select').hidden = false; }
 
 function beginShift(level) {
   ensureAudio(); loadLevel(level); resetRun(); handLabels();
   $('title').hidden = true; $('result').hidden = true; $('select').hidden = true; state = 'intro';
+  sceneReset((level.intro[0] && level.intro[0].scene) || 'line');
   runDialog(level.intro, startPlay);
 }
 function startPlay() {
-  ensureAudio(); resetRun();
+  ensureAudio(); resetRun(); sceneReset();
   $('title').hidden = true; $('result').hidden = true; $('select').hidden = true;
   events = buildEvents(); evI = 0; T0 = ctx.currentTime + 0.8;
   lastClock = ''; lastCombo = -1; lastSay = ''; lastHint = '';
@@ -2632,7 +3135,9 @@ function frame(now) {
     schedule(); judgeTick(t); updateHud(t);
     if (t > timeAt(END_BEAT)) finishPlay();
   }
-  drawScene(t, now / 1000, active, now);
+  sceneTick(now);
+  if (SCENE.kind === 'office' && !active) drawOffice(now);
+  else { drawScene(t, now / 1000, active, now); drawSceneFade(now); }
 }
 requestAnimationFrame(frame);
 })();
