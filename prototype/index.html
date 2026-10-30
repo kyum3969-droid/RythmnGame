@@ -2097,17 +2097,32 @@ const THEME = {
   blues: { ring: ['#f0b429', '#ffe9a8'], bits: ['#f0b429', '#ffe9a8', '#efe6d2'], spark: ['#f0b429', '#ff8a3d'], glow: '#f0b429' },
   chill: { ring: ['#9db4ff', '#e8e0ff'], bits: ['#9db4ff', '#e8e0ff', '#ffffff'], spark: ['#9db4ff', '#78dcff'], glow: '#9db4ff' }
 };
-// the climax hit: a driven power chord on the chord's root, a cracking snare, a sub thump and a splash, and the band ducks under it
-// for a moment so the hit lands on top of the music rather than inside it
-function climaxHit(t, tones, j, done) {
+// the climax hit answers by where the box falls. On the beat it is 반장: a driven power chord on the chord's root with a low thump,
+// the band ducking under it. Off the beat it is 지우: a bright piano chord stab (her instrument, below the synth lead) with a short
+// clap, the band barely ducking. A crate held to the end gets both. Two layers each, so an off-beat stays light.
+function pianoStab(t, fs, v) {
+  const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 4200; fl.connect(bus);
+  fs.forEach((f, i) => {
+    const t0 = t + i * 0.006;
+    osc('triangle', f, t0, 0.003, v, 0.38, fl); osc('sine', f * 2, t0, 0.002, v * 0.45, 0.22, fl); osc('sine', f * 3, t0, 0.002, v * 0.16, 0.12, fl);
+  });
+  osc('triangle', fs[fs.length - 1] * 2, t, 0.003, v * 0.5, 0.25, fl);
+  noise(t, 'highpass', 2600, v * 1.1, 0.018, 0.7, bus);
+}
+function climaxHit(t, tones, j, done, beat) {
   let r = tones[0]; while (r > 300) r /= 2; while (r < 140) r *= 2;
-  const big = done || j === 'perfect', d = done ? 0.9 : 0.34;
-  for (const f of [r, r * 1.5, r * 2]) gtrDist(t, f, d, big ? 0.05 : 0.038, false, bus);
-  noise(t, 'highpass', 1600, big ? 0.42 : 0.3, 0.13, 0.7, bus); osc('triangle', 200, t, 0.002, 0.22, 0.08, bus);
-  const o = osc('sine', 115, t, 0.003, big ? 0.55 : 0.38, 0.32, bus); o.frequency.exponentialRampToValueAtTime(42, t + 0.26);
-  noise(t + 0.008, 'bandpass', 3200, big ? 0.2 : 0.14, 0.24, 0.8, bus);
-  if (done) noise(t, 'highpass', 4200, 0.24, 1.1, 0.7, bus);
-  mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(big ? 0.5 : 0.62, t); mus.gain.linearRampToValueAtTime(1, t + 0.18);
+  const big = done || j === 'perfect', off = Math.abs(beat - Math.round(beat)) > 0.01;
+  const chord = tones.slice(0, 4).map(f => { while (f < 200) f *= 2; while (f > 420) f /= 2; return f; }).sort((a, b) => a - b);
+  if (done || !off) {
+    for (const f of [r, r * 1.5, r * 2]) gtrDist(t, f, done ? 0.9 : 0.34, big ? 0.05 : 0.038, false, bus);
+    const o = osc('sine', 115, t, 0.003, big ? 0.55 : 0.4, 0.32, bus); o.frequency.exponentialRampToValueAtTime(42, t + 0.26);
+  }
+  if (done || off) {
+    pianoStab(t, chord, big ? 0.055 : 0.042);
+    noise(t, 'bandpass', 1500, big ? 0.24 : 0.18, 0.05, 1.2, bus); noise(t + 0.011, 'bandpass', 1650, big ? 0.18 : 0.13, 0.07, 1.2, bus);
+  }
+  const duck = off && !done ? (big ? 0.8 : 0.86) : (big ? 0.55 : 0.65);
+  mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(duck, t); mus.gain.linearRampToValueAtTime(1, t + (off && !done ? 0.1 : 0.18));
 }
 function sfxPluck(t, f, v, d) {
   const o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
@@ -2117,7 +2132,7 @@ function sfxPluck(t, f, v, d) {
 }
 function hitSound(j, tones, beat, done) {
   const t = ctx.currentTime, th = fxTheme(beat), f = tones[(stats.combo + (done ? 1 : 0)) % Math.min(3, tones.length)], good = j === 'good';
-  if (phase3(beat) && beat >= 200) { climaxHit(t, tones, j, done); return; }
+  if (phase3(beat) && beat >= 200) { climaxHit(t, tones, j, done, beat); return; }
   if (phase3(beat)) { if (done) gtr(t, tones.slice(0, 3).map(x => x * 2), 0.9, 0.04); else gtrLead(t, f * 2, good ? 0.3 : 0.42, good ? 0.034 : 0.044, false); return; }
   if (th === 'chill') {
     // a soft piano note: triangle with its octave, a little felt in the attack
