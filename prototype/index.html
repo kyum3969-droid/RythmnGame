@@ -1597,8 +1597,7 @@ function dockProgress() {
   if (dockTotal.id !== L.id) dockTotal = { id: L.id, n: Math.max(1, notes.filter(n => !isAuto(n)).length) };
   return stats ? Math.min(1, (stats.perfect + stats.good) / dockTotal.n) : 0;
 }
-// behind everyone: the dock on the right with the truck backed in (its load is your work), the departure board over it, and the
-// rest of the floor busy behind the racks: two workers and a forklift, which stops when 반장's knee goes and races in the rush
+// behind everyone: the dock on the right with the truck backed in (its load is your work) and the departure board over it
 const DOCK = { x: 282, y: 44, w: 88, h: 64 };
 function drawDockBack(beat, nowMs, active) {
   const { x, y, w, h } = DOCK, rush = beat >= 144 && beat < 192;
@@ -1609,6 +1608,8 @@ function drawDockBack(beat, nowMs, active) {
   R(x, y + h - 4, w, 4, '#2a2e35');
   const nb = Math.round(dockProgress() * 36);
   for (let k = 0; k < nb; k++) { const row = Math.floor(k / 6), col = k % 6, bx = x + 6 + col * 13 + (row % 2 ? 3 : 0), by = y + h - 4 - (row + 1) * 9; if (by < y + 2) break; R(bx, by, 12, 9, C.kraft); R(bx, by, 12, 1, C.kraftTop); R(bx + 5, by, 2, 9, C.tape); R(bx + 11, by + 1, 1, 8, C.kraftDark); }
+  // the trailer is deep in shadow behind the far gate: its load reads as background, never as boxes on the belt
+  R(x, y, w, h, 'rgba(6,8,12,0.58)');
   // the trailer's tail lights at the door edges, pulsing on the beat in the rush
   const tl = rush ? Math.max(0.35, 1 - (beat % 1) * 2.5) : 0.4;
   for (const lx of [x - 3, x + w]) { R(lx, y + h - 16, 3, 6, `rgba(255,60,50,${tl})`); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,50,40,${0.12 * tl})`; g.fillRect(lx - 8, y + h - 24, 19, 22); g.restore(); }
@@ -1616,34 +1617,14 @@ function drawDockBack(beat, nowMs, active) {
   const close = beat >= 188 ? Math.min(1, (beat - 188) / 1) : 0;
   R(x - 4, y - 10, w + 8, 7, '#4a4d52'); for (let k = 0; k < w + 8; k += 6) R(x - 4 + k, y - 9, 1, 5, '#3a3d42');
   if (close > 0) { const sh = Math.round(h * ease(close)); for (let yy = 0; yy < sh; yy += 4) { R(x, y + yy, w, 3, '#6b6f75'); R(x, y + yy + 3, w, 1, '#53575d'); } }
-  // the departure board: the time now, an arrow, 04:40. Red from the rush; green once the truck is loaded
-  R(288, 22, 76, 12, '#0c0d10'); R(288, 22, 76, 1, '#2a2d33');
+  // the departure board: the time now, an arrow, 04:40. Red from the rush; green once the truck is loaded. It hangs off to the
+  // right so the far gate's judgement pops clear of it
+  R(324, 22, 48, 12, '#0c0d10'); R(324, 22, 48, 1, '#2a2d33');
   const done = beat >= 188, col = done ? (Math.floor(nowMs / 300) % 2 ? '#7fe08a' : '#3f7a46') : rush ? (Math.floor(nowMs / 250) % 2 ? '#ff5a4a' : '#c23b2e') : '#f0b429';
-  pixText(`${clockAt(Math.min(beat, 188))}>04:40`, 292, 25, col);
-  if (!done) { const p = Math.min(1, Math.max(0, beat) / 188); R(292, 31, Math.round(68 * p), 1, col); }
-  // the floor behind the racks
-  drawBackLife(beat, nowMs, active);
+  pixText(`${clockAt(Math.min(beat, 188))}>04:40`, 328, 25, col);
+  if (!done) { const p = Math.min(1, Math.max(0, beat) / 188); R(328, 31, Math.round(40 * p), 1, col); }
   // a light passing over the back wall as the truck pulls away (192)
   if (beat >= 192 && beat < 196 && !reduce) { const p = (beat - 192) / 4, cx = lerp(W + 40, -80, p); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(cx - 50, 0, cx + 50, 0); gr.addColorStop(0, 'rgba(255,240,200,0)'); gr.addColorStop(0.5, `rgba(255,240,200,${0.22 * Math.sin(Math.PI * p)})`); gr.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = gr; g.fillRect(cx - 50, 36, 100, 110); g.restore(); }
-}
-const LIFE = { last: 0, lift: 200, walk: 0 };
-function drawBackLife(beat, nowMs, active) {
-  const dt = Math.min(0.1, Math.max(0, (nowMs - LIFE.last) / 1000)); LIFE.last = nowMs;
-  const knee = beat >= 40 && beat < 60, rush = beat >= 144 && beat < 192, sp = !active || reduce ? 0 : knee ? 0 : rush ? 2.4 : 1;
-  LIFE.lift = ((LIFE.lift - 26 * sp * dt) % 330 + 330) % 330; LIFE.walk = (LIFE.walk + 16 * sp * dt) % 300;
-  g.save(); g.globalAlpha = 0.6;
-  // two workers walking right, one a little behind the other
-  for (const [off, hgt] of [[0, 30], [70, 28]]) {
-    const wx = Math.round((LIFE.walk + off) % 300) - 20, step = Math.floor(LIFE.walk / 6 + off) % 2, top = 132 - hgt;
-    R(wx - 3, top, 6, 6, '#120d0b'); R(wx - 4, top + 6, 8, hgt - 14, '#120d0b'); R(wx - 3 + (step ? 1 : -1), top + hgt - 8, 2, 8, '#120d0b'); R(wx + 1 + (step ? -1 : 1), top + hgt - 8, 2, 8, '#120d0b');
-    R(wx - 4, top + 9, 8, 4, '#3a2210');
-  }
-  // the forklift, heading left; its beacon blinks while it moves
-  const fx = Math.round(LIFE.lift) - 40;
-  R(fx, 118, 26, 12, '#1a1712'); R(fx + 4, 108, 12, 10, '#1a1712'); R(fx - 6, 100, 2, 30, '#1a1712'); R(fx - 12, 126, 8, 2, '#1a1712');
-  R(fx + 3, 128, 6, 6, '#0c0a08'); R(fx + 18, 128, 6, 6, '#0c0a08'); R(fx + 4, 120, 16, 2, '#5a4a1a');
-  g.restore();
-  if (sp > 0 && Math.floor(nowMs / 220) % 2) { R(fx + 9, 105, 3, 2, '#ffb030'); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(255,160,40,.18)'; g.fillRect(fx + 2, 98, 17, 14); g.restore(); }
 }
 // the beacons: one on each scanner, one on a post halfway down each belt. 하은 counts them on one by one (60 to 63);
 // they spin for whoever is feeding the belt, both in the 'both' stretch, faster in the rush, stuttering when the knee goes again
