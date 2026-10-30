@@ -1348,63 +1348,167 @@ function doorBust(t) {
   bars();
   blackout(W, H, t < 0.3 ? 1 - t / 0.3 : t > 5.0 ? (t - 5.0) / 0.4 : 0);
 }
-// 3. 계단 — close and from the side on her legs: one shoe on a tread, the knee comes up, the other shoe lands on the next one;
-//    the camera climbs with her along the slope. Then from behind at the waist, the exit's sky opening over her head
+// 3. 계단 — close and from the side on her legs: one sneaker planted on a tread, the knee comes up and the other lands on the
+//    next; the camera climbs the slope with her. Then from behind at the waist, the exit's sky opening over her cap
 function shotStairs(u) {
   if (u < 3.4) stairsKnee(u); else stairsWaist(u - 3.4);
 }
-function shoeSide(ax, ay, c = '#1e1a1a') {   // a sneaker side on, facing right; (ax, ay) the ankle, sole bottom at ay + 5
-  R(ax - 5, ay - 1, 13, 4, c); R(ax + 6, ay + 1, 5, 2, c); R(ax + 9, ay + 2, 2, 1, c); R(ax - 6, ay, 2, 3, c);
-  for (let k = 0; k < 3; k++) R(ax + 1 + k * 2, ay - 1, 1, 1, '#efe6d2');
-  R(ax - 6, ay + 3, 17, 2, '#d9d4c6'); R(ax - 6, ay + 4, 17, 1, '#a9a49a'); R(ax - 4, ay + 1, 2, 1, '#3a3236');
+// crisp polygon fill (no anti-aliasing): scanline spans at pixel centres
+function polyFill(pts, c) {
+  let y0 = Infinity, y1 = -Infinity; for (const [, y] of pts) { y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  for (let y = Math.floor(y0); y <= Math.ceil(y1); y++) {
+    const yc = y + 0.5, xs = [];
+    for (let i = 0; i < pts.length; i++) { const [ax, ay] = pts[i], [bx, by] = pts[(i + 1) % pts.length]; if ((ay <= yc && by > yc) || (by <= yc && ay > yc)) xs.push(ax + (yc - ay) / (by - ay) * (bx - ax)); }
+    xs.sort((p, q) => p - q);
+    for (let i = 0; i + 1 < xs.length; i += 2) { const xa = Math.round(xs[i]), xb = Math.round(xs[i + 1]); if (xb > xa) R(xa, y, xb - xa, 1, c); }
+  }
 }
+// a tapered limb segment from (ax, ay) width wa to (bx, by) width wb; `side` offsets toward the lit (+) or shaded (-) edge
+function limb(ax, ay, wa, bx, by, wb, c, shrink = 0, shift = 0) {
+  const dx = bx - ax, dy = by - ay, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L, ha = wa / 2 - shrink, hb = wb / 2 - shrink;
+  polyFill([[ax + nx * (ha + shift), ay + ny * (ha + shift)], [bx + nx * (hb + shift), by + ny * (hb + shift)], [bx - nx * (hb - shift), by - ny * (hb - shift)], [ax - nx * (ha - shift), ay - ny * (ha - shift)]], c);
+}
+function blob(x, y, r, c) { for (let j = -r; j <= r; j++) { const w = Math.round(Math.sqrt(r * r - j * j)); R(Math.round(x) - w, Math.round(y) + j, w * 2 + 1, 1, c); } }
+// a leg in loose work trousers, side on, knee forward (to the right): thigh, knee, shin, a fold behind the knee, the hem
+// over a dark sock; light from the upper right lays a highlight down the front edge
+function legSide(hx, hy, kx, ky, ax, ay, pal) {
+  const [base, dark, lite, fold] = pal;
+  limb(hx, hy, 13, kx, ky, 10, dark); limb(kx, ky, 10, ax, ay - 3, 8, dark); blob(kx, ky, 5, dark);
+  limb(hx, hy, 13, kx, ky, 10, base, 1, -1); limb(kx, ky, 10, ax, ay - 3, 8, base, 1, -1); blob(kx - 0.5, ky - 0.5, 4, base);
+  limb(hx, hy, 13, kx, ky, 10, lite, 5, -5); limb(kx, ky, 10, ax, ay - 3, 8, lite, 3.5, -3.5);
+  // the fold behind the knee and two creases on the shin
+  const bx = kx - (ky - hy) * 0.08 - 3, by = ky + 3; R(Math.round(bx), Math.round(by), 3, 1, fold); R(Math.round(bx) + 1, Math.round(by) + 1, 3, 1, fold); R(Math.round(bx) + 3, Math.round(by) + 5, 2, 1, fold);
+  // the hem, slightly flared, then the sock
+  R(Math.round(ax) - 5, Math.round(ay) - 5, 10, 2, dark); R(Math.round(ax) - 4, Math.round(ay) - 4, 8, 1, base); R(Math.round(ax) - 3, Math.round(ay) - 3, 6, 2, '#1a1a1e');
+}
+defMap('sneaker', [
+  '...kkkkk',
+  '..knnnnnkk',
+  '..knnmmnnnkkk',
+  '..knnnnwnwnwnkk',
+  '.knnnnnnnnnnnnnk',
+  '.kmnnnnnnnnnnnnnk',
+  'kwwwwwwwwwwwwwwwwk',
+  'kOOOOOOOOOOOOOOOk',
+  '.kkkkkkkkkkkkkkk'
+]);
+const SNEAK = { k: '#141012', n: '#2a2a2e', m: '#4a4a52', w: '#f2efe6', O: '#c9c4b8' };
 function stairsKnee(u) {
-  const SW = 28, SH = 13, rate = 1 / 0.62, s = u * rate, n = Math.floor(s), f = s - n;
-  const treadY = k => -k * SH, footAt = k => [k * SW + 12, treadY(k) - 5];
-  // the hip rides up the slope with a small bob each step; the two feet: one planted, one swinging two treads up
-  const hipX = (s + 0.5) * SW + 2, hipY = -(s + 0.5) * SH - 36 - Math.round(Math.sin(f * Math.PI) * 2);
-  const planted = footAt(n + 1), from = footAt(n), to = footAt(n + 2), sw = [lerp(from[0], to[0], ease(f)), lerp(from[1], to[1], f) - Math.sin(f * Math.PI) * 9];
-  const nearPlanted = (n + 1) % 2 === 0, near = nearPlanted ? planted : sw, far = nearPlanted ? sw : planted;
-  const camX = Math.round(hipX + 2 - 64), camY = Math.round(hipY + 24 - 38);
+  const SW = 30, SH = 14, rate = 1 / 0.62, s = u * rate, n = Math.floor(s), f = s - n;
+  const treadY = k => -k * SH, footAt = k => [k * SW + 13, treadY(k)];
+  // the hip rides up the slope with a little bob; one foot planted, the other swinging two treads up with toe clearance
+  const bob = Math.sin(f * Math.PI) * 2, hipX = (s + 0.5) * SW - 2, hipY = -(s + 0.5) * SH - 40 - bob;
+  const planted = footAt(n + 1), from = footAt(n), to = footAt(n + 2), fe = f < 0.5 ? 2 * f * f : 1 - 2 * (1 - f) * (1 - f);
+  const swing = [lerp(from[0], to[0], fe), lerp(from[1], to[1], fe) - Math.sin(f * Math.PI) * 11];
+  const nearIsPlanted = (n + 1) % 2 === 0, near = nearIsPlanted ? planted : swing, far = nearIsPlanted ? swing : planted;
+  const camX = Math.round(hipX - 60), camY = Math.round(hipY - 12);
   shot(3, (w, h) => {
-    // the tiled wall behind, slower than the stairs
-    R(0, 0, w, h, '#22242e'); g.save(); g.translate(-Math.round(camX * 0.6) % 8, -Math.round(camY * 0.6) % 8); for (let y = -8; y < h + 8; y += 8) for (let x = -8; x < w + 8; x += 8) { R(x, y, 7, 7, ((x + y) / 8) % 2 ? '#2a2d38' : '#262934'); } g.restore();
-    light(w - 10, 0, 90, '255,214,170', 0.22);
+    // the wall: big tiles, warm light from the street at the upper right, cool shade below
+    const tx = -((camX * 0.9) % 16 + 16) % 16, ty = -((camY * 0.9) % 10 + 10) % 10;
+    R(0, 0, w, h, '#5d6461');
+    for (let y = ty - 10; y < h + 10; y += 10) for (let x = tx - 16; x < w + 16; x += 16) { const v = rnd(Math.floor((x + camX) / 16), Math.floor((y + camY) / 10)); R(x, y, 15, 9, v < 0.3 ? '#646b68' : v > 0.8 ? '#58605d' : '#5f6663'); R(x, y, 15, 1, '#6c7370'); }
+    for (let y = ty - 10; y < h + 10; y += 10) R(0, y + 9, w, 1, '#545b58'); for (let y = ty - 10; y < h + 10; y += 10) for (let x = tx - 16; x < w + 16; x += 16) R(x + 15, y, 1, 9, '#545b58');
+    g.save(); g.globalCompositeOperation = 'lighter'; const lg = g.createLinearGradient(w, 0, 20, h); lg.addColorStop(0, 'rgba(255,200,150,.30)'); lg.addColorStop(1, 'rgba(255,200,150,0)'); g.fillStyle = lg; g.fillRect(0, 0, w, h); g.restore();
+    shade(0, 0, w, h, '20,24,40', 0.18);
     g.save(); g.translate(-camX, -camY);
-    // the handrail along the slope
-    for (let x = camX - 10; x < camX + w + 10; x++) { const y = Math.round(-(x / SW) * SH - 44); R(x, y, 1, 2, '#8a8f98'); R(x, y, 1, 1, '#c9ced3'); }
-    // the far leg behind, then the stairs (the planted far shoe stands on them), then the near leg in front
-    const leg = (foot, c, cd) => { const [ax, ay] = foot; const L1 = 22, L2 = 22, dx = ax - hipX, dy = ay - 2 - hipY, d = Math.min(L1 + L2 - 0.5, Math.hypot(dx, dy)), a = Math.atan2(dy, dx), k = Math.acos(clamp((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), -1, 1)), kx = hipX + Math.cos(a - k) * L1, ky = hipY + Math.sin(a - k) * L1;
-      thick(hipX, hipY, kx, ky, 10, cd); thick(kx, ky, ax, ay - 2, 9, cd); thick(hipX, hipY, kx, ky, 8, c); thick(kx, ky, ax, ay - 2, 7, c); R(Math.round(kx) - 2, Math.round(ky) - 4, 4, 1, mix(c, '#ffffff', 0.15)); R(ax - 4, ay - 3, 9, 2, cd); };
-    leg(far, '#2c3036', '#1c1f24'); shoeSide(Math.round(far[0]), Math.round(far[1]), '#141012');
-    for (let k = n - 3; k < n + 6; k++) { const x = k * SW, y = treadY(k); R(x, y, SW, 200, '#3a3b46'); dfill(x, y + 4, SW, 60, '#33343e', 0.3); R(x, y, SW, 3, '#6a6c78'); R(x, y, SW, 1, '#8a8c98'); R(x, y, 6, 1, '#c9a63a'); R(x, y + 3, SW, 1, '#2a2b34'); R(x, y, 1, SH, '#4a4b56'); }
-    leg(near, '#3a3f45', '#262a2f'); shoeSide(Math.round(near[0]), Math.round(near[1]));
+    // the handrail on the wall: a tube with its brackets and its shadow, parallel to the stairs
+    const railY = x => -(x / SW) * SH - 52;
+    for (let x = camX - 4; x < camX + w + 4; x++) { const y = Math.round(railY(x)); R(x, y + 5, 1, 1, '#454c49'); R(x, y, 1, 1, '#e9edf0'); R(x, y + 1, 1, 1, '#b9bfc5'); R(x, y + 2, 1, 1, '#7a8088'); }
+    for (let k = Math.floor(camX / 60) - 1; k < Math.floor((camX + w) / 60) + 2; k++) { const x = k * 60, y = Math.round(railY(x)); R(x, y + 3, 2, 4, '#7a8088'); R(x - 2, y + 7, 6, 2, '#5a6066'); }
+    // the far leg (in shadow) behind the near one
+    const knee = (foot, hx, hy) => { const [ax, ay] = foot, L1 = 23, L2 = 23, dx = ax - hx, dy = ay - 3 - hy, d = Math.min(L1 + L2 - 0.5, Math.hypot(dx, dy)), a = Math.atan2(dy, dx), k = Math.acos(clamp((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), -1, 1)); return [hx + Math.cos(a - k) * L1, hy + Math.sin(a - k) * L1]; };
+    const kf = knee(far, hipX - 3, hipY + 1);
+    legSide(hipX - 3, hipY + 1, kf[0], kf[1], far[0], far[1], ['#2c3036', '#1e2126', '#383d44', '#191b1f']);
+    spr('sneaker', Math.round(far[0]) - 6, Math.round(far[1]) - 9, { pal: { ...SNEAK, n: '#1e1e22', m: '#2e2e34', w: '#c9c4ba', O: '#a9a49a' } });
+    // the stairs: stone treads with a ribbed metal nosing and a yellow line, risers in the shadow of the nosing, a little wear
+    for (let k = n - 4; k < n + 6; k++) {
+      const x = k * SW, y = treadY(k);
+      R(x, y, SW, 220, '#4a4c56'); R(x, y + 4, SW, 3, '#34353e'); R(x, y + 7, SW, 6, '#42444e');
+      for (let q = 0; q < 5; q++) if (rnd(k, q) < 0.7) R(x + 2 + Math.floor(rnd(q, k) * (SW - 4)), y + 8 + Math.floor(rnd(k * 3, q) * 4), 2, 1, '#50525c');
+      R(x, y, SW, 4, '#8a8d98'); R(x, y, SW, 1, '#c3c6cf'); R(x + SW - 6, y + 1, 6, 3, '#7c7f8a');
+      R(x, y - 1, 7, 2, '#9aa0a6'); R(x + 1, y - 1, 1, 1, '#5a6066'); R(x + 3, y - 1, 1, 1, '#5a6066'); R(x + 5, y - 1, 1, 1, '#5a6066'); R(x + 8, y, 2, 1, '#d9b84a');
+      R(x, y, 1, SH, '#5a5c66');
+    }
+    // the near foot's shadow on its tread, then the near leg and sneaker
+    for (const ft of [near, far]) { const k = Math.round(ft[0] / SW - 0.43), ty0 = treadY(k), lift = ty0 - ft[1]; if (lift >= 0 && lift < 16) { g.fillStyle = `rgba(10,10,20,${0.35 - lift * 0.02})`; g.fillRect(Math.round(ft[0]) - 6 + Math.round(lift * 0.3), ty0, 18 - Math.round(lift * 0.4), 1); } }
+    const kn = knee(near, hipX, hipY);
+    legSide(hipX, hipY, kn[0], kn[1], near[0], near[1], ['#3a3f45', '#2a2e33', '#56606a', '#22262b']);
+    spr('sneaker', Math.round(near[0]) - 6, Math.round(near[1]) - 9, { pal: SNEAK });
     g.restore();
-    vig(w, h, 0.45);
+    // the light from the exit on everything, and the corners pulled down
+    light(w + 10, -10, 120, '255,200,150', 0.18);
+    vig(w, h, 0.5);
   });
   bars();
   for (let k = 0; k < 8; k++) if (s >= k + 1) cue('kstep' + k, () => noiseS(now(), 'lowpass', 700, 0.07, 0.07));
   blackout(W, H, u < 0.4 ? 1 - u / 0.4 : 0);
 }
+// 하은 from behind, waist up, at 3x: cap from behind (the snapback strap and the ponytail through its opening), the nape,
+// black long sleeves with the arms swinging a little each step, the vest's back with two reflective bands, the bag strap;
+// backlit by the exit ahead of her
+function haeunBackBust(cx, top, t, step, ph) {
+  const red = '#c23d33', redD = '#8e2c25', redL = '#e86452', hair = '#3e2a21', hairL = '#5e4434', sleeve = '#19171a', vest = '#5fa3be', vestD = '#4a87a0', band = '#cfc9b0';
+  const armL = step ? -2 : 1, armR = step ? 1 : -2;
+  // arms at the sides, swinging
+  limb(cx - 17, top + 24, 7, cx - 20, top + 44 + armL, 6, sleeve); limb(cx + 17, top + 24, 7, cx + 20, top + 44 + armR, 6, sleeve);
+  R(cx - 21, top + 30 + armL, 1, 10, '#3a3436'); R(cx + 20, top + 30 + armR, 1, 10, '#3a3436');
+  // shoulders and back: black long sleeve at the shoulders, the vest over the back
+  polyFill([[cx - 6, top + 19], [cx + 6, top + 19], [cx + 17, top + 22], [cx + 20, top + 27], [cx + 19, top + 60], [cx - 19, top + 60], [cx - 20, top + 27], [cx - 17, top + 22]], sleeve);
+  polyFill([[cx - 7, top + 21], [cx + 7, top + 21], [cx + 14, top + 24], [cx + 15, top + 60], [cx - 15, top + 60], [cx - 14, top + 24]], vest);
+  R(cx - 15, top + 24, 1, 36, vestD); R(cx + 14, top + 24, 1, 36, vestD); R(cx, top + 22, 1, 38, vestD);
+  R(cx - 15, top + 34, 30, 3, band); R(cx - 15, top + 37, 30, 1, '#a8a28a'); R(cx - 15, top + 44, 30, 3, band); R(cx - 15, top + 47, 30, 1, '#a8a28a');
+  for (let k = 0; k < 36; k++) R(Math.round(cx - 15 + k * 0.85), top + 22 + k, 2, 1, '#26282c');
+  R(cx - 17, top + 22, 5, 1, '#ffcf9a'); R(cx + 12, top + 22, 5, 1, '#ffcf9a'); R(cx - 20, top + 27, 1, 3, '#ffbf8a'); R(cx + 19, top + 27, 1, 3, '#ffbf8a');
+  // the nape and neck, hair at the back of the head below the cap
+  R(cx - 4, top + 12, 8, 9, '#b07a5a'); R(cx - 4, top + 12, 8, 1, '#8a5e44'); R(cx - 4, top + 12, 1, 9, '#946448'); R(cx + 3, top + 12, 1, 9, '#946448');
+  polyFill([[cx - 10, top + 5], [cx + 10, top + 5], [cx + 9, top + 9], [cx + 6, top + 12], [cx + 2, top + 13], [cx - 2, top + 13], [cx - 6, top + 12], [cx - 9, top + 9]], hair);
+  for (const s of [-1, 1]) for (const o of [2, 4, 6]) for (let k = 0; k <= 5; k++) R(Math.round(cx + s * lerp(o, o * 0.4, k / 5)), top + 11 - k, 1, 1, k % 3 === 1 ? hairL : '#33231c');
+  R(cx - 11, top + 6, 2, 4, '#c08866'); R(cx + 9, top + 6, 2, 4, '#c08866'); R(cx - 11, top + 7, 1, 2, '#946448'); R(cx + 10, top + 7, 1, 2, '#946448');
+  // the cap from behind: crown with seams to the button, the opening's arc, the strap with its snaps
+  for (let y = 0; y < 9; y++) { const half = Math.round(12 * Math.sqrt(1 - Math.pow((8 - y) / 9.5, 2))); R(cx - half, top - 3 + y, half * 2, 1, red); }
+  R(cx - 1, top - 4, 2, 1, redD); R(cx, top - 3, 1, 9, redD); R(cx - 6, top - 2, 1, 7, redD); R(cx + 6, top - 2, 1, 7, redD); R(cx - 8, top - 2, 6, 1, redL);
+  R(cx - 12, top + 4, 24, 1, redD);
+  polyFill([[cx - 5, top + 5], [cx + 5, top + 5], [cx + 4, top + 1], [cx - 4, top + 1]], hair); R(cx - 5, top + 4, 10, 1, redD);
+  R(cx - 12, top - 1, 1, 6, '#ffcf9a'); R(cx - 9, top - 3, 8, 1, '#ffd8aa'); R(cx + 11, top, 1, 5, '#ffbf8a');
+  // the ponytail through the opening, swinging with her steps (a little behind the beat)
+  const sw = Math.sin(ph * Math.PI * 2 - 0.8) * 2;
+  R(cx - 1, top + 2, 3, 2, '#f4d35e');
+  for (let k = 0; k < 20; k++) { const x = cx - 2 + Math.round(sw * k / 20 + Math.sin(k * 0.4) * 0.6), wd = k < 4 ? 5 : k < 14 ? 4 : 3; R(x - (wd > 4 ? 1 : 0), top + 4 + k, wd, 1, hair); R(x + 1, top + 4 + k, 1, 1, hairL); }
+}
 function stairsWaist(t) {
-  const climb = t * 1.6 + 3, done = Math.max(0, t - 2.4);
-  shot(4, (w, h) => {
-    const VX = 48, VY = 4, Y = z => VY + 40 / (1 + 0.32 * z), X = (z, side) => VX + side * 44 / (1 + 0.32 * z), CY = z => VY - 30 / (1 + 0.32 * z);
-    const ztop = 9.5 - climb * 0.9;
-    dgrad(0, 0, w, h, ['#3a4f86', '#6f7fae', '#c99aa6', '#f2c49a']);
-    for (let k = 0; k < 3; k++) { const bx = 34 + k * 9 + t * 4, by = 8 + (k % 2) * 2 - t * 1.5, fl = Math.floor(t * 7 + k) % 2; R(bx, by, 1, 1, '#2a2a38'); R(bx + 1, by - fl, 1, 1, '#2a2a38'); R(bx - 1, by - fl, 1, 1, '#2a2a38'); }
-    for (const [x, ww, hh] of [[10, 12, 9], [25, 9, 13], [60, 15, 8], [78, 10, 12]]) { R(x, Y(ztop) - hh, ww, hh, '#3a3f5e'); for (let j = 2; j < hh - 1; j += 3) for (let i = 2; i < ww - 1; i += 3) if (rnd(x + i, j) < 0.3) R(x + i, Y(ztop) - hh + j, 1, 1, '#ffd890'); }
-    g.fillStyle = '#16171f'; g.beginPath(); g.moveTo(0, 0); g.lineTo(w, 0); g.lineTo(X(ztop, 1), CY(ztop)); g.lineTo(X(ztop, -1), CY(ztop)); g.closePath(); g.fill();
-    for (const s of [-1, 1]) { g.fillStyle = '#23252f'; g.beginPath(); g.moveTo(s < 0 ? 0 : w, 0); g.lineTo(X(ztop, s), CY(ztop)); g.lineTo(X(ztop, s), Y(ztop)); g.lineTo(s < 0 ? 0 : w, h + 30); g.closePath(); g.fill(); }
-    for (let k = -2; k < 30; k++) { const z = k - (climb % 1); if (z > ztop) break; if (z < -1.2) continue; const ya = Y(z + 1), yb = Y(z), xl = X(z, -1), xr = X(z, 1), mid = ya + (yb - ya) * 0.42; R(xl, ya, xr - xl, mid - ya + 1, '#33343f'); R(xl, mid, xr - xl, yb - mid + 1, '#545663'); R(xl, mid, xr - xl, 1, '#8a8c98'); }
-    for (const s of [-1, 1]) { g.strokeStyle = '#8a8f98'; g.lineWidth = 1; g.beginPath(); for (let z = -1; z <= ztop; z += 0.25) { const x = X(z, s) - s * 3 / (1 + 0.32 * z), y = Y(z) - 16 / (1 + 0.32 * z); z === -1 ? g.moveTo(x, y) : g.lineTo(x, y); } g.stroke(); }
-    R(3, 6, 13, 7, '#111'); R(4, 7, 11, 5, '#2f8a5a'); R(6, 8, 1, 3, '#fff'); R(5, 9, 3, 1, '#fff'); R(11, 8, 3, 3, '#f2d35a'); R(12, 8, 1, 3, '#1b1716');
-    light(VX, Y(ztop) - 3, 60, '255,214,170', 0.3 + done * 0.15);
-    // her from behind, cut at the waist; a bob and a sway each step, the light on the cap and shoulders
-    const ph = climb % 1, bob = ph < 0.5 ? 0 : 1, sway = Math.floor(climb) % 2 ? 1 : 0, up = Math.round(done * 14);
-    spr('hBack', 38 + sway, 17 + bob - up, { tint: ['#20222e', 0.3 + 0.3 * clamp(done, 0, 1)] });
-    R(41 + sway, 16 + bob - up, 12, 1, '#ffd8a0'); R(40 + sway, 33 + bob - up, 3, 1, '#ffc890'); R(52 + sway, 33 + bob - up, 3, 1, '#ffc890');
-    vig(w, h, 0.4);
+  const climb = t * 1.6 + 3, done = Math.max(0, t - 2.4), ph = climb % 1, step = Math.floor(climb) % 2;
+  shot(3, (w, h) => {
+    const VX = 64, VY = 6, P = z => 1 / (1 + 0.3 * z), Y = z => VY + 58 * P(z), X = (z, s) => VX + s * 60 * P(z), CY = z => VY - 46 * P(z);
+    const ztop = 9.0 - climb * 0.85;
+    // the street at the top: dawn sky, a low sun, the buildings, a street lamp, birds
+    dgrad(0, 0, w, h, ['#2e3f74', '#53629a', '#9a88a8', '#e8a88c', '#f6cfa0']);
+    light(78, Y(ztop) - 6, 40, '255,220,160', 0.5);
+    for (const [x, ww, hh] of [[8, 18, 12], [28, 12, 20], [44, 16, 9], [82, 22, 11], [108, 14, 18]]) { const yb = Y(ztop); R(x, yb - hh, ww, hh, '#433f63'); R(x, yb - hh, ww, 1, '#5a5478'); for (let j = 3; j < hh - 1; j += 3) for (let i = 2; i < ww - 1; i += 3) if (rnd(x + i, j) < 0.25) R(x + i, yb - hh + j, 1, 1, '#ffd890'); }
+    R(70, Y(ztop) - 16, 1, 16, '#2a2838'); R(70, Y(ztop) - 16, 4, 1, '#2a2838');
+    for (let k = 0; k < 3; k++) { const bx = 50 + k * 10 + t * 4, by = 6 + (k % 2) * 3 - t * 1.5, fl = Math.floor(t * 7 + k) % 2; R(bx, by, 1, 1, '#2a2838'); R(bx + 1, by - fl, 1, 1, '#2a2838'); R(bx - 1, by - fl, 1, 1, '#2a2838'); }
+    // the exit's canopy (a lip of steel and glass over the opening)
+    const cy0 = CY(ztop), xl0 = X(ztop, -1), xr0 = X(ztop, 1); R(xl0 - 2, cy0 - 3, xr0 - xl0 + 4, 3, '#2e3038'); R(xl0 - 2, cy0, xr0 - xl0 + 4, 1, '#6a6f7a');
+    // ceiling, walls (perspective tile seams), fluorescent tubes on the ceiling
+    g.fillStyle = '#1a1b22'; g.beginPath(); g.moveTo(-5, -5); g.lineTo(w + 5, -5); g.lineTo(xr0, cy0 - 3); g.lineTo(xl0, cy0 - 3); g.closePath(); g.fill();
+    for (const s of [-1, 1]) { g.fillStyle = s < 0 ? '#3c403f' : '#353938'; g.beginPath(); g.moveTo(s < 0 ? -5 : w + 5, -5); g.lineTo(X(ztop, s), cy0 - 3); g.lineTo(X(ztop, s), Y(ztop)); g.lineTo(s < 0 ? -5 : w + 5, h + 40); g.closePath(); g.fill(); }
+    for (let k = -2; k < 24; k++) { const z = k * 0.6 - (climb * 0.85 % 0.6); if (z > ztop || z < -1) continue; for (const s of [-1, 1]) { const x = Math.round(X(z, s)), y0 = CY(z), y1 = Y(z); R(x, y0, 1, y1 - y0, '#2c302f'); } }
+    for (const s of [-1, 1]) for (let j = 1; j < 6; j++) { g.strokeStyle = '#2f3332'; g.lineWidth = 1; g.beginPath(); for (let z = -1; z <= ztop; z += 0.5) { const x = X(z, s), y = CY(z) + (Y(z) - CY(z)) * j / 6; z === -1 ? g.moveTo(x, y) : g.lineTo(x, y); } g.stroke(); }
+    for (let k = 0; k < 6; k++) { const z = k * 1.6 + 0.6 - (climb * 0.85 % 1.6); if (z > ztop - 0.3 || z < -0.5) continue; const p = P(z), y = Math.round(VY - 44 * p), x = VX, ww = Math.max(2, Math.round(20 * p)); R(x - ww / 2, y, ww, Math.max(1, Math.round(2 * p)), '#eef6f0'); light(x, y + 1, 22 * p + 4, '230,245,235', 0.18); }
+    // the treads: stone, a yellow line on each nosing, the risers in shadow
+    for (let k = -2; k < 30; k++) { const z = k * 0.85 - (climb * 0.85 % 0.85); if (z > ztop) break; if (z < -1.3) continue;
+      const ya = Y(z + 0.85), yb = Y(z), xl = X(z, -1), xr = X(z, 1), mid = ya + (yb - ya) * 0.45;
+      R(xl, ya, xr - xl, mid - ya + 1, '#3c3d47'); R(xl, mid, xr - xl, yb - mid + 1, '#6a6c76'); R(xl, mid, xr - xl, 1, '#a3a6b0'); R(xl + 2, mid + 1, xr - xl - 4, 1, '#8a7a44'); }
+    // handrails: tubes along the walls with their brackets
+    for (const s of [-1, 1]) { for (const [dy, c] of [[0, '#c9ced3'], [1, '#7a8088']]) { g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); for (let z = -1.2; z <= ztop; z += 0.25) { const x = X(z, s) - s * 3 * P(z), y = Y(z) - 22 * P(z) + dy; z === -1.2 ? g.moveTo(x, y) : g.lineTo(x, y); } g.stroke(); } }
+    // the exit sign on the left wall: a green panel, the running figure, the yellow 3
+    R(3, 6, 22, 10, '#101114'); R(4, 7, 20, 8, '#2a8a52'); R(8, 8, 1, 6, '#fff'); R(7, 9, 3, 1, '#fff'); R(6, 10, 1, 1, '#fff'); R(10, 10, 1, 1, '#fff'); g.fillStyle = '#f2d35a'; g.beginPath(); g.arc(18.5, 11, 3.2, 0, Math.PI * 2); g.fill(); digits('3', 17, 9, '#1b1716'); light(14, 11, 14, '90,220,150', 0.2);
+    // the light pouring down the stairs from the street
+    g.save(); g.globalCompositeOperation = 'lighter'; for (let k = 0; k < 4; k++) { g.fillStyle = `rgba(255,214,170,${0.05 + 0.02 * Math.sin(t * 2 + k)})`; g.beginPath(); g.moveTo(xl0 + 8 + k * 9, Y(ztop)); g.lineTo(xl0 + 12 + k * 9, Y(ztop)); g.lineTo(26 + k * 30, h); g.lineTo(14 + k * 30, h); g.closePath(); g.fill(); } g.restore();
+    // her, waist up from behind, a bob and a sway with each step; going up into the light at the end
+    const bob = ph < 0.5 ? 0 : 1, sway = step ? 1 : 0, up = Math.round(done * 16);
+    haeunBackBust(64 + sway, 20 + bob - up, t, step, ph);
+    if (done > 0) shade(0, 0, w, h, '255,226,190', 0.12 * done);
+    vig(w, h, 0.45);
   });
   bars();
   if (t > 0.3) cue('birds', () => { [2600, 3100, 2800, 3300].forEach((f, i) => oscS('sine', f, now() + 0.6 + i * 0.15, 0.03, 0.12, f * 1.2)); });
