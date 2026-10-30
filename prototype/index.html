@@ -486,17 +486,18 @@ const LEVELS = [
   }
   ,{
     id:'s1-4', stageNo:'1-4', who:'반장 + 하은', role:'반장 · 하은 · 100 BPM · 벨트 둘', tag:'벨트 둘 · 버튼 하나 · 양쪽 한 번에', bpm:100, style:'duo14',
-    // 반장 feeds both belts while 하은 scans the upper gate above you. Her belt keeps running dry and she pushes him, three times, and
-    // each time the song gets faster (100, 104, 108): she knocks on her gate (14.5), checks her watch (21.5), then walks over and taps
-    // the empty belt in front of him (35). He goes for a heavy box to fill it and his back gives (40); the line falls to 78. She
+    // 반장 feeds both belts while 하은 scans the upper gate above you. Her belt keeps running dry and she calls him on it three times,
+    // and the song gets faster each time he answers (100, 104, 108): from her gate, knocking on it (13), again after a look at her
+    // watch (24), then she walks over and taps the empty belt in front of him (35.5). He goes for a heavy box to fill it and his
+    // back gives (40); the line falls to 78. She
     // takes the upper belt from him without a word, and from her count-in you scan both belts with one button: a press goes to
     // whichever gate has a box at it, and two boxes landing on the same beat are scanned together. In the rush she spends her speed
     // on her own belt instead (her fever, 144-176).
     lanes: 2, partners: ['haeun', 'boss'], onePlacer: true, handover: [46, 50], coScanner: 'haeun', autoLane: 0, autoUntil: 60, oneButton: true,
-    haeunCross: [30, 35], knock: [14.5, 15], haeunWatch: [[21.5, 23]], tapBelt: [35, 35.5], lift: [37, 40], hurt: [[40, 46]],
+    haeunCross: [32, 35.5], knock: [14.5, 15], haeunWatch: [[22.5, 23.75]], tapBelt: [35.5, 36], lift: [37.5, 40], hurt: [[40, 46]],
     haeunLook: [[128.5, 131.5]], fever: [[144, 176]],
     fxTheme: 'blues', clock:'03:40', title:'합류',
-    tempo: [[0, 100], [16, 104], [24, 108], [40, 88], [44, 78], [52, 84], [60, 100]], endAt: 188, offTilt: true,
+    tempo: [[0, 100], [16, 104], [28, 108], [40, 88], [44, 78], [52, 84], [60, 100]], endAt: 188, offTilt: true,
     chords: BLUES.chords, roots: BLUES.roots, chordAt: bar => bar < 2 ? 0 : BLUES.prog[(bar - 2) % 12],
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 },
     // no on-screen hints (as in 1-1 to 1-3); the dock, the departure board and the beacons carry the Friday rush
@@ -507,7 +508,7 @@ const LEVELS = [
     // 8ths in the rush, every beat with him at the end
     bars: [
       '............', '............',
-      'x.....x.....', 'x...........', 'x.....x.....', 'x...........', 'x..x..x..x..', 'x...........', '............', '............',
+      'x.....x.....', 'x...........', '......x..x..', 'x.....x.....', '............', 'x..x..x..x..', '............', '............',
       '............', '............', '............', '............', '............', '............',
       'x...x...x...x...', 'x...x...x.x.x...', '................', '................', 'x...x...x...x...', 'x.x.x...x.x.x...', '................', '................',
       'x...x...x...x...', 'x...x...x...x...', 'x.......x.......', 'x...x...x...x...', 'x.x.x...x.......', 'x...x...x...x...', 'x.......x.......', '................',
@@ -519,7 +520,7 @@ const LEVELS = [
     // lower belt: 반장's shuffle all the way (12 cells), every beat once she pushes him, late boxes where his back catches him
     bars2: [
       '............', '............',
-      '............', 'x.....x.....', 'x.....x.....', 'x..x..x.....', 'x..x..x..x..', 'x..x..x..x..', 'x..x..x.....', 'x...........',
+      '............', 'x.....x.....', 'x.....x.....', 'x..x..x.....', 'x.....x.....', 'x..x..x..x..', 'x..x..x.....', 'x...........',
       '......L.....', 'L...........', '......x.....', 'x.....x.....', 'x...........', '............',
       '............', '............', 'x.....x.....', 'x..x..x.....', '............', '............', 'x.....x.....', 'x..x..x..x..',
       'x.....x.....', 'x..x..x.....', 'x.....x.x...', 'x...........', 'x.....x.....', 'x..x..x..x..', 'x.....x.x...', 'h=====......',
@@ -531,7 +532,10 @@ const LEVELS = [
     // [beat, text, beats shown, lane, speaker, style]: 반장 between the belts (lane 0) until his back goes, at the lower belt (lane 1) after;
     // 'h' = 하은, at the upper gate beside you, then at the upper belt's loading end
     say: [[3, '위아래 다 내가 싣는다. 위는 하은이가 찍고, 너는 아래.', 4.5, 0], [8, '네. 위는 제가요.', 2, 0, 'h'],
-          [40, '윽…!', 1.5, 0, null, 'loud'], [42, '…허리가. 잠깐만.', 3, 0],
+          [13, '반장님! 제 쪽 없어요.', 2.5, 0, 'h'], [15.5, '어? 그래 잠시만', 2, 0],
+          [24, '반장님! 또 끊겼어요.', 2.5, 0, 'h'], [26.5, '빨리 하마.', 2, 0],
+          [35.5, '반장님!', 2, 0, 'h'], [37.5, '기다려봐!', 2.5, 0],
+          [40, '아이고 악!!', 1.8, 0, null, 'loud'], [42, '…허리가. 잠깐만.', 3, 0],
           [45, '(작게) …반장님.', 2.5, 0, 'h'],
           [50, '위는 제가 실을게요. 반장님은 아래만.', 4, 0, 'h'], [55.5, '신입. 양쪽 다, 할 수 있지?', 3, 0, 'h'],
           [60, '하나, 둘, 셋, 넷!', 3.5, 0, 'h'],
