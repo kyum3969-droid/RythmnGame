@@ -281,9 +281,7 @@ function trainTwoShot(t) {
 // 2. 문 — close on the train door from the platform: it opens, she comes out toward us; then her chest and shoulder close in
 //    the foreground and, over her shoulder, him asleep against the pole inside; the doors close between them and the train
 //    goes, its windows strobing across her; then flat and wide, the empty platform, the clock, her second watch
-function shotDoor(u) {
-  if (u < 4.6) doorBust(u); else platformWide(u - 4.6);
-}
+function shotDoor(u) { doorBust(u); }
 // a tiny 신입 for the far background: slumped against the pole with his head over on it
 function sinipFar(x, seatY, t) {
   R(x - 3, seatY + 1, 2, 5, '#33415a'); R(x + 1, seatY + 1, 2, 5, '#33415a'); R(x - 4, seatY - 1, 8, 2, '#33415a');
@@ -319,117 +317,110 @@ function haeunBust(cx, by, t, look) {
   for (let x = -19; x <= 19; x++) { const yy = by + Math.round((x / 19) * (x / 19) * 2); R(cx + x + d, yy - 1, 1, 1, '#3a3236'); R(cx + x + d, yy, 1, 2, '#1e1a1a'); }
 }
 function doorBust(t) {
-  // 0-0.4 she stands just inside, seen through the door's glass; 0.4-1.1 the doors open; 1.2 she steps out (a dip and she is
-  // a little lower and nearer); 1.5-2.3 she glances back; 2.4-3.2 the doors close behind her on him; 3.3 the train goes
-  const open = ease(clamp((t - 0.4) / 0.7, 0, 1)), step = clamp((t - 1.2) / 0.4, 0, 1), dip = step > 0 && step < 1 ? Math.round(Math.sin(step * Math.PI) * 2) : 0;
-  const close = ease(clamp((t - 2.4) / 0.8, 0, 1)), dep = Math.max(0, t - 3.3), tx = -Math.round(dep * dep * 30);
-  const look = t > 1.5 && t < 2.5 ? -ease(clamp((t - 1.5) / 0.35, 0, 1)) * (t > 2.15 ? 1 - (t - 2.15) / 0.35 : 1) : 0;
+  // she is out on the platform; behind her the open door and him asleep against the pole. 0.3-1.1 she glances back;
+  // 1.2-2.0 the doors close on him; 2.2 the train goes, its windows strobing over her; 3.6 she lifts her wrist: 05:14
+  const close = ease(clamp((t - 1.2) / 0.8, 0, 1)), dep = Math.max(0, t - 2.2), tx = -Math.round(dep * dep * 30);
+  const look = t > 0.3 && t < 1.3 ? -ease(clamp((t - 0.3) / 0.35, 0, 1)) * (t > 0.95 ? 1 - (t - 0.95) / 0.35 : 1) : 0;
+  const wrist = ease(clamp((t - 3.6) / 0.6, 0, 1));
   const D0 = 30, D1 = 106;
-  const panels = (amount, front) => {   // the two door panels, closed by `amount`; in front of her they are glass she shows through
+  const panels = amount => {   // the door panels sliding shut from their pockets; he shows through their glass
     const pw = Math.round(38 * amount); if (pw <= 0) return;
     for (const [x, s] of [[D0, 1], [D1, -1]]) {
       const px = s > 0 ? x : x - pw, wx = px + 4, ww = pw - 8;
-      if (front) { R(px, 0, pw, 6, '#d3d8dd'); R(px, 34, pw, 24, '#d3d8dd'); R(px, 6, 4, 28, '#d3d8dd'); R(px + pw - 4, 6, 4, 28, '#d3d8dd'); if (ww > 0) { R(wx - 1, 5, ww + 2, 1, '#2b2e33'); R(wx - 1, 34, ww + 2, 1, '#2b2e33'); shade(wx, 6, ww, 28, '190,208,220', 0.28); g.save(); g.globalAlpha = 0.25; for (let k = 0; k < 14; k++) R(wx + 2 + k, 32 - k * 2, 3, 1, '#ffffff'); g.restore(); } }
-      else { R(px, 0, pw, 58, '#d3d8dd'); if (ww > 0) { R(wx - 1, 6, ww + 2, 26, '#2b2e33'); g.save(); g.beginPath(); g.rect(wx, 7, ww, 24); g.clip(); R(D0, 7, D1 - D0, 4, '#d6dbe1'); R(D0, 10, D1 - D0, 15, '#1a1f28'); R(D0, 25, D1 - D0, 6, '#2f5f8a'); R(60, 0, 2, 58, '#b8bec4'); sinipFar(55, 40, t); shade(wx, 7, ww, 24, '180,200,212', 0.3); g.restore(); } }
+      R(px, 0, pw, 58, '#d3d8dd'); if (ww > 0) { R(wx - 1, 6, ww + 2, 26, '#2b2e33'); g.save(); g.beginPath(); g.rect(wx, 7, ww, 24); g.clip(); R(D0, 7, D1 - D0, 4, '#d6dbe1'); R(D0, 10, D1 - D0, 15, '#1a1f28'); R(D0, 25, D1 - D0, 6, '#2f5f8a'); R(60, 0, 2, 58, '#b8bec4'); sinipFar(55, 40, t); shade(wx, 7, ww, 24, '180,200,212', 0.3); R(wx + 2, 28, 5, 1, 'rgba(255,255,255,.35)'); g.restore(); }
       R(s > 0 ? px + pw - 1 : px, 0, 1, 58, '#2b2e33');
     }
   };
   shot(3, (w, h) => {
     // once the train is gone: the far wall across the tracks
     R(0, 0, w, h, '#2a2f36'); R(0, 10, w, 50, '#cfd8d4'); for (let x = 0; x < w; x += 6) R(x, 10, 1, 50, '#c0c9c5'); R(0, 44, w, 3, '#2f6f8a');
+    R(14, 18, 34, 10, '#1e2a33'); R(15, 19, 32, 8, '#2f3a4a'); R(15, 27, 32, 1, '#8fd694');
     g.save(); g.translate(tx, 0);
-    // the car side around the doorway, with the sheen of its panels
     R(-20, 0, 200, 64, '#d9dee3'); for (let k = 0; k < 9; k++) for (let j = 0; j < 30; j++) R(-14 + k * 22 + j, 62 - j * 2, 2, 1, '#cdd3d8');
     R(D0 - 3, 0, 3, 64, '#2b2e33'); R(D1, 0, 3, 64, '#2b2e33'); R(D0, 58, D1 - D0, 3, '#f2d35a');
-    // inside: the far wall and its window, the bench, the floor, the pole, him asleep against it
     g.save(); g.beginPath(); g.rect(D0, 0, D1 - D0, 58); g.clip();
     R(D0, 0, D1 - D0, 58, '#d6dbe1'); R(D0, 10, D1 - D0, 15, '#1a1f28'); R(D0, 25, D1 - D0, 2, '#9aa1a8'); R(D0, 27, D1 - D0, 13, '#2f5f8a'); R(D0, 27, D1 - D0, 1, '#4a82b4'); R(D0, 40, D1 - D0, 3, '#3f7fb0'); R(D0, 43, D1 - D0, 15, '#8a9198');
     light(64, 4, 50, '255,244,220', 0.25);
     R(60, 0, 2, 58, '#b8bec4'); R(60, 0, 1, 58, '#eef1f3'); sinipFar(55, 40, t);
-    panels(close, false);
+    panels(close);
     g.restore();
     g.restore();
     R(0, 60, w, 12, '#9ea7a5'); R(0, 60, w, 2, '#e8c34a');
-    if (dep > 0) for (let k = 0; k < 4; k++) { const x = ((k * 42 - dep * dep * 40) % 190 + 190) % 190 - 30; g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,190,${0.13 * Math.min(1, dep * 1.5)})`; g.fillRect(x, 0, 22, h); g.restore(); }
-    // her: just inside at first (a pixel higher and smaller in the frame's depth), then out on the platform
-    // still inside the car, the car body hides whatever of her is outside the doorway
-    if (step < 0.5) { g.save(); g.beginPath(); g.rect(D0, 0, D1 - D0, 58); g.clip(); }
-    haeunBust(82, 12 + (step < 1 ? -1 : 0) + dip, t, look);
-    if (step < 0.5) g.restore();
-    // the doors in front of her before they open
-    if (open < 1) { g.save(); g.beginPath(); g.rect(D0, 0, D1 - D0, 58); g.clip(); panels(1 - open, true); g.restore(); R(D0, 58, D1 - D0, 3, '#f2d35a'); }
+    if (dep > 0 && dep < 2) for (let k = 0; k < 4; k++) { const x = ((k * 42 - dep * dep * 40) % 190 + 190) % 190 - 30; g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,190,${0.13 * Math.min(1, dep * 1.5) * (1 - dep / 2)})`; g.fillRect(x, 0, 22, h); g.restore(); }
+    // her, close, in front of it all; at the end her head dips toward the wrist
+    haeunBust(82, 12 + (wrist > 0.5 ? 1 : 0), t, look);
+    // the wrist comes up into the frame: black cuff, the watch, 05:14
+    if (wrist > 0) {
+      const wy = Math.round(lerp(76, 44, wrist)), wx = 60;
+      thick(wx - 10, wy + 28, wx + 4, wy + 6, 7, '#1e1a1a'); R(wx + 2, wy + 1, 10, 7, '#d9a27a'); R(wx + 2, wy + 7, 10, 1, '#b98260');
+      R(wx - 12, wy + 2, 4, 10, '#1e1a1a'); R(wx - 14, wy - 1, 22, 11, '#c9ccd2'); R(wx - 14, wy - 1, 22, 1, '#eef0f2'); R(wx - 13, wy + 1, 20, 7, '#0e130e'); digits('05:14', wx - 12, wy + 2, '#8fd694'); light(wx - 3, wy + 4, 12, '143,214,148', 0.2);
+    }
     vig(w, h, 0.5);
   });
   bars();
-  blackout(W, H, t < 0.3 ? 1 - t / 0.3 : t > 4.2 ? (t - 4.2) / 0.4 : 0);
+  blackout(W, H, t < 0.3 ? 1 - t / 0.3 : t > 5.0 ? (t - 5.0) / 0.4 : 0);
 }
-function platformWide(t) {
-  shot(1, (w, h) => {
-    // flat and symmetrical: the screen-door wall across, the clock hanging, the ceiling's lamp rows, her alone at the right third
-    R(0, 0, w, h, '#1a1e22'); R(0, 24, w, 30, '#2a2f36'); for (let x = 12; x < w; x += 48) { R(x, 30, 32, 4, '#eef6f2'); light(x + 16, 34, 30, '240,250,245', 0.18); }
-    R(0, 54, w, 4, '#3a4048'); R(0, 58, w, 104, '#141a20');
-    // the tunnel beyond the glass: the far wall, the station name, the red tail lights far off in the dark
-    R(0, 66, w, 70, '#cfd8d4'); for (let x = 0; x < w; x += 8) R(x, 66, 1, 70, '#c0c9c5'); for (let y = 66; y < 136; y += 6) R(0, y, w, 1, '#c0c9c5'); R(0, 116, w, 4, '#2f6f8a');
-    for (const sx of [60, 260]) { R(sx, 82, 70, 18, '#1e2a33'); R(sx + 2, 84, 66, 14, '#2f3a4a'); R(sx + 2, 97, 66, 1, '#8fd694'); hospName(sx + 8, 84, '#e9eef0', 9); }
-    R(0, 136, w, 26, '#262220');
-    // screen doors: posts every 64, glass, a faint reflection of the platform lights
-    for (let x = 0; x < w; x += 64) { R(x, 58, 5, 104, '#8e979f'); R(x, 58, 1, 104, '#c9d0d4'); R(x + 30, 60, 4, 6, '#111'); }
-    shade(0, 58, w, 104, '190,215,225', 0.1); g.save(); g.globalAlpha = 0.08; for (let x = 12; x < w; x += 48) R(x, 140, 32, 2, '#ffffff'); g.restore();
-    // platform floor and its edge strip
-    R(0, 162, w, 30, '#9ea7a5'); dfill(0, 162, w, 30, '#b0b9b7', 0.25); R(0, 162, w, 4, '#e8c34a'); for (let x = 1; x < w; x += 3) R(x, 163, 1, 2, '#c9a63a');
-    for (let x = 12; x < w; x += 48) shade(x, 166, 32, 26, '240,250,245', 0.05);
-    // the hanging clock
-    R(110, 24, 2, 26, '#5a6066'); R(130, 24, 2, 26, '#5a6066'); R(94, 48, 54, 22, '#141414'); R(96, 50, 50, 18, '#06140c'); digits('05:14', 99, 53, '#8fd694', 2); light(121, 59, 40, '143,214,148', 0.18);
-    // her: stands, the bag, looks at the watch
-    haeunWalkSide(262, 190, t, { stand: true, watch: t > 0.8 });
-    g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(262, 191, 12, 2, 0, 0, Math.PI * 2); g.fill();
+// 3. 계단 — close and from the side on her legs: one shoe on a tread, the knee comes up, the other shoe lands on the next one;
+//    the camera climbs with her along the slope. Then from behind at the waist, the exit's sky opening over her head
+function shotStairs(u) {
+  if (u < 3.4) stairsKnee(u); else stairsWaist(u - 3.4);
+}
+function shoeSide(ax, ay, c = '#1e1a1a') {   // a sneaker side on, facing right; (ax, ay) the ankle, sole bottom at ay + 5
+  R(ax - 5, ay - 1, 13, 4, c); R(ax + 6, ay + 1, 5, 2, c); R(ax + 9, ay + 2, 2, 1, c); R(ax - 6, ay, 2, 3, c);
+  for (let k = 0; k < 3; k++) R(ax + 1 + k * 2, ay - 1, 1, 1, '#efe6d2');
+  R(ax - 6, ay + 3, 17, 2, '#d9d4c6'); R(ax - 6, ay + 4, 17, 1, '#a9a49a'); R(ax - 4, ay + 1, 2, 1, '#3a3236');
+}
+function stairsKnee(u) {
+  const SW = 28, SH = 13, rate = 1 / 0.62, s = u * rate, n = Math.floor(s), f = s - n;
+  const treadY = k => -k * SH, footAt = k => [k * SW + 12, treadY(k) - 5];
+  // the hip rides up the slope with a small bob each step; the two feet: one planted, one swinging two treads up
+  const hipX = (s + 0.5) * SW + 2, hipY = -(s + 0.5) * SH - 36 - Math.round(Math.sin(f * Math.PI) * 2);
+  const planted = footAt(n + 1), from = footAt(n), to = footAt(n + 2), sw = [lerp(from[0], to[0], ease(f)), lerp(from[1], to[1], f) - Math.sin(f * Math.PI) * 9];
+  const nearPlanted = (n + 1) % 2 === 0, near = nearPlanted ? planted : sw, far = nearPlanted ? sw : planted;
+  const camX = Math.round(hipX + 2 - 64), camY = Math.round(hipY + 24 - 38);
+  shot(3, (w, h) => {
+    // the tiled wall behind, slower than the stairs
+    R(0, 0, w, h, '#22242e'); g.save(); g.translate(-Math.round(camX * 0.6) % 8, -Math.round(camY * 0.6) % 8); for (let y = -8; y < h + 8; y += 8) for (let x = -8; x < w + 8; x += 8) { R(x, y, 7, 7, ((x + y) / 8) % 2 ? '#2a2d38' : '#262934'); } g.restore();
+    light(w - 10, 0, 90, '255,214,170', 0.22);
+    g.save(); g.translate(-camX, -camY);
+    // the handrail along the slope
+    for (let x = camX - 10; x < camX + w + 10; x++) { const y = Math.round(-(x / SW) * SH - 44); R(x, y, 1, 2, '#8a8f98'); R(x, y, 1, 1, '#c9ced3'); }
+    // the far leg behind, then the stairs (the planted far shoe stands on them), then the near leg in front
+    const leg = (foot, c, cd) => { const [ax, ay] = foot; const L1 = 22, L2 = 22, dx = ax - hipX, dy = ay - 2 - hipY, d = Math.min(L1 + L2 - 0.5, Math.hypot(dx, dy)), a = Math.atan2(dy, dx), k = Math.acos(clamp((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), -1, 1)), kx = hipX + Math.cos(a - k) * L1, ky = hipY + Math.sin(a - k) * L1;
+      thick(hipX, hipY, kx, ky, 10, cd); thick(kx, ky, ax, ay - 2, 9, cd); thick(hipX, hipY, kx, ky, 8, c); thick(kx, ky, ax, ay - 2, 7, c); R(Math.round(kx) - 2, Math.round(ky) - 4, 4, 1, mix(c, '#ffffff', 0.15)); R(ax - 4, ay - 3, 9, 2, cd); };
+    leg(far, '#2c3036', '#1c1f24'); shoeSide(Math.round(far[0]), Math.round(far[1]), '#141012');
+    for (let k = n - 3; k < n + 6; k++) { const x = k * SW, y = treadY(k); R(x, y, SW, 200, '#3a3b46'); dfill(x, y + 4, SW, 60, '#33343e', 0.3); R(x, y, SW, 3, '#6a6c78'); R(x, y, SW, 1, '#8a8c98'); R(x, y, 6, 1, '#c9a63a'); R(x, y + 3, SW, 1, '#2a2b34'); R(x, y, 1, SH, '#4a4b56'); }
+    leg(near, '#3a3f45', '#262a2f'); shoeSide(Math.round(near[0]), Math.round(near[1]));
+    g.restore();
     vig(w, h, 0.45);
   });
   bars();
-  rollerOn(true, Math.max(0, 0.06 - t * 0.03));
-  blackout(W, H, Math.max(t < 0.3 ? 1 - t / 0.3 : 0, t > 2.3 ? (t - 2.3) / 0.5 : 0));
+  for (let k = 0; k < 8; k++) if (s >= k + 1) cue('kstep' + k, () => noiseS(now(), 'lowpass', 700, 0.07, 0.07));
+  blackout(W, H, u < 0.4 ? 1 - u / 0.4 : 0);
 }
-
-// 3. 계단 — a steadicam behind her up the exit stairs: the treads roll under the camera, the opening of sky grows, she steps out
-function shotStairs(u) {
-  const climb = Math.min(u, 4.4) * 2.3, done = Math.max(0, u - 4.4);
-  shot(2, (w, h) => {
-    const VX = 96, VY = 22, Y = z => VY + 74 / (1 + 0.32 * z), X = (z, side) => VX + side * 84 / (1 + 0.32 * z), CY = z => VY - 60 / (1 + 0.32 * z);
-    const ztop = 12.5 - climb;
-    // the sky through the opening
+function stairsWaist(t) {
+  const climb = t * 1.6 + 3, done = Math.max(0, t - 2.4);
+  shot(4, (w, h) => {
+    const VX = 48, VY = 4, Y = z => VY + 40 / (1 + 0.32 * z), X = (z, side) => VX + side * 44 / (1 + 0.32 * z), CY = z => VY - 30 / (1 + 0.32 * z);
+    const ztop = 9.5 - climb * 0.9;
     dgrad(0, 0, w, h, ['#3a4f86', '#6f7fae', '#c99aa6', '#f2c49a']);
-    for (let k = 0; k < 3; k++) { const bx = 70 + k * 18 + u * 6, by = 18 + (k % 2) * 4 - u * 2, f = Math.floor(u * 7 + k) % 2; R(bx, by, 2, 1, '#2a2a38'); R(bx + 2, by - f, 2, 1, '#2a2a38'); R(bx - 2, by - f, 2, 1, '#2a2a38'); }
-    for (const [x, ww, hh] of [[20, 26, 18], [52, 18, 26], [120, 30, 16], [156, 22, 24]]) { R(x, Y(ztop) - hh, ww, hh, '#3a3f5e'); for (let j = 3; j < hh - 2; j += 4) for (let i = 2; i < ww - 2; i += 4) if (rnd(x + i, j) < 0.3) R(x + i, Y(ztop) - hh + j, 1, 1, '#ffd890'); }
-    // the stairwell up to the opening: ceiling, two tiled walls, the treads
+    for (let k = 0; k < 3; k++) { const bx = 34 + k * 9 + t * 4, by = 8 + (k % 2) * 2 - t * 1.5, fl = Math.floor(t * 7 + k) % 2; R(bx, by, 1, 1, '#2a2a38'); R(bx + 1, by - fl, 1, 1, '#2a2a38'); R(bx - 1, by - fl, 1, 1, '#2a2a38'); }
+    for (const [x, ww, hh] of [[10, 12, 9], [25, 9, 13], [60, 15, 8], [78, 10, 12]]) { R(x, Y(ztop) - hh, ww, hh, '#3a3f5e'); for (let j = 2; j < hh - 1; j += 3) for (let i = 2; i < ww - 1; i += 3) if (rnd(x + i, j) < 0.3) R(x + i, Y(ztop) - hh + j, 1, 1, '#ffd890'); }
     g.fillStyle = '#16171f'; g.beginPath(); g.moveTo(0, 0); g.lineTo(w, 0); g.lineTo(X(ztop, 1), CY(ztop)); g.lineTo(X(ztop, -1), CY(ztop)); g.closePath(); g.fill();
-    for (const s of [-1, 1]) { g.fillStyle = '#23252f'; g.beginPath(); g.moveTo(s < 0 ? 0 : w, 0); g.lineTo(X(ztop, s), CY(ztop)); g.lineTo(X(ztop, s), Y(ztop)); g.lineTo(s < 0 ? 0 : w, h + 40); g.closePath(); g.fill(); }
-    for (let k = 0; k < 40; k++) { const z = k * 0.5 - (climb % 0.5); if (z > ztop) break; for (const s of [-1, 1]) { const x = X(z, s), y0 = CY(z), y1 = Y(z); if (z >= 0) R(Math.round(x) - (s > 0 ? 0 : 0), y0, 1, y1 - y0, '#2c2f3a'); } }
-    const treads = [];
-    for (let k = -2; k < 30; k++) { const z = k - (climb % 1), zk = z; if (zk > ztop) break; if (zk < -1.2) continue; treads.push(zk); }
-    for (const z of treads.reverse()) {
-      const ya = Y(z + 1), yb = Y(z), xl = X(z, -1), xr = X(z, 1), mid = ya + (yb - ya) * 0.42;
-      R(xl, ya, xr - xl, mid - ya + 1, '#33343f'); R(xl, mid, xr - xl, yb - mid + 1, '#545663'); R(xl, mid, xr - xl, 1, '#8a8c98');
-      dfill(xl, mid + 1, xr - xl, yb - mid, '#4b4d59', 0.3);
-    }
-    // handrails
-    for (const s of [-1, 1]) { g.strokeStyle = '#8a8f98'; g.lineWidth = 1; g.beginPath(); for (let z = -1; z <= ztop; z += 0.25) { const x = X(z, s) - s * 5 / (1 + 0.32 * z), y = Y(z) - 30 / (1 + 0.32 * z); z === -1 ? g.moveTo(x, y) : g.lineTo(x, y); } g.stroke(); }
-    // the exit sign on the left wall
-    R(10, 13, 26, 13, '#111'); R(11, 14, 24, 11, '#2f8a5a'); R(16, 16, 1, 7, '#fff'); R(15, 17, 3, 1, '#fff'); R(14, 18, 1, 1, '#fff'); R(18, 18, 1, 1, '#fff');
-    g.fillStyle = '#f2d35a'; g.beginPath(); g.arc(28, 19.5, 4.5, 0, Math.PI * 2); g.fill(); digits('3', 27, 17, '#1b1716'); light(22, 19, 18, '120,220,160', 0.2);
-    // light pouring down from the street
-    light(VX, Y(ztop) - 4, 110, '255,214,170', 0.35 + done * 0.1);
-    g.save(); g.globalCompositeOperation = 'lighter'; for (let k = 0; k < 4; k++) { g.fillStyle = `rgba(255,220,180,${0.05 + 0.02 * Math.sin(u * 2 + k)})`; g.beginPath(); g.moveTo(X(ztop, -1) + 10 + k * 18, Y(ztop)); g.lineTo(X(ztop, -1) + 18 + k * 18, Y(ztop)); g.lineTo(30 + k * 46 + 30, h); g.lineTo(10 + k * 46, h); g.closePath(); g.fill(); } g.restore();
-    // her, from behind, one step per tread; at the top she walks on into the light
-    const ph = (climb % 1), up = done * 26, sil = 0.35 + 0.4 * clamp(done / 1.2, 0, 1);
-    const bob = ph < 0.5 ? 0 : -1, lift = Math.sin(ph * Math.PI);
-    haeunBack(86, 36 + bob - Math.round(up), Math.floor(climb) % 2 ? lift : 0, Math.floor(climb) % 2 ? 0 : lift, { tint: ['#20222e', sil] });
-    R(89, 35 + bob - Math.round(up), 14, 1, '#ffd8a0'); R(88, 51 + bob - Math.round(up), 2, 1, '#ffc890'); R(104, 51 + bob - Math.round(up), 2, 1, '#ffc890');
-    vig(w, h, 0.35);
+    for (const s of [-1, 1]) { g.fillStyle = '#23252f'; g.beginPath(); g.moveTo(s < 0 ? 0 : w, 0); g.lineTo(X(ztop, s), CY(ztop)); g.lineTo(X(ztop, s), Y(ztop)); g.lineTo(s < 0 ? 0 : w, h + 30); g.closePath(); g.fill(); }
+    for (let k = -2; k < 30; k++) { const z = k - (climb % 1); if (z > ztop) break; if (z < -1.2) continue; const ya = Y(z + 1), yb = Y(z), xl = X(z, -1), xr = X(z, 1), mid = ya + (yb - ya) * 0.42; R(xl, ya, xr - xl, mid - ya + 1, '#33343f'); R(xl, mid, xr - xl, yb - mid + 1, '#545663'); R(xl, mid, xr - xl, 1, '#8a8c98'); }
+    for (const s of [-1, 1]) { g.strokeStyle = '#8a8f98'; g.lineWidth = 1; g.beginPath(); for (let z = -1; z <= ztop; z += 0.25) { const x = X(z, s) - s * 3 / (1 + 0.32 * z), y = Y(z) - 16 / (1 + 0.32 * z); z === -1 ? g.moveTo(x, y) : g.lineTo(x, y); } g.stroke(); }
+    R(3, 6, 13, 7, '#111'); R(4, 7, 11, 5, '#2f8a5a'); R(6, 8, 1, 3, '#fff'); R(5, 9, 3, 1, '#fff'); R(11, 8, 3, 3, '#f2d35a'); R(12, 8, 1, 3, '#1b1716');
+    light(VX, Y(ztop) - 3, 60, '255,214,170', 0.3 + done * 0.15);
+    // her from behind, cut at the waist; a bob and a sway each step, the light on the cap and shoulders
+    const ph = climb % 1, bob = ph < 0.5 ? 0 : 1, sway = Math.floor(climb) % 2 ? 1 : 0, up = Math.round(done * 14);
+    spr('hBack', 38 + sway, 17 + bob - up, { tint: ['#20222e', 0.3 + 0.3 * clamp(done, 0, 1)] });
+    R(41 + sway, 16 + bob - up, 12, 1, '#ffd8a0'); R(40 + sway, 33 + bob - up, 3, 1, '#ffc890'); R(52 + sway, 33 + bob - up, 3, 1, '#ffc890');
+    vig(w, h, 0.4);
   });
   bars();
-  if (u > 0.4) cue('birds', () => { [2600, 3100, 2800, 3300].forEach((f, i) => oscS('sine', f, now() + 0.6 + i * 0.15, 0.03, 0.12, f * 1.2)); });
-  for (let k = 0; k < 12; k++) if (u * 2.3 >= k + 0.5 && u < 4.4) cue('sstep' + k, () => noiseS(now(), 'lowpass', 700, 0.06, 0.07));
-  blackout(W, H, fadeIO(u, 6, 0.5, 0.5));
+  if (t > 0.3) cue('birds', () => { [2600, 3100, 2800, 3300].forEach((f, i) => oscS('sine', f, now() + 0.6 + i * 0.15, 0.03, 0.12, f * 1.2)); });
+  blackout(W, H, t < 0.1 ? 1 - t / 0.1 : t > 2.7 ? (t - 2.7) / 0.5 : 0);
 }
 
 // 4. 가로등 — tracking beside her along the shutters at the blue hour; the parallax layers pass at their own speeds;
