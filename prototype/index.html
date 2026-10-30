@@ -1084,9 +1084,9 @@ function drawCast(t, nowMs, active, placerPose) {
   if (listening) { const ax = jx + 6, ay = 92, bxe = bx - 3, bye = 99; for (let k = 0; k <= 20; k++) { const p = k / 20; R(lerp(ax, bxe, p), lerp(ay, bye, p) + Math.sin(p * Math.PI) * 6, 1, 1, '#f4f1ea'); } }
 }
 
-// 하은, the co-scanner on the upper belt, at the same scale as the rest of the cast (about four heads tall): a round bob with
-// scalloped bangs under a teal snapback worn forward (flat lime brim, white logo), dot eyes low on the face, blush, a white top
-// under the lime vest, work gloves. She stands on the far side of the upper gate facing it; your left hand fires her gun.
+// 하은, the co-scanner on the upper belt, at the cast's scale: a red snapback pulled low (the brim's shadow where her eyes would be),
+// a high ponytail out the back that swings when she scans, a black long sleeve under the sky-blue vest of 2번 라인, weight on one
+// leg and the free hand in a pocket. She stands on the far side of the upper gate facing it; your left hand fires her gun.
 const HAEUN_X = 272;
 function drawHaeun(t, kick, nowMs, active) {
   const beat = active ? beatAt(t) : (state === 'outro' || state === 'result') ? END_BEAT : -1;
@@ -1094,36 +1094,34 @@ function drawHaeun(t, kick, nowMs, active) {
   const walkP = L.beltIn && beat < L.beltIn[1] ? ease((beat - L.beltIn[0]) / (L.beltIn[1] - L.beltIn[0])) : 1;
   const cx = Math.round(lerp(W + 30, HAEUN_X, walkP)), ph = beat - Math.floor(beat), watch = active && inRange(beat, L.phone);
   const bob = walkP < 1 ? (ph < 0.5 ? 1 : 0) : (active && ph < 0.18 ? 1 : 0), top = 60 + bob + (kick > 0.5 ? 1 : 0);
-  const hair = '#4a3328', hairD = '#372417', shirt = '#e6edf3', shirtD = '#c9d2d6', cap = '#1f6f6b', capD = '#154f4c', brim = '#cfe04a', glove = '#2a2d31', cheek = '#f2a0a8';
-  // legs and shoes
-  R(cx - 6, top + 38, 5, 16, '#2f3338'); R(cx + 1, top + 38, 5, 16, '#2f3338'); R(cx - 7, top + 53, 6, 3, '#1e1a1a'); R(cx + 1, top + 53, 6, 3, '#1e1a1a');
-  // body: white top, lime vest with the reflective stripe
-  R(cx - 7, top + 16, 14, 23, shirt); R(cx - 7, top + 18, 14, 13, C.vest2); R(cx - 7, top + 25, 14, 2, C.reflect); R(cx - 7, top + 37, 14, 2, shirtD);
-  // bob behind the face, then the face with its corners knocked off
-  R(cx - 8, top + 2, 16, 14, hair); R(cx - 8, top + 14, 3, 4, hairD); R(cx + 5, top + 14, 3, 4, hairD);
-  R(cx - 5, top + 3, 10, 13, C.skin); R(cx - 6, top + 4, 12, 11, C.skin);
-  R(cx - 7, top + 6, 2, 7, hair); R(cx + 5, top + 6, 2, 7, hair);   // sideburns
-  // the snapback pulled right down: a tall flat front panel with a seam and a button, the brim over the eyes with a lit edge
-  // and a dark underside, the snap at the back. Under the brim the top of the face is in shadow and the eyes are all but gone.
-  R(cx - 8, top + 1, 16, 6, cap); R(cx - 7, top, 14, 1, cap); R(cx - 6, top - 1, 12, 1, cap);
-  R(cx - 8, top + 1, 1, 6, capD); R(cx + 1, top, 1, 7, capD); R(cx - 1, top - 2, 2, 1, capD);   // seam and button
-  R(cx - 8, top + 6, 16, 1, capD);
-  R(cx - 9, top + 3, 2, 2, '#2a2d31'); R(cx - 9, top + 4, 1, 1, '#9aa1a6');   // the snap strap at the back
-  R(cx + 4, top + 6, 11, 2, brim); R(cx + 4, top + 6, 11, 1, '#e4f27a'); R(cx + 4, top + 8, 11, 1, '#5f6e1c'); R(cx + 14, top + 6, 1, 3, '#9fb030');
-  R(cx - 3, top + 2, 6, 3, '#ffffff'); R(cx - 2, top + 3, 4, 1, cap); R(cx - 3, top + 2, 1, 1, '#d8dde0');   // the patch
-  // shadow under the brim: the upper face goes dark
+  const hair = '#4a3328', hairL = '#6b4a3a', shirt = '#1e1a1a', shirtD = '#121010', cap = '#d8463b', capD = '#a83328', brim = '#1e1a1a', glove = '#2a2d31', sky = '#7ec8e3';
+  // legs: weight on the near leg, the far one a touch back
+  R(cx - 6, top + 38, 5, 16, '#3a3f45'); R(cx + 2, top + 38, 5, 15, '#3a3f45'); R(cx - 7, top + 53, 6, 3, '#1e1a1a'); R(cx + 3, top + 52, 6, 3, '#1e1a1a');
+  // body: black long sleeve, the sky-blue vest with its stripe
+  R(cx - 7, top + 16, 14, 23, shirt); R(cx - 7, top + 18, 14, 13, sky); R(cx - 7, top + 25, 14, 2, C.reflect); R(cx - 7, top + 37, 14, 2, shirtD);
+  // the ponytail out the back of the cap, swinging back when she fires (and a little with the beat)
+  const sw = Math.round(kick * 3) + (bob ? 1 : 0);
+  R(cx - 13 - sw, top + 2, 5, 6, hair); R(cx - 16 - sw, top + 6, 5, 9, hair); R(cx - 17 - sw, top + 13, 4, 7, hair); R(cx - 15 - sw, top + 18, 3, 4, hair);
+  R(cx - 15 - sw, top + 7, 1, 7, hairL); R(cx - 16 - sw, top + 14, 1, 5, hairL);   // a lit strand so the tail reads against the racks
+  R(cx - 9, top + 2, 2, 2, '#f4d35e');   // the tie
+  // face with the corners knocked off, sideburns
+  R(cx - 5, top + 3, 10, 13, C.skin); R(cx - 6, top + 4, 12, 11, C.skin); R(cx - 7, top + 4, 2, 8, hair); R(cx + 5, top + 4, 2, 6, hair);
+  // the snapback: tall front panel with a seam and a button, pulled down so the brim sits over the eyes; the patch
+  R(cx - 8, top + 1, 16, 6, cap); R(cx - 7, top, 14, 1, cap); R(cx - 6, top - 1, 12, 1, cap); R(cx - 8, top + 6, 16, 1, capD); R(cx + 1, top, 1, 7, capD); R(cx - 1, top - 2, 2, 1, capD);
+  R(cx + 4, top + 6, 11, 2, brim); R(cx + 4, top + 6, 11, 1, '#3a3236'); R(cx + 4, top + 8, 11, 1, '#0d0b0b');
+  R(cx - 3, top + 2, 6, 3, '#ffffff'); R(cx - 2, top + 3, 4, 1, cap);
+  // under the brim: shadow instead of eyes. The scan lights two pinpoints in it for a moment
   R(cx - 6, top + 7, 12, 5, '#8a5e44'); R(cx - 6, top + 7, 12, 2, '#6b4631'); R(cx - 6, top + 11, 12, 1, '#b08366');
-  // no eyes at all: the brim's shadow is her whole expression. Only the scan lights two pinpoints under it for a moment.
   if (kick > 0.4) { R(cx - 3, top + 9, 1, 1, '#f4f1ea'); R(cx + 2, top + 9, 1, 1, '#f4f1ea'); }
-  R(cx - 6, top + 12, 2, 1, cheek); R(cx + 3, top + 12, 2, 1, cheek); R(cx - 1, top + 13, 2, 1, '#b2565a');
-  // arms: the gun into the upper gate (kicks back when your left hand fires), or the watch check
+  R(cx - 1, top + 13, 2, 1, '#b2565a');
+  // arms: the gun into the upper gate (kicks back when your left hand fires), the watch check, or the hand in a pocket
   if (watch) { thick(cx + 6, top + 22, cx + 2, top + 30, 4, shirt); R(cx, top + 28, 4, 4, glove); R(cx + 1, top + 26, 3, 3, '#d8dde0'); R(cx + 2, top + 27, 1, 1, C.ink); }
   else {
     const gx = cx + 18 - kick * 3, gy = 87;
     thick(cx + 6, top + 22, gx - 2, gy + 3, 4, shirt);
     R(gx - 3, gy - 3, 12, 5, '#2d2f33'); R(gx - 2, gy + 2, 3, 6, '#2d2f33'); R(gx + 8, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser); R(gx - 3, gy + 2, 3, 3, glove);
   }
-  R(cx - 9, top + 24, 3, 3, glove);   // the other hand at her side
+  thick(cx - 6, top + 22, cx - 8, top + 32, 4, shirt); R(cx - 9, top + 31, 4, 3, glove);   // the other hand, in the pocket
 }
 const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
 function drawPlayer(kick, nowMs) {
