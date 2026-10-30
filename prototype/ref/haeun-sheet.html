@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>하은 디자인 시트</title>
+<title>하은 디자인 진단</title>
 <style>
 :root{--bg:#1b1716;--ink:#efe6d2;--muted:#b8a998;--card:#241f1d;--accent:#cfe04a}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1b1716}}
@@ -11,98 +11,102 @@
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;padding:16px}
 h1{font-size:18px;margin:0 0 4px}
 p{margin:0 0 14px;color:var(--muted)}
-.row{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:14px;max-width:760px}
+.row{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:14px;max-width:820px}
 .card{background:var(--card);border-radius:10px;padding:12px}
 .card h2{font-size:15px;margin:0 0 2px}
 .card small{color:var(--muted);display:block;margin-bottom:8px}
 canvas{display:block;width:100%;image-rendering:pixelated;background:#2a211c;border-radius:6px}
 .tag{display:inline-block;background:var(--accent);color:#1b1716;font-weight:700;border-radius:4px;padding:0 6px;font-size:12px;margin-right:4px}
+ul{margin:0 0 12px 18px;color:var(--ink)} li{margin:2px 0}
 </style>
 </head>
 <body>
-<h1>하은 디자인 시트 (3차: 작은 눈 + 모자)</h1>
-<p>눈은 다른 인물들처럼 검은 점 두 개(홍채·하이라이트 없음). 같은 동글 단발에 모자 세 가지. 네 표정(기본 · 깜빡 · 스캔 성공 · 시계). 가장 오른쪽은 게임 안 크기(3배).</p>
+<h1>하은 디자인 진단</h1>
+<p>게임 크기 그대로 5배 확대. 왼쪽부터 반장, 신입(플레이어), 하은. 같은 자리에 서 있을 때 어떻게 읽히는지.</p>
 <div class="row" id="rows"></div>
 <script>
-const C = { skin:'#f6d2b5', skinDark:'#e0b393', ink:'#2a2024', vest:'#cfe04a', reflect:'#ebe5c9', cheek:'#f7a3ad', mouth:'#c0606a', hi:'#ffffff', iris:'#4a3340', irisL:'#7a5a66' };
+const C = { kraft:'#c48b52', ink:'#1b1716', vest:'#f07a2a', reflect:'#ebe5c9', shirt:'#6b7073', cap:'#2c3b57', skin:'#d9a27a', skinDark:'#b98260', hair:'#9a948e', hoodie:'#2f4f58', vest2:'#cfe04a', hairDark:'#1e1a1a', sky:'#7ec8e3', laser:'#ff4a3d', ok:'#8fd694' };
 function px(g, s) { return (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x * s), Math.round(y * s), Math.round(w * s), Math.round(h * s)); }; }
-// a rounded block: corners knocked off two deep
-function blob(R, x, y, w, h, c) { R(x + 2, y, w - 4, h, c); R(x + 1, y + 1, w - 2, h - 2, c); R(x, y + 2, w, h - 4, c); }
-// eyes like the rest of the cast: small black dots low on the face, no iris, no highlight
-function eyes(R, cx, y, mode) {
-  for (const ex of [cx - 5, cx + 3]) {
-    if (mode === 'blink') { R(ex, y + 1, 2, 1, C.ink); continue; }
-    if (mode === 'happy') { R(ex - 1, y + 1, 1, 1, C.ink); R(ex, y, 2, 1, C.ink); R(ex + 2, y + 1, 1, 1, C.ink); continue; }
-    if (mode === 'watch') { R(ex, y + 2, 2, 2, C.ink); continue; }
-    R(ex, y, 2, 2, C.ink);
-  }
+function thick(R, x0, y0, x1, y1, w, c) { const n = Math.max(2, Math.ceil(Math.hypot(x1 - x0, y1 - y0))); for (let i = 0; i <= n; i++) { const p = i / n; R(x0 + (x1 - x0) * p - w / 2, y0 + (y1 - y0) * p - w / 2, w, w, c); } }
+// the cast as they are in the game
+function boss(R, cx, top) {
+  R(cx - 11, top + 20, 3, 18, C.shirt); R(cx - 9, top + 18, 18, 40, C.shirt); R(cx - 9, top + 18, 6, 40, C.vest); R(cx + 3, top + 18, 6, 40, C.vest); R(cx - 9, top + 34, 18, 2, C.reflect);
+  R(cx - 2, top + 15, 5, 4, C.skinDark); R(cx - 6, top + 2, 12, 14, C.skin); R(cx - 6, top + 7, 2, 3, C.skinDark); R(cx - 6, top + 4, 3, 5, C.hair);
+  R(cx - 7, top - 1, 14, 5, C.cap); R(cx + 3, top + 3, 9, 2, C.cap); R(cx + 3, top + 7, 2, 2, C.ink); R(cx + 1, top + 11, 6, 2, C.hair);
+  R(cx - 9, top + 58, 8, 3, C.ink); R(cx + 1, top + 58, 8, 3, C.ink);
 }
-function face(R, cx, top, mode) {
-  eyes(R, cx, top + 10, mode);
-  R(cx - 8, top + 13, 2, 1, C.cheek); R(cx + 6, top + 13, 2, 1, C.cheek);   // blush beside the eyes
-  if (mode === 'happy') { R(cx - 1, top + 15, 1, 1, C.mouth); R(cx, top + 16, 2, 1, C.mouth); R(cx + 2, top + 15, 1, 1, C.mouth); }
-  else R(cx, top + 16, 2, 1, C.mouth);
+function player(R, cx, top) {
+  R(cx - 9, top + 18, 18, 36, C.hoodie); R(cx - 9, top + 20, 18, 22, C.vest2); R(cx - 9, top + 32, 18, 2, C.reflect); R(cx - 7, top + 14, 15, 5, '#264149');
+  R(cx - 6, top + 1, 12, 14, C.skin); R(cx - 7, top - 1, 14, 5, C.hairDark); R(cx + 1, top + 1, 6, 10, C.hairDark); R(cx - 4, top + 7, 2, 2, C.ink);
+  R(cx - 9, top + 54, 8, 3, C.ink); R(cx + 1, top + 54, 8, 3, C.ink);
+  thick(R, cx - 6, top + 22, cx - 18, top + 24, 4, C.hoodie); R(cx - 26, top + 21, 12, 5, '#2d2f33'); R(cx - 27, top + 22, 2, 3, C.laser);
 }
-// a small body under a big head: 12 wide, mitten hands, short legs
-function body(R, cx, top, topCol, legCol, mode) {
-  R(cx - 6, top, 12, 15, topCol); R(cx - 6, top + 2, 12, 9, C.vest); R(cx - 6, top + 6, 12, 2, C.reflect);
-  R(cx - 5, top + 15, 4, 6, legCol); R(cx + 1, top + 15, 4, 6, legCol);
-  R(cx - 6, top + 20, 5, 2, '#1e1a1a'); R(cx + 1, top + 20, 5, 2, '#1e1a1a');
-  if (mode === 'watch') { R(cx + 4, top + 3, 3, 5, topCol); R(cx + 1, top + 7, 5, 3, topCol); R(cx + 2, top + 6, 3, 2, '#e2e8ec'); R(cx + 3, top + 6, 1, 1, C.ink); R(cx - 9, top + 3, 3, 3, C.skin); }
-  else { R(cx + 5, top + 4, 8, 3, topCol); R(cx + 12, top + 3, 3, 3, C.skin); R(cx + 14, top + 1, 8, 4, '#2d2f33'); R(cx + 15, top + 5, 2, 4, '#2d2f33'); R(cx + 22, top + 2, 2, 2, '#ff4a3d'); R(cx - 9, top + 5, 3, 3, C.skin); }
+// the current 하은 (snapback low, no eyes, lime vest) facing right
+function current(R, cx, top) {
+  const hair = '#4a3328', hairD = '#372417', shirt = '#e6edf3', cap = '#1f6f6b', capD = '#154f4c', brim = '#cfe04a';
+  R(cx - 6, top + 38, 5, 16, '#2f3338'); R(cx + 1, top + 38, 5, 16, '#2f3338'); R(cx - 7, top + 53, 6, 3, '#1e1a1a'); R(cx + 1, top + 53, 6, 3, '#1e1a1a');
+  R(cx - 7, top + 16, 14, 23, shirt); R(cx - 7, top + 18, 14, 13, C.vest2); R(cx - 7, top + 25, 14, 2, C.reflect);
+  R(cx - 8, top + 2, 16, 14, hair); R(cx - 8, top + 14, 3, 4, hairD); R(cx + 5, top + 14, 3, 4, hairD); R(cx - 5, top + 3, 10, 13, C.skin); R(cx - 6, top + 4, 12, 11, C.skin);
+  R(cx - 7, top + 6, 2, 7, hair); R(cx + 5, top + 6, 2, 7, hair);
+  R(cx - 8, top + 1, 16, 6, cap); R(cx - 7, top, 14, 1, cap); R(cx - 6, top - 1, 12, 1, cap); R(cx - 8, top + 6, 16, 1, capD); R(cx + 4, top + 6, 11, 2, brim); R(cx + 4, top + 8, 11, 1, '#5f6e1c');
+  R(cx - 3, top + 2, 6, 3, '#ffffff'); R(cx - 2, top + 3, 4, 1, cap);
+  R(cx - 6, top + 7, 12, 5, '#8a5e44'); R(cx - 6, top + 7, 12, 2, '#6b4631'); R(cx - 6, top + 12, 2, 1, '#f2a0a8'); R(cx + 3, top + 12, 2, 1, '#f2a0a8'); R(cx - 1, top + 13, 2, 1, '#b2565a');
+  thick(R, cx + 6, top + 22, cx + 16, top + 26, 4, shirt); R(cx + 15, top + 23, 12, 5, '#2d2f33'); R(cx + 26, top + 24, 2, 3, C.laser);
 }
-// the same round bob under three hats
-function bob(R, cx, top, hair, hairD) {
-  blob(R, cx - 13, top - 2, 26, 22, hair); R(cx - 13, top + 17, 4, 5, hairD); R(cx + 9, top + 17, 4, 5, hairD);
-  blob(R, cx - 11, top + 1, 22, 20, C.skin);
-  R(cx - 11, top + 1, 22, 4, hair); R(cx - 11, top + 5, 4, 3, hair); R(cx - 5, top + 5, 3, 2, hair); R(cx + 1, top + 5, 4, 2, hair); R(cx + 7, top + 5, 4, 3, hair);
-  R(cx - 12, top + 4, 2, 12, hair); R(cx + 10, top + 4, 2, 12, hair);
+// ---- three redesigns. All: 2번 라인의 하늘색 조끼 (nobody else wears it), weight on one leg, free hand in a pocket, a silhouette hook.
+function legsRelaxed(R, cx, top, col) { R(cx - 6, top + 38, 5, 16, col); R(cx + 2, top + 38, 5, 15, col); R(cx - 7, top + 53, 6, 3, '#1e1a1a'); R(cx + 3, top + 52, 6, 3, '#1e1a1a'); }
+function vestBody(R, cx, top, topCol) { R(cx - 7, top + 16, 14, 23, topCol); R(cx - 7, top + 18, 14, 13, C.sky); R(cx - 7, top + 25, 14, 2, C.reflect); R(cx - 7, top + 37, 14, 2, '#2a2d31'); }
+function gunArm(R, cx, top, col) { thick(R, cx + 6, top + 22, cx + 16, top + 26, 4, col); R(cx + 15, top + 23, 12, 5, '#2d2f33'); R(cx + 26, top + 24, 2, 3, C.laser); R(cx + 13, top + 26, 3, 3, '#2a2d31'); }
+function pocketArm(R, cx, top, col) { thick(R, cx - 6, top + 22, cx - 8, top + 32, 4, col); R(cx - 9, top + 31, 4, 3, '#2a2d31'); }
+// 1. 레드 스냅백 + 하이 포니테일: the tail is the hook, it swings when she scans
+function d1(R, cx, top, scan) {
+  const hair = '#2c2422', shirt = '#1e1a1a', cap = '#d8463b', capD = '#a83328', brim = '#1e1a1a';
+  legsRelaxed(R, cx, top, '#3a3f45'); vestBody(R, cx, top, shirt);
+  const sw = scan ? 3 : 0; R(cx - 13 - sw, top + 2, 5, 6, hair); R(cx - 16 - sw, top + 6, 5, 9, hair); R(cx - 17 - sw, top + 13, 4, 7, hair); R(cx - 15 - sw, top + 18, 3, 4, hair);   // ponytail out the back
+  R(cx - 5, top + 3, 10, 13, C.skin); R(cx - 6, top + 4, 12, 11, C.skin); R(cx - 7, top + 4, 2, 8, hair); R(cx + 5, top + 4, 2, 6, hair);
+  R(cx - 8, top + 1, 16, 6, cap); R(cx - 7, top, 14, 1, cap); R(cx - 6, top - 1, 12, 1, cap); R(cx - 8, top + 6, 16, 1, capD); R(cx + 1, top, 1, 7, capD);
+  R(cx + 4, top + 6, 11, 2, brim); R(cx + 4, top + 8, 11, 1, '#0d0b0b'); R(cx - 3, top + 2, 6, 3, '#ffffff'); R(cx - 2, top + 3, 4, 1, cap);
+  R(cx - 6, top + 7, 12, 5, '#8a5e44'); R(cx - 6, top + 7, 12, 2, '#6b4631'); R(cx - 1, top + 13, 2, 1, '#b2565a');
+  R(cx - 9, top + 2, 2, 2, '#f4d35e');   // the tie
+  if (scan) gunArm(R, cx, top, shirt); else { pocketArm(R, cx, top, shirt); R(cx + 5, top + 22, 3, 3, '#2a2d31'); }
 }
-// A. 버킷햇: 차콜, 챙이 아래로, 작은 라벨
-function drawA(R, cx, top, mode) {
-  const hair = '#4a3328', hairD = '#372417', top2 = '#e6edf3', hat = '#3a3d45', hatD = '#24262c';
-  body(R, cx, top + 20, top2, '#2f3338', mode);
-  bob(R, cx, top, hair, hairD);
-  blob(R, cx - 11, top - 6, 22, 10, hat); R(cx - 14, top + 2, 28, 2, hat); R(cx - 15, top + 3, 30, 2, hatD); R(cx - 11, top + 1, 22, 1, hatD);
-  R(cx + 5, top - 1, 4, 2, '#e9e4da'); R(cx + 6, top - 1, 2, 1, '#d8463b');   // label
-  face(R, cx, top + 1, mode);
+// 2. 블랙 비니 + 목에 헤드폰 + 머스터드 후드: the headphones are the hook, the hoodie is big on her
+function d2(R, cx, top, scan) {
+  const hair = '#4a3328', hood = '#d9a441', hoodD = '#b5842e', beanie = '#2a2d31';
+  legsRelaxed(R, cx, top, '#1e1a1a');
+  R(cx - 8, top + 16, 16, 24, hood); R(cx - 8, top + 19, 16, 12, C.sky); R(cx - 8, top + 25, 16, 2, C.reflect); R(cx - 8, top + 38, 16, 2, hoodD);
+  R(cx - 5, top + 3, 10, 13, C.skin); R(cx - 6, top + 4, 12, 11, C.skin); R(cx - 7, top + 8, 2, 8, hair); R(cx + 5, top + 8, 2, 6, hair);
+  R(cx - 8, top - 3, 16, 10, beanie); R(cx - 7, top - 4, 14, 1, beanie); R(cx - 8, top + 5, 16, 2, '#3d4148');   // beanie low, folded cuff
+  R(cx - 6, top + 7, 12, 3, '#9a6e50');   // beanie shade, lighter: her eyes just show
+  R(cx - 4, top + 9, 2, 2, C.ink); R(cx + 1, top + 9, 2, 2, C.ink); R(cx - 1, top + 13, 2, 1, '#b2565a');
+  R(cx - 9, top + 14, 3, 6, '#2d2f33'); R(cx + 6, top + 14, 3, 6, '#2d2f33'); R(cx - 8, top + 19, 16, 2, '#2d2f33'); R(cx - 9, top + 15, 1, 4, '#9aa1a6'); R(cx + 8, top + 15, 1, 4, '#9aa1a6');   // headphones round the neck
+  if (scan) gunArm(R, cx, top, hood); else { pocketArm(R, cx, top, hood); R(cx + 5, top + 22, 3, 3, hood); }
 }
-// B. 스냅백 앞으로: 납작한 챙, 투톤, 정면 로고
-function drawB(R, cx, top, mode) {
-  const hair = '#4a3328', hairD = '#372417', top2 = '#e6edf3', cap = '#1f6f6b', capD = '#154f4c', brim = '#cfe04a';
-  body(R, cx, top + 20, top2, '#2f3338', mode);
-  bob(R, cx, top, hair, hairD);
-  blob(R, cx - 12, top - 6, 24, 9, cap); R(cx - 12, top + 1, 24, 2, capD);
-  R(cx + 6, top + 1, 15, 2, brim); R(cx + 6, top + 3, 15, 1, '#9fb030');   // flat brim forward (she faces right)
-  R(cx - 3, top - 3, 5, 3, '#ffffff'); R(cx - 2, top - 2, 3, 1, cap);   // logo
-  face(R, cx, top + 1, mode);
+// 3. 흰 버킷햇 + 숏컷 + 큰 귀걸이: no cap brim shadow, a hoop earring and a dark tee
+function d3(R, cx, top, scan) {
+  const hair = '#2c2422', tee = '#2a2d31', hat = '#efe6d2', hatD = '#cfc3b4';
+  legsRelaxed(R, cx, top, '#6b7073'); vestBody(R, cx, top, tee);
+  R(cx - 7, top + 2, 14, 12, hair); R(cx - 5, top + 4, 10, 12, C.skin); R(cx - 6, top + 5, 12, 10, C.skin); R(cx - 7, top + 5, 2, 6, hair); R(cx + 5, top + 5, 2, 4, hair);
+  R(cx - 8, top - 2, 16, 7, hat); R(cx - 7, top - 3, 14, 1, hat); R(cx - 11, top + 4, 22, 2, hat); R(cx - 12, top + 5, 24, 2, hatD); R(cx - 8, top + 3, 16, 1, hatD);
+  R(cx - 6, top + 7, 12, 2, '#9a6e50'); R(cx - 4, top + 9, 2, 2, C.ink); R(cx + 1, top + 9, 2, 2, C.ink); R(cx - 1, top + 13, 2, 1, '#b2565a');
+  R(cx - 8, top + 10, 1, 4, '#f4d35e'); R(cx - 9, top + 11, 1, 2, '#f4d35e');   // hoop
+  if (scan) gunArm(R, cx, top, tee); else { pocketArm(R, cx, top, tee); R(cx + 5, top + 22, 3, 3, C.skin); }
 }
-// C. 슬라우치 비니: 뒤로 길게 늘어지고 접힌 단, 방울 없음
-function drawC(R, cx, top, mode) {
-  const hair = '#4a3328', hairD = '#372417', top2 = '#ffe3ea', beanie = '#d8463b', beanieD = '#a83328';
-  body(R, cx, top + 20, top2, '#3a3f45', mode);
-  bob(R, cx, top, hair, hairD);
-  blob(R, cx - 12, top - 9, 24, 13, beanie); blob(R, cx - 19, top - 7, 12, 10, beanie); R(cx - 19, top - 1, 6, 2, beanieD);   // slouch hanging back-left
-  R(cx - 12, top + 1, 24, 3, beanieD); R(cx - 12, top + 3, 24, 1, beanie);   // folded cuff
-  face(R, cx, top + 1, mode);
-}
-const variants = [
-  ['A', '버킷햇', '차콜 버킷햇, 챙이 눈썹까지. 작은 라벨 하나. 동글 단발.', drawA],
-  ['B', '스냅백', '청록 스냅백을 앞으로, 납작한 연두 챙(벨트 색), 흰 로고. 동글 단발.', drawB],
-  ['C', '슬라우치 비니', '빨간 비니를 뒤로 길게, 접힌 단. 방울 없음. 동글 단발.', drawC]
-];
-const modes = [['idle', '기본'], ['blink', '깜빡'], ['happy', '스캔 성공'], ['watch', '시계']];
 const rows = document.getElementById('rows');
-for (const [key, name, desc, fn] of variants) {
-  const card = document.createElement('div'); card.className = 'card';
-  card.innerHTML = `<h2><span class="tag">${key}</span>${name}</h2><small>${desc}</small>`;
-  const cv = document.createElement('canvas'); const S = 7, cellW = 50, H = 62;
-  cv.width = (cellW * 4 + 30) * S; cv.height = H * S;
+function card(title, desc, draw) {
+  const el = document.createElement('div'); el.className = 'card'; el.innerHTML = `<h2>${title}</h2><small>${desc}</small>`;
+  const cv = document.createElement('canvas'); const S = 5, W = 160, H = 72; cv.width = W * S; cv.height = H * S;
   const g = cv.getContext('2d'); g.imageSmoothingEnabled = false; const R = px(g, S);
-  modes.forEach(([m, label], i) => { fn(R, 24 + i * cellW, 12, m); g.fillStyle = '#b8a998'; g.font = `${2.4 * S}px system-ui`; g.fillText(label, (12 + i * cellW) * S, (H - 3) * S); });
-  const R3 = px(g, 3); fn(R3, Math.round((cellW * 4 + 14) * S / 3), Math.round(14 * S / 3), 'idle'); g.fillStyle = '#b8a998'; g.fillText('게임 크기', (cellW * 4 + 4) * S, (H - 3) * S);
-  card.appendChild(cv); rows.appendChild(card);
+  R(0, 62, W, 10, '#38302c'); draw(R); el.appendChild(cv); rows.appendChild(el);
 }
+card('<span class="tag">지금</span> 반장 · 신입 · 하은(현재)', '신입과 하은이 같은 연두 조끼, 비슷한 청록·흰 상의, 같은 총, 같은 자세. 모자가 머리의 반을 차지하고 눈이 없어서 얼굴이 빈 띠로 읽힘. 신입의 복제처럼 보이는 게 핵심 문제.',
+  R => { boss(R, 24, 4); player(R, 70, 8); current(R, 112, 8); });
+card('<span class="tag">1</span> 레드 스냅백 + 하이 포니테일 + 검정 상의 + 하늘색 조끼', '뒤로 빠진 포니테일이 실루엣을 만들고 스캔할 때 흔들림. 하늘색 조끼는 2번 라인 것(아무도 안 입음). 검정 상의로 신입의 청록과 분리. 눈은 챙 그늘.',
+  R => { player(R, 30, 8); d1(R, 72, 8, false); d1(R, 118, 8, true); });
+card('<span class="tag">2</span> 블랙 비니 + 목에 헤드폰 + 머스터드 후드', '목에 건 헤드폰이 하나로 읽히는 소품(지우 이어폰과 대구). 큰 머스터드 후드가 체형을 바꿈. 비니 그늘은 옅어서 눈이 보임.',
+  R => { player(R, 30, 8); d2(R, 72, 8, false); d2(R, 118, 8, true); });
+card('<span class="tag">3</span> 흰 버킷햇 + 숏컷 + 큰 귀걸이 + 검정 티', '밝은 모자가 어두운 창고에서 제일 먼저 눈에 띔. 귀걸이 한 점. 챙이 넓어 눈은 반쯤.',
+  R => { player(R, 30, 8); d3(R, 72, 8, false); d3(R, 118, 8, true); });
 </script>
 </body>
 </html>
