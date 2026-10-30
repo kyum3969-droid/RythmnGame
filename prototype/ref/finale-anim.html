@@ -30,16 +30,15 @@ ul{color:var(--muted);font-size:13px;margin:8px 0 0 18px}
 <body>
 <div class="wrap">
 <h1>1-5 첫 회식 · 애니매틱</h1>
-<p>벨트 도입 → 매치 컷 → 초밥 세 벨트 → 소주잔과 취기 → 지하철 → 새벽 거리 → 병원 로비 → 복도 → 병실 심장박동 → 새벽. 약 2분 45초. 재생을 누르면 효과음이 납니다(롤러, 딱, 쏙, 짠, 발소리, 차임, 심장박동). 음악은 뺐습니다.</p>
+<p>벨트 도입 → 매치 컷 → 초밥 세 벨트 → 소주잔과 취기, 그리고 하은의 밤: 창 → 문 → 계단 → 가로등 → 횡단보도 → 웅덩이 → 복도 → 손 → 병실 → 새벽 → 탁자. 약 2분 40초. 하은의 밤은 컷과 클로즈업으로 가고, 박자 모티프가 창의 불빛 → 횡단보도 신호음 → 복도의 일곱 등 → 심전도로 이어집니다. 재생을 누르면 효과음이 납니다.</p>
 <canvas id="cv" width="384" height="216"></canvas>
 <div class="bar"><button id="play">▶ 재생</button><input id="seek" type="range" min="0" max="100" step="0.05" value="0"><span id="lbl"></span><select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
 <div class="jumps" id="jumps"></div>
 
 
 <ul>
-<li>조작은 없고 타임라인만 흐릅니다. 게임 안에서는 벨트·초밥·병실 구간이 플레이, 지하철·걷기·병원 입구가 컷씬.</li>
-<li>초밥집 접시 넷 중 하나는 신입이 안 집고 지나가서 하은이 받아 쌓입니다. 소주잔 구간은 취기가 시간으로 오르고 하은만 선명합니다.</li>
-<li>병실은 심박 58에서 시작해 64로 고르게, 일곱 번째 박마다 "7".</li>
+<li>조작은 없고 타임라인만 흐릅니다. 게임 안에서는 벨트·초밥·병실 구간이 플레이, 나머지는 컷씬.</li>
+<li>하은의 밤은 한 컷에 한 가지씩: 창(신입을 어깨에서 내려놓음), 문(닫히는 문이 둘을 가름), 계단(실루엣과 하늘), 가로등(지나가자 꺼짐), 횡단보도(신호음에 맞춰 건넘), 웅덩이(거꾸로 비친 십자가), 복도(일곱 등이 켜짐), 손(어머니 손 위에), 병실, 새벽, 탁자(납부서와 시계).</li>
 </ul>
 </div>
 <script>
@@ -576,128 +575,137 @@ const cart = (x, y, c = '#8fb0a0') => { R(x, y - 20, 26, 14, c); R(x, y - 22, 26
 const wheelchair = (x, y) => { g.fillStyle = '#2b2e31'; g.beginPath(); g.arc(x + 4, y - 7, 7, 0, Math.PI * 2); g.fill(); g.fillStyle = '#6a7075'; g.beginPath(); g.arc(x + 4, y - 7, 4, 0, Math.PI * 2); g.fill(); R(x - 10, y - 22, 16, 3, '#2b2e31'); R(x - 10, y - 36, 3, 16, '#2b2e31'); R(x + 14, y - 5, 4, 4, '#2b2e31'); };
 const ivPole = (x, y) => { R(x, y - 56, 2, 56, '#9aa0a6'); R(x - 6, y - 2, 14, 2, '#9aa0a6'); R(x - 3, y - 58, 8, 14, '#dfe6ea'); R(x - 1, y - 56, 4, 9, '#bfe3d2'); };
 
-// ---------- 3. 지하철 ----------
-// a half-full first train: people asleep, a worker in a vest, a student with earbuds, a grandmother with shopping. The train slows,
-// the doors open onto the platform (cleaner, a nurse on her way in, tiles, the station sign), 하은 and the grandmother get off.
-function subwayCar(u, speed, sc, doors) {
-  R(0, 0, W, H, '#d9dde3'); R(0, 0, W, 26, '#c3c8d0'); R(0, 26, W, 2, '#9aa0a8');
-  // ads and the route strip
-  for (let k = 0; k < 3; k++) { const x = 30 + k * 120; R(x + 4, 4, 92, 18, ['#f2d35a', '#9fd0ff', '#f2a6c8'][k]); R(x + 10, 8, 40, 3, '#1b1716'); R(x + 10, 14, 60, 2, '#1b1716'); R(x + 70, 7, 20, 11, '#ffffff'); }
-  R(40, 8, 300, 2, 'rgba(0,0,0,0)');
-  for (let k = 0; k < 3; k++) {
-    const x = 30 + k * 120; R(x, 34, 100, 54, '#0a0c12');
-    g.save(); g.beginPath(); g.rect(x, 34, 100, 54); g.clip();
-    if (!doors) { for (let j = 0; j < 6; j++) { const sx = x + ((j * 53 + k * 29 - sc) % 160 + 160) % 160 - 20; R(sx, 48 + (j % 3) * 13, 14 + (speed > 0 ? 10 : 0), 2, j % 2 ? '#ffd890' : '#8fb8e0'); } }
-    else { R(x, 34, 100, 54, '#cfd6d2'); for (let yy = 36; yy < 88; yy += 8) for (let xx = x; xx < x + 100; xx += 12) R(xx, yy, 11, 7, (xx + yy) % 3 ? '#dfe6e2' : '#d2dad6'); R(x + 10, 40, 80, 44, '#3a3f45'); R(x + 14, 44, 72, 36, '#1e2a33'); text('○○대학병원', x + 50, 56, '#ffffff', 7, 'center', true); R(x + 14, 68, 72, 1, '#8fd694'); }
-    g.restore(); R(x - 2, 32, 104, 2, '#8d939a'); R(x - 2, 88, 104, 2, '#8d939a');
-  }
-  const sway = speed > 0 ? Math.round(Math.sin(u * 7) * 1) : 0;
-  for (let k = 0; k < 7; k++) { const x = 40 + k * 50; R(x, 28, 1, 14, '#6a7075'); R(x - 4 + sway, 42, 9, 6, '#f2f4f6'); R(x - 3 + sway, 44, 7, 2, '#c3c8d0'); }
-  R(0, 110, W, 36, '#2f5f8a'); R(0, 110, W, 3, '#3f7fb0'); for (let x = 0; x < W; x += 46) R(x, 112, 1, 34, '#244a6e'); R(0, 146, W, 70, '#8d939a'); R(0, 146, W, 2, '#6a7075'); R(0, 200, W, 3, '#f2d35a');
-  R(190, 28, 3, 118, '#9aa0a6');   // the pole
-}
-function seated(x, top, o) { person(x, top, { ...o, sit: true }); R(x - 26, 146, 52, 24, '#8d939a'); R(x - 26, 146, 52, 2, '#6a7075'); }
-function drawSubway(u) {
-  const speed = u < 4 ? 120 : u < 5.2 ? 120 * (1 - ease((u - 4) / 1.2)) : 0, sc = u < 4 ? u * 120 : 4 * 120 + 120 * 1.2 * 0.5, doors = u >= 5.4;
-  const sw = speed > 0 ? Math.round(Math.sin(u * 7)) : 0;
-  subwayCar(u, speed, sc, doors);
-  // passengers, seated: an old man asleep under his cap, a student with earbuds nodding, a worker in a vest, a grandmother with her bags
-  seated(40, 120 + sw, { coat: '#4a3a2e', pants: '#3a3f45', cap: '#2b2e31', asleep: true, grey: true, bob: Math.round(Math.sin(u * 1.3)) });
-  seated(120, 120 + sw, { coat: '#2f4f58', hair: '#1e1a1a', earbuds: true, phone: true, bob: (Math.floor(u / 0.43) % 2) });
-  seated(270, 120 + sw, { coat: '#6b7073', vest: '#f07a2a', cap: '#2c3b57', asleep: true });
-  const gx = u > 6.2 ? Math.round(lerp(150, -30, clamp((u - 6.2) / 3.4, 0, 1))) : 150;
-  if (u <= 6.2) seated(150, 122 + sw, { coat: '#8a3a4a', pants: '#3a3f45', grey: true, hair: '#c9c2b0', bag: '#2f6f4a', bob: 0 });
-  else person(gx, 96, { coat: '#8a3a4a', pants: '#3a3f45', grey: true, hair: '#c9c2b0', bag: '#2f6f4a', step: Math.floor(u / 0.24) % 2 });
-  // 신입 asleep, slumped
-  g.save(); g.translate(0, 26 + Math.round(Math.sin(u * 1.5) * 1)); drawPlayer(0, 0); R(PLAYER_X + 6, 102, 2, 3, '#e07070'); R(PLAYER_X - 8, 102, 2, 3, '#e07070'); R(PLAYER_X - 4, 101, 3, 1, C.ink); g.restore();
-  R(PLAYER_X - 26, 146, 52, 24, '#8d939a'); R(PLAYER_X - 26, 146, 52, 2, '#6a7075'); zzz(PLAYER_X + 12, 112, u * 1000);
-  // 하은: standing by the pole, then stepping off
-  const leave = u > 5.8, hx = leave ? Math.round(lerp(210, -30, clamp((u - 5.8) / 2.6, 0, 1))) : 210;
-  drawHaeunAt(hx, 70 + (leave ? (Math.floor(u / 0.16) % 2) : 0), 0, leave ? { step: Math.floor(u / 0.16) % 2 } : { load: true });
-  if (!leave) { thick(hx - 6, 92, hx - 2 + sw, 44, 4, '#1e1a1a'); R(hx - 4 + sw, 42, 4, 4, '#2a2d31'); }
-  R(hx + 6, 104, 12, 14, '#3a3f45'); R(hx + 7, 100, 10, 5, '#2a2d31');
-  // the platform seen through the doorway when they open (left side), with a cleaner and a nurse walking in
-  if (doors) {
-    const a = clamp((u - 5.4) / 0.6, 0, 1); g.save(); g.globalAlpha = a; R(0, 28, 60, 118, '#cfd6d2'); for (let yy = 30; yy < 146; yy += 8) for (let xx = 0; xx < 60; xx += 12) R(xx, yy, 11, 7, (xx + yy) % 3 ? '#dfe6e2' : '#d2dad6'); R(0, 146, 60, 24, '#b9c4c0');
-    person(20, 90, { coat: '#5a8a6a', pants: '#3a3f45', apron: '#2f6f4a', grey: true, hair: '#c9c2b0', step: Math.floor(u / 0.5) % 2, mirror: true }); cart(28, 150, '#8fb0a0');
-    g.restore();
-  }
-  say(u, 1.4, 4.4, '…이제 내려요.', 150, 50, 62, { bg: '#d9d0bd' });
-  say(u, 2.6, 5, 'zZ…', 352, 96, 24, { size: 6 });
-  if (u >= 5.2) cue('sub-door', () => { SND.chime(); SND.door(); });
-  if (u > 5.2) { const a = clamp((u - 5.2) / 0.5, 0, 1) * 0.35; g.fillStyle = `rgba(255,236,200,${a * (u > 9.6 ? 1 - (u - 9.6) / 0.6 : 1)})`; g.fillRect(0, 28, 60, 120); }
-  hud('첫차 · 05:12', '');
-  cue('sub-rumble', () => rollerOn(true, 0.07)); if (u > 5) cue('sub-stop', () => rollerOn(false));
-  fadeBlack(u > 10.5 ? Math.min(1, (u - 10.5) / 1.2) : 0);
-}
-// ---------- 4. 걷기: 새벽 거리 ----------
-// three layers: far buildings, the shopfronts and lamps, the sidewalk with people. A cleaner sweeping, a convenience store with its
-// clerk, a delivery scooter and a bus passing, a crosswalk she waits at with a worker, an old woman with a cart of cardboard, a jogger,
-// pigeons, steam from a manhole, and the hospital at the end.
-const STREET = 7 * W;
-const WALK_STOP = { at: 1480, wait: 4 };   // she waits at the crosswalk (street x) for a few seconds
-function walkScroll(u, dur) {
-  const v = (STREET - W) / (dur - WALK_STOP.wait - 2), tStop = (WALK_STOP.at - 150) / v;
-  if (u < tStop) return { sc: u * v, waiting: false, v };
-  if (u < tStop + WALK_STOP.wait) return { sc: tStop * v, waiting: true, v };
-  return { sc: Math.min(STREET - W, tStop * v + (u - tStop - WALK_STOP.wait) * v), waiting: false, v };
-}
-function drawWalk(u, dur) {
-  const dawn = clamp(u / dur, 0, 1), { sc: scroll, waiting, v } = walkScroll(u, dur);
-  const sky = g.createLinearGradient(0, 0, 0, 150); sky.addColorStop(0, mix('#1a2440', '#5a7aa8', dawn)); sky.addColorStop(0.6, mix('#3a4a70', '#9ab4d0', dawn)); sky.addColorStop(1, mix('#c97a4a', '#ffd8a0', dawn)); g.fillStyle = sky; g.fillRect(0, 0, W, 150);
-  g.globalAlpha = 1 - dawn; for (let k = 0; k < 14; k++) R((k * 53) % W, (k * 29) % 70, 1, 1, '#ffffff'); g.globalAlpha = 1;
-  // far layer, half speed
-  g.save(); g.translate(-Math.round(scroll * 0.5), 0);
-  const BLD = [[0, 60, 80], [70, 40, 60], [120, 70, 96], [200, 50, 70], [262, 60, 50], [340, 80, 88], [440, 50, 64], [500, 90, 100], [610, 60, 56], [690, 70, 80], [780, 40, 60], [840, 90, 92], [950, 60, 70], [1040, 70, 84], [1130, 50, 60], [1200, 90, 96], [1310, 60, 72], [1390, 80, 58]];
-  for (const [x, w, h] of BLD) { R(x, 150 - h, w, h, mix('#2a3350', '#6a7a98', dawn)); for (let y = 150 - h + 8; y < 142; y += 12) for (let xx = x + 6; xx < x + w - 6; xx += 12) if ((xx + y) % 5 === 0) R(xx, y, 4, 5, '#ffd890'); }
+// ---------- 하은의 밤: 컷과 클로즈업 ----------
+// The second half is cut like a film: one idea per shot, the camera moves (zoom, pan) instead of the world scrolling, black bars on,
+// and the beat motif carries from shot to shot: belt slats -> tunnel lights -> the crossing's beeps and stripes -> seven corridor lamps
+// -> the ECG. People appear only where the story needs them.
+let silC = null;
+function silhouette(draw, dark) { if (!silC) { silC = document.createElement('canvas'); silC.width = W; silC.height = H; } const o = silC.getContext('2d'), g0 = g; o.clearRect(0, 0, W, H); g = o; draw(); g.globalCompositeOperation = 'source-atop'; g.fillStyle = `rgba(16,18,26,${dark})`; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over'; g = g0; g.drawImage(silC, 0, 0); }
+function letterbox() { R(0, 0, W, 22, '#000'); R(0, H - 22, W, 22, '#000'); }
+function cam(zoom, cx, cy) { g.translate(W / 2, H / 2); g.scale(zoom, zoom); g.translate(-cx, -cy); }
+function sitPlayer(x, tilt, floorY = 146, floorC = '#8d939a') { g.save(); g.translate(x, floorY); g.rotate(tilt); g.translate(-PLAYER_X, -floorY); g.translate(0, floorY - 132); drawPlayer(0, 0); R(PLAYER_X + 6, 102, 2, 3, '#e07070'); R(PLAYER_X - 8, 102, 2, 3, '#e07070'); R(PLAYER_X - 4, 101, 3, 1, C.ink); g.restore(); R(x - 30, floorY, 60, 30, floorC); }
+// 1. the window: 신입 asleep on her shoulder, her face in the dark glass, the tunnel lights slowing; the next stop is read in the
+//    reflection; she eases his head off her shoulder and stands
+function drawTrainClose(u) {
+  const speed = u < 5 ? 1 : Math.max(0, 1 - (u - 5) / 3), sc = u < 5 ? u * 140 : 5 * 140 + 140 * 3 * (1 - Math.pow(1 - Math.min(1, (u - 5) / 3), 2)) / 2;
+  g.save(); cam(1.6, 288, 110);
+  R(0, 0, W, H, '#d9dde3'); R(0, 0, W, 26, '#c3c8d0');
+  R(200, 34, 184, 56, '#06070c'); for (let j = 0; j < 7; j++) { const sx = 200 + ((j * 47 - sc) % 230 + 230) % 230 - 20; R(sx, 44 + (j % 3) * 14, 16 + speed * 14, 2, j % 2 ? '#ffd890' : '#8fb8e0'); }
+  R(198, 32, 188, 2, '#8d939a'); R(198, 90, 188, 2, '#8d939a');
+  R(0, 110, W, 36, '#2f5f8a'); R(0, 110, W, 3, '#3f7fb0'); for (let x = 0; x < W; x += 46) R(x, 112, 1, 34, '#244a6e'); R(0, 146, W, 70, '#8d939a'); R(0, 146, W, 2, '#6a7075');
+  // her reflection in the glass, faint, looking back at her; the announcement comes up in the glass
+  g.save(); g.beginPath(); g.rect(200, 34, 184, 56); g.clip(); g.globalAlpha = 0.22; g.translate(2 * 262, 0); g.scale(-1, 1); drawHaeunAt(262, 40, 0, { load: true, bob: 0 }); g.restore();
+  if (u > 2.5) { const n = Math.min(14, Math.floor((u - 2.5) * 9)); text('다음은 ○○대학병원'.slice(0, n), 300, 78, `rgba(255,255,255,${0.7 * Math.min(1, (u - 2.5))})`, 7, 'center'); if (u > 2.5 && u < 2.7) cue('ann', SND.chime); }
+  // she sits; he leans on her shoulder, then is eased off against the pole; then she stands and moves to the door
+  const tilt = u < 6 ? -0.26 : lerp(-0.26, 0.1, ease((u - 6) / 1.6));
+  if (u < 7.6) { drawHaeunAt(262, 108, 0, { load: true, bob: 0 }); R(236, 146, 52, 30, '#8d939a'); thick(268, 130, 284, 124, 4, '#1e1a1a'); R(283, 121, 4, 4, '#2a2d31'); }
+  sitPlayer(312, tilt);
+  if (u >= 7.6) { const p = ease((u - 7.6) / 1.2); drawHaeunAt(262 - Math.round(p * 30), Math.round(lerp(108, 72, p)), 0, p < 1 ? { step: Math.floor(u / 0.2) % 2 } : { load: true, bob: 0 }); }
+  R(338, 110, 3, 40, '#9aa0a6');
+  if (u >= 6 && u < 6.2) cue('ease', () => noiseS(now(), 'lowpass', 400, 0.08, 0.3));
   g.restore();
-  // mid layer: shopfronts, lamps, the crosswalk signal, the hospital
-  g.save(); g.translate(-Math.round(scroll), 0);
-  R(0, 110, STREET, 40, mix('#2f3550', '#8a96b0', dawn));
-  // a convenience store
-  const cs = 560; R(cs, 90, 110, 60, '#1a1f2e'); R(cs + 4, 94, 102, 52, '#fff3c8'); R(cs, 84, 110, 8, '#2f6f4a'); R(cs + 4, 85, 50, 6, '#ffffff'); text('24 MART', cs + 29, 85, '#2f6f4a', 5, 'center', true); for (let k = 0; k < 4; k++) R(cs + 10 + k * 24, 100, 18, 40, '#dfe6ea'); R(cs + 70, 120, 30, 26, '#9fb8c8');
-  person(cs + 84, 92, { coat: '#2f6f4a', pants: '#3a3f45', cap: '#2f6f4a', sit: true, bob: 0 }); R(cs + 64, 128, 44, 22, '#1a1f2e');
-  // a closed shutter shop, a pharmacy
-  R(300, 96, 70, 54, '#3a3d44'); for (let yy = 100; yy < 150; yy += 6) R(302, yy, 66, 2, '#4a4d54'); R(300, 90, 70, 6, '#8a3a2a');
-  R(900, 92, 80, 58, '#dfe6ea'); R(900, 86, 80, 6, '#2f8a5a'); text('약국', 940, 86, '#ffffff', 5, 'center', true); R(910, 100, 60, 44, '#1e2a33');
-  // bus stop
-  R(1200, 96, 3, 54, '#2b2e31'); R(1180, 94, 44, 4, '#2b2e31'); R(1184, 98, 36, 20, '#9fd0ff'); R(1186, 118, 32, 2, '#2b2e31'); R(1180, 128, 44, 3, '#2b2e31');
-  // the crosswalk with its signal
-  const csx = WALK_STOP.at;
-  R(csx + 34, 96, 3, 54, '#2b2e31'); R(csx + 30, 84, 11, 16, '#2b2e31'); R(csx + 32, 86, 7, 5, waiting ? '#ff4a3d' : '#5a2b27'); R(csx + 32, 93, 7, 5, waiting ? '#2a4a2a' : '#8fd694');
-  // the hospital at the end
-  const hx = STREET - 84; R(hx, 40, 84, 110, '#dfe6ea'); R(hx, 40, 84, 3, '#b9c4c8'); for (let y = 52; y < 140; y += 14) for (let x = hx + 8; x < hx + 80; x += 14) R(x, y, 8, 9, (x + y) % 3 ? '#2f3a4a' : '#ffe9a8');
-  R(hx + 36, 20, 12, 30, '#d8463b'); R(hx + 27, 29, 30, 12, '#d8463b'); text('○○대학병원', hx + 42, 56, '#1b1716', 6, 'center', true);
-  R(0, 150, STREET, 66, '#3a3a40'); R(0, 150, STREET, 2, '#6a6a70'); for (let x = 0; x < STREET; x += 28) if (Math.abs(x - csx) > 40) R(x, 182, 16, 3, '#9a9a90');
-  for (let k = 0; k < 6; k++) R(csx - 28 + k * 10, 154, 6, 58, '#d9d4c6');
-  for (let x = 30; x < STREET; x += 110) { R(x, 96, 3, 54, '#2b2e31'); R(x - 6, 92, 15, 5, '#3a3d44'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x + 1, 98, 2, x + 1, 120, 50); gr.addColorStop(0, `rgba(255,200,120,${0.3 * (1 - dawn * 0.7)})`); gr.addColorStop(1, 'rgba(255,200,120,0)'); g.fillStyle = gr; g.fillRect(x - 50, 90, 100, 80); g.restore(); }
-  // a manhole with steam
-  R(400, 152, 20, 3, '#2b2e31'); for (let k = 0; k < 4; k++) { const p = ((u * 0.3 + k * 0.25) % 1); g.fillStyle = `rgba(230,230,240,${0.25 * (1 - p)})`; g.beginPath(); g.ellipse(410 + Math.sin(k * 2 + u) * 4, 150 - p * 40, 6 + p * 8, 3 + p * 3, 0, 0, Math.PI * 2); g.fill(); }
-  // people in the world (street x): a cleaner sweeping, a grandmother pushing a cart of cardboard, pigeons, a man waiting at the stop
-  person(240, 94, { coat: '#5a8a6a', pants: '#3a3f45', apron: '#2f6f4a', grey: true, hair: '#c9c2b0', step: Math.floor(u / 0.5) % 2 }); R(226, 110, 2, 40, '#8a6a3a'); R(220, 148, 12, 4, '#c9b48a');
-  person(1230, 94, { coat: '#2f4f58', pants: '#3a3f45', vest: '#cfe04a', phone: true, bob: 0 });
-  const gcx = 760 - u * 6; person(gcx, 98, { coat: '#6b4a5a', pants: '#3a3f45', grey: true, hair: '#c9c2b0', step: Math.floor(u / 0.6) % 2, mirror: true }); R(gcx - 40, 128, 30, 22, '#c9b48a'); R(gcx - 42, 126, 34, 3, '#8a6a3a'); R(gcx - 38, 150, 4, 4, '#2b2e31'); R(gcx - 16, 150, 4, 4, '#2b2e31'); for (let k = 0; k < 3; k++) R(gcx - 38 + k * 9, 118 - k * 3, 10, 10 + k * 3, '#b8a57a');
-  for (let k = 0; k < 4; k++) { const px = 1000 + k * 14 + Math.sin(u * 2 + k) * 2; R(px, 146, 5, 4, '#6a7075'); R(px + 4, 144, 3, 3, '#6a7075'); }
-  // a worker waits at the crosswalk with her
-  person(csx - 24, 94, { coat: '#6b7073', pants: '#3a3f45', vest: '#f07a2a', cap: '#2c3b57', step: waiting ? null : Math.floor(u / 0.22) % 2, bob: waiting ? 0 : 0 });
-  g.restore();
-  // moving traffic on the road (screen space): a scooter early, a bus later, a jogger the other way
-  const sct = u - 6; if (sct > 0 && sct < 4) { const x = -40 + sct * 140; R(x, 160, 26, 10, '#d8463b'); R(x + 22, 152, 6, 10, '#2b2e31'); R(x - 2, 150, 14, 12, '#2f6f4a'); person(x + 10, 118, { coat: '#2f4f58', cap: '#d8463b', sit: true }); g.fillStyle = '#1b1716'; g.beginPath(); g.arc(x + 2, 172, 5, 0, Math.PI * 2); g.arc(x + 24, 172, 5, 0, Math.PI * 2); g.fill(); if (sct < 0.1) cue('scooter', () => noiseS(now(), 'bandpass', 900, 0.08, 1.2, 1.5)); }
-  const bt = u - 19; if (bt > 0 && bt < 6) { const x = W + 20 - bt * 90; R(x, 148, 110, 32, '#2f6f8a'); R(x, 148, 110, 4, '#9fd0ff'); for (let k = 0; k < 5; k++) R(x + 6 + k * 21, 154, 16, 12, '#ffe9a8'); R(x + 10, 170, 90, 3, '#1b1716'); g.fillStyle = '#1b1716'; g.beginPath(); g.arc(x + 18, 182, 6, 0, Math.PI * 2); g.arc(x + 92, 182, 6, 0, Math.PI * 2); g.fill(); if (bt < 0.1) cue('bus', () => noiseS(now(), 'lowpass', 300, 0.15, 2.5, 0.7)); }
-  const jt = u - 11; if (jt > 0 && jt < 5) { const x = W + 10 - jt * 110; person(x, 94, { coat: '#d8463b', pants: '#2b2e31', hair: '#3a2a20', step: Math.floor(u / 0.14) % 2, mirror: true, earbuds: true, bob: Math.floor(u / 0.14) % 2 ? -1 : 0 }); }
-  // 하은 walking in place (the street moves), or waiting at the light and looking at her watch
-  const wx = 150; const stp = waiting ? null : Math.floor(u / 0.18) % 2;
-  drawHaeunAt(wx, 94 + (stp ? 0 : 1), 0, waiting ? { mirror: true, watch: u % 4 > 2 } : { step: stp, mirror: true }); R(wx - 10, 128, 12, 14, '#3a3f45');
-  const near = Math.min(...Array.from({ length: 26 }, (_, i) => Math.abs(30 + i * 110 - scroll - wx))); const lit = clamp(1 - near / 60, 0, 1) * (1 - dawn * 0.6);
-  if (lit > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,200,120,${0.18 * lit})`; g.fillRect(wx - 14, 88, 30, 60); g.restore(); }
-  if (waiting) { const k = Math.floor(u * 2) % 2; if (k) cue('xw' + Math.floor(u * 2), () => oscS('sine', 1200, now(), 0.03, 0.08)); }
-  for (let k = 0; k < 40; k++) { const st = 0.3 + k * 0.36; if (u >= st && !waiting && st < dur - 1) cue('wstep' + k, () => noiseS(now(), 'lowpass', 500, 0.05, 0.06)); }
-  cue('walk-quiet', () => rollerOn(false));
-  fadeBlack(u < 0.6 ? 1 - u / 0.6 : u > dur - 0.7 ? (u - (dur - 0.7)) / 0.7 : 0);
+  letterbox();
+  cue('tc-rumble', () => rollerOn(true, 0.08)); if (u > 7.5) cue('tc-stop', () => rollerOn(false));
+  fadeBlack(u < 0.8 ? 1 - u / 0.8 : 0);
 }
-// ---------- 5. 병원 입구 ----------
-// the lobby: sliding doors with an ambulance outside, a security guard, a reception desk with a night nurse, a man asleep across the
-// chairs, a patient in a wheelchair with a caregiver, a vending machine. The doctor comes over to 하은.
+// 2. the door from the platform: it opens, she steps out, the door closes on the sleeping 신입, the train leaves, she is alone
+function drawDoorOut(u) {
+  const open = clamp((u - 0.6) / 1.2, 0, 1) * (u < 4.6 ? 1 : 1 - clamp((u - 4.6) / 1.2, 0, 1)), gone = clamp((u - 6.2) / 2.2, 0, 1);
+  const zoom = u > 8 ? lerp(1.5, 1, ease((u - 8) / 2)) : 1.5;
+  g.save(); cam(zoom, 192, 120);
+  // platform: wall tiles, the station sign, a clock
+  R(0, 0, W, H, '#cfd6d2'); for (let yy = 0; yy < 150; yy += 8) for (let xx = 0; xx < W; xx += 12) R(xx, yy, 11, 7, (xx + yy) % 3 ? '#dfe6e2' : '#d2dad6');
+  R(120, 40, 144, 30, '#1e2a33'); R(124, 44, 136, 22, '#2f3a4a'); text('○○대학병원', 192, 49, '#ffffff', 9, 'center', true); R(124, 66, 136, 2, '#8fd694');
+  R(300, 36, 40, 14, '#1b1716'); text('05:14', 320, 38, '#8fd694', 7, 'center');
+  R(0, 150, W, 66, '#b9c4c0'); R(0, 150, W, 3, '#f2d35a');
+  // the train, sliding away to the right once the doors shut
+  const tx = Math.round(gone * gone * 420);
+  g.save(); g.translate(tx, 0);
+  R(-20, 20, W + 40, 136, '#d9dde3'); R(-20, 20, W + 40, 6, '#9aa0a8'); R(-20, 150, W + 40, 6, '#6a7075');
+  for (const x of [20, 300]) { R(x, 40, 60, 40, '#0a0c12'); R(x - 2, 38, 64, 2, '#8d939a'); }
+  // the doorway and what is inside: 신입 asleep against the pole
+  R(130, 36, 124, 116, '#9aa0a6'); R(134, 40, 116, 112, '#2f5f8a'); R(134, 40, 116, 60, '#1a2440'); R(134, 100, 116, 52, '#2f5f8a'); R(134, 134, 116, 18, '#8d939a');
+  sitPlayer(226, 0.1, 134, '#8d939a'); R(176, 40, 3, 112, '#9aa0a6');
+  // the two door panels
+  const dw = 58 * (1 - open); R(134, 40, dw, 112, '#dfe6ea'); R(134 + 8, 48, Math.max(0, dw - 16), 40, '#0a0c12'); R(250 - dw, 40, dw, 112, '#dfe6ea'); R(250 - dw + 8, 48, Math.max(0, dw - 16), 40, '#0a0c12');
+  g.restore();
+  // 하은 stepping out, then standing on the platform as the train pulls away
+  const out = clamp((u - 1.8) / 2.2, 0, 1), hx = Math.round(lerp(192, 120, ease(out))), hy = Math.round(lerp(88, 96, ease(out)));
+  if (u > 1.6) drawHaeunAt(hx, hy, 0, out < 1 ? { step: Math.floor(u / 0.18) % 2 } : (u > 7 ? { load: true, watch: u > 8.4 } : { load: true }));
+  if (u > 1.6) R(hx + 6, hy + 34, 12, 14, '#3a3f45');
+  g.restore();
+  letterbox();
+  if (u >= 0.6) cue('d-open', () => { SND.chime(); SND.door(); }); if (u >= 4.6) cue('d-close', SND.door); if (u >= 6.2) cue('d-go', () => { rollerOn(true, 0.07); setTimeout(() => rollerOn(false), 2200); });
+  fadeBlack(u > 9.3 ? (u - 9.3) / 0.7 : 0);
+}
+// 3. the stairs: her silhouette climbing out of the station into a pale sky, birds
+function drawStairs(u) {
+  const sky = g.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#5a7aa8'); sky.addColorStop(0.55, '#c9a0a8'); sky.addColorStop(1, '#ffd8a0'); g.fillStyle = sky; g.fillRect(0, 0, W, H);
+  for (let k = 0; k < 3; k++) { const bx = 120 + k * 70 + u * 12, by = 50 + k * 14 - u * 6, f = Math.floor(u * 6 + k) % 2 ? 2 : 0; R(bx, by, 3, 1, '#2a2a30'); R(bx + 3, by - f, 3, 1, '#2a2a30'); R(bx - 3, by - f, 3, 1, '#2a2a30'); }
+  // the stairwell: dark walls either side, steps rising to the light
+  R(0, 0, 70, H, '#1a1b22'); R(314, 0, 70, H, '#1a1b22');
+  for (let k = 0; k < 9; k++) { const y = 70 + k * 16; R(70, y, 244, 16, k % 2 ? '#2a2b33' : '#242530'); R(70, y, 244, 2, '#3a3b44'); }
+  R(70, 0, 244, 70, 'rgba(26,27,34,0)');
+  // her silhouette, climbing
+  const p = clamp(u / 5, 0, 1), sx = 192, sy = Math.round(lerp(150, 46, p));
+  silhouette(() => { drawHaeunAt(sx, sy, 0, { step: Math.floor(u / 0.26) % 2, mirror: true }); R(sx - 10, sy + 34, 12, 14, '#3a3f45'); }, 0.85 - p * 0.3);
+  letterbox();
+  if (u > 0.5) cue('birds', () => { [2600, 3100, 2800, 3300].forEach((f, i) => oscS('sine', f, now() + 0.4 + i * 0.15, 0.03, 0.12, f * 1.2)); });
+  for (let k = 0; k < 12; k++) { const st = 0.2 + k * 0.52; if (u >= st) cue('sstep' + k, () => noiseS(now(), 'lowpass', 600, 0.05, 0.08)); }
+  fadeBlack(u < 0.5 ? 1 - u / 0.5 : u > 5.4 ? (u - 5.4) / 0.6 : 0);
+}
+// 4. the last streetlight: one lamp over the sidewalk, she walks under it, it buzzes and goes out as the sky comes up behind her
+function drawLamp(u) {
+  const dawn = clamp(u / 8, 0, 1);
+  const sky = g.createLinearGradient(0, 0, 0, 150); sky.addColorStop(0, mix('#2a3658', '#7a9ac8', dawn)); sky.addColorStop(1, mix('#c97a4a', '#ffe2b0', dawn)); g.fillStyle = sky; g.fillRect(0, 0, W, 150);
+  for (const [x, w, h] of [[0, 90, 60], [100, 60, 84], [170, 110, 50], [290, 94, 72]]) R(x, 150 - h, w, h, mix('#2a3350', '#8a98b8', dawn));
+  R(0, 150, W, 66, '#3a3a40'); R(0, 150, W, 2, '#6a6a70');
+  const off = u > 4.2, flick = u > 3.4 && u < 4.2 && Math.floor(u * 14) % 3 === 0;
+  const lampOn = !off && !flick;
+  R(190, 60, 4, 90, '#2b2e31'); R(184, 54, 16, 7, '#3a3d44'); R(188, 61, 8, 2, lampOn ? '#ffd890' : '#3a3d44');
+  if (lampOn) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(192, 62, 2, 192, 110, 90); gr.addColorStop(0, 'rgba(255,200,120,.45)'); gr.addColorStop(1, 'rgba(255,200,120,0)'); g.fillStyle = gr; g.fillRect(100, 56, 184, 120); g.restore(); }
+  const hx = Math.round(lerp(-20, 404, u / 8)); drawHaeunAt(hx, 94 + (Math.floor(u / 0.18) % 2 ? 0 : 1), 0, { step: Math.floor(u / 0.18) % 2, mirror: true }); R(hx - 10, 128, 12, 14, '#3a3f45');
+  if (lampOn && Math.abs(hx - 192) < 50) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(255,200,120,.2)'; g.fillRect(hx - 14, 88, 30, 60); g.restore(); }
+  // her shadow stretching away from the lamp
+  if (lampOn) { g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(hx + (hx - 192) * 0.4, 150, 14 + Math.abs(hx - 192) * 0.2, 3, 0, 0, Math.PI * 2); g.fill(); }
+  if (u >= 3.4) cue('buzz', () => { const o = oscS('sawtooth', 120, now(), 0.025, 0.8); }); if (u >= 4.2) cue('lampoff', () => noiseS(now(), 'highpass', 4000, 0.05, 0.05));
+  for (let k = 0; k < 24; k++) { const st = 0.2 + k * 0.36; if (u >= st) cue('lstep' + k, () => noiseS(now(), 'lowpass', 500, 0.05, 0.06)); }
+  letterbox();
+  fadeBlack(u < 0.5 ? 1 - u / 0.5 : u > 7.5 ? (u - 7.5) / 0.5 : 0);
+}
+// 5. the crossing: seen from above the stripes, the green man beeping; she crosses in time, each stripe lighting under her step
+function drawCross(u) {
+  R(0, 0, W, H, '#3a3a40'); for (let k = 0; k < 9; k++) R(40 + k * 36, 40, 20, 136, '#d9d4c6');
+  R(0, 0, W, 40, '#2a2a30'); R(0, 176, W, 40, '#2a2a30'); R(0, 40, W, 2, '#6a6a70'); R(0, 174, W, 2, '#6a6a70');
+  // the signal in the corner, green man blinking on the beat
+  const beat = 0.5, on = Math.floor(u / beat) % 2 === 0, late = u > 5.5;
+  R(330, 8, 44, 26, '#1b1716'); R(334, 12, 16, 18, late && !on ? '#0d2a16' : '#8fd694'); R(354, 12, 16, 18, '#2a0f0f'); text('' + Math.max(0, 9 - Math.floor(u)), 362, 15, '#ff8a3d', 9, 'center', true);
+  // the stripe under her lights as she steps on it, the beat motif
+  const hx = Math.round(lerp(10, 374, u / 8)), stepI = Math.floor(u / 0.36) % 2;
+  const stripe = Math.round((hx - 40) / 36); if (stripe >= 0 && stripe < 9 && Math.abs(hx - (50 + stripe * 36)) < 12) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(255,233,168,.35)'; g.fillRect(40 + stripe * 36, 40, 20, 136); g.restore(); }
+  drawHaeunAt(hx, 84 + (stepI ? 0 : 1), 0, { step: stepI, mirror: true }); R(hx - 10, 118, 12, 14, '#3a3f45');
+  g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(hx + 2, 142, 12, 3, 0, 0, Math.PI * 2); g.fill();
+  for (let k = 0; k < 18; k++) { const st = k * beat; if (u >= st && (k % 2 === 0 || late)) cue('beep' + k, () => oscS('sine', late ? 1500 : 1200, now(), 0.04, 0.07)); }
+  for (let k = 0; k < 24; k++) { const st = 0.1 + k * 0.36; if (u >= st) cue('cstep' + k, () => noiseS(now(), 'lowpass', 500, 0.05, 0.06)); }
+  letterbox();
+  fadeBlack(u < 0.4 ? 1 - u / 0.4 : u > 7.5 ? (u - 7.5) / 0.5 : 0);
+}
+// 6. the puddle: the red cross upside down in the water, her shoe breaks it, then the camera tilts up to the real sign
+function drawPuddle(u) {
+  const tilt = clamp((u - 3.2) / 2, 0, 1);
+  g.save(); g.translate(0, Math.round(ease(tilt) * 150));
+  // the world: hospital wall and its cross above, the pavement with a puddle below (drawn in one tall canvas space)
+  R(0, -150, W, 150, '#dfe6ea'); for (let y = -140; y < -20; y += 14) for (let x = 30; x < 360; x += 14) R(x, y, 8, 9, (x + y) % 3 ? '#2f3a4a' : '#ffe9a8'); R(170, -140, 44, 110, '#dfe6ea'); R(186, -130, 12, 60, '#d8463b'); R(168, -112, 48, 20, '#d8463b'); text('○○대학병원', 192, -46, '#1b1716', 8, 'center', true);
+  R(0, 0, W, 216, '#3a3a40'); R(0, 0, W, 2, '#6a6a70');
+  g.fillStyle = '#1e2a3a'; g.beginPath(); g.ellipse(192, 110, 120, 48, 0, 0, Math.PI * 2); g.fill();
+  g.save(); g.beginPath(); g.ellipse(192, 110, 120, 48, 0, 0, Math.PI * 2); g.clip(); g.globalAlpha = 0.5; const wob = Math.round(Math.sin(u * 3) * 2); R(186 + wob, 84, 12, 52, '#d8463b'); R(168 + wob, 100, 48, 18, '#d8463b'); g.globalAlpha = 0.25; for (let k = 0; k < 6; k++) R(130 + k * 22, 70 + (k % 2) * 60, 10, 2, '#ffe9a8'); g.restore();
+  const step = u > 1.6 && u < 3.2; const rip = (t0) => { const a = u - t0; if (a < 0 || a > 1.4) return; g.strokeStyle = `rgba(200,225,255,${0.7 * (1 - a / 1.4)})`; g.lineWidth = 1; g.beginPath(); g.ellipse(192, 118, 6 + a * 60, (6 + a * 60) * 0.4, 0, 0, Math.PI * 2); g.stroke(); };
+  rip(1.6); rip(2.4);
+  if (step) { R(176, 96, 14, 22, '#1e1a1a'); R(174, 114, 18, 6, '#1e1a1a'); } if (u >= 1.6) cue('splash', () => noiseS(now(), 'bandpass', 1400, 0.1, 0.18, 1));
+  g.restore();
+  letterbox();
+  fadeBlack(u < 0.4 ? 1 - u / 0.4 : u > 5.5 ? (u - 5.5) / 0.5 : 0);
+}
 function drawDoctorAt(cx, top, nod) {
   R(cx - 5, top + 38, 5, 16, '#3a3f45'); R(cx + 2, top + 38, 5, 16, '#3a3f45'); R(cx - 6, top + 53, 6, 3, '#1e1a1a'); R(cx + 2, top + 53, 6, 3, '#1e1a1a');
   R(cx - 8, top + 16, 16, 24, '#f7f7f2'); R(cx - 3, top + 16, 6, 12, '#2b2e31'); R(cx - 8, top + 16, 2, 24, '#dfe6ea'); R(cx + 6, top + 16, 2, 24, '#dfe6ea');
@@ -709,67 +717,59 @@ function drawDoctorAt(cx, top, nod) {
   thick(cx + 6, top + 22, cx + 14, top + 34, 4, '#f7f7f2'); R(cx + 11, top + 28, 10, 13, '#c9b48a'); R(cx + 12, top + 30, 8, 1, '#1b1716'); R(cx + 12, top + 33, 6, 1, '#1b1716'); R(cx + 12, top + 36, 7, 1, '#1b1716');
   thick(cx - 6, top + 22, cx - 10, top + 36, 4, '#f7f7f2'); R(cx - 12, top + 35, 4, 4, C.skin);
 }
-function hospitalLobby(u) {
-  R(0, 0, W, H, '#e4ece6'); R(0, 0, W, 24, '#c9d6cc'); R(0, 150, W, 66, '#c9cfc9'); R(0, 150, W, 2, '#8a948c'); R(0, 100, W, 3, '#8fb0a0');
-  R(0, 4, W, 14, '#dfe6ea'); for (let x = 30; x < W; x += 140) R(x, 6, 36, 10, '#fff3c8');
-  // sliding doors and the street outside with the ambulance
-  R(20, 36, 110, 114, '#9aa0a6'); R(24, 40, 102, 110, '#1a2440'); for (let k = 0; k < 6; k++) R(28 + (k * 31) % 90, 50 + (k * 17) % 50, 3, 2, '#ffd890');
-  R(30, 92, 70, 40, '#f7f7f2'); R(30, 88, 70, 6, '#d8463b'); R(36, 98, 20, 14, '#9fd0ff'); R(80, 100, 16, 10, '#d8463b'); R(62, 104, 10, 10, '#d8463b'); R(66, 100, 2, 18, '#d8463b'); g.fillStyle = (u * 3) % 1 < 0.5 ? '#ff4a3d' : '#5ad7e8'; g.fillRect(44, 84, 6, 4); R(34, 132, 8, 6, '#1b1716'); R(88, 132, 8, 6, '#1b1716');
-  R(74, 40, 2, 110, '#dfe6ea'); R(24, 94, 102, 1, '#dfe6ea');
-  // reception
-  R(250, 96, 120, 54, '#b9c9bd'); R(250, 94, 120, 4, '#dfe6ea'); R(256, 70, 108, 6, '#2f8a5a'); text('접수 · 야간', 310, 70, '#ffffff', 5, 'center', true);
-  person(300, 50, { coat: '#f7f7f2', pants: '#dfe6ea', hair: '#3a2a20', longHair: true, cap: '#f7f7f2', sit: true, mask: true, bob: Math.floor(u / 0.9) % 2 ? 1 : 0 }); R(280, 100, 40, 12, '#b9c9bd');
-  R(318, 80, 14, 10, '#1b1716'); R(319, 81, 12, 8, '#5ad7e8');
-  // chairs with a man asleep across them, the wheelchair pair, the vending machine
-  for (let k = 0; k < 4; k++) R(150 + k * 22, 126, 18, 24, '#2f6f8a'); R(150, 122, 84, 4, '#3f7fb0');
-  person(176, 96, { coat: '#4a3a2e', pants: '#3a3f45', asleep: true, sit: true, cap: '#2b2e31' }); R(190, 112, 30, 10, '#4a3a2e'); R(150, 136, 84, 14, '#c9cfc9');
-  R(372, 60, 12, 90, '#8a2f2a'); R(374, 66, 8, 40, '#f1d58b');
-  // the wheelchair pair, rolling slowly across the back
-  const wcx = 336 - u * 2; wheelchair(wcx, 150); person(wcx + 2, 102, { coat: '#9fb8c8', pants: '#dfe6ea', grey: true, hair: '#c9c2b0', sit: true, mask: true }); person(wcx + 24, 94, { coat: '#6b4a5a', pants: '#3a3f45', longHair: true, step: Math.floor(u / 0.5) % 2, mirror: true });
-  // the guard by the door
-  person(112, 94, { coat: '#2c3b57', pants: '#2b2e31', cap: '#2c3b57', bob: Math.floor(u / 1.1) % 2 ? 1 : 0 });
+// 7. the corridor in one-point perspective: dark, the doctor far away; seven ceiling lamps come on toward her, one per count, the
+//    seventh over him; then he says the line
+function drawCorridor(u) {
+  R(0, 0, W, H, '#0e1412');
+  const vx = 192, vy = 92;
+  const persp = (x, y, z) => ({ x: vx + (x - vx) / z, y: vy + (y - vy) / z });
+  // floor, walls, ceiling converging
+  g.fillStyle = '#1f2a26'; g.beginPath(); g.moveTo(0, 150); g.lineTo(W, 150); g.lineTo(vx + 20, vy + 8); g.lineTo(vx - 20, vy + 8); g.closePath(); g.fill();
+  g.fillStyle = '#16201c'; g.beginPath(); g.moveTo(0, 30); g.lineTo(W, 30); g.lineTo(vx + 20, vy - 10); g.lineTo(vx - 20, vy - 10); g.closePath(); g.fill();
+  for (const sgn of [-1, 1]) { g.fillStyle = '#1a2420'; g.beginPath(); g.moveTo(vx + sgn * 192, 30); g.lineTo(vx + sgn * 192, 150); g.lineTo(vx + sgn * 20, vy + 8); g.lineTo(vx + sgn * 20, vy - 10); g.closePath(); g.fill(); }
+  // doors on both walls receding
+  for (let k = 1; k <= 7; k++) { const z = 1 + k * 0.9; for (const sgn of [-1, 1]) { const a = persp(vx + sgn * 180, 60, z), b = persp(vx + sgn * 180, 150, z); R(Math.min(a.x, a.x + sgn * 10 / z), a.y, 10 / z + 1, b.y - a.y, '#2a3a34'); } }
+  // the seven lamps, lit one per count from near to far
+  const lit = clamp(Math.floor((u - 1.4) / 0.5) + 1, 0, 7);
+  for (let k = 0; k < 7; k++) { const z = 1.2 + k * 0.75, p = persp(vx, 38, z), w = 40 / z, on = k < lit; R(p.x - w / 2, p.y, w, 3 / z + 1, on ? '#fff3c8' : '#2a3a34'); if (on) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(p.x, p.y, 1, p.x, p.y + 30 / z, 60 / z); gr.addColorStop(0, `rgba(255,236,170,${k === 6 ? 0.35 : 0.2})`); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.fillRect(p.x - 80 / z, p.y, 160 / z, 120 / z); g.restore(); } if (k < lit) cue('lamp' + k, k === 6 ? SND.beep : SND.rim); }
+  for (let k = 0; k < 7; k++) { const z = 1.2 + k * 0.75, p = persp(vx, 38, z); const on = k < lit; text(String(k + 1), p.x, p.y + 6 / z + 2, on ? (k === 6 ? '#ffffff' : '#8fd694') : '#2a3a34', Math.max(5, 9 / z), 'center', k === 6 && on); }
+  // the doctor under the far lamp, walking closer once the lamps are on; 하은 near, her back to us (silhouette)
+  const dz = u < 5 ? 5.2 : Math.max(1.6, 5.2 - (u - 5) * 1.4), dp = persp(vx + 12, 150, dz), dsc = 1 / dz;
+  g.save(); g.translate(dp.x, dp.y); g.scale(dsc, dsc); drawDoctorAt(0, -56, (u % 1.2) < 0.2 ? 1 : 0); g.restore();
+  silhouette(() => { drawHaeunAt(120, 80, 0, { load: true, bob: 0 }); R(126, 114, 12, 14, '#3a3f45'); }, 0.6);
+  say(u, 7.4, 10.6, '어머님 리듬이 오늘 좀 흔들려요. 일곱 번째에 맞춰요.', 150, 44, 190, { size: 7 });
+  say(u, 10.6, 11.8, '…일곱.', 100, 60, 34, { bg: '#d9d0bd' });
+  letterbox();
+  fadeBlack(u < 0.6 ? 1 - u / 0.6 : u > 11.4 ? (u - 11.4) / 0.6 : 0);
 }
-function drawDoctor(u, dur) {
-  hospitalLobby(u);
-  // the doctor walks over from the desk to 하은, who has just come in through the doors
-  const hx = u < 2.2 ? Math.round(lerp(60, 150, ease(u / 2.2))) : 150, dx = u < 3 ? 236 : Math.round(lerp(236, 198, ease((u - 3) / 1.6)));
-  drawDoctorAt(dx, 90, (u % 1.2) < 0.2 ? 1 : 0);
-  const hn = u > 7.2 && u < 8.2 && Math.floor((u - 7.2) / 0.25) % 2 ? 2 : 0;
-  drawHaeunAt(hx, 90 + hn, 0, u < 2.2 ? { step: Math.floor(u / 0.18) % 2 } : { load: true }); thick(hx - 6, 112 + hn, hx - 10, 124, 4, '#1e1a1a'); R(hx - 12, 123, 4, 3, '#2a2d31'); R(hx + 6, 124, 12, 14, '#3a3f45');
-  if (u < 0.3) cue('lobby-door', () => noiseS(now(), 'lowpass', 500, 0.25, 0.8));
-  say(u, 4.6, 7.4, '어머님 리듬이 오늘 좀 흔들려요. 일곱 번째에 맞춰요.', 100, 44, 190, { size: 7 });
-  say(u, 7.4, 8.8, '…일곱.', 150, 58, 34, { bg: '#d9d0bd' });
-  for (let k = 0; k < 7; k++) { const t0 = 5.2 + k * 0.4, on = u >= t0, seven = k === 6; if (on) cue('cnt' + k, seven ? SND.beep : SND.rim); const x = 100 + k * 22; R(x - 6, 160, 12, 12, on ? (seven ? '#8fd694' : '#f7f7f2') : '#dfe6ea'); R(x - 6, 160, 12, 1, on ? (seven ? '#cfe04a' : '#ffffff') : '#b9c4c8'); text(String(k + 1), x, 162, on ? '#1b1716' : '#9aa0a6', 7, 'center', seven && on); }
-  fadeBlack(u < 0.5 ? 1 - u / 0.5 : u > dur - 0.5 ? (u - (dur - 0.5)) / 0.5 : 0);
+// 8. the hands: a close-up of her hand finding her mother's on the blanket, the monitor's green pulse on their skin
+function drawHands(u) {
+  R(0, 0, W, H, '#1a2a30'); R(0, 90, W, 126, '#b9cde0'); for (let x = 0; x < W; x += 36) R(x, 130, 24, 1, '#a0b4c8');
+  const pulse = Math.max(0, 1 - ((u * 1.0) % 1) * 3);
+  g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(143,214,148,${0.08 + 0.1 * pulse})`; g.fillRect(0, 0, W, H); g.restore();
+  // mother's hand: old, thin, palm up, with the pulse clip on a finger
+  R(120, 110, 70, 26, '#d9b59a'); R(110, 118, 14, 12, '#d9b59a'); for (let k = 0; k < 4; k++) R(190 + k * 2, 108 + k * 7, 34, 6, '#d9b59a'); R(226, 122, 10, 6, '#dfe6ea'); R(230, 118, 3, 3, '#ff4a3d'); R(236, 124, 40, 1, '#dfe6ea');
+  for (let k = 0; k < 3; k++) R(130 + k * 16, 114, 1, 18, '#c9a080');
+  // her hand coming in from the right and settling over it
+  const p = ease(clamp((u - 1.5) / 2.5, 0, 1)), hx = Math.round(lerp(330, 176, p)), hy = Math.round(lerp(60, 100, p));
+  R(hx - 8, hy, 60, 24, '#e0b48e'); R(hx + 40, hy - 6, 30, 12, '#1e1a1a'); for (let k = 0; k < 4; k++) R(hx - 40 + k * 2, hy + 2 + k * 6, 36, 5, '#e0b48e'); R(hx + 10, hy + 6, 14, 10, '#d8dde0'); R(hx + 13, hy + 9, 8, 4, '#1b1716');
+  if (p >= 1) { const sq = (u * 1.0) % 1 < 0.15 ? 1 : 0; R(hx - 8, hy - sq, 60, 2, '#d8a880'); }
+  for (let k = 0; k < 10; k++) if (u >= k) cue('hb-close' + k, () => { SND.heart(); });
+  say(u, 4.6, 7, '…밥은 먹었니.', 40, 40, 56, { bg: '#f2ead6', size: 6 });
+  say(u, 6.2, 8, '회식. 공짜.', 270, 52, 48, { bg: '#d9d0bd', size: 6 });
+  letterbox();
+  fadeBlack(u < 0.6 ? 1 - u / 0.6 : u > 7.4 ? (u - 7.4) / 0.6 : 0);
 }
-// the corridor: the night nurse's station, a cart, a patient shuffling with an IV pole, a cleaner mopping, a family asleep on a bench;
-// at the room the caregiver comes out and hands over. 하은 bows, checks her watch (the second time), goes in.
-function drawHall(u, dur) {
-  const sc = Math.min(u * 26, 26 * (dur - 5));
-  g.save(); g.translate(-Math.round(sc), 0); const L = 26 * (dur - 5) + W;
-  R(0, 0, L, H, '#e4ece6'); R(0, 0, L, 24, '#c9d6cc'); R(0, 150, L, 66, '#c9cfc9'); R(0, 150, L, 2, '#8a948c'); R(0, 100, L, 3, '#8fb0a0');
-  for (let x = 20; x < L; x += 96) { const idx = Math.floor(x / 96); if (idx === 2) { R(x, 40, 160, 60, '#b9c9bd'); R(x + 4, 44, 152, 52, '#dfe6ea'); R(x + 20, 60, 120, 30, '#9fb8c8'); text('간호사실', x + 80, 48, '#1b1716', 6, 'center', true); R(x, 100, 160, 50, '#b9c9bd'); continue; } if (idx === 3) continue; R(x, 40, 48, 110, '#b9c9bd'); R(x + 4, 44, 40, 106, '#dfe6ea'); R(x + 8, 50, 32, 22, '#9fb8c8'); R(x + 16, 36, 16, 6, '#8fd694'); text(String(301 + idx), x + 24, 76, '#6a7075', 6, 'center'); }
-  R(0, 4, L, 14, '#dfe6ea'); for (let x = 30; x < L; x += 140) R(x, 6, 36, 10, '#fff3c8');
-  // the nurse at the station, a cart, the patient with the pole, the cleaner, the family on the bench
-  person(300, 50, { coat: '#f7f7f2', pants: '#dfe6ea', hair: '#3a2a20', longHair: true, cap: '#f7f7f2', sit: true, mask: true, bob: Math.floor(u / 0.9) % 2 ? 1 : 0 }); R(250, 100, 160, 1, '#dfe6ea');
-  cart(430, 150, '#dfe6ea'); R(432, 132, 22, 2, '#bfe3d2'); R(436, 126, 6, 6, '#f2d35a');
-  const ivx = 620 + u * 4; ivPole(ivx + 14, 150); person(ivx, 96, { coat: '#9fb8c8', pants: '#dfe6ea', grey: true, hair: '#c9c2b0', step: Math.floor(u / 0.8) % 2, mask: true });
-  const clx = 760; person(clx, 94, { coat: '#5a8a6a', pants: '#3a3f45', apron: '#2f6f4a', grey: true, hair: '#c9c2b0', mirror: true, bob: 0 }); R(clx - 28 + Math.round(Math.sin(u * 3) * 8), 146, 16, 4, '#dfe6ea'); R(clx - 20 + Math.round(Math.sin(u * 3) * 8), 110, 2, 38, '#8a6a3a'); R(clx + 10, 136, 12, 14, '#f2d35a');
-  R(880, 126, 70, 24, '#2f6f8a'); R(880, 122, 70, 4, '#3f7fb0'); person(900, 96, { coat: '#6b4a5a', pants: '#3a3f45', longHair: true, asleep: true, sit: true }); person(930, 102, { coat: '#9fd0ff', pants: '#3a3f45', asleep: true, sit: true, bob: 0 }); R(880, 136, 70, 14, '#c9cfc9');
-  g.restore();
-  // 하은 walking, then at the door the caregiver comes out, they bow, she checks her watch and goes in
-  const wx = 190, arrived = u > dur - 5;
-  if (!arrived) { drawHaeunAt(wx, 90 + (Math.floor(u / 0.2) % 2 ? 0 : 1), 0, { step: Math.floor(u / 0.2) % 2, mirror: true }); R(wx - 10, 124, 12, 14, '#3a3f45'); }
-  else {
-    const a = u - (dur - 5), doorX = 20 + 4 * 96 - Math.round(sc);
-    const cgx = Math.round(lerp(doorX + 10, doorX + 38, ease(a / 1.4)));
-    person(cgx, 94, { coat: '#8a6a9a', pants: '#3a3f45', apron: '#dfe6ea', grey: true, hair: '#c9c2b0', step: a < 1.4 ? Math.floor(u / 0.3) % 2 : null, bob: a > 1.6 && a < 2.4 ? 3 : 0 });
-    drawHaeunAt(wx, 90 + (a > 1.6 && a < 2.4 ? 3 : 0), 0, a > 2.8 && a < 4 ? { mirror: true, watch: true } : { mirror: true, load: true }); R(wx - 10, 124, 12, 14, '#3a3f45');
-    say(u, dur - 3.4, dur - 1.6, '별일 없었어요. 새벽에 한 번 깨셨고.', doorX + 30, 56, 130, { bg: '#f2ead6', size: 6 });
-    say(u, dur - 1.8, dur - 0.4, '…감사합니다.', 150, 60, 54, { bg: '#d9d0bd', size: 6 });
-  }
-  for (let k = 0; k < 40; k++) { const st = 0.3 + k * 0.4; if (u >= st && st < dur - 5) cue('hstep' + k, () => noiseS(now(), 'lowpass', 700, 0.04, 0.05)); }
-  fadeBlack(u < 0.4 ? 1 - u / 0.4 : u > dur - 0.5 ? (u - (dur - 0.5)) / 0.5 : 0);
+// 10. the last insert: the bedside table in morning light, the bill, her watch set down, the time
+function drawTable(u) {
+  R(0, 0, W, H, '#e8ede6'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, 'rgba(255,226,176,0)'); gr.addColorStop(1, 'rgba(255,226,176,.5)'); g.fillStyle = gr; g.fillRect(0, 0, W, H); g.restore();
+  R(0, 120, W, 96, '#c9bfae'); R(0, 120, W, 4, '#e0d8c8');
+  R(60, 70, 120, 60, '#f7f1e2'); R(70, 80, 100, 3, '#8a8a8a'); R(70, 90, 70, 2, '#8a8a8a'); R(70, 98, 90, 2, '#8a8a8a'); text('입원비 납부 안내', 120, 106, '#d8463b', 7, 'center', true); text('2,140,000', 120, 116, '#1b1716', 7, 'center');
+  R(230, 94, 60, 36, '#d8dde0'); R(236, 100, 48, 24, '#1b1716'); text('06:10', 260, 104, '#8fd694', 10, 'center', true); R(220, 108, 10, 8, '#2b2e31'); R(290, 108, 10, 8, '#2b2e31');
+  R(300, 60, 60, 60, '#dfe6ea'); R(306, 66, 48, 48, '#bfe3d2');
+  letterbox();
+  if (u > 7) { const a = clamp((u - 7) / 1.5, 0, 1); fadeBlack(a); text('— 스테이지 1 끝 —', W / 2, 100, `rgba(239,230,210,${a})`, 10, 'center'); }
+  fadeBlack(u < 0.6 ? 1 - u / 0.6 : 0);
 }
 // ---------- 6·7. 병실 ----------
 function drawWard(u, dawnK, playing) {
@@ -805,7 +805,6 @@ function drawWard(u, dawnK, playing) {
   if (playing) {
     for (let j = 0; j <= beatNo; j++) cue('hb' + j, () => { SND.heart(); if (j % 7 === 6) SND.beep(); });
     const lastSeven = Math.floor((beatNo + 1) / 7) * 7 - 1, age = u - lastSeven * per; if (lastSeven >= 0 && age < 0.6) judge('7', 238, 20, '#ffffff', 12, '', age);
-    say(u, 3, 6, '…밥은 먹었니.', 22, 98, 56, { bg: '#f2ead6', size: 6 }); say(u, 6.5, 9, '회식. 공짜.', 96, 76, 48, { bg: '#d9d0bd', size: 6 });
     if (u > 12 && u < 14.6) drawHaeunAt(130, 94, 0, { load: true, mirror: true, watch: true });
   }
 }
@@ -818,12 +817,17 @@ function buildTL() {
     { id: 'cut', name: '매치 컷', dur: 2, draw: u => { drawSushi(0, 1); const o = offC || (offC = Object.assign(document.createElement('canvas'), { width: W, height: H })); const oc = o.getContext('2d'); oc.clearRect(0, 0, W, H); const g0 = g; g = oc; drawOpening(22.5); g = g0; g.save(); g.globalAlpha = 1 - ease(u / 2); g.drawImage(o, 0, 0); g.restore(); if (u < 0.1) cue('cut-roller', () => rollerOn(true, 0.04)); } },
     { id: 'sushi1', name: '초밥', dur: 18, draw: u => { drawSushi(u, 1); fadeBlack(0); } },
     { id: 'sushi2', name: '소주잔', dur: 18, draw: u => { const lv = drawSushi(u, 2); drunkFx(lv, u, () => { haeunBeside({ eat: (u % 1.4) < 0.7 ? (u % 1.4) / 0.7 : 1 - ((u % 1.4) - 0.7) / 0.7 }); plateStack(362, 172, 10 + Math.min(6, Math.floor(u / 2.5))); }); fadeBlack(u > 16.6 ? (u - 16.6) / 1.4 : 0); if (u > 16.6) cue('sushi-off', () => rollerOn(false)); } },
-    { id: 'subway', name: '지하철', dur: 12, draw: u => drawSubway(u) },
-    { id: 'walk', name: '걷기', dur: 34, draw: (u, d) => drawWalk(u, d) },
-    { id: 'doctor', name: '병원', dur: 11, draw: (u, d) => drawDoctor(u, d) },
-    { id: 'hall', name: '복도', dur: 16, draw: (u, d) => drawHall(u, d) },
-    { id: 'ward', name: '병실', dur: 19, draw: u => { drawWard(u, 0, true); fadeBlack(u < 0.5 ? 1 - u / 0.5 : 0); } },
-    { id: 'end', name: '새벽', dur: 12, draw: u => { drawWard(19 + u, clamp(u / 7, 0, 1), false); if (u > 9.5) { const a = clamp((u - 9.5) / 1.5, 0, 1); fadeBlack(a); text('— 스테이지 1 끝 —', W / 2, 100, `rgba(239,230,210,${a})`, 10, 'center'); } if (u >= 0.2) cue('end-bird', () => { [2600, 3100, 2800].forEach((f, i) => oscS('sine', f, now() + 1 + i * 0.12, 0.03, 0.12, f * 1.2)); }); } }
+    { id: 'train', name: '창', dur: 10, draw: u => drawTrainClose(u) },
+    { id: 'door', name: '문', dur: 10, draw: u => drawDoorOut(u) },
+    { id: 'stairs', name: '계단', dur: 6, draw: u => drawStairs(u) },
+    { id: 'lamp', name: '가로등', dur: 8, draw: u => drawLamp(u) },
+    { id: 'cross', name: '횡단보도', dur: 8, draw: u => drawCross(u) },
+    { id: 'puddle', name: '웅덩이', dur: 6, draw: u => drawPuddle(u) },
+    { id: 'corridor', name: '복도', dur: 12, draw: u => drawCorridor(u) },
+    { id: 'hands', name: '손', dur: 8, draw: u => drawHands(u) },
+    { id: 'ward', name: '병실', dur: 14, draw: u => { drawWard(u + 5, 0, true); letterbox(); fadeBlack(u < 0.5 ? 1 - u / 0.5 : 0); } },
+    { id: 'end', name: '새벽', dur: 10, draw: u => { drawWard(19 + u, clamp(u / 7, 0, 1), false); letterbox(); fadeBlack(u > 9.3 ? (u - 9.3) / 0.7 : 0); if (u >= 0.2) cue('end-bird', () => { [2600, 3100, 2800].forEach((f, i) => oscS('sine', f, now() + 1 + i * 0.12, 0.03, 0.12, f * 1.2)); }); } },
+    { id: 'table', name: '탁자', dur: 9, draw: u => drawTable(u) }
   ];
   TOTAL = TL.reduce((a, s) => a + s.dur, 0);
 }
