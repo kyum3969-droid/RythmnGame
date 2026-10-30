@@ -985,7 +985,7 @@ function partnerPose(t, bt, active, lane = 0) {
     if (hurt) p = { x: BOSS_X - 6, y: 108 };
     pose.hand = { x: SCAN_X + (p.x - SCAN_X) / FAR.k, y: BELT_Y + (p.y - LANE_DY[0] - BELT_Y) / FAR.k }; pose.wave = false; pose.carry = null;
   }
-  if (lane === 0 && L.capFlip && Math.abs(beat - L.capFlip) < 0.35 && !pose.carry) pose.wave = true;   // her hand to the cap as she turns it
+  if (lane === 0 && L.capFlip && Math.abs(beat - L.capFlip) < 0.35 && !pose.carry) pose.wave = true;   // her hand to the cap: she pulls it down
   if (lane === 0) { pose.look = inRange(beat, L.haeunLook); if (inRange(beat, L.fever)) pose.bob = (beat * 2) % 1 < 0.3 ? 1 : 0; }
   return pose;
 }
@@ -1111,9 +1111,9 @@ const PARTNERS = {
       R(cx + 1, top + 11, 6, 2, C.hair);
     },
     arm(pose) {
-      const top = bodyTop(90, pose);
-      if (pose.wave && !pose.carry) { thick(BOSS_X + 7, top + 22, BOSS_X + 10, top + 1, 4, C.shirt); R(BOSS_X + 8, top - 3, 5, 5, C.skin); return; }
-      if (L.lanes === 2) { const h = elbowArm(BOSS_X + 7, top + 22, pose.hand.x, pose.hand.y, C.shirt); R(h.x - 2, h.y - 2, 4, 4, C.skin); return; }
+      const top = bodyTop(90, pose), sx = pose.back ? BOSS_X - 6 : BOSS_X + 7, col = pose.back ? '#4a5560' : C.shirt;
+      if (pose.wave && !pose.carry) { thick(sx, top + 22, sx + 3, top + 1, 4, col); R(sx + 1, top - 3, 5, 5, C.skin); return; }
+      if (L.lanes === 2) { const h = elbowArm(sx, top + 22, pose.hand.x, pose.hand.y, col); R(h.x - 2, h.y - 2, 4, 4, C.skin); return; }
       thick(BOSS_X + 7, top + 22, pose.hand.x, pose.hand.y, 4, C.shirt); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
     }
   },
@@ -1148,7 +1148,7 @@ const PARTNERS = {
     base: 86,
     draw(pose, nowMs, active) {
       const top = bodyTop(86, pose) + (pose.bob ? 1 : 0);
-      drawHaeunAt(BOSS_X, top, nowMs, { mirror: !pose.look, watch: pose.phone, load: true, bob: 0, rest: pose.look, eyes: active && pose.beat >= (L.capFlip || 1e9) && pose.beat < L.fever[0][1], capBack: active && pose.beat >= (L.capFlip || 1e9) });
+      drawHaeunAt(BOSS_X, top, nowMs, { mirror: !pose.look, watch: pose.phone, load: true, bob: 0, rest: pose.look, eyes: active && inRange(pose.beat, L.fever) });
     },
     arm(pose) {
       const top = bodyTop(86, pose), shirt = '#1e1a1a', glove = '#2a2d31';
@@ -1356,18 +1356,11 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
   R(cx - 6, top + 1, 12, 14, C.skin); R(cx - 7, top + 3, 2, 8, hair); R(cx + 5, top + 3, 2, 6, hair);
   // the snapback, 14 wide like 반장's cap, pulled down: front panel with a seam and a button, the patch, the brim out to the left
   R(cx - 7, top - 2, 14, 6, cap); R(cx - 6, top - 3, 12, 1, cap); R(cx - 7, top + 3, 14, 1, capD); R(cx - 2, top - 3, 1, 7, capD); R(cx - 1, top - 4, 2, 1, capD);
-  if (o.capBack) {
-    // turned back: the strap's gap over her forehead, the brim out behind over the ponytail, and her eyes, set
-    R(cx - 5, top + 1, 4, 2, '#4a3328'); R(cx + 6, top + 1, 9, 2, brim); R(cx + 6, top + 1, 9, 1, '#3a3236');
-    R(cx - 4, top + 6, 2, 2, C.ink); R(cx + 1, top + 6, 2, 2, C.ink); R(cx - 5, top + 5, 3, 1, '#4a3328'); R(cx + 1, top + 5, 3, 1, '#4a3328');
-    if (o.eyes) { R(cx - 4, top + 6, 1, 1, '#bfe9ff'); R(cx + 1, top + 6, 1, 1, '#bfe9ff'); }
-  } else {
   R(cx - 6, top - 1, 5, 3, '#ffffff'); R(cx - 5, top, 3, 1, cap);
   R(cx - 16, top + 3, 10, 2, brim); R(cx - 16, top + 3, 10, 1, '#3a3236'); R(cx - 16, top + 5, 10, 1, '#0d0b0b');
   // under the brim: shadow instead of eyes; a scan lights two pinpoints in it for a moment
   R(cx - 6, top + 4, 12, 5, '#8a5e44'); R(cx - 6, top + 4, 12, 2, '#6b4631'); R(cx - 6, top + 8, 12, 1, '#b08366');
-  }
-  if (!o.capBack && (kick > 0.4 || o.eyes)) { R(cx - 4, top + 6, 1, 1, o.eyes ? '#bfe9ff' : '#f4f1ea'); R(cx + 1, top + 6, 1, 1, o.eyes ? '#bfe9ff' : '#f4f1ea'); }
+  if (kick > 0.4 || o.eyes) { R(cx - 4, top + 6, 1, 1, o.eyes ? '#bfe9ff' : '#f4f1ea'); R(cx + 1, top + 6, 1, 1, o.eyes ? '#bfe9ff' : '#f4f1ea'); }
   R(cx - 3, top + 11, 2, 1, '#b2565a');
   // front arm: the gun on the upper gate (kicks back toward her when a scan fires there), the watch check, a swing while walking,
   // or nothing (the loading arm is drawn with the belt). The other hand stays in a pocket.
@@ -1660,18 +1653,18 @@ function laneSlide(lane, t, active) {
 // 하은's fever takes the whole warehouse: the room sinks into her deep blue, the lamps turn sky and flash on her eighths, light
 // shafts sweep the back wall, streaks of boxes race across the racks, and a glow pulses behind her at the loading end
 // it starts as a soft tint and builds bar by bar (feverRamp), and on the fever's last beat it bursts (drawFeverBurst)
-const feverRamp = (beat, [a, z]) => 0.22 + 0.78 * Math.pow(Math.max(0, Math.min(1, (beat - a) / (z - a))), 1.4);
+const feverRamp = (beat, [a, z]) => 0.1 + 0.9 * Math.pow(Math.max(0, Math.min(1, (beat - a) / (z - a))), 1.6);
 function drawFeverBack(beat, nowMs) {
   const fr = L.fever.find(([a, z]) => beat >= a - 1 && beat < z); if (!fr) return;
-  const env = Math.max(0, Math.min(1, beat - fr[0] + 1)) * feverRamp(beat, fr), e = reduce ? 0.4 : Math.max(0, 1 - ((beat * 2) % 1) * 3), bar = Math.floor(beat / 4);
+  const env = Math.max(0, Math.min(1, beat - fr[0] + 1)) * feverRamp(beat, fr), last = beat >= fr[1] - 4, e = reduce ? 0.4 : Math.max(0, 1 - ((beat * (last ? 4 : 2)) % 1) * 3), bar = Math.floor(beat / 4);
   g.save();
-  g.globalCompositeOperation = 'multiply'; g.fillStyle = `rgba(${Math.round(lerp(255, 70, env))},${Math.round(lerp(255, 115, env))},${Math.round(lerp(255, 190, env))},1)`; g.fillRect(0, 0, W, 168);
+  g.globalCompositeOperation = 'multiply'; g.fillStyle = `rgba(${Math.round(lerp(255, 30, env))},${Math.round(lerp(255, 62, env))},${Math.round(lerp(255, 160, env))},1)`; g.fillRect(0, 0, W, 168);
   g.globalCompositeOperation = 'lighter';
   // the lamps
-  for (const lx of [88, 202, 318]) { const gr = g.createLinearGradient(0, 18, 0, 150); gr.addColorStop(0, `rgba(140,215,255,${(0.22 + 0.25 * e) * env})`); gr.addColorStop(1, 'rgba(140,215,255,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(lx - 14, 20); g.lineTo(lx + 14, 20); g.lineTo(lx + 52, 150); g.lineTo(lx - 52, 150); g.closePath(); g.fill(); }
+  for (const lx of [88, 202, 318]) { const gr = g.createLinearGradient(0, 18, 0, 150); gr.addColorStop(0, `rgba(140,215,255,${(0.3 + 0.4 * e) * env})`); gr.addColorStop(1, 'rgba(140,215,255,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(lx - 14, 20); g.lineTo(lx + 14, 20); g.lineTo(lx + 52, 150); g.lineTo(lx - 52, 150); g.closePath(); g.fill(); }
   if (!reduce) {
     // shafts sweeping the back wall, a new direction every bar
-    for (let k = 0; k < 4; k++) { const p = ((beat * 0.35 + k / 4) % 1), x = (bar % 2 ? 1 - p : p) * (W + 80) - 40; const gr = g.createLinearGradient(x - 12, 0, x + 12, 0); gr.addColorStop(0, 'rgba(120,200,255,0)'); gr.addColorStop(0.5, `rgba(120,200,255,${(0.1 + 0.12 * e) * env})`); gr.addColorStop(1, 'rgba(120,200,255,0)'); g.fillStyle = gr; g.fillRect(x - 12, 30, 24, 138); }
+    for (let k = 0; k < 4; k++) { const p = ((beat * 0.35 + k / 4) % 1), x = (bar % 2 ? 1 - p : p) * (W + 80) - 40; const gr = g.createLinearGradient(x - 12, 0, x + 12, 0); gr.addColorStop(0, 'rgba(120,200,255,0)'); gr.addColorStop(0.5, `rgba(120,200,255,${(0.1 + 0.22 * e) * env})`); gr.addColorStop(1, 'rgba(120,200,255,0)'); g.fillStyle = gr; g.fillRect(x - 12, 30, 24, 138); }
     // box streaks racing left along the shelf rows
     for (let k = 0; k < 10; k++) { const row = [58, 76, 96, 118][k % 4], sp = 90 + (k * 37) % 70, x = W - ((nowMs / 1000 * sp + k * 53) % (W + 40)); g.fillStyle = `rgba(160,220,255,${0.16 * env})`; g.fillRect(Math.round(x), row, 14, 2); g.fillStyle = `rgba(160,220,255,${0.07 * env})`; g.fillRect(Math.round(x) + 14, row, 18, 2); }
   }
@@ -1686,9 +1679,10 @@ function drawFeverBurst(beat, nowMs) {
   const f1 = L.fever[0][1], d = beat - f1; if (d < 0 || d >= 1.5) return;
   const a = 1 - d / 1.5, hx = BOSS_X + LANE_DX[0];
   g.save(); g.globalCompositeOperation = 'lighter';
-  g.fillStyle = `rgba(190,235,255,${0.55 * a * a})`; g.fillRect(0, 0, W, H);
-  if (!reduce) { const r = 20 + d * 260; g.strokeStyle = `rgba(160,225,255,${0.7 * a})`; g.lineWidth = 6 * a + 1; g.beginPath(); g.arc(hx, 74, r, 0, Math.PI * 2); g.stroke(); }
-  g.globalCompositeOperation = 'multiply'; g.fillStyle = `rgba(${Math.round(lerp(255, 120, a * 0.6))},${Math.round(lerp(255, 170, a * 0.6))},255,1)`; g.fillRect(0, 0, W, 168);
+  g.fillStyle = `rgba(210,240,255,${0.9 * Math.pow(Math.max(0, 1 - d / 0.6), 2)})`; g.fillRect(0, 0, W, H);
+  if (!reduce) for (const [k, w] of [[0, 10], [0.18, 5]]) { const r = 10 + Math.max(0, d - k) * 300; g.strokeStyle = `rgba(170,230,255,${0.8 * a})`; g.lineWidth = w * a + 1; g.beginPath(); g.arc(hx, 74, r, 0, Math.PI * 2); g.stroke(); }
+  // out of the blue into the warm of the last stretch together
+  g.fillStyle = `rgba(255,190,110,${0.16 * Math.sin(Math.PI * Math.min(1, d / 1.5))})`; g.fillRect(0, 0, W, H);
   g.restore();
 }
 // light, not boxes: the room sits in a dim ambient and each belt you can scan has a work light over it, a soft pool along the
@@ -1781,7 +1775,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   if (!far) drawPartnerArmOf(pid, pose, lane);
   g.restore();
   // the arm to the far belt is drawn in screen space so it stays on the body; only the hand goes through the perspective
-  if (far && DUO.mode !== 'walk') { const who = DUO.mode === 'two' ? pid : L.partners[1], o = placerOff(0), h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
+  if (far && DUO.mode === 'two') { const who = pid, o = placerOff(0), h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
 }
 // ---------- 1-4: Friday rush. The dock and the truck, the departure board, the floor behind the racks, the beacons ----------
 // whose turn it is on the belts (the music's own split): 하은 above, 반장 below, both from bar 24
@@ -2294,6 +2288,8 @@ function drawScene(t, bt, active, nowMs) {
     else {
       // one loader between the belts: his body follows whichever belt is busy
       const o = placerOff(1), bp = { ...poses[1], wince: poses[0].wince || poses[1].wince, dip: Math.max(poses[0].dip, poses[1].dip), nod: Math.max(poses[0].nod, poses[1].nod) };
+      // his other arm, for the upper belt: from his far shoulder, drawn before his body so it goes behind him
+      if (DUO.mode === 'one') { const o0 = placerOff(0), fp = poses[0], h = { x: farX(fp.hand.x), y: farY(fp.hand.y) }; g.save(); g.translate(o0.dx, o0.dy); PARTNERS.boss.arm({ ...bp, carry: fp.carry, wave: fp.wave, back: true, hand: { x: h.x - o0.dx, y: h.y - o0.dy } }); g.restore(); }
       g.save(); g.translate(o.dx, o.dy); drawPartnerBody(L.partners[1], bp, nowMs, active); g.restore();
       drawLiftDrop(active ? mb : -1, t);
     }
