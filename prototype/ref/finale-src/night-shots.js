@@ -18,8 +18,8 @@ function clacks(key, S, J, quiet = 1) { const n = Math.floor(S / J); cue(key + n
 
 // 1. 창 — an insert of the LED board, then across the aisle: the two of them on the bench, the tunnel lamps sweeping past
 function shotWindow(u) {
-  if (u < 2.8) return ledInsert(u);
-  trainTwoShot(u - 2.8);
+  if (u < 3.5) return ledInsert(u);
+  trainTwoShot(u - 3.5);
   if (u > 9.4) blackout(W, H, 0);
 }
 function ledInsert(u) {
@@ -36,8 +36,8 @@ function ledInsert(u) {
     for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) R(ox + i * 3, oy + j * 3, 2, 2, '#2a1209');
     const lit = (bm, dx) => { for (const [x, y] of bm.on) { const i = x + dx, j = y + 3; if (i >= 0 && i < cols && j < rows) R(ox + i * 3, oy + j * 3, 2, 2, '#ff8a3d'); } };
     const a = bitmap('다음 역', 15), b = bitmap('○○대학병원', 15);
-    if (u < 1.2) lit(a, Math.round((cols - a.w) / 2));
-    else { const p = ease(clamp((u - 1.2) / 0.9, 0, 1)); lit(b, Math.round(lerp(cols, (cols - b.w) / 2, p))); }
+    if (u < 1.6) lit(a, Math.round((cols - a.w) / 2));
+    else { const p = ease(clamp((u - 1.6) / 1.0, 0, 1)); lit(b, Math.round(lerp(cols, (cols - b.w) / 2, p))); }
     light(192, y0 + 46, 150, '255,138,61', 0.16);
     // a glint crossing the glass
     g.save(); g.globalAlpha = 0.07; for (let k = 0; k < 26; k++) R(250 + k * 3, y0 + 84 - k * 3, 10, 2, '#ffffff'); g.restore();
@@ -47,12 +47,13 @@ function ledInsert(u) {
   bars();
   if (u >= 0.1) cue('w-chime', SND.chime);
   rollerOn(true, 0.07); clacks('w-led', u * 150, 68, 0.8);
-  subtitle(u, 1.4, 2.7, '다음 역은 ○○대학병원입니다.', 'sign');
+  subtitle(u, 1.8, 3.4, '다음 역은 ○○대학병원입니다.', 'sign');
   blackout(W, H, u < 0.4 ? 1 - u / 0.4 : 0);
 }
 // the train's position along the tunnel: cruising, then braking into the station
-const trainS = t => t < 3.2 ? 150 * t : 480 + 150 * (Math.min(t - 3.2, 2.8) - Math.min(t - 3.2, 2.8) ** 2 / 5.6);
-const trainV = t => t < 3.2 ? 150 : Math.max(0, 150 * (1 - (t - 3.2) / 2.8));
+const BRAKE = 7.5, BRAKE_LEN = 3.0, PLAT = 150 * BRAKE + 75 * BRAKE_LEN;
+const trainS = t => t < BRAKE ? 150 * t : 150 * BRAKE + 150 * (Math.min(t - BRAKE, BRAKE_LEN) - Math.min(t - BRAKE, BRAKE_LEN) ** 2 / (2 * BRAKE_LEN));
+const trainV = t => t < BRAKE ? 150 : Math.max(0, 150 * (1 - (t - BRAKE) / BRAKE_LEN));
 // ---- people seen from the front, all on one template so they share the game's 4-head proportion:
 //      a 12x13 face, hair or cap on top, an 18-row torso, a lap, 12-row shins
 const INK = '#1b1716';
@@ -91,6 +92,7 @@ function sitF(cx, seatY, o) {
   R(cx - 6 - spread, seatY + 3, 5, 12, pants); R(cx + 1 + spread, seatY + 3, 5, 12, pants); R(cx - 2 - spread, seatY + 3, 1, 12, ps); R(cx + 1 + spread, seatY + 3, 1, 12, ps);
   R(cx - 7 - spread, seatY + 15, 6, 2, o.shoe || '#1e1a1a'); R(cx + 1 + spread, seatY + 15, 6, 2, o.shoe || '#1e1a1a'); R(cx - 7 - spread, seatY + 17, 6, 1, o.sole || '#3a3236'); R(cx + 1 + spread, seatY + 17, 6, 1, o.sole || '#3a3236');
   R(x0 + 1, seatY, w - 2, 3, pants); R(x0 + 1, seatY, w - 2, 1, mix(pants, '#ffffff', 0.18)); R(cx, seatY + 1, 1, 2, ps);
+  if (o.noTorso) return top;
   R(cx - 2, top - 1, 4, 2, o.skinD || '#b98260');
   R(x0 + 1, top, w - 2, 1, topC); R(x0, top + 1, w, 17, topC); R(x0 + 2, top + 3, 1, 14, sh); R(x0 + w - 3, top + 3, 1, 14, sh);
   if (o.dress) o.dress(cx, top, w);
@@ -138,7 +140,8 @@ const PASS = {
     const cx = 64, feet = 93, scroll = Math.floor(t / 0.9) % 2;
     const top = standF(cx, feet, { w: 14, top: '#c9b089', pants: '#4a5a7a', shoe: '#e9e4da', sole: '#c9c4ba', dress: (x, y) => { R(x - 2, y + 1, 4, 10, '#f4f1ea'); R(x - 7, y + 12, 3, 8, '#e0d4b8'); } });
     HAIR.long(cx, top - 14); faceF(cx, top - 14, { eyes: 'open', look: 'down' }); R(cx - 6, top - 14, 12, 3, '#3a2620'); HAIR.long(cx, top - 14);
-    R(cx - 8, 21, 2, top - 20, '#c9b089'); R(cx - 9, 18, 3, 4, '#d9a27a'); R(cx - 9, 17, 3, 1, '#b98260');
+    R(cx - 9, 12, 1, top - 30, '#e3e7ea'); R(cx - 12, top - 19, 7, 1, '#eef1f3'); R(cx - 12, top - 19, 1, 6, '#eef1f3'); R(cx - 6, top - 19, 1, 6, '#eef1f3'); R(cx - 12, top - 14, 7, 1, '#c9ced3');
+    thick(cx - 7, top + 2, cx - 11, top - 7, 3, '#c9b089'); thick(cx - 11, top - 7, cx - 9, top - 15, 3, '#c9b089'); R(cx - 11, top - 8, 2, 1, '#e0d4b8'); R(cx - 11, top - 18, 4, 4, '#d9a27a'); R(cx - 11, top - 15, 4, 1, '#b98260');
     R(cx + 1, top + 6, 5, 7, '#1b1716'); R(cx + 2, top + 7, 3, 5, scroll ? '#9fd8ec' : '#bfe6f2'); R(cx, top + 9, 3, 4, '#d9a27a'); thick(cx + 6, top + 3, cx + 3, top + 10, 3, '#c9b089');
     light(cx + 3, top + 4, 12, '159,216,236', 0.25);
     R(cx + 6, top + 14, 6, 9, '#8a5a3a'); R(cx + 7, top + 2, 1, 12, '#8a5a3a');
@@ -160,8 +163,24 @@ function sinipAsleep(SX, SEAT, ang, t) {
   zzz(Math.round(headX + 6), Math.round(headY - 14), t * 1000);
   return [headX, headY];
 }
+function sinipTorso(cx, hip) {
+  const top = hip - 18; R(cx - 2, top - 1, 4, 2, '#b98260');
+  R(cx - 8, top, 16, 1, '#2f4f58'); R(cx - 9, top + 1, 18, 17, '#2f4f58'); R(cx - 7, top + 3, 1, 14, '#213840'); R(cx + 6, top + 3, 1, 14, '#213840');
+  R(cx - 7, top + 1, 14, 12, '#cfe04a'); R(cx - 7, top + 8, 14, 2, '#ebe5c9'); R(cx - 1, top + 1, 2, 12, '#2f4f58'); R(cx - 3, top - 1, 6, 2, '#213840');
+}
+// lean: the upper body about the hips; tilt: the head about the neck on top of that
+function sinipLean(SX, SEAT, lean, tilt, t) {
+  sitF(SX, SEAT, { w: 18, top: '#2f4f58', pants: '#33415a', spread: 1, hands: false, noTorso: true });
+  rotDraw(() => sinipTorso(40, 70), 96, 72, 40, 70, lean, SX, SEAT);
+  const nx = SX + Math.sin(lean) * 19, ny = SEAT - Math.cos(lean) * 19;
+  rotDraw(() => { faceF(40, 40, { eyes: 'closed', blush: true, mouthOpen: true }); HAIR.sinip(40, 40); }, 96, 72, 40, 53, lean + tilt, Math.round(nx), Math.round(ny));
+  R(SX - 6, SEAT - 3, 4, 3, '#d9a27a'); R(SX + 3, SEAT - 2, 4, 3, '#d9a27a');
+  const a = lean + tilt, hx = nx + Math.sin(a) * 7, hy = ny - Math.cos(a) * 7;
+  zzz(Math.round(hx + 6), Math.round(hy - 14), t * 1000);
+  return [hx, hy];
+}
 function trainTwoShot(t) {
-  const S = trainS(t), v = trainV(t), arrived = clamp((t - 4.6) / 1.4, 0, 1);
+  const S = trainS(t), v = trainV(t), arrived = clamp((t - 9.0) / 1.4, 0, 1), DOOR = 10.6;
   shot(2, (w, h) => {
     const bounce = v > 20 && (S % 68) < 6 ? 1 : 0;
     g.save(); g.translate(0, bounce);
@@ -175,14 +194,14 @@ function trainTwoShot(t) {
     for (let k = -1; k < 8; k++) { const x = wx0 + (((k * 24 - S) % 168) + 168) % 168; R(x, wy0, 2, wy1 - wy0, '#121620'); }
     R(wx0, 27, wx1 - wx0, 1, '#171b25'); R(wx0, 29, wx1 - wx0, 1, '#131720'); R(wx0, 42, wx1 - wx0, 1, '#10131b');
     for (let k = 0; k < 3; k++) { const x = wx0 + (((k * 84 + 40 - S) % 252) + 252) % 252, len = 2 + Math.round(v * 0.12); R(x - len, 24, len + 2, 2, '#ffd890'); R(x - len, 24, len + 2, 1, '#fff3c8'); light(x, 25, 10 + v * 0.06, '255,216,144', 0.5); }
-    const px = wx0 + (690 - S);
+    const px = wx0 + (PLAT - S);
     if (px < wx1) { R(px, wy0, wx1 - px, wy1 - wy0, '#d7dfdb'); for (let y = wy0; y < wy1; y += 4) R(px, y, wx1 - px, 1, '#c6cfcb'); for (let x = px; x < wx1; x += 6) R(x, wy0, 1, wy1 - wy0, '#c6cfcb'); R(px, 34, wx1 - px, 3, '#2f6f8a'); R(px + 30, 25, 40, 8, '#1e2a33'); R(px + 32, 27, 36, 4, '#2f3a4a'); R(px + 34, 28, 20, 2, '#e9eef0'); light(px + 50, 24, 50, '240,250,255', 0.35); }
     g.restore();
     g.save(); g.globalAlpha = 0.16; for (let k = 0; k < 3; k++) R(wx0 + 6 + k * 38, wy0 + 1, 20, 1, '#ffffff'); for (let k = 0; k < 8; k++) R(wx0 + 74 + k, wy1 - 1 - k * 3, 6, 1, '#ffffff'); g.restore();
     // the door to the right
     R(128, 18, 52, 78, '#b9c0c7'); R(130, 20, 23, 76, '#d3d8dd'); R(155, 20, 23, 76, '#d3d8dd'); R(153, 20, 2, 76, '#2b2e33'); for (const x of [134, 159]) { R(x, 26, 15, 26, '#2b2e33'); R(x + 1, 27, 13, 24, px < x + 14 ? '#cfd8d4' : '#0a0c10'); }
     R(128, 18, 52, 1, '#8a9097'); R(130, 70, 48, 2, '#f2d35a');
-    if (t > 6.2) { const o = ease(clamp((t - 6.2) / 0.6, 0, 1)) * 22; g.save(); g.beginPath(); g.rect(130, 20, 48, 76); g.clip(); R(130, 20, 48, 76, '#c9d2ce'); R(130, 60, 48, 36, '#a9b4b0'); R(130, 68, 48, 3, '#f2d35a'); light(154, 50, 40, '255,255,255', 0.3); R(130 - o, 20, 23, 76, '#d3d8dd'); R(155 + o, 20, 23, 76, '#d3d8dd'); R(153 - o, 20, 1, 76, '#2b2e33'); R(155 + o, 20, 1, 76, '#2b2e33'); g.restore(); }
+    if (t > DOOR) { const o = ease(clamp((t - DOOR) / 0.6, 0, 1)) * 22; g.save(); g.beginPath(); g.rect(130, 20, 48, 76); g.clip(); R(130, 20, 48, 76, '#c9d2ce'); R(130, 60, 48, 36, '#a9b4b0'); R(130, 68, 48, 3, '#f2d35a'); light(154, 50, 40, '255,255,255', 0.3); R(130 - o, 20, 23, 76, '#d3d8dd'); R(155 + o, 20, 23, 76, '#d3d8dd'); R(153 - o, 20, 1, 76, '#2b2e33'); R(155 + o, 20, 1, 76, '#2b2e33'); g.restore(); }
     // the bench: moquette back, cushion, the steel skirt, the floor
     R(0, 46, 124, 24, '#2f5f8a'); dfill(0, 47, 124, 22, '#3a6d9a', 0.32); dfill(0, 62, 124, 8, '#284f74', 0.5); R(0, 46, 124, 2, '#4a82b4');
     for (const x of [29, 51, 73, 95]) R(x, 48, 1, 22, '#284f74');
@@ -190,30 +209,27 @@ function trainTwoShot(t) {
     R(0, 81, w, 15, '#6b7279'); dfill(0, 81, w, 15, '#7a8188', 0.3); R(0, 81, w, 1, '#5a6066'); dfill(0, 88, w, 8, '#5f666d', 0.4);
     // the straps, swinging forward as the train brakes
     R(0, 10, w, 2, '#9aa1a8'); const sw = Math.round((v < 150 && v > 0 ? 2 : 0) + Math.sin(t * 3) * (v > 0 ? 1 : 0.4));
-    for (const x of [12, 36, 56, 84, 108]) { R(x, 12, 1, 5, '#e3e7ea'); R(x - 2 + sw, 17, 5, 1, '#eef1f3'); R(x - 2 + sw, 17, 1, 4, '#eef1f3'); R(x + 2 + sw, 17, 1, 4, '#eef1f3'); R(x - 2 + sw, 20, 5, 1, '#c9ced3'); }
+    for (const x of [12, 36, 84, 108]) { R(x, 12, 1, 5, '#e3e7ea'); R(x - 2 + sw, 17, 5, 1, '#eef1f3'); R(x - 2 + sw, 17, 1, 4, '#eef1f3'); R(x + 2 + sw, 17, 1, 4, '#eef1f3'); R(x - 2 + sw, 20, 5, 1, '#c9ced3'); }
     R(122, 10, 3, 86, '#b8bec4'); R(123, 10, 1, 86, '#eef1f3'); R(124, 10, 1, 86, '#7a8086');
     // the other passengers on the bench
     PASS.salaryman(t); PASS.student(t);
-    // 신입, asleep: on her shoulder, then moved over against the pole
-    const SX = 108, SEAT = 70, move = ease(clamp((t - 3.1) / 1.2, 0, 1)), ang = lerp(-0.62, 0.62, move);
-    const [headX, headY] = sinipAsleep(SX, SEAT, ang, t);
-    // 하은: looks at him, takes his head in her hand and moves it over to the pole, stands, goes to the door
-    const HX = 86, stood = t > 5.2;
+    // 하은 and 신입: he sleeps leaning on her, the cheek on her shoulder. She notices, lifts her forearm (the elbow stays at her
+    // side), puts her hand to his head and slowly tips him over against the pole, puts her hand back, sits a moment, stands
+    const HX = 84, SX = 106, SEAT = 70, stood = t > 9.4;
+    const move = ease(clamp((t - 4.9) / 1.7, 0, 1)), lean = lerp(-0.22, 0.24, move), tilt = lerp(-0.8, 0.32, move);
+    const reach = t < 4.2 ? 0 : t < 4.9 ? ease((t - 4.2) / 0.7) : t < 6.6 ? 1 : t < 7.1 ? 1 - ease((t - 6.6) / 0.5) : 0;
+    let hTop = 0;
+    const [headX, headY] = sinipLean(SX, SEAT, lean, tilt, t);
     if (!stood) {
-      const hTop = sitF(HX, SEAT, { w: 16, top: '#1e1a1a', pants: '#3a3f45', dress: (x, y) => { R(x - 6, y + 1, 12, 15, '#7ec8e3'); R(x - 6, y + 8, 12, 2, '#ebe5c9'); R(x - 1, y + 1, 2, 15, '#5aa6c4'); R(x - 2, y - 1, 4, 2, '#1e1a1a'); } });
-      const turned = t > 1.8 && t < 4.9;
-      faceF(HX, hTop - 14, { eyes: 'hidden', skin: '#d9a27a' }); HAIR.cap(HX, hTop - 14, turned);
-      bagAt(64, 84);
-      const reach = t < 2.6 ? 0 : t < 3.1 ? ease((t - 2.6) / 0.5) : t < 4.3 ? 1 : t < 4.7 ? 1 - ease((t - 4.3) / 0.4) : 0;
-      if (reach > 0) {
-        // her hand goes to the left side of his head and stays with it while it turns
-        const side = ang - Math.PI / 2, tx = headX + Math.cos(side) * 6 - 1, ty = headY + Math.sin(side) * 6 + 1, rx = HX + 4, ry = SEAT - 3;
-        arm(HX + 7, hTop + 2, lerp(rx, tx, reach), lerp(ry, ty, reach), '#1e1a1a', '#d9a27a', 1);
-      }
-    } else {
-      const p = clamp((t - 5.4) / 1.5, 0, 1), x = Math.round(lerp(88, 150, ease(p)));
-      haeunWalkSide(x, 95, t, { mirror: true, stand: p <= 0 || p >= 1 });
+      hTop = sitF(HX, SEAT, { w: 16, top: '#1e1a1a', pants: '#3a3f45', dress: (x, y) => { R(x - 6, y + 1, 12, 15, '#7ec8e3'); R(x - 6, y + 8, 12, 2, '#ebe5c9'); R(x - 1, y + 1, 2, 15, '#5aa6c4'); R(x - 2, y - 1, 4, 2, '#1e1a1a'); } });
+      faceF(HX, hTop - 14, { eyes: 'hidden' }); HAIR.cap(HX, hTop - 14, t > 3.0 && t < 7.4);
+      bagAt(62, 84);
     }
+    if (!stood && reach > 0) {
+      const ex = HX + 6, ey = SEAT - 5, a = lean + tilt - Math.PI / 2, hx = Math.round(lerp(HX + 3, headX + Math.cos(a) * 6, reach)), hy = Math.round(lerp(SEAT - 3, headY + Math.sin(a) * 6 + 2, reach));
+      thick(ex, ey, hx, hy, 3, '#1e1a1a'); R(hx - 1, hy - 1, 3, 3, '#d9a27a'); R(hx - 1, hy + 2, 3, 1, '#b98260');
+    }
+    if (stood) { const p = clamp((t - 9.6) / 1.8, 0, 1), x = Math.round(lerp(86, 150, ease(p))); haeunWalkSide(x, 95, t, { mirror: true, stand: p <= 0 || p >= 1 }); }
     // standing passengers, nearer the camera than the bench
     PASS.phoneWoman(t); PASS.trackMan(t);
     // a tunnel lamp passing lights the car for a moment: the beat in the light
