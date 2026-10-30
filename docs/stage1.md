@@ -148,6 +148,7 @@
   - 1절: First train out, the city's still asleep / I count the stops the way I count my pay / You're dreaming in the seat where I was sitting / I didn't wake you, nothing left to say
   - 후렴: So I walk on, under the last streetlight / One more day I'm holding on for you / The sun comes up like it's got nowhere to be / And I keep time, 'cause someone has to
   - 2절: Free meal, a stack of plates, I ate for two / The watch says half past five, she'll be awake / The doctor counts to seven, so do I / I learned to keep a beat for someone's sake
+- **Lyria로 뽑은 음원**: `prototype/ref/the_last_streetlight.mp3`(2:01, 약 71 BPM). 애니매틱은 이 음원을 하은이 일어서는 순간부터 그대로 재생하고, 구간 시작 초(절 10 · 후렴 36 · 병원 입구 62 · 복도 76 · 병실 98 · 새벽 117, 음량 윤곽으로 잡은 추정값)를 페이지 패널에서 맞출 수 있다. 병원 입구와 병실 사이에 복도 걷기 장면을 하나 더 두어 두 번째 후렴을 받는다.
 - 멜로디와 가사는 `prototype/ref/keep-time.mid`(멜로디 트랙에 음마다 가사 메타, 피아노·베이스 트랙 포함)에 있어서 Synthesizer V 같은 가창 합성이나 가수에게 그대로 넘기면 됨. 애니매틱의 목소리는 모음으로 부르는 포먼트 합성(자리 표시용)이고, 걷기 구간에는 부른 음절만 밝아지는 가사 자막이 뜸.
 
 ### 연출 재료(정리)

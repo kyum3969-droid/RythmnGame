@@ -21,22 +21,26 @@ input[type=range]{flex:1;min-width:160px}
 select{background:var(--card);color:var(--ink);border:1px solid #3a302a;border-radius:6px;padding:5px}
 #lbl{color:var(--muted);font-size:13px;min-width:140px}
 .jumps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.secs{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.secs label{font-size:13px;color:var(--muted)} .secs input{width:64px;background:var(--card);color:var(--ink);border:1px solid #3a302a;border-radius:4px;padding:3px 5px}
+details{margin:8px 0} summary{cursor:pointer;color:var(--muted)}
 ul{color:var(--muted);font-size:13px;margin:8px 0 0 18px}
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>1-5 첫 회식 · 애니매틱</h1>
-<p>벨트 도입 → 매치 컷 → 초밥 세 벨트 → 소주잔과 취기 → 지하철 → 걷기(노래) → 병원(리듬닥터 오마주) → 병실 심장박동 → 새벽. 약 1분 40초. 재생을 누르면 소리도 납니다(롤러, 딱, 쏙, 짠, 발소리, 차임, 노래, 심장박동).</p>
+<p>벨트 도입 → 매치 컷 → 초밥 세 벨트 → 소주잔과 취기 → 지하철 → 걷기(노래) → 병원(리듬닥터 오마주) → 병실 심장박동 → 새벽. 약 1분 40초. 재생을 누르면 소리도 납니다(롤러, 딱, 쏙, 짠, 발소리, 차임, 심장박동). 노래는 Lyria로 만든 "The Last Streetlight"가 하은이 일어서는 순간부터 그대로 흐릅니다.</p>
 <canvas id="cv" width="384" height="216"></canvas>
 <div class="bar"><button id="play">▶ 재생</button><input id="seek" type="range" min="0" max="100" step="0.05" value="0"><span id="lbl"></span><button id="midi">♩ 가창용 MIDI 내려받기 (zip: mid + 가사)</button><select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
 <div class="jumps" id="jumps"></div>
+<details><summary>노래 구간 맞추기 (초, 음원 기준)</summary><div class="secs" id="secs"></div><button id="secreset" style="margin-top:6px">기본값으로</button><p style="margin:6px 0 0;font-size:13px">음원 "The Last Streetlight"(2:01)를 들으면서 절·후렴·병원·복도·병실·새벽이 시작되는 초를 넣으면 장면 길이와 가사 자막이 그에 맞춰 다시 계산됩니다. 이 브라우저에만 저장.</p></details>
 <details open><summary>노래 "Keep Time" (G장조, 70 BPM) · 가사</summary><pre id="lyrics" style="white-space:pre-wrap;color:var(--ink);font:13px/1.6 system-ui;margin:6px 0 0"></pre></details>
 <ul>
 <li>조작은 없고 타임라인만 흐릅니다. 게임 안에서는 벨트·초밥·병실 구간이 플레이, 지하철·걷기·병원 입구가 컷씬.</li>
 <li>초밥집 접시 넷 중 하나는 신입이 안 집고 지나가서 하은이 받아 쌓입니다. 소주잔 구간은 취기가 시간으로 오르고 하은만 선명합니다.</li>
 <li>병실은 심박 58에서 시작해 64로 고르게, 일곱 번째 박마다 "7".</li>
-<li>노래는 지하철 문이 열리는 순간 시작해 걷기 구간에 1절과 후렴, 병원 입구에 간주, 병실은 심장박동만, 새벽에 마지막 두 줄. 지금 목소리는 모음으로 부르는 합성음(자리 표시용)이고, MIDI에는 음마다 가사가 들어 있어서 Synthesizer V나 가수에게 그대로 넘길 수 있습니다. 2절은 MIDI에만.</li>
+<li>노래는 하은이 일어서는 순간 시작해 전주 동안 내리고, 절과 후렴이 걷기, 다음 구간이 병원 입구와 복도, 브레이크다운이 병실, 아웃트로가 새벽. 구간 시작 초는 아래 패널에서 맞출 수 있고 가사 자막은 그 구간 안에서 줄을 고르게 나눕니다. 음원이 안 불러지면 합성 밴드가 대신 납니다.</li>
 </ul>
 </div>
 <script>
@@ -570,13 +574,12 @@ function drawSubway(u) {
   if (u > 5.2) { const a = clamp((u - 5.2) / 0.5, 0, 1) * 0.5; g.fillStyle = `rgba(255,236,200,${a * (u > 7.6 ? 1 - (u - 7.6) / 0.6 : 1)})`; g.fillRect(0, 28, 60, 120); }
   hud('첫차 · 05:12', '');
   cue('sub-rumble', () => rollerOn(true, 0.07)); if (u > 5) cue('sub-stop', () => rollerOn(false));
-  fadeBlack(u > 8 ? (u - 8) : 0);
+  fadeBlack(u > 8 ? Math.min(1, u - 8) : 0);
 }
 // ---------- 4. 걷기 ----------
 const STREET = 7 * W;
-const WALK_DUR = 55;
-function drawWalk(u) {
-  const dawn = clamp(u / WALK_DUR, 0, 1), scroll = Math.min(u * 42, STREET - W);
+function drawWalk(u, dur) {
+  const dawn = clamp(u / dur, 0, 1), scroll = Math.min(u * ((STREET - W) / (dur - 1)), STREET - W);
   const sky = g.createLinearGradient(0, 0, 0, 150); sky.addColorStop(0, mix('#1a2440', '#5a7aa8', dawn)); sky.addColorStop(0.6, mix('#3a4a70', '#9ab4d0', dawn)); sky.addColorStop(1, mix('#c97a4a', '#ffd8a0', dawn)); g.fillStyle = sky; g.fillRect(0, 0, W, 150);
   g.globalAlpha = 1 - dawn; for (let k = 0; k < 14; k++) R((k * 53) % W, (k * 29) % 70, 1, 1, '#ffffff'); g.globalAlpha = 1;
   g.save(); g.translate(-Math.round(scroll), 0);
@@ -592,10 +595,10 @@ function drawWalk(u) {
   const near = Math.min(...Array.from({ length: 26 }, (_, i) => Math.abs(30 + i * 110 - scroll - wx))); const lit = clamp(1 - near / 60, 0, 1) * (1 - dawn * 0.6);
   if (lit > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,200,120,${0.18 * lit})`; g.fillRect(wx - 14, 88, 30, 60); g.restore(); }
   // notes drift up from her on every sung syllable
-  for (const e of ARR.lyr) { const a = SONG_T - e.t; if (a < 0 || a > 2) continue; text('♪', wx + 20 + a * 8 + (e.t * 7 % 10), 80 - a * 30, (e.l % 2 ? 'rgba(242,166,200,' : 'rgba(255,233,168,') + (0.9 * (1 - a / 2)).toFixed(2) + ')', 8); }
-  drawLyric(SONG_T);
+  if (lyricNow(SONG_T)) for (let k = 0; k < 6; k++) { const a = ((SONG_T * 0.5 + k * 0.37) % 2); text('♪', wx + 20 + a * 8 + k * 9, 80 - a * 30, (k % 2 ? 'rgba(242,166,200,' : 'rgba(255,233,168,') + (0.9 * (1 - a / 2)).toFixed(2) + ')', 8); }
+  drawLyric2(SONG_T);
   cue('walk-quiet', () => rollerOn(false));
-  fadeBlack(u < 0.6 ? 1 - u / 0.6 : u > WALK_DUR - 0.7 ? (u - (WALK_DUR - 0.7)) / 0.7 : 0);
+  fadeBlack(u < 0.6 ? 1 - u / 0.6 : u > dur - 0.7 ? (u - (dur - 0.7)) / 0.7 : 0);
 }
 // ---------- 5. 병원 입구 ----------
 function hospitalHall() {
@@ -614,7 +617,7 @@ function drawDoctorAt(cx, top, nod) {
   thick(cx + 6, top + 22, cx + 14, top + 34, 4, '#f7f7f2'); R(cx + 11, top + 28, 10, 13, '#c9b48a'); R(cx + 12, top + 30, 8, 1, '#1b1716'); R(cx + 12, top + 33, 6, 1, '#1b1716'); R(cx + 12, top + 36, 7, 1, '#1b1716');
   thick(cx - 6, top + 22, cx - 10, top + 36, 4, '#f7f7f2'); R(cx - 12, top + 35, 4, 4, C.skin);
 }
-function drawDoctor(u) {
+function drawDoctor(u, dur) {
   hospitalHall();
   drawDoctorAt(150, 90, (u % 1.2) < 0.2 ? 1 : 0);
   const hn = u > 4.2 && u < 5.2 && Math.floor((u - 4.2) / 0.25) % 2 ? 2 : 0;
@@ -622,7 +625,19 @@ function drawDoctor(u) {
   say(u, 0.6, 4.2, '어머님 리듬이 오늘 좀 흔들려요. 일곱 번째에 맞춰요.', 20, 50, 190, { size: 7 });
   say(u, 4.4, 5.8, '…일곱.', 240, 58, 34, { bg: '#d9d0bd' });
   for (let k = 0; k < 7; k++) { const t0 = 1.2 + k * 0.4, on = u >= t0, seven = k === 6; if (on) cue('cnt' + k, seven ? SND.beep : SND.rim); const x = 100 + k * 22; R(x - 6, 136, 12, 12, on ? (seven ? '#8fd694' : '#f7f7f2') : '#dfe6ea'); R(x - 6, 136, 12, 1, on ? (seven ? '#cfe04a' : '#ffffff') : '#b9c4c8'); text(String(k + 1), x, 138, on ? '#1b1716' : '#9aa0a6', 7, 'center', seven && on); }
-  fadeBlack(u < 0.5 ? 1 - u / 0.5 : u > 13.2 ? (u - 13.2) / 0.5 : 0);
+  fadeBlack(u < 0.5 ? 1 - u / 0.5 : u > dur - 0.5 ? (u - (dur - 0.5)) / 0.5 : 0);
+}
+// the corridor: she walks past the doors to the room, the hall slides by
+function drawHall(u, dur) {
+  const sc = Math.min(u * 26, 26 * (dur - 2));
+  g.save(); g.translate(-Math.round(sc % 96), 0); R(-96, 0, W + 192, H, '#e4ece6'); R(-96, 0, W + 192, 24, '#c9d6cc'); R(-96, 150, W + 192, 66, '#c9cfc9'); R(-96, 150, W + 192, 2, '#8a948c'); R(-96, 100, W + 192, 3, '#8fb0a0');
+  for (let x = -96; x < W + 96; x += 96) { const idx = Math.floor((x + sc) / 96); R(x + 20, 40, 48, 110, '#b9c9bd'); R(x + 24, 44, 40, 106, '#dfe6ea'); R(x + 28, 50, 32, 22, '#9fb8c8'); R(x + 36, 36, 16, 6, '#8fd694'); text(String(301 + ((idx % 8) + 8) % 8), x + 44, 76, '#6a7075', 6, 'center'); }
+  R(-96, 4, W + 192, 14, '#dfe6ea'); for (let x = -96 + 30; x < W + 96; x += 140) R(x, 6, 36, 10, '#fff3c8');
+  g.restore();
+  const wx = 190; drawHaeunAt(wx, 90 + (Math.floor(u / 0.2) % 2 ? 0 : 1), 0, { step: u < dur - 2 ? Math.floor(u / 0.2) % 2 : null, mirror: true }); R(wx - 10, 124, 12, 14, '#3a3f45');
+  if (u > dur - 2) { drawHaeunAt(wx, 90, 0, { mirror: true, watch: true }); R(wx - 10, 124, 12, 14, '#3a3f45'); }
+  drawLyric2(SONG_T);
+  fadeBlack(u < 0.4 ? 1 - u / 0.4 : u > dur - 0.5 ? (u - (dur - 0.5)) / 0.5 : 0);
 }
 // ---------- 6·7. 병실 ----------
 function drawWard(u, dawnK, playing) {
@@ -657,44 +672,85 @@ function drawWard(u, dawnK, playing) {
     for (let j = 0; j <= beatNo; j++) cue('hb' + j, () => { SND.heart(); if (j % 7 === 6) SND.beep(); });
     const lastSeven = Math.floor((beatNo + 1) / 7) * 7 - 1, age = u - lastSeven * per; if (lastSeven >= 0 && age < 0.6) judge('7', 238, 20, '#ffffff', 12, '', age);
     say(u, 3, 6, '…밥은 먹었니.', 22, 98, 56, { bg: '#f2ead6', size: 6 }); say(u, 6.5, 9, '회식. 공짜.', 96, 76, 48, { bg: '#d9d0bd', size: 6 });
-    if (u > 12 && u < 14.6) { const t0 = 12; drawHaeunAt(130, 94, 0, { load: true, mirror: true, watch: true }); }
+    if (u > 12 && u < 14.6) drawHaeunAt(130, 94, 0, { load: true, mirror: true, watch: true });
   }
 }
 
 // ---------- 타임라인 ----------
-const TL = [
-  { id: 'open', name: '벨트', dur: 22.5, draw: u => drawOpening(u) },
-  { id: 'cut', name: '매치 컷', dur: 2, draw: u => { drawSushi(0, 1); const o = offC || (offC = Object.assign(document.createElement('canvas'), { width: W, height: H })); const oc = o.getContext('2d'); oc.clearRect(0, 0, W, H); const g0 = g; g = oc; drawOpening(22.5); g = g0; g.save(); g.globalAlpha = 1 - ease(u / 2); g.drawImage(o, 0, 0); g.restore(); if (u < 0.1) cue('cut-roller', () => rollerOn(true, 0.04)); } },
-  { id: 'sushi1', name: '초밥', dur: 18, draw: u => { drawSushi(u, 1); fadeBlack(0); } },
-  { id: 'sushi2', name: '소주잔', dur: 18, draw: u => { const lv = drawSushi(u, 2); drunkFx(lv, u, () => { haeunBeside({ eat: (u % 1.4) < 0.7 ? (u % 1.4) / 0.7 : 1 - ((u % 1.4) - 0.7) / 0.7 }); plateStack(362, 172, 10 + Math.min(6, Math.floor(u / 2.5))); }); fadeBlack(u > 16.6 ? (u - 16.6) / 1.4 : 0); if (u > 16.6) cue('sushi-off', () => rollerOn(false)); } },
-  { id: 'subway', name: '지하철', dur: 9, draw: u => drawSubway(u) },
-  { id: 'walk', name: '걷기', dur: WALK_DUR, draw: u => drawWalk(u) },
-  { id: 'doctor', name: '병원', dur: 13.7, draw: u => drawDoctor(u) },
-  { id: 'ward', name: '병실', dur: 19, draw: u => { drawWard(u, 0, true); fadeBlack(u < 0.5 ? 1 - u / 0.5 : 0); } },
-  { id: 'end', name: '새벽', dur: 16, draw: u => { drawWard(19 + u, clamp(u / 8, 0, 1), false); drawLyric(SONG_T); if (u > 13.5) { const a = clamp((u - 13.5) / 1.5, 0, 1); fadeBlack(a); text('— 스테이지 1 끝 —', W / 2, 100, `rgba(239,230,210,${a})`, 10, 'center'); } if (u >= 0.2) cue('end-bird', () => { [2600, 3100, 2800].forEach((f, i) => oscS('sine', f, ac.currentTime + 1 + i * 0.12, 0.03, 0.12, f * 1.2)); }); } }
-];
-const TOTAL = TL.reduce((a, s) => a + s.dur, 0);
-let T = 0, playing = false, lastNow = 0, speed = 1, SONG_T = -1;
-function songTimeAt(t) { const sub = TL.findIndex(s => s.id === 'subway'); let acc = 0; for (let i = 0; i < sub; i++) acc += TL[i].dur; const start = acc + 5.2; const ward = TL.findIndex(s => s.id === 'ward'); let wacc = 0; for (let i = 0; i < ward; i++) wacc += TL[i].dur; const played = SONG_LEN.intro + SONG_LEN.verse + SONG_LEN.chorus + SONG_LEN.tag; if (t < start) return -1; const st = t - start; if (st <= played) return st; if (t < wacc + TL[ward].dur) return played; return played + SONG_LEN.gap + (t - wacc - TL[ward].dur); }
+// SEC: where each section starts, in seconds of the song. The song starts when 하은 stands up on the train (subway u = 1).
+const SEC_DEF = { walk: 10, chorus: 36, doctor: 62, hall: 76, ward: 98, end: 117 };
+let SEC = { ...SEC_DEF }; try { const sv = JSON.parse(localStorage.getItem('fin.sec') || 'null'); if (sv) SEC = { ...SEC_DEF, ...sv }; } catch (e) {}
+const SONG_AT_SUBWAY = 1;
+let TL = [], TOTAL = 0;
+function buildTL() {
+  TL = [
+    { id: 'open', name: '벨트', dur: 22.5, draw: u => drawOpening(u) },
+    { id: 'cut', name: '매치 컷', dur: 2, draw: u => { drawSushi(0, 1); const o = offC || (offC = Object.assign(document.createElement('canvas'), { width: W, height: H })); const oc = o.getContext('2d'); oc.clearRect(0, 0, W, H); const g0 = g; g = oc; drawOpening(22.5); g = g0; g.save(); g.globalAlpha = 1 - ease(u / 2); g.drawImage(o, 0, 0); g.restore(); if (u < 0.1) cue('cut-roller', () => rollerOn(true, 0.04)); } },
+    { id: 'sushi1', name: '초밥', dur: 18, draw: u => { drawSushi(u, 1); fadeBlack(0); } },
+    { id: 'sushi2', name: '소주잔', dur: 18, draw: u => { const lv = drawSushi(u, 2); drunkFx(lv, u, () => { haeunBeside({ eat: (u % 1.4) < 0.7 ? (u % 1.4) / 0.7 : 1 - ((u % 1.4) - 0.7) / 0.7 }); plateStack(362, 172, 10 + Math.min(6, Math.floor(u / 2.5))); }); fadeBlack(u > 16.6 ? (u - 16.6) / 1.4 : 0); if (u > 16.6) cue('sushi-off', () => rollerOn(false)); } },
+    { id: 'subway', name: '지하철', dur: SONG_AT_SUBWAY + SEC.walk, draw: u => drawSubway(u) },
+    { id: 'walk', name: '걷기', dur: SEC.doctor - SEC.walk, draw: (u, d) => drawWalk(u, d) },
+    { id: 'doctor', name: '병원', dur: SEC.hall - SEC.doctor, draw: (u, d) => drawDoctor(u, d) },
+    { id: 'hall', name: '복도', dur: SEC.ward - SEC.hall, draw: (u, d) => drawHall(u, d) },
+    { id: 'ward', name: '병실', dur: SEC.end - SEC.ward, draw: u => { drawWard(u, 0, true); fadeBlack(u < 0.5 ? 1 - u / 0.5 : 0); } },
+    { id: 'end', name: '새벽', dur: 16, draw: u => { drawWard((SEC.end - SEC.ward) + u, clamp(u / 8, 0, 1), false); drawLyric2(SONG_T); if (u > 13.5) { const a = clamp((u - 13.5) / 1.5, 0, 1); fadeBlack(a); text('— 스테이지 1 끝 —', W / 2, 100, `rgba(239,230,210,${a})`, 10, 'center'); } if (u >= 0.2) cue('end-bird', () => { [2600, 3100, 2800].forEach((f, i) => oscS('sine', f, ac.currentTime + 1 + i * 0.12, 0.03, 0.12, f * 1.2)); }); } }
+  ];
+  TOTAL = TL.reduce((a, s) => a + s.dur, 0);
+}
+buildTL();
 function sceneAt(t) { let acc = 0; for (const s of TL) { if (t < acc + s.dur) return { s, u: t - acc, start: acc }; acc += s.dur; } const s = TL[TL.length - 1]; return { s, u: s.dur, start: TOTAL - s.dur }; }
+let T = 0, playing = false, lastNow = 0, speed = 1, SONG_T = -1;
+function songStart() { let acc = 0; for (const s of TL) { if (s.id === 'subway') break; acc += s.dur; } return acc + SONG_AT_SUBWAY; }
+function songTimeAt(t) { return t - songStart(); }
+// the generated song: play it in sync when it loads; the synth band is the fallback
+const SONG_AUDIO = new Audio('the_last_streetlight.mp3'); SONG_AUDIO.preload = 'auto'; let mp3ok = false;
+SONG_AUDIO.addEventListener('canplaythrough', () => { mp3ok = true; });
+SONG_AUDIO.addEventListener('error', () => { mp3ok = false; });
+function syncAudio() {
+  if (!mp3ok) return;
+  const st = SONG_T, inSong = st >= 0 && st < SONG_AUDIO.duration;
+  if (playing && inSong) { if (Math.abs(SONG_AUDIO.currentTime - st) > 0.3) SONG_AUDIO.currentTime = st; SONG_AUDIO.playbackRate = clamp(speed, 0.5, 2); if (SONG_AUDIO.paused) SONG_AUDIO.play().catch(() => {}); }
+  else if (!SONG_AUDIO.paused) SONG_AUDIO.pause();
+}
+// lyric lines on the song's clock: four lines spread over the verse, four over the chorus, two at the end
+function lyricNow(st) {
+  const segs = [[SEC.walk, SEC.chorus, LINES.slice(0, 4)], [SEC.chorus, SEC.doctor, LINES.slice(4)], [SEC.end, SEC.end + 9, ['And I keep time', '\'cause someone has to']]];
+  for (const [a, b, lines] of segs) { if (st < a || st >= b) continue; const per = (b - a) / lines.length, i = Math.min(lines.length - 1, Math.floor((st - a) / per)); return { line: lines[i], p: ((st - a) - i * per) / per }; }
+  return null;
+}
+function drawLyric2(st) {
+  const L = lyricNow(st); if (!L) return;
+  R(0, 182, W, 26, 'rgba(0,0,0,.55)');
+  const words = L.line.split(' '); g.font = 'bold 9px "Apple SD Gothic Neo","Malgun Gothic",sans-serif'; const wAll = g.measureText(L.line).width; let x = W / 2 - wAll / 2;
+  words.forEach((w, i) => { const on = i < Math.ceil(L.p * 0.9 * words.length + 0.5); text(w, x, 190, on ? '#ffe9a8' : '#8a8a8a', 9, 'left', true); x += g.measureText(w + ' ').width; });
+}
 const cv = document.getElementById('cv'); g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
 const seekEl = document.getElementById('seek'), lbl = document.getElementById('lbl');
-function seek(t) { T = clamp(t, 0, TOTAL); fired.clear(); rollerOn(false); songLast = -1; }
+function seek(t) { T = clamp(t, 0, TOTAL); fired.clear(); rollerOn(false); songLast = -1; if (mp3ok) { const st = songTimeAt(T); if (st >= 0 && st < SONG_AUDIO.duration) SONG_AUDIO.currentTime = st; } }
 function frame(now) {
   requestAnimationFrame(frame);
-  if (playing) { T += Math.min(0.1, (now - lastNow) / 1000) * speed; if (T >= TOTAL) { T = TOTAL; playing = false; rollerOn(false); } }
+  if (playing) { T += Math.min(0.1, (now - lastNow) / 1000) * speed; if (T >= TOTAL) { T = TOTAL; playing = false; rollerOn(false); document.getElementById('play').textContent = '▶ 재생'; } }
   lastNow = now;
-  const { s, u } = sceneAt(T); SONG_T = songTimeAt(T); if (playing) songTick(SONG_T); else songLast = SONG_T;
+  const { s, u } = sceneAt(T); SONG_T = songTimeAt(T); if (!mp3ok) { if (playing) songTick(SONG_T); else songLast = SONG_T; } syncAudio();
   g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H);
-  try { s.draw(u); } catch (e) { text(String(e), 4, 4, '#ff4a3d', 7); }
+  try { s.draw(u, s.dur); } catch (e) { text(String(e), 4, 4, '#ff4a3d', 7); }
   seekEl.value = T; lbl.textContent = `${s.name} · ${u.toFixed(1)}s / ${T.toFixed(0)}s`;
 }
 requestAnimationFrame(frame);
 seekEl.max = TOTAL; seekEl.addEventListener('input', () => seek(+seekEl.value));
-document.getElementById('play').addEventListener('click', () => { audioOn(); if (ac && ac.state === 'suspended') ac.resume(); playing = !playing; if (T >= TOTAL) seek(0); document.getElementById('play').textContent = playing ? '❚❚ 일시정지' : '▶ 재생'; if (!playing) rollerOn(false); });
+document.getElementById('play').addEventListener('click', () => { audioOn(); if (ac && ac.state === 'suspended') ac.resume(); playing = !playing; if (T >= TOTAL) seek(0); document.getElementById('play').textContent = playing ? '❚❚ 일시정지' : '▶ 재생'; if (!playing) { rollerOn(false); SONG_AUDIO.pause(); } });
 document.getElementById('speed').addEventListener('change', e => { speed = +e.target.value; });
 document.getElementById('midi').addEventListener('click', downloadMidi);
-const jumps = document.getElementById('jumps'); let acc = 0; for (const s of TL) { const b = document.createElement('button'); b.textContent = s.name; const at = acc; b.addEventListener('click', () => { audioOn(); seek(at); }); jumps.append(b); acc += s.dur; }
+const jumps = document.getElementById('jumps');
+function buildJumps() { jumps.innerHTML = ''; let acc = 0; for (const s of TL) { const b = document.createElement('button'); b.textContent = s.name; const at = acc; b.addEventListener('click', () => { audioOn(); seek(at); }); jumps.append(b); acc += s.dur; } seekEl.max = TOTAL; }
+buildJumps();
+// the section panel: start times in seconds of the song, kept in this browser
+const secEl = document.getElementById('secs');
+for (const [k, label] of [['walk', '걷기(절)'], ['chorus', '후렴'], ['doctor', '병원 입구'], ['hall', '복도'], ['ward', '병실'], ['end', '새벽']]) {
+  const l = document.createElement('label'); l.innerHTML = `${label} <input type="number" step="0.5" min="0" max="130" data-k="${k}" value="${SEC[k]}">`; secEl.append(l);
+}
+secEl.addEventListener('change', e => { const k = e.target.dataset.k; if (!k) return; SEC[k] = +e.target.value; try { localStorage.setItem('fin.sec', JSON.stringify(SEC)); } catch (x) {} const st = SONG_T; buildTL(); buildJumps(); seek(st >= 0 ? songStart() + st : T); });
+document.getElementById('secreset').addEventListener('click', () => { SEC = { ...SEC_DEF }; try { localStorage.removeItem('fin.sec'); } catch (x) {} buildTL(); buildJumps(); for (const inp of secEl.querySelectorAll('input')) inp.value = SEC[inp.dataset.k]; seek(0); });
 
 // ---------- "Keep Time": the song from the subway doors on ----------
 // G major with the verse sitting on E minor, 70 BPM, 4/4. Piano, strings, a soft bass, and a placeholder voice (formant synth) that
