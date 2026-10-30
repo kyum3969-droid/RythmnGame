@@ -658,6 +658,9 @@ const bgOffice = document.createElement('canvas'); bgOffice.width = W; bgOffice.
 // start for phase 3. Every sign on the street is dead until then. The lit signs, reflections, rain and drips are drawn live.
 const SW = W * 4;
 const BULBS = Array.from({ length: 16 }, (_, i) => { const x = 6 + i * 14; return { x, y: Math.round(19 + 7 * Math.sin(Math.PI * x / 222)) }; });
+// lanterns hung under the fire escape rails, and the order hits light the street in phase 3: one string bulb, one lantern, and so on
+const FE_BULBS = [...Array.from({ length: 8 }, (_, i) => ({ x: 284 + i * 12, y: 22 })), ...Array.from({ length: 8 }, (_, i) => ({ x: 284 + i * 12, y: 62 }))];
+const LIT_SPOTS = BULBS.flatMap((p, i) => [p, FE_BULBS[(i * 5) % 16]]);
 const ALLEY_BG = ['ground', 'wall', 'lamp'].reduce((o, k) => { const c = document.createElement('canvas'); c.width = SW; c.height = H; o[k] = c; return o; }, {});
 const SIGN = { x: 124, y: 44 }, NEON_GTR_AT = { x: 104, y: 34 }, GUITARS = { x: 252, y: 58 }, NOTE_SIGN = { x: 194, y: 32 }, PUDDLE = { x: 110, y: 142 }, PUDDLE2 = { x: 206, y: 142 };
 // in street coordinates: lamp heads, drip sources (awning edges), puddles
@@ -711,6 +714,7 @@ const PUDDLES = [PUDDLE, PUDDLE2, { x: 259, y: 142 }, { x: 470, y: 142 }, { x: 5
   const poster = (x, y, c, ink) => { r(x, y, 14, 19, c); r(x + 2, y + 3, 10, 8, ink); r(x + 2, y + 13, 9, 1, ink); r(x + 2, y + 15, 6, 1, ink); };
   poster(98, 66, '#bfa880', '#3a2a1e'); poster(115, 70, '#8a3a2a', '#e0c9a0');
   BULBS.forEach((p, i) => { if (i) { const q = BULBS[i - 1]; for (let k = 0; k <= 14; k++) r(q.x + k, Math.round(q.y + (p.y - q.y) * k / 14) - 1, 1, 1, '#141210'); } r(p.x, p.y, 2, 3, '#3a3530'); });
+  FE_BULBS.forEach(p => { r(p.x, p.y - 2, 1, 2, '#141210'); r(p.x - 1, p.y, 3, 3, '#3a3530'); });
   // --- screen 2: a record shop, flats above ---
   r(416, 64, 128, 70, '#2a1e18'); r(420, 52, 120, 10, '#121519');
   r(424, 72, 64, 52, '#141820'); r(424, 100, 64, 24, '#2e2016');
@@ -1600,7 +1604,8 @@ function drawAlleyBack(al, t, nowMs) {
     g.restore();
   }
   // signs: his blue BLUES, and from the fusion her lilac note across the alley
-  'CHICAGO'.split('').forEach((ch, i) => neonPix(SIGN_FONT[ch], SIGN.x + i * 8, SIGN.y, 2, '#bff3ff', '57,198,255', nv.sign, al.wall));
+  const letterRun = al.beat >= 200 && al.beat < 248 ? Math.floor(al.beat * 2) % 7 : -1;
+  'CHICAGO'.split('').forEach((ch, i) => neonPix(SIGN_FONT[ch], SIGN.x + i * 8, SIGN.y, 2, '#bff3ff', '57,198,255', nv.sign * (letterRun < 0 ? 1 : i === letterRun ? 1.15 : 0.7), al.wall));
   neonPix(NEON_GTR, NEON_GTR_AT.x, NEON_GTR_AT.y, 2, '#ffe0b0', '255,170,80', nv.gtr * (0.8 + 0.2 * glint), al.wall);
   if (al.wall > 0 && al.beat >= 152) neonPix(NOTE_PIX, NOTE_SIGN.x, NOTE_SIGN.y, 3, '#f3e8ff', '190,150,255', nv.note);
   // window and the bulb over the door (the third rim of the count-in)
@@ -1618,11 +1623,15 @@ function drawAlleyBack(al, t, nowMs) {
     g.fillStyle = `rgba(255,240,210,${0.35 * glint * nv.gtr})`; g.fillRect(243, 44, 1, 31); g.fillRect(261, 48, 1, 31);
     g.restore();
   }
-  if (nv.bulbs > 0) {
+  if (nv.bulbs > 0 && FX.lit > 0) {
+    const chase = al.beat >= 200 && al.beat < 248 ? Math.floor(al.beat * 2) % 4 : -1;
     g.save(); g.globalCompositeOperation = 'lighter';
-    BULBS.forEach((p, i) => { const a = nv.bulbs * (0.75 + 0.25 * (nv.k && i % 2 === Math.floor(al.beat) % 2 ? 1 : 0)); g.fillStyle = `rgba(255,200,110,${0.22 * a})`; g.fillRect(p.x - 3, p.y - 2, 8, 8); });
+    for (let i = 0; i < FX.lit; i++) {
+      const p = LIT_SPOTS[i], flare = Math.max(0, 1 - (nowMs - (FX.litAt[i] || -1e9)) / 300), a = nv.bulbs * (0.7 + 0.3 * (i % 4 === chase ? 1 : 0)) + flare;
+      g.fillStyle = `rgba(255,200,110,${0.22 * a})`; g.fillRect(p.x - 3 - flare * 4, p.y - 2 - flare * 4, 8 + flare * 8, 8 + flare * 8);
+    }
     g.restore();
-    BULBS.forEach(p => { g.globalAlpha = Math.min(1, nv.bulbs * 1.3); R(p.x, p.y, 2, 3, '#ffd88a'); g.globalAlpha = 1; });
+    for (let i = 0; i < FX.lit; i++) { const p = LIT_SPOTS[i]; g.globalAlpha = Math.min(1, nv.bulbs * 1.3); R(p.x - (i % 2), p.y, 2 + (i % 2), 3, '#ffd88a'); g.globalAlpha = 1; }
   }
   // reflections on the wet street, shivering when the guitar plays
   g.save(); g.globalCompositeOperation = 'lighter';
@@ -1638,10 +1647,16 @@ function drawAlleyRain(al, t, nowMs) {
   if (al.rain > 0) {
     const n = Math.round(60 * al.rain), thick = al.rain > 1.6 ? 2 : 1, a = Math.min(0.42, 0.18 + 0.08 * al.rain);
     g.save(); g.beginPath(); g.rect(0, 0, W, BELT_Y); g.clip();
-    g.fillStyle = `rgba(175,195,225,${a})`;
+    const nv = neonLevels(al, nowMs), fz = !reduce && nowMs - FX.freezeAt < 200, tf = FX.freezeAt / 1000;
     for (let i = 0; i < n; i++) {
       const sp = 230 + rnd(i, 1) * 80, x0 = rnd(i, 2) * (W + 40), y0 = rnd(i, 3) * 170;
-      const y = ((y0 + ts * sp) % 170) - 20, x = ((x0 - ts * sp * 0.22) % (W + 40) + W + 40) % (W + 40) - 20;
+      const at = tt => ({ y: ((y0 + tt * sp) % 170) - 20, x: ((x0 - tt * sp * 0.22) % (W + 40) + W + 40) % (W + 40) - 20 });
+      let { x, y } = at(ts), held = false;
+      if (fz) { const q = at(tf); if (Math.hypot(q.x - SCAN_X, (q.y - (BELT_Y - 30)) * 1.4) < 72) { x = q.x; y = q.y; held = true; } }
+      // drops falling through a lit sign's glow take its colour
+      const sg = nv.sign > 0 && x > 100 && x < 200 && y < 120 ? nv.sign : 0, nt = nv.note > 0 && x > 184 && x < 228 && y < 110 ? nv.note : 0;
+      g.fillStyle = held ? `rgba(235,245,255,${Math.min(0.9, a + 0.35)})` : sg ? `rgba(130,215,255,${a + 0.12 * sg})` : nt ? `rgba(210,180,255,${a + 0.12 * nt})` : `rgba(175,195,225,${a})`;
+      if (held) { g.fillRect(Math.round(x), Math.round(y), thick, 3); continue; }
       for (let k = 0; k < 7; k++) g.fillRect(Math.round(x - k * 0.22 * 1.2), Math.round(y + k * 1.2), thick, 1);
     }
     g.restore();
@@ -1690,7 +1705,9 @@ function alleyLightList(al, nowMs) {
   out.push({ x: NEON_GTR_AT.x + 5, y: NEON_GTR_AT.y + 11, r: 50, a: nv.gtr, c: '255,170,80', belt: 0.4 });
   out.push({ x: GUITARS.x, y: GUITARS.y, r: 66, a: nv.gtr * (0.8 + 0.2 * glint), c: '255,200,130', belt: 0.6 });
   out.push({ x: NOTE_SIGN.x + 9, y: NOTE_SIGN.y + 10, r: 70, a: nv.note, c: '190,150,255', belt: 0.7 });
-  out.push({ x: 110, y: 26, r: 130, a: nv.bulbs * 0.75, c: '255,200,110', belt: 0.5 });
+  const litStr = LIT_SPOTS.slice(0, FX.lit).filter((p, i) => i % 2 === 0).length / 16, litFe = LIT_SPOTS.slice(0, FX.lit).filter((p, i) => i % 2 === 1).length / 16;
+  out.push({ x: 110, y: 26, r: 130, a: nv.bulbs * 0.75 * litStr, c: '255,200,110', belt: 0.5 });
+  out.push({ x: 326, y: 44, r: 110, a: nv.bulbs * 0.7 * litFe, c: '255,200,110', belt: 0.5 });
   return out.filter(l => l.a > 0.01 && l.x > -l.r && l.x < W + l.r);
 }
 function drawAlleyLight(al, t, nowMs) {
@@ -1718,6 +1735,51 @@ function drawAlleyLight(al, t, nowMs) {
     }
   }
   g.restore();
+}
+// phase 3: the belt's top edge is a guitar string. His lead notes set it humming end to end; each hit plucks it at the scanner and
+// the wave runs back up the belt.
+const phase3 = beat => !!L.alley && beat >= 152 && beat < 248;
+function drawBeltString(al, t, nowMs) {
+  if (!phase3(al.beat) && !(al.beat >= 248 && al.beat < 250)) return;
+  const glint = guitarGlint(al.beat), age = (nowMs - FX.pluckAt) / 1000, pl = age < 0.9 ? FX.pluckAmp * Math.exp(-age * 4) : 0;
+  const hum = glint * 0.8, a = 0.35 + 0.4 * Math.max(glint, pl);
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (let x = 48; x < W; x++) {
+    const u = (x - 48) / (W - 48), d = Math.abs(x - SCAN_X);
+    let dy = hum * Math.sin(Math.PI * u * 3) * Math.sin(nowMs / 18);
+    if (pl > 0) dy += pl * 1.6 * Math.exp(-Math.pow((d - age * 420) / 26, 2)) * Math.sin(d / 5 - age * 40);
+    const y = BELT_Y + (reduce ? 0 : Math.round(dy));
+    g.fillStyle = `rgba(255,210,150,${a * (0.6 + 0.4 * Math.exp(-d / 160))})`; g.fillRect(x, y, 1, 1);
+  }
+  g.restore();
+}
+function drawPuddleMirror(al, t, nowMs) {
+  const b = al.beat; if (!L.alley || b < 231 || b >= 250) return;
+  const fade = b < 232 ? b - 231 : b >= 248 ? 1 - (b - 248) / 2 : 1, kick = Math.max(0, 1 - (b % 1) * 3);
+  const top = BELT_Y + 18, rows = H - top;
+  g.save(); g.globalAlpha = 0.3 * fade;
+  for (let k = 0; k < rows; k++) {
+    const sy = Math.round(BELT_Y + 14 - k * 2.2); if (sy < 20) break;
+    const dx = reduce ? 0 : Math.round(Math.sin(k * 0.55 + nowMs / 140) * (0.6 + kick * 2.2) * (0.4 + k / rows));
+    g.drawImage(cv, 0, sy, W, 1, dx, top + k, W, 1);
+  }
+  g.restore();
+  g.fillStyle = `rgba(10,14,30,${0.25 * fade})`; g.fillRect(0, top, W, rows);
+}
+// a hit in phase 3 lights the next light on the street and plucks the string; a perfect holds the rain for a breath.
+// No zoom or shake here: that is 1-2's language.
+function alleyHit(j) {
+  const now = performance.now();
+  if (FX.lit < LIT_SPOTS.length) { FX.litAt[FX.lit] = now; FX.lit++; }
+  FX.pluckAt = now; FX.pluckAmp = j === 'perfect' ? 1 : 0.6;
+  if (j === 'perfect') FX.freezeAt = now;
+  FX.punchAt = -1e9; FX.shakeUntil = 0;
+}
+function alleyMiss() {
+  if (!(FX.lit > 0)) return;
+  const i = --FX.lit, p = LIT_SPOTS[i];
+  spawn(p.x, p.y + 2, 7, ['#ffd88a', '#fff3c8', '#ff9a4a'], -45, 45, -70, 10, 320, 420, [1, 1]);
+  if (ctx) { noise(ctx.currentTime, 'bandpass', 3200, 0.12, 0.03, 3, bus); noise(ctx.currentTime + 0.02, 'highpass', 5000, 0.06, 0.08, 0.7, bus); }
 }
 // in front of everything: the blackout before the count-in, the dark beat before the second drop, and lightning
 const LIGHTNING = [152, 200, 216, 232, 236, 240, 244];
@@ -1774,7 +1836,7 @@ function drawScene(t, bt, active, nowMs) {
   for (const [n, f, dy] of laneFx.falling) { g.save(); g.translate(f.x, f.y + dy - n.h / 2); g.rotate(f.rot); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); }
   drawPlayerArm(kick, nowMs, nowMs - lastHeavy < 260, upperKick);
   drawParticles(nowMs);
-  if (al) drawAlleyLight(al, t, nowMs);
+  if (al) { drawAlleyLight(al, t, nowMs); drawBeltString(al, t, nowMs); drawPuddleMirror(al, t, nowMs); }
   // blackout overlay: darkness with holes where the scanners glow and a faint one around each partner
   const dark = active ? blackoutAmount(t) : 0;
   if (dark > 0) {
@@ -1970,6 +2032,7 @@ function sfxPluck(t, f, v, d) {
 }
 function hitSound(j, tones, beat, done) {
   const t = ctx.currentTime, th = fxTheme(beat), f = tones[(stats.combo + (done ? 1 : 0)) % Math.min(3, tones.length)], good = j === 'good';
+  if (phase3(beat)) { if (done) gtr(t, tones.slice(0, 3).map(x => x * 2), 0.9, 0.034); else gtrLead(t, f * 2, good ? 0.3 : 0.42, good ? 0.028 : 0.036, false); return; }
   if (th === 'chill') {
     // a soft piano note: triangle with its octave, a little felt in the attack
     osc('triangle', f * 4, t, 0.004, good ? 0.05 : 0.07, 0.45, bus); osc('sine', f * 8, t, 0.004, 0.018, 0.25, bus); noise(t, 'lowpass', 900, 0.05, 0.015, 0.7, bus);
@@ -2596,7 +2659,7 @@ try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}
 
 function resetRun() {
   notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; });
-  FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1;
+  FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
   rings = []; heavyPend = null;
 }
@@ -2626,6 +2689,7 @@ function addCombo() {
 function failFx(kind, judgeKind, sub, d, lane = 0) {
   const now = performance.now(), lost = stats.combo;
   stats.combo = 0; stats.missStreak++;
+  if (L.alley && ctx && phase3(beatAt(songAt(now)))) alleyMiss();
   popJudge(judgeKind, lost >= 10 ? lost + ' 콤보 끊김' : sub, lane);
   FX.lastMiss = now; FX.missKind = kind; FX.missLane = lane; FX.react[lane] = { type: 'glance', at: now }; FX.flinch = now;
   if (d != null) FX.marks.push({ d, at: now, c: C.laser });
@@ -2669,10 +2733,12 @@ function judgeNote(target, t) {
     const tones = CHORDS[chordIdx(target.beat)];
     const th = THEME[fxTheme(target.beat)];
     if (!inRange(target.beat, L.hype)) hitSound(j, tones, target.beat, false);
+    const lightUp = phase3(target.beat);
     lastGood = now; FX.goodLane = target.lane; FX.glow = th.glow; ring(th.ring[(stats.combo + (j === 'good' ? 1 : 0)) % 2], target.lane);
     spawnBits(j === 'perfect' ? 14 : 6, th);
     FX.punchAt = now; FX.punch = milestone ? 1.6 : j === 'perfect' ? 1 : 0.5;
     FX.marks.push({ d, at: now, c: j === 'perfect' ? th.ring[0] : th.ring[1] });
+    if (lightUp) alleyHit(j);
     if (isSpecial(target)) stats.special++;
     if (target.late) FX.react[target.lane] = { type: 'relief', at: now };
     else if (j === 'perfect') FX.react[target.lane] = { type: 'nod', at: now };
@@ -2736,6 +2802,7 @@ function completeHold(n) {
   n.state = 'hit'; n.doneAt = songAt(now); stats.tailOk++; const milestone = addCombo(); stopHold();
   hitSound('perfect', CHORDS[chordIdx(n.beat)], n.beat, true); tear(ctx.currentTime);
   lastGood = now; FX.goodLane = n.lane; ring(C.ok, n.lane); spawnBits(16); FX.punchAt = now; FX.punch = 1.4; FX.shakeUntil = now + 150; FX.react[n.lane] = { type: 'nod', at: now };
+  if (phase3(n.beat)) alleyHit('perfect');
   popJudge('done', milestone, n.lane);
 }
 function onRelease(ts, lane = 0) {
