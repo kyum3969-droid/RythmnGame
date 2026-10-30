@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>1-5 애니매틱</title>
+<style>
+:root{--bg:#1b1716;--ink:#efe6d2;--muted:#b8a998;--card:#241f1d;--accent:#cfe04a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1b1716}}
+:root[data-theme="dark"]{--bg:#1b1716}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;padding:16px}
+h1{font-size:18px;margin:0 0 4px}
+p{margin:0 0 12px;color:var(--muted)}
+.wrap{max-width:900px;margin:0 auto}
+canvas{display:block;width:100%;image-rendering:pixelated;background:#000;border-radius:6px}
+.bar{display:flex;gap:8px;align-items:center;margin:10px 0;flex-wrap:wrap}
+button{background:var(--card);color:var(--ink);border:1px solid #3a302a;border-radius:6px;padding:6px 10px;font-size:14px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+#play{background:var(--accent);color:#1b1716;font-weight:700}
+input[type=range]{flex:1;min-width:160px}
+select{background:var(--card);color:var(--ink);border:1px solid #3a302a;border-radius:6px;padding:5px}
+#lbl{color:var(--muted);font-size:13px;min-width:140px}
+.jumps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.secs{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.secs label{font-size:13px;color:var(--muted)} .secs input{width:64px;background:var(--card);color:var(--ink);border:1px solid #3a302a;border-radius:4px;padding:3px 5px}
+details{margin:8px 0} summary{cursor:pointer;color:var(--muted)}
+ul{color:var(--muted);font-size:13px;margin:8px 0 0 18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>1-5 첫 회식 · 애니매틱</h1>
+<p>벨트 도입 → 매치 컷 → 초밥 세 벨트 → 소주잔과 취기, 그리고 하은의 밤: 창 → 문 → 계단 → 가로등 → 횡단보도 → 웅덩이 → 복도 → 손 → 병실 → 새벽 → 탁자. 약 2분 40초. 하은의 밤은 컷과 클로즈업으로 가고, 박자 모티프가 창의 불빛 → 횡단보도 신호음 → 복도의 일곱 등 → 심전도로 이어집니다. 재생을 누르면 효과음이 납니다.</p>
+<canvas id="cv" width="384" height="216"></canvas>
+<div class="bar"><button id="play">▶ 재생</button><input id="seek" type="range" min="0" max="100" step="0.05" value="0"><span id="lbl"></span><select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
+<div class="jumps" id="jumps"></div>
+
+
+<ul>
+<li>조작은 없고 타임라인만 흐릅니다. 게임 안에서는 벨트·초밥·병실 구간이 플레이, 나머지는 컷씬.</li>
+<li>하은의 밤은 한 컷에 한 가지씩: 창(신입을 어깨에서 내려놓음), 문(닫히는 문이 둘을 가름), 계단(실루엣과 하늘), 가로등(지나가자 꺼짐), 횡단보도(신호음에 맞춰 건넘), 웅덩이(거꾸로 비친 십자가), 복도(일곱 등이 켜짐), 손(어머니 손 위에), 병실, 새벽, 탁자(납부서와 시계).</li>
+</ul>
+</div>
+<script>
