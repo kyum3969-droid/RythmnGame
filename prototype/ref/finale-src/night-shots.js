@@ -51,7 +51,7 @@ function ledInsert(u) {
   blackout(W, H, u < 0.4 ? 1 - u / 0.4 : 0);
 }
 // the train's position along the tunnel: cruising, then braking into the station
-const BRAKE = 7.5, BRAKE_LEN = 3.0, PLAT = 150 * BRAKE + 75 * BRAKE_LEN;
+const BRAKE = 8.0, BRAKE_LEN = 3.0, PLAT = 150 * BRAKE + 75 * BRAKE_LEN;
 const trainS = t => t < BRAKE ? 150 * t : 150 * BRAKE + 150 * (Math.min(t - BRAKE, BRAKE_LEN) - Math.min(t - BRAKE, BRAKE_LEN) ** 2 / (2 * BRAKE_LEN));
 const trainV = t => t < BRAKE ? 150 : Math.max(0, 150 * (1 - (t - BRAKE) / BRAKE_LEN));
 // ---- people seen from the front, all on one template so they share the game's 4-head proportion:
@@ -163,6 +163,35 @@ function sinipAsleep(SX, SEAT, ang, t) {
   zzz(Math.round(headX + 6), Math.round(headY - 14), t * 1000);
   return [headX, headY];
 }
+const HAEUN_DRESS = (x, y) => { R(x - 6, y + 1, 12, 15, '#7ec8e3'); R(x - 6, y + 8, 12, 2, '#ebe5c9'); R(x - 1, y + 1, 2, 15, '#5aa6c4'); R(x - 2, y - 1, 4, 2, '#1e1a1a'); };
+function haeunFront(cx, pose, o = {}) {
+  const seat = 70, sk = '#d9a27a', pants = '#3a3f45', pd = '#2a2e33';
+  const torso = (top, dx = 0) => { R(cx - 7 + dx, top, 14, 1, '#1e1a1a'); R(cx - 8 + dx, top + 1, 16, 17, '#1e1a1a'); R(cx - 6 + dx, top + 3, 1, 14, '#121010'); R(cx + 5 + dx, top + 3, 1, 14, '#121010'); HAUN_D(cx + dx, top); R(cx - 2 + dx, top - 1, 4, 2, '#b98260'); };
+  const HAUN_D = HAEUN_DRESS;
+  const head = (top, dx = 0) => { faceF(cx + dx, top, { eyes: 'hidden' }); HAIR.cap(cx + dx, top, o.turned); };
+  const shins = () => { R(cx - 6, seat + 3, 5, 12, pants); R(cx + 1, seat + 3, 5, 12, pants); R(cx - 2, seat + 3, 1, 12, pd); R(cx + 1, seat + 3, 1, 12, pd); R(cx - 7, seat + 15, 6, 2, '#1e1a1a'); R(cx + 1, seat + 15, 6, 2, '#1e1a1a'); R(cx - 7, seat + 17, 6, 1, '#3a3236'); R(cx + 1, seat + 17, 6, 1, '#3a3236'); };
+  if (pose === 'sit') { shins(); R(cx - 7, seat, 14, 3, pants); R(cx - 7, seat, 14, 1, '#545a62'); torso(seat - 18); head(seat - 32); return seat - 18; }
+  if (pose === 'lean') {   // forward over the knees: the torso drops and shortens, the head bows, hands on the knees
+    shins(); R(cx - 7, seat, 14, 3, pants); R(cx - 7, seat, 14, 1, '#545a62');
+    const top = seat - 15; R(cx - 8, top + 1, 16, 14, '#1e1a1a'); R(cx - 7, top, 14, 1, '#1e1a1a'); R(cx - 6, top + 1, 12, 12, '#7ec8e3'); R(cx - 6, top + 6, 12, 2, '#ebe5c9'); R(cx - 1, top + 1, 2, 12, '#5aa6c4');
+    head(top - 12); R(cx - 6, top - 12, 12, 2, '#a83328');
+    thick(cx - 7, top + 3, cx - 6, seat + 1, 3, '#1e1a1a'); thick(cx + 7, top + 3, cx + 6, seat + 1, 3, '#1e1a1a'); R(cx - 8, seat + 1, 4, 3, sk); R(cx + 4, seat + 1, 4, 3, sk);
+    return top;
+  }
+  if (pose === 'half') {   // hips up off the seat, knees still bent: the thighs show, the body is still a little forward
+    shins(); R(cx - 7, seat - 5, 14, 8, pants); R(cx - 1, seat - 5, 2, 8, pd); R(cx - 7, seat - 5, 14, 1, '#545a62');
+    const top = seat - 22; torso(top); head(top - 13);
+    thick(cx - 7, top + 3, cx - 7, top + 15, 3, '#1e1a1a'); thick(cx + 7, top + 3, cx + 7, top + 15, 3, '#1e1a1a'); R(cx - 8, top + 15, 3, 3, sk); R(cx + 6, top + 15, 3, 3, sk);
+    return top;
+  }
+  // standing, feet on the floor
+  const feet = 87, legTop = feet - 22, top = legTop - 18;
+  R(cx - 6, legTop, 5, 20, pants); R(cx + 1, legTop, 5, 20, pants); R(cx - 2, legTop, 1, 20, pd); R(cx + 1, legTop, 1, 20, pd);
+  R(cx - 7, feet - 2, 6, 2, '#1e1a1a'); R(cx + 1, feet - 2, 6, 2, '#1e1a1a'); R(cx - 7, feet, 6, 1, '#3a3236'); R(cx + 1, feet, 6, 1, '#3a3236');
+  torso(top); head(top - 14);
+  thick(cx - 7, top + 3, cx - 8, top + 16, 3, '#1e1a1a'); thick(cx + 7, top + 3, cx + 8, top + 16, 3, '#1e1a1a'); R(cx - 9, top + 16, 3, 3, sk); R(cx + 7, top + 16, 3, 3, sk);
+  return top;
+}
 function sinipTorso(cx, hip) {
   const top = hip - 18; R(cx - 2, top - 1, 4, 2, '#b98260');
   R(cx - 8, top, 16, 1, '#2f4f58'); R(cx - 9, top + 1, 18, 17, '#2f4f58'); R(cx - 7, top + 3, 1, 14, '#213840'); R(cx + 6, top + 3, 1, 14, '#213840');
@@ -180,7 +209,7 @@ function sinipLean(SX, SEAT, lean, tilt, t) {
   return [hx, hy];
 }
 function trainTwoShot(t) {
-  const S = trainS(t), v = trainV(t), arrived = clamp((t - 9.0) / 1.4, 0, 1), DOOR = 10.6;
+  const S = trainS(t), v = trainV(t), arrived = clamp((t - 9.6) / 1.4, 0, 1), DOOR = 11.2;
   shot(2, (w, h) => {
     const bounce = v > 20 && (S % 68) < 6 ? 1 : 0;
     g.save(); g.translate(0, bounce);
@@ -213,23 +242,31 @@ function trainTwoShot(t) {
     R(122, 10, 3, 86, '#b8bec4'); R(123, 10, 1, 86, '#eef1f3'); R(124, 10, 1, 86, '#7a8086');
     // the other passengers on the bench
     PASS.salaryman(t); PASS.student(t);
-    // 하은 and 신입: he sleeps leaning on her, the cheek on her shoulder. She notices, lifts her forearm (the elbow stays at her
-    // side), puts her hand to his head and slowly tips him over against the pole, puts her hand back, sits a moment, stands
-    const HX = 84, SX = 106, SEAT = 70, stood = t > 9.4;
-    const move = ease(clamp((t - 4.9) / 1.7, 0, 1)), lean = lerp(-0.22, 0.24, move), tilt = lerp(-0.8, 0.32, move);
-    const reach = t < 4.2 ? 0 : t < 4.9 ? ease((t - 4.2) / 0.7) : t < 6.6 ? 1 : t < 7.1 ? 1 - ease((t - 6.6) / 0.5) : 0;
-    let hTop = 0;
+    // 하은 and 신입: he sleeps leaning on her, the cheek on her shoulder. She notices and looks a while; her far hand (the right)
+    // comes across her body to his head and slowly tips him over against the pole; the hand goes back; a moment; she gets up
+    // (leans forward, hands on her knees, pushes up, stands, takes the bag), turns to the door and goes
+    const HX = 84, SX = 106, SEAT = 70, RISE = 9.2, WALK = 11.0;
+    const move = ease(clamp((t - 5.2) / 2.0, 0, 1)), lean = lerp(-0.22, 0.24, move), tilt = lerp(-0.8, 0.32, move);
+    const reach = t < 4.4 ? 0 : t < 5.2 ? ease((t - 4.4) / 0.8) : t < 7.2 ? 1 : t < 7.8 ? 1 - ease((t - 7.2) / 0.6) : 0;
     const [headX, headY] = sinipLean(SX, SEAT, lean, tilt, t);
-    if (!stood) {
-      hTop = sitF(HX, SEAT, { w: 16, top: '#1e1a1a', pants: '#3a3f45', dress: (x, y) => { R(x - 6, y + 1, 12, 15, '#7ec8e3'); R(x - 6, y + 8, 12, 2, '#ebe5c9'); R(x - 1, y + 1, 2, 15, '#5aa6c4'); R(x - 2, y - 1, 4, 2, '#1e1a1a'); } });
-      faceF(HX, hTop - 14, { eyes: 'hidden' }); HAIR.cap(HX, hTop - 14, t > 3.0 && t < 7.4);
+    if (t < RISE) {
+      const hTop = haeunFront(HX, 'sit', { turned: t > 3.0 && t < 8.2 });
       bagAt(62, 84);
+      // the near hand stays in her lap; the far arm: shoulder, elbow in front of her chest, hand to the side of his head
+      R(HX + 1, SEAT - 3, 4, 3, '#d9a27a'); R(HX + 1, SEAT - 1, 4, 1, '#b98260');
+      // she only pushes while her arm can reach; once it is straight she lets go and he tips the rest of the way himself
+      const a = lean + tilt - Math.PI / 2, txh = headX + Math.cos(a) * 6, tyh = headY + Math.sin(a) * 6 + 2, rr = reach * clamp((29 - Math.hypot(txh - (HX - 6), tyh - (hTop + 3))) / 4, 0, 1);
+      const hx = lerp(HX - 3, txh, rr), hy = lerp(SEAT - 2, tyh, rr);
+      const ex = lerp(HX - 7, HX + 2, rr), ey = lerp(SEAT - 7, hTop + 5, rr);
+      thick(HX - 6, hTop + 3, ex, ey, 3, '#1e1a1a'); thick(ex, ey, hx, hy, 3, '#1e1a1a'); R(Math.round(hx) - 1, Math.round(hy) - 1, 3, 3, '#d9a27a'); R(Math.round(hx) - 1, Math.round(hy) + 2, 3, 1, '#b98260');
+    } else if (t < WALK) {
+      const r = t - RISE, pose = r < 0.45 ? 'lean' : r < 0.9 ? 'half' : 'stand';
+      haeunFront(HX, pose, { turned: r > 1.35 });
+      if (pose === 'stand') bagAt(HX + 8, 70); else bagAt(62, 84);
+    } else {
+      const p = clamp((t - WALK) / 1.8, 0, 1), x = Math.round(lerp(HX, 150, ease(p))), feet = Math.round(lerp(87, 93, ease(p)));
+      haeunWalkSide(x, feet, t, { mirror: true, stand: p >= 1 });
     }
-    if (!stood && reach > 0) {
-      const ex = HX + 6, ey = SEAT - 5, a = lean + tilt - Math.PI / 2, hx = Math.round(lerp(HX + 3, headX + Math.cos(a) * 6, reach)), hy = Math.round(lerp(SEAT - 3, headY + Math.sin(a) * 6 + 2, reach));
-      thick(ex, ey, hx, hy, 3, '#1e1a1a'); R(hx - 1, hy - 1, 3, 3, '#d9a27a'); R(hx - 1, hy + 2, 3, 1, '#b98260');
-    }
-    if (stood) { const p = clamp((t - 9.6) / 1.8, 0, 1), x = Math.round(lerp(86, 150, ease(p))); haeunWalkSide(x, 95, t, { mirror: true, stand: p <= 0 || p >= 1 }); }
     // standing passengers, nearer the camera than the bench
     PASS.phoneWoman(t); PASS.trackMan(t);
     // a tunnel lamp passing lights the car for a moment: the beat in the light
