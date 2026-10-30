@@ -488,6 +488,8 @@ const LEVELS = [
     tempo: [[0, 100], [40, 88], [44, 78], [52, 84], [60, 100]], endAt: 188, offTilt: true,
     chords: BLUES.chords, roots: BLUES.roots, chordAt: bar => bar < 2 ? 0 : BLUES.prog[(bar - 2) % 12],
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 },
+    // no on-screen hints (as in 1-1 to 1-3); the dock, the departure board and the beacons carry the Friday rush
+    hints: false, dock: true, dim: [[40, 60]],
     phone: [[88, 90]], phoneLane: 0, lateHint: '반장님 무릎… 손이 늦어요. 손을 봐요', special:['양쪽 동시에 찍은 상자', 'pair2', '한 번에'],
     sections: [[0, 'intro'], [2, 'boss'], [10, 'knee'], [13, 'walk'], [15, 'count'], [16, 'open'], [24, 'both'], [32, 'knee2'], [36, 'rush'], [44, 'final'], [48, 'outro']],
     // upper belt: 반장's shuffle (12 cells) until the knee, then 하은's straight 16ths (16 cells): trading two-bar phrases, then both,
@@ -1481,7 +1483,7 @@ let rings = [];
 // hit-stop: only the scanned box pauses; the belt, the music and the next boxes keep their time
 const HITSTOP = reduce ? 0 : 0.085;
 function hitLag(dt, hs) { return Math.max(0, Math.min(dt, hs)); }
-const LANE_DY = [-36, 0], LANE_DX = [14, 6];
+const LANE_DY = [-36, 0], LANE_DX = [36, 6];
 // the upper belt is the far one: drawn smaller, converging on the middle of the screen
 const FAR = { k: 0.82 };
 // the far belt is scaled about the scan line: both gates sit on the same vertical, so two boxes due on the same beat arrive stacked
@@ -1573,6 +1575,127 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   // the arm to the far belt is drawn in screen space so it stays on the body; only the hand goes through the perspective
   if (far && DUO.mode !== 'walk') { const who = DUO.mode === 'two' ? pid : L.partners[1], o = placerOff(0), h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
 }
+// ---------- 1-4: Friday rush. The dock and the truck, the departure board, the floor behind the racks, the beacons ----------
+// whose turn it is on the belts (the music's own split): 하은 above, 반장 below, both from bar 24
+function duoTurn(beat) {
+  const bar = Math.floor(beat / 4);
+  if (bar < 15) return 'boss'; if (bar < 16) return 'count';
+  if (bar < 24) return (((bar - 16) >> 1) % 2) ? 'boss' : 'haeun';
+  return bar < 48 ? 'both' : 'out';
+}
+const DIGITS = { 0: ['111', '101', '101', '101', '111'], 1: ['010', '110', '010', '010', '111'], 2: ['111', '001', '111', '100', '111'], 3: ['111', '001', '111', '001', '111'], 4: ['101', '101', '111', '001', '001'],
+  5: ['111', '100', '111', '001', '111'], 6: ['111', '100', '111', '101', '111'], 7: ['111', '001', '010', '010', '010'], 8: ['111', '101', '111', '101', '111'], 9: ['111', '101', '111', '001', '111'], ':': ['0', '1', '0', '1', '0'], '>': ['100', '010', '001', '010', '100'] };
+function pixText(str, x, y, col) { let cx = x; for (const ch of str) { const rows = DIGITS[ch]; if (!rows) { cx += 3; continue; } rows.forEach((row, j) => [...row].forEach((v, i) => { if (v === '1') R(cx + i, y + j, 1, 1, col); })); cx += rows[0].length + 1; } }
+const clockAt = beat => { const [hh, mm] = L.clock.split(':').map(Number), m = mm + Math.max(0, Math.floor(beat / 4)); return `${String(hh + Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
+let dockTotal = { id: '', n: 1 };
+function dockProgress() {
+  if (dockTotal.id !== L.id) dockTotal = { id: L.id, n: Math.max(1, notes.filter(n => !isAuto(n)).length) };
+  return stats ? Math.min(1, (stats.perfect + stats.good) / dockTotal.n) : 0;
+}
+// behind everyone: the dock on the right with the truck backed in (its load is your work), the departure board over it, and the
+// rest of the floor busy behind the racks: two workers and a forklift, which stops when 반장's knee goes and races in the rush
+const DOCK = { x: 282, y: 44, w: 88, h: 64 };
+function drawDockBack(beat, nowMs, active) {
+  const { x, y, w, h } = DOCK, rush = beat >= 144 && beat < 192;
+  R(272, 36, 112, 110, '#26221e'); R(272, 36, 112, 2, '#34302a');
+  R(x - 4, y - 4, w + 8, h + 8, '#3a3d44'); R(x - 4, y - 4, w + 8, 2, '#4d5158');
+  // inside the trailer: dark walls closing in, the floor, your boxes stacked from the floor up
+  R(x, y, w, h, '#121417'); R(x + 6, y + 6, w - 12, h - 10, '#181b20'); R(x + 12, y + 12, w - 24, h - 18, '#1d2127');
+  R(x, y + h - 4, w, 4, '#2a2e35');
+  const nb = Math.round(dockProgress() * 36);
+  for (let k = 0; k < nb; k++) { const row = Math.floor(k / 6), col = k % 6, bx = x + 6 + col * 13 + (row % 2 ? 3 : 0), by = y + h - 4 - (row + 1) * 9; if (by < y + 2) break; R(bx, by, 12, 9, C.kraft); R(bx, by, 12, 1, C.kraftTop); R(bx + 5, by, 2, 9, C.tape); R(bx + 11, by + 1, 1, 8, C.kraftDark); }
+  // the trailer's tail lights at the door edges, pulsing on the beat in the rush
+  const tl = rush ? Math.max(0.35, 1 - (beat % 1) * 2.5) : 0.4;
+  for (const lx of [x - 3, x + w]) { R(lx, y + h - 16, 3, 6, `rgba(255,60,50,${tl})`); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,50,40,${0.12 * tl})`; g.fillRect(lx - 8, y + h - 24, 19, 22); g.restore(); }
+  // the shutter: rolled up on its drum, and it comes down on the last pair (188)
+  const close = beat >= 188 ? Math.min(1, (beat - 188) / 1) : 0;
+  R(x - 4, y - 10, w + 8, 7, '#4a4d52'); for (let k = 0; k < w + 8; k += 6) R(x - 4 + k, y - 9, 1, 5, '#3a3d42');
+  if (close > 0) { const sh = Math.round(h * ease(close)); for (let yy = 0; yy < sh; yy += 4) { R(x, y + yy, w, 3, '#6b6f75'); R(x, y + yy + 3, w, 1, '#53575d'); } }
+  // the departure board: the time now, an arrow, 04:40. Red from the rush; green once the truck is loaded
+  R(288, 22, 76, 12, '#0c0d10'); R(288, 22, 76, 1, '#2a2d33');
+  const done = beat >= 188, col = done ? (Math.floor(nowMs / 300) % 2 ? '#7fe08a' : '#3f7a46') : rush ? (Math.floor(nowMs / 250) % 2 ? '#ff5a4a' : '#c23b2e') : '#f0b429';
+  pixText(`${clockAt(Math.min(beat, 188))}>04:40`, 292, 25, col);
+  if (!done) { const p = Math.min(1, Math.max(0, beat) / 188); R(292, 31, Math.round(68 * p), 1, col); }
+  // the floor behind the racks
+  drawBackLife(beat, nowMs, active);
+  // a light passing over the back wall as the truck pulls away (192)
+  if (beat >= 192 && beat < 196 && !reduce) { const p = (beat - 192) / 4, cx = lerp(W + 40, -80, p); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(cx - 50, 0, cx + 50, 0); gr.addColorStop(0, 'rgba(255,240,200,0)'); gr.addColorStop(0.5, `rgba(255,240,200,${0.22 * Math.sin(Math.PI * p)})`); gr.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = gr; g.fillRect(cx - 50, 36, 100, 110); g.restore(); }
+}
+const LIFE = { last: 0, lift: 200, walk: 0 };
+function drawBackLife(beat, nowMs, active) {
+  const dt = Math.min(0.1, Math.max(0, (nowMs - LIFE.last) / 1000)); LIFE.last = nowMs;
+  const knee = beat >= 40 && beat < 60, rush = beat >= 144 && beat < 192, sp = !active || reduce ? 0 : knee ? 0 : rush ? 2.4 : 1;
+  LIFE.lift = ((LIFE.lift - 26 * sp * dt) % 330 + 330) % 330; LIFE.walk = (LIFE.walk + 16 * sp * dt) % 300;
+  g.save(); g.globalAlpha = 0.6;
+  // two workers walking right, one a little behind the other
+  for (const [off, hgt] of [[0, 30], [70, 28]]) {
+    const wx = Math.round((LIFE.walk + off) % 300) - 20, step = Math.floor(LIFE.walk / 6 + off) % 2, top = 132 - hgt;
+    R(wx - 3, top, 6, 6, '#120d0b'); R(wx - 4, top + 6, 8, hgt - 14, '#120d0b'); R(wx - 3 + (step ? 1 : -1), top + hgt - 8, 2, 8, '#120d0b'); R(wx + 1 + (step ? -1 : 1), top + hgt - 8, 2, 8, '#120d0b');
+    R(wx - 4, top + 9, 8, 4, '#3a2210');
+  }
+  // the forklift, heading left; its beacon blinks while it moves
+  const fx = Math.round(LIFE.lift) - 40;
+  R(fx, 118, 26, 12, '#1a1712'); R(fx + 4, 108, 12, 10, '#1a1712'); R(fx - 6, 100, 2, 30, '#1a1712'); R(fx - 12, 126, 8, 2, '#1a1712');
+  R(fx + 3, 128, 6, 6, '#0c0a08'); R(fx + 18, 128, 6, 6, '#0c0a08'); R(fx + 4, 120, 16, 2, '#5a4a1a');
+  g.restore();
+  if (sp > 0 && Math.floor(nowMs / 220) % 2) { R(fx + 9, 105, 3, 2, '#ffb030'); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(255,160,40,.18)'; g.fillRect(fx + 2, 98, 17, 14); g.restore(); }
+}
+// the beacons: one on each scanner, one on a post halfway down each belt. 하은 counts them on one by one (60 to 63);
+// they spin for whoever is feeding the belt, both in the 'both' stretch, faster in the rush, stuttering when the knee goes again
+const BEACONS = [
+  { lane: 0, x: farX(200), y: farY(122), post: [farY(124), farY(146)], c: '120,200,255', on: 60 },
+  { lane: 0, x: farX(SCAN_X + 10), y: farY(101), post: null, c: '120,200,255', on: 61 },
+  { lane: 1, x: 200, y: 122, post: [124, 146], c: '255,170,60', on: 62 },
+  { lane: 1, x: SCAN_X + 10, y: 101, post: null, c: '255,170,60', on: 63 }];
+function beaconSpin(B, beat) {
+  if (beat < B.on || beat >= 192) return 0;
+  const turn = duoTurn(beat), mine = turn === 'both' || (turn === 'haeun' && B.lane === 0) || (turn === 'boss' && B.lane === 1);
+  if (beat < 64) return 0.6;
+  if (beat >= 128 && beat < 144 && Math.floor(beat * 4) % 3 === 0) return 0.15;
+  return mine ? 1 : 0.25;
+}
+function drawBeaconPosts(beat) { for (const B of BEACONS) if (B.post) R(B.x, B.post[0], 2, B.post[1] - B.post[0], '#2b2e33'); }
+function drawDockFront(beat, t, nowMs, active) {
+  const rushK = beat >= 144 && beat < 192 ? 1.8 : 1;
+  // the belt whose loader is playing glows in that person's colour (the trade, bars 16 to 23)
+  const turn = active ? duoTurn(beat) : 'out';
+  if (turn === 'haeun' || turn === 'boss') {
+    const k = 0.07 + 0.06 * Math.max(0, 1 - (beat % 1) * 3);
+    g.save(); g.globalCompositeOperation = 'lighter';
+    if (turn === 'haeun') { g.fillStyle = `rgba(120,200,255,${k})`; g.fillRect(farX(48), farY(BELT_Y - 40), W - farX(48), farY(BELT_Y + 16) - farY(BELT_Y - 40)); }
+    else { g.fillStyle = `rgba(255,170,60,${k})`; g.fillRect(48, BELT_Y - 40, W - 48, 56); }
+    g.restore();
+  }
+  // beacon domes and their sweeping beams
+  for (const B of BEACONS) {
+    const on = active ? beaconSpin(B, beat) : 0, lit = active && beat >= B.on && beat < 192;
+    R(B.x - 2, B.y + 2, 6, 2, '#3a3d44'); R(B.x - 1, B.y - 1, 4, 3, lit ? `rgb(${B.c})` : '#4a4440');
+    if (!lit || on <= 0) continue;
+    const ang = reduce ? 0 : (t * Math.PI * 1.4 * rushK + B.x * 0.05) % (Math.PI * 2), face = Math.max(0, Math.cos(ang));
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (const dir of [1, -1]) {
+      const a = ang + (dir < 0 ? Math.PI : 0), len = 46, ex = B.x + 1 + Math.sin(a) * len, ey = B.y + 1 - Math.abs(Math.cos(a)) * 6;
+      const gr = g.createLinearGradient(B.x, B.y, ex, ey); gr.addColorStop(0, `rgba(${B.c},${0.35 * on})`); gr.addColorStop(1, `rgba(${B.c},0)`);
+      g.fillStyle = gr; g.beginPath(); g.moveTo(B.x + 1, B.y); g.lineTo(ex, ey - 9); g.lineTo(ex, ey + 9); g.closePath(); g.fill();
+    }
+    if (face > 0.85) { g.fillStyle = `rgba(${B.c},${0.5 * on * face})`; g.fillRect(B.x - 4, B.y - 4, 10, 9); }
+    g.restore();
+  }
+  // a pair scanned at once: a bolt joins the two gates on their shared vertical
+  const ba = (nowMs - (FX.boltAt || -1e9)) / 170;
+  if (ba >= 0 && ba < 1) {
+    const x0 = farX(SCAN_X), y0 = farY(BELT_Y - 14), y1 = BELT_Y - 12, a = 1 - ba, seg = 7;
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (const [lw, c] of [[5, `rgba(120,220,255,${0.35 * a})`], [2, `rgba(255,255,255,${0.95 * a})`]]) {
+      g.strokeStyle = c; g.lineWidth = lw; g.beginPath(); g.moveTo(x0, y0);
+      for (let k = 1; k < seg; k++) g.lineTo(x0 + (FX.boltJ[k] || 0) * (FX.boltBig ? 1.4 : 1), lerp(y0, y1, k / seg));
+      g.lineTo(SCAN_X, y1); g.stroke();
+    }
+    for (const [cx, cy] of [[x0, y0], [SCAN_X, y1]]) { g.fillStyle = `rgba(255,255,255,${0.6 * a})`; g.fillRect(cx - 4, cy - 3, 9, 7); }
+    g.restore();
+  }
+}
+
 // ---------- intro scenes ----------
 // A dialog line can carry scene:'office'. When the next line sits in a different scene the box hides, the screen goes dark,
 // and on the line 반장 walks from the middle of the room over to his spot behind the belt before the next line shows.
@@ -1962,6 +2085,8 @@ function drawScene(t, bt, active, nowMs) {
   // the downpour thumps with the kick, one pixel
   if (al && !reduce && al.beat >= 200 && al.beat < 248) g.translate(0, Math.round(Math.max(0, 1 - (al.beat % 1) * 4)));
   if (al) drawAlleyBack(al, t, nowMs); else g.drawImage(bg, 0, 0);
+  const dockBeat = L.dock ? castBeatAt(t, active) : 0;
+  if (L.dock) { drawDockBack(dockBeat, nowMs, active); drawBeaconPosts(dockBeat); }
   drawLights(bt, t, active, al);
   if (al) drawAlleyRain(al, t, nowMs);
   rings = rings.filter(r => nowMs - r.at < 420);
@@ -1988,6 +2113,7 @@ function drawScene(t, bt, active, nowMs) {
   else if (!(L.lanes === 2 && DUO.mode !== 'two')) { const o = L.lanes === 2 ? placerOff(1) : { dx: 0, dy: 0 }; g.save(); g.translate(laneSlide(lo, t, active) + o.dx, o.dy); drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); g.restore(); drawObserver(t, nowMs, active); }
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
+  if (L.dock) drawDockFront(dockBeat, t, nowMs, active);
   drawGauge(nowMs);
   drawBin(laneFx.binned, nowMs);
   drawPallet(laneFx.delivered);
@@ -2240,8 +2366,16 @@ function sfxPluck(t, f, v, d) {
   gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(v, t + 0.004); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
   o.connect(fl); fl.connect(gn); gn.connect(bus); o.start(t); o.stop(t + d + 0.05);
 }
-function hitSound(j, tones, beat, done) {
+// 1-4: a box on 하은's belt answers with her sound, a short rhodes stab with a vinyl tick; 반장's belt keeps the organ
+function haeunHit(t, tones, j, done) {
+  const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 3600; fl.connect(bus);
+  const v = j === 'good' ? 0.04 : 0.052, d = done ? 0.8 : 0.32;
+  tones.slice(0, 3).forEach((f, i) => { const ff = f * 2, t0 = t + i * 0.008; osc('sine', ff, t0, 0.004, v, d, fl); osc('triangle', ff * 2, t0, 0.003, v * 0.3, d * 0.4, fl); });
+  noise(t, 'highpass', 3800, 0.08, 0.025, 0.7, bus); noise(t + 0.01, 'bandpass', 1200, 0.05, 0.04, 2, bus);
+}
+function hitSound(j, tones, beat, done, lane = -1) {
   const t = ctx.currentTime, th = fxTheme(beat), f = tones[(stats.combo + (done ? 1 : 0)) % Math.min(3, tones.length)], good = j === 'good';
+  if (L.dock && lane === 0 && beat >= 60) { haeunHit(t, tones, j, done); return; }
   if (phase3(beat) && beat >= 200) { climaxHit(t, tones, j, done, beat); return; }
   if (phase3(beat)) { if (done) gtr(t, tones.slice(0, 3).map(x => x * 2), 0.9, 0.04); else gtrLead(t, f * 2, good ? 0.3 : 0.42, good ? 0.034 : 0.044, false); return; }
   if (th === 'chill') {
@@ -2792,11 +2926,26 @@ function buildEvents() {
       }
       if (blues) {
         // 반장: the walking bass in his bars, organ comp on the 'and', the lick at the end of every fourth bar
-        if (!both) { E(0, T => bass(T, roots[ci] * walk, s * 0.5, 320)); E(s / 2 + sw, T => bass(T, roots[ci] * walk, s * 0.3, 320)); }
-        E(s / 2 + sw, T => organ(T, chords[ci].slice(1), s * 0.22, both ? 0.02 : 0.026));
+        if (!both) { E(0, T => bass(T, roots[ci] * walk, s * 0.5, 320)); E(2 * s / 3, T => bass(T, roots[ci] * walk, s * 0.3, 320)); }
+        // his comp sits on the shuffle 'and' (two thirds in), so his swing is heard against her straight hats: three against two
+        E(2 * s / 3, T => organ(T, chords[ci].slice(1), s * 0.22, both ? 0.02 : 0.026));
+        if (inBar === 1 || inBar === 3) E(2 * s / 3, T => gtr(T, chords[ci].slice(1, 3), s * 0.2, 0.014));
         if (inBar === 0) E(0, T => organ(T, chords[ci], s * 4, 0.011));
         if (sec !== 'knee2' && ((bar - 16) % 4) === 3 && inBar === 0) for (const [ob, nm, len] of LICK) E(ob * s, T => gtrLead(T, N_[nm], len * s * 0.95, 0.045, nm === 'E5'));
         if (both && sec !== 'knee2' && ((bar - 24) % 2) === 1 && inBar === 1) for (const [ob, nm, len] of LICK_DOWN) E((ob - 1.667) * s, T => gtrLead(T, N_[nm], len * s * 0.9, 0.045, nm === 'A4'));
+      }
+      // the rush: the warehouse joins the band (a forklift's reversing beep on the 'and' of 2 and 4, the truck's air brake every four
+      // bars) and an 808 roll into every bar. The last four bars: a 32nd hat roll into each bar, the shutter's clank on the last pair,
+      // and the tune someone whistled on your first night (1-1) comes back over everything.
+      if (rush) {
+        if (inBar === 1 || inBar === 3) E(s / 2, T => forklift(T, 0.022));
+        if (inBar === 0 && bar % 4 === 0) E(0, T => noise(T, 'highpass', 3200, 0.1, 0.45, 0.7));
+        if (inBar === 3) for (let k = 0; k < 4; k++) E(k * s / 4, T => { const o = osc('sine', roots[ci] * 2, T, 0.003, 0.1 + k * 0.03, 0.09); o.frequency.exponentialRampToValueAtTime(roots[ci], T + 0.08); });
+      }
+      if (sec === 'final') {
+        if (inBar === 3) for (let k = 0; k < 8; k++) E(k * s / 8, T => hat(T, 0.02 + k * 0.006));
+        if (bar === 44 && inBar === 0) for (const [ob, nm, len] of WHISTLE) if (ob < 16) E(ob * s, T => whistle(T, N_[nm], len * s * 0.95, 0.055));
+        if (b === 188) E(0, T => { noise(T, 'bandpass', 700, 0.32, 0.22, 1.5, bus); osc('square', 140, T, 0.003, 0.07, 0.12, bus); noise(T + 0.06, 'lowpass', 420, 0.2, 0.5, 0.7, bus); });
       }
     } else if (style === 'duo') {
       if (dark) {
@@ -2960,7 +3109,7 @@ function judgeNote(target, t) {
     const milestone = addCombo();
     const tones = CHORDS[chordIdx(target.beat)];
     const th = THEME[fxTheme(target.beat)];
-    if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false);
+    if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false, target.lane);
     const lightUp = phase3(target.beat);
     lastGood = now; FX.goodLane = target.lane; FX.glow = th.glow; ring(th.ring[(stats.combo + (j === 'good' ? 1 : 0)) % 2], target.lane);
     spawnBits(j === 'perfect' ? 14 : 6, th);
@@ -3000,7 +3149,8 @@ function hitPair(a, b, t) {
 // both gates fire at once: white rings on both belts, a flash, the room jolts, sparks from both scanners, and a chord on the organ
 function pairFx(a, b) {
   const now = performance.now(), tc = ctx.currentTime, th = THEME[fxTheme(a.beat)], fs = CHORDS[chordIdx(a.beat)], both = a.judge === 'perfect' && b.judge === 'perfect';
-  FX.goodBoth = now; FX.hypeAt = now; FX.hypeBig = both;
+  FX.goodBoth = now; FX.hypeBig = both;
+  if (L.dock) { FX.boltAt = now; FX.boltBig = both; FX.boltJ = Array.from({ length: 8 }, () => Math.round((Math.random() * 2 - 1) * 5)); } else FX.hypeAt = now;
   FX.shakeUntil = now + (both ? 240 : 160); FX.shakeAmp = both ? 3 : 2; FX.punchAt = now; FX.punch = both ? 2.8 : 2;
   FX.react[0] = { type: 'nod', at: now }; FX.react[1] = { type: 'nod', at: now };
   ring('#ffffff', 0); ring('#ffffff', 1);
@@ -3008,6 +3158,7 @@ function pairFx(a, b) {
   spawn(farX(SCAN_X), farY(BELT_Y - 10), both ? 18 : 10, th.spark, -140, 140, -180, -50, 300, 800, [2, 2]);
   popJudge('both', both ? '둘 다 딱!' : '', 1);
   thud(tc, 1.3); organ(tc, fs.map(f => f * 2), 0.45, 0.06); noise(tc, 'highpass', 2600, 0.22, 0.14, 0.8, bus);
+  if (L.dock) haeunHit(tc, fs, both ? 'perfect' : 'good', false);
   osc('sine', 1480, tc, 0.003, 0.06, 0.1, bus); osc('sine', 1976, tc + 0.03, 0.003, 0.05, 0.1, bus);
 }
 // heavy boxes need two different keys inside a short window; one hand alone drops it
@@ -3068,7 +3219,7 @@ function completeHold(n) {
   const now = performance.now();
   if (inRange(n.beat, L.hype)) { stopHold(); n.state = 'hit'; n.doneAt = songAt(now); stats.tailOk++; const m = addCombo(); lastGood = now; FX.goodLane = n.lane; ring(C.ok, n.lane); hypeHit(n, true); popJudge('bam', m || '촤라락', n.lane); return; }
   n.state = 'hit'; n.doneAt = songAt(now); stats.tailOk++; const milestone = addCombo(); stopHold();
-  hitSound('perfect', CHORDS[chordIdx(n.beat)], n.beat, true); tear(ctx.currentTime);
+  hitSound('perfect', CHORDS[chordIdx(n.beat)], n.beat, true, n.lane); tear(ctx.currentTime);
   lastGood = now; FX.goodLane = n.lane; ring(C.ok, n.lane); spawnBits(16); FX.punchAt = now; FX.punch = 1.4; FX.shakeUntil = now + 150; FX.react[n.lane] = { type: 'nod', at: now };
   if (phase3(n.beat)) alleyHit('perfect', n.beat);
   popJudge('done', milestone, n.lane);
