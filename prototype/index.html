@@ -2444,9 +2444,10 @@ const glass = t => { noise(t, 'highpass', 5000, 0.28, 0.25, 0.7, bus); for (let 
 const click = t => noise(t, 'bandpass', 1800, 0.12, 0.02, 3, bus);
 const tear = t => noise(t, 'highpass', 2500, 0.22, 0.12, 0.7, bus);
 const blip = (f) => { if (ctx && ctx.state === 'running') osc('square', f, ctx.currentTime, 0.002, 0.025, 0.025, bus); };
-const musBase = () => (state === 'play' && inRange(beatAt(songAt(performance.now())), L.unplug)) ? 3200 : (L.lofi || 20000);
+const feverCut = beat => { const fr = L.fever && L.fever.find(([a, z]) => beat >= a && beat < z); return fr ? 700 * Math.pow(18000 / 700, Math.pow((beat - fr[0]) / (fr[1] - fr[0]), 1.3)) : 0; };
+const musBase = () => { const b = beatAt(songAt(performance.now())); return state === 'play' && inRange(b, L.unplug) ? 3200 : state === 'play' && feverCut(b) ? feverCut(b) : (L.lofi || 20000); };
 function muffle() {
-  const t = ctx.currentTime;
+  const t = ctx.currentTime; FX.muffleAt = performance.now();
   musF.frequency.cancelScheduledValues(t); musF.frequency.setValueAtTime(450, t); musF.frequency.exponentialRampToValueAtTime(musBase(), t + 0.55);
 }
 // trot lead: square through a soft filter, a small scoop up into the note and vibrato that grows as it holds (꺾기)
@@ -2604,9 +2605,20 @@ function haeunHit(t, tones, j, done) {
   tones.slice(0, 3).forEach((f, i) => { const ff = f * 2, t0 = t + i * 0.008; osc('sine', ff, t0, 0.004, v, d, fl); osc('triangle', ff * 2, t0, 0.003, v * 0.3, d * 0.4, fl); });
   noise(t, 'highpass', 3800, 0.08, 0.025, 0.7, bus); noise(t + 0.01, 'bandpass', 1200, 0.05, 0.04, 2, bus);
 }
+// 하은's hook: sixteen eighths in A minor pentatonic, one per upper-belt box in her fever, so the hits play her tune (a missed box
+// leaves its note out). Rhodes with a soft square on top; from the fever's fifth bar an octave doubles it.
+const HOOK14 = ['E5', 'G5', 'A5', 'G5', 'E5', 'D5', 'E5', 'G5', 'A5', 'C6', 'A5', 'G5', 'E5', 'D5', 'C5', 'D5'].map(n => n === 'C6' ? 1046.5 : N_[n]);
+function feverHit(t, beat, j) {
+  const fr = L.fever[0], i = Math.round((beat - fr[0]) * 2), f = HOOK14[((i % 16) + 16) % 16], fb = Math.floor((beat - fr[0]) / 4), v = j === 'good' ? 0.045 : 0.06;
+  const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 3000; fl.connect(bus);
+  osc('sine', f, t, 0.004, v, 0.32, fl); osc('triangle', f * 2, t, 0.003, v * 0.22, 0.14, fl); osc('square', f, t, 0.003, v * 0.18, 0.12, fl);
+  if (fb >= 4) osc('sine', f * 2, t, 0.004, v * 0.4, 0.22, fl);
+  noise(t, 'highpass', 3800, 0.05, 0.02, 0.7, bus);
+}
+const inFever = beat => !!L.fever && inRange(beat, L.fever);
 function hitSound(j, tones, beat, done, lane = -1) {
   const t = ctx.currentTime, th = fxTheme(beat), f = tones[(stats.combo + (done ? 1 : 0)) % Math.min(3, tones.length)], good = j === 'good';
-  if (L.dock && lane === 0 && beat >= L.autoUntil) { haeunHit(t, tones, j, done); return; }
+  if (L.dock && lane === 0 && beat >= L.autoUntil) { if (inFever(beat) && !done) feverHit(t, beat, j); else haeunHit(t, tones, j, done); return; }
   if (phase3(beat) && beat >= 200) { climaxHit(t, tones, j, done, beat); return; }
   if (phase3(beat)) { if (done) gtr(t, tones.slice(0, 3).map(x => x * 2), 0.9, 0.04); else gtrLead(t, f * 2, good ? 0.3 : 0.42, good ? 0.034 : 0.044, false); return; }
   if (th === 'chill') {
@@ -3132,7 +3144,7 @@ function buildEvents() {
       if (sec === 'outro') { if (b === L.endAt + 4) E(0, T => truckHorn(T)); E(0, T => roller(T, 0.03)); continue; }
       if (sec === 'count') { E(0, T => rim(T, 0.35)); E(0, T => hat(T, 0.03)); E(s / 2, T => hat(T, 0.02)); if (inBar === 3) { E(s / 2, T => rim(T, 0.22)); E(s / 2, T => scratch(T)); } continue; }
       const walk = [1, 1.189, 1.498, 1.682][inBar], blues = turn === 'boss' || turn === 'both', funk = turn === 'haeun' || turn === 'both', both = turn === 'both';
-      const hurt = sec === 'knee' || sec === 'walk', rush = sec === 'rush' || sec === 'final', hip = bar >= oB, sw = s / 4 * 0.2, fever = inRange(b, L.fever);
+      const hurt = sec === 'knee' || sec === 'walk', rush = sec === 'rush' || sec === 'final', hip = bar >= oB, sw = s / 4 * 0.2, fever = inRange(b, L.fever), fb = fever ? Math.floor((b - L.fever[0][0]) / 4) : -1;
       // 하은 pushing: two knocks of her gun on the gate, two taps on the empty belt; then his back goes, the drums drop out and the
       // heavy box lands behind the belt
       const knock = T => { noise(T, 'bandpass', 1900, 0.16, 0.05, 6, bus); osc('sine', 430, T, 0.002, 0.07, 0.05, bus); };
@@ -3143,6 +3155,8 @@ function buildEvents() {
       if (L.driver && b === L.driver[0]) E(0, T => { noise(T, 'bandpass', 900, 0.3, 0.18, 3, bus); osc('square', 95, T, 0.003, 0.06, 0.12, bus); noise(T + 0.09, 'lowpass', 400, 0.2, 0.15, 0.7, bus); });
       if (L.fever && bar === L.fever[0][0] / 4 - 1) { if (inBar === 0) E(0, T => riser(T, s * 4, 0.07)); if (inBar === 3) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.08 + k * 0.04)); }
       if (L.fever && b === L.fever[0][0]) E(0, T => { crash(T); subDrop(T); thud(T, 1.1); });
+      if (L.fever && b === L.fever[0][1] - 1) E(s / 2, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(0.0001, T); });
+      if (L.fever && b === L.fever[0][1]) E(0, T => { mus.gain.setValueAtTime(1, T); });
       if (L.fever && b === L.fever[0][1]) E(0, T => { crash(T); subDrop(T); thud(T, 1.4); noise(T, 'lowpass', 900, 0.4, 0.6, 0.7, bus); });
       if (b === L.lift[1]) E(s * 0.75, T => { noise(T, 'lowpass', 300, 0.4, 0.25, 0.7, bus); osc('sine', 70, T, 0.003, 0.18, 0.2, bus); });
       if (inBar === 0 && ((sec === 'open' && turn === 'haeun' && (bar - oB) % 2 === 0) || bar === oB + 8 || bar === oB + 20 || sec === 'final')) E(0, T => crash(T));
@@ -3163,20 +3177,27 @@ function buildEvents() {
       if (inBar === 3 && rush) E(s / 2, T => bbKick(T, 0.6));
       if (inBar === 1 || inBar === 3) E(0, T => { bbSnare(T, funk ? 0.32 : 0.24); clap(T, funk ? 0.14 : 0.08); });
       if (inBar === 2) E(s / 4 + sw, T => bbSnare(T, 0.05)); if (inBar === 3) E(3 * s / 4 + sw, T => bbSnare(T, 0.06));
-      if (rush) for (let k = 0; k < 4; k++) E(k * s / 4 + (k % 2 ? sw : 0), T => hat(T, k % 2 ? 0.03 : 0.055)); else { E(0, T => hat(T, 0.05)); E(s / 2 + sw, T => hat(T, 0.035)); }
+      if (rush && !(fever && fb < 2)) for (let k = 0; k < 4; k++) E(k * s / 4 + (k % 2 ? sw : 0), T => hat(T, k % 2 ? 0.03 : 0.055)); else { E(0, T => hat(T, 0.05)); E(s / 2 + sw, T => hat(T, 0.035)); }
       if (inBar === 3) E(s / 2 + sw, T => openHat(T, 0.05));
       if (funk) {
         // 하은: the 808 under the kick, crackle, rhodes on the 'and' of 2 and of 4, a chop in the rush
         if (inBar === 0) E(0, T => sub808(T, roots[ci], s * 1.3)); if (inBar === 1) E(s / 2, T => sub808(T, roots[ci], s * 1.4));
         if (inBar === 2 && bar % 2) E(3 * s / 4 + sw, T => sub808(T, roots[ci] * (ci === 0 ? 1.5 : 1), s * 0.6));
         if (inBar === 0) E(0, T => vinyl(T, s * 4));
-        if (inBar === 1 || inBar === 3) E(s / 2 + sw, T => rhodes(T, chords[ci].slice(0, 3), s * 0.45, both ? 0.028 : 0.036));
-        if (rush && inBar === 2) E(s / 2, T => chop(T, chords[ci][2] * 2, 0.035));
-        // her fever: the 808 on every beat, a chop on every 'and', rhodes on 1 and 3 too
+        // (in her fever the rhodes stabs give way: her melody comes from your hits, see feverHit)
+        if ((inBar === 1 || inBar === 3) && !fever) E(s / 2 + sw, T => rhodes(T, chords[ci].slice(0, 3), s * 0.45, both ? 0.028 : 0.036));
+        if (rush && inBar === 2 && !(fever && fb < 2)) E(s / 2, T => chop(T, chords[ci][2] * 2, 0.035));
+        // her fever builds in two-bar steps under the light: 808 on every beat from the start; chops on every 'and' from bar 3;
+        // a clap on every beat from bar 5; the last two bars a riser, a snare build (eighths, then sixteenths) and an 808 that
+        // slides up into the burst
         if (fever) {
           if (inBar === 2 || inBar === 3) E(0, T => sub808(T, roots[ci], s * 0.8));
-          if (inBar !== 2) E(s / 2, T => chop(T, chords[ci][(inBar + 1) % 3] * 2, 0.03));
-          if (inBar === 0 || inBar === 2) E(s / 2 + sw, T => rhodes(T, chords[ci].slice(0, 3), s * 0.35, 0.026));
+          if (fb >= 2 && inBar !== 2) E(s / 2, T => chop(T, chords[ci][(inBar + 1) % 3] * 2, 0.03));
+          if (fb >= 4) E(0, T => clap(T, 0.1));
+          if (fb === 6 && inBar === 0 && (b - L.fever[0][0]) % 8 === 0) E(0, T => riser(T, s * 8, 0.09));
+          if (fb === 6) { E(0, T => snare(T, 0.06)); E(s / 2, T => snare(T, 0.06)); }
+          if (fb === 7) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.06 + inBar * 0.03 + k * 0.008));
+          if (fb === 7 && inBar === 2) E(0, T => { const o = osc('sine', roots[ci], T, 0.004, 0.22, s * 1.5); o.frequency.exponentialRampToValueAtTime(roots[ci] * 4, T + s * 1.45); });
         }
       }
       if (blues) {
@@ -3422,7 +3443,7 @@ function pairFx(a, b) {
   spawn(farX(SCAN_X), farY(BELT_Y - 10), both ? 18 : 10, th.spark, -140, 140, -180, -50, 300, 800, [2, 2]);
   popPair(a.lane === 0 ? a : b, a.lane === 0 ? b : a);
   thud(tc, 1.3); organ(tc, fs.map(f => f * 2), 0.45, 0.06); noise(tc, 'highpass', 2600, 0.22, 0.14, 0.8, bus);
-  if (L.dock) haeunHit(tc, fs, both ? 'perfect' : 'good', false);
+  if (L.dock) { const up = a.lane === 0 ? a : b; if (inFever(up.beat)) feverHit(tc, up.beat, up.judge); else haeunHit(tc, fs, both ? 'perfect' : 'good', false); }
   osc('sine', 1480, tc, 0.003, 0.06, 0.1, bus); osc('sine', 1976, tc + 0.03, 0.003, 0.05, 0.1, bus);
 }
 // heavy boxes need two different keys inside a short window; one hand alone drops it
@@ -3533,6 +3554,11 @@ function updateHud(t) {
   const [hh, mm] = L.clock.split(':').map(Number);
   const mins = mm + Math.max(0, Math.floor(beat / 4)), c = `B동 3번 라인 · ${String(hh + Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
   if (c !== lastClock) { clockEl.textContent = c; lastClock = c; }
+  if (L.fever && ctx) {
+    const cut = feverCut(beat);
+    if (cut && performance.now() - (FX.muffleAt || -1e9) > 600) { musF.frequency.setTargetAtTime(cut, ctx.currentTime, 0.05); FX.feverF = true; }
+    else if (!cut && FX.feverF) { musF.frequency.setTargetAtTime(L.lofi || 20000, ctx.currentTime, 0.02); FX.feverF = false; }
+  }
   if (stats.combo !== lastCombo) { comboEl.textContent = '콤보 ' + stats.combo; comboEl.classList.toggle('hot', stats.combo >= 10); lastCombo = stats.combo; }
   comboEl.classList.toggle('fever', !!(L.fever && inRange(beat, L.fever)));
   const line = L.say.find(([b, , d]) => beat >= b && beat < b + d);
