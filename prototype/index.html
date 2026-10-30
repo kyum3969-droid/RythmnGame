@@ -2068,6 +2068,12 @@ function trotLead(t, f, d, vol = 0.055) {
 }
 // electric piano chord for the 짝
 const ep = (t, fs, d, v = 0.04) => fs.forEach(f => { osc('triangle', f, t, 0.004, v, d); osc('sine', f * 2, t, 0.003, v * 0.35, d * 0.5); });
+// boom bap (1-4 from 하은's count-in): a deeper, shorter kick with a click, a snare with a clap inside it, an 808 that slides
+// down into the root and rings, and vinyl crackle under her bars
+const bbKick = (t, v = 0.95) => { const o = osc('sine', 120, t, 0.002, v, 0.22); o.frequency.exponentialRampToValueAtTime(38, t + 0.1); noise(t, 'lowpass', 900, v * 0.25, 0.02); };
+const bbSnare = (t, v = 0.3) => { noise(t, 'bandpass', 1900, v, 0.12, 0.9); noise(t + 0.01, 'bandpass', 1300, v * 0.6, 0.09, 1.2); osc('triangle', 180, t, 0.002, v * 0.4, 0.06); };
+const sub808 = (t, f, d, v = 0.24) => { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 200; fl.connect(mus); const o = osc('sine', f * 1.7, t, 0.004, v, d, fl); o.frequency.exponentialRampToValueAtTime(f, t + 0.07); osc('sine', f * 2, t, 0.004, v * 0.1, d * 0.5, fl); };
+const vinyl = (t, d) => { for (let k = 0, n = Math.round(d * 12); k < n; k++) noise(t + (k + Math.random()) * d / n, 'highpass', 4000 + Math.random() * 3000, 0.012 + Math.random() * 0.016, 0.01, 0.7); };
 const clap = (t, v = 0.22) => { noise(t, 'bandpass', 1400, v, 0.06, 1.2); noise(t + 0.012, 'bandpass', 1500, v * 0.8, 0.09, 1.2); };
 const crackle = (t, v) => noise(t, 'highpass', 3500, v, 0.004);
 // warehouse sounds that turn into the beat
@@ -2676,44 +2682,56 @@ function buildEvents() {
         else gtrDist(T, N_[nm], len * 2 * s * 0.96, 0.055, !!bend);
       });
     } else if (style === 'duo14') {
-      // 반장's shuffle blues (kick 1 and 3, brushed backbeat, ride on the beat and its last third, walking bass, organ, guitar licks)
-      // and 하은's funk (16th hats, kick on 1 and the 'and' of 2, a crisp 2 and 4 with ghosts, staccato bass, guitar cutting).
-      // Whoever is feeding a belt plays. While his knee has him the band thins to bass, organ and the ride; 하은 counts the line
-      // back in on the rim; then they trade two-bar phrases, and from 'both' it is blues funk: her drums and cutting under his bass,
-      // organ and licks, harder in the rush, a crash on every bar at the end.
+      // 반장's straight four (kick 1 and 3, snare 2 and 4, even hats, a root on every beat, organ, a guitar lick every fourth bar)
+      // until his knee goes and the band thins to bass, organ and hats. 하은 counts the line back in and from bar 16 it is boom bap
+      // at 100: a deep short kick on 1 and the 'and' of 2, snare and clap on 2 and 4 with ghosts, lightly swung hats, an 808 sliding
+      // into the root, vinyl crackle and rhodes stabs in her bars; his walking bass, organ and licks ride the same drums in his bars;
+      // everything when both belts run, 16th hats in the rush, a crash on every bar at the end.
       const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4);
       const openTurn = br => (((br - 16) >> 1) % 2) ? 'boss' : 'haeun';
       const turn = sec === 'boss' || sec === 'knee' || sec === 'walk' ? 'boss' : sec === 'open' ? openTurn(bar) : (sec === 'both' || sec === 'knee2' || sec === 'rush' || sec === 'final') ? 'both' : '';
       if (sec === 'intro') { E(0, T => roller(T, 0.03)); E(s / 2, T => roller(T, 0.02)); if (inBar === 0) { E(0, T => forklift(T)); E(s * 0.75, T => forklift(T)); } if (b === 2) E(0, T => thud(T, 1.1)); continue; }
       if (sec === 'outro') { if (b === 192) E(0, T => truckHorn(T)); E(0, T => roller(T, 0.03)); continue; }
-      if (sec === 'count') { E(0, T => rim(T, 0.35)); E(0, T => hat(T, 0.03)); E(s / 2, T => hat(T, 0.02)); if (inBar === 3) E(s / 2, T => rim(T, 0.22)); continue; }
+      if (sec === 'count') { E(0, T => rim(T, 0.35)); E(0, T => hat(T, 0.03)); E(s / 2, T => hat(T, 0.02)); if (inBar === 3) { E(s / 2, T => rim(T, 0.22)); E(s / 2, T => scratch(T)); } continue; }
       const walk = [1, 1.189, 1.498, 1.682][inBar], blues = turn === 'boss' || turn === 'both', funk = turn === 'haeun' || turn === 'both', both = turn === 'both';
-      const hurt = sec === 'knee' || sec === 'walk', rush = sec === 'rush' || sec === 'final';
+      const hurt = sec === 'knee' || sec === 'walk', rush = sec === 'rush' || sec === 'final', hip = bar >= 16, sw = s / 4 * 0.2;
       // the knee: a stumble, and the drums drop out
       if (b === 40) E(0, T => { thud(T, 1.2); noise(T, 'lowpass', 260, 0.5, 0.35, 0.7, bus); noise(T + 0.12, 'lowpass', 500, 0.3, 0.12, 0.7, bus); });
       if (inBar === 0 && ((sec === 'open' && turn === 'haeun' && (bar - 16) % 2 === 0) || bar === 24 || bar === 36 || sec === 'final')) E(0, T => crash(T));
-      // trading phrases: the one about to start counts the other in with a rim on the last beat
-      if (inBar === 3 && sec === 'open' && openTurn(bar + 1) !== turn) { E(0, T => rim(T, 0.3)); E(s / 2, T => rim(T, 0.3)); }
-      if (blues && !both) {
-        if (!hurt) {
-          if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.72));
-          if (inBar === 1 || inBar === 3) E(0, T => { snare(T, 0.16); noise(T, 'bandpass', 2400, 0.05, 0.2, 0.8); });
-        }
-        E(0, T => hat(T, hurt ? 0.03 : 0.04)); E(2 * s / 3, T => hat(T, hurt ? 0.02 : 0.03));
-      }
-      if (blues) {
-        if (!hurt || inBar === 0 || inBar === 2) E(0, T => bass(T, roots[ci] * walk, both ? s * 0.5 : s * 0.85, 320)); if (both) E(s / 2, T => bass(T, roots[ci] * walk, s * 0.3, 320));
-        if (!hurt) E(2 * s / 3, T => organ(T, chords[ci].slice(1), s * 0.28, 0.026));
+      // trading phrases: a scratch hands over to 하은, a rim count hands back to 반장
+      if (inBar === 3 && sec === 'open' && openTurn(bar + 1) !== turn) { if (openTurn(bar + 1) === 'haeun') E(s / 2, T => scratch(T)); else { E(0, T => rim(T, 0.3)); E(s / 2, T => rim(T, 0.3)); } }
+      if (!hip) {
+        if (!hurt) { if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.75)); if (inBar === 1 || inBar === 3) E(0, T => snare(T, 0.18)); }
+        E(0, T => hat(T, hurt ? 0.03 : 0.045)); E(s / 2, T => hat(T, hurt ? 0.02 : 0.03));
+        if (!hurt || inBar === 0 || inBar === 2) E(0, T => bass(T, roots[ci], s * 0.6, 320));
+        if (!hurt) E(s / 2, T => organ(T, chords[ci].slice(1), s * 0.25, 0.024));
         if (inBar === 0) E(0, T => organ(T, chords[ci], s * 4, hurt ? 0.016 : 0.011));
         if (!hurt && ((bar - 2) % 4) === 3 && inBar === 0) for (const [ob, nm, len] of LICK) E(ob * s, T => gtrLead(T, N_[nm], len * s * 0.95, 0.045, nm === 'E5'));
-        if (both && sec !== 'knee2' && ((bar - 24) % 2) === 1 && inBar === 1) for (const [ob, nm, len] of LICK_DOWN) E((ob - 1.667) * s, T => gtrLead(T, N_[nm], len * s * 0.9, 0.045, nm === 'A4'));
+        continue;
       }
+      // boom bap under everyone
+      if (inBar === 0) E(0, T => bbKick(T, 0.95)); if (inBar === 1) E(s / 2, T => bbKick(T, 0.85));
+      if (inBar === 2) { E(0, T => bbKick(T, 0.7)); if (bar % 2) E(3 * s / 4 + sw, T => bbKick(T, 0.5)); }
+      if (inBar === 3 && rush) E(s / 2, T => bbKick(T, 0.6));
+      if (inBar === 1 || inBar === 3) E(0, T => { bbSnare(T, funk ? 0.32 : 0.24); clap(T, funk ? 0.14 : 0.08); });
+      if (inBar === 2) E(s / 4 + sw, T => bbSnare(T, 0.05)); if (inBar === 3) E(3 * s / 4 + sw, T => bbSnare(T, 0.06));
+      if (rush) for (let k = 0; k < 4; k++) E(k * s / 4 + (k % 2 ? sw : 0), T => hat(T, k % 2 ? 0.03 : 0.055)); else { E(0, T => hat(T, 0.05)); E(s / 2 + sw, T => hat(T, 0.035)); }
+      if (inBar === 3) E(s / 2 + sw, T => openHat(T, 0.05));
       if (funk) {
-        if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.85)); if (inBar === 1) E(s / 2, T => kick(T, 0.7)); if (inBar === 3) E(3 * s / 4, T => kick(T, 0.5));
-        if (inBar === 1 || inBar === 3) E(0, T => snare(T, rush ? 0.34 : 0.3)); E(s / 4, T => snare(T, 0.05)); if (inBar === 2) E(3 * s / 4, T => snare(T, 0.07));
-        for (let k = 0; k < 4; k++) E(k * s / 4, T => hat(T, (k % 2 ? 0.03 : 0.05) + (rush ? 0.02 : 0))); if (inBar === 3 || (rush && inBar === 1)) E(s / 2, T => openHat(T, 0.05));
-        if (!both) for (const o of (inBar === 0 ? [0, 0.75] : inBar === 1 ? [0.5] : inBar === 2 ? [0.25, 0.5] : [0, 0.5, 0.75])) E(o * s, T => bass(T, roots[ci] * (o === 0.75 || o === 0.25 ? 2 : 1), s * 0.14, 900));
-        for (const o of (inBar === 0 ? [0, 0.5, 0.75] : inBar === 1 ? [0.5] : inBar === 2 ? [0, 0.75] : [0.5])) E(o * s, T => gtr(T, chords[ci].slice(1), 0.09, both ? 0.022 : 0.028));
+        // 하은: the 808 under the kick, crackle, rhodes on the 'and' of 2 and of 4, a chop in the rush
+        if (inBar === 0) E(0, T => sub808(T, roots[ci], s * 1.3)); if (inBar === 1) E(s / 2, T => sub808(T, roots[ci], s * 1.4));
+        if (inBar === 2 && bar % 2) E(3 * s / 4 + sw, T => sub808(T, roots[ci] * (ci === 0 ? 1.5 : 1), s * 0.6));
+        if (inBar === 0) E(0, T => vinyl(T, s * 4));
+        if (inBar === 1 || inBar === 3) E(s / 2 + sw, T => rhodes(T, chords[ci].slice(0, 3), s * 0.45, both ? 0.028 : 0.036));
+        if (rush && inBar === 2) E(s / 2, T => chop(T, chords[ci][2] * 2, 0.035));
+      }
+      if (blues) {
+        // 반장: the walking bass in his bars, organ comp on the 'and', the lick at the end of every fourth bar
+        if (!both) { E(0, T => bass(T, roots[ci] * walk, s * 0.5, 320)); E(s / 2 + sw, T => bass(T, roots[ci] * walk, s * 0.3, 320)); }
+        E(s / 2 + sw, T => organ(T, chords[ci].slice(1), s * 0.22, both ? 0.02 : 0.026));
+        if (inBar === 0) E(0, T => organ(T, chords[ci], s * 4, 0.011));
+        if (sec !== 'knee2' && ((bar - 16) % 4) === 3 && inBar === 0) for (const [ob, nm, len] of LICK) E(ob * s, T => gtrLead(T, N_[nm], len * s * 0.95, 0.045, nm === 'E5'));
+        if (both && sec !== 'knee2' && ((bar - 24) % 2) === 1 && inBar === 1) for (const [ob, nm, len] of LICK_DOWN) E((ob - 1.667) * s, T => gtrLead(T, N_[nm], len * s * 0.9, 0.045, nm === 'A4'));
       }
     } else if (style === 'duo') {
       if (dark) {
@@ -2749,7 +2767,7 @@ function buildEvents() {
     if (L.style === 'night1') { kick(T, 0.8); crash(T); rhodes(T, NIGHT.chords[3], SPB * 7, 0.055); rhodes(T, NIGHT.chords[3].map(f => f * 2), SPB * 5, 0.02); bass(T, NIGHT.roots[3], SPB * 5, 300); whistle(T, N_.C5, SPB * 4, 0.05); forklift(T + SPB * 5, 0.02); forklift(T + SPB * 5.75, 0.02); return; }
     if (L.style === 'mix13') { kick(T, 0.8); crash(T); organ(T, chords[4], SPB * 7, 0.03); bass(T, roots[4], SPB * 5, 300); gtrDist(T, N_.A4, SPB * 6, 0.08, true); return; }
     if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[4], SPB * 4, 0.016, 2400); anthem(T, N_.D5, SPB * 3, 2); return; }
-    if (L.style === 'duo14') { kick(T, 0.8); crash(T); organ(T, chords[0], SPB * 6, 0.035); bass(T, roots[0], SPB * 4, 320); gtrLead(T, N_.A4, SPB * 4, 0.05, true); forklift(T + SPB * 4.5, 0.02); return; }
+    if (L.style === 'duo14') { bbKick(T, 0.9); crash(T); organ(T, chords[0], SPB * 6, 0.035); sub808(T, roots[0], SPB * 4); gtrLead(T, N_.A4, SPB * 4, 0.05, true); forklift(T + SPB * 4.5, 0.02); return; }
     if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
     kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4);
   }]);
