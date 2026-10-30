@@ -29,7 +29,7 @@ ul{color:var(--muted);font-size:13px;margin:8px 0 0 18px}
 <h1>1-5 첫 회식 · 애니매틱</h1>
 <p>벨트 도입 → 매치 컷 → 초밥 세 벨트 → 소주잔과 취기 → 지하철 → 걷기(노래) → 병원(리듬닥터 오마주) → 병실 심장박동 → 새벽. 약 1분 40초. 재생을 누르면 소리도 납니다(롤러, 딱, 쏙, 짠, 발소리, 차임, 노래, 심장박동).</p>
 <canvas id="cv" width="384" height="216"></canvas>
-<div class="bar"><button id="play">▶ 재생</button><input id="seek" type="range" min="0" max="100" step="0.05" value="0"><span id="lbl"></span><button id="midi">♩ 가창용 MIDI 내려받기</button><select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
+<div class="bar"><button id="play">▶ 재생</button><input id="seek" type="range" min="0" max="100" step="0.05" value="0"><span id="lbl"></span><button id="midi">♩ 가창용 MIDI 내려받기 (zip: mid + 가사)</button><select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
 <div class="jumps" id="jumps"></div>
 <details open><summary>노래 "Keep Time" (G장조, 70 BPM) · 가사</summary><pre id="lyrics" style="white-space:pre-wrap;color:var(--ink);font:13px/1.6 system-ui;margin:6px 0 0"></pre></details>
 <ul>
@@ -795,7 +795,26 @@ function midiBytes() {
   const head = [...str('MThd'), 0, 0, 0, 6, 0, 1, 0, 4, (PPQ >> 8) & 255, PPQ & 255];
   return new Uint8Array([...head, ...track(t0), ...track(mel), ...track(chords), ...track(bass)]);
 }
-function downloadMidi() { const b = new Blob([midiBytes()], { type: 'audio/midi' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'keep-time.mid'; a.click(); }
+// a stored (uncompressed) zip: the viewer's save surface takes zip but not mid, so the MIDI and the lyric sheet travel together
+const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = b => { let c = 0xffffffff; for (let i = 0; i < b.length; i++) c = CRC_T[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
+function zipStore(files) {
+  const le16 = n => [n & 255, (n >> 8) & 255], le32 = n => [n & 255, (n >> 8) & 255, (n >> 16) & 255, (n >>> 24) & 255];
+  const parts = [], central = []; let off = 0;
+  for (const [name, data] of files) { const nm = [...new TextEncoder().encode(name)], crc = crc32(data), head = [0x50, 0x4b, 3, 4, ...le16(20), ...le16(0x800), ...le16(0), ...le16(0), ...le16(0x21), ...le32(crc), ...le32(data.length), ...le32(data.length), ...le16(nm.length), ...le16(0), ...nm]; parts.push(new Uint8Array(head), data); central.push([0x50, 0x4b, 1, 2, ...le16(20), ...le16(20), ...le16(0x800), ...le16(0), ...le16(0), ...le16(0x21), ...le32(crc), ...le32(data.length), ...le32(data.length), ...le16(nm.length), ...le16(0), ...le16(0), ...le16(0), ...le16(0), ...le32(0), ...le32(off), ...nm]); off += head.length + data.length; }
+  const cd = central.flat(), end = [0x50, 0x4b, 5, 6, ...le16(0), ...le16(0), ...le16(files.length), ...le16(files.length), ...le32(cd.length), ...le32(off), ...le16(0)];
+  const out = new Uint8Array(off + cd.length + end.length); let p = 0; for (const x of parts) { out.set(x, p); p += x.length; } out.set(cd, p); p += cd.length; out.set(end, p); return out;
+}
+function lyricSheet() { return ['Keep Time — G major (verse on E minor), 70 BPM, 4/4', '', '[Verse 1]  Em | C | G | D | Em | C | G | D', ...LINES.slice(0, 4), '', '[Chorus]  C | G | Am | D | C | G | Em | D', ...LINES.slice(4), '', '[Verse 2]', ...LINES2, '', '[Chorus]', ...LINES.slice(4), '', '[Coda]  Em | D | C | G', LINES[7], '', 'keep-time.mid: track 1 vocal melody with a lyric meta event on every note, track 2 piano chords, track 3 bass.'].join('\n'); }
+async function downloadMidi() {
+  const zip = zipStore([['keep-time.mid', midiBytes()], ['keep-time-lyrics.txt', new TextEncoder().encode(lyricSheet())]]);
+  const btn = document.getElementById('midi');
+  try {
+    const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null;
+    if (dl) { btn.disabled = true; try { await dl.save({ filename: 'keep-time.zip', data: zip }); btn.textContent = '♩ 저장됨 (keep-time.zip)'; } catch (e) { btn.textContent = e && e.code === 'declined' ? '♩ 가창용 MIDI 내려받기' : '♩ 저장 불가: ' + (e && e.code || e); } finally { btn.disabled = false; } return; }
+  } catch (e) {}
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([zip], { type: 'application/zip' })); a.download = 'keep-time.zip'; a.click();
+}
 
 document.getElementById('lyrics').textContent = ['[Verse 1]  Em · C · G · D', ...LINES.slice(0, 4), '', '[Chorus]  C · G · Am · D · C · G · Em · D', ...LINES.slice(4), '', '[Verse 2]', ...LINES2, '', '[Chorus] (반복)', '', '[Coda, 새벽]  Em · D · C · G', LINES[7]].join('\n');
 </script>
