@@ -53,72 +53,176 @@ function ledInsert(u) {
 // the train's position along the tunnel: cruising, then braking into the station
 const trainS = t => t < 3.2 ? 150 * t : 480 + 150 * (Math.min(t - 3.2, 2.8) - Math.min(t - 3.2, 2.8) ** 2 / 5.6);
 const trainV = t => t < 3.2 ? 150 : Math.max(0, 150 * (1 - (t - 3.2) / 2.8));
+// ---- people seen from the front, all on one template so they share the game's 4-head proportion:
+//      a 12x13 face, hair or cap on top, an 18-row torso, a lap, 12-row shins
+const INK = '#1b1716';
+function faceF(cx, top, o = {}) {
+  const s = o.skin || '#d9a27a', sd = o.skinD || '#b98260';
+  R(cx - 6, top, 12, 11, s); R(cx - 5, top + 11, 10, 1, s); R(cx - 4, top + 12, 8, 1, sd); R(cx - 6, top + 9, 1, 2, sd); R(cx + 5, top + 9, 1, 2, sd);
+  R(cx - 7, top + 4, 1, 3, sd); R(cx + 6, top + 4, 1, 3, sd);
+  const e = o.eyes || 'open', ey = top + 5 + (o.look === 'down' ? 1 : 0);
+  if (e === 'open') { R(cx - 4, ey, 2, 2, INK); R(cx + 2, ey, 2, 2, INK); } else if (e === 'closed') { R(cx - 4, ey + 1, 2, 1, INK); R(cx + 2, ey + 1, 2, 1, INK); }
+  if (o.blush) { R(cx - 5, top + 7, 2, 1, '#e07070'); R(cx + 3, top + 7, 2, 1, '#e07070'); }
+  R(cx - 1, top + 9, o.mouthOpen ? 2 : 2, o.mouthOpen ? 2 : 1, o.mouthOpen ? '#6a2a2a' : '#a0524e');
+}
+const HAIR = {
+  sinip(cx, top) { const c = '#1e1a1a'; R(cx - 7, top - 3, 14, 5, c); R(cx - 6, top - 4, 11, 1, c); R(cx - 7, top + 2, 2, 5, c); R(cx + 5, top + 2, 2, 4, c); R(cx - 5, top + 2, 5, 2, c); R(cx + 1, top + 2, 3, 1, c); R(cx - 3, top - 3, 4, 1, '#3a3436'); },
+  salary(cx, top) { const c = '#22201e'; R(cx - 7, top - 3, 14, 4, c); R(cx - 6, top - 4, 12, 1, c); R(cx - 7, top + 1, 1, 4, c); R(cx + 6, top + 1, 1, 4, c); R(cx - 2, top - 3, 1, 3, '#4a4440'); R(cx - 7, top + 3, 1, 2, '#8a8580'); R(cx + 6, top + 3, 1, 2, '#8a8580'); },
+  student(cx, top) { const c = '#2a221e'; R(cx - 7, top - 3, 14, 5, c); R(cx - 5, top - 5, 2, 2, c); R(cx, top - 5, 3, 2, c); R(cx + 4, top - 4, 2, 1, c); R(cx - 7, top + 2, 1, 4, c); R(cx + 6, top + 2, 1, 4, c); R(cx - 6, top + 2, 4, 1, c);
+    const f = '#2b2e31'; R(cx - 6, top + 4, 5, 1, f); R(cx + 1, top + 4, 5, 1, f); R(cx - 6, top + 7, 5, 1, f); R(cx + 1, top + 7, 5, 1, f); R(cx - 6, top + 4, 1, 4, f); R(cx - 2, top + 4, 1, 4, f); R(cx + 1, top + 4, 1, 4, f); R(cx + 5, top + 4, 1, 4, f); R(cx - 1, top + 5, 2, 1, f); },
+  long(cx, top) { const c = '#3a2620'; R(cx - 7, top - 3, 14, 5, c); R(cx - 6, top - 4, 12, 1, c); R(cx - 8, top, 2, 18, c); R(cx + 6, top, 2, 18, c); R(cx - 6, top + 2, 6, 2, c); R(cx - 6, top + 4, 2, 1, c); R(cx - 4, top - 3, 5, 1, '#5a3a30'); },
+  buzz(cx, top) { const c = '#2a2420'; R(cx - 6, top - 2, 12, 3, c); R(cx - 7, top, 1, 3, c); R(cx + 6, top, 1, 3, c); dfill(cx - 6, top - 2, 12, 3, '#4a3e36', 0.3); R(cx - 7, top + 5, 1, 2, '#f4f1ea'); R(cx + 6, top + 5, 1, 2, '#f4f1ea'); R(cx + 6, top + 7, 1, 8, '#e3e7ea'); },
+  // 하은's snapback, pulled down: brim and its shadow hide the eyes; turned = the brim swings toward her left (screen right)
+  cap(cx, top, turned) {
+    const d = turned ? 2 : 0, red = '#d8463b', redD = '#a83328';
+    if (turned) { R(cx - 9, top - 1, 2, 9, '#4a3328'); R(cx - 9, top + 3, 1, 5, '#6b4a3a'); }
+    R(cx - 7, top + 4, 1, 4, '#4a3328'); R(cx + 6, top + 4, 1, 3, '#4a3328');
+    R(cx - 5, top - 6, 10, 1, redD); R(cx - 7, top - 5, 14, 7, red); R(cx - 7, top - 5, 1, 7, redD); R(cx + 6, top - 5, 1, 7, redD); R(cx - 4, top - 5, 3, 1, '#ef6a55');
+    R(cx - 3 + d, top - 4, 6, 4, '#f4f1ea'); R(cx - 2 + d, top - 3, 4, 2, red); R(cx - 2 + d, top - 3, 4, 1, '#f4f1ea');
+    R(cx - 8 + d, top + 2, 16, 1, '#3a3236'); R(cx - 8 + d, top + 3, 16, 1, '#1e1a1a');
+    R(cx - 6, top + 4, 12, 3, '#8a5e44'); R(cx - 6, top + 4, 12, 1, '#6b4631');
+  }
+};
+// seated, front: seatY = the cushion top (the lap sits on it)
+function sitF(cx, seatY, o) {
+  const w = o.w || 16, x0 = cx - w / 2, top = seatY - 18, sk = o.skin || '#d9a27a', topC = o.top, sh = mix(o.top, '#000000', 0.3);
+  const spread = o.spread || 0, pants = o.pants, ps = mix(pants, '#000000', 0.25);
+  // shins and shoes, then the lap, then the torso over them
+  R(cx - 6 - spread, seatY + 3, 5, 12, pants); R(cx + 1 + spread, seatY + 3, 5, 12, pants); R(cx - 2 - spread, seatY + 3, 1, 12, ps); R(cx + 1 + spread, seatY + 3, 1, 12, ps);
+  R(cx - 7 - spread, seatY + 15, 6, 2, o.shoe || '#1e1a1a'); R(cx + 1 + spread, seatY + 15, 6, 2, o.shoe || '#1e1a1a'); R(cx - 7 - spread, seatY + 17, 6, 1, o.sole || '#3a3236'); R(cx + 1 + spread, seatY + 17, 6, 1, o.sole || '#3a3236');
+  R(x0 + 1, seatY, w - 2, 3, pants); R(x0 + 1, seatY, w - 2, 1, mix(pants, '#ffffff', 0.18)); R(cx, seatY + 1, 1, 2, ps);
+  R(cx - 2, top - 1, 4, 2, o.skinD || '#b98260');
+  R(x0 + 1, top, w - 2, 1, topC); R(x0, top + 1, w, 17, topC); R(x0 + 2, top + 3, 1, 14, sh); R(x0 + w - 3, top + 3, 1, 14, sh);
+  if (o.dress) o.dress(cx, top, w);
+  // arms: hands in the lap by default
+  if (o.hands !== false) { R(cx - 5, seatY - 3, 4, 3, sk); R(cx + 1, seatY - 3, 4, 3, sk); R(cx - 5, seatY - 1, 10, 1, o.skinD || '#b98260'); }
+  if (o.extra) o.extra(cx, top, seatY);
+  return top;   // the torso's top: the face sits 14 rows above it
+}
+function standF(cx, feetY, o) {
+  const w = o.w || 16, x0 = cx - w / 2, legTop = feetY - 22, top = legTop - 18, pants = o.pants, ps = mix(pants, '#000000', 0.25);
+  R(cx - 6, legTop, 5, 20, pants); R(cx + 1, legTop, 5, 20, pants); R(cx - 2, legTop, 1, 20, ps); R(cx + 1, legTop, 1, 20, ps);
+  if (o.stripe) { R(cx - 6, legTop, 1, 20, o.stripe); R(cx + 5, legTop, 1, 20, o.stripe); }
+  R(cx - 7, feetY - 2, 6, 2, o.shoe || '#1e1a1a'); R(cx + 1, feetY - 2, 6, 2, o.shoe || '#1e1a1a'); R(cx - 7, feetY, 6, 1, o.sole || '#d9d4c6'); R(cx + 1, feetY, 6, 1, o.sole || '#d9d4c6');
+  R(cx - 2, top - 1, 4, 2, '#b98260');
+  R(x0 + 1, top, w - 2, 1, o.top); R(x0, top + 1, w, 18, o.top); R(x0 + 2, top + 3, 1, 15, mix(o.top, '#000000', 0.3)); R(x0 + w - 3, top + 3, 1, 15, mix(o.top, '#000000', 0.3));
+  if (o.dress) o.dress(cx, top, w);
+  if (o.extra) o.extra(cx, top);
+  return top;
+}
+// a two-segment arm from shoulder S to hand H, elbow bending downward/outward; sleeve colour c
+function arm(sx, sy, hx, hy, c, skin, bendSide = 1) {
+  const L1 = 8, L2 = 8, dx = hx - sx, dy = hy - sy, d = Math.min(L1 + L2 - 0.01, Math.hypot(dx, dy)), a = Math.atan2(dy, dx), k = Math.acos(clamp((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), -1, 1));
+  const ex = sx + Math.cos(a + bendSide * k) * L1, ey = sy + Math.sin(a + bendSide * k) * L1, tx = sx + Math.cos(a) * d, ty = sy + Math.sin(a) * d;
+  thick(sx, sy, ex, ey, 3, c); thick(ex, ey, tx, ty, 3, c); R(ex - 1, ey - 1, 2, 1, mix(c, '#ffffff', 0.15));
+  R(Math.round(tx) - 1, Math.round(ty) - 2, 3, 4, skin); R(Math.round(tx) + 2, Math.round(ty) - 1, 1, 2, skin); R(Math.round(tx) - 1, Math.round(ty) + 2, 3, 1, mix(skin, '#000000', 0.2));
+}
+// the passengers on the last train home
+const PASS = {
+  salaryman(t) { // after his own 회식: suit, tie pulled loose, dozing; his head drops and jerks back up
+    const drop = (t % 4.2) > 3.1 ? 2 : (t % 4.2) > 2.2 ? 1 : 0, cx = 18, seat = 70;
+    R(cx + 8, 79, 12, 9, '#4a3a2a'); R(cx + 8, 79, 12, 1, '#6a5440'); R(cx + 12, 77, 4, 2, '#4a3a2a');
+    const top = sitF(cx, seat, { w: 18, top: '#3a3e48', pants: '#33363e', spread: 1, dress: (x, y) => { R(x - 3, y + 1, 6, 6, '#e9ecef'); R(x - 1 + 1, y + 2, 2, 8, '#8a2a2a'); R(x + 1, y + 2, 1, 1, '#b84a4a'); R(x - 4, y + 1, 1, 9, '#2a2d35'); R(x + 3, y + 1, 1, 9, '#2a2d35'); } });
+    faceF(cx, top - 14 + drop, { eyes: 'closed', blush: true }); HAIR.salary(cx, top - 14 + drop);
+  },
+  student(t) { // studying: a book open on the lap, head down, a page turns
+    const cx = 40, seat = 70, turn = t > 1.4 && t < 1.8;
+    R(cx + 9, 78, 10, 10, '#4a5a3a'); R(cx + 9, 78, 10, 2, '#5a6a4a'); R(cx + 12, 81, 4, 3, '#3a4a2a');
+    const top = sitF(cx, seat, { w: 16, top: '#9a9488', pants: '#3a3f4a', shoe: '#e9e4da', sole: '#b9b4aa', hands: false, dress: (x, y) => { R(x - 1, y + 1, 1, 5, '#d9d4c6'); R(x + 1, y + 1, 1, 5, '#d9d4c6'); R(x - 4, y + 10, 8, 5, '#8a847a'); } });
+    R(cx - 8, seat - 6, 16, 6, '#f4f1ea'); R(cx, seat - 6, 1, 6, '#c9c2b0'); R(cx - 8, seat - 1, 16, 1, '#2f5f8a'); for (let k = 0; k < 4; k++) { R(cx - 6, seat - 5 + k, 5, 1, '#c9c2b0'); R(cx + 2, seat - 5 + k, 5, 1, '#c9c2b0'); }
+    if (turn) R(cx + 1, seat - 9, 4, 4, '#ffffff');
+    R(cx - 9, seat - 4, 3, 3, '#d9a27a'); R(cx + 7, seat - 4, 3, 3, '#d9a27a');
+    faceF(cx, top - 13, { eyes: 'closed', look: 'down' }); HAIR.student(cx, top - 13);
+  },
+  phoneWoman(t) { // standing in the aisle, one hand on a strap, the other with the phone, its light on her face
+    const cx = 64, feet = 93, scroll = Math.floor(t / 0.9) % 2;
+    const top = standF(cx, feet, { w: 14, top: '#c9b089', pants: '#4a5a7a', shoe: '#e9e4da', sole: '#c9c4ba', dress: (x, y) => { R(x - 2, y + 1, 4, 10, '#f4f1ea'); R(x - 7, y + 12, 3, 8, '#e0d4b8'); } });
+    HAIR.long(cx, top - 14); faceF(cx, top - 14, { eyes: 'open', look: 'down' }); R(cx - 6, top - 14, 12, 3, '#3a2620'); HAIR.long(cx, top - 14);
+    R(cx - 8, 21, 2, top - 20, '#c9b089'); R(cx - 9, 18, 3, 4, '#d9a27a'); R(cx - 9, 17, 3, 1, '#b98260');
+    R(cx + 1, top + 6, 5, 7, '#1b1716'); R(cx + 2, top + 7, 3, 5, scroll ? '#9fd8ec' : '#bfe6f2'); R(cx, top + 9, 3, 4, '#d9a27a'); thick(cx + 6, top + 3, cx + 3, top + 10, 3, '#c9b089');
+    light(cx + 3, top + 4, 12, '159,216,236', 0.25);
+    R(cx + 6, top + 14, 6, 9, '#8a5a3a'); R(cx + 7, top + 2, 1, 12, '#8a5a3a');
+  },
+  trackMan(t) { // by the door: track suit, earbuds, a gym bag, nodding to whatever he is listening to
+    const cx = 184, feet = 93, nod = Math.floor(t / 0.5) % 2;
+    const top = standF(cx, feet, { w: 18, top: '#2a3a6a', pants: '#2a3a6a', stripe: '#e9ecef', shoe: '#e9e4da', sole: '#d8463b', dress: (x, y, w) => { R(x - w / 2, y + 1, 1, 17, '#e9ecef'); R(x + w / 2 - 1, y + 1, 1, 17, '#e9ecef'); R(x, y + 1, 1, 17, '#9aa0a6'); R(x - 3, y, 6, 2, '#1f2c52'); } });
+    faceF(cx, top - 14 + nod, { eyes: 'closed' }); HAIR.buzz(cx, top - 14 + nod);
+    R(cx - 12, top + 8, 9, 12, '#1e1a1a'); R(cx - 11, top + 11, 4, 2, '#d8463b'); thick(cx - 6, top + 1, cx - 8, top + 9, 2, '#1e1a1a');
+    R(cx - 10, top - 26, 1, 28, '#c9ced3');
+  }
+};
+function sinipAsleep(SX, SEAT, ang, t) {
+  const sTop = sitF(SX, SEAT, { w: 18, top: '#2f4f58', pants: '#33415a', spread: 1, hands: false, dress: (x, y) => { R(x - 7, y + 1, 14, 12, '#cfe04a'); R(x - 7, y + 8, 14, 2, '#ebe5c9'); R(x - 1, y + 1, 2, 12, '#2f4f58'); R(x - 3, y - 1, 6, 2, '#213840'); } });
+  R(SX - 10, SEAT - 4, 3, 4, '#d9a27a'); R(SX + 7, SEAT - 4, 3, 4, '#d9a27a');
+  const pivX = SX, pivY = sTop - 1;
+  rotDraw(() => { faceF(40, 40, { eyes: 'closed', blush: true, mouthOpen: true }); HAIR.sinip(40, 40); }, 96, 72, 40, 53, ang, pivX, pivY);
+  const headX = pivX + Math.sin(ang) * 7, headY = pivY - Math.cos(ang) * 7;
+  zzz(Math.round(headX + 6), Math.round(headY - 14), t * 1000);
+  return [headX, headY];
+}
 function trainTwoShot(t) {
   const S = trainS(t), v = trainV(t), arrived = clamp((t - 4.6) / 1.4, 0, 1);
-  shot(2, (w, h, lb) => {
+  shot(2, (w, h) => {
     const bounce = v > 20 && (S % 68) < 6 ? 1 : 0;
     g.save(); g.translate(0, bounce);
     // the car: wall, ad frames, the window and what is outside it
-    R(0, 0, w, h, '#c9cfd6'); R(0, 12, w, 8, '#d9dee3'); for (const [x, c] of [[18, '#c0546a'], [46, '#3f8a7a'], [74, '#e0b84a'], [102, '#5a6fa8'], [130, '#d77a4a']]) { R(x, 13, 24, 6, '#eef1f3'); R(x + 1, 14, 22, 4, c); R(x + 2, 15, 9, 1, '#f7f1e2'); }
+    R(0, 0, w, h, '#c9cfd6'); R(0, 12, w, 8, '#d9dee3'); for (const [x, c] of [[18, '#c0546a'], [46, '#3f8a7a'], [74, '#e0b84a'], [102, '#5a6fa8'], [134, '#d77a4a']]) { R(x, 13, 24, 6, '#eef1f3'); R(x + 1, 14, 22, 4, c); R(x + 2, 15, 9, 1, '#f7f1e2'); }
     R(0, 20, w, 1, '#9aa1a8');
-    const wx0 = 8, wx1 = 120, wy0 = 22, wy1 = 50;
+    const wx0 = 4, wx1 = 120, wy0 = 22, wy1 = 46;
     R(wx0 - 2, wy0 - 2, wx1 - wx0 + 4, wy1 - wy0 + 4, '#9aa1a8'); R(wx0 - 1, wy0 - 1, wx1 - wx0 + 2, wy1 - wy0 + 2, '#2b2e33');
     g.save(); g.beginPath(); g.rect(wx0, wy0, wx1 - wx0, wy1 - wy0); g.clip();
     R(wx0, wy0, wx1 - wx0, wy1 - wy0, '#07080c');
     for (let k = -1; k < 8; k++) { const x = wx0 + (((k * 24 - S) % 168) + 168) % 168; R(x, wy0, 2, wy1 - wy0, '#121620'); }
-    R(wx0, 27, wx1 - wx0, 1, '#171b25'); R(wx0, 29, wx1 - wx0, 1, '#131720'); R(wx0, 45, wx1 - wx0, 1, '#10131b');
+    R(wx0, 27, wx1 - wx0, 1, '#171b25'); R(wx0, 29, wx1 - wx0, 1, '#131720'); R(wx0, 42, wx1 - wx0, 1, '#10131b');
     for (let k = 0; k < 3; k++) { const x = wx0 + (((k * 84 + 40 - S) % 252) + 252) % 252, len = 2 + Math.round(v * 0.12); R(x - len, 24, len + 2, 2, '#ffd890'); R(x - len, 24, len + 2, 1, '#fff3c8'); light(x, 25, 10 + v * 0.06, '255,216,144', 0.5); }
-    // the platform sliding in as the train brakes
     const px = wx0 + (690 - S);
-    if (px < wx1) { R(px, wy0, wx1 - px, wy1 - wy0, '#d7dfdb'); for (let y = wy0; y < wy1; y += 4) R(px, y, wx1 - px, 1, '#c6cfcb'); for (let x = px; x < wx1; x += 6) R(x, wy0, 1, wy1 - wy0, '#c6cfcb'); R(px, 36, wx1 - px, 3, '#2f6f8a'); R(px + 30, 26, 40, 8, '#1e2a33'); R(px + 32, 28, 36, 4, '#2f3a4a'); R(px + 34, 29, 20, 2, '#e9eef0'); R(px + 90, 26, 4, 24, '#b9c4c0'); light(px + 50, 24, 50, '240,250,255', 0.35); }
+    if (px < wx1) { R(px, wy0, wx1 - px, wy1 - wy0, '#d7dfdb'); for (let y = wy0; y < wy1; y += 4) R(px, y, wx1 - px, 1, '#c6cfcb'); for (let x = px; x < wx1; x += 6) R(x, wy0, 1, wy1 - wy0, '#c6cfcb'); R(px, 34, wx1 - px, 3, '#2f6f8a'); R(px + 30, 25, 40, 8, '#1e2a33'); R(px + 32, 27, 36, 4, '#2f3a4a'); R(px + 34, 28, 20, 2, '#e9eef0'); light(px + 50, 24, 50, '240,250,255', 0.35); }
     g.restore();
-    // reflections on the glass: the car's lamps, faint
-    g.save(); g.globalAlpha = 0.16; for (let k = 0; k < 3; k++) R(wx0 + 6 + k * 38, wy0 + 1, 20, 1, '#ffffff'); for (let k = 0; k < 10; k++) R(wx0 + 74 + k, wy1 - 1 - k * 3, 6, 1, '#ffffff'); g.restore();
-    // the door to the right, its window, the tunnel through it too
+    g.save(); g.globalAlpha = 0.16; for (let k = 0; k < 3; k++) R(wx0 + 6 + k * 38, wy0 + 1, 20, 1, '#ffffff'); for (let k = 0; k < 8; k++) R(wx0 + 74 + k, wy1 - 1 - k * 3, 6, 1, '#ffffff'); g.restore();
+    // the door to the right
     R(128, 18, 52, 78, '#b9c0c7'); R(130, 20, 23, 76, '#d3d8dd'); R(155, 20, 23, 76, '#d3d8dd'); R(153, 20, 2, 76, '#2b2e33'); for (const x of [134, 159]) { R(x, 26, 15, 26, '#2b2e33'); R(x + 1, 27, 13, 24, px < x + 14 ? '#cfd8d4' : '#0a0c10'); }
     R(128, 18, 52, 1, '#8a9097'); R(130, 70, 48, 2, '#f2d35a');
+    if (t > 6.2) { const o = ease(clamp((t - 6.2) / 0.6, 0, 1)) * 22; g.save(); g.beginPath(); g.rect(130, 20, 48, 76); g.clip(); R(130, 20, 48, 76, '#c9d2ce'); R(130, 60, 48, 36, '#a9b4b0'); R(130, 68, 48, 3, '#f2d35a'); light(154, 50, 40, '255,255,255', 0.3); R(130 - o, 20, 23, 76, '#d3d8dd'); R(155 + o, 20, 23, 76, '#d3d8dd'); R(153 - o, 20, 1, 76, '#2b2e33'); R(155 + o, 20, 1, 76, '#2b2e33'); g.restore(); }
     // the bench: moquette back, cushion, the steel skirt, the floor
-    R(0, 50, 124, 20, '#2f5f8a'); dfill(0, 51, 124, 18, '#3a6d9a', 0.32); dfill(0, 62, 124, 8, '#284f74', 0.5); R(0, 50, 124, 2, '#4a82b4');
-    for (const x of [38, 62]) R(x, 52, 1, 18, '#284f74');
+    R(0, 46, 124, 24, '#2f5f8a'); dfill(0, 47, 124, 22, '#3a6d9a', 0.32); dfill(0, 62, 124, 8, '#284f74', 0.5); R(0, 46, 124, 2, '#4a82b4');
+    for (const x of [29, 51, 73, 95]) R(x, 48, 1, 22, '#284f74');
     R(0, 70, 124, 3, '#3f7fb0'); R(0, 70, 124, 1, '#5b97c6'); R(0, 73, 124, 4, '#244766'); R(0, 77, 124, 4, '#8e979f'); R(0, 77, 124, 1, '#b5bdc4'); R(0, 80, 124, 1, '#6f777e');
     R(0, 81, w, 15, '#6b7279'); dfill(0, 81, w, 15, '#7a8188', 0.3); R(0, 81, w, 1, '#5a6066'); dfill(0, 88, w, 8, '#5f666d', 0.4);
-    light(60, 92, 60, '200,220,235', 0.12);
-    // the hanging straps, swinging forward as the train brakes
+    // the straps, swinging forward as the train brakes
     R(0, 10, w, 2, '#9aa1a8'); const sw = Math.round((v < 150 && v > 0 ? 2 : 0) + Math.sin(t * 3) * (v > 0 ? 1 : 0.4));
-    for (const x of [14, 38, 62, 86, 110]) { R(x, 12, 1, 5, '#e3e7ea'); R(x - 2 + sw, 17, 5, 1, '#eef1f3'); R(x - 2 + sw, 17, 1, 4, '#eef1f3'); R(x + 2 + sw, 17, 1, 4, '#eef1f3'); R(x - 2 + sw, 20, 5, 1, '#c9ced3'); }
-    // the pole at the end of the bench
+    for (const x of [12, 36, 56, 84, 108]) { R(x, 12, 1, 5, '#e3e7ea'); R(x - 2 + sw, 17, 5, 1, '#eef1f3'); R(x - 2 + sw, 17, 1, 4, '#eef1f3'); R(x + 2 + sw, 17, 1, 4, '#eef1f3'); R(x - 2 + sw, 20, 5, 1, '#c9ced3'); }
     R(122, 10, 3, 86, '#b8bec4'); R(123, 10, 1, 86, '#eef1f3'); R(124, 10, 1, 86, '#7a8086');
-    // the bag by her feet
-    const stood = t > 5.4;
-    if (!stood) bagAt(62, 84);
-    // 신입 asleep: on her shoulder, then eased against the pole
-    const ease1 = ease(clamp((t - 3.6) / 1.3, 0, 1)), ang = lerp(-0.95, 0.72, ease1);
-    spr('pBodySit', 97 + Math.round(ease1 * 5), 59);
-    sprRot('pHead', 107 + Math.round(ease1 * 5), 60, ang, 6.5, 12);
-    zzz(110 + Math.round(ease1 * 8), 44, t * 1000);
-    // 하은: looks at him, puts him against the pole, stands, goes to the door
+    // the other passengers on the bench
+    PASS.salaryman(t); PASS.student(t);
+    // 신입, asleep: on her shoulder, then moved over against the pole
+    const SX = 108, SEAT = 70, move = ease(clamp((t - 3.1) / 1.2, 0, 1)), ang = lerp(-0.62, 0.62, move);
+    const [headX, headY] = sinipAsleep(SX, SEAT, ang, t);
+    // 하은: looks at him, takes his head in her hand and moves it over to the pole, stands, goes to the door
+    const HX = 86, stood = t > 5.2;
     if (!stood) {
-      spr('hBodySit', 77, 54);
-      const turned = t > 2.0;
-      spr(turned ? 'hHeadT' : 'hHeadF', 76, 38);
-      if (t > 3.2 && t < 5.2) { const hx = 107 + Math.round(ease1 * 2) + Math.round(Math.sin(ang) * 7), hy = 60 - Math.round(Math.cos(ang) * 7); thick(93, 57, hx - 2, hy, 2, '#1e1a1a'); R(hx - 3, hy - 2, 3, 3, '#d9a27a'); }
+      const hTop = sitF(HX, SEAT, { w: 16, top: '#1e1a1a', pants: '#3a3f45', dress: (x, y) => { R(x - 6, y + 1, 12, 15, '#7ec8e3'); R(x - 6, y + 8, 12, 2, '#ebe5c9'); R(x - 1, y + 1, 2, 15, '#5aa6c4'); R(x - 2, y - 1, 4, 2, '#1e1a1a'); } });
+      const turned = t > 1.8 && t < 4.9;
+      faceF(HX, hTop - 14, { eyes: 'hidden', skin: '#d9a27a' }); HAIR.cap(HX, hTop - 14, turned);
+      bagAt(64, 84);
+      const reach = t < 2.6 ? 0 : t < 3.1 ? ease((t - 2.6) / 0.5) : t < 4.3 ? 1 : t < 4.7 ? 1 - ease((t - 4.3) / 0.4) : 0;
+      if (reach > 0) {
+        // her hand goes to the left side of his head and stays with it while it turns
+        const side = ang - Math.PI / 2, tx = headX + Math.cos(side) * 6 - 1, ty = headY + Math.sin(side) * 6 + 1, rx = HX + 4, ry = SEAT - 3;
+        arm(HX + 7, hTop + 2, lerp(rx, tx, reach), lerp(ry, ty, reach), '#1e1a1a', '#d9a27a', 1);
+      }
     } else {
-      const p = clamp((t - 5.7) / 1.5, 0, 1), x = Math.round(lerp(86, 150, ease(p)));
+      const p = clamp((t - 5.4) / 1.5, 0, 1), x = Math.round(lerp(88, 150, ease(p)));
       haeunWalkSide(x, 95, t, { mirror: true, stand: p <= 0 || p >= 1 });
     }
+    // standing passengers, nearer the camera than the bench
+    PASS.phoneWoman(t); PASS.trackMan(t);
     // a tunnel lamp passing lights the car for a moment: the beat in the light
     for (let k = 0; k < 3; k++) { const x = wx0 + (((k * 84 + 40 - S) % 252) + 252) % 252; if (v > 10) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(x - 26, 0, x + 26, 0); gr.addColorStop(0, 'rgba(255,200,120,0)'); gr.addColorStop(0.5, `rgba(255,200,120,${0.12 * v / 150})`); gr.addColorStop(1, 'rgba(255,200,120,0)'); g.fillStyle = gr; g.fillRect(x - 26, 0, 52, h); g.restore(); } }
-    // the station's light fills the car when it stops; the doors open
     if (arrived > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(230,240,245,${0.14 * arrived})`; g.fillRect(0, 0, w, h); g.restore(); }
-    if (t > 6.2) { const o = ease(clamp((t - 6.2) / 0.6, 0, 1)) * 22; R(130, 20, 23, 76, '#d3d8dd'); R(155, 20, 23, 76, '#d3d8dd'); g.save(); g.beginPath(); g.rect(130, 20, 48, 76); g.clip(); R(130, 20, 48, 76, '#c9d2ce'); R(130, 60, 48, 36, '#a9b4b0'); R(130, 68, 48, 3, '#f2d35a'); light(154, 50, 40, '255,255,255', 0.3); R(130 - o, 20, 23, 76, '#d3d8dd'); R(155 + o, 20, 23, 76, '#d3d8dd'); g.restore(); }
     g.restore();
     vig(w, h, 0.45);
   });
   bars();
-  rollerOn(true, 0.03 + 0.05 * v / 150); clacks('w-two', S, 68);
-  if (t > 3.3) cue('w-brake', () => { const o = oscS('sine', 1900, now(), 0.012, 2.4, 1300); });
-  if (t > 6.2) cue('w-door', () => { SND.chime(); SND.door(); });
-  if (t > 3.3 && t < 3.5) cue('w-ease', () => noiseS(now(), 'lowpass', 500, 0.05, 0.4));
 }
 
 // 2. 문 — from the platform, through the screen doors: she steps out, turns back; two layers of glass close on him; the train
@@ -141,16 +245,21 @@ function doorClose(u) {
     R(0, 72, w, 12, '#2a2622');
     // the train: body, livery, the door, what is inside; she is inside it until she steps out
     trainSide(tx - 34, x0 => {
+      // the same passengers, through the windows
+      g.save(); g.beginPath(); g.rect(x0 + 9, 25, 38, 24); g.rect(x0 + 161, 25, 38, 24); g.rect(x0 + 211, 25, 38, 24); g.clip();
+      for (const [px, f, hair, top] of [[x0 + 19, 'salary', '#3a3e48', 42], [x0 + 38, 'student', '#9a9488', 42], [x0 + 178, 'long', '#c9b089', 38], [x0 + 228, 'buzz', '#2a3a6a', 36]]) { R(px - 8, top, 16, 14, top === 42 ? hair : hair); faceF(px, top - 14, { eyes: f === 'long' ? 'open' : 'closed', look: f === 'long' || f === 'student' ? 'down' : '' }); HAIR[f](px, top - 14); }
+      R(x0 + 172, 38, 6, 6, '#1b1716'); R(x0 + 173, 39, 4, 4, '#9fd8ec');
+      g.restore();
       const dx = x0 + 104;   // the train door, 44 wide
       R(dx, 20, 44, 66, '#2b2e33'); R(dx + 1, 21, 42, 64, '#f2efe6'); R(dx + 1, 21, 42, 30, '#e8eef0'); R(dx + 1, 51, 42, 18, '#3f7fb0'); R(dx + 1, 51, 42, 1, '#5b97c6'); R(dx + 1, 69, 42, 16, '#8a9198');
-      R(dx + 34, 21, 2, 64, '#b8bec4'); R(dx + 34, 21, 1, 64, '#eef1f3');
+      R(dx + 36, 21, 2, 64, '#b8bec4'); R(dx + 36, 21, 1, 64, '#eef1f3');
       // 신입 against the pole inside, asleep
-      spr('pBodySit', dx + 17, 45); sprRot('pHead', dx + 27, 46, 0.7, 6.5, 12); zzz(dx + 32, 30, u * 1000);
+      sinipAsleep(dx + 22, 63, 0.62, u);
       light(dx + 22, 40, 40, '255,240,210', 0.25);
       const dw = Math.round(21 * (1 - open)); R(dx + 1, 21, dw, 64, '#d3d8dd'); R(dx + 43 - dw, 21, dw, 64, '#d3d8dd');
       if (dw > 6) { R(dx + 4, 27, dw - 6, 24, '#2b2e33'); R(dx + 5, 28, dw - 8, 22, '#cfe0e8'); R(dx + 43 - dw + 2, 27, dw - 6, 24, '#2b2e33'); R(dx + 43 - dw + 3, 28, dw - 8, 22, '#cfe0e8'); }
       if (dw > 0) { R(dx + dw, 21, 1, 64, '#2b2e33'); R(dx + 43 - dw, 21, 1, 64, '#2b2e33'); }
-      if (dw > 12) { g.save(); g.beginPath(); g.rect(dx + 5, 28, dw - 8, 22); g.rect(dx + 43 - dw + 3, 28, dw - 8, 22); g.clip(); spr('pBodySit', dx + 17, 45); sprRot('pHead', dx + 27, 46, 0.7, 6.5, 12); shade(dx, 21, 44, 64, '207,224,232', 0.35); g.restore(); }
+      if (dw > 12) { g.save(); g.beginPath(); g.rect(dx + 5, 28, dw - 8, 22); g.rect(dx + 43 - dw + 3, 28, dw - 8, 22); g.clip(); sinipAsleep(dx + 22, 63, 0.62, u); shade(dx, 21, 44, 64, '207,224,232', 0.35); g.restore(); }
     });
     // the windows streak past as it leaves; their light strobes across the platform
     if (dep > 0) { const sp = dep * 92; for (let k = 0; k < 6; k++) { const x = ((k * 70 - sp * 1.6) % 420 + 420) % 420 - 60; g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,190,${Math.min(0.16, dep * 0.12)})`; g.fillRect(x, 84, 40, 12); g.restore(); } }

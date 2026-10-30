@@ -66,7 +66,9 @@ function plateStack(x, base, n) { for (let k = 0; k < n; k++) { const c = ['red'
 
 // ---------- 소리 ----------
 let ac = null, master = null, roller = null;
-function audioOn() { if (ac) return; try { ac = new (window.AudioContext || window.webkitAudioContext)(); master = ac.createGain(); master.gain.value = 0.6; master.connect(ac.destination); } catch (e) { ac = null; } }
+// sound is off in this animatic for now (the cues stay in the code; set SOUND = true to hear them)
+const SOUND = false;
+function audioOn() { if (ac || !SOUND) return; try { ac = new (window.AudioContext || window.webkitAudioContext)(); master = ac.createGain(); master.gain.value = 0.6; master.connect(ac.destination); } catch (e) { ac = null; } }
 const nbufOf = () => { const b = ac.createBuffer(1, ac.sampleRate, ac.sampleRate); const d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; return b; };
 let NB = null;
 let silent = false;
