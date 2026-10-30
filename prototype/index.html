@@ -315,6 +315,8 @@ const VOX = [
   [16.5, 'E4', 0.5], [17, 'Fs4', 0.5], [17.5, 'G4', 1], [19, 'G4', 0.5], [19.5, 'B4', 0.5], [20, 'B4', 1.2], [21.5, 'A4', 0.5], [22, 'G4', 1.5],
   [24.5, 'B4', 0.5], [25, 'C5', 0.5], [25.5, 'B4', 1], [27, 'G4', 0.5], [27.5, 'Fs4', 0.5], [28, 'E4', 1.5], [30, 'Fs4', 0.5], [30.5, 'G4', 1.5]];
 // her track's chords: Em | C | G | D
+// a whole step: 1-3's second drop lifts by this for its last eight bars
+const LIFT = Math.pow(2, 2 / 12);
 const CHILL = { chords: [[164.81, 196, 246.94], [130.81, 164.81, 196], [196, 246.94, 293.66], [146.83, 185, 220]], roots: [82.41, 65.41, 98, 73.42] };
 // 반장 humming his blues (two bars), for the last stretch of the blues in 1-3
 const HUM = [[0, 'A4', 1], [1, 'C5', 0.5], [1.5, 'D5', 0.5], [2, 'E5', 1.5], [4, 'E5', 1], [5, 'D5', 1], [6, 'C5', 0.5], [6.5, 'A4', 1.5]];
@@ -417,18 +419,19 @@ const LEVELS = [
     // 지우's track (after the first reference: 115 BPM, E minor, piano and tune alone, a build, a drop) at 115;
     // 반장's slow Chicago blues (after the second: ~57 BPM, A minor, a guitar lead the whole way) at 60; then her kick at double time (120)
     // under the same blues and the guitar comes in driven
-    tempo: [[0, 115], [96, 60], [152, 120]], style:'mix13', fxTheme: beat => beat < 96 ? 'chill' : 'blues', tintColors: [[157, 180, 255], [120, 220, 255]], preClub: [[40, 88], [152, 256]],
+    tempo: [[0, 115], [96, 60], [152, 120]], style:'mix13', fxTheme: beat => beat < 96 ? 'chill' : 'blues', tintColors: [[157, 180, 255], [120, 220, 255]], preClub: [[40, 88], [152, 288]],
     clock:'03:05', title:'선곡', partners:['jiwoo'], hints:false,
     // cast: 지우 places first while 반장 watches; at beat 88 he walks over, takes an earbud, and they swap places by beat 96
     cast: { swap: 88 },
-    chords: [...CHILL.chords, ...BLUES.chords], roots: [...CHILL.roots, ...BLUES.roots],
+    // the same blues a whole step up (chords 7-9) for the last eight bars of the second drop
+    chords: [...CHILL.chords, ...BLUES.chords, ...BLUES.chords.map(c => c.map(f => f * LIFT))], roots: [...CHILL.roots, ...BLUES.roots, ...BLUES.roots.map(f => f * LIFT)],
     // phase 3 (bars 38-61) runs at double time over the same 12-bar blues, so a blues chord lasts two of them
-    chordAt: bar => bar < 22 ? ((bar - 2) % 4 + 4) % 4 : bar < 25 ? 4 : bar < 38 ? 4 + BLUES.prog[(bar - 25) % 12] : bar < 62 ? 4 + BLUES.prog[((bar - 38) >> 1) % 12] : 4,
+    chordAt: bar => bar < 22 ? ((bar - 2) % 4 + 4) % 4 : bar < 25 ? 4 : bar < 38 ? 4 + BLUES.prog[(bar - 25) % 12] : bar < 62 ? 4 + BLUES.prog[((bar - 38) >> 1) % 12] : bar < 70 ? 7 + BLUES.prog[((bar - 38) >> 1) % 12] : 7,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
-    tinny: [[89, 94.5]], lounge: [[100, 256]], cut: [[199, 200]],
+    tinny: [[89, 94.5]], lounge: [[100, 288]], cut: [[199, 200]],
     // 반장's memory: the warehouse flickers out after the tape stop, the count-in builds a rainy alley, the outro wakes back up
-    alley: { dark: 94.5, reveal: 96, out: 248 }, special:['엇박 상자', 'off', '받아냄'],
-    sections: [[0, 'intro'], [2, 'verse'], [10, 'build'], [18, 'drop'], [22, 'swap'], [24, 'count'], [25, 'blues'], [37, 'fuseIn'], [38, 'fusion'], [48, 'break'], [50, 'swing'], [62, 'outro']],
+    alley: { dark: 94.5, reveal: 96, out: 280 }, special:['엇박 상자', 'off', '받아냄'],
+    sections: [[0, 'intro'], [2, 'verse'], [10, 'build'], [18, 'drop'], [22, 'swap'], [24, 'count'], [25, 'blues'], [37, 'fuseIn'], [38, 'fusion'], [48, 'break'], [50, 'swing'], [70, 'outro']],
     // 8 cells per bar = straight 8ths. 12 cells per bar = triplets: 'x.x' is a shuffle pair (on the beat, then two thirds later)
     bars: [
       '........', '........',
@@ -450,7 +453,9 @@ const LEVELS = [
       'h=======', '........',
       // the second drop: his off-beats on her fast 'and', with holds between, two or three boxes riding one crate
       // (no box on 200: it would cross the screen during the dark beat before the drop)
-      '....x...', '.x...x..', 'h=o=o=..', 'x....x..', '.x.x....', 'h===..x.', '.x...x..', 'h=o=....', '.x.x.x..', 'h=o=o=o=', '........', 'x.......',
+      '....x...', '.x...x..', 'h=o=o=..', 'x....x..', '.x.x....', 'h===..x.', '.x...x..', 'h=o=....', '.x.x.x..', 'h=o=o=o=', '..x.x.x.', 'x.x.x.xx',
+      // eight more bars, a whole step up from 248: no rest, off-beats thickening, a crate with riders, 8ths into the end
+      'x...x...', '.x...x.x', 'h===..x.', '.x.x.x..', 'x.x.x.x.', 'h=o=o=..', '.x.x.x.x', 'x.x.x.xx',
       '........', '........'
     ],
     say: [[1, '반장님! 신곡이에요.', 4, 0, 'j'], [13, '…또 뭐냐 그건.', 2.5, 0, 'b'], [36.5, '들어보실래요? 어제 밤새 만들었어요.', 3, 0, 'j'], [50, '여기서부터 올라가요.', 3, 0, 'j'],
@@ -461,7 +466,7 @@ const LEVELS = [
           [148.3, '잠깐만요! 반장님 블루스 위에 제 비트 얹어볼게요!', 3.5, 0, 'j'], [158, '…허 참. 두 배로 가냐.', 3.5, 0, 'b'],
           [170, '형! 불 들어와요!', 3, 0, 'j'], [192, '…이거 반장님이 친 거예요?', 4, 0, 'j'], [196, '…옛날에.', 2.2, 0, 'b'],
           [198.3, '한 번 더. 세게.', 1.5, 0, 'b'], [204, '반장님 기타, 이제 제 신스로 받을게요!', 3.5, 0, 'j'], [214, '(까딱까딱) 이거 몸이 먼저 알아요!', 4, 0, 'j'], [230, '…좀 하네.', 3, 0, 'b'],
-          [242, '끝까지 가요!!', 4, 0, 'j']],
+          [248, '끝까지 가요!!', 4, 0, 'j']],
     // misses are answered by whoever is feeding the belt: 지우 before the swap, 반장 after
     comfort: ['괜찮아. 다음 거 봐.', '내 손 봐.'], comfortBy: { jiwoo: ['괜찮아요! 다음 거!', '형! 정신 차려요!'], boss: ['괜찮아. 다음 거 봐.', '내 손 봐.'] },
     intro: [
@@ -1224,7 +1229,7 @@ function drawCast(t, nowMs, active, placerPose) {
   // 지우
   const jPose = placer === 'jiwoo' && !(rel >= 0) ? placerPose
     : { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: !active ? 0 : (rel >= 4 && rel < 8) ? walkBob : (beat >= 132 && ph < 0.25 ? 1 : 0), nod: 0, doze: false, phone: false,
-        vibe: beat >= 148 && beat < 248, unplug: rel >= 2, lane: placer === 'jiwoo' ? 0 : 2 };
+        vibe: beat >= 148 && beat < 280, unplug: rel >= 2, lane: placer === 'jiwoo' ? 0 : 2 };
   if (placer !== 'jiwoo') FX.react[2] = { type: beat < 128 ? 'glance' : '', at: nowMs };
   const jMirror = rel >= 8;
   drawActor('jiwoo', jx, jMirror, jPose, nowMs, active, jMirror ? null : (active && rel >= 4 && rel < 8 ? null : null));
@@ -1760,12 +1765,12 @@ function alleyState(beat) {
   if (beat < A.reveal) tube = beat < A.reveal - 0.75 ? flick(beat) : 0;
   if (beat >= A.out) { rainK = Math.max(0, 1 - (beat - A.out) / 2); if (beat >= A.out + 2) { const p = (beat - A.out - 2) / 2; tube = p > 0.6 ? 1 : flick(beat); fade = Math.max(0, 1 - p) * (tube ? 0.5 : 1); } }
   // rain: steady in the blues, heavier into the fusion, thin in the break, a downpour in the second drop
-  const inten = beat < 148 ? 1 : beat < 152 ? 1.4 : beat < 192 ? 1.1 : beat < 199 ? 0.45 : beat < 200 ? 0 : beat < 232 ? 2 : 2.4;
+  const inten = beat < 148 ? 1 : beat < 152 ? 1.4 : beat < 192 ? 1.1 : beat < 199 ? 0.45 : beat < 200 ? 0 : beat < 248 ? 2 : 2.2;
   return { beat, tube, ground: lay(0) * fade, wall: lay(1) * fade, neon: lay(2) * fade, lamp: lay(3) * fade, rain: lay(0) * rainK * inten, out: beat >= A.out };
 }
 // how hard the guitar just played: the street reflections shiver on each lead note (GLEAD beats, doubled in phase 3)
 function guitarGlint(beat) {
-  let rel = -1, mul = 1; if (beat >= 100 && beat < 148) rel = beat - 100; else if (beat >= 152 && beat < 248) { rel = beat - 152; mul = 2; }
+  let rel = -1, mul = 1; if (beat >= 100 && beat < 148) rel = beat - 100; else if (beat >= 152 && beat < 280) { rel = beat >= 248 ? beat - 248 : beat - 152; mul = 2; }
   if (rel < 0) return 0;
   for (const [ob] of GLEAD) { const d = rel - ob * mul; if (d >= 0 && d < 0.4) return 1 - d / 0.4; }
   return 0;
@@ -1773,15 +1778,15 @@ function guitarGlint(beat) {
 // the signs and the decorations stay dark through the slow blues, sputter in the entry bar, and all come on with phase 3 (152)
 function neonLevels(al, nowMs) {
   const b = al.beat;
-  let on = b >= 152 && b < 248 ? 1 : 0;
+  let on = b >= 152 && b < 280 ? 1 : 0;
   if (b >= 148 && b < 152) { const k = (b - 148) / 4; on = rnd(Math.floor(b * 4), 9) < 0.15 + k * 0.7 ? 0.25 + 0.45 * k : 0; }
-  let sign = on, gtr = on, bulbs = on, note = b >= 152 && b < 248 ? 1 : 0;
+  let sign = on, gtr = on, bulbs = on, note = b >= 152 && b < 280 ? 1 : 0;
   if (!reduce && b >= 152 && Math.sin(nowMs / 41) + Math.sin(nowMs / 13.7) > 1.9) sign *= 0.35;   // the old sign still stutters now and then
   if (b >= 176 && b < 192) { const o = Math.floor(b) % 2; sign *= o ? 1 : 0.3; note *= o ? 0.3 : 1; }   // his sign and her note trade beats
   if (b >= 192 && b < 199) { sign *= 0.25; note *= 0.15; gtr *= 0.3; bulbs *= 0.35; }                // the break: the lamp carries it
   if (b >= 199 && b < 200) sign = note = gtr = bulbs = 0;
-  if (b >= 200 && b < 248) { const k = Math.max(0, 1 - (b % 1) * 3); sign = Math.min(1, sign * (0.85 + 0.3 * k)); note = Math.min(1, note * (0.85 + 0.3 * k)); }
-  const w = al.wall; return { sign: sign * w, gtr: gtr * w, bulbs: bulbs * w, note: note * w, k: b >= 200 && b < 248 ? Math.max(0, 1 - (b % 1) * 3) : 0 };
+  if (b >= 200 && b < 280) { const k = Math.max(0, 1 - (b % 1) * 3); sign = Math.min(1, sign * (0.85 + 0.3 * k)); note = Math.min(1, note * (0.85 + 0.3 * k)); }
+  const w = al.wall; return { sign: sign * w, gtr: gtr * w, bulbs: bulbs * w, note: note * w, k: b >= 200 && b < 280 ? Math.max(0, 1 - (b % 1) * 3) : 0 };
 }
 function neonPix(rows, x0, y0, sc, col, glow, a, vis = 1) {
   const each = fn => rows.forEach((row, j) => [...row].forEach((v, i) => { if (v !== '.' && v !== '0') fn(x0 + i * sc, y0 + j * sc); }));
@@ -1824,7 +1829,7 @@ function drawAlleyBack(al, t, nowMs) {
     g.restore();
   }
   // signs: his blue BLUES, and from the fusion her lilac note across the alley
-  const letterRun = al.beat >= 200 && al.beat < 248 ? Math.floor(al.beat * 2) % 7 : -1, gate = k => al.beat < 152 ? 1 : unitOn(k) ? 1 : 0;
+  const letterRun = al.beat >= 200 && al.beat < 280 ? Math.floor(al.beat * 2) % 7 : -1, gate = k => al.beat < 152 ? 1 : unitOn(k) ? 1 : 0;
   'CHICAGO'.split('').forEach((ch, i) => neonPix(SIGN_FONT[ch], SIGN.x + i * 8, SIGN.y, 2, '#bff3ff', '57,198,255', nv.sign * gate(i) * (letterRun < 0 ? 1 : i === letterRun ? 1.15 : 0.7) + unitFlare(i, nowMs), al.wall));
   neonPix(NEON_GTR, NEON_GTR_AT.x, NEON_GTR_AT.y, 2, '#ffe0b0', '255,170,80', nv.gtr * gate(U_GTR) * (0.8 + 0.2 * glint) + unitFlare(U_GTR, nowMs), al.wall);
   if (al.wall > 0 && al.beat >= 152) neonPix(NOTE_PIX, NOTE_SIGN.x, NOTE_SIGN.y, 3, '#f3e8ff', '190,150,255', nv.note * gate(U_NOTE) + unitFlare(U_NOTE, nowMs), al.wall * 0.8);
@@ -1846,7 +1851,7 @@ function drawAlleyBack(al, t, nowMs) {
   }
   const nb = Math.max(0, FX.lit - U_BULB);
   if (nv.bulbs > 0 && nb > 0) {
-    const chase = al.beat >= 200 && al.beat < 248 ? Math.floor(al.beat * 2) % 4 : -1;
+    const chase = al.beat >= 200 && al.beat < 280 ? Math.floor(al.beat * 2) % 4 : -1;
     g.save(); g.globalCompositeOperation = 'lighter';
     for (let i = 0; i < nb; i++) {
       const p = LIT_SPOTS[i], flare = unitFlare(U_BULB + i, nowMs), a = nv.bulbs * (0.7 + 0.3 * (i % 4 === chase ? 1 : 0)) + flare;
@@ -1885,11 +1890,11 @@ function drawAlleyRain(al, t, nowMs) {
       for (let m = 0; m < L0.length; m += 2) { const x = L0[m], y = L0[m + 1]; if (k === 3) { g.fillRect(x, y, thick, 3); continue; } g.fillRect(x, y, thick, Math.min(4, BELT_Y - y)); if (y + 4 < BELT_Y) g.fillRect(x - 1, y + 4, thick, Math.min(4, BELT_Y - y - 4)); }
     }
   }
-  if (al.ground <= 0 || b >= 248) return;
+  if (al.ground <= 0 || b >= 280) return;
   const ox = Math.round(alleyScroll(b)), vis = P => P.x - ox > -30 && P.x - ox < W + 30;
   g.save(); g.translate(-ox, alleyBob(b));
   // drips: on the beat and two thirds into it through the slow blues, on the beat and the 'and' at double time
-  const grid = b >= 100 && b < 148 ? [0, 2 / 3] : b >= 148 && b < 199 || b >= 200 && b < 248 ? [0, 0.5] : null;
+  const grid = b >= 100 && b < 148 ? [0, 2 / 3] : b >= 148 && b < 199 || b >= 200 && b < 280 ? [0, 0.5] : null;
   if (grid && !reduce) for (let bb = Math.floor(b) - 1; bb <= Math.floor(b) + 1; bb++) for (const f of grid) {
     const tl = timeAt(bb + f), dt = t - tl;
     if (dt < -0.28 || dt > 0.5) continue;
@@ -1904,13 +1909,13 @@ function drawAlleyRain(al, t, nowMs) {
   if (!reduce) {
     const fb = Math.floor(b), recent = [fb - 1, fb];
     if (b >= 100 && b < 148) for (const P of PUDDLES) if (vis(P) && !DRIPS.some(D => D.x === P.x)) ripple(P, '255,214,160', recent.filter(x => x % 2 === 0), 26);
-    if (b >= 152 && b < 199 || b >= 200 && b < 248) ripple(PUDDLE2, '200,170,255', recent, 22);
-    if (b >= 200 && b < 248) ripple(PUDDLE, '220,235,255', recent, 34);
+    if (b >= 152 && b < 199 || b >= 200 && b < 280) ripple(PUDDLE2, '200,170,255', recent, 22);
+    if (b >= 200 && b < 280) ripple(PUDDLE, '220,235,255', recent, 34);
   }
   // the climax bursts leave a ring where they land on the ground
   if (FX.splashes && FX.splashes.length) { g.lineWidth = 1; for (const p of FX.splashes) { const age = (nowMs - p.at) / 1000; if (age < 0 || age > 0.5) continue; if (age < 0.08) { g.fillStyle = `rgba(240,248,255,${0.9 * (1 - age / 0.08)})`; g.fillRect(p.x + ox - 2, p.y - 3, 5, 3); } if (!p.ring) continue; const rr = 3 + age * 40; g.strokeStyle = `rgba(220,235,255,${0.8 * (1 - age / 0.5)})`; g.beginPath(); g.ellipse(p.x + ox, p.y, rr, rr * 0.24, 0, 0, Math.PI * 2); g.stroke(); } }
   // splashes on the kick in the second drop
-  if (b >= 200 && b < 248 && !reduce && FX.alleyBeat !== Math.floor(b)) {
+  if (b >= 200 && b < 280 && !reduce && FX.alleyBeat !== Math.floor(b)) {
     FX.alleyBeat = Math.floor(b);
     for (const P of [PUDDLE, PUDDLE2]) spawn(P.x, P.y - 1, 6, ['#cfe6ff', '#9fb8d8'], -40, 40, -90, -40, 360, 420, [1, 1]);
   }
@@ -1965,9 +1970,9 @@ function drawAlleyLight(al, t, nowMs) {
 }
 // phase 3: the belt's top edge is a guitar string. His lead notes set it humming end to end; each hit plucks it at the scanner and
 // the wave runs back up the belt.
-const phase3 = beat => !!L.alley && beat >= 152 && beat < 248;
+const phase3 = beat => !!L.alley && beat >= 152 && beat < 280;
 function drawBeltString(al, t, nowMs) {
-  if (!phase3(al.beat) && !(al.beat >= 248 && al.beat < 250)) return;
+  if (!phase3(al.beat) && !(al.beat >= 280 && al.beat < 282)) return;
   const glint = guitarGlint(al.beat), age = (nowMs - FX.pluckAt) / 1000, pl = age < 0.9 ? FX.pluckAmp * Math.exp(-age * 4) : 0;
   const hum = glint * 0.8, a = 0.35 + 0.4 * Math.max(glint, pl);
   const sg = g.createLinearGradient(48, 0, W, 0); sg.addColorStop(0, `rgba(255,210,150,${a * 0.6})`); sg.addColorStop((SCAN_X - 48) / (W - 48), `rgba(255,220,170,${a})`); sg.addColorStop(1, `rgba(255,210,150,${a * 0.7})`);
@@ -1983,8 +1988,8 @@ function drawBeltString(al, t, nowMs) {
 }
 const mirrorBuf = document.createElement('canvas'); mirrorBuf.width = W; mirrorBuf.height = BELT_Y;
 function drawPuddleMirror(al, t, nowMs) {
-  const b = al.beat; if (!L.alley || b < 231 || b >= 250) return;
-  const fade = b < 232 ? b - 231 : b >= 248 ? 1 - (b - 248) / 2 : 1, kick = Math.max(0, 1 - (b % 1) * 3);
+  const b = al.beat; if (!L.alley || b < 263 || b >= 282) return;
+  const fade = b < 264 ? b - 263 : b >= 280 ? 1 - (b - 280) / 2 : 1, kick = Math.max(0, 1 - (b % 1) * 3);
   const top = BELT_Y + 18, rows = H - top, m = mirrorBuf.getContext('2d');
   // the reflection only needs a fresh copy of the picture every third frame
   FX.mirrorTick = (FX.mirrorTick || 0) + 1;
@@ -2005,11 +2010,11 @@ function alleyHit(j, beat) {
   if (FX.lit < UNIT_POS.length) { FX.litAt[FX.lit] = now; FX.lit++; }
   FX.pluckAt = now; FX.pluckAmp = j === 'perfect' ? 1 : 0.6;
   FX.shakeUntil = 0;
-  if (beat >= 200 && beat < 248) {
+  if (beat >= 200 && beat < 280) {
     // the climax: the view punches in, and the rain bursts up off wet surfaces all over the alley (the scanner keeps its usual hit)
-    const top = beat >= 232 ? 1.3 : 1;
+    const top = beat >= 264 ? 1.3 : 1;
     FX.punchAt = now; FX.punch = (j === 'perfect' ? 2.2 : 1.4) * top;
-    alleySplashes(now, (j === 'perfect' ? 4 : 3) + (beat >= 232 ? 1 : 0));
+    alleySplashes(now, (j === 'perfect' ? 4 : 3) + (beat >= 264 ? 1 : 0));
   } else { FX.punchAt = -1e9; if (j === 'perfect') FX.freezeAt = now; }
 }
 // wet surfaces the climax splashes burst from: puddles and the street, the belt top, the awning edge, under the sign, the fire
@@ -2043,7 +2048,7 @@ function alleyMiss() {
   if (ctx) { noise(ctx.currentTime, 'bandpass', 3200, 0.12, 0.03, 3, bus); noise(ctx.currentTime + 0.02, 'highpass', 5000, 0.06, 0.08, 0.7, bus); }
 }
 // in front of everything: the blackout before the count-in, the dark beat before the second drop, and lightning
-const LIGHTNING = [152, 200, 216, 232, 236, 240, 244];
+const LIGHTNING = [152, 200, 216, 232, 248, 256, 264, 268, 272, 276];
 function drawAlleyFront(al, t) {
   const b = al.beat, A = L.alley;
   let dark = 0;
@@ -2083,7 +2088,7 @@ function drawScene(t, bt, active, nowMs) {
   if (!reduce && pa >= 0 && pa < 1) { const z = 1 + 0.03 * (FX.punch || 1) * (1 - pa) * (1 - pa), px = SCAN_X, py = BELT_Y - 10; g.translate(px, py); g.scale(z, z); g.translate(-px, -py); }
   const al = active ? alleyState(beatAt(t)) : null;
   // the downpour thumps with the kick, one pixel
-  if (al && !reduce && al.beat >= 200 && al.beat < 248) g.translate(0, Math.round(Math.max(0, 1 - (al.beat % 1) * 4)));
+  if (al && !reduce && al.beat >= 200 && al.beat < 280) g.translate(0, Math.round(Math.max(0, 1 - (al.beat % 1) * 4)));
   if (al) drawAlleyBack(al, t, nowMs); else g.drawImage(bg, 0, 0);
   const dockBeat = L.dock ? castBeatAt(t, active) : 0;
   if (L.dock) { drawDockBack(dockBeat, nowMs, active); drawBeaconPosts(dockBeat); }
@@ -2846,11 +2851,14 @@ function buildEvents() {
       // plays the chorus; she adds her phase-1 palette underneath, soft at first and growing: a soft kick and 8th bass, her piano
       // figure on his chords, a pumping pad, then her snare, 16th bass, a sub, chopped snares, until the second drop is all beat.
       // The lead hands over: driven guitar through the fusion, clean guitar alone in the break, the electronic lead from the second drop.
-      const ph2 = sec === 'swing', brk = sec === 'break', pb = bar - 38, st = ph2 ? (bar >= 58 ? 3 : 2) : (bar >= 44 ? 1.5 : 1), rel2 = b - 152;
+      const ph2 = sec === 'swing', brk = sec === 'break', pb = bar - 38, st = ph2 ? (bar >= 66 ? 3.5 : bar >= 58 ? 3 : 2) : (bar >= 44 ? 1.5 : 1), rel2 = b - 152;
+      const lift = bar >= 62, lf = lift ? LIFT : 1;
       const half = pb % 2, walk = [1, 1.189, 1.498, 1.682][half * 2 + (inBar >> 1)];
       if (brk && bar === 49 && inBar === 3) { E(0, T => mus.gain.setValueAtTime(0.0001, T)); E(s * 0.98, T => mus.gain.setValueAtTime(1, T)); continue; }
       if (b === 152) E(0, T => { crash(T); subDrop(T); gtrDist(T, N_.E5, s * 7, 0.065, true); });
       if (b === 200) E(0, T => { crash(T); subDrop(T); synthLead(T, N_.E5, s * 3, 0.045); });
+      // 248: the lift, a whole step up, with the lightning
+      if (b === 248) E(0, T => { crash(T); subDrop(T); whoosh(T, s * 2, true); synthLead(T, N_.E5 * LIFT, s * 3, 0.045); });
       // her piano figure (1, the 'and' of 2, 4) on his chords
       if (inBar === 0) E(0, T => piano(T, chords[ci], s * 1.8, brk ? 0.045 : 0.03 + st * 0.006)); if (inBar === 1) E(s / 2, T => piano(T, chords[ci].slice(1), s * 1.2, 0.028)); if (inBar === 3) E(0, T => piano(T, chords[ci], s * 1.4, 0.03));
       // his rhythm guitar on the shuffle 'and', all the way through
@@ -2872,11 +2880,16 @@ function buildEvents() {
         if (ph2 && pb % 4 === 3 && inBar === 3) for (let k = 0; k < 8; k++) E(k * s / 8, T => snare(T, 0.08 + k * 0.022));
         if (st >= 3 && (inBar === 1 || inBar === 3)) E(s / 2, T => clap(T, 0.18));
         if (ph2 && bar > 50 && (bar - 50) % 4 === 0 && inBar === 0) E(0, T => { crash(T); whoosh(T, s * 2, true); });
+        // the last four bars: a clap on every beat, a riser over the final two, and a 16th roll into the last beat
+        if (ph2 && bar >= 66) E(0, T => clap(T, 0.15));
+        if (ph2 && bar === 68 && inBar === 0) E(0, T => riser(T, s * 8, 0.07));
+        if (ph2 && bar === 69 && inBar === 2) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.08 + k * 0.03));
       }
       // the chorus on top: driven guitar, clean guitar in the break, the electronic lead for the second drop, an octave up at the end
-      const hi = bar >= 58;
-      if (rel2 >= 7 && !(b >= 200 && b < 203)) for (const [ob, nm, len, bend] of GLEAD) if (Math.floor(ob * 2) === rel2) E((ob * 2 - rel2) * s, T => {
-        if (ph2) synthLead(T, N_[nm] * (hi ? 2 : 1), len * 2 * s * 0.96, hi ? 0.036 : 0.042);
+      // after the lift the chorus starts again from its top, in the new key; an octave up for 58-61 and again for the last four bars
+      const hi = (bar >= 58 && bar < 62) || bar >= 66, relL = lift ? b - 248 : rel2;
+      if (relL >= (lift ? 4 : 7) && !(b >= 200 && b < 203)) for (const [ob, nm, len, bend] of GLEAD) if (Math.floor(ob * 2) === relL) E((ob * 2 - relL) * s, T => {
+        if (ph2) synthLead(T, N_[nm] * lf * (hi ? 2 : 1), len * 2 * s * 0.96, hi ? 0.036 : 0.042);
         else if (brk) gtrLead(T, N_[nm], len * 2 * s * 0.96, 0.055, !!bend);
         else gtrDist(T, N_[nm], len * 2 * s * 0.96, 0.055, !!bend);
       });
@@ -2979,7 +2992,7 @@ function buildEvents() {
   const tEnd = timeAt(L.endAt != null ? L.endAt : total - 4);
   ev.push([tEnd, T => {
     if (L.style === 'night1') { kick(T, 0.8); crash(T); rhodes(T, NIGHT.chords[3], SPB * 7, 0.055); rhodes(T, NIGHT.chords[3].map(f => f * 2), SPB * 5, 0.02); bass(T, NIGHT.roots[3], SPB * 5, 300); whistle(T, N_.C5, SPB * 4, 0.05); forklift(T + SPB * 5, 0.02); forklift(T + SPB * 5.75, 0.02); return; }
-    if (L.style === 'mix13') { kick(T, 0.8); crash(T); organ(T, chords[4], SPB * 7, 0.03); bass(T, roots[4], SPB * 5, 300); gtrDist(T, N_.A4, SPB * 6, 0.08, true); return; }
+    if (L.style === 'mix13') { kick(T, 0.8); crash(T); organ(T, chords[7], SPB * 7, 0.03); bass(T, roots[7], SPB * 5, 300); gtrDist(T, N_.A4 * LIFT, SPB * 6, 0.08, true); return; }
     if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[4], SPB * 4, 0.016, 2400); anthem(T, N_.D5, SPB * 3, 2); return; }
     if (L.style === 'duo14') { bbKick(T, 0.9); crash(T); organ(T, chords[0], SPB * 6, 0.035); sub808(T, roots[0], SPB * 4); gtrLead(T, N_.A4, SPB * 4, 0.05, true); forklift(T + SPB * 4.5, 0.02); return; }
     if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
