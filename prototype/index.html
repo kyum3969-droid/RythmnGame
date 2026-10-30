@@ -496,7 +496,7 @@ const LEVELS = [
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 },
     // no on-screen hints (as in 1-1 to 1-3); the dock, the departure board and the beacons carry the Friday rush
     hints: false, dock: true, dim: [[40, 60]],
-    phone: [[88, 90]], phoneLane: 0, lateHint: '반장님 무릎… 손이 늦어요. 손을 봐요', special:['양쪽 동시에 찍은 상자', 'pair2', '한 번에'],
+    phone: [[88, 90]], phoneLane: 0, haeunWatch: [[42.5, 45.25]], lateHint: '반장님 무릎… 손이 늦어요. 손을 봐요', special:['양쪽 동시에 찍은 상자', 'pair2', '한 번에'],
     sections: [[0, 'intro'], [2, 'boss'], [10, 'knee'], [13, 'walk'], [15, 'count'], [16, 'open'], [24, 'both'], [32, 'knee2'], [36, 'rush'], [44, 'final'], [48, 'outro']],
     // upper belt: 반장's shuffle (12 cells) until the knee, then 하은's straight 16ths (16 cells): trading two-bar phrases, then both,
     // 8ths in the rush, every beat with him at the end
@@ -548,6 +548,7 @@ const LEVELS = [
       { who:'하은', text: sp >= 30 ? '…양쪽 다 받네. 야간 처음 맞아?' : '…됐다. 수고.' },
       { who:'반장', text:'무릎은 괜찮다. 아무한테도 말하지 마.' },
       { who:'', text:'반장님이 무릎을 한 번 두드리고, 벨트를 한 번 두드렸다.' },
+      { who:'', text:'하은은 계수기 숫자를 휴대폰 메모에 옮겨 적었다.' },
       { who:'하은', text:'(시계를 본다) 먼저 갈게.' },
       { who:'', text:'지우한테서 문자. "…공연 망했어요. 내일 얘기해요."' }] : [
       { who:'', text:'트럭이 떴다. 04:52. 12분 늦었다.' },
@@ -1075,7 +1076,7 @@ const PARTNERS = {
     base: 86,
     draw(pose, nowMs, active) {
       const top = bodyTop(86, pose) + (pose.bob ? 1 : 0);
-      drawHaeunAt(BOSS_X, top, nowMs, { mirror: true, watch: pose.phone, load: true, bob: 0 });
+      drawHaeunAt(BOSS_X, top, nowMs, { mirror: true, watch: pose.phone, load: true, bob: 0, tally: active && L.coScanner });
     },
     arm(pose) {
       const top = bodyTop(86, pose), shirt = '#1e1a1a', glove = '#2a2d31';
@@ -1290,14 +1291,44 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
   }
   else if (o.step != null) { const st = o.step ? 4 : -2; thick(cx - 6, top + 22, cx - 9 + st, top + 33, 4, shirt); R(cx - 11 + st, top + 32, 4, 3, glove); }
   thick(cx + 6, top + 22, cx + 8, top + 32, 4, shirt); R(cx + 6, top + 31, 4, 3, glove);
+  // the tally counter in that hand: the thumb clicks it for every box of hers that goes through
+  const ck = nowMs - TALLY.at < 90 ? 1 : 0;
+  R(cx + 6, top + 29, 5, 5, '#b9bec4'); R(cx + 6, top + 33, 5, 1, '#7d8288'); R(cx + 7, top + 30, 3, 2, '#1d2226');
+  R(cx + 7, top + 27 + ck, 2, 2 - ck, '#d9dde1');
+  g.restore();
+  if (o.tally) drawTallyPop(o.mirror ? cx - 9 : cx + 9, top + 24, nowMs);
+}
+// 하은 counts her boxes all night (2번 라인 pays by the piece): the number pops over her hand at each click, red and unmoved when
+// one of hers is missed, and gold when it turns over 1000 (the last box of the night, if every one of hers went through)
+const TALLY = { base: 872, n: -1, miss: -1, at: -1e9, missAt: -1e9 };
+function updateTally(nowMs) {
+  let n = 0, m = 0;
+  for (const x of notes) if (x.lane === 0) { if (x.state === 'hit' || x.state === 'holding') n++; else if (x.state === 'miss' || x.state === 'broken') m++; }
+  if (TALLY.n >= 0 && n > TALLY.n) TALLY.at = nowMs;
+  if (TALLY.miss >= 0 && m > TALLY.miss) TALLY.missAt = nowMs;
+  TALLY.n = n; TALLY.miss = m;
+}
+function drawTallyPop(hx, y, nowMs) {
+  const v = TALLY.base + TALLY.n, big = v >= 1000, age = nowMs - TALLY.at, mage = nowMs - TALLY.missAt;
+  const life = big ? 1600 : 520, missed = mage < 520 && mage < age;
+  const a = missed ? 1 - mage / 520 : age < life ? 1 - age / life : 0;
+  if (a <= 0) return;
+  const txt = String(v).padStart(4, '0'), sc = big && !missed ? 2 : 1, w = (txt.length * 4 - 1) * sc;
+  const rise = Math.round((missed ? 0 : Math.min(1, age / 200)) * 5), jit = missed && !reduce ? Math.round(Math.sin(mage / 18) * 1.5) : 0;
+  const x0 = Math.round(Math.min(W - w - 1, Math.max(1, hx - w / 2))) + jit, y0 = y - 6 * sc - rise;
+  const col = missed ? '#ff5a4a' : big ? '#f4d35e' : '#7ec8e3';
+  g.save(); g.globalAlpha = Math.min(1, a * 1.6);
+  g.fillStyle = 'rgba(8,10,14,.55)'; g.fillRect(x0 - 1, y0 - 1, w + 2, 5 * sc + 2);
+  if (sc === 1) pixText(txt, x0, y0, col);
+  else { g.translate(x0, y0); g.scale(2, 2); pixText(txt, 0, 0, col); }
   g.restore();
 }
 // beside you at the gates, facing the belts the way you do: her gun scans the upper gate in 1-4's first stretch
 function drawHaeun(t, kick, nowMs, active) {
   const beat = active ? beatAt(t) : (state === 'outro' || state === 'result') ? END_BEAT : -1;
-  const ph = beat - Math.floor(beat), watch = active && inRange(beat, L.phone) && DUO.mode === 'one';
+  const ph = beat - Math.floor(beat), watch = active && inRange(beat, L.haeunWatch) && DUO.mode === 'one';
   const bob = active && ph < 0.18 ? 1 : 0, top = HAEUN_TOP + bob + (kick > 0.5 ? 1 : 0);
-  drawHaeunAt(HAEUN_X, top, nowMs, { gun: watch ? null : kick, watch });
+  drawHaeunAt(HAEUN_X, top, nowMs, { gun: watch ? null : kick, watch, tally: active });
 }
 // crossing to the upper belt's loading end in a hurry: a step back behind the far belt first, then left along it
 function haeunWalkPos(p) {
@@ -2095,6 +2126,7 @@ function drawScene(t, bt, active, nowMs) {
   const beltT = active ? t : bt;
   const laneFx = { delivered: 0, binned: 0, falling: [] };
   if (L.lanes === 2) {
+    if (L.coScanner) updateTally(nowMs);
     const mb = castBeatAt(t, active); DUO.mode = duoMode(mb); DUO.p = L.handover ? Math.max(0, Math.min(1, (mb - L.handover[0]) / (L.handover[1] - L.handover[0]))) : 1;
     if (DUO.mode === 'walk' && L.coScanner) drawHaeunWalk(nowMs);
     if (DUO.mode === 'two') { g.save(); g.translate(LANE_DX[0], LANE_DY[0]); drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); }
@@ -3044,7 +3076,7 @@ function resetRun() {
   notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; });
   FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.splashes = []; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9; FX.goodBoth = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
-  rings = []; heavyPend = null;
+  rings = []; heavyPend = null; TALLY.n = TALLY.miss = -1; TALLY.at = TALLY.missAt = -1e9;
 }
 loadLevel(LEVELS[0]); resetRun();
 
