@@ -7,7 +7,8 @@ const C = {
   belt:'#38302c', slat:'#2a2320', face:'#171312', metal:'#6a7075', sweat:'#9fd0ff', cyan:'#5ad7e8'
 };
 
-const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+let RHOOK = null;   // when set, rectangles go through it (the animatic uses it to draw rotated shapes crisply)
+const R = (x, y, w, h, c) => { if (RHOOK) return RHOOK(x, y, w, h, c); g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
 const thick = (x1, y1, x2, y2, s, c) => {
   const d = Math.max(1, Math.hypot(x2 - x1, y2 - y1));
   for (let k = 0; k <= d; k++) { const p = k / d; R(lerp(x1, x2, p) - s / 2, lerp(y1, y2, p) - s / 2, s, s, c); }
