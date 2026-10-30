@@ -475,13 +475,13 @@ const LEVELS = [
   ,{
     id:'s1-4', stageNo:'1-4', who:'반장 + 하은', role:'반장 · 하은 · 100 BPM · 벨트 둘', tag:'벨트 둘 · 주고받기 · 양손 겹침', bpm:100, style:'duo14',
     // 반장 alone loads both belts; 하은 scans the upper belt beside you (your left hand is her trigger), you scan the lower one
-    lanes: 2, partners: ['boss', 'boss'], onePlacer: true, coScanner: 'haeun', fxTheme: 'blues', clock:'03:40', title:'합류',
+    lanes: 2, partners: ['boss', 'boss'], onePlacer: true, coScanner: 'haeun', autoLane: 0, fxTheme: 'blues', clock:'03:40', title:'합류',
     // 반장's shuffle blues on the upper belt (left hand), 하은's straight funk on the lower one (right hand). They trade phrases,
     // four bars, then two, with one box each where a phrase hands over; at the end both belts run and each hand keeps its own feel.
     chords: BLUES.chords, roots: BLUES.roots, chordAt: bar => bar < 2 ? 0 : BLUES.prog[(bar - 2) % 12],
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
     // the second belt rolls in from the right with 하은 on it
-    phone: [[88, 90]], special:['양손 상자', 'pair', '받아냄'],
+    phone: [[88, 90]], special:['하은과 같은 박에 찍은 상자', 'pair', '받아냄'],
     sections: [[0, 'intro'], [2, 'boss'], [10, 'haeun'], [18, 'trade4'], [34, 'trade2'], [42, 'both'], [50, 'outro']],
     // upper belt, 12 cells = shuffle triplets
     bars: [
@@ -506,16 +506,16 @@ const LEVELS = [
       '................', '................'
     ],
     // [beat, text, beats shown, lane, speaker]: 반장 at the belts; 'h' = 하은 at the upper scanner, beside you
-    say: [[4, '위부터 간다. 하은이는 쉬어.', 3, 0], [8, '네. 위는 제가 찍을게요. 왼손, 저 믿고.', 3.5, 0, 'h'], [20, '너도 야간 처음이지? 난 2년.', 3.5, 0, 'h'],
-          [36, '아래. 2번 라인 속도다.', 3, 0], [41, '이게 제 라인 속도예요. 빠르죠?', 3.5, 0, 'h'], [52, '여기 시급 그대로죠?', 2.5, 0, 'h'], [55, '…그대로다. 손이나 봐.', 2.5, 0],
-          [72, '자, 위아래 번갈아 싣는다. 위부터.', 3, 0], [88, '(시계 봄) …아직 네 시간.', 2.5, 0, 'h'], [104, '넘어갈 땐 양손.', 3, 0],
-          [136, '빨라진다. 두 손 다 써라.', 3, 0], [152, '저 안 늦어요. 반장님 손이나 보세요.', 3.5, 0, 'h'],
+    say: [[4, '위부터 간다. 하은이는 쉬어.', 3, 0], [8, '네. 위는 제가 찍을게요. 너는 쉬어.', 3.5, 0, 'h'], [20, '너도 야간 처음이지? 난 2년.', 3.5, 0, 'h'],
+          [36, '아래. 2번 라인 속도다.', 3, 0], [41, '이게 제 라인 속도예요. 아래, 네 차례.', 3.5, 0, 'h'], [52, '여기 시급 그대로죠?', 2.5, 0, 'h'], [55, '…그대로다. 손이나 봐.', 2.5, 0],
+          [72, '자, 위아래 번갈아 싣는다. 위부터.', 3, 0], [88, '(시계 봄) …아직 네 시간.', 2.5, 0, 'h'], [104, '넘어갈 땐 둘이 같은 박이다.', 3, 0],
+          [136, '빨라진다. 하은 소리 듣지 말고 내 손.', 3.5, 0], [152, '저 안 늦어요. 반장님 손이나 보세요.', 3.5, 0, 'h'],
           [168, '같이 간다!', 2, 0], [170, '네!', 1.5, 0, 'h'], [184, '(위는 흔들고, 아래는 똑바로)', 3, 0], [200, '(트럭 경적)', 3, 0]],
-    comfort: ['한 손씩. 왼손은 하은이랑, 오른손은 너.', '내 손을 봐.'],
+    comfort: ['위는 하은이 한다. 너는 아래만.', '내 손을 봐.'],
     intro: [
       { who:'', text:'닷새째 밤. 금요일. 트럭이 새벽 4시 40분에 뜬다. 라인을 합쳐서 벨트가 둘이다.' },
       { who:'반장', text:'지우는 오늘 공연이라 뺐다. 2번 라인에서 온 하은이. 오늘 네 옆에서 위 벨트 찍는다.' },
-      { who:'하은', text:'하은이에요. 2년 차. 위는 제가 찍을 테니까 왼손은 저랑 맞춰요. 오른손은 네 거.' },
+      { who:'하은', text:'하은이에요. 2년 차. 위는 제가 알아서 찍을게요. 너는 아래만 봐.' },
       { who:'반장', text:'싣는 건 위아래 다 내가 한다. 벨트 말고 내 손을 봐.' },
       { who:'하은', text:'(작게) 반장님 손 느려지면 말해 줘. 나도 처음엔 몰랐어.' }],
     outro: (good, sp) => good ? [
@@ -566,7 +566,7 @@ function loadLevel(level) {
     }
   }));
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
-  notes.forEach(n => { n.pair = notes.some(m => m !== n && m.lane !== n.lane && Math.abs(m.beat - n.beat) < 1e-6); });
+  notes.forEach(n => { n.pair = n.lane !== level.autoLane && notes.some(m => m !== n && m.lane !== n.lane && Math.abs(m.beat - n.beat) < 1e-6); });
   notes.forEach((n, i) => {
     n.i = i; n.arr = timeAt(n.beat); n.place = n.arr - TRAVEL * SPB; n.end = timeAt(n.beat + n.len);
     if (n.len) { n.w = Math.round((n.end - n.arr) * SPEED) + 16; n.h = 12; }
@@ -1116,7 +1116,7 @@ function drawHaeun(t, kick, nowMs, active) {
   // arms: the gun on the upper gate (kicks back toward her when your left hand fires), or the watch check; the other hand in a pocket
   if (watch) { thick(cx - 6, top + 22, cx - 2, top + 30, 4, shirt); R(cx - 4, top + 28, 4, 4, glove); R(cx - 3, top + 26, 3, 3, '#d8dde0'); R(cx - 2, top + 27, 1, 1, C.ink); }
   else {
-    const gx = 326 + kick * 3, gy = 87;
+    const gx = 312 + kick * 3, gy = 84;
     thick(cx - 6, top + 22, gx + 6, gy + 3, 4, shirt);
     R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33'); R(gx - 10, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser); R(gx, gy + 2, 3, 3, glove);
   }
@@ -1307,7 +1307,11 @@ let rings = [];
 // hit-stop: only the scanned box pauses; the belt, the music and the next boxes keep their time
 const HITSTOP = reduce ? 0 : 0.085;
 function hitLag(dt, hs) { return Math.max(0, Math.min(dt, hs)); }
-const LANE_DY = [-30, 0], LANE_DX = [-26, 6];
+const LANE_DY = [-36, 0], LANE_DX = [-26, 6];
+// the upper belt is the far one: drawn smaller, converging on the middle of the screen
+const FAR = { k: 0.82 };
+const farX = x => W / 2 + FAR.k * (x - W / 2), farY = y => LANE_DY[0] + BELT_Y + FAR.k * (y - BELT_Y);
+function farXform() { g.translate(W / 2, BELT_Y); g.scale(FAR.k, FAR.k); g.translate(-W / 2, -BELT_Y); }
 // one partner feeding both belts stands between them
 const ONE = { dx: -12, dy: -14 };
 const darkBuf = document.createElement('canvas'); darkBuf.width = W; darkBuf.height = H;
@@ -1321,8 +1325,8 @@ function laneSlide(lane, t, active) {
 // a belt with no box due for a while is the other hand's rest
 function laneIdle(lane, t) { const beat = beatAt(t); return !notes.some(n => n.lane === lane && n.beat > beat - 2 && n.beat < beat + 3); }
 function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
-  const dy = L.lanes === 2 ? LANE_DY[lane] : 0, pid = L.partners[lane];
-  g.save(); g.translate(laneSlide(lane, t, active), dy);
+  const dy = L.lanes === 2 ? LANE_DY[lane] : 0, pid = L.partners[lane], far = lane === 0 && L.lanes === 2;
+  g.save(); g.translate(laneSlide(lane, t, active), dy); if (far) farXform();
   drawScannerBack(0);
   drawBeltTop(beltT, active);
   let holding = false;
@@ -1373,9 +1377,11 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   drawScannerFront(FX.goodLane === lane ? flash : 0, holding, missF, 0);
   drawBeltFront(beltT);
   if (pose.carry) drawBox(pose.carry.n, pose.carry.x, pose.carry.y + pose.carry.n.h / 2, '', t);
-  drawPartnerArmOf(pid, pose, lane);
+  if (!far) drawPartnerArmOf(pid, pose, lane);
   if (active && L.lanes === 2 && laneIdle(lane, t)) { g.fillStyle = 'rgba(8,6,10,0.32)'; g.fillRect(0, BELT_Y - 46, W, 34); }
   g.restore();
+  // the arm to the far belt is drawn in screen space so it stays on the body; only the hand goes through the perspective
+  if (far && L.onePlacer) { const h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(ONE.dx, ONE.dy); PARTNERS[pid].arm({ ...pose, hand: { x: h.x - ONE.dx, y: h.y - ONE.dy } }); g.restore(); }
 }
 function drawScene(t, bt, active, nowMs) {
   g.save();
@@ -2325,6 +2331,7 @@ function judgeNote(target, t) {
 // heavy boxes need two different keys inside a short window; one hand alone drops it
 function onHit(ts, key, lane = 0) {
   const t = songAt(ts) - offsetMs / 1000;
+  if (lane === L.autoLane) return;
   if (L.lanes === 2 && lane === 0) lastPressUpper = performance.now(); else lastPress = performance.now();
   if (heavyPend) {
     const hp = heavyPend;
@@ -2387,9 +2394,18 @@ function onRelease(ts, lane = 0) {
     }
   }
 }
+// 하은's belt: every box is scanned the moment it reaches her gate, with her own tick, and never counts
+const haeunTick = t => { noise(t, 'bandpass', 2600, 0.16, 0.03, 4, bus); osc('sine', 1480, t, 0.003, 0.05, 0.07, bus); };
+function autoHit(n, t) {
+  const now = performance.now();
+  n.state = n.len ? 'holding' : 'hit'; n.judge = 'perfect'; n.hitAt = t;
+  lastPressUpper = now; lastGood = now; FX.goodLane = n.lane; ring(THEME[fxTheme(n.beat)].ring[0], n.lane);
+  haeunTick(ctx.currentTime);
+}
 function judgeTick(t) {
   const tt = t - offsetMs / 1000;
   for (const n of notes) {
+    if (n.lane === L.autoLane) { if (n.state === 'pending' && tt >= n.arr) autoHit(n, tt); else if (n.state === 'holding' && tt >= n.end) { n.state = 'hit'; n.doneAt = tt; } continue; }
     if (n.state === 'pending' && tt - n.arr > WIN_M) { n.state = 'miss'; n.hitAt = tt; n.missKind = 'pass'; registerMiss('지나감', null, 'pass', n.lane); }
     else if (n.state === 'holding' && tt >= n.end) completeHold(n);
   }
@@ -2429,9 +2445,9 @@ function updateHud(t) {
   if (L.id === 's1-2' && beat >= 104 && beat < 114) h = '이어폰 뺐어요. 벨트 박자로';
   if (L.id === 's1-2' && beat >= 172 && beat < 179) h = '숨 고르기. 곧 한 번 더';
   if (L.id === 's1-4') {
-    if (beat >= 2 && beat < 10) h = '왼손은 위(하은이 찍음), 오른손은 아래(내가 찍음)';
-    { const pr = notes.find(n => n.pair && n.state === 'pending'); if (pr && t > pr.place - SPB && t < pr.place + SPB) h = '넘어갈 때: 양손 같이'; }
-    if (beat >= 168 && beat < 176) h = '위는 흔들고, 아래는 똑바로. 손마다 따로';
+    if (beat >= 2 && beat < 10) h = '위 벨트는 하은이 알아서 찍어요. 나는 아래만';
+    { const pr = notes.find(n => n.pair && n.state === 'pending'); if (pr && t > pr.place - SPB && t < pr.place + SPB) h = '하은이랑 같은 박: 같이 찍어요'; }
+    if (beat >= 168 && beat < 176) h = '위는 하은이 흔들고, 아래는 내가 똑바로. 하은 소리에 흔들리지 말고';
   }
   if (L.id === 's1-3') {
     if (beat >= 95 && beat < 100) h = '느려져요. 반장님 손을 봐요';
@@ -2452,8 +2468,8 @@ function updateHud(t) {
   if (L.id === 'sunja') { const n = notes.find(x => x.beat % 1 === 0.25 || x.beat % 1 === 0.75); if (n && n.state === 'pending' && t > n.place - 0.3) h = '탁탁: 손목으로 두 번'; }
   if (L.lanes === 2) {
     const f1 = notes.find(n => n.lane === 1);
-    if (notes[0].state === 'pending' && t > notes[0].place) h = L.coScanner ? '주황 벨트 = 왼손, 하은이 찍어요' : '주황 벨트 = 왼손';
-    if (f1 && f1.state === 'pending' && t > f1.place) h = L.coScanner ? '연두 벨트 = 오른손, 내가 찍어요' : '연두 벨트 = 오른손';
+    if (notes[0].state === 'pending' && t > notes[0].place) h = L.autoLane === 0 ? '위 벨트는 하은이 찍어요. 나는 아래만' : L.coScanner ? '주황 벨트 = 왼손, 하은이 찍어요' : '주황 벨트 = 왼손';
+    if (f1 && f1.state === 'pending' && t > f1.place) h = L.autoLane === 0 ? '연두 벨트 = 내 손' : L.coScanner ? '연두 벨트 = 오른손, 내가 찍어요' : '연두 벨트 = 오른손';
     if (blackout(beat)) h = '정전! 소리로';
   }
   if (h !== lastHint) { hint.textContent = h; hint.hidden = !h; lastHint = h; }
@@ -2533,7 +2549,7 @@ function startPlay() {
   mus.gain.cancelScheduledValues(ctx.currentTime); mus.gain.setValueAtTime(1, ctx.currentTime);
   hud.hidden = false; state = 'play'; startHum();
 }
-function accuracy() { return (stats.perfect + stats.good * 0.6 + stats.tailOk) / (notes.length + notes.filter(n => n.len).length); }
+function accuracy() { const mine = notes.filter(n => n.lane !== L.autoLane); return (stats.perfect + stats.good * 0.6 + stats.tailOk) / (mine.length + mine.filter(n => n.len).length); }
 function finishPlay() {
   state = 'outro'; stopHum(); stopHold(); bubble.hidden = true; hint.hidden = true;
   const acc = accuracy();
@@ -2566,7 +2582,7 @@ $('board').addEventListener('click', e => { e.stopPropagation(); openBoard(); })
 const held = new Map();
 const LEFT_KEYS = new Set(['KeyF', 'KeyD']);
 const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyD', 'KeyK']);
-function laneOf(side) { return L.lanes === 2 ? (side === 'L' ? 0 : 1) : 0; }
+function laneOf(side) { return L.lanes === 2 ? (L.autoLane != null ? 1 - L.autoLane : side === 'L' ? 0 : 1) : 0; }
 function handLabels() {}
 function press(ts, key, lane) {
   if (state === 'play') onHit(ts, key, lane);
