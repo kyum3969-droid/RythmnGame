@@ -505,7 +505,7 @@ const LEVELS = [
     chords: BLUES.chords, roots: BLUES.roots, chordAt: bar => bar < 2 ? 0 : BLUES.prog[(bar - 2) % 12],
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 },
     // no on-screen hints (as in 1-1 to 1-3); the dock, the departure board, the beacons and the light on the belts carry it
-    hints: false, dock: true, dim: [[72, 92]],
+    hints: false, dock: true,
     phone: [[120, 122]], phoneLane: 0, lateHint: '반장님 허리… 손이 늦어요. 손을 봐요', special:['양쪽 동시에 찍은 상자', 'pair2', '한 번에'],
     sections: [[0, 'intro'], [2, 'boss'], [18, 'knee'], [21, 'walk'], [23, 'count'], [24, 'open'], [32, 'both'], [40, 'knee2'], [44, 'rush'], [52, 'final'], [56, 'outro']],
     // upper belt: 반장's shuffle (12 cells), running dry before his back goes, then 하은's straight 16ths (16 cells): trading two-bar phrases, then both,
@@ -518,7 +518,7 @@ const LEVELS = [
       'x...x...x...x...', 'x...x...x.x.x...', '................', '................', 'x...x...x...x...', 'x.x.x...x.x.x...', '................', '................',
       'x...x...x...x...', 'x...x...x...x...', 'x.......x.......', 'x...x...x...x...', 'x.x.x...x.......', 'x...x...x...x...', 'x.......x.......', '................',
       '................', 'x...............', '................', 'x...x...x...x...',
-      'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.x.x.x.........',
+      'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...........',
       'x...x...x...x...', 'x...x...x...x...', 'x.x.x...x.x.x...', 'x...............',
       '............', '............'
     ],
@@ -1749,6 +1749,9 @@ function drawIdleShade(t, nowMs, active) {
   }
   // her lamp stutters on at the count-in
   const sp = beat - L.autoUntil, stutter = !reduce && sp >= 0 && sp < 0.9 ? [1, 0.2, 1, 0.5, 1, 0][Math.floor(sp * 6.6)] ?? 0 : 0;
+  // the lamps stutter for a moment when his back goes
+  const hd = L.lift ? beat - L.lift[1] : -1, flick = !reduce && hd >= 0 && hd < 0.5 ? [0.55, 0, 0.35, 0][Math.floor(hd * 8)] || 0 : 0;
+  if (flick) { g.fillStyle = `rgba(4,3,8,${flick})`; g.fillRect(0, 0, W, H); }
   const dark = Math.max(IDLE.k[0], IDLE.k[1]); if (dark < 0.01) return;
   const sc = shadeBuf.getContext('2d'); sc.globalCompositeOperation = 'source-over'; sc.clearRect(0, 0, W / 4, H / 4);
   sc.fillStyle = `rgba(5,4,10,${0.56 * dark})`; sc.fillRect(0, 0, W / 4, H / 4);
@@ -2614,11 +2617,11 @@ function haeunHit(t, tones, j, done) {
   tones.slice(0, 3).forEach((f, i) => { const ff = f * 2, t0 = t + i * 0.008; osc('sine', ff, t0, 0.004, v, d, fl); osc('triangle', ff * 2, t0, 0.003, v * 0.3, d * 0.4, fl); });
   noise(t, 'highpass', 3800, 0.08, 0.025, 0.7, bus); noise(t + 0.01, 'bandpass', 1200, 0.05, 0.04, 2, bus);
 }
-// 하은's hook: sixteen eighths in A minor pentatonic, one per upper-belt box in her fever, so the hits play her tune (a missed box
+// 하은's hook: sixteen notes in A minor pentatonic, one per upper-belt box (one a beat) in her fever, so the hits play her tune (a missed box
 // leaves its note out). Rhodes with a soft square on top; from the fever's fifth bar an octave doubles it.
 const HOOK14 = ['E5', 'G5', 'A5', 'G5', 'E5', 'D5', 'E5', 'G5', 'A5', 'C6', 'A5', 'G5', 'E5', 'D5', 'C5', 'D5'].map(n => n === 'C6' ? 1046.5 : N_[n]);
 function feverHit(t, beat, j) {
-  const fr = L.fever[0], i = Math.round((beat - fr[0]) * 2), f = HOOK14[((i % 16) + 16) % 16], fb = Math.floor((beat - fr[0]) / 4), v = j === 'good' ? 0.045 : 0.06;
+  const fr = L.fever[0], i = Math.round(beat - fr[0]), f = HOOK14[((i % 16) + 16) % 16], fb = Math.floor((beat - fr[0]) / 4), v = j === 'good' ? 0.045 : 0.06;
   const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 3000; fl.connect(bus);
   osc('sine', f, t, 0.004, v, 0.32, fl); osc('triangle', f * 2, t, 0.003, v * 0.22, 0.14, fl); osc('square', f, t, 0.003, v * 0.18, 0.12, fl);
   if (fb >= 4) osc('sine', f * 2, t, 0.004, v * 0.4, 0.22, fl);
