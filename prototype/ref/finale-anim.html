@@ -2020,44 +2020,57 @@ function crossTop(t) {
 
 // 6. 웅덩이 — low on the wet road: the hospital upside down in a puddle, her shoe breaks it, the camera tilts up to the real thing
 function hospitalFront() {
-  return layer('hospital', 192, 104, (w, h) => {
-    dgrad(0, 0, w, 104, ['#33467c', '#5a6a9e', '#a890a6', '#e6b496']);
-    R(150, 20, 42, 84, '#2a2f44'); R(0, 34, 30, 70, '#2a2f44'); for (let k = 0; k < 14; k++) if (rnd(k, 9) < 0.5) R(154 + (k % 4) * 9, 26 + Math.floor(k / 4) * 10, 3, 3, '#ffd890');
-    R(34, 26, 124, 78, '#d9e0e4'); R(34, 26, 124, 2, '#b9c4c8'); R(34, 26, 2, 78, '#eef2f4'); R(156, 26, 2, 78, '#a9b4b8');
-    for (let y = 32; y < 66; y += 8) for (let x = 40; x < 152; x += 10) { const lit = rnd(x, y) < 0.3; R(x, y, 7, 5, lit ? '#ffe9a8' : '#2f3a4a'); R(x, y, 7, 1, lit ? '#fff6d8' : '#4a5a6e'); }
-    R(84, 4, 24, 20, '#e9eef0'); R(84, 4, 24, 1, '#ffffff'); R(91, 6, 10, 16, '#d8463b'); R(87, 10, 18, 8, '#d8463b'); R(92, 7, 2, 3, '#ef6a55');
-    R(58, 68, 76, 11, '#1b1716'); hospName(66, 68, '#ffffff', 8);
-    R(66, 82, 60, 22, '#9aa0a6'); R(68, 84, 56, 20, '#fff3c8'); R(95, 84, 2, 20, '#9aa0a6'); R(60, 80, 72, 3, '#5a6066');
+  return layer('hospital1', 384, 208, (w, h) => {
+    dgrad(0, 0, w, h, ['#33467c', '#4a5a90', '#7a78a6', '#b890a4', '#e6b496']);
+    // the neighbours, dark, a few windows lit
+    R(300, 40, 84, 168, '#2a2f44'); R(300, 40, 84, 2, '#3a4058'); R(0, 68, 62, 140, '#262b40'); R(0, 68, 62, 2, '#363c56');
+    for (let j = 0; j < 9; j++) for (let i = 0; i < 4; i++) if (rnd(i, j + 9) < 0.35) { R(310 + i * 18, 52 + j * 16, 8, 8, '#ffd890'); R(310 + i * 18, 52 + j * 16, 8, 1, '#fff0c0'); }
+    for (let j = 0; j < 7; j++) for (let i = 0; i < 3; i++) if (rnd(i + 5, j) < 0.3) R(8 + i * 18, 80 + j * 16, 8, 8, '#ffd890');
+    // the hospital: the pale facade, pilasters between the window bays, floor bands, windows with frames and sills, some lit
+    R(68, 52, 248, 156, '#d9e0e4'); R(68, 52, 248, 4, '#b9c4c8'); R(68, 52, 3, 156, '#eef2f4'); R(313, 52, 3, 156, '#a9b4b8');
+    for (let x = 76; x < 312; x += 40) R(x, 56, 4, 76, '#ccd4d8');
+    for (let y = 60, f = 0; y < 132; y += 18, f++) { R(68, y + 15, 248, 2, '#c4ccd0'); for (let x = 82; x < 306; x += 20) { const lit = rnd(x, y) < 0.32; R(x, y, 14, 11, '#9aa4ac'); R(x + 1, y + 1, 12, 9, lit ? '#ffe9a8' : '#2f3a4a'); R(x + 1, y + 1, 12, 1, lit ? '#fff6d8' : '#4a5a6e'); R(x + 7, y + 1, 1, 9, lit ? '#e8cf88' : '#3a4656'); if (lit && rnd(y, x) < 0.4) R(x + 2, y + 4, 4, 6, '#d9b870'); R(x, y + 11, 14, 1, '#eef2f4'); } }
+    // the red cross on the roof, in its lit box
+    R(166, 6, 52, 46, '#c9d0d4'); R(168, 8, 48, 42, '#f4f7f8'); R(168, 8, 48, 1, '#ffffff'); R(184, 12, 16, 34, '#d8463b'); R(174, 21, 36, 16, '#d8463b'); R(185, 13, 4, 6, '#ef6a55'); R(175, 22, 6, 3, '#ef6a55'); R(162, 50, 60, 3, '#9aa4ac');
+    // the name board and the lit entrance under its canopy
+    R(116, 136, 152, 22, '#1b1716'); R(116, 136, 152, 1, '#3a3236'); hospName(134, 139, '#ffffff', 14);
+    R(124, 160, 136, 6, '#5a6066'); R(124, 160, 136, 1, '#8a9097');
+    R(134, 166, 116, 42, '#9aa0a6'); R(137, 168, 110, 40, '#fff3c8'); for (const x of [164, 191, 218]) R(x, 168, 2, 40, '#9aa0a6'); R(137, 168, 110, 2, '#ffffff');
   });
 }
+// her shoe and trouser hem side on, for the puddle: the same sneaker as on the stairs, posed flat (or toe down)
+function shoeSide(x, y, q, pitch) {
+  const F = { ball: [BALL, 0], pitch, toe: pitch * 0.4 }, M = (a, b) => [x + a * q, y - b * q], A = M(...shoePt(F, ANK[0], ANK[1]));
+  sneakerSide(F, M, 0); trouserLeg([A[0] - 4, A[1] - 120], [A[0] - 2, A[1] - 60], A, q, ['#3a3f45', '#2a2e33', '#56606a', '#22252a']);
+}
 function shotPuddle(u) {
-  const tilt = ease(clamp((u - 3.0) / 2.0, 0, 1)), camY = Math.round(lerp(106, -4, tilt));
-  shot(2, (w, h) => {
-    const bld = hospitalFront(), GY = 104;
+  const tilt = ease(clamp((u - 3.0) / 2.0, 0, 1)), camY = Math.round(lerp(212, -8, tilt));
+  shot(1, (w, h) => {
+    const bld = hospitalFront(), GY = 208;
     g.save(); g.translate(0, -camY);
-    R(0, -20, w, 20, '#33467c'); g.drawImage(bld, 0, 0); light(96, 14, 34, '216,70,59', 0.4); light(96, 94, 46, '255,236,170', 0.3);
-    // the road: wet asphalt, the kerb at the horizon, a sheen from the building's light
-    g.drawImage(layer('wetroad', w, 120, () => { R(0, 0, w, 120, '#25262d'); for (let y = 0; y < 120; y += 2) for (let x = (y / 2) % 3; x < w; x += 3) if (rnd(x, y) < 0.16) R(x, y, 1, 1, '#32333b'); }), 0, GY);
-    R(0, GY, w, 2, '#4a4c54');
+    R(0, -40, w, 40, '#33467c'); g.drawImage(bld, 0, 0); light(192, 28, 66, '216,70,59', 0.38); light(192, 188, 90, '255,236,170', 0.28);
+    // the road: wet asphalt, the kerb at the horizon, the building's light lying on it
+    g.drawImage(layer('wetroad1', w, 240, () => { R(0, 0, w, 240, '#25262d'); for (let y = 0; y < 240; y++) for (let x = 0; x < w; x++) if (rnd(x, y) < 0.08) R(x, y, 1, 1, rnd(y, x) < 0.5 ? '#32333b' : '#1e1f25'); }), 0, GY);
+    R(0, GY, w, 3, '#4a4c54'); R(0, GY, w, 1, '#6a6c74');
+    g.save(); g.globalAlpha = 0.16; for (let k = 0; k < 9; k++) R(150 + k * 9, GY + 6 + k * 3, 80 - k * 6, 1, '#fff3c8'); g.restore();
     // the puddle: near rows reflect the top of the building (the cross), far rows its foot; rippled after her step
-    const cx = 100, cy = GY + 50, rx = 66, ry = 22;
+    const cx = 200, cy = GY + 100, rx = 132, ry = 44;
     for (let y = cy - ry; y <= cy + ry; y++) {
-      const dy = (y - cy) / ry, wob = Math.round(Math.sin(y * 1.7) * 2), half = Math.round(rx * Math.sqrt(Math.max(0, 1 - dy * dy))) + wob; if (half <= 2) continue;
+      const dy = (y - cy) / ry, wob = Math.round(Math.sin(y * 0.85) * 3), half = Math.round(rx * Math.sqrt(Math.max(0, 1 - dy * dy))) + wob; if (half <= 3) continue;
       const src = Math.round(GY - 2 - (y - (cy - ry)) * (GY / (2 * ry)));
-      let dx = 0; for (const t0 of [1.6, 2.5]) { const a = u - t0; if (a > 0 && a < 2.4) dx += Math.round(Math.sin(y * 0.8 - a * 11) * 3 * Math.exp(-a * 1.3)); }
+      let dx = 0; for (const t0 of [1.6, 2.5]) { const a = u - t0; if (a > 0 && a < 2.4) dx += Math.round(Math.sin(y * 0.4 - a * 11) * 6 * Math.exp(-a * 1.3)); }
       if (src >= 0 && src < GY) g.drawImage(bld, cx - half - dx, src, half * 2, 1, cx - half, y, half * 2, 1); else R(cx - half, y, half * 2, 1, '#33467c');
       R(cx - half, y, 1, 1, '#4a5068'); R(cx + half - 1, y, 1, 1, '#4a5068');
     }
-    g.save(); g.beginPath(); g.ellipse(cx, cy, rx + 2, ry, 0, 0, Math.PI * 2); g.clip(); shade(cx - rx - 3, cy - ry, rx * 2 + 6, ry * 2 + 1, '16,22,40', 0.38); light(cx, cy + 10, 30, '216,70,59', 0.18); g.restore();
-    for (const t0 of [1.6, 2.5]) { const a = u - t0; if (a > 0 && a < 1.8) { g.strokeStyle = `rgba(210,230,255,${0.55 * (1 - a / 1.8)})`; g.lineWidth = 1; g.beginPath(); g.ellipse(112, cy + 8, 3 + a * 40, (3 + a * 40) * 0.3, 0, 0, Math.PI * 2); g.stroke(); } }
-    // her shoe, side on: it comes down into the water and lifts away
+    g.save(); g.beginPath(); g.ellipse(cx, cy, rx + 3, ry, 0, 0, Math.PI * 2); g.clip(); shade(cx - rx - 4, cy - ry, rx * 2 + 8, ry * 2 + 1, '16,22,40', 0.36); light(cx, cy + 20, 60, '216,70,59', 0.16); g.restore();
+    for (let k = 0; k < 12; k++) { const a = Math.PI * 2 * k / 12, x = cx + Math.cos(a) * (rx + 2), y = cy + Math.sin(a) * (ry + 1); R(x, y, 2, 1, '#3a3c44'); }
+    for (const t0 of [1.6, 2.5]) { const a = u - t0; if (a > 0 && a < 1.8) { g.strokeStyle = `rgba(210,230,255,${0.5 * (1 - a / 1.8)})`; g.lineWidth = 1; g.beginPath(); g.ellipse(224, cy + 16, 6 + a * 80, (6 + a * 80) * 0.3, 0, 0, Math.PI * 2); g.stroke(); } }
+    // her shoe: it comes down into the water and lifts away
     if (u > 1.0 && u < 3.3) {
-      const d = u - 1.0, down = clamp(d / 0.6, 0, 1), upp = clamp((u - 2.4) / 0.7, 0, 1), sx = Math.round(lerp(84, 98, down) + upp * 50), sy = Math.round(lerp(GY + 10, cy + 10, ease(down)) - upp * 46);
-      R(sx + 4, sy - 44, 9, 38, '#3a3f45'); R(sx + 4, sy - 44, 1, 38, '#4a5058'); R(sx + 12, sy - 44, 1, 38, '#2a2e33'); R(sx + 5, sy - 8, 8, 3, '#2a2e33');
-      R(sx + 2, sy - 6, 16, 3, '#1e1a1a'); R(sx, sy - 3, 26, 3, '#1e1a1a'); R(sx + 18, sy - 4, 7, 1, '#2a2d31'); R(sx + 21, sy - 5, 3, 1, '#2a2d31');
-      for (let k = 0; k < 3; k++) R(sx + 8 + k * 3, sy - 6, 2, 1, '#efe6d2');
-      R(sx, sy, 27, 2, '#d9d4c6'); R(sx + 1, sy + 2, 25, 1, '#a9a49a'); R(sx + 2, sy - 2, 3, 1, '#3a3236');
-      if (d > 0.55 && d < 1.2) { const s = (d - 0.55) / 0.65; for (let k = 0; k < 10; k++) { const a = -Math.PI * (0.08 + 0.84 * k / 9); R(112 + Math.cos(a) * s * 30, cy + 8 + Math.sin(a) * s * 22 + s * s * 26, 2, 1, '#cfe6ff'); } }
+      const d = u - 1.0, down = clamp(d / 0.6, 0, 1), upp = clamp((u - 2.4) / 0.7, 0, 1), sx = lerp(150, 178, down) + upp * 100, sy = lerp(GY + 20, cy + 20, ease(down)) - upp * 92;
+      if (down >= 1 && upp === 0) { g.fillStyle = 'rgba(8,10,20,.35)'; g.beginPath(); g.ellipse(sx + 28, sy + 1, 30, 4, 0, 0, Math.PI * 2); g.fill(); }
+      shoeSide(sx, sy, 2.1, upp * 0.35);
+      if (d > 0.55 && d < 1.2) { const s = (d - 0.55) / 0.65; for (let k = 0; k < 14; k++) { const a = -Math.PI * (0.08 + 0.84 * k / 13); R(224 + Math.cos(a) * s * 60, cy + 16 + Math.sin(a) * s * 44 + s * s * 52, 2, 2, '#cfe6ff'); R(224 + Math.cos(a) * s * 60, cy + 16 + Math.sin(a) * s * 44 + s * s * 52, 1, 1, '#ffffff'); } }
     }
     g.restore();
     vig(w, h, 0.4);
@@ -2076,76 +2089,139 @@ function shotCorridor(u) {
   subtitle(u, 11.0, 11.95, '…네.', 'haeun');
 }
 const LAMP_AT = k => 0.8 + k * 0.9;
+// draw into a scratch canvas, darken what was drawn by a tint, and lay it over the frame
+let TINTC = null;
+function tinted(w, h, rgb, a, draw) {
+  if (!TINTC) { TINTC = document.createElement('canvas'); TINTC.width = W; TINTC.height = H; }
+  const o = TINTC.getContext('2d'), g0 = g; o.setTransform(1, 0, 0, 1, 0, 0); o.globalCompositeOperation = 'source-over'; o.globalAlpha = 1; o.clearRect(0, 0, W, H); g = o;
+  try { draw(); o.globalCompositeOperation = 'source-atop'; o.fillStyle = `rgba(${rgb},${a})`; o.fillRect(0, 0, w, h); o.globalCompositeOperation = 'source-over'; } finally { g = g0; }
+  g.drawImage(TINTC, 0, 0, w, h, 0, 0, w, h);
+}
 function corridorOTS(u) {
-  shot(2, (w, h) => {
-    const VX = 118, VY = 46, P = z => 1 / (1 + 0.55 * z);
+  shot(1, (w, h) => {
+    const VX = 236, VY = 92, P = z => 1 / (1 + 0.55 * z);
     const lit = k => u >= LAMP_AT(k), litA = k => clamp((u - LAMP_AT(k)) / 0.12, 0, 1);
     // floor, walls, ceiling: four trapezoids into the dark
-    const zf = 12, fx = s => VX + s * 90 * P(zf), fyB = VY + 50 * P(zf), fyT = VY - 34 * P(zf);
+    const zf = 12, fx = s => VX + s * 180 * P(zf), fyB = VY + 100 * P(zf), fyT = VY - 68 * P(zf);
     R(0, 0, w, h, '#0b100e');
-    g.fillStyle = '#18211e'; g.beginPath(); g.moveTo(-20, h); g.lineTo(w + 40, h); g.lineTo(fx(1), fyB); g.lineTo(fx(-1), fyB); g.closePath(); g.fill();
-    g.fillStyle = '#111815'; g.beginPath(); g.moveTo(-20, 0); g.lineTo(w + 40, 0); g.lineTo(fx(1), fyT); g.lineTo(fx(-1), fyT); g.closePath(); g.fill();
-    for (const s of [-1, 1]) { g.fillStyle = '#141c19'; g.beginPath(); g.moveTo(s < 0 ? -20 : w + 40, 0); g.lineTo(fx(s), fyT); g.lineTo(fx(s), fyB); g.lineTo(s < 0 ? -20 : w + 40, h); g.closePath(); g.fill(); }
+    g.fillStyle = '#18211e'; g.beginPath(); g.moveTo(-40, h); g.lineTo(w + 80, h); g.lineTo(fx(1), fyB); g.lineTo(fx(-1), fyB); g.closePath(); g.fill();
+    g.fillStyle = '#111815'; g.beginPath(); g.moveTo(-40, 0); g.lineTo(w + 80, 0); g.lineTo(fx(1), fyT); g.lineTo(fx(-1), fyT); g.closePath(); g.fill();
+    for (const s of [-1, 1]) { g.fillStyle = '#141c19'; g.beginPath(); g.moveTo(s < 0 ? -40 : w + 80, 0); g.lineTo(fx(s), fyT); g.lineTo(fx(s), fyB); g.lineTo(s < 0 ? -40 : w + 80, h); g.closePath(); g.fill(); }
     R(fx(-1), fyT, fx(1) - fx(-1), fyB - fyT, '#050706');
-    // doors, rails and the floor's seams in perspective
-    for (let z = 0.5; z < zf; z += 1.3) { const p = P(z); for (const s of [-1, 1]) { const x = VX + s * 90 * p, y0 = VY - 10 * p, y1 = VY + 50 * p; R(Math.round(x - (s > 0 ? 0 : 0)), y0, Math.max(1, Math.round(10 * p)) * (s > 0 ? 1 : 1), y1 - y0, '#1d2824'); R(Math.round(x + s * 2 * p), y0 + 6 * p, Math.max(1, Math.round(4 * p)), Math.round(8 * p), '#2a3a34'); } }
-    for (const s of [-1, 1]) { g.strokeStyle = '#2c3a35'; g.beginPath(); g.moveTo(VX + s * 300, VY + 20 * 3.3); g.lineTo(fx(s), VY + 20 * P(zf)); g.stroke(); }
-    for (let z = 0.4; z < zf; z += 0.8) { const y = VY + 50 * P(z); R(VX - 90 * P(z), y, 180 * P(z), 1, '#1c2622'); }
+    // the doors along both walls, their windows and handles; the handrail; the floor's seams
+    for (let z = 0.5; z < zf; z += 1.3) { const p = P(z), p2 = P(z + 0.7); for (const s of [-1, 1]) { const x0 = VX + s * 180 * p, x1 = VX + s * 180 * p2; polyFill([[x0, VY - 20 * p], [x1, VY - 20 * p2], [x1, VY + 100 * p2], [x0, VY + 100 * p]], '#1d2824'); polyFill([[x0 + (x1 - x0) * 0.2, VY - 8 * p], [x0 + (x1 - x0) * 0.6, VY - 8 * lerp(p, p2, 0.6)], [x0 + (x1 - x0) * 0.6, VY + 20 * lerp(p, p2, 0.6)], [x0 + (x1 - x0) * 0.2, VY + 20 * p]], '#2a3a34'); R(x0 + (x1 - x0) * 0.8, VY + 40 * p, Math.max(1, 2 * p), Math.max(1, 6 * p), '#4a5a52'); } }
+    for (const s of [-1, 1]) { g.strokeStyle = '#2c3a35'; g.lineWidth = 1; g.beginPath(); g.moveTo(VX + s * 600, VY + 40 * 3.3); g.lineTo(fx(s), VY + 40 * P(zf)); g.stroke(); g.strokeStyle = '#1f2a26'; g.beginPath(); g.moveTo(VX + s * 600, VY + 43 * 3.3); g.lineTo(fx(s), VY + 43 * P(zf)); g.stroke(); }
+    for (let z = 0.4; z < zf; z += 0.8) { const y = VY + 100 * P(z); R(VX - 180 * P(z), y, 360 * P(z), 1, '#1c2622'); }
     // the seven ceiling panels, near to far; each one lit lights its stretch of floor and leaves a smear in the polish
     for (let k = 0; k < 7; k++) {
-      const z = 0.9 + k * 1.45, p = P(z), x = VX, y = VY - 34 * p, pw = Math.max(2, Math.round(36 * p)), a = litA(k);
-      R(x - pw / 2, y, pw, Math.max(1, Math.round(4 * p)), a > 0 ? '#eef6ea' : '#202a26');
+      const z = 0.9 + k * 1.45, p = P(z), x = VX, y = VY - 68 * p, pw = Math.max(3, Math.round(72 * p)), ph = Math.max(1, Math.round(8 * p)), a = litA(k);
+      R(x - pw / 2 - 1, y - 1, pw + 2, ph + 2, '#151d1a'); R(x - pw / 2, y, pw, ph, a > 0 ? '#eef6ea' : '#202a26'); if (a > 0 && ph > 2) R(x - pw / 2, y + ph - 1, pw, 1, '#c9dcc8');
       if (a > 0) {
-        light(x, y + 2, 40 * p + 6, '220,240,215', 0.14 * a);
-        g.save(); g.globalCompositeOperation = 'lighter'; const fy = VY + 50 * p, gr = g.createLinearGradient(0, y, 0, fy); gr.addColorStop(0, `rgba(210,235,205,${0.07 * a})`); gr.addColorStop(1, `rgba(210,235,205,${0.02 * a})`); g.fillStyle = gr; g.beginPath(); g.moveTo(x - pw / 2, y); g.lineTo(x + pw / 2, y); g.lineTo(x + 70 * p, fy); g.lineTo(x - 70 * p, fy); g.closePath(); g.fill(); g.restore();
-        const fy2 = Math.round(VY + 50 * p + 1); g.save(); g.globalAlpha = 0.5 * a; R(x - Math.round(pw / 4), fy2, Math.max(1, Math.round(pw / 2)), 1, '#9fb8a8'); R(x - Math.round(pw / 6), fy2 + 2, Math.max(1, Math.round(pw / 3)), 1, '#7f9a88'); g.restore();
+        light(x, y + 3, 80 * p + 10, '220,240,215', 0.14 * a);
+        g.save(); g.globalCompositeOperation = 'lighter'; const fy = VY + 100 * p, gr = g.createLinearGradient(0, y, 0, fy); gr.addColorStop(0, `rgba(210,235,205,${0.07 * a})`); gr.addColorStop(1, `rgba(210,235,205,${0.02 * a})`); g.fillStyle = gr; g.beginPath(); g.moveTo(x - pw / 2, y); g.lineTo(x + pw / 2, y); g.lineTo(x + 140 * p, fy); g.lineTo(x - 140 * p, fy); g.closePath(); g.fill(); g.restore();
+        const fy2 = Math.round(VY + 100 * p + 1); g.save(); g.globalAlpha = 0.5 * a; R(x - Math.round(pw / 4), fy2, Math.max(1, Math.round(pw / 2)), 1, '#9fb8a8'); R(x - Math.round(pw / 6), fy2 + 3, Math.max(1, Math.round(pw / 3)), 1, '#7f9a88'); g.restore();
       }
     }
-    // the doctor, far, under the seventh panel; he starts walking once it is on
-    const dz = u < LAMP_AT(6) + 0.3 ? 9.6 : 9.6 - (u - LAMP_AT(6) - 0.3) * 1.9, dp = P(dz), dy = VY + 50 * dp, dh = Math.round(66 * dp), dwid = Math.max(3, Math.round(18 * dp));
-    if (u > LAMP_AT(6) - 0.2) { const a = clamp((u - LAMP_AT(6) + 0.2) / 0.3, 0, 1); g.save(); g.globalAlpha = a; R(VX - dwid / 2, dy - dh * 0.62, dwid, dh * 0.5, '#e8ece6'); R(VX - dwid / 2 + 1, dy - dh * 0.62, Math.max(1, dwid - 2), Math.max(1, dh * 0.16), '#3a4a44'); R(VX - dwid / 3, dy - dh, Math.round(dwid * 0.66), Math.round(dh * 0.38), '#d9a27a'); R(VX - dwid / 3, dy - dh, Math.round(dwid * 0.66), Math.max(1, Math.round(dh * 0.12)), '#2a2220'); const st = Math.floor(u / 0.3) % 2; R(VX - dwid / 2 + (st ? 1 : 0), dy - dh * 0.12, Math.max(1, dwid / 3), dh * 0.12, '#3a3f45'); R(VX + dwid / 6 - (st ? 1 : 0), dy - dh * 0.12, Math.max(1, dwid / 3), dh * 0.12, '#3a3f45'); g.restore(); }
-    // her, close, from behind and in shadow, the light rimming the cap
-    haeunBack(30, 38, 0, 0, { tint: ['#0e1412', 0.62] });
-    const rim = clamp((lit(0) ? 0.5 : 0) + (lit(2) ? 0.3 : 0), 0, 1); if (rim > 0) { g.save(); g.globalAlpha = rim; R(36, 38, 8, 1, '#cfe8d0'); R(34, 39, 2, 1, '#cfe8d0'); R(47, 56, 2, 8, '#9fc0a8'); g.restore(); }
+    // the doctor, far, under the seventh panel; he starts walking once it is on: coat, scrubs, head, the stride
+    const dz = u < LAMP_AT(6) + 0.3 ? 9.6 : 9.6 - (u - LAMP_AT(6) - 0.3) * 1.9, dp = P(dz), dy = VY + 100 * dp, s2 = dp * 2;
+    if (u > LAMP_AT(6) - 0.2) { const a = clamp((u - LAMP_AT(6) + 0.2) / 0.3, 0, 1), st = Math.floor(u / 0.3) % 2; g.save(); g.globalAlpha = a;
+      for (const [lx, d] of [[-5, st], [1, 1 - st]]) R(VX + lx * s2, dy - 22 * s2 + d * s2, 4 * s2, 22 * s2 - d * s2, '#3a3f45');
+      polyFill([[VX - 9 * s2, dy - 50 * s2], [VX + 9 * s2, dy - 50 * s2], [VX + 10 * s2, dy - 20 * s2], [VX - 10 * s2, dy - 20 * s2]], '#e8ece6'); R(VX - 3 * s2, dy - 50 * s2, 6 * s2, 10 * s2, '#4f8f8a');
+      ellFill(VX, dy - 56 * s2, 5 * s2, 6 * s2, '#d9a27a'); ellFill(VX, dy - 59 * s2, 5 * s2, 3.5 * s2, '#2a2220'); g.restore(); }
+    // her, close, from behind and in shadow: the same 하은 as on the stairs, with her legs, the lit panels rimming her
+    tinted(w, h, '14,20,18', 0.6, () => {
+      const hy = 114, q = 1.0;
+      for (const sd of [-1, 1]) { R(70 + sd * 8 - 5, hy + 10, 11, 74, '#3a3f45'); R(70 + sd * 8 + (sd < 0 ? -5 : 5), hy + 10, 1, 74, '#2a2e33'); R(70 + sd * 8 - 6, hy + 82, 13, 6, '#1e1a1a'); R(70 + sd * 8 - 6, hy + 88, 13, 2, '#e9e3d6'); }
+      haeunBackHD(70, hy, q, { armL: 0, armR: 0, tail: 0 });
+    });
+    const rim = clamp((lit(0) ? 0.55 : 0) + (lit(2) ? 0.3 : 0), 0, 1); if (rim > 0) { g.save(); g.globalAlpha = rim; dotLine(66, 38, 79, 42, '#cfe8d0', 1); dotLine(79, 42, 80, 50, '#cfe8d0', 1); dotLine(84, 66, 89, 70, '#9fc0a8', 1); R(90, 72, 1, 40, '#9fc0a8'); g.restore(); }
     vig(w, h, 0.5);
   });
   bars();
   for (let k = 0; k < 7; k++) if (u >= LAMP_AT(k)) cue('lamp' + k, () => { SND.heart(); noiseS(now(), 'highpass', 5000, 0.03, 0.04); });
   blackout(W, H, u < 0.5 ? 1 - u / 0.5 : 0);
 }
+// the doctor, chest up at full resolution: the white coat with its lapels and pockets, teal scrubs, the stethoscope, the
+// name tag and pens; a tired face: short dark hair, glasses, bags under the eyes; light from the panels above
 function doctorMCU(t) {
-  shot(2, (w, h) => {
-    // behind him: the corridor, the lit panels as soft discs receding
+  shot(1, (w, h) => {
     dgrad(0, 0, w, h, ['#0d1311', '#1a2420', '#1f2a26', '#141c19']);
-    for (let k = 0; k < 6; k++) light(30 + k * 9, 30 - k * 2, 18 - k * 2, '220,240,215', 0.25);
-    light(40, 26, 50, '200,230,200', 0.12);
-    R(0, 80, w, 16, '#16201c');
-    // him: coat shoulders, scrubs, stethoscope, a name tag, the head; light from above
-    const x = 108, top = 22, talk = (Math.floor(t * 7) % 3 === 0) && ((t > 0.2 && t < 1.6) || (t > 1.8 && t < 3.1)), blink = t > 1.2 && t < 1.32;
-    g.fillStyle = '#e9ece6'; g.beginPath(); g.moveTo(x - 12, top + 20); g.lineTo(x + 12, top + 20); g.lineTo(x + 28, top + 28); g.lineTo(x + 33, top + 40); g.lineTo(x + 34, top + 90); g.lineTo(x - 34, top + 90); g.lineTo(x - 33, top + 40); g.lineTo(x - 28, top + 28); g.closePath(); g.fill(); g.fillStyle = '#c9cdc8'; g.fillRect(x - 34, top + 44, 4, 46); g.fillStyle = '#b9bdb8'; g.fillRect(x + 30, top + 44, 4, 46); R(x - 27, top + 28, 14, 1, '#ffffff'); R(x + 13, top + 28, 14, 1, '#ffffff');
-    g.fillStyle = '#4f8f8a'; g.beginPath(); g.moveTo(x - 9, top + 22); g.lineTo(x + 9, top + 22); g.lineTo(x, top + 44); g.closePath(); g.fill();
-    g.fillStyle = '#d5d9d3'; g.beginPath(); g.moveTo(x - 9, top + 22); g.lineTo(x - 14, top + 24); g.lineTo(x - 2, top + 60); g.lineTo(x, top + 44); g.closePath(); g.fill(); g.beginPath(); g.moveTo(x + 9, top + 22); g.lineTo(x + 14, top + 24); g.lineTo(x + 2, top + 60); g.lineTo(x, top + 44); g.closePath(); g.fill();
-    R(x - 1, top + 50, 2, 2, '#9aa0a6'); R(x - 1, top + 62, 2, 2, '#9aa0a6');
-    g.strokeStyle = '#2b2e31'; g.lineWidth = 2; g.beginPath(); g.moveTo(x - 8, top + 20); g.quadraticCurveTo(x - 14, top + 36, x - 12, top + 46); g.moveTo(x + 8, top + 20); g.quadraticCurveTo(x + 13, top + 34, x + 10, top + 42); g.stroke(); g.fillStyle = '#c9ccd2'; g.beginPath(); g.arc(x - 12, top + 48, 3, 0, Math.PI * 2); g.fill(); R(x - 13, top + 47, 2, 1, '#ffffff');
-    R(x + 14, top + 34, 10, 6, '#ffffff'); R(x + 15, top + 35, 3, 4, '#2f6f8a'); R(x + 19, top + 36, 4, 1, '#8a8a8a'); R(x + 19, top + 38, 3, 1, '#8a8a8a'); R(x - 24, top + 36, 2, 7, '#2f6f8a'); R(x - 21, top + 36, 2, 6, '#d8463b');
-    R(x - 4, top + 17, 8, 6, '#b98260');
-    spr('docHead', x - 8, top);
-    if (blink) { R(x - 6, top + 9, 4, 1, '#b98260'); R(x + 3, top + 9, 4, 1, '#b98260'); }
-    if (talk) R(x - 2, top + 15, 4, 1, '#3a1f1a');
-    light(x, top - 6, 40, '230,245,225', 0.22);
+    for (let k = 0; k < 6; k++) light(60 + k * 18, 60 - k * 4, 36 - k * 4, '220,240,215', 0.25);
+    light(80, 52, 100, '200,230,200', 0.12);
+    R(0, 160, w, 32, '#16201c');
+    const x = 216, top = 40, talk = (Math.floor(t * 7) % 3 === 0) && ((t > 0.2 && t < 1.6) || (t > 1.8 && t < 3.1)), blink = t > 1.2 && t < 1.32;
+    const sk = '#d9a27a', skD = '#b98260', skDD = '#9c6a4c', hair = '#2a2220';
+    // the coat
+    polyFill([[x - 24, top + 46], [x + 24, top + 46], [x + 56, top + 58], [x + 66, top + 82], [x + 68, 200], [x - 68, 200], [x - 66, top + 82], [x - 56, top + 58]], '#e9ece6');
+    polyFill([[x - 68, top + 88], [x - 60, top + 88], [x - 60, 200], [x - 68, 200]], '#c9cdc8'); polyFill([[x + 60, top + 88], [x + 68, top + 88], [x + 68, 200], [x + 60, 200]], '#b9bdb8');
+    dotLine(x - 54, top + 58, x - 26, top + 48, '#ffffff', 1); dotLine(x + 26, top + 48, x + 54, top + 58, '#ffffff', 1);
+    polyFill([[x - 18, top + 48], [x + 18, top + 48], [x, top + 92]], '#4f8f8a'); polyFill([[x - 12, top + 50], [x + 12, top + 50], [x, top + 70]], '#5fa29c');
+    polyFill([[x - 18, top + 48], [x - 28, top + 52], [x - 4, top + 124], [x, top + 92]], '#d5d9d3'); polyFill([[x + 18, top + 48], [x + 28, top + 52], [x + 4, top + 124], [x, top + 92]], '#d5d9d3');
+    dotLine(x - 28, top + 52, x - 4, top + 124, '#b9bdb8', 1); dotLine(x + 28, top + 52, x + 4, top + 124, '#b9bdb8', 1);
+    for (const y of [top + 104, top + 128]) { R(x - 2, y, 4, 4, '#9aa0a6'); R(x - 1, y, 2, 1, '#c9ced3'); }
+    R(x - 52, top + 96, 22, 1, '#c9cdc8'); R(x + 30, top + 96, 22, 1, '#c9cdc8');
+    // the stethoscope round his neck, the chest piece hanging
+    for (const sd of [-1, 1]) { const pts = [[x + sd * 16, top + 44], [x + sd * 24, top + 64], [x + sd * 26, top + 82], [x + sd * 22, top + 92]]; for (let i = 0; i + 1 < pts.length; i++) limb(pts[i][0], pts[i][1], 3, pts[i + 1][0], pts[i + 1][1], 3, '#2b2e31'); }
+    ellFill(x - 22, top + 98, 6, 6, '#9aa0a6'); ellFill(x - 22, top + 98, 4.5, 4.5, '#c9ccd2'); R(x - 25, top + 95, 3, 1, '#ffffff');
+    // name tag and pens
+    R(x + 28, top + 68, 22, 13, '#ffffff'); R(x + 28, top + 80, 22, 1, '#c9cdc8'); R(x + 30, top + 70, 6, 9, '#2f6f8a'); R(x + 38, top + 72, 10, 1, '#6a6a6a'); R(x + 38, top + 75, 8, 1, '#8a8a8a');
+    R(x - 46, top + 74, 3, 16, '#2f6f8a'); R(x - 41, top + 74, 3, 14, '#d8463b'); R(x - 46, top + 74, 3, 2, '#c9ced3'); R(x - 41, top + 74, 3, 2, '#c9ced3');
+    // the neck, the head
+    polyFill([[x - 9, top + 32], [x + 9, top + 32], [x + 10, top + 48], [x - 10, top + 48]], skD); R(x - 9, top + 32, 18, 6, skDD);
+    for (const sd of [-1, 1]) { ellFill(x + sd * 17, top + 22, 3.5, 6, skD); ellFill(x + sd * 16.5, top + 22, 2, 4.5, sk); }
+    polyFill([[x - 15, top + 2], [x + 15, top + 2], [x + 17, top + 6], [x + 17, top + 26], [x + 14, top + 33], [x + 8, top + 38], [x - 8, top + 38], [x - 14, top + 33], [x - 17, top + 26], [x - 17, top + 6]], sk);
+    polyFill([[x - 14, top + 33], [x - 8, top + 38], [x + 8, top + 38], [x + 14, top + 33], [x + 6, top + 35], [x - 6, top + 35]], skD); R(x - 17, top + 10, 1, 16, skD); R(x + 16, top + 10, 1, 16, skD);
+    polyFill([[x - 18, top + 12], [x - 18, top + 2], [x - 14, top - 4], [x - 4, top - 7], [x + 8, top - 6], [x + 15, top - 2], [x + 18, top + 4], [x + 18, top + 12], [x + 16, top + 12], [x + 15, top + 5], [x + 2, top + 4], [x - 6, top + 6], [x - 15, top + 6], [x - 16, top + 12]], hair);
+    dotLine(x - 6, top - 6, x - 6, top + 5, '#4a3e38', 1); dotLine(x - 3, top - 6, x + 12, top - 1, '#3a302c', 1);
+    // brows, tired eyes behind the glasses, the bags under them, the nose, the mouth
+    R(x - 12, top + 11, 8, 1, hair); R(x + 4, top + 11, 8, 1, hair);
+    for (const ex of [x - 10, x + 6]) { if (blink) R(ex, top + 17, 5, 1, skDD); else { R(ex, top + 15, 5, 1, skDD); R(ex + 1, top + 16, 3, 2, INK); R(ex + 3, top + 16, 1, 1, '#f4f1ea'); } R(ex, top + 20, 5, 1, '#c49072'); }
+    for (const gx of [x - 13, x + 3]) { R(gx, top + 13, 11, 1, '#2b2e31'); R(gx, top + 21, 11, 1, '#2b2e31'); R(gx, top + 13, 1, 9, '#2b2e31'); R(gx + 10, top + 13, 1, 9, '#2b2e31'); R(gx + 7, top + 14, 2, 1, '#e8f0f4'); }
+    R(x - 2, top + 15, 4, 1, '#2b2e31'); R(x - 17, top + 15, 4, 1, '#2b2e31'); R(x + 13, top + 15, 4, 1, '#2b2e31');
+    R(x, top + 19, 1, 6, skD); R(x - 2, top + 25, 4, 1, skD);
+    if (talk) { R(x - 4, top + 29, 8, 3, '#3a1f1a'); R(x - 3, top + 31, 6, 1, '#8a4a40'); } else R(x - 4, top + 30, 8, 1, '#8a5a4a');
+    for (let i = 0; i < 14; i++) R(x - 10 + rnd(i, 4) * 20, top + 30 + rnd(4, i) * 6, 1, 1, '#c99a78');
+    light(x, top - 12, 80, '230,245,225', 0.2);
     vig(w, h, 0.45);
   });
   bars();
   blackout(W, H, t < 0.12 ? 1 - t / 0.12 : 0);
 }
+// 하은 in profile, close, facing him (right): the cap's crown and the brim's shadow over her eye, the ponytail out of the back,
+// the ear, the line of the nose and lips and chin caught by the corridor light, the collar of the black top and the vest
 function haeunCU(t) {
-  shot(3, (w, h) => {
+  shot(1, (w, h) => {
     dgrad(0, 0, w, h, ['#0b100e', '#141c19', '#18221e']);
-    light(118, 20, 30, '220,240,215', 0.3); light(104, 30, 16, '220,240,215', 0.2);
-    const nod = t > 0.35 && t < 0.75 ? 1 : 0;
-    spr('hProfile', 36, 12 + nod);
-    // the light from the corridor catches the brim's edge, the tip of the nose, the lips
-    R(64, 22 + nod, 9, 1, '#5a4a48'); R(65, 30 + nod, 1, 1, '#f2c8a8'); R(62, 34 + nod, 1, 1, '#e8a8a0');
+    light(354, 60, 90, '220,240,215', 0.3); light(312, 90, 48, '220,240,215', 0.2);
+    const n = t > 0.35 && t < 0.75 ? 2 : 0, P = arr => arr.map(([x, y]) => [x, y + n]);
+    const sk = '#d9a27a', skD = '#b98260', skDD = '#9c6a4c', skL = '#ecc29a', hair = '#4a3328', hairL = '#6b4a3a', red = '#d8463b', redD = '#a83328', redL = '#ef6a55';
+    // the black top and the vest at the bottom of frame
+    polyFill([[96, 200], [112, 170], [140, 160], [170, 158], [190, 166], [226, 178], [244, 200]], '#1e1a1a');
+    polyFill([[118, 200], [128, 176], [150, 168], [168, 166], [186, 174], [214, 186], [222, 200]], '#7ec8e3'); polyFill([[118, 200], [128, 176], [140, 171], [134, 200]], '#5aa6c4'); dotLine(168, 166, 214, 186, '#a8e0f2', 1);
+    // the ponytail, out of the opening and down her back
+    for (const [a, b, wa, wb] of [[[128, 82], [116, 112], 13, 12], [[116, 112], [112, 142], 12, 10], [[112, 142], [116, 168], 10, 6]]) { limb(a[0], a[1] + n, wa, b[0], b[1] + n, wb, hair); }
+    for (const dx of [-3, 0, 3]) dotLine(126 + dx, 86 + n, 114 + dx * 0.6, 160 + n, hairL, 3);
+    // the neck and the face in profile
+    const face = P([[152, 80], [186, 80], [189, 86], [191, 91], [187, 96], [190, 100], [196, 105], [203, 109], [202, 111], [196, 112], [195, 114], [197, 117], [194, 119], [197, 121], [195, 124], [191, 126], [194, 130], [192, 134], [184, 138], [174, 140], [172, 146], [174, 162], [146, 162], [146, 130], [150, 118], [150, 90]]);
+    polyFill(face, sk);
+    g.save(); clipPoly(face);
+    polyFill(P([[174, 140], [184, 138], [192, 134], [180, 146], [176, 162], [146, 162], [146, 128], [160, 132]]), skD);
+    polyFill(P([[146, 76], [194, 76], [194, 90], [180, 97], [146, 99]]), '#6e4834'); polyFill(P([[146, 99], [180, 97], [194, 90], [194, 94], [182, 101], [146, 103]]), '#8c5c42');
+    g.restore();
+    dotLine(196, 105 + n, 202, 109 + n, skL, 1); R(199, 106 + n, 2, 2, skL); R(195, 112 + n, 2, 1, skDD); R(190, 119 + n, 5, 1, '#a8705a'); R(194, 123 + n, 2, 1, skL); R(191, 130 + n, 2, 1, skL);
+    R(183, 96 + n, 3, 1, '#3a2420'); R(184, 95 + n, 2, 1, '#2a1a16');
+    // hair under the cap at the back, the sideburn, the ear
+    polyFill(P([[112, 76], [152, 76], [152, 88], [148, 92], [146, 118], [140, 124], [126, 114], [116, 96]]), hair); for (let k = 0; k < 5; k++) dotLine(118 + k * 6, 80 + n, 128 + k * 4, 118 + n, k % 2 ? hairL : '#3a271e', 2);
+    ellFill(152, 99 + n, 6, 9, skD); ellFill(153, 99 + n, 4, 7, sk); R(151, 95 + n, 1, 8, skDD); R(154, 93 + n, 2, 1, skL);
+    // the cap: the crown with its seams and eyelet, the back opening and strap, the patch, the brim out over her face
+    const crown = P([[108, 80], [109, 64], [118, 50], [136, 40], [158, 37], [176, 41], [188, 52], [194, 66], [195, 80]]); polyFill(crown, red);
+    g.save(); clipPoly(crown); polyFill(P([[100, 30], [140, 30], [124, 82], [100, 82]]), '#b8382e'); polyFill(P([[150, 30], [170, 30], [150, 50], [138, 50]]), redL); g.restore();
+    dotLine(156, 38 + n, 128, 80 + n, redD, 1); dotLine(158, 38 + n, 178, 80 + n, redD, 1); R(155, 36 + n, 5, 2, redD); R(146, 58 + n, 2, 2, redD);
+    polyFill(P([[108, 80], [109, 70], [118, 68], [120, 80]]), '#2a1c16'); R(108, 73 + n, 13, 2, '#1e1a1a'); R(110, 73 + n, 2, 1, '#4a4a52');
+    R(182, 56 + n, 6, 12, '#f4f1ea'); R(184, 59 + n, 3, 6, red);
+    R(108, 78 + n, 88, 3, redD);
+    polyFill(P([[186, 74], [214, 76], [232, 81], [233, 84], [214, 84], [190, 82]]), red); polyFill(P([[190, 82], [214, 84], [233, 84], [231, 87], [212, 88], [188, 85]]), '#5c2420');
+    dotLine(188, 75 + n, 230, 81 + n, '#f08070', 1); R(231, 82 + n, 2, 3, redD); for (let x = 192; x < 228; x += 3) R(x, 79 + n + Math.round((x - 192) * 0.08), 1, 1, '#b8382e');
     vig(w, h, 0.55);
   });
   bars();
@@ -2154,28 +2230,53 @@ function haeunCU(t) {
 
 // 8. 손 — straight down onto the blanket: her mother's thin hand with the clip on its finger; hers comes up from below and
 //    covers it; the monitor's green pulses over both; the old thumb moves once, twice
+// a hand palm down seen from above, in its own frame: the wrist at (0, 0), fingers toward +x, the thumb toward -y. The sleeve
+// runs back from the wrist; tendons and knuckles on the back, creases at the finger joints, nails
+function handBack(p, o = {}) {
+  const { skin, shade, dark, nail, light: lt } = p;
+  if (o.sleeve) { polyFill([[-90, -19], [2, -17], [4, 17], [-90, 19]], o.sleeve); R(-90, -19, 92, 2, o.sleeveL || mix(o.sleeve, '#ffffff', 0.2)); if (o.stripe) for (let x = -86; x < 0; x += 8) R(x, -17, 3, 34, o.stripe); R(-2, -18, 5, 36, mix(o.sleeve, '#000000', 0.25)); }
+  const th = o.thumb || 0;
+  // the thumb, from the base of the palm out and forward
+  limb(10, -11, 11, 26 + th * 2, -24 - th * 4, 9, shade); limb(26 + th * 2, -24 - th * 4, 9, 38 + th * 4, -27 - th * 5, 7.5, shade);
+  limb(10, -11, 11, 26 + th * 2, -24 - th * 4, 9, skin, 1, 1); limb(26 + th * 2, -24 - th * 4, 9, 38 + th * 4, -27 - th * 5, 7.5, skin, 1, 1);
+  ellFill(37 + th * 4, -27 - th * 5, 3, 2.5, nail);
+  // the back of the hand
+  polyFill([[0, -14], [14, -16], [38, -15], [44, -10], [45, 11], [40, 15], [12, 15], [0, 13]], shade);
+  polyFill([[1, -13], [14, -15], [37, -14], [42, -9], [43, 9], [38, 13], [12, 13], [1, 11]], skin);
+  for (const [y0, y1] of [[-6, -9], [0, -3], [6, 3], [11, 9]]) dotLine(6, y0 * 0.6, 38, y1, lt, 2);
+  // four fingers: index (top) to little (bottom), each with two joint creases and a nail
+  const F = [[-10, 30], [-3.4, 33], [3.2, 31], [9.6, 25]];
+  for (const [fy, L] of F) { limb(42, fy, 8.6, 42 + L, fy + fy * 0.08, 7.4, shade); limb(42, fy, 8.6, 42 + L, fy + fy * 0.08, 7.4, skin, 1, 0.8); blob(43, fy, 3, lt); }
+  for (const [fy, L] of F) { for (const k of [0.4, 0.72]) { const x = 42 + L * k, y = fy + fy * 0.08 * k; R(x, y - 1, 1, 2, shade); } const tx = 42 + L - 3, ty = fy + fy * 0.08; polyFill([[tx - 4, ty - 2.5], [tx + 2, ty - 2.5], [tx + 3, ty], [tx + 2, ty + 2.5], [tx - 4, ty + 2.5]], nail); R(tx - 4, ty - 2.5, 1, 5, dark); }
+  for (const [fy] of F) R(41, fy - 1, 3, 2, dark);
+  if (o.veins) { dotLine(4, -4, 30, -7, o.veins, 2); dotLine(8, 5, 26, 2, o.veins, 2); dotLine(16, -6, 22, 4, o.veins, 3); }
+  if (o.spots) for (const [x, y] of [[20, -8], [28, 6], [14, 3], [33, -2]]) R(x, y, 2, 1, o.spots);
+}
 function shotHands(u) {
-  shot(3, (w, h) => {
+  shot(1, (w, h) => {
     const beatP = (u % 1), pulse = Math.max(0, 1 - beatP * 3);
-    // the blanket: weave, two folds
-    R(0, 0, w, h, '#a9bfd6'); for (let y = 0; y < h; y += 2) for (let x = (y / 2) % 2; x < w; x += 2) R(x, y, 1, 1, '#b4c9de');
-    for (let k = 0; k < 2; k++) { const y0 = 16 + k * 30; for (let x = 0; x < w; x++) { const y = y0 + Math.round(Math.sin(x / 18 + k) * 3 + x * 0.12); R(x, y, 1, 2, '#93aac4'); R(x, y - 1, 1, 1, '#c6d7e8'); } }
-    g.save(); g.translate(22, 2);
-    // the mother's hand, the IV tape on its back, the clip and its cable
+    // the blanket: a fine weave, two soft folds running across
+    g.drawImage(layer('blanket1', w, h, () => { R(0, 0, w, h, '#a9bfd6'); for (let y = 0; y < h; y++) for (let x = y % 2; x < w; x += 2) if ((x + y) % 4 === 0) R(x, y, 1, 1, '#b4c9de'); for (let y = 0; y < h; y += 3) for (let x = 0; x < w; x++) if (rnd(x, y) < 0.05) R(x, y, 1, 1, '#9fb5cc');
+      for (let k = 0; k < 2; k++) { const y0 = 46 + k * 92; for (let x = 0; x < w; x++) { const y = y0 + Math.round(Math.sin(x / 54 + k) * 9 + x * 0.12); R(x, y, 1, 6, '#93aac4'); R(x, y + 6, 1, 3, '#9fb5cc'); R(x, y - 2, 1, 2, '#c6d7e8'); } } }), 0, 0);
     const thumb = (u > 4.2 && u < 4.6) || (u > 5.4 && u < 5.8) ? 1 : 0;
-    const MOM = { Q: '#dcb393', I: '#b98d6e', K: '#8e6650', Z: '#c49a80', N: '#ecd2bf', F: '#cfdfee' };
-    spr('hand', 14, 22, { pal: MOM });
-    if (thumb) { R(26, 21, 12, 2, '#dcb393'); R(27, 20, 9, 1, '#b98d6e'); }
-    for (let y = 22; y < 41; y++) if ((y % 4) < 2) R(14, y, 9, 1, '#bcd0e4');
-    R(30, 30, 9, 5, '#f4f1ea'); R(31, 31, 7, 3, '#e6e2d8'); R(33, 32, 3, 1, '#9fb8c8'); R(36, 29, 1, 3, '#dfe6ea');
-    R(45, 25, 7, 6, '#d8dde0'); R(45, 25, 7, 2, '#3a3f45'); R(52, 27, 3, 2, '#3a3f45'); for (let x = 55; x < w; x++) R(x, 28 - Math.round((x - 55) * 0.22), 1, 1, '#e3e7ea');
-    light(48, 28, 5 + pulse * 2, '255,74,61', 0.3 + 0.25 * pulse);
-    // her hand: up from the bottom of the frame, fingers up, the sleeve, the watch
-    const p = ease(clamp((u - 1.0) / 1.8, 0, 1)), hx = 38, hy = Math.round(lerp(98, 46, p));
-    const HER = { Q: '#e2b48c', I: '#c0906a', K: '#a3765a', Z: '#e2b48c', N: '#f2d6c4', F: '#1e1a1a' };
-    sprRot('hand', hx, hy, -Math.PI / 2, 18, 9, { pal: HER });
-    R(hx - 9, hy + 10, 20, 5, '#c9ccd2'); R(hx - 6, hy + 11, 14, 3, '#1b1716'); R(hx - 4, hy + 12, 2, 1, '#8fd694'); R(hx - 1, hy + 12, 2, 1, '#8fd694'); R(hx + 2, hy + 12, 2, 1, '#8fd694');
-    g.restore();
+    // the mother's hand: thin and pale, the hospital gown's sleeve, the IV tape on its back, the clip on her index finger
+    const MOM = { skin: '#dcb393', shade: '#b98d6e', dark: '#9a7058', nail: '#ecd2bf', light: '#e6c2a6' };
+    g.fillStyle = 'rgba(40,60,90,.16)'; g.beginPath(); g.ellipse(150, 120, 110, 26, -0.06, 0, Math.PI * 2); g.fill();
+    rotated(-0.06, 0, 0, 66, 112, () => {
+      handBack(MOM, { sleeve: '#cfdfee', stripe: '#bcd0e4', veins: '#a99ab8', spots: '#c49a80', thumb });
+      R(16, -6, 18, 12, '#f4f1ea'); R(18, -4, 14, 8, '#e6e2d8'); R(22, -2, 6, 3, '#9fb8c8'); R(30, -8, 2, 6, '#dfe6ea');
+      R(54, -13, 16, 9, '#d8dde0'); R(54, -13, 16, 3, '#3a3f45'); R(54, -6, 16, 2, '#9aa0a6'); R(70, -10, 4, 3, '#3a3f45');
+    }, 1.5);
+    for (let x = 177; x < w; x++) R(x, 102 - Math.round((x - 177) * 0.22), 1, 1, '#e3e7ea');
+    light(162, 101, 10 + pulse * 5, '255,74,61', 0.3 + 0.25 * pulse);
+    // her hand: up from the bottom of the frame, fingers up, onto her mother's; the black sleeve, the watch
+    const p = ease(clamp((u - 1.0) / 1.8, 0, 1)), hx = 118, hy = Math.round(lerp(330, 176, p));
+    const HER = { skin: '#e2b48c', shade: '#c0906a', dark: '#a3765a', nail: '#f2d6c4', light: '#ecc4a0' };
+    g.fillStyle = 'rgba(40,60,90,.2)'; g.beginPath(); g.ellipse(hx + 8, hy - 30, 30, 80, 0, 0, Math.PI * 2); g.fill();
+    rotated(-Math.PI / 2, 0, 0, hx, hy, () => {
+      handBack(HER, { sleeve: '#1e1a1a', sleeveL: '#2c2829' });
+      R(-14, -18, 12, 36, '#c9ccd2'); R(-12, -12, 8, 24, '#1b1716'); for (let k = 0; k < 3; k++) R(-9, -8 + k * 6, 2, 4, '#8fd694');
+    }, 1.5);
     // the monitor's green, beating over everything
     g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(143,214,148,${0.05 + 0.1 * pulse})`; g.fillRect(0, 0, w, h); g.restore();
     vig(w, h, 0.5);
@@ -2282,36 +2383,48 @@ function shotWard(u, dawnK, uEnd = -1) {
 // 11. 탁자 — the last insert, straight down on the bedside table in the morning: her cap, the bill, the watch she took off,
 //     a paper cup of green tea; the blinds' light drifts over them; the camera eases across; then black
 function shotTable(u) {
-  const cam = Math.round(lerp(0, 22, ease(clamp(u / 6.5, 0, 1))));
+  const cam = Math.round(lerp(0, 44, ease(clamp(u / 6.5, 0, 1))));
   let billAt = null;
-  shot(2, (w, h) => {
+  shot(1, (w, h) => {
     g.save(); g.translate(-cam, 0);
-    // the wood: three planks, the grain
-    for (let p = 0; p < 4; p++) { const y0 = p * 28; R(0, y0, 230, 28, ['#a47c54', '#ab845a', '#9f774f', '#a8805a'][p]); R(0, y0, 230, 1, '#7a5a3a'); for (let k = 0; k < 6; k++) { const yy = y0 + 4 + k * 4; for (let x = 0; x < 230; x++) if (Math.sin(x / (12 + k * 3) + p * 2 + k) > 0.6) R(x, yy + Math.round(Math.sin(x / 20 + k) * 1), 1, 1, '#94704a'); } }
-    const shadow = (x, y, ww, hh) => { g.fillStyle = 'rgba(40,24,10,.28)'; g.fillRect(x + 3, y + 3, ww, hh); };
-    // the cap, from above
-    shadow(18, 28, 30, 26);
-    g.fillStyle = '#a83328'; g.beginPath(); g.ellipse(33, 38, 15, 13, 0, 0, Math.PI * 2); g.fill(); g.fillStyle = '#d8463b'; g.beginPath(); g.ellipse(33, 37, 13, 11, 0, 0, Math.PI * 2); g.fill();
-    g.strokeStyle = '#b83a2e'; g.lineWidth = 1; for (const a of [0.5, 1.6, 2.6, 3.7, 4.7, 5.7]) { g.beginPath(); g.moveTo(33, 37); g.lineTo(33 + Math.cos(a) * 12, 37 + Math.sin(a) * 10); g.stroke(); }
-    R(32, 36, 3, 3, '#a83328'); R(28, 29, 4, 2, '#ef6a55'); g.fillStyle = '#1e1a1a'; g.beginPath(); g.ellipse(33, 50, 13, 7, 0, 0, Math.PI); g.fill(); R(28, 45, 10, 4, '#f4f1ea'); R(30, 46, 6, 2, '#d8463b');
+    // the wood: four planks with their seams, the grain running along them, a knot or two
+    g.drawImage(layer('table1', 460, 216, () => {
+      for (let p = 0; p < 4; p++) { const y0 = p * 56; R(0, y0, 460, 56, ['#a47c54', '#ab845a', '#9f774f', '#a8805a'][p]); R(0, y0, 460, 2, '#7a5a3a'); R(0, y0 + 2, 460, 1, '#b8916a');
+        for (let k = 0; k < 11; k++) { const yy = y0 + 6 + k * 4.6; for (let x = 0; x < 460; x++) if (Math.sin(x / (24 + k * 5) + p * 2 + k) > 0.55) R(x, Math.round(yy + Math.sin(x / 40 + k) * 2), 1, 1, k % 3 ? '#94704a' : '#8a6642'); }
+        const kx = 60 + p * 113 % 400, ky = y0 + 28; ellFill(kx, ky, 7, 4, '#7a5636'); ellFill(kx, ky, 4, 2, '#5e4028'); }
+    }), 0, 0);
+    const shadow = pts => { g.fillStyle = 'rgba(40,24,10,.28)'; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x + 6, y + 6) : g.moveTo(x + 6, y + 6)); g.closePath(); g.fill(); };
+    // the cap, crown up: six panels to the button, the patch, the brim with its stitching
+    g.fillStyle = 'rgba(40,24,10,.28)'; g.beginPath(); g.ellipse(72, 82, 32, 34, 0, 0, Math.PI * 2); g.fill();
+    polyFill([[40, 96], [104, 96], [100, 108], [88, 116], [56, 116], [44, 108]], '#1e1a1a'); polyFill([[42, 97], [102, 97], [98, 106], [87, 113], [57, 113], [46, 106]], '#b8382e'); for (let x = 48; x < 98; x += 3) R(x, 108 + Math.round(Math.abs(x - 72) * -0.1 + 2), 1, 1, '#8e2c25');
+    ellFill(66, 74, 30, 27, '#a83328'); ellFill(66, 72, 27, 24, '#d8463b');
+    for (const a of [0.52, 1.57, 2.62, 3.67, 4.71, 5.76]) dotLine(66, 72, 66 + Math.cos(a) * 26, 72 + Math.sin(a) * 23, '#b03a2e', 1);
+    polyFill([[46, 60], [58, 52], [62, 60], [50, 68]], '#ef6a55'); ellFill(66, 72, 3, 3, '#a83328'); R(65, 71, 2, 1, '#ef6a55');
+    R(56, 86, 20, 9, '#f4f1ea'); R(56, 94, 20, 1, '#c9c2b0'); R(60, 88, 12, 4, '#d8463b');
     // the bill
-    shadow(58, 18, 54, 40); R(58, 18, 54, 40, '#f4efe4'); R(58, 18, 54, 1, '#ffffff'); R(62, 22, 6, 5, '#2f8a5a'); for (let k = 0; k < 3; k++) R(62, 46 + k * 3, 30 - k * 6, 1, '#a8a294'); R(62, 31, 46, 1, '#c9c2b0'); R(84, 46, 22, 1, '#d8463b'); R(84, 48, 18, 1, '#d8463b');
-    billAt = [58 - cam, 18];
-    // the watch, strap open
-    shadow(124, 20, 16, 66); R(126, 20, 12, 66, '#1e1a1a'); for (let y = 24; y < 40; y += 4) R(130, y, 4, 1, '#3a3236'); R(124, 80, 16, 4, '#9aa0a6'); R(128, 81, 8, 2, '#1e1a1a');
-    R(120, 44, 24, 18, '#c9ccd2'); R(120, 44, 24, 1, '#eef0f2'); R(122, 46, 20, 14, '#0e130e'); digits('06:10', 123, 50, '#8fd694'); light(132, 53, 12, '143,214,148', 0.15);
-    // the paper cup of green tea, the bag's string and tag, the steam
-    shadow(160, 38, 26, 26); g.fillStyle = '#e6e2d6'; g.beginPath(); g.arc(173, 51, 13, 0, Math.PI * 2); g.fill(); g.fillStyle = '#f7f4ec'; g.beginPath(); g.arc(173, 50, 12, 0, Math.PI * 2); g.fill();
-    g.fillStyle = '#7f9a52'; g.beginPath(); g.arc(173, 51, 10, 0, Math.PI * 2); g.fill(); g.fillStyle = '#9ab36a'; g.beginPath(); g.arc(173, 51, 8, 0, Math.PI * 2); g.fill(); R(168, 46, 4, 1, '#c9d89a');
-    R(173, 51, 1, 1, '#f4f1ea'); for (let k = 0; k < 9; k++) R(174 + k, 52 + Math.round(k * 0.6), 1, 1, '#f4f1ea'); R(183, 57, 6, 5, '#e9d9a0'); R(183, 57, 6, 1, '#d8463b');
-    for (let k = 0; k < 3; k++) for (let s = 0; s < 22; s++) { const p = ((u * 0.3 + k * 0.33 + s * 0.012) % 1); g.save(); g.globalAlpha = 0.28 * Math.sin(Math.PI * p); R(171 + k * 2 + Math.round(Math.sin(p * 7 + k * 2) * 3), 46 - Math.round(p * 40), 1, 1, '#ffffff'); g.restore(); }
+    shadow([[116, 36], [224, 36], [224, 116], [116, 116]]); R(116, 36, 108, 80, '#f4efe4'); R(116, 36, 108, 1, '#ffffff'); R(223, 36, 1, 80, '#d9d2c2'); R(116, 115, 108, 1, '#d9d2c2');
+    R(124, 44, 12, 10, '#2f8a5a'); R(126, 46, 8, 2, '#e9f4ec'); R(124, 62, 92, 1, '#c9c2b0');
+    for (let k = 0; k < 4; k++) R(124, 70 + k * 6, 60 - k * 8, 1, '#a8a294'); for (let k = 0; k < 3; k++) R(124, 92 + k * 6, 54 - k * 12, 1, '#a8a294');
+    R(168, 92, 44, 1, '#d8463b'); R(168, 96, 36, 1, '#d8463b');
+    billAt = [116 - cam, 36];
+    // the watch she took off, its strap open: the holes, the buckle, the digital face with the time
+    shadow([[252, 40], [276, 40], [276, 172], [252, 172]]);
+    R(254, 40, 20, 132, '#1e1a1a'); R(254, 40, 1, 132, '#2c2829'); R(273, 40, 1, 132, '#121010'); for (let y = 48; y < 84; y += 7) { R(262, y, 4, 2, '#3a3236'); R(263, y, 2, 1, '#0c0a0a'); }
+    R(250, 160, 28, 8, '#9aa0a6'); R(252, 161, 24, 6, '#1e1a1a'); R(250, 160, 28, 1, '#c9ced3'); R(262, 156, 3, 8, '#c9ced3');
+    R(242, 88, 44, 34, '#c9ccd2'); R(242, 88, 44, 2, '#eef0f2'); R(242, 120, 44, 2, '#9aa0a6'); R(286, 96, 3, 6, '#9aa0a6');
+    R(246, 92, 36, 26, '#0e130e'); digits('06:10', 249, 99, '#8fd694', 2); light(264, 105, 22, '143,214,148', 0.15);
+    // the paper cup of green tea: the rim, the tea, the bag's string and tag, the steam
+    g.fillStyle = 'rgba(40,24,10,.28)'; g.beginPath(); g.ellipse(352, 108, 28, 28, 0, 0, Math.PI * 2); g.fill();
+    ellFill(346, 102, 26, 26, '#d9d4c6'); ellFill(346, 100, 25, 25, '#f7f4ec'); ellFill(346, 102, 21, 21, '#7f9a52'); ellFill(346, 102, 17, 17, '#9ab36a'); ellFill(340, 96, 6, 3, '#c9d89a');
+    R(345, 101, 2, 2, '#f4f1ea'); for (let k = 0; k < 18; k++) R(347 + k, 103 + Math.round(k * 0.6), 1, 1, '#f4f1ea'); R(364, 112, 12, 10, '#e9d9a0'); R(364, 112, 12, 2, '#d8463b'); R(366, 116, 8, 1, '#c9b980');
+    for (let k = 0; k < 3; k++) for (let s = 0; s < 40; s++) { const p = ((u * 0.3 + k * 0.33 + s * 0.007) % 1); g.save(); g.globalAlpha = 0.26 * Math.sin(Math.PI * p); R(342 + k * 4 + Math.round(Math.sin(p * 7 + k * 2) * 6), 92 - Math.round(p * 80), 1, 1, '#ffffff'); g.restore(); }
     // the light through the blinds, drifting
-    g.save(); g.globalCompositeOperation = 'lighter'; for (let s = 0; s < 7; s++) { const x0 = -40 + s * 34 + u * 2; g.fillStyle = 'rgba(255,220,170,.13)'; g.beginPath(); g.moveTo(x0, 0); g.lineTo(x0 + 14, 0); g.lineTo(x0 + 64, h); g.lineTo(x0 + 50, h); g.closePath(); g.fill(); } g.restore();
+    g.save(); g.globalCompositeOperation = 'lighter'; for (let s = 0; s < 8; s++) { const x0 = -80 + s * 68 + u * 4; g.fillStyle = 'rgba(255,220,170,.12)'; g.beginPath(); g.moveTo(x0, 0); g.lineTo(x0 + 28, 0); g.lineTo(x0 + 128, h); g.lineTo(x0 + 100, h); g.closePath(); g.fill(); } g.restore();
     g.restore();
     vig(w, h, 0.4);
   });
   // the bill's text at screen resolution so it reads
-  if (billAt) { text('입원비 납부 안내', billAt[0] * 2 + 54, billAt[1] * 2 + 10, '#1b1716', 8, 'center', true); text('2,140,000원', billAt[0] * 2 + 76, billAt[1] * 2 + 66, '#d8463b', 9, 'center', true); }
+  if (billAt) { text('입원비 납부 안내', billAt[0] + 22, billAt[1] + 8, '#1b1716', 9, 'left', true); text('2,140,000원', billAt[0] + 102, billAt[1] + 64, '#d8463b', 10, 'right', true); }
   bars();
   blackout(W, H, Math.max(u < 0.6 ? 1 - u / 0.6 : 0, u > 6.6 ? (u - 6.6) / 0.8 : 0));
   if (u > 7.2) text('— 스테이지 1 끝 —', W / 2, 102, `rgba(239,230,210,${clamp((u - 7.2) / 0.8, 0, 1)})`, 10, 'center');
