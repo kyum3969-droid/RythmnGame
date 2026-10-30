@@ -22,7 +22,7 @@ ul{margin:0 0 12px 18px;color:var(--ink)} li{margin:2px 0}
 </head>
 <body>
 <h1>1-5 첫 회식 · 연출 시안</h1>
-<p>게임 화면 크기(384×216) 그대로 그린 장면 목업. 위에서 아래로 한 밤의 흐름: 고깃집 → 취기 → 노래방 → 문 → 지하철 → 병실 → 새벽. 색이 따뜻해졌다가 식어 가는 곡선이 이 레벨의 연출 축.</p>
+<p>게임 화면 크기(384×216) 그대로 그린 장면 목업. 위에서 아래로 한 밤의 흐름: 벨트(지우의 합격) → 고깃집 → 취기 → 노래방 → 문 → 지하철 → 병실 → 새벽. 색이 따뜻해졌다가 식어 가는 곡선이 이 레벨의 연출 축.</p>
 <div class="row" id="rows"></div>
 <script>
 const rnd = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
@@ -455,8 +455,67 @@ function drawWard(dawn) {
   else { text('엔딩: 창이 밝아오고 모니터는 어두워진다. 하은 시점에서 끝. 결과 화면 없이 타이틀로.', 12, 184, '#efe6d2', 7); text('마지막 소리: 모니터 삑 하나, 그리고 새 소리.', 12, 198, '#b8a998', 7); }
 }
 
+
+// ---------- 도입: 벨트에서 ----------
+const BELT_Y = 146, SCAN_X = 300, SPEED = 60;
+function beltS(time) {
+  R(48, BELT_Y, W - 48, 4, C.belt); R(48, BELT_Y, W - 48, 1, '#4a403b');
+  for (let k = -40; k <= 10; k++) { const x = Math.round(SCAN_X + (time - k * 0.15) * SPEED), q = ((k % 4) + 4) % 4; if (x < 49 || x >= W) continue; if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); } else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44'); else R(x, BELT_Y + 1, 1, 3, C.slat); }
+  R(46, BELT_Y + 4, W - 46, 12, C.face); for (let x = 50; x < W; x += 14) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); }
+  R(46, BELT_Y + 15, W - 46, 1, '#0c0a09'); for (const x of [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422'); R(44, BELT_Y - 1, 5, 17, '#3d3431');
+}
+function scannerS(on) { R(SCAN_X - 11, 108, 4, 40, '#555a5f'); R(SCAN_X - 11, 105, 24, 5, C.metal); R(SCAN_X - 2, 110, 6, 3, '#2b2e31'); R(SCAN_X + 8, 108, 4, 56, '#7b8288'); R(SCAN_X + 8, 108, 4, 2, '#9aa1a6'); R(SCAN_X, 113, 1, 33, on ? C.laser : '#5a2b27'); R(SCAN_X + 2, 103, 5, 2, on ? '#ff4a3d' : '#5a2b27'); }
+function boxS(x, bottom, w = 18, h = 14) { R(x - w / 2 + 1, bottom, w, 1, 'rgba(0,0,0,.45)'); R(x - w / 2, bottom - h, w, h, C.kraft); R(x - w / 2, bottom - h, w, 2, C.kraftTop); R(x + w / 2 - 2, bottom - h + 2, 2, h - 2, C.kraftDark); R(x - 1, bottom - h, 3, h, C.tape); R(x - w / 2 + 2, bottom - 6, 7, 4, C.label); }
+function playerS(aim) { drawPlayer(0, 0); const top = 94; thick(PLAYER_X - 6, top + 22, 326, 120, 4, C.hoodie); drawGun(324, 117, aim ? 0 : 0); }
+function haeunBeside(o = {}) { drawHaeunAt(354, 60, 0, { load: true, ...o }); if (!o.watch) { thick(348, 82, 346, 94, 4, '#1e1a1a'); R(344, 93, 4, 3, '#2a2d31'); } }
+function drawOpening(phase) {
+  g.drawImage(bg, 0, 0);
+  // the house lights, three tubes
+  for (const x of [60, 180, 300]) { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, '#fff3c8'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, 18, 0, 150); gr.addColorStop(0, 'rgba(255,236,170,.14)'); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 86, 150); g.lineTo(x - 40, 150); g.closePath(); g.fill(); g.restore(); }
+  scannerS(true);
+  if (phase === 0) {
+    // 지우 jumping with both arms up, the box she was carrying on the floor, the last box already past the gate
+    actor('jiwoo', 46, { bob: -7, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 14, top + 2, 4, '#6b2f3f'); R(BOSS_X + 13, top - 2, 5, 5, C.skin); thick(BOSS_X - 7, top + 23, BOSS_X - 16, top + 4, 4, '#6b2f3f'); R(BOSS_X - 19, top, 5, 5, C.skin); });
+    g.save(); g.translate(28, 150); g.rotate(-0.3); boxS(0, 0); g.restore();
+    beltS(0); boxS(338, BELT_Y);
+    bubble('붙었어요!!!!', 56, 44, 78, { loud: true, size: 10, h: 18, shake: 1 });
+    for (let k = 0; k < 4; k++) text('♪', 70 + k * 14, 70 + (k % 2) * 8, k % 2 ? '#f2a6c8' : '#5ad7e8', 9);
+    playerS(true); haeunBeside();
+    bubble('…?', 320, 44, 18, { bg: '#d9d0bd' });
+    judge('딱!', 300, 84, '#8fd694', 14);
+    hud('3번 라인 · 04:10', '콤보 18');
+  } else if (phase === 1) {
+    // 반장 storming in from the right, the belt empty, 지우 still bouncing
+    actor('jiwoo', 46, { bob: -2, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 14, top + 2, 4, '#6b2f3f'); R(BOSS_X + 13, top - 2, 5, 5, C.skin); });
+    g.save(); g.translate(28, 150); g.rotate(-0.3); boxS(0, 0); g.restore();
+    beltS(0);
+    actor('boss', 150, { bob: 1, noArm: true }, true, top => { R(BOSS_X + 2, top + 6, 5, 1, C.hair); R(BOSS_X + 1, top + 5, 2, 1, C.hair); R(BOSS_X - 8, top + 4, 2, 3, C.sweat); thick(BOSS_X + 7, top + 22, BOSS_X + 28, top + 14, 4, C.shirt); R(BOSS_X + 27, top + 11, 5, 5, C.skin); });
+    bubble('…야! 벨트가 왜 비어!', 104, 64, 92, { loud: true, size: 8, h: 15 });
+    bubble('반장님! 저 붙었어요! 반장님 기타 넣은 곡으로요!', 2, 28, 184, { size: 7 });
+    playerS(false); haeunBeside();
+    hud('3번 라인 · 04:11', '콤보 18');
+    text('(벨트는 돌지만 상자가 안 온다. 롤러 소리만.)', 60, 190, 'rgba(239,230,210,.75)', 6);
+  } else {
+    actor('jiwoo', 46, { bob: -1, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 13, top + 30, 4, '#6b2f3f'); R(BOSS_X + 12, top + 29, 4, 4, C.skin); });
+    beltS(0);
+    actor('boss', 150, { nod: 1, noArm: true }, true, top => { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); });   // arms folded
+    bubble('…회식이다. 오늘. 다 와.', 92, 50, 96, { size: 8, h: 15 });
+    playerS(false); haeunBeside({ watch: true });
+    bubble('저도요? …밥은 공짜죠?', 270, 40, 90, { bg: '#d9d0bd' });
+    hud('3번 라인 · 04:12', '');
+    R(W - 46, 8, 36, 11, '#231b17');
+    text('(상자는 끝까지 안 온다. 롤러만 돈다. 형광등 하나가 깜빡.)', 60, 190, 'rgba(239,230,210,.75)', 6);
+  }
+}
+
 // ---------- 시트 ----------
 const SCENES = [
+  { id: 'open1', title: '0-1. 벨트: 지우가 뛴다', sub: '평소처럼 지우의 상자를 받다가, 지우가 갑자기 점프하면서 소리를 지른다. 오디션에 붙었다.', draw: () => drawOpening(0),
+    notes: ['레벨은 1-2 그루브로 시작(지우 곡, 116). 8마디쯤 받다가 상자 하나가 지우 손에서 바닥에 떨어지고, 지우가 뛴다. 외침 말풍선(1-2의 "이어폰 빼.라.고!"와 같은 빨간 테두리)과 화면 흔들림.', '그 순간부터 벨트에 상자가 안 온다. 롤러 소리만 남고 음악은 멈춘다(테이프 스톱 아님: 그냥 끊김). 플레이어는 스캐너를 들고 서 있고, 판정은 아무것도 안 뜸.', '하은은 1-4 자리(신입 뒤 오른쪽 한 단 위)에 그대로.'] },
+  { id: 'open2', title: '0-2. 반장이 뿔나서 온다', sub: '빈 벨트를 보고 반장이 오른쪽에서 걸어 들어온다. "벨트가 왜 비어!" 지우는 아직 뛰고 있다.', draw: () => drawOpening(1),
+    notes: ['반장은 1-2처럼 화면 오른쪽 밖에서 걸어 들어와 지우 앞에 선다(1-1 인트로의 걷기 재료). 땀 한 방울, 눈썹.', '지우 "반장님! 저 붙었어요! 반장님 기타 넣은 곡으로요!" 반장이 멈춘다. 한 박 정적(상자 없음, 롤러만).', '조작 없음 구간이지만 플레이어는 계속 스캐너를 들고 있음: 손이 놀고 있다는 느낌 자체가 연출.'] },
+  { id: 'open3', title: '0-3. "회식이다."', sub: '반장이 팔짱을 끼고 한참 있다가 "…회식이다. 오늘. 다 와." 신입 옆의 하은까지 합류.', draw: () => drawOpening(2),
+    notes: ['반장의 뿔이 풀리는 걸 말이 아니라 자세로: 삿대질 → 팔짱 → 고개 한 번 끄덕.', '하은 "저도요? …밥은 공짜죠?" 반장 "공짜다." 하은이 시계를 보고 따라나선다(첫 번째 시계).', '암전 → 고깃집. 벨트 롤러 소리가 고깃집 불판 소리로 이어짐(같은 리듬 템포로).'] },
   { id: 'gogi1', title: '1. 고깃집 (맑음)', sub: '벨트 자리에 테이블이 흐르고, 잔이 상자. 반장 젓가락 장단이 리듬, 잔이 닿으면 "짠".', draw: () => drawGogi(0),
     notes: ['테이블 가장자리 점이 박자 격자(벨트 윗면의 페인트 자리).', '반장이 따라주는 잔은 두 손(무거운 상자), 원샷은 긴 화물, 지우가 늦게 드는 잔은 늦은 상자.', '하은은 고기만 먹고 받은 잔은 들고만 있음. 이 잔이 끝까지 그대로(복선).', '판정음은 잔 부딪는 소리 + 그 마디 화음.'] },
   { id: 'gogi2', title: '2. 고깃집 (취기 2단계)', sub: '같은 장면에 취기 효과: 따뜻한 색, 블룸, 기울기, 가장자리 흐림, 잔상, 말풍선 겹침.', draw: () => { const off = document.createElement('canvas'); off.width = W; off.height = H; const g0 = g; g = off.getContext('2d'); drawGogi(1); g = g0; drunkFx(off, 2); },
@@ -472,6 +531,7 @@ const SCENES = [
   { id: 'end', title: '7. 엔딩', sub: '창이 밝아오고 모니터는 어두워진다. 하은 시점에서 끝. 결과 화면 없이 타이틀로.', draw: () => drawWard(true),
     notes: ['마지막 상자 = 마지막 삑. 그 뒤 4마디는 상자 없이 창만 밝아짐.', '신입 시점으로 돌아오지 않는다. 스테이지 1 완료 표시만. 스테이지 2 예고는 여기서 하지 않음.', '정할 것: 하은 구간을 플레이어가 조작할지(추천: 조작, 거의 빈 차트), 반장 송별 고백을 고깃집에서 할지, 노래방 곡 길이.'] }
 ];
+function render() {
 const rows = document.getElementById('rows');
 for (const sc of SCENES) {
   const card = document.createElement('div'); card.className = 'card';
@@ -480,6 +540,43 @@ for (const sc of SCENES) {
   g = card.querySelector('canvas').getContext('2d'); g.imageSmoothingEnabled = false;
   sc.draw();
 }
+}
+
+const bg = document.createElement('canvas'); bg.width = W; bg.height = H;
+(() => {
+  const b = bg.getContext('2d');
+  const r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  r(0, 0, W, H, '#231b17');
+  r(0, 0, W, 34, '#191311');
+  for (let x = 0; x < W; x += 48) r(x, 0, 3, 34, '#211915');
+  r(0, 34, W, 2, '#2e241f');
+  for (let x = 24; x < W; x += 64) r(x, 36, 1, 132, '#2a211c');
+  let seed = 1;
+  const bays = [[66, 128], [214, 150]];
+  for (const [x0, w] of bays) {
+    r(x0, 44, 3, 124, '#41332a'); r(x0 + w - 3, 44, 3, 124, '#41332a');
+    for (const y of [64, 100, 136]) {
+      let x = x0 + 5;
+      while (x < x0 + w - 16) {
+        const bw = 9 + Math.floor(rnd(seed, 3) * 12), bh = 8 + Math.floor(rnd(seed, 4) * 16);
+        const c = ['#5b4330', '#4f3a2a', '#66503a'][Math.floor(rnd(seed, 5) * 3)];
+        r(x, y - bh, bw, bh, c); r(x, y - bh, bw, 1, '#76604a'); r(x + (bw >> 1), y - bh, 1, bh, '#6e5a42');
+        x += bw + 2 + Math.floor(rnd(seed, 6) * 5); seed++;
+      }
+      r(x0, y, w, 3, '#4a3a2f'); r(x0, y + 3, w, 1, '#1d1714');
+    }
+  }
+  r(186, 36, 1, 8, '#4a4038'); r(200, 36, 1, 8, '#4a4038');
+  r(180, 44, 27, 15, '#d9a520'); r(180, 58, 27, 1, '#8a6a12');
+  const three = ['111', '001', '111', '001', '111'];
+  three.forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') r(190 + x * 2, 46 + y * 2, 2, 2, '#1d1815'); }));
+  r(0, 168, W, 48, '#18120f'); r(0, 168, W, 1, '#2e241f');
+  for (let x = 0; x < W; x += 14) r(x, 200, 8, 3, '#c99a1e');
+  r(0, 158, 34, 4, '#6b4a2e'); r(0, 162, 34, 2, '#4a3220'); r(2, 164, 4, 4, '#4a3220'); r(28, 164, 4, 4, '#4a3220');
+  const sb = (x, y) => { r(x, y, 15, 13, C.kraft); r(x, y, 15, 2, C.kraftTop); r(x + 13, y + 2, 2, 11, C.kraftDark); r(x + 6, y, 3, 13, C.tape); };
+  sb(1, 145); sb(17, 145); sb(1, 132); sb(17, 132); sb(9, 119);
+})();
+render();
 </script>
 </body>
 </html>
