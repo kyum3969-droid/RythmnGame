@@ -1492,143 +1492,140 @@ function trainTwoShot(t) {
   bars();
 }
 
-// 2. 문 — close on the train door from the platform: it opens, she comes out toward us; then her chest and shoulder close in
-//    the foreground and, over her shoulder, him asleep against the pole inside; the doors close between them and the train
-//    goes, its windows strobing across her; then flat and wide, the empty platform, the clock, her second watch
 function shotDoor(u) { doorBust(u); }
-// a filled ellipse, crisp
 function ellFill(cx, cy, rx, ry, c, yMin = -Infinity, yMax = Infinity) { if (XF) { const pts = []; for (let i = 0; i < 24; i++) { const a = Math.PI * 2 * i / 24; pts.push([cx + Math.cos(a) * rx, Math.max(yMin, Math.min(yMax, cy + Math.sin(a) * ry))]); } return polyFill(pts, c); } for (let y = Math.ceil(cy - ry); y <= Math.floor(cy + ry); y++) { if (y < yMin || y > yMax) continue; const d = (y + 0.5 - cy) / ry, half = rx * Math.sqrt(Math.max(0, 1 - d * d)); R(Math.round(cx - half), y, Math.round(half * 2), 1, c); } }
 function clipPoly(pts) { if (XF) pts = pts.map(([a, b]) => XF(a, b)); g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.clip(); }
 function dotLine(x0, y0, x1, y1, c, gap = 3) { const n = Math.max(1, Math.round(Math.hypot(x1 - x0, y1 - y0) / gap)); for (let i = 0; i <= n; i++) R(Math.round(lerp(x0, x1, i / n)), Math.round(lerp(y0, y1, i / n)), 1, 1, c); }
-// 하은 as a bust at full resolution (the game's pixel size): the snapback's crown with its seams and stitching, the patch,
-// the brim with its highlight; the brim's shadow over the eyes; nose, lips, ears, the hair under the cap; the neck; the
-// black long sleeves and the sky-blue vest with its zip, its reflective band and the crossbody strap. Rim light from the
-// lit doorway on her left. look < 0 turns her head toward the door behind her.
-function haeunBustHD(cx, by, look) {
-  const d = Math.round(look * 7), sk = '#d9a27a', skD = '#b98260', skDD = '#9c6a4c', skL = '#e8b890', hair = '#4a3328', hairL = '#6b4a3a';
-  const red = '#d8463b', redD = '#a83328', redL = '#ef6a55', rim = '#ffd2a2';
-  const s0 = by + 80;
-  // shoulders and the long black sleeves
-  const body = [[cx - 16, s0], [cx - 34, s0 + 4], [cx - 56, s0 + 12], [cx - 70, s0 + 22], [cx - 77, s0 + 36], [cx - 80, 220], [cx + 80, 220], [cx + 77, s0 + 36], [cx + 70, s0 + 22], [cx + 56, s0 + 12], [cx + 34, s0 + 4], [cx + 16, s0]];
-  polyFill(body, '#1e1a1a');
-  polyFill([[cx - 34, s0 + 6], [cx - 54, s0 + 14], [cx - 66, s0 + 24], [cx - 62, s0 + 28], [cx - 40, s0 + 14]], '#2c2829');
-  polyFill([[cx + 34, s0 + 6], [cx + 54, s0 + 14], [cx + 66, s0 + 24], [cx + 62, s0 + 28], [cx + 40, s0 + 14]], '#2c2829');
-  // the vest over the chest, open at the neck in a V
-  const vest = [[cx - 14, s0 + 2], [cx - 30, s0 + 8], [cx - 50, s0 + 18], [cx - 58, s0 + 30], [cx - 60, 220], [cx + 60, 220], [cx + 58, s0 + 30], [cx + 50, s0 + 18], [cx + 30, s0 + 8], [cx + 14, s0 + 2], [cx + 2, s0 + 34], [cx - 2, s0 + 34]];
-  polyFill(vest, '#7ec8e3');
-  polyFill([[cx - 30, s0 + 8], [cx - 50, s0 + 18], [cx - 58, s0 + 30], [cx - 60, 220], [cx - 52, 220], [cx - 50, s0 + 30], [cx - 44, s0 + 18]], '#68b4d0');
-  polyFill([[cx + 50, s0 + 18], [cx + 58, s0 + 30], [cx + 60, 220], [cx + 56, 220], [cx + 54, s0 + 30]], '#5aa6c4');
-  for (let y = s0 + 34; y < 220; y++) { R(cx - 1, y, 1, 1, '#4a8fb0'); R(cx, y, 1, 1, '#a8e0f2'); if (y % 3 === 0) R(cx + 1, y, 1, 1, '#4a8fb0'); }
-  R(cx - 13, s0 + 3, 1, 1, '#b4e6f4'); dotLine(cx - 14, s0 + 3, cx - 2, s0 + 33, '#a8dcef', 2); dotLine(cx + 14, s0 + 3, cx + 2, s0 + 33, '#4a8fb0', 2);
-  // the reflective band with its segments
-  const bandY = s0 + 46; R(cx - 58, bandY, 116, 9, '#e6e1cc'); R(cx - 58, bandY, 116, 1, '#fffdf2'); R(cx - 58, bandY + 9, 116, 1, '#a8a28a'); for (let x = cx - 56; x < cx + 58; x += 10) R(x, bandY + 1, 1, 8, '#cfc9b0');
-  R(cx - 46, bandY + 18, 26, 1, '#5aa6c4'); R(cx + 20, bandY + 18, 26, 1, '#5aa6c4'); R(cx - 46, bandY + 19, 26, 1, '#a8e0f2'); R(cx + 20, bandY + 19, 26, 1, '#a8e0f2');
-  // the crossbody strap, right shoulder to left hip, stitched
-  polyFill([[cx + 46, s0 + 12], [cx + 54, s0 + 16], [cx - 36, 220], [cx - 46, 220]], '#2f3237');
-  for (let k = 0; k <= 40; k++) { const x = lerp(cx + 50, cx - 41, k / 40), y = lerp(s0 + 14, 220, k / 40); if (k % 2) R(Math.round(x), Math.round(y), 1, 1, '#4a4e55'); }
-  dotLine(cx + 46, s0 + 12, cx - 46, 220, '#1a1c20', 1); R(cx + 40, s0 + 22, 8, 6, '#9aa0a6'); R(cx + 41, s0 + 23, 6, 4, '#2f3237');
-  // rim light from the doorway on her left
-  dotLine(cx - 34, s0 + 4, cx - 56, s0 + 12, '#4a4244', 1); dotLine(cx - 56, s0 + 12, cx - 70, s0 + 22, '#4a4244', 1);
-  // her hair at the sides under the cap, behind the face to the jaw (the rest is in the ponytail out the back)
-  for (const sd of [-1, 1]) { polyFill([[cx + sd * 25, by + 2], [cx + sd * 34, by + 2], [cx + sd * 35, by + 28], [cx + sd * 31, by + 48], [cx + sd * 25, by + 55], [cx + sd * 21, by + 44]], hair); dotLine(cx + sd * 30, by + 8, cx + sd * 29, by + 46, sd < 0 ? hairL : '#5a3e30', 1); }
-  // the neck, long and slim, in the jaw's shadow
-  polyFill([[cx - 13, by + 50], [cx + 13, by + 50], [cx + 15, s0 + 4], [cx - 15, s0 + 4]], sk);
-  polyFill([[cx - 13, by + 50], [cx + 13, by + 50], [cx + 13, by + 62], [cx, by + 69], [cx - 13, by + 62]], skD);
-  R(cx - 15, by + 60, 2, s0 - by - 56, skD); R(cx + 13, by + 60, 2, s0 - by - 56, '#c99470');
-  // the ears just showing under the cap
-  for (const s of [-1, 1]) { const ex = cx + s * 25.5; ellFill(ex, by + 23, 3.5, 9, skD); ellFill(ex + s * 0.5, by + 23, 2, 7, sk); R(ex - (s > 0 ? 0 : 1), by + 19, 1, 8, skDD); }
-  // the face: slim, widest at the cheekbones, a V-line jaw to a small pointed chin
-  const face = [[cx - 25, by + 4], [cx + 25, by + 4], [cx + 26, by + 14], [cx + 25.5, by + 24], [cx + 23.5, by + 34], [cx + 19.5, by + 44], [cx + 14, by + 53], [cx + 8, by + 60], [cx + 3, by + 63.5], [cx - 3, by + 63.5], [cx - 8, by + 60], [cx - 14, by + 53], [cx - 19.5, by + 44], [cx - 23.5, by + 34], [cx - 25.5, by + 24], [cx - 26, by + 14]];
-  // flat shading like the game: a shade colour under everything, the lit face over it a little to the right, the brim's
-  // shadow in bands following its curve (light enough that her eyes read), the jaw's underside
-  polyFill(face, '#c08a66');
-  polyFill(face.map(([x, y]) => [cx + (x - cx) * 0.93 + 1.5, by + (y - by) * 0.975]), sk);
-  // the cap's measures: a six-panel crown a little wider than her head; the brim seen from just below, its dark underside
-  // between the crown's edge and the brim's curved front edge
-  const CR = 39, CT = by - 34, join = x => by + 3 + (x / CR) ** 2 * 4, front = x => by + 10 + (x / 44) ** 2 * 8;
+// 2. 문 — drawn like a pixel illustration: one-pixel dark outlines round every shape, flat colours with one shade and one
+//    light, the brim's shadow a solid black band over her eyes. She stands on the platform, still, chest up; behind her
+//    the car's open door and him asleep on the bench inside; the doors slide shut on him, the train pulls away
+const OL = '#16121a';
+// a shape with its one-pixel outline
+function inked(pts, c) { outlined(pts, c, OL); }
+function haeunBustG(cx, by) {
+  const sk = '#f2cdb6', skD = '#dcae96', skDD = '#b98877', skL = '#fde6d8', hair = '#1c1a1f', hairL = '#3a3642';
+  const capR = '#b8323c', capD = '#8c2430', capL = '#d4505a', capDD = '#5e1620', blue = '#3fa9e0', blueD = '#2f86c4', blueL = '#74c6ef', blk = '#1d1b21', blkL = '#34313a';
+  const s0 = by + 72;
+  // hair behind the face and neck
+  inked([[cx - 30, by - 2], [cx + 30, by - 2], [cx + 32, by + 26], [cx + 30, by + 46], [cx + 25, by + 58], [cx + 17, by + 50], [cx - 17, by + 50], [cx - 25, by + 58], [cx - 30, by + 46], [cx - 32, by + 26]], hair);
+  // the body: black raglan sleeves, the blue front, the black crew neck
+  inked([[cx - 14, s0 - 3], [cx - 40, s0 + 1], [cx - 62, s0 + 10], [cx - 76, s0 + 26], [cx - 82, 220], [cx + 82, 220], [cx + 76, s0 + 26], [cx + 62, s0 + 10], [cx + 40, s0 + 1], [cx + 14, s0 - 3]], blk);
+  polyFill([[cx - 16, s0 - 1], [cx - 38, s0 + 4], [cx - 52, s0 + 30], [cx - 56, 220], [cx + 56, 220], [cx + 52, s0 + 30], [cx + 38, s0 + 4], [cx + 16, s0 - 1]], blue);
+  for (const sd of [-1, 1]) { dotLine(cx + sd * 38, s0 + 4, cx + sd * 52, s0 + 30, OL, 1); dotLine(cx + sd * 52, s0 + 30, cx + sd * 56, 216, OL, 1); }
+  polyFill([[cx + 40, s0 + 10], [cx + 50, s0 + 30], [cx + 54, 220], [cx + 44, 220], [cx + 42, s0 + 30]], blueD); polyFill([[cx - 34, s0 + 8], [cx - 42, s0 + 24], [cx - 40, s0 + 40], [cx - 34, s0 + 22]], blueL);
+  dotLine(cx - 66, s0 + 22, cx - 60, s0 + 44, blkL, 1); dotLine(cx + 64, s0 + 20, cx + 70, s0 + 40, blkL, 1); dotLine(cx - 40, s0 + 3, cx - 62, s0 + 12, blkL, 1);
+  inked([[cx - 16, s0 - 3], [cx + 16, s0 - 3], [cx + 13, s0 + 6], [cx, s0 + 10], [cx - 13, s0 + 6]], blk);
+  // the bag's strap across her, from her left shoulder, and its buckle
+  polyFill([[cx + 38, s0 + 2], [cx + 48, s0 + 6], [cx - 24, 220], [cx - 36, 220]], OL); polyFill([[cx + 39, s0 + 3], [cx + 46, s0 + 6], [cx - 25, 220], [cx - 33, 220]], blk); dotLine(cx + 44, s0 + 5, cx - 27, 218, blkL, 1);
+  rotated(-1.12, 0, 0, cx + 20, s0 + 34, () => { R(-8, -6, 16, 12, OL); R(-7, -5, 14, 10, '#c9ced3'); R(-5, -3, 10, 6, OL); R(-4, -2, 8, 4, blk); R(-7, -5, 14, 1, '#eef1f3'); });
+  // the neck and the black shadow the jaw throws on it
+  polyFill([[cx - 11, by + 40], [cx + 11, by + 40], [cx + 12, s0 - 1], [cx - 12, s0 - 1]], sk); R(cx - 12, by + 44, 1, s0 - by - 44, OL); R(cx + 12, by + 44, 1, s0 - by - 44, OL);
+  polyFill([[cx - 11, by + 48], [cx + 11, by + 48], [cx + 11, by + 56], [cx + 4, by + 63], [cx - 4, by + 63], [cx - 11, by + 56]], '#2a1c20'); R(cx + 8, by + 58, 3, s0 - by - 60, skD);
+  // the ear, just showing on her left
+  inked([[cx + 22, by + 12], [cx + 26, by + 11], [cx + 28, by + 16], [cx + 27, by + 24], [cx + 23, by + 27]], sk); R(cx + 24, by + 15, 1, 8, skD);
+  // the face: slim, a V-line to a small chin
+  const face = [[cx - 23, by + 2], [cx + 23, by + 2], [cx + 24, by + 14], [cx + 23, by + 24], [cx + 20, by + 34], [cx + 15, by + 43], [cx + 9, by + 50], [cx + 3, by + 55], [cx - 3, by + 55], [cx - 9, by + 50], [cx - 15, by + 43], [cx - 20, by + 34], [cx - 23, by + 24], [cx - 24, by + 14]];
+  inked(face, sk);
   g.save(); clipPoly(face);
-  for (let x = -27; x <= 27; x++) { const y0 = Math.round(front(x)); R(cx + x, by, 1, y0 + 3 - by, '#7a5038'); R(cx + x, y0 + 3, 1, 5, '#a06c50'); R(cx + x, y0 + 8, 1, 3, '#c08a66'); }
-  polyFill([[cx - 21, by + 42], [cx - 14, by + 53], [cx - 8, by + 60], [cx - 3, by + 63.5], [cx + 3, by + 63.5], [cx + 8, by + 60], [cx + 14, by + 53], [cx + 18, by + 47], [cx + 9, by + 57], [cx, by + 60], [cx - 11, by + 56]], '#c08a66');
+  // the brim's shadow: solid across the eyes, its lower edge following the brim's curve; a soft step below it
+  for (let x = -24; x <= 24; x++) { const y0 = Math.round(by + 21 + (x / 24) ** 2 * 3); R(cx + x, by, 1, y0 - by, '#140e12'); R(cx + x, y0, 1, 1, '#6a4446'); R(cx + x, y0 + 1, 1, 2, skD); }
+  R(cx + 19, by + 26, 2, 10, skD);
   g.restore();
-  // hair framing the face: thin locks from under the cap down past the cheeks
-  for (const sd of [-1, 1]) { polyFill([[cx + sd * 26.5, by + 4], [cx + sd * 22, by + 4], [cx + sd * 22.5, by + 20], [cx + sd * 21, by + 36], [cx + sd * 18, by + 48], [cx + sd * 21, by + 50], [cx + sd * 25, by + 38], [cx + sd * 26.5, by + 20]], hair); dotLine(cx + sd * 24, by + 8, cx + sd * 22.5, by + 40, sd < 0 ? hairL : '#5a3e30', 1); }
-  // the eyes under the brim: almond, the outer corners lifting, a fold above, dark irises with a catchlight
-  for (const sd of [-1, 1]) { const ex = cx + sd * 11, y = by + 17;
-    R(ex - 4, y - 2, 8, 1, '#8a5a42'); R(ex - 5, y, 10, 1, '#2a1810'); R(sd < 0 ? ex - 6 : ex + 5, y - 1, 1, 1, '#2a1810');
-    R(ex - 4, y + 1, 2, 1, '#d4b49c'); R(ex + 2, y + 1, 2, 1, '#d4b49c'); R(ex - 2, y + 1, 4, 2, '#3a2418'); R(ex - 1, y + 1, 1, 1, '#e8d4c4'); R(ex - 3, y + 3, 6, 1, '#b07c5c'); }
-  // a small straight nose: the bridge's light, a shade down one side, the tip, the nostrils
-  R(cx + 1, by + 21, 1, 10, '#e2ae86'); R(cx - 2, by + 24, 1, 8, '#c99470'); R(cx, by + 31, 2, 2, skL);
-  R(cx - 4, by + 34, 2, 1, '#a8705a'); R(cx + 3, by + 34, 2, 1, '#a8705a'); R(cx - 2, by + 35, 5, 1, '#c08a66'); R(cx, by + 37, 1, 3, '#c99470');
-  // fuller lips: the upper with its bow, the line between, the lower with a highlight; the shade under them
-  polyFill([[cx - 7, by + 43], [cx - 3, by + 41], [cx, by + 42], [cx + 3, by + 41], [cx + 7, by + 43]], '#b8665e');
-  R(cx - 7, by + 43, 15, 1, '#8e4a44'); polyFill([[cx - 6, by + 44], [cx + 7, by + 44], [cx + 5, by + 46.5], [cx - 4, by + 46.5]], '#c97a72'); R(cx - 1, by + 45, 4, 1, '#e0a098');
-  R(cx - 3, by + 48, 7, 1, '#c99470');
+  // a small nose: a light on the bridge, the tip, a touch of shade; red lips, parted a little
+  R(cx, by + 25, 2, 6, skL); R(cx - 1, by + 32, 4, 1, skD); R(cx + 2, by + 31, 1, 1, skDD);
+  polyFill([[cx - 6, by + 39], [cx - 2, by + 37.5], [cx, by + 38.5], [cx + 2, by + 37.5], [cx + 6, by + 39], [cx, by + 40]], '#c42f3c');
+  R(cx - 6, by + 39, 13, 1, '#7e1a26'); polyFill([[cx - 5, by + 40], [cx + 5, by + 40], [cx + 3, by + 43], [cx - 3, by + 43]], '#cf3e4a'); R(cx - 1, by + 41, 3, 1, '#ec7a82');
+  R(cx - 2, by + 46, 5, 1, skD);
+  // hair framing the face, from under the cap to the jaw
+  inked([[cx - 27, by], [cx - 15, by], [cx - 16, by + 18], [cx - 19, by + 32], [cx - 17, by + 46], [cx - 22, by + 52], [cx - 26, by + 38], [cx - 27, by + 20]], hair);
+  inked([[cx + 27, by], [cx + 17, by], [cx + 18, by + 14], [cx + 21, by + 28], [cx + 19, by + 44], [cx + 24, by + 50], [cx + 27, by + 36], [cx + 28, by + 18]], hair);
+  dotLine(cx - 22, by + 4, cx - 21, by + 44, hairL, 1); dotLine(cx + 23, by + 4, cx + 23, by + 42, hairL, 1);
+  // the cap: the crown's six panels with their seams, the button, the eyelets; a light on its left panel
+  const CR = 33, CT = by - 27, join = x => by - 3 + (x / CR) ** 2 * 4;
   const crown = []; for (let i = 0; i <= 24; i++) { const th = Math.PI * i / 24, c = Math.cos(th), x = Math.sign(c) * Math.abs(c) ** 0.8 * CR; crown.push([cx + x, CT + (1 - Math.sin(th) ** 0.6) * (join(x) - CT)]); }
-  polyFill(crown, red);
+  inked(crown, capR);
   g.save(); clipPoly(crown);
-  const seam = (sd, p) => [cx + sd * 27 * Math.sin(p * Math.PI / 2), lerp(CT + 1, join(27), p)];
-  const sideP = sd => { const pts = []; for (let i = 0; i <= 10; i++) pts.push(seam(sd, i / 10)); pts.push([cx + sd * 50, by + 10], [cx + sd * 50, CT - 4]); return pts; };
-  polyFill(sideP(-1), '#c43f35'); polyFill(sideP(1), '#a8342b');
-  polyFill([[cx - 26, CT + 6], [cx - 8, CT + 3], [cx - 10, CT + 9], [cx - 24, CT + 14]], redL);
+  const seam = (sd, p) => [cx + sd * 24 * Math.sin(p * Math.PI / 2), lerp(CT + 1, join(24), p)];
+  const sideP = sd => { const pts = []; for (let i = 0; i <= 10; i++) pts.push(seam(sd, i / 10)); pts.push([cx + sd * 44, by + 6], [cx + sd * 44, CT - 4]); return pts; };
+  polyFill(sideP(1), capD); polyFill([[cx - 24, CT + 8], [cx - 8, CT + 3], [cx - 9, CT + 10], [cx - 22, CT + 16]], capL);
   g.restore();
-  for (const sd of [-1, 1]) for (let i = 0; i < 10; i++) { const [x0, y0] = seam(sd, i / 10), [x1, y1] = seam(sd, (i + 1) / 10); dotLine(x0, y0, x1, y1, redD, 1); }
-  dotLine(cx + d, CT + 2, cx + d, by - 1, redD, 1); R(cx - 3, CT - 1, 7, 2, redD); R(cx - 2, CT - 1, 5, 1, redL);
-  for (const sd of [-1, 1]) R(cx + sd * 15 - 1, CT + 12, 2, 1, '#7a2620');
-  { const px = cx - 9 + d, py = by - 19; R(px, py, 18, 9, '#f4f1ea'); R(px, py + 8, 18, 1, '#c9c2b0'); R(px + 4, py + 3, 10, 3, red); }
-  for (let x = -CR + 4; x <= CR - 4; x += 2) R(cx + x, Math.round(join(x)) - 3, 1, 1, '#b8382e');
-  // the brim
-  const top = x => Math.abs(x) <= CR ? join(x) : join(CR) + (Math.abs(x) - CR) * 1.1, brim = [];
-  for (let x = -44; x <= 44; x += 2) brim.push([cx + x, top(x)]); for (let x = 44; x >= -44; x -= 2) brim.push([cx + x, front(x) + 1]);
-  polyFill(brim, '#5c2420');
-  for (let x = -43; x <= 43; x++) { const yt = Math.round(top(x)), yf = Math.round(front(x)); R(cx + x, yt, 1, 2, '#461a17'); R(cx + x, yf - 1, 1, 1, '#b8382e'); R(cx + x, yf, 1, 1, '#8e2c25'); }
+  for (const sd of [-1, 1]) for (let i = 0; i < 10; i++) { const [x0, y0] = seam(sd, i / 10), [x1, y1] = seam(sd, (i + 1) / 10); dotLine(x0, y0, x1, y1, capDD, 1); }
+  dotLine(cx, CT + 2, cx, by - 2, capDD, 1); for (const sd of [-1, 1]) R(cx + sd * 13 - 1, CT + 11, 2, 2, capDD);
+  inked([[cx - 4, CT + 1], [cx - 3, CT - 2], [cx + 3, CT - 2], [cx + 4, CT + 1]], capR);
+  // the brim, seen from a little above: its curved top, the stitching, the darker front edge
+  const fr = x => by + 9 + (x / 41) ** 2 * 9, brim = [];
+  for (let x = -38; x <= 38; x += 2) brim.push([cx + x, Math.abs(x) <= CR ? join(x) : join(CR) + (Math.abs(x) - CR) * 1.4]); for (let x = 41; x >= -41; x -= 1) brim.push([cx + x, fr(x)]);
+  inked(brim, capR);
+  for (let x = -40; x <= 40; x++) { R(cx + x, Math.round(fr(x)) - 2, 1, 2, capD); if (x % 3 === 0 && Math.abs(x) < 34) R(cx + x, Math.round(join(Math.min(CR, Math.abs(x)))) + 2, 1, 1, capDD); }
+  for (let x = -30; x <= 30; x += 2) R(cx + x, Math.round(fr(x)) - 4, 1, 1, capL);
 }
-// the car's inside through its doorway: ceiling lights, the window band with the tunnel, the bench, the pole, him asleep
-function carThroughDoor(x0, x1, y0, y1, t) {
-  R(x0, y0, x1 - x0, y1 - y0, '#d3d9de');
-  R(x0, y0, x1 - x0, 10, '#c3cad0'); R(x0 + 10, y0 + 2, 80, 3, '#f6fafb'); R(x0 + 130, y0 + 2, 80, 3, '#f6fafb'); light(x0 + 50, y0 + 4, 60, '240,248,250', 0.25); light(x0 + 170, y0 + 4, 60, '240,248,250', 0.25);
-  R(x0, y0 + 16, x1 - x0, 2, '#c9ced3'); R(x0, y0 + 16, x1 - x0, 1, '#eef1f3');
-  for (const ax of [x0 + 20, x0 + 90, x0 + 160]) { R(ax, y0 + 20, 46, 9, '#9aa1a8'); R(ax + 1, y0 + 21, 44, 7, ['#c0546a', '#3f8a7a', '#e0b84a'][((ax - x0) / 70) | 0]); }
-  R(x0, y0 + 32, x1 - x0, 46, '#2b2e33'); R(x0, y0 + 33, x1 - x0, 44, '#07080c'); for (let k = 0; k < 6; k++) R(x0 + ((k * 46 + t * 30) % (x1 - x0)), y0 + 33, 2, 44, '#10141c'); R(x0 + 40, y0 + 36, 30, 1, '#c99a54');
-  R(x0, y0 + 80, x1 - x0, 40, '#2f5f8a'); for (let y = y0 + 84; y < y0 + 118; y += 4) for (let x = x0 + ((y / 4) % 2 ? 2 : 0); x < x1; x += 4) R(x, y, 2, 1, '#3a6d9a'); R(x0, y0 + 80, x1 - x0, 3, '#4a82b4');
-  R(x0, y0 + 120, x1 - x0, 4, '#3f7fb0'); R(x0, y0 + 120, x1 - x0, 1, '#6aa2cc'); R(x0, y0 + 124, x1 - x0, 6, '#244766'); R(x0, y0 + 130, x1 - x0, 8, '#8e979f'); R(x0, y0 + 130, x1 - x0, 1, '#c5ccd2'); R(x0, y0 + 138, x1 - x0, y1 - y0 - 138, '#6b7279');
-  const SX = x0 + 30, SEAT = y0 + 120;
-  R(SX + 16, y0 + 10, 4, y1 - y0, '#b8bec4'); R(SX + 17, y0 + 10, 1, y1 - y0, '#f2f4f6'); R(SX + 19, y0 + 10, 1, y1 - y0, '#7a8086');
-  sinipLean(SX, SEAT, 0.24, 0.32, t);
+// the sleeper on the bench inside, drawn the same way: dark green jacket, the safety vest with its bands, his head tipped
+function sinipSeatG(x, seat, t) {
+  const gr = '#2f4a3a', vest = '#c8dc48', vestD = '#9eb03a', band = '#e8eadf', pants = '#2f3a5a', sk = '#e8b898', skD = '#c99878';
+  inked([[x - 9, seat + 6], [x - 2, seat + 6], [x - 2, seat + 21], [x - 9, seat + 21]], pants); inked([[x + 2, seat + 6], [x + 9, seat + 6], [x + 9, seat + 21], [x + 2, seat + 21]], pants);
+  inked([[x - 12, seat - 2], [x + 12, seat - 2], [x + 12, seat + 7], [x - 12, seat + 7]], pants); R(x - 11, seat - 1, 22, 1, '#4a5a80'); R(x, seat, 1, 7, '#222c48');
+  inked([[x - 10, seat + 21], [x - 2, seat + 21], [x - 1, seat + 25], [x - 11, seat + 25]], '#1d1b21'); inked([[x + 2, seat + 21], [x + 10, seat + 21], [x + 11, seat + 25], [x + 1, seat + 25]], '#1d1b21');
+  inked([[x - 10, seat - 30], [x + 10, seat - 30], [x + 13, seat - 26], [x + 13, seat - 2], [x - 13, seat - 2], [x - 13, seat - 26]], gr);
+  polyFill([[x - 9, seat - 28], [x - 2, seat - 28], [x - 2, seat - 4], [x - 10, seat - 4], [x - 10, seat - 24]], vest); polyFill([[x + 2, seat - 28], [x + 9, seat - 28], [x + 10, seat - 24], [x + 10, seat - 4], [x + 2, seat - 4]], vest);
+  R(x - 10, seat - 16, 8, 3, band); R(x + 2, seat - 16, 8, 3, band); R(x - 10, seat - 9, 8, 2, band); R(x + 2, seat - 9, 8, 2, band); R(x + 8, seat - 26, 2, 22, vestD);
+  inked([[x - 8, seat - 1], [x - 2, seat - 1], [x - 2, seat + 3], [x - 8, seat + 3]], sk); inked([[x + 2, seat], [x + 8, seat], [x + 8, seat + 4], [x + 2, seat + 4]], sk);
+  rotated(-0.42, 0, 0, x - 1, seat - 29, () => {
+    inked([[-8, -2], [8, -2], [9, -12], [7, -18], [-7, -18], [-9, -12]], sk); R(-9, -12, 1, 9, skD);
+    inked([[-10, -10], [-9, -20], [-4, -24], [5, -24], [10, -19], [10, -11], [8, -16], [-2, -17], [-8, -14]], '#1d1b21');
+    R(-6, -10, 4, 1, OL); R(2, -10, 4, 1, OL); R(-1, -5, 3, 2, '#7e3a3a'); R(-7, -8, 3, 1, '#e89a8a'); R(5, -8, 3, 1, '#e89a8a');
+  });
+  zzz(x + 8, seat - 52, t * 1000);
+}
+// the inside of the car through a doorway: ceiling and its light, straps, the dark window band, the blue bench, the floor
+function carInsideG(x0, x1, y0, y1, t, withHim) {
+  R(x0, y0, x1 - x0, y1 - y0, '#d7dadc');
+  R(x0, y0, x1 - x0, 14, '#c3c8cc'); R(x0, y0 + 14, x1 - x0, 1, '#9aa0a6'); R(x0 + 20, y0 + 4, 80, 4, '#f6fafb'); R(x0 + 150, y0 + 4, 80, 4, '#f6fafb');
+  R(x0, y0 + 18, x1 - x0, 2, '#b9bfc5');
+  for (const sx of [x0 + 40, x0 + 100, x0 + 160, x0 + 220]) { R(sx, y0 + 20, 1, 10, '#8a9097'); inked([[sx - 4, y0 + 30], [sx + 5, y0 + 30], [sx + 5, y0 + 38], [sx - 4, y0 + 38]], '#e3e6e8'); R(sx - 2, y0 + 32, 5, 4, '#d7dadc'); }
+  R(x0, y0 + 44, x1 - x0, 52, '#9aa0a6'); R(x0, y0 + 46, x1 - x0, 48, '#20262e'); for (let k = 0; k < 5; k++) R(x0 + ((k * 61 + t * 40) % (x1 - x0)), y0 + 46, 2, 48, '#2a3038'); R(x0 + 30, y0 + 52, 40, 1, '#c99a54');
+  R(x0, y0 + 98, x1 - x0, 44, '#2f5f9a'); for (let x = x0 + 4; x < x1; x += 44) { R(x, y0 + 100, 40, 40, '#3a6eaa'); R(x, y0 + 100, 40, 2, '#5a8ec8'); R(x + 39, y0 + 100, 1, 40, '#25507e'); }
+  R(x0, y0 + 142, x1 - x0, 8, '#3f78b4'); R(x0, y0 + 142, x1 - x0, 1, '#6a9cd0'); R(x0, y0 + 150, x1 - x0, 14, '#5a5f66'); for (let x = x0 + 6; x < x1; x += 14) R(x, y0 + 156, 8, 1, '#4a4f56');
+  R(x0, y0 + 164, x1 - x0, y1 - y0 - 164, '#8a8f94'); R(x0, y0 + 164, x1 - x0, 1, '#6a6f74');
+  R(x0 + 36, y0 + 18, 4, y1 - y0, '#b8bec4'); R(x0 + 37, y0 + 18, 1, y1 - y0, '#f2f4f6'); R(x0 + 39, y0 + 18, 1, y1 - y0, '#7a8086');
+  if (withHim) sinipSeatG(x0 + 72, y0 + 140, t);
+}
+// one door leaf, its tall window showing the car inside with the glass's reflections
+function doorLeafG(x, y0, y1, wdt, side, t, ix = 76, him = true) {
+  inked([[x, y0], [x + wdt, y0], [x + wdt, y1], [x, y1]], '#c3c7cb');
+  R(x, y0, wdt, 2, '#dfe2e5'); R(side > 0 ? x + wdt - 3 : x, y0, 3, y1 - y0, '#2a2d31');
+  const wx = x + 12, ww = wdt - 24, wy0 = y0 + 14, wy1 = y0 + 128;
+  if (ww > 6) {
+    inked([[wx, wy0], [wx + ww, wy0], [wx + ww, wy1], [wx, wy1]], '#9aa0a6');
+    g.save(); g.beginPath(); g.rect(wx + 1, wy0 + 1, ww - 2, wy1 - wy0 - 2); g.clip();
+    carInsideG(ix, ix + 248, 18, 216, t, him); shade(wx, wy0, ww, wy1 - wy0, '200,215,230', 0.22);
+    g.globalAlpha = 0.5; for (let k = 0; k < 3; k++) polyFill([[wx + 8 + k * 16, wy1], [wx + 16 + k * 16, wy1], [wx + 60 + k * 16, wy0], [wx + 52 + k * 16, wy0]], '#ffffff'); g.globalAlpha = 1;
+    g.restore();
+  }
+  R(x + (side > 0 ? wdt - 14 : 6), y0 + 150, 8, 14, '#a9aeb3'); R(x + (side > 0 ? wdt - 13 : 7), y0 + 151, 6, 12, '#c9ced3');
 }
 function doorBust(t) {
-  // she is out on the platform, still; behind her the open door and him asleep against the pole. 0.9-2.9 the doors
-  // slide shut on him; 3.3 the train goes, its windows strobing over her
-  const close = ease(clamp((t - 0.9) / 2.0, 0, 1)), dep = Math.max(0, t - 3.3), tx = -Math.round(dep * dep * 90), look = 0;
-  const D0 = 90, D1 = 318, DY0 = 24, DY1 = 174;
+  const close = ease(clamp((t - 0.9) / 2.0, 0, 1)), dep = Math.max(0, t - 3.3), tx = -Math.round(dep * dep * 70);
   shot(1, (w, h) => {
-    // once the train is gone: the far wall across the tracks, its tiles, the station's name
-    R(0, 0, w, h, '#1f252c'); R(0, 40, w, 140, '#cfd8d4'); for (let x = 0; x < w; x += 9) R(x, 40, 1, 140, '#c0c9c5'); for (let y = 40; y < 180; y += 6) R(0, y, w, 1, '#c3ccc8'); R(0, 132, w, 6, '#2f6f8a'); R(0, 138, w, 1, '#7fb4c8');
-    R(40, 70, 104, 22, '#1e2a33'); R(42, 72, 100, 18, '#2f3a4a'); R(42, 89, 100, 1, '#8fd694'); hospName(54, 74, '#e9eef0', 11);
+    // the car's side: light panels in bands, a seam, the blue stripe; a closed door further along and the next car's
+    // coupling as the train pulls away
     g.save(); g.translate(tx, 0);
-    // the car's side around the doorway: panels with a sheen, rivets, the door frame and its rubber, the sill
-    R(-40, 0, 520, 180, '#d9dee3'); for (let x = -40; x < 480; x += 2) { const v = Math.sin(x / 23) * 0.5 + 0.5; if (v > 0.8) R(x, 0, 1, 180, '#e6eaee'); else if (v < 0.15) R(x, 0, 1, 180, '#ccd2d7'); }
-    for (const x of [D0 - 30, D1 + 30]) for (let y = 30; y < 170; y += 12) R(x, y, 1, 1, '#aab2b8');
-    R(-40, 150, 520, 6, '#2f6f8a'); R(-40, 156, 520, 1, '#7fb4c8');
-    R(D0 - 6, DY0 - 6, D1 - D0 + 12, DY1 - DY0 + 6, '#9aa1a8'); R(D0 - 4, DY0 - 4, D1 - D0 + 8, DY1 - DY0 + 4, '#2b2e33'); R(D0 - 2, DY0 - 2, D1 - D0 + 4, DY1 - DY0 + 2, '#4a4f56');
-    g.save(); g.beginPath(); g.rect(D0, DY0, D1 - D0, DY1 - DY0); g.clip();
-    carThroughDoor(D0, D1, DY0, DY1, t);
-    // the panels slide shut from their pockets; their windows show him still
-    const pw = Math.round((D1 - D0) / 2 * close);
-    if (pw > 0) for (const [x, s] of [[D0, 1], [D1, -1]]) {
-      const px = s > 0 ? x : x - pw; R(px, DY0, pw, DY1 - DY0, '#d6dbe0'); R(px, DY0, pw, 1, '#eef1f3'); R(s > 0 ? px + pw - 3 : px, DY0, 3, DY1 - DY0, '#2b2e33'); R(s > 0 ? px + pw - 4 : px + 3, DY0, 1, DY1 - DY0, '#4a4f56');
-      const wx = px + 12, ww = pw - 24; if (ww > 4) { R(wx - 2, DY0 + 14, ww + 4, 80, '#2b2e33'); g.save(); g.beginPath(); g.rect(wx, DY0 + 16, ww, 76); g.clip(); carThroughDoor(D0, D1, DY0, DY1, t); shade(wx, DY0 + 16, ww, 76, '190,208,220', 0.28); g.globalAlpha = 0.18; for (let k = 0; k < 20; k++) R(wx + 6 + k * 2, DY0 + 88 - k * 4, 5, 1, '#ffffff'); g.restore(); }
-      R(px + 10, DY0 + 120, Math.max(0, pw - 20), 1, '#aab2b8'); if (pw > 30) { R(px + 14, DY0 + 104, 12, 12, '#f2d35a'); R(px + 19, DY0 + 107, 2, 5, '#1b1716'); R(px + 19, DY0 + 113, 2, 1, '#1b1716'); }
-    }
+    const carW = 1400;
+    R(-10, 0, carW, h, '#b9bdc1'); R(-10, 0, carW, 60, '#c9cdd0'); R(-10, 60, carW, 2, '#a4a9ae'); R(-10, 128, carW, 2, '#a4a9ae'); R(-10, 130, carW, 50, '#adb1b5'); R(-10, 180, carW, 8, '#2f5f9a'); R(-10, 180, carW, 1, '#5a8ac8'); R(-10, 188, carW, 30, '#9a9ea3');
+    for (let x = -10; x < carW; x += 3) if (rnd(x, 1) < 0.2) R(x, 62 + Math.floor(rnd(1, x) * 60), 2, 1, '#c3c7cb');
+    for (const dx of [480, 940]) { inked([[66 + dx, 8], [334 + dx, 8], [334 + dx, 216], [66 + dx, 216]], '#d2d5d8'); doorLeafG(76 + dx, 18, 216, 124, 1, t, 76 + dx, false); doorLeafG(200 + dx, 18, 216, 124, -1, t, 76 + dx, false); }
+    R(1380, 0, 40, h, '#2a2d31');
+    // this door: its frame, the inside through it, the leaves sliding shut
+    inked([[66, 8], [334, 8], [334, 216], [66, 216]], '#d2d5d8'); R(68, 10, 264, 2, '#eef0f2'); R(72, 14, 256, 202, '#7d8287'); R(74, 16, 252, 200, '#5a5f64');
+    g.save(); g.beginPath(); g.rect(76, 18, 248, 198); g.clip();
+    carInsideG(76, 324, 18, 216, t, true);
+    const lw = Math.round(124 * close); if (lw > 0) { doorLeafG(76 - 124 + lw, 18, 216, 124, 1, t); doorLeafG(324 - lw, 18, 216, 124, -1, t); }
     g.restore();
-    R(D0 - 6, DY1, D1 - D0 + 12, 5, '#f2d35a'); for (let x = D0 - 6; x < D1 + 6; x += 3) R(x, DY1 + 1, 1, 3, '#c9a63a');
     g.restore();
-    // the platform behind her, low: granite and the tactile strip
-    R(0, 180, w, 20, '#9ea7a5'); for (let x = 0; x < w; x += 2) if (rnd(x, 7) < 0.4) R(x, 182 + Math.floor(rnd(7, x) * 10), 1, 1, '#b0b9b7'); R(0, 180, w, 4, '#e8c34a'); for (let x = 1; x < w; x += 4) R(x, 181, 2, 2, '#c9a63a');
-    // the train's windows strobing over everything as it goes
-    if (dep > 0 && dep < 2.2) for (let k = 0; k < 4; k++) { const x = ((k * 130 - dep * dep * 120) % 560 + 560) % 560 - 90; g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,190,${0.12 * Math.min(1, dep * 1.5) * (1 - dep / 2.2)})`; g.fillRect(x, 0, 66, h); g.restore(); }
-    // her, close, in front of it all
-    haeunBustHD(246, 64, look);
-    vig(w, h, 0.45);
+    // the train's windows strobing over her as it goes
+    if (dep > 0 && dep < 1.8) { g.save(); g.globalCompositeOperation = 'lighter'; for (let k = 0; k < 3; k++) { const x = ((k * 150 - dep * dep * 140) % 450 + 450) % 450 - 60; g.fillStyle = `rgba(255,240,210,${0.08 * Math.min(1, dep * 2) * (1 - dep / 1.8)})`; g.fillRect(x, 0, 60, h); } g.restore(); }
+    // her, close, in front of it all, still
+    haeunBustG(244, 70);
+    vig(w, h, 0.22);
   });
   bars();
   blackout(W, H, t < 0.3 ? 1 - t / 0.3 : t > 4.6 ? (t - 4.6) / 0.4 : 0);
