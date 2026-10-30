@@ -551,7 +551,7 @@ const LEVELS = [
           [128, '둘 다 온다. 같이 닿으면 한 번에.', 3.5, 1], [148, '…손 빠르네.', 2, 0, 'h'],
           [160, '…윽.', 1.5, 1], [165, '…허리가 말을 안 듣네.', 3, 1],
           [171, '…쉬세요. 제가 할게요.', 3, 0, 'h'], [192, '하은이 소리 말고. 둘 다 네 손이다.', 3.5, 1],
-          [208, '마지막. 같이 간다!', 2.5, 1], [211, '네!', 1.5, 0, 'h'], [224, '(트럭 경적)', 3, 1]],
+          [208, '마지막. 같이 간다!', 2.5, 1], [211, '네!', 1.5, 0, 'h']],
     comfort: ['괜찮아. 다음 거 봐.', '양쪽 다 네 손이다. 내 손 봐.'],
     intro: [
       { who:'', text:'닷새째 밤. 금요일. 트럭이 새벽 4시 40분에 뜬다. 라인을 합쳐서 벨트가 둘이다.' },
@@ -1854,6 +1854,16 @@ function drawDockBack(beat, nowMs, active) {
   const { x, y, w, h } = DOCK, E0 = L.endAt, rush = beat >= L.fever[0][0] && beat < E0 + 4;
   R(272, 36, 112, 110, '#26221e'); R(272, 36, 112, 2, '#34302a');
   R(x - 4, y - 4, w + 8, h + 8, '#3a3d44'); R(x - 4, y - 4, w + 8, 2, '#4d5158');
+  // after the last pair the shutter comes down; at the horn (endAt + 4) the trailer shudders, sound rings off it and its tail
+  // lights flare, then it pulls out of the dock (endAt + 5.5 to + 8.5) and the night outside shows through the empty door
+  const horn = beat - E0 - 4, depart = beat >= E0 + 5.5 ? ease(Math.min(1, (beat - E0 - 5.5) / 3)) : 0;
+  const jit = horn >= 0 && horn < 1.4 && !reduce ? Math.round(Math.sin(nowMs / 18)) : 0;
+  if (depart > 0) {
+    const sky = g.createLinearGradient(0, y, 0, y + h); sky.addColorStop(0, '#0a1024'); sky.addColorStop(1, '#141a2c'); g.fillStyle = sky; g.fillRect(x, y, w, h);
+    for (const [lx, ly] of [[x + 14, y + 30], [x + 40, y + 26], [x + 70, y + 33]]) { R(lx, ly, 2, 2, '#f0c060'); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(240,190,90,.15)'; g.fillRect(lx - 3, ly - 3, 8, 8); g.restore(); }
+    R(x, y + h - 10, w, 10, '#1b1d22'); R(x, y + h - 10, w, 1, '#2c3038');
+  }
+  g.save(); g.beginPath(); g.rect(x - 4, y - 1, w + 8, h + 1); g.clip(); g.translate(Math.round(depart * (w + 16)) + jit, 0);
   // inside the trailer: dark walls closing in, the floor, your boxes stacked from the floor up
   R(x, y, w, h, '#121417'); R(x + 6, y + 6, w - 12, h - 10, '#181b20'); R(x + 12, y + 12, w - 24, h - 18, '#1d2127');
   R(x, y + h - 4, w, 4, '#2a2e35');
@@ -1866,8 +1876,18 @@ function drawDockBack(beat, nowMs, active) {
   for (const lx of [x - 3, x + w]) { R(lx, y + h - 16, 3, 6, `rgba(255,60,50,${tl})`); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,50,40,${0.12 * tl})`; g.fillRect(lx - 8, y + h - 24, 19, 22); g.restore(); }
   // the shutter: rolled up on its drum, and it comes down on the last pair (endAt)
   const close = beat >= E0 ? Math.min(1, (beat - E0) / 1) : 0;
-  R(x - 4, y - 10, w + 8, 7, '#4a4d52'); for (let k = 0; k < w + 8; k += 6) R(x - 4 + k, y - 9, 1, 5, '#3a3d42');
   if (close > 0) { const sh = Math.round(h * ease(close)); for (let yy = 0; yy < sh; yy += 4) { R(x, y + yy, w, 3, '#6b6f75'); R(x, y + yy + 3, w, 1, '#53575d'); } }
+  g.restore();
+  // the shutter's drum stays with the dock
+  R(x - 4, y - 10, w + 8, 7, '#4a4d52'); for (let k = 0; k < w + 8; k += 6) R(x - 4 + k, y - 9, 1, 5, '#3a3d42');
+  // the horn: the tail lights flare and rings of sound go out from the trailer into the room
+  if (horn >= 0 && horn < 1.6) {
+    const a = 1 - horn / 1.6;
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (const lx of [x - 3, x + w]) { g.fillStyle = `rgba(255,70,50,${0.5 * a})`; g.fillRect(lx - 10, y + h - 26, 23, 26); }
+    if (!reduce) for (let k = 0; k < 3; k++) { const p = (horn * 1.4 + k / 3) % 1, r = 8 + p * 46; g.strokeStyle = `rgba(255,228,170,${0.55 * (1 - p) * a})`; g.lineWidth = 2; g.beginPath(); g.arc(x + 4, y + h / 2, r, Math.PI * 0.62, Math.PI * 1.38); g.stroke(); }
+    g.restore();
+  }
   // the departure board: the time now, an arrow, 04:40. Red from the rush; green once the truck is loaded. It hangs off to the
   // right so the far gate's judgement pops clear of it
   R(324, 22, 48, 12, '#0c0d10'); R(324, 22, 48, 1, '#2a2d33');
