@@ -655,8 +655,9 @@ const bgOffice = document.createElement('canvas'); bgOffice.width = W; bgOffice.
 // 1-3: 반장's memory of his guitar days, a rainy alley. Painted once in four layers that the count-in reveals one per rim:
 // ground (darkness and wet street), wall (brick, fire escape, back door with an awning, a bin), lamp (the street lamp). The neon
 // signs, reflections, rain and drips are drawn live.
+const BULBS = Array.from({ length: 16 }, (_, i) => { const x = 6 + i * 14; return { x, y: Math.round(19 + 7 * Math.sin(Math.PI * x / 222)) }; });
 const ALLEY_BG = ['ground', 'wall', 'lamp'].reduce((o, k) => { const c = document.createElement('canvas'); c.width = W; c.height = H; o[k] = c; return o; }, {});
-const SIGN = { x: 136, y: 44 }, NOTE_SIGN = { x: 194, y: 32 }, DRIP = { x: 259, y0: 90, y1: 141 }, PUDDLE = { x: 110, y: 142 }, PUDDLE2 = { x: 206, y: 142 }, LAMP = { x: 33, y: 33 };
+const SIGN = { x: 124, y: 44 }, NEON_GTR_AT = { x: 104, y: 34 }, GUITARS = { x: 252, y: 58 }, NOTE_SIGN = { x: 194, y: 32 }, DRIP = { x: 259, y0: 90, y1: 141 }, PUDDLE = { x: 110, y: 142 }, PUDDLE2 = { x: 206, y: 142 }, LAMP = { x: 33, y: 33 };
 (() => {
   let b = ALLEY_BG.ground.getContext('2d');
   let r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
@@ -693,12 +694,29 @@ const SIGN = { x: 136, y: 44 }, NOTE_SIGN = { x: 194, y: 32 }, DRIP = { x: 259, 
   r(74, 116, 22, 18, '#26332c'); r(72, 113, 26, 4, '#30403a'); r(80, 111, 10, 2, '#30403a'); for (let x = 77; x < 94; x += 4) r(x, 119, 1, 13, '#1d2822');
   r(98, 128, 26, 3, '#6b4a2e'); r(98, 131, 26, 1, '#4a3220'); r(100, 132, 3, 2, '#4a3220'); r(119, 132, 3, 2, '#4a3220');
   // backing board for the sign
-  r(SIGN.x - 4, SIGN.y - 4, 48, 18, '#121519'); r(SIGN.x + 8, SIGN.y - 10, 1, 6, '#2a2d33'); r(SIGN.x + 32, SIGN.y - 10, 1, 6, '#2a2d33');
+  r(SIGN.x - 4, SIGN.y - 4, 64, 18, '#121519'); r(SIGN.x + 10, SIGN.y - 10, 1, 6, '#2a2d33'); r(SIGN.x + 46, SIGN.y - 10, 1, 6, '#2a2d33');
+  // two guitars hung over the back door
+  const guitar = (x, y, body, burst, head) => {
+    r(x + 6, y - 4, 2, 4, '#3a3d44'); r(x + 5, y, 4, 6, head);
+    for (const [dx, dy] of [[4, 1], [9, 1], [4, 4], [9, 4]]) r(x + dx, y + dy, 1, 1, '#c9c2b0');
+    r(x + 6, y + 6, 2, 17, '#6a4a2c'); for (let k = 0; k < 5; k++) r(x + 6, y + 8 + k * 3, 2, 1, '#8a7a5a');
+    r(x + 2, y + 22, 10, 6, body); r(x + 3, y + 28, 8, 2, body); r(x + 1, y + 30, 12, 9, body); r(x + 2, y + 39, 10, 2, body);
+    r(x + 4, y + 31, 6, 6, burst); r(x + 4, y + 24, 6, 2, '#1b1716'); r(x + 4, y + 33, 6, 2, '#1b1716'); r(x + 5, y + 36, 4, 1, '#c9c2b0');
+    r(x + 7, y + 6, 1, 31, 'rgba(230,225,210,.45)');
+  };
+  guitar(236, 38, '#5a1f12', '#c8742a', '#2a1a12');
+  guitar(254, 42, '#1d1f24', '#d9d4c6', '#1d1f24');
+  // old gig posters, one half torn
+  r(98, 66, 15, 20, '#bfa880'); r(100, 69, 11, 9, '#3a2a1e'); r(104, 70, 2, 7, '#bfa880'); r(101, 80, 9, 1, '#6a5a40'); r(101, 82, 7, 1, '#6a5a40');
+  r(115, 70, 13, 17, '#8a3a2a'); r(117, 73, 9, 1, '#e0c9a0'); r(117, 76, 7, 1, '#e0c9a0'); r(119, 80, 5, 5, '#2a1a12'); r(124, 84, 4, 3, '#22130f');
+  // the bulb string, unlit
+  BULBS.forEach((p, i) => { if (i) { const q = BULBS[i - 1]; for (let k = 0; k <= 14; k++) r(q.x + k, Math.round(q.y + (p.y - q.y) * k / 14) - 1, 1, 1, '#141210'); } r(p.x, p.y, 2, 3, '#3a3530'); });
   b = ALLEY_BG.lamp.getContext('2d');
   r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
   r(10, 26, 3, 134, '#2b2e33'); r(8, 158, 7, 3, '#2b2e33'); r(10, 26, 24, 2, '#2b2e33'); r(28, 28, 11, 4, '#3a3d44'); r(30, 32, 7, 1, '#ffd890');
 })();
-const BLUES_FONT = { B: ['110', '101', '110', '101', '110'], L: ['100', '100', '100', '100', '111'], U: ['101', '101', '101', '101', '111'], E: ['111', '100', '110', '100', '111'], S: ['111', '100', '111', '001', '111'] };
+const SIGN_FONT = { C: ['111', '100', '100', '100', '111'], H: ['101', '101', '111', '101', '101'], I: ['111', '010', '010', '010', '111'], A: ['010', '101', '111', '101', '101'], G: ['111', '100', '101', '101', '111'], O: ['111', '101', '101', '101', '111'] };
+const NEON_GTR = ['....x', '...x.', '..x..', '..x..', '.xxx.', 'x...x', 'x...x', '.x.x.', 'x...x', 'x...x', '.xxx.'];
 const NOTE_PIX = ['..xx..', '..x.x.', '..x..x', '..x...', '..x...', 'xxx...', 'xxx...'];
 
 // ---------- drawing helpers ----------
@@ -1498,24 +1516,26 @@ function guitarGlint(beat) {
   for (const [ob] of GLEAD) { const d = rel - ob * mul; if (d >= 0 && d < 0.4) return 1 - d / 0.4; }
   return 0;
 }
+// the signs and the decorations stay dark through the slow blues, sputter in the entry bar, and all come on with phase 3 (152)
 function neonLevels(al, nowMs) {
   const b = al.beat;
-  let blues = al.neon, note = b >= 152 && b < 248 ? al.neon : 0;
-  if (!reduce && Math.sin(nowMs / 41) + Math.sin(nowMs / 13.7) > 1.9) blues *= 0.2;   // the old sign stutters now and then
-  if (b >= 148 && b < 152) blues *= Math.floor(b * 4) % 2 ? 0.25 : 1;                    // 16ths into the fusion
-  if (b >= 176 && b < 192) { const on = Math.floor(b) % 2; blues *= on ? 1 : 0.3; note *= on ? 0.3 : 1; }   // the two signs trade beats
-  if (b >= 192 && b < 199) { blues *= 0.25; note *= 0.15; }                                // the break: only the lamp
-  if (b >= 199 && b < 200) { blues = 0; note = 0; }
-  if (b >= 200 && b < 248) { const k = Math.max(0, 1 - (b % 1) * 3); blues = Math.min(1, blues * (0.85 + 0.3 * k)); note = Math.min(1, note * (0.85 + 0.3 * k)); }
-  if (b >= 152 && b < 153) note *= Math.min(1, (b - 152) * 3);
-  return { blues, note };
+  let on = b >= 152 && b < 248 ? 1 : 0;
+  if (b >= 148 && b < 152) { const k = (b - 148) / 4; on = rnd(Math.floor(b * 4), 9) < 0.15 + k * 0.7 ? 0.25 + 0.45 * k : 0; }
+  let sign = on, gtr = on, bulbs = on, note = b >= 152 && b < 248 ? 1 : 0;
+  if (!reduce && b >= 152 && Math.sin(nowMs / 41) + Math.sin(nowMs / 13.7) > 1.9) sign *= 0.35;   // the old sign still stutters now and then
+  if (b >= 176 && b < 192) { const o = Math.floor(b) % 2; sign *= o ? 1 : 0.3; note *= o ? 0.3 : 1; }   // his sign and her note trade beats
+  if (b >= 192 && b < 199) { sign *= 0.25; note *= 0.15; gtr *= 0.3; bulbs *= 0.35; }                // the break: the lamp carries it
+  if (b >= 199 && b < 200) sign = note = gtr = bulbs = 0;
+  if (b >= 200 && b < 248) { const k = Math.max(0, 1 - (b % 1) * 3); sign = Math.min(1, sign * (0.85 + 0.3 * k)); note = Math.min(1, note * (0.85 + 0.3 * k)); }
+  const w = al.wall; return { sign: sign * w, gtr: gtr * w, bulbs: bulbs * w, note: note * w, k: b >= 200 && b < 248 ? Math.max(0, 1 - (b % 1) * 3) : 0 };
 }
-function neonPix(rows, x0, y0, sc, col, glow, a) {
+function neonPix(rows, x0, y0, sc, col, glow, a, vis = 1) {
+  const each = fn => rows.forEach((row, j) => [...row].forEach((v, i) => { if (v !== '.' && v !== '0') fn(x0 + i * sc, y0 + j * sc); }));
+  if (vis > 0) { g.globalAlpha = vis; each((x, y) => R(x, y, sc, sc, '#2b3238')); g.globalAlpha = 1; }
   if (a <= 0) return;
-  g.save(); g.globalCompositeOperation = 'lighter';
-  rows.forEach((row, j) => [...row].forEach((v, i) => { if (v !== '.' && v !== '0') { g.fillStyle = `rgba(${glow},${0.12 * a})`; g.fillRect(x0 + i * sc - 2, y0 + j * sc - 2, sc + 4, sc + 4); } }));
-  g.restore();
-  rows.forEach((row, j) => [...row].forEach((v, i) => { if (v !== '.' && v !== '0') { g.globalAlpha = 0.35 + 0.65 * a; R(x0 + i * sc, y0 + j * sc, sc, sc, a > 0.5 ? col : '#2a3640'); g.globalAlpha = 1; } }));
+  g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${glow},${0.12 * a})`;
+  each((x, y) => g.fillRect(x - 2, y - 2, sc + 4, sc + 4)); g.restore();
+  g.globalAlpha = Math.min(1, a * 1.4); each((x, y) => R(x, y, sc, sc, col)); g.globalAlpha = 1;
 }
 function drawAlleyBack(al, t, nowMs) {
   if (al.out) g.drawImage(bg, 0, 0); else { g.fillStyle = '#000'; g.fillRect(0, 0, W, H); }
@@ -1531,13 +1551,34 @@ function drawAlleyBack(al, t, nowMs) {
     g.restore();
   }
   // signs: his blue BLUES, and from the fusion her lilac note across the alley
-  const letters = 'BLUES'.split('').map(ch => BLUES_FONT[ch]);
-  letters.forEach((rows, i) => neonPix(rows, SIGN.x + i * 8, SIGN.y, 2, '#bff3ff', '57,198,255', nv.blues));
+  'CHICAGO'.split('').forEach((ch, i) => neonPix(SIGN_FONT[ch], SIGN.x + i * 8, SIGN.y, 2, '#bff3ff', '57,198,255', nv.sign, al.wall));
+  neonPix(NEON_GTR, NEON_GTR_AT.x, NEON_GTR_AT.y, 2, '#ffe0b0', '255,170,80', nv.gtr * (0.8 + 0.2 * glint), al.wall);
   if (al.wall > 0 && al.beat >= 152) neonPix(NOTE_PIX, NOTE_SIGN.x, NOTE_SIGN.y, 3, '#f3e8ff', '190,150,255', nv.note);
+  // window and the bulb over the door (the third rim of the count-in)
+  if (al.neon > 0) {
+    g.save(); g.globalCompositeOperation = 'lighter';
+    g.fillStyle = `rgba(255,190,110,${0.18 * al.neon})`; g.fillRect(58, 12, 22, 20);
+    const dg = g.createRadialGradient(247, 86, 1, 247, 92, 26); dg.addColorStop(0, `rgba(255,210,140,${0.3 * al.neon})`); dg.addColorStop(1, 'rgba(255,210,140,0)'); g.fillStyle = dg; g.fillRect(220, 70, 56, 50);
+    g.restore();
+  }
+  // phase 3: a warm light finds the hanging guitars, and the bulb string lights (pulsing with the kick in the second drop)
+  if (nv.gtr > 0) {
+    g.save(); g.globalCompositeOperation = 'lighter';
+    const sg = g.createRadialGradient(GUITARS.x, GUITARS.y - 10, 2, GUITARS.x, GUITARS.y, 34); sg.addColorStop(0, `rgba(255,200,130,${(0.3 + 0.15 * glint) * nv.gtr})`); sg.addColorStop(1, 'rgba(255,200,130,0)');
+    g.fillStyle = sg; g.fillRect(GUITARS.x - 40, GUITARS.y - 50, 80, 90);
+    g.fillStyle = `rgba(255,240,210,${0.35 * glint * nv.gtr})`; g.fillRect(243, 44, 1, 31); g.fillRect(261, 48, 1, 31);
+    g.restore();
+  }
+  if (nv.bulbs > 0) {
+    g.save(); g.globalCompositeOperation = 'lighter';
+    BULBS.forEach((p, i) => { const a = nv.bulbs * (0.75 + 0.25 * (nv.k && i % 2 === Math.floor(al.beat) % 2 ? 1 : 0)); g.fillStyle = `rgba(255,200,110,${0.22 * a})`; g.fillRect(p.x - 3, p.y - 2, 8, 8); });
+    g.restore();
+    BULBS.forEach(p => { g.globalAlpha = Math.min(1, nv.bulbs * 1.3); R(p.x, p.y, 2, 3, '#ffd88a'); g.globalAlpha = 1; });
+  }
   // reflections on the wet street, shivering when the guitar plays
   g.save(); g.globalCompositeOperation = 'lighter';
   const refl = (x0, w, c, a) => { if (a <= 0) return; for (let x = x0; x < x0 + w; x += 2) { const s = 0.55 + 0.45 * Math.sin(nowMs / (reduce ? 1e9 : 110) + x * 0.7) + glint * 0.6; g.fillStyle = `rgba(${c},${0.16 * a * s})`; g.fillRect(x + Math.round(glint * Math.sin(x + nowMs / 40)), 136, 1, 9); } };
-  refl(SIGN.x, 40, '57,198,255', nv.blues); refl(LAMP.x - 12, 26, '255,200,120', al.lamp); refl(NOTE_SIGN.x, 18, '190,150,255', nv.note);
+  refl(SIGN.x, 56, '57,198,255', nv.sign); refl(NEON_GTR_AT.x, 10, '255,170,80', nv.gtr); refl(LAMP.x - 12, 26, '255,200,120', al.lamp); refl(NOTE_SIGN.x, 18, '190,150,255', nv.note);
   g.restore();
 }
 // rain behind the belt only, so it never hides a box; drips from the awning land on the groove's off-beat grid
