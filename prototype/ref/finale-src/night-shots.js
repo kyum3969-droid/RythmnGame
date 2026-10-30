@@ -541,48 +541,52 @@ function haeunBustHD(cx, by, look) {
   // rim light from the doorway on her left
   dotLine(cx - 34, s0 + 4, cx - 56, s0 + 12, '#4a4244', 1); dotLine(cx - 56, s0 + 12, cx - 70, s0 + 22, '#4a4244', 1);
   // the neck, shadowed under the jaw
-  polyFill([[cx - 14, by + 52], [cx + 14, by + 52], [cx + 15, s0 + 4], [cx - 15, s0 + 4]], sk);
-  for (let y = by + 52; y < by + 64; y++) R(cx - 14, y, 28, 1, y < by + 58 ? skDD : skD);
-  R(cx - 15, by + 52, 2, 24, skD); R(cx + 13, by + 52, 2, 24, skD);
+  polyFill([[cx - 16, by + 50], [cx + 16, by + 50], [cx + 18, s0 + 4], [cx - 18, s0 + 4]], sk);
+  polyFill([[cx - 16, by + 50], [cx + 16, by + 50], [cx + 16, by + 57], [cx, by + 61], [cx - 16, by + 57]], skD);
+  R(cx - 18, by + 50, 2, 26, skD); R(cx + 16, by + 50, 2, 26, skD);
   // hair under the cap at the sides, the ears
-  polyFill([[cx - 40, by + 4], [cx - 33, by + 4], [cx - 33, by + 34], [cx - 38, by + 38], [cx - 41, by + 24]], hair);
-  polyFill([[cx + 40, by + 4], [cx + 33, by + 4], [cx + 33, by + 30], [cx + 38, by + 34], [cx + 41, by + 22]], hair);
-  for (let k = 0; k < 4; k++) { dotLine(cx - 39 + k, by + 6, cx - 38 + k, by + 30 - k * 3, hairL, 2); dotLine(cx + 37 - k, by + 6, cx + 36 - k, by + 26 - k * 3, '#3a271e', 2); }
-  for (const s of [-1, 1]) { const ex = cx + s * 38; ellFill(ex, by + 30, 5, 9, skD); ellFill(ex + s * 0.5, by + 30, 3, 7, sk); R(ex - (s > 0 ? 0 : 1), by + 26, 1, 8, skDD); }
-  // the face: wide under the brim, a soft jaw down to the chin
-  const face = [[cx - 34, by + 4], [cx + 34, by + 4], [cx + 35, by + 22], [cx + 33, by + 34], [cx + 28, by + 45], [cx + 20, by + 53], [cx + 10, by + 58], [cx, by + 60], [cx - 10, by + 58], [cx - 20, by + 53], [cx - 28, by + 45], [cx - 33, by + 34], [cx - 35, by + 22]];
+  polyFill([[cx - 34, by + 4], [cx - 27, by + 4], [cx - 27, by + 30], [cx - 31, by + 36], [cx - 35, by + 22]], hair);
+  polyFill([[cx + 34, by + 4], [cx + 27, by + 4], [cx + 27, by + 28], [cx + 31, by + 33], [cx + 35, by + 20]], hair);
+  for (let k = 0; k < 3; k++) { dotLine(cx - 33 + k, by + 6, cx - 32 + k, by + 30 - k * 3, hairL, 2); dotLine(cx + 32 - k, by + 6, cx + 31 - k, by + 26 - k * 3, '#3a271e', 2); }
+  for (const s of [-1, 1]) { const ex = cx + s * 29.5; ellFill(ex, by + 25, 4.5, 11, skD); ellFill(ex + s * 0.5, by + 25, 2.5, 9, sk); R(ex - (s > 0 ? 0 : 1), by + 20, 1, 10, skDD); R(ex + s, by + 33, 1, 2, skDD); }
+  // the face: an oval, the cheekbones its widest, the jaw narrowing to a small chin
+  const face = [[cx - 27, by + 4], [cx + 27, by + 4], [cx + 28.5, by + 18], [cx + 28, by + 28], [cx + 26, by + 36], [cx + 22, by + 45], [cx + 16, by + 52], [cx + 9, by + 57], [cx + 3, by + 59.5], [cx - 3, by + 59.5], [cx - 9, by + 57], [cx - 16, by + 52], [cx - 22, by + 45], [cx - 26, by + 36], [cx - 28, by + 28], [cx - 28.5, by + 18]];
   // flat shading like the game: a shade colour under everything, the lit face over it a little to the right, the brim's
-  // shadow in three hard bands, the jaw's underside
+  // shadow in hard bands following its curve, the hollow under each cheekbone, the jaw's underside
   polyFill(face, '#c08a66');
-  polyFill(face.map(([x, y]) => [cx + (x - cx) * 0.9 + 2, by + (y - by) * 0.96]), sk);
+  polyFill(face.map(([x, y]) => [cx + (x - cx) * 0.92 + 1.5, by + (y - by) * 0.97]), sk);
   // the cap: a six-panel crown that sits on her head, a little wider than it; the brim seen from just below, its dark
   // underside between the crown's edge and the brim's curved front edge, which drops a shadow over her eyes
-  const CR = 43, CT = by - 36, join = x => by + 3 + (x / CR) ** 2 * 4, front = x => by + 10 + (x / 48) ** 2 * 8;
+  const CR = 39, CT = by - 34, join = x => by + 3 + (x / CR) ** 2 * 4, front = x => by + 10 + (x / 44) ** 2 * 8;
   g.save(); clipPoly(face);
-  for (let x = -40; x <= 40; x++) { const y0 = Math.round(front(x)); R(cx + x, by, 1, y0 + 9 - by, '#6e4834'); R(cx + x, y0 + 9, 1, 3, '#8c5c42'); R(cx + x, y0 + 12, 1, 2, '#ad7655'); }
-  polyFill([[cx - 30, by + 44], [cx - 20, by + 53], [cx - 10, by + 58], [cx, by + 60], [cx + 10, by + 58], [cx + 20, by + 53], [cx + 26, by + 47], [cx + 12, by + 54], [cx, by + 56], [cx - 14, by + 53]], '#c08a66');
+  for (let x = -30; x <= 30; x++) { const y0 = Math.round(front(x)); R(cx + x, by, 1, y0 + 9 - by, '#6e4834'); R(cx + x, y0 + 9, 1, 3, '#8c5c42'); R(cx + x, y0 + 12, 1, 2, '#ad7655'); }
+  for (const sd of [-1, 1]) polyFill([[cx + sd * 27, by + 29], [cx + sd * 19, by + 33], [cx + sd * 20, by + 43], [cx + sd * 25, by + 39]], sd < 0 ? '#c99470' : '#cc9a76');
+  polyFill([[cx - 24, by + 42], [cx - 16, by + 52], [cx - 9, by + 57], [cx - 3, by + 59.5], [cx + 3, by + 59.5], [cx + 9, by + 57], [cx + 16, by + 52], [cx + 20, by + 47], [cx + 10, by + 55], [cx, by + 57], [cx - 12, by + 54]], '#c08a66');
   g.restore();
-  // the nose and the mouth, just shapes of shade
-  R(cx - 1 + d, by + 34, 4, 1, '#c08a66'); R(cx + 2 + d, by + 31, 1, 3, '#c99470');
-  R(cx - 4 + d, by + 44, 8, 1, '#a8705a'); R(cx - 2 + d, by + 46, 5, 1, '#c99470');
+  // the eyes, just there in the brim's shadow; the nose's bridge and tip, the nostrils; the lips; the chin
+  for (const ex of [cx - 12, cx + 11]) { R(ex - 4, by + 18, 9, 1, '#3a2418'); R(ex - 3, by + 19, 7, 1, '#2a1810'); R(ex + (ex < cx ? 1 : 0), by + 19, 1, 1, '#8a6048'); }
+  R(cx + 1 + d, by + 23, 1, 9, '#e2ae86'); R(cx - 3 + d, by + 26, 1, 8, '#c99470'); R(cx + d, by + 32, 3, 2, skL);
+  R(cx - 5 + d, by + 35, 2, 1, '#a8705a'); R(cx + 4 + d, by + 35, 2, 1, '#a8705a'); R(cx - 3 + d, by + 36, 7, 1, '#c08a66'); R(cx + d, by + 38, 1, 3, '#c99470');
+  R(cx - 6 + d, by + 43, 13, 1, '#a8705a'); R(cx - 7 + d, by + 44, 1, 1, '#b07a62'); R(cx + 7 + d, by + 44, 1, 1, '#b07a62'); R(cx - 4 + d, by + 44, 9, 1, '#c8866e'); R(cx - 3 + d, by + 46, 7, 1, '#c99470');
+  R(cx - 2 + d, by + 51, 5, 1, '#c99470');
   const crown = []; for (let i = 0; i <= 24; i++) { const th = Math.PI * i / 24, c = Math.cos(th), x = Math.sign(c) * Math.abs(c) ** 0.8 * CR; crown.push([cx + x, CT + (1 - Math.sin(th) ** 0.6) * (join(x) - CT)]); }
   polyFill(crown, red);
   g.save(); clipPoly(crown);
-  const seam = (sd, p) => [cx + sd * 30 * Math.sin(p * Math.PI / 2), lerp(CT + 1, join(30), p)];
+  const seam = (sd, p) => [cx + sd * 27 * Math.sin(p * Math.PI / 2), lerp(CT + 1, join(27), p)];
   const sideP = sd => { const pts = []; for (let i = 0; i <= 10; i++) pts.push(seam(sd, i / 10)); pts.push([cx + sd * 50, by + 10], [cx + sd * 50, CT - 4]); return pts; };
   polyFill(sideP(-1), '#c43f35'); polyFill(sideP(1), '#a8342b');
   polyFill([[cx - 26, CT + 6], [cx - 8, CT + 3], [cx - 10, CT + 9], [cx - 24, CT + 14]], redL);
   g.restore();
   for (const sd of [-1, 1]) for (let i = 0; i < 10; i++) { const [x0, y0] = seam(sd, i / 10), [x1, y1] = seam(sd, (i + 1) / 10); dotLine(x0, y0, x1, y1, redD, 1); }
   dotLine(cx + d, CT + 2, cx + d, by - 1, redD, 1); R(cx - 3, CT - 1, 7, 2, redD); R(cx - 2, CT - 1, 5, 1, redL);
-  for (const sd of [-1, 1]) R(cx + sd * 17 - 1, CT + 12, 2, 1, '#7a2620');
+  for (const sd of [-1, 1]) R(cx + sd * 15 - 1, CT + 12, 2, 1, '#7a2620');
   { const px = cx - 9 + d, py = by - 19; R(px, py, 18, 9, '#f4f1ea'); R(px, py + 8, 18, 1, '#c9c2b0'); R(px + 4, py + 3, 10, 3, red); }
   for (let x = -CR + 4; x <= CR - 4; x += 2) R(cx + x, Math.round(join(x)) - 3, 1, 1, '#b8382e');
   // the brim
   const top = x => Math.abs(x) <= CR ? join(x) : join(CR) + (Math.abs(x) - CR) * 1.1, brim = [];
-  for (let x = -48; x <= 48; x += 2) brim.push([cx + x, top(x)]); for (let x = 48; x >= -48; x -= 2) brim.push([cx + x, front(x) + 1]);
+  for (let x = -44; x <= 44; x += 2) brim.push([cx + x, top(x)]); for (let x = 44; x >= -44; x -= 2) brim.push([cx + x, front(x) + 1]);
   polyFill(brim, '#5c2420');
-  for (let x = -47; x <= 47; x++) { const yt = Math.round(top(x)), yf = Math.round(front(x)); R(cx + x, yt, 1, 2, '#461a17'); R(cx + x, yf - 1, 1, 1, '#b8382e'); R(cx + x, yf, 1, 1, '#8e2c25'); }
+  for (let x = -43; x <= 43; x++) { const yt = Math.round(top(x)), yf = Math.round(front(x)); R(cx + x, yt, 1, 2, '#461a17'); R(cx + x, yf - 1, 1, 1, '#b8382e'); R(cx + x, yf, 1, 1, '#8e2c25'); }
 }
 // the car's inside through its doorway: ceiling lights, the window band with the tunnel, the bench, the pole, him asleep
 function carThroughDoor(x0, x1, y0, y1, t) {
@@ -942,7 +946,8 @@ function shotLamp(u) {
   blackout(W, H, fadeIO(u, 8, 0.5, 0.5));
 }
 // 5. 횡단보도 — an insert of the signal turning green, then straight down from above: one step per beep, each on the next
-//    white bar, the bar she steps on a little brighter for a moment; it cuts as she passes the middle of the road
+//    white bar, the bar she steps on a little brighter for a moment. She is her true size in the street, and the camera keeps
+//    climbing so she shrinks into it; it cuts as she passes the middle of the road
 function shotCross(u) {
   if (u < 1.6) return signalInsert(u);
   crossTop(u - 1.6);
@@ -1000,30 +1005,66 @@ function haeunTop(x, y, ph, step) {
   for (const a of [0.5, 1.55, 2.6, 3.65, 4.7, 5.75]) dotLine(x, y - 4, x + Math.cos(a) * 7.5, y - 4 + Math.sin(a) * 7.5, '#a83328', 1);
   R(x - 4, y - 9, 3, 2, '#ef6a55'); R(x - 1, y - 5, 2, 2, '#a83328');
 }
+// the street from straight above, in world units (16 to the metre): the road between its kerbs, the crossing, the pavements
+// with their trees and lamps, the rooftops beyond. Grain and paving are laid in world space so they hold still as the
+// camera climbs
+let CROSSW = null;
+function crossWorld() {
+  if (CROSSW) return CROSSW;
+  const sp = [], roofs = [];
+  for (let i = 0; i < 5200; i++) sp.push([-260 + rnd(i, 1) * 920, 53 + rnd(1, i) * 111, rnd(i, 7) < 0.5 ? '#383a42' : '#26272d']);
+  for (let k = 0; k < 9; k++) { const x0 = -300 + k * 120 + rnd(k, 3) * 20; roofs.push([x0, 100 + rnd(3, k) * 20, k]); }
+  return (CROSSW = { sp, roofs });
+}
+// 하은 from above at her true size in the street: a shadow, the shoes stepping, the shoulders in black, the vest, the red cap
+// with its brim ahead, the ponytail behind
+function haeunTopSmall(S, x, y, z, ph, step) {
+  const k = z, foot = 3 * Math.cos(ph * Math.PI) * (step ? 1 : -1), sw = Math.sin(ph * Math.PI) * (step ? 1 : -1);
+  const P = (dx, dy) => S(x + dx, y + dy);
+  { const [sx, sy] = P(2, 3); g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(sx, sy, 6 * k, 4 * k, 0, 0, Math.PI * 2); g.fill(); }
+  for (const [fx, d] of [[-2, foot], [2, -foot]]) { const [px, py] = P(fx, 3 + d); R(px - k, py - k, Math.max(1, 2 * k), Math.max(1, 3 * k), '#1e1a1a'); }
+  for (const [ax, d] of [[-5, sw * 2], [5, -sw * 2]]) { const [px, py] = P(ax, d); R(px - k, py - 1.5 * k, Math.max(1, 2 * k), Math.max(1, 4 * k), '#1e1a1a'); }
+  { const [px, py] = P(0, -1); ellFill(px, py, 5 * k, 3 * k, '#1e1a1a'); ellFill(px, py, 3.6 * k, 2.4 * k, '#7ec8e3'); }
+  { const [px, py] = P(sw * 0.8, -6); R(px - 0.5 * k, py - 2 * k, Math.max(1, 1.5 * k), Math.max(1, 3 * k), '#4a3328'); }
+  { const [px, py] = P(0, -2); ellFill(px, py, 3 * k, 3 * k, '#d8463b'); const [bx, by] = P(0, 0.6); R(bx - 2 * k, by, Math.max(1, 4 * k), Math.max(1, 1.4 * k), '#a83328'); if (k > 1.2) R(px - k, py - 1.5 * k, 1, 1, '#ef6a55'); }
+}
 function crossTop(t) {
   const beat = 0.5, start = 0.6, steps = Math.floor((t - start) / beat), ph = (((t - start) / beat) % 1 + 1) % 1;
+  // the camera climbs the whole shot: she begins small on the road and ends a speck in the city
+  const z = lerp(1.15, 0.55, ease(clamp(t / 3.2, 0, 1)) * 0.7 + clamp(t / 3.2, 0, 1) * 0.3), CXw = 194, CYw = 110;
+  const S = (x, y) => [192 + (x - CXw) * z, 108 + (y - CYw) * z];
+  const RW = (x, y, w0, h0, c) => { const [a, b] = S(x, y); R(a, b, Math.max(1, w0 * z), Math.max(1, h0 * z), c); };
   shot(1, (w, h) => {
-    // asphalt with grain, the kerbs and their tactile paving, the double centre line, the stop lines, the crossing's bars
-    g.drawImage(layer('asphalt1', w, h, () => { R(0, 0, w, h, '#2e2f36'); for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (rnd(x, y) < 0.09) R(x, y, 1, 1, rnd(y, x) < 0.5 ? '#383a42' : '#26272d'); for (let k = 0; k < 6; k++) { const cx = rnd(k, 9) * w, cy = 60 + rnd(9, k) * 100; for (let i = 0; i < 30; i++) R(cx + i * 1.3, cy + Math.sin(i * 0.4 + k) * 2, 1, 1, '#25262c'); } }), 0, 0);
-    g.drawImage(layer('kerbs1', w, h, () => {
-      for (const [y0, y1] of [[24, 52], [168, 192]]) { R(0, y0, w, y1 - y0, '#8d8f96'); for (let x = 0; x < w; x += 16) for (let y = y0; y < y1; y += 8) { R(x, y, 15, 7, rnd(x, y) < 0.5 ? '#94969d' : '#898b92'); } }
-      R(0, 52, w, 3, '#6a6c72'); R(0, 52, w, 1, '#a9abb1'); R(0, 165, w, 3, '#6a6c72'); R(0, 165, w, 1, '#a9abb1');
-      for (const y0 of [42, 170]) { R(148, y0, 92, 10, '#c9a63a'); for (let x = 150; x < 240; x += 4) for (let y = y0 + 2; y < y0 + 10; y += 4) R(x, y, 2, 2, '#e8c34a'); }
-      for (let x = 0; x < w; x++) if (x < 130 || x > 254) { R(x, 106, 1, 2, '#d9a83a'); R(x, 112, 1, 2, '#d9a83a'); }
-      R(128, 58, 4, 46, '#d9d4c6'); R(252, 116, 4, 46, '#d9d4c6');
-      for (let y = 60; y < 166; y += 16) { R(148, y, 92, 8, '#d4cfc1'); R(148, y, 92, 1, '#e4dfd1'); for (let k = 0; k < 26; k++) if (rnd(y, k) < 0.6) R(148 + Math.floor(rnd(k, y) * 90), y + 1 + Math.floor(rnd(y * 3, k) * 6), 2, 1, '#b2ad9f'); }
-    }), 0, 0);
-    // the bars she has stepped on stay a little brighter for a moment (no glow round her)
-    for (let i = 0, y = 60; y < 166; y += 16, i++) { const age = t - (start + i * beat + beat * 0.5); if (age >= 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,190,${Math.max(0, 0.22 - age * 0.06)})`; g.fillRect(148, y, 92, 8); g.restore(); } }
-    // the cars waiting at the stop lines, one headlight beam across the road
-    carTop(60, 64, '#3a4a6a', false); g.save(); g.globalCompositeOperation = 'lighter'; const hl = g.createLinearGradient(124, 0, 220, 0); hl.addColorStop(0, 'rgba(255,240,200,.16)'); hl.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = hl; g.beginPath(); g.moveTo(124, 66); g.lineTo(220, 56); g.lineTo(220, 106); g.lineTo(124, 96); g.closePath(); g.fill(); g.restore();
-    carTop(264, 122, '#8a3a2a', true);
-    // the signal pole on the far kerb
-    ellFill(258, 178, 5, 5, '#3a3d44'); ellFill(257, 177, 3, 3, '#5a5d64');
-    // 하은, one bar per beat; the shot cuts as she passes the middle of the road
-    const prog = clamp((t - start) / beat, 0, 10), y = Math.round(34 + prog * 16);
-    haeunTop(194, y, ph, steps % 2);
-    vig(w, h, 0.32);
+    const W0 = (0 - 192) / z + CXw, W1 = (w - 192) / z + CXw;
+    R(0, 0, w, h, '#24252c');
+    // rooftops beyond both pavements: parapets, air-conditioning units, a water tank, a skylight
+    for (const [y0, y1, sd] of [[-400, -44, -1], [261, 600, 1]]) {
+      RW(W0 - 10, y0, W1 - W0 + 20, y1 - y0, '#2c2f3a');
+      for (const [x0, , k] of crossWorld().roofs) { const yy = sd < 0 ? y1 - 110 : y0 + 6; RW(x0, yy, 112, 104, k % 2 ? '#353846' : '#30333f'); RW(x0, yy, 112, 3, '#4a4e5e'); RW(x0 + 10, yy + 14, 22, 16, '#5a5e6a'); RW(x0 + 12, yy + 16, 10, 10, '#3a3e48'); RW(x0 + 40, yy + 20, 18, 14, '#5a5e6a'); if (k % 3 === 0) { const [cx2, cy2] = S(x0 + 80, yy + 60); ellFill(cx2, cy2, 12 * z, 12 * z, '#4a6a8a'); ellFill(cx2, cy2, 9 * z, 9 * z, '#5a7a9a'); } if (k % 4 === 1) RW(x0 + 60, yy + 70, 30, 18, '#c9b06a'); }
+    }
+    // the pavements: paving in a grid, the kerbs, tactile paving at the crossing, trees and lamp posts, bollards
+    for (const [y0, y1] of [[-44, 52], [165, 261]]) { RW(W0 - 10, y0, W1 - W0 + 20, y1 - y0, '#8d8f96'); const st = 16; for (let x = Math.floor(W0 / st) * st; x < W1; x += st) RW(x, y0, 1, y1 - y0, '#83858c'); for (let y = y0; y < y1; y += st) RW(W0 - 10, y, W1 - W0 + 20, 1, '#83858c'); }
+    RW(W0 - 10, 50, W1 - W0 + 20, 3, '#6a6c72'); RW(W0 - 10, 50, W1 - W0 + 20, 1, '#a9abb1'); RW(W0 - 10, 165, W1 - W0 + 20, 3, '#6a6c72'); RW(W0 - 10, 165, W1 - W0 + 20, 1, '#a9abb1');
+    for (const y0 of [40, 168]) { RW(148, y0, 92, 10, '#c9a63a'); for (let x = 150; x < 240; x += 4) for (let y = y0 + 2; y < y0 + 10; y += 4) RW(x, y, 2, 2, '#e8c34a'); }
+    for (const yb of [44, 172]) for (const x of [140, 248]) { const [bx, by] = S(x, yb); ellFill(bx, by, 2 * z, 2 * z, '#3a3d44'); }
+    for (let x = Math.floor(W0 / 160) * 160 + 40; x < W1 + 40; x += 160) for (const yt of [8, 212]) { if (Math.abs(x - 194) < 70) continue; const [tx, ty] = S(x, yt); ellFill(tx + 3 * z, ty + 3 * z, 18 * z, 16 * z, 'rgba(10,16,10,.45)'); ellFill(tx, ty, 18 * z, 16 * z, '#2f4a32'); ellFill(tx - 3 * z, ty - 3 * z, 12 * z, 10 * z, '#3e5e40'); ellFill(tx - 6 * z, ty - 6 * z, 5 * z, 4 * z, '#4e7050'); }
+    for (let x = Math.floor(W0 / 160) * 160 + 120; x < W1 + 40; x += 160) for (const [yl, dir] of [[46, 1], [170, -1]]) { const [lx, ly] = S(x, yl); ellFill(lx, ly, 2.5 * z, 2.5 * z, '#3a3d44'); RW(x - 1, yl + (dir > 0 ? 0 : -16), 2, 16, '#3a3d44'); const [hx, hy] = S(x, yl + dir * 16); ellFill(hx, hy, 3 * z, 2 * z, '#fff3c8'); light(hx, hy, 22 * z, '255,226,170', 0.16); }
+    // the road: grain, the double centre line, stop lines, the crossing's bars
+    for (const [x, y, c] of crossWorld().sp) { if (x < W0 - 2 || x > W1 + 2) continue; const [a, b] = S(x, y); R(a, b, 1, 1, c); }
+    for (const yy of [106, 112]) { RW(W0 - 10, yy, 130 - W0 + 10, 2, '#d9a83a'); RW(254, yy, W1 - 254 + 10, 2, '#d9a83a'); }
+    for (let x = Math.floor(W0 / 48) * 48; x < W1; x += 48) { if (x > 110 && x < 270) continue; RW(x, 78, 24, 2, '#b9b4a6'); RW(x, 138, 24, 2, '#b9b4a6'); }
+    RW(128, 58, 4, 46, '#d9d4c6'); RW(252, 116, 4, 46, '#d9d4c6');
+    for (let y = 60, i = 0; y < 166; y += 16, i++) { RW(148, y, 92, 8, '#d4cfc1'); const age = t - (start + i * beat + beat * 0.5); if (age >= 0) { g.save(); g.globalAlpha = Math.max(0, 0.5 - age * 0.15); RW(148, y, 92, 8, '#fff6dc'); g.restore(); } }
+    // the cars at the stop lines and the queue behind, headlights across the road
+    const car = (x, y, c, flip) => { const [a, b] = S(x, y); rotated(flip ? Math.PI : 0, 0, 0, a + (flip ? 64 * z : 0), b + (flip ? 32 * z : 0), () => carTop(0, 0, c, false), z); };
+    car(60, 64, '#3a4a6a'); car(-24, 66, '#5a5e66'); car(-110, 64, '#6a3a3a');
+    car(264, 122, '#8a3a2a', true); car(350, 120, '#c9ccd2', true); car(440, 122, '#2a3a4a', true);
+    { const [a0, b0] = S(124, 66), [a1, b1] = S(220, 56), [a2, b2] = S(220, 106), [a3, b3] = S(124, 96); g.save(); g.globalCompositeOperation = 'lighter'; const hl = g.createLinearGradient(a0, 0, a1, 0); hl.addColorStop(0, 'rgba(255,240,200,.14)'); hl.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = hl; g.beginPath(); g.moveTo(a0, b0); g.lineTo(a1, b1); g.lineTo(a2, b2); g.lineTo(a3, b3); g.closePath(); g.fill(); g.restore(); }
+    { const [px, py] = S(258, 178); ellFill(px, py, 4 * z, 4 * z, '#3a3d44'); }
+    // 하은, one bar per beat
+    const prog = clamp((t - start) / beat, 0, 10), y = 44 + prog * 16;
+    haeunTopSmall(S, 194, y, z, ph, steps % 2);
+    vig(w, h, 0.32 + 0.18 * clamp(t / 3.2, 0, 1));
   });
   bars();
   for (let k = 0; k < 8; k++) { const at = 0.6 + k * 0.5; if (t >= at) cue('beep' + k, () => oscS('sine', 1200, now(), 0.045, 0.07)); }
