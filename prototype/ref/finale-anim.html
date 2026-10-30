@@ -1507,7 +1507,7 @@ function dotLine(x0, y0, x1, y1, c, gap = 3) { const n = Math.max(1, Math.round(
 function haeunBustHD(cx, by, look) {
   const d = Math.round(look * 7), sk = '#d9a27a', skD = '#b98260', skDD = '#9c6a4c', skL = '#e8b890', hair = '#4a3328', hairL = '#6b4a3a';
   const red = '#d8463b', redD = '#a83328', redL = '#ef6a55', rim = '#ffd2a2';
-  const s0 = by + 72;
+  const s0 = by + 80;
   // shoulders and the long black sleeves
   const body = [[cx - 16, s0], [cx - 34, s0 + 4], [cx - 56, s0 + 12], [cx - 70, s0 + 22], [cx - 77, s0 + 36], [cx - 80, 220], [cx + 80, 220], [cx + 77, s0 + 36], [cx + 70, s0 + 22], [cx + 56, s0 + 12], [cx + 34, s0 + 4], [cx + 16, s0]];
   polyFill(body, '#1e1a1a');
@@ -1529,35 +1529,40 @@ function haeunBustHD(cx, by, look) {
   dotLine(cx + 46, s0 + 12, cx - 46, 220, '#1a1c20', 1); R(cx + 40, s0 + 22, 8, 6, '#9aa0a6'); R(cx + 41, s0 + 23, 6, 4, '#2f3237');
   // rim light from the doorway on her left
   dotLine(cx - 34, s0 + 4, cx - 56, s0 + 12, '#4a4244', 1); dotLine(cx - 56, s0 + 12, cx - 70, s0 + 22, '#4a4244', 1);
-  // the neck, shadowed under the jaw
-  polyFill([[cx - 16, by + 50], [cx + 16, by + 50], [cx + 18, s0 + 4], [cx - 18, s0 + 4]], sk);
-  polyFill([[cx - 16, by + 50], [cx + 16, by + 50], [cx + 16, by + 57], [cx, by + 61], [cx - 16, by + 57]], skD);
-  R(cx - 18, by + 50, 2, 26, skD); R(cx + 16, by + 50, 2, 26, skD);
-  // hair under the cap at the sides, the ears
-  polyFill([[cx - 34, by + 4], [cx - 27, by + 4], [cx - 27, by + 30], [cx - 31, by + 36], [cx - 35, by + 22]], hair);
-  polyFill([[cx + 34, by + 4], [cx + 27, by + 4], [cx + 27, by + 28], [cx + 31, by + 33], [cx + 35, by + 20]], hair);
-  for (let k = 0; k < 3; k++) { dotLine(cx - 33 + k, by + 6, cx - 32 + k, by + 30 - k * 3, hairL, 2); dotLine(cx + 32 - k, by + 6, cx + 31 - k, by + 26 - k * 3, '#3a271e', 2); }
-  for (const s of [-1, 1]) { const ex = cx + s * 29.5; ellFill(ex, by + 25, 4.5, 11, skD); ellFill(ex + s * 0.5, by + 25, 2.5, 9, sk); R(ex - (s > 0 ? 0 : 1), by + 20, 1, 10, skDD); R(ex + s, by + 33, 1, 2, skDD); }
-  // the face: an oval, the cheekbones its widest, the jaw narrowing to a small chin
-  const face = [[cx - 27, by + 4], [cx + 27, by + 4], [cx + 28.5, by + 18], [cx + 28, by + 28], [cx + 26, by + 36], [cx + 22, by + 45], [cx + 16, by + 52], [cx + 9, by + 57], [cx + 3, by + 59.5], [cx - 3, by + 59.5], [cx - 9, by + 57], [cx - 16, by + 52], [cx - 22, by + 45], [cx - 26, by + 36], [cx - 28, by + 28], [cx - 28.5, by + 18]];
+  // her hair at the sides under the cap, behind the face to the jaw (the rest is in the ponytail out the back)
+  for (const sd of [-1, 1]) { polyFill([[cx + sd * 25, by + 2], [cx + sd * 34, by + 2], [cx + sd * 35, by + 28], [cx + sd * 31, by + 48], [cx + sd * 25, by + 55], [cx + sd * 21, by + 44]], hair); dotLine(cx + sd * 30, by + 8, cx + sd * 29, by + 46, sd < 0 ? hairL : '#5a3e30', 1); }
+  // the neck, long and slim, in the jaw's shadow
+  polyFill([[cx - 13, by + 50], [cx + 13, by + 50], [cx + 15, s0 + 4], [cx - 15, s0 + 4]], sk);
+  polyFill([[cx - 13, by + 50], [cx + 13, by + 50], [cx + 13, by + 62], [cx, by + 69], [cx - 13, by + 62]], skD);
+  R(cx - 15, by + 60, 2, s0 - by - 56, skD); R(cx + 13, by + 60, 2, s0 - by - 56, '#c99470');
+  // the ears just showing under the cap
+  for (const s of [-1, 1]) { const ex = cx + s * 25.5; ellFill(ex, by + 23, 3.5, 9, skD); ellFill(ex + s * 0.5, by + 23, 2, 7, sk); R(ex - (s > 0 ? 0 : 1), by + 19, 1, 8, skDD); }
+  // the face: slim, widest at the cheekbones, a V-line jaw to a small pointed chin
+  const face = [[cx - 25, by + 4], [cx + 25, by + 4], [cx + 26, by + 14], [cx + 25.5, by + 24], [cx + 23.5, by + 34], [cx + 19.5, by + 44], [cx + 14, by + 53], [cx + 8, by + 60], [cx + 3, by + 63.5], [cx - 3, by + 63.5], [cx - 8, by + 60], [cx - 14, by + 53], [cx - 19.5, by + 44], [cx - 23.5, by + 34], [cx - 25.5, by + 24], [cx - 26, by + 14]];
   // flat shading like the game: a shade colour under everything, the lit face over it a little to the right, the brim's
-  // shadow in hard bands following its curve, the hollow under each cheekbone, the jaw's underside
+  // shadow in bands following its curve (light enough that her eyes read), the jaw's underside
   polyFill(face, '#c08a66');
-  polyFill(face.map(([x, y]) => [cx + (x - cx) * 0.92 + 1.5, by + (y - by) * 0.97]), sk);
-  // the cap: a six-panel crown that sits on her head, a little wider than it; the brim seen from just below, its dark
-  // underside between the crown's edge and the brim's curved front edge, which drops a shadow over her eyes
+  polyFill(face.map(([x, y]) => [cx + (x - cx) * 0.93 + 1.5, by + (y - by) * 0.975]), sk);
+  // the cap's measures: a six-panel crown a little wider than her head; the brim seen from just below, its dark underside
+  // between the crown's edge and the brim's curved front edge
   const CR = 39, CT = by - 34, join = x => by + 3 + (x / CR) ** 2 * 4, front = x => by + 10 + (x / 44) ** 2 * 8;
   g.save(); clipPoly(face);
-  for (let x = -30; x <= 30; x++) { const y0 = Math.round(front(x)); R(cx + x, by, 1, y0 + 9 - by, '#6e4834'); R(cx + x, y0 + 9, 1, 3, '#8c5c42'); R(cx + x, y0 + 12, 1, 2, '#ad7655'); }
-  for (const sd of [-1, 1]) polyFill([[cx + sd * 27, by + 29], [cx + sd * 19, by + 33], [cx + sd * 20, by + 43], [cx + sd * 25, by + 39]], sd < 0 ? '#c99470' : '#cc9a76');
-  polyFill([[cx - 24, by + 42], [cx - 16, by + 52], [cx - 9, by + 57], [cx - 3, by + 59.5], [cx + 3, by + 59.5], [cx + 9, by + 57], [cx + 16, by + 52], [cx + 20, by + 47], [cx + 10, by + 55], [cx, by + 57], [cx - 12, by + 54]], '#c08a66');
+  for (let x = -27; x <= 27; x++) { const y0 = Math.round(front(x)); R(cx + x, by, 1, y0 + 3 - by, '#7a5038'); R(cx + x, y0 + 3, 1, 5, '#a06c50'); R(cx + x, y0 + 8, 1, 3, '#c08a66'); }
+  polyFill([[cx - 21, by + 42], [cx - 14, by + 53], [cx - 8, by + 60], [cx - 3, by + 63.5], [cx + 3, by + 63.5], [cx + 8, by + 60], [cx + 14, by + 53], [cx + 18, by + 47], [cx + 9, by + 57], [cx, by + 60], [cx - 11, by + 56]], '#c08a66');
   g.restore();
-  // the eyes, just there in the brim's shadow; the nose's bridge and tip, the nostrils; the lips; the chin
-  for (const ex of [cx - 12, cx + 11]) { R(ex - 4, by + 18, 9, 1, '#3a2418'); R(ex - 3, by + 19, 7, 1, '#2a1810'); R(ex + (ex < cx ? 1 : 0), by + 19, 1, 1, '#8a6048'); }
-  R(cx + 1 + d, by + 23, 1, 9, '#e2ae86'); R(cx - 3 + d, by + 26, 1, 8, '#c99470'); R(cx + d, by + 32, 3, 2, skL);
-  R(cx - 5 + d, by + 35, 2, 1, '#a8705a'); R(cx + 4 + d, by + 35, 2, 1, '#a8705a'); R(cx - 3 + d, by + 36, 7, 1, '#c08a66'); R(cx + d, by + 38, 1, 3, '#c99470');
-  R(cx - 6 + d, by + 43, 13, 1, '#a8705a'); R(cx - 7 + d, by + 44, 1, 1, '#b07a62'); R(cx + 7 + d, by + 44, 1, 1, '#b07a62'); R(cx - 4 + d, by + 44, 9, 1, '#c8866e'); R(cx - 3 + d, by + 46, 7, 1, '#c99470');
-  R(cx - 2 + d, by + 51, 5, 1, '#c99470');
+  // hair framing the face: thin locks from under the cap down past the cheeks
+  for (const sd of [-1, 1]) { polyFill([[cx + sd * 26.5, by + 4], [cx + sd * 22, by + 4], [cx + sd * 22.5, by + 20], [cx + sd * 21, by + 36], [cx + sd * 18, by + 48], [cx + sd * 21, by + 50], [cx + sd * 25, by + 38], [cx + sd * 26.5, by + 20]], hair); dotLine(cx + sd * 24, by + 8, cx + sd * 22.5, by + 40, sd < 0 ? hairL : '#5a3e30', 1); }
+  // the eyes under the brim: almond, the outer corners lifting, a fold above, dark irises with a catchlight
+  for (const sd of [-1, 1]) { const ex = cx + sd * 11, y = by + 17;
+    R(ex - 4, y - 2, 8, 1, '#8a5a42'); R(ex - 5, y, 10, 1, '#2a1810'); R(sd < 0 ? ex - 6 : ex + 5, y - 1, 1, 1, '#2a1810');
+    R(ex - 4, y + 1, 2, 1, '#d4b49c'); R(ex + 2, y + 1, 2, 1, '#d4b49c'); R(ex - 2, y + 1, 4, 2, '#3a2418'); R(ex - 1, y + 1, 1, 1, '#e8d4c4'); R(ex - 3, y + 3, 6, 1, '#b07c5c'); }
+  // a small straight nose: the bridge's light, a shade down one side, the tip, the nostrils
+  R(cx + 1, by + 21, 1, 10, '#e2ae86'); R(cx - 2, by + 24, 1, 8, '#c99470'); R(cx, by + 31, 2, 2, skL);
+  R(cx - 4, by + 34, 2, 1, '#a8705a'); R(cx + 3, by + 34, 2, 1, '#a8705a'); R(cx - 2, by + 35, 5, 1, '#c08a66'); R(cx, by + 37, 1, 3, '#c99470');
+  // fuller lips: the upper with its bow, the line between, the lower with a highlight; the shade under them
+  polyFill([[cx - 7, by + 43], [cx - 3, by + 41], [cx, by + 42], [cx + 3, by + 41], [cx + 7, by + 43]], '#b8665e');
+  R(cx - 7, by + 43, 15, 1, '#8e4a44'); polyFill([[cx - 6, by + 44], [cx + 7, by + 44], [cx + 5, by + 46.5], [cx - 4, by + 46.5]], '#c97a72'); R(cx - 1, by + 45, 4, 1, '#e0a098');
+  R(cx - 3, by + 48, 7, 1, '#c99470');
   const crown = []; for (let i = 0; i <= 24; i++) { const th = Math.PI * i / 24, c = Math.cos(th), x = Math.sign(c) * Math.abs(c) ** 0.8 * CR; crown.push([cx + x, CT + (1 - Math.sin(th) ** 0.6) * (join(x) - CT)]); }
   polyFill(crown, red);
   g.save(); clipPoly(crown);
@@ -2240,20 +2245,26 @@ function haeunCU(t) {
     polyFill([[96, 200], [112, 170], [140, 160], [170, 158], [190, 166], [226, 178], [244, 200]], '#1e1a1a');
     polyFill([[118, 200], [128, 176], [150, 168], [168, 166], [186, 174], [214, 186], [222, 200]], '#7ec8e3'); polyFill([[118, 200], [128, 176], [140, 171], [134, 200]], '#5aa6c4'); dotLine(168, 166, 214, 186, '#a8e0f2', 1);
     // the ponytail, out of the opening and down her back
-    for (const [a, b, wa, wb] of [[[128, 82], [116, 112], 13, 12], [[116, 112], [112, 142], 12, 10], [[112, 142], [116, 168], 10, 6]]) { limb(a[0], a[1] + n, wa, b[0], b[1] + n, wb, hair); }
-    for (const dx of [-3, 0, 3]) dotLine(126 + dx, 86 + n, 114 + dx * 0.6, 160 + n, hairL, 3);
-    // the neck and the face in profile
-    const face = P([[152, 80], [186, 80], [189, 86], [191, 91], [187, 96], [190, 100], [196, 105], [203, 109], [202, 111], [196, 112], [195, 114], [197, 117], [194, 119], [197, 121], [195, 124], [191, 126], [194, 130], [192, 134], [184, 138], [174, 140], [172, 146], [174, 162], [146, 162], [146, 130], [150, 118], [150, 90]]);
+    for (const [a, b, wa, wb] of [[[126, 80], [114, 110], 13, 12], [[114, 110], [110, 140], 12, 10], [[110, 140], [114, 166], 10, 6]]) { limb(a[0], a[1] + n, wa, b[0], b[1] + n, wb, hair); }
+    dotLine(124, 84 + n, 112, 160 + n, hairL, 1); dotLine(128, 86 + n, 116, 150 + n, '#3a271e', 1);
+    // the long slim neck and the face in profile: a straight small nose, fuller lips, a V-line jaw to a small chin
+    const face = P([[150, 80], [186, 80], [189, 87], [188, 92], [185, 95], [186, 97], [191, 104], [197, 110], [198, 112], [195, 113], [192, 114], [192, 116], [195, 118.5], [192, 121], [195, 123.5], [193, 126], [190, 128], [191, 132], [189, 136], [184, 138.5], [176, 138], [169, 137], [169, 146], [173, 168], [146, 168], [145, 132], [150, 118], [148, 92]]);
     polyFill(face, sk);
     g.save(); clipPoly(face);
-    polyFill(P([[174, 140], [184, 138], [192, 134], [180, 146], [176, 162], [146, 162], [146, 128], [160, 132]]), skD);
-    polyFill(P([[146, 76], [194, 76], [194, 90], [180, 97], [146, 99]]), '#6e4834'); polyFill(P([[146, 99], [180, 97], [194, 90], [194, 94], [182, 101], [146, 103]]), '#8c5c42');
+    polyFill(P([[189, 136], [184, 138.5], [169, 137], [169, 146], [173, 168], [146, 168], [145, 130], [158, 124], [176, 133]]), skD);
+    polyFill(P([[154, 114], [170, 126], [182, 134], [158, 124]]), '#c99470');
+    polyFill(P([[146, 76], [194, 76], [194, 86], [146, 90]]), '#7a5038'); polyFill(P([[146, 90], [194, 86], [194, 92], [146, 96]]), '#a06c50');
     g.restore();
-    dotLine(196, 105 + n, 202, 109 + n, skL, 1); R(199, 106 + n, 2, 2, skL); R(195, 112 + n, 2, 1, skDD); R(190, 119 + n, 5, 1, '#a8705a'); R(194, 123 + n, 2, 1, skL); R(191, 130 + n, 2, 1, skL);
-    R(183, 96 + n, 3, 1, '#3a2420'); R(184, 95 + n, 2, 1, '#2a1a16');
-    // hair under the cap at the back, the sideburn, the ear
-    polyFill(P([[112, 76], [152, 76], [152, 88], [148, 92], [146, 118], [140, 124], [126, 114], [116, 96]]), hair); for (let k = 0; k < 5; k++) dotLine(118 + k * 6, 80 + n, 128 + k * 4, 118 + n, k % 2 ? hairL : '#3a271e', 2);
-    ellFill(152, 99 + n, 6, 9, skD); ellFill(153, 99 + n, 4, 7, sk); R(151, 95 + n, 1, 8, skDD); R(154, 93 + n, 2, 1, skL);
+    // the eye under the brim: the lid's line and lashes lifting at the corner, the iris, a catchlight; the fold above
+    R(178, 95 + n, 7, 1, '#2a1810'); R(184, 94 + n, 2, 1, '#2a1810'); R(180, 96 + n, 3, 2, '#3a2418'); R(181, 96 + n, 1, 1, '#e8d4c4'); R(183, 96 + n, 1, 1, '#d4b49c'); R(179, 93 + n, 5, 1, '#8a5a42'); R(179, 98 + n, 4, 1, '#b07c5c');
+    // the light along the nose's bridge and tip, the nostril, the lips, the chin
+    dotLine(188, 97 + n, 196, 108 + n, skL, 1); R(196, 109 + n, 2, 2, skL); R(192, 113 + n, 2, 1, '#a8705a');
+    polyFill(P([[192, 116], [195, 118.5], [191, 119.5], [189, 119]]), '#b8665e'); R(188, 120 + n, 6, 1, '#8e4a44'); polyFill(P([[189, 121], [194, 121], [195, 123.5], [192, 124.5], [189, 123]]), '#c97a72'); R(192, 122 + n, 2, 1, '#e0a098');
+    R(190, 133 + n, 1, 2, skL);
+    // hair under the cap at the back and a lock in front of the ear; the ear
+    polyFill(P([[112, 76], [152, 76], [152, 86], [148, 90], [146, 118], [140, 124], [126, 114], [116, 96]]), hair); for (let k = 0; k < 4; k++) dotLine(120 + k * 7, 80 + n, 128 + k * 4, 116 + n, k % 2 ? hairL : '#3a271e', 1);
+    ellFill(152, 101 + n, 5.5, 9, skD); ellFill(153, 101 + n, 3.5, 7, sk); R(151, 97 + n, 1, 8, skDD); R(154, 95 + n, 2, 1, skL);
+    polyFill(P([[156, 80], [162, 80], [163, 96], [161, 112], [158, 122], [156, 112], [157, 96]]), hair); dotLine(159, 82 + n, 159, 116 + n, hairL, 1);
     // the cap: the crown with its seams and eyelet, the back opening and strap, the patch, the brim out over her face
     const crown = P([[108, 80], [109, 64], [118, 50], [136, 40], [158, 37], [176, 41], [188, 52], [194, 66], [195, 80]]); polyFill(crown, red);
     g.save(); clipPoly(crown); polyFill(P([[100, 30], [140, 30], [124, 82], [100, 82]]), '#b8382e'); polyFill(P([[150, 30], [170, 30], [150, 50], [138, 50]]), redL); g.restore();
