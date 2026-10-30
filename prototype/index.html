@@ -228,7 +228,9 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 // ---------- constants ----------
 const W = 384, H = 216, TRAVEL = 2;
 const PLACE_X = 66, SCAN_X = 300, BELT_Y = 146, BOSS_X = 46, PLAYER_X = 340;
-let WIN_P = 0.05, WIN_G = 0.10, WIN_M = 0.16, WIN_REL = 0.12;
+let WIN_P = 0.05, WIN_G = 0.10, WIN_M = 0.16, WIN_REL = 0.12, WIN_OFF = 1;
+// off-beat boxes (the shuffle's 2/3, the 8th 'and') get their windows widened by the level's win.off
+const winK = n => n.off ? WIN_OFF : 1;
 const $ = id => document.getElementById(id);
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const rnd = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
@@ -427,7 +429,8 @@ const LEVELS = [
     chords: [...CHILL.chords, ...BLUES.chords, ...BLUES.chords.map(c => c.map(f => f * LIFT))], roots: [...CHILL.roots, ...BLUES.roots, ...BLUES.roots.map(f => f * LIFT)],
     // phase 3 (bars 38-61) runs at double time over the same 12-bar blues, so a blues chord lasts two of them
     chordAt: bar => bar < 22 ? ((bar - 2) % 4 + 4) % 4 : bar < 25 ? 4 : bar < 38 ? 4 + BLUES.prog[(bar - 25) % 12] : bar < 62 ? 4 + BLUES.prog[((bar - 38) >> 1) % 12] : bar < 70 ? 7 + BLUES.prog[((bar - 38) >> 1) % 12] : 7,
-    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 },
+    // the tester found the blues off-beats too hard: off-beat boxes get windows 1.35x as wide, and they sit crooked with red tape
+    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.35 }, offTilt: true,
     tinny: [[89, 94.5]], lounge: [[100, 288]], cut: [[199, 200]],
     // 반장's memory: the warehouse flickers out after the tape stop, the count-in builds a rainy alley, the outro wakes back up
     alley: { dark: 94.5, reveal: 96, out: 280 }, special:['엇박 상자', 'off', '받아냄'],
@@ -444,8 +447,9 @@ const LEVELS = [
       '........', '........',
       '............',
       // slow blues at 60: quarter notes and long crates first, then the shuffle pairs, the off-beats creeping in over the last four bars
+      // (each of those bars starts on the beat as an anchor: a bar of nothing but off-beats was too hard)
       'x.....x.....', 'h=====..x...', 'x..x..x..x..', 'h==...x.x...', 'x..x..h==...', 'x.x...x.x...',
-      'h==...x..x..', 'x..x..h==...', 'x....x..x...', 'h=====..x...', '..x..x..x...', 'h==.........',
+      'h==...x..x..', 'x..x..h==...', 'x.....x.x...', 'h=====..x...', 'x....x..x...', 'h==.........',
       '........',
       // her song comes back at 120 under his guitar: the boxes stay on the slow pulse at first, then pick up her 8ths; two bars of break
       // ('o' inside a hold = a box riding on the crate: keep holding, tap it with the other hand). Holds get a beat of air after them.
@@ -453,9 +457,9 @@ const LEVELS = [
       'h=======', '........',
       // the second drop: his off-beats on her fast 'and', with holds between, two or three boxes riding one crate
       // (no box on 200: it would cross the screen during the dark beat before the drop)
-      '....x...', '.x...x..', 'h=o=o=..', 'x....x..', '.x.x....', 'h===..x.', '.x...x..', 'h=o=....', '.x.x.x..', 'h=o=o=o=', '..x.x.x.', 'x.x.x.xx',
+      '....x...', '.x...x..', 'h=o=o=..', 'x....x..', '.x.x....', 'h===..x.', '.x...x..', 'h=o=....', '.x...x..', 'h=o=o=o=', '..x...x.', 'x.x.x.xx',
       // eight more bars, a whole step up from 248: no rest, off-beats thickening, a crate with riders, 8ths into the end
-      'x...x...', '.x...x.x', 'h===..x.', '.x.x.x..', 'x.x.x.x.', 'h=o=o=..', '.x.x.x.x', 'x.x.x.xx',
+      'x...x...', '.x...x.x', 'h===..x.', '.x...x..', 'x.x.x.x.', 'h=o=o=..', '.x...x.x', 'x.x.x.xx',
       '........', '........'
     ],
     say: [[1, '반장님! 신곡이에요.', 4, 0, 'j'], [13, '…또 뭐냐 그건.', 2.5, 0, 'b'], [36.5, '들어보실래요? 어제 밤새 만들었어요.', 3, 0, 'j'], [50, '여기서부터 올라가요.', 3, 0, 'j'],
@@ -576,7 +580,7 @@ function beatAt(t) { let s = tempoSeg[0]; for (const x of tempoSeg) if (t >= x.t
 function spbAt(t) { let s = tempoSeg[0]; for (const x of tempoSeg) if (t >= x.t) s = x; return s.spb; }
 
 function loadLevel(level) {
-  const w = level.win || {}; WIN_P = w.p || 0.05; WIN_G = w.g || 0.10; WIN_M = w.m || 0.16; WIN_REL = w.release || 0.12;
+  const w = level.win || {}; WIN_P = w.p || 0.05; WIN_G = w.g || 0.10; WIN_M = w.m || 0.16; WIN_REL = w.release || 0.12; WIN_OFF = w.off || 1;
   L = level; setTempo(level); SPB = 60 / level.bpm; SPEED = (SCAN_X - PLACE_X) / (TRAVEL * SPB); CHORDS = level.chords;
   notes = [];
   [level.bars, level.bars2 || []].forEach((bars, lane) => bars.forEach((bar, bi) => {
@@ -2958,17 +2962,18 @@ function findTarget(t, lane) {
   for (const n of notes) {
     if (n.state !== 'pending' || n.lane !== lane) continue;
     const d = t - n.arr;
-    if (d > WIN_M) continue;
-    if (d < -WIN_M) break;
+    if (d > WIN_M * winK(n)) continue;
+    if (d < -WIN_M * WIN_OFF) break;
+    if (d < -WIN_M * winK(n)) continue;
     if (Math.abs(d) < bd) { bd = Math.abs(d); best = n; }
   }
   return best;
 }
 function judgeNote(target, t) {
-  const d = t - target.arr, ad = Math.abs(d);
+  const d = t - target.arr, ad = Math.abs(d), k = winK(target);
   target.hitAt = t;
-  if (ad <= WIN_G) {
-    const j = ad <= WIN_P ? 'perfect' : 'good', now = performance.now();
+  if (ad <= WIN_G * k) {
+    const j = ad <= WIN_P * k ? 'perfect' : 'good', now = performance.now();
     target.judge = j; stats[j]++; stats.missStreak = 0;
     const milestone = addCombo();
     const tones = CHORDS[chordIdx(target.beat)];
@@ -2998,8 +3003,9 @@ function findTargetAny(t) {
   for (const n of notes) {
     if (n.state !== 'pending' || isAuto(n)) continue;
     const d = t - n.arr;
-    if (d > WIN_M) continue;
-    if (d < -WIN_M) break;
+    if (d > WIN_M * winK(n)) continue;
+    if (d < -WIN_M * WIN_OFF) break;
+    if (d < -WIN_M * winK(n)) continue;
     if (Math.abs(d) < bd) { bd = Math.abs(d); best = n; }
   }
   return best;
@@ -3110,7 +3116,7 @@ function judgeTick(t) {
   const tt = t - offsetMs / 1000;
   for (const n of notes) {
     if (isAuto(n)) { if (n.state === 'pending' && tt >= n.arr) autoHit(n, tt); else if (n.state === 'holding' && tt >= n.end) { n.state = 'hit'; n.doneAt = tt; } continue; }
-    if (n.state === 'pending' && tt - n.arr > WIN_M) { n.state = 'miss'; n.hitAt = tt; n.missKind = 'pass'; registerMiss('지나감', null, 'pass', n.lane); }
+    if (n.state === 'pending' && tt - n.arr > WIN_M * winK(n)) { n.state = 'miss'; n.hitAt = tt; n.missKind = 'pass'; registerMiss('지나감', null, 'pass', n.lane); }
     else if (n.state === 'holding' && tt >= n.end) completeHold(n);
   }
 }
