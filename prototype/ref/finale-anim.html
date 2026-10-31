@@ -30,7 +30,7 @@ ul{color:var(--muted);font-size:13px;margin:8px 0 0 18px}
 <body>
 <div class="wrap">
 <h1>1-5 첫 회식 · 애니매틱</h1>
-<p>벨트 도입 → 매치 컷 → 초밥 세 벨트 → 소주잔과 취기, 그리고 하은의 밤: 창 → 문 → 계단 → 가로등 → 횡단보도 → 웅덩이 → 복도 → 손 → 병실 → 새벽 → 탁자. 약 2분 40초. 하은의 밤은 컷과 클로즈업으로 가고, 박자 모티프가 창의 불빛 → 횡단보도 신호음 → 복도의 일곱 등 → 심전도로 이어집니다. 재생을 누르면 효과음이 납니다.</p>
+<p>1-4 엔딩의 빈 벨트 → 매치 컷 → 초밥 벨트 둘 → 소주잔과 취기, 그리고 하은의 밤: 창 → 문 → 계단 → 가로등 → 횡단보도 → 웅덩이 → 복도 → 손 → 병실 → 새벽 → 탁자. 약 2분 40초. 하은의 밤은 컷과 클로즈업으로 가고, 박자 모티프가 창의 불빛 → 횡단보도 신호음 → 복도의 일곱 등 → 심전도로 이어집니다. 재생을 누르면 효과음이 납니다.</p>
 <canvas id="cv" width="384" height="216"></canvas>
 <div class="bar"><button id="play">▶ 재생</button><input id="seek" type="range" min="0" max="100" step="0.05" value="0"><span id="lbl"></span><select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
 <div class="jumps" id="jumps"></div>
@@ -449,15 +449,16 @@ function drawAfterShift(u) {
 }
 
 // ---------- 1·2. 회전초밥집 ----------
-const LANES = [{ y: 110, k: 0.7 }, { y: 128, k: 0.85 }, { y: 146, k: 1 }];
+// two belts, as in 1-4: the far one 36 px up and drawn at 0.82 about the gate line, the near one full size
+const LANES = [{ y: 110, k: 0.82 }, { y: 146, k: 1 }];
 const laneX = (x, k) => SCAN_X + k * (x - SCAN_X);
 const SUSHI = { bpm: 100, speed: 70, fly: 0.5, landX: 130 };
 // one item per throw: thrown at t, flies 0.5 s to lane L at x=130 (lane coords), then rides to the gate
 function throwsFor(phase) {
-  const spb = 60 / SUSHI.bpm, pat = [2, 0, 1, 2, 1, 0, 2, 2, 0, 1, 2, 0, 1, 2, 1, 2, 0, 2, 1, 2];
+  const spb = 60 / SUSHI.bpm, pat = [1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1];
   const list = []; for (let i = 0; i < 20; i++) list.push({ t: 1 + i * spb * 1.0, lane: pat[i], col: ['red', 'blue', 'red', 'gold', 'red'][i % 5], kind: i % 4, who: (i % 4 === 3) ? 'haeun' : 'player' });
-  // a triple at the end: three at once on all belts
-  const t3 = 1 + 21 * spb; for (let l = 0; l < 3; l++) list.push({ t: t3, lane: l, col: 'red', kind: l, who: 'player', triple: true });
+  // a pair at the end: one on each belt on the same beat, taken with one press
+  const t3 = 1 + 21 * spb; for (let l = 0; l < 2; l++) list.push({ t: t3, lane: l, col: 'red', kind: l, who: 'player', triple: true });
   return list;
 }
 const THROWS = [throwsFor(1), throwsFor(2)];
@@ -469,7 +470,7 @@ function drawSushi(u, phase) {
   const items = THROWS[phase - 1];
   let lastPick = -9, lastTriple = -9, kick = 0, haeunStack = drunk ? 8 : 0, lastHaeun = -9, lastClink = -9;
   // belts far to near, then the items riding them, then the gates
-  LANES.forEach((L, i) => { beltAt(L.y, Math.round(laneX(48, L.k)), 0.75 + i * 0.125, u * SUSHI.speed * L.k); });
+  LANES.forEach((L, i) => { beltAt(L.y, Math.round(laneX(48, L.k)), i ? 1 : 0.8, u * SUSHI.speed * L.k); });
   for (const it of items) {
     const arr = itemArrive(it), L = LANES[it.lane];
     if (u < it.t) continue;
@@ -479,7 +480,7 @@ function drawSushi(u, phase) {
       if (it.who === 'haeun') { if (sx > SEAT.x) { haeunStack++; lastHaeun = Math.max(lastHaeun, u - (sx - SEAT.x) / (SUSHI.speed * L.k)); cue('haeun' + phase + it.t, SND.pick); continue; } } }
     if (drunk) sojuGlass(sx, sy, sc); else sushiPlate(sx, sy, it.col, it.kind, sc);
   }
-  LANES.forEach((L, i) => gate(SCAN_X, L.y, i === 2 ? 38 : 16, true, kick));
+  LANES.forEach((L, i) => gate(SCAN_X, L.y, i ? 38 : 30, true, kick));
   // 반장 at the loading end: the throw is a quick arm swing on each throw time
   let swing = 0; for (const it of items) if (u >= it.t - 0.25 && u < it.t + 0.3) swing = Math.max(swing, Math.sin(Math.PI * clamp((u - it.t + 0.25) / 0.55, 0, 1)));
   const twinge = (u % 6) < 0.7;   // his back, since 1-4
@@ -492,7 +493,8 @@ function drawSushi(u, phase) {
   if (!drunk) plateStack(SEAT.x, 172, 2 + haeunStack);
   // judgements and lines
   if (u - lastPick < 0.55) judge(drunk ? '짠!' : '쏙', 300, drunk ? 84 : 96, drunk ? '#ffe9a8' : '#8fd694', drunk ? 18 : 14, '', u - lastPick);
-  if (u - lastTriple < 0.9) { judge(drunk ? '짠!!!' : '세 개!', 300, 60, '#ffe9a8', 24, drunk ? '셋 다 짠' : '셋 다 한 번에', u - lastTriple); if (u - lastTriple < 0.25) { g.fillStyle = `rgba(255,255,255,${0.4 * (1 - (u - lastTriple) / 0.25)})`; g.fillRect(0, 0, W, H); } }
+  // a pair: each gate shows its own plain judgement, one above the other, like the gates themselves (as in 1-4)
+  if (u - lastTriple < 0.9) { for (const jy of [50, 96]) judge(drunk ? '짠!' : '쏙', 300, jy, drunk ? '#ffe9a8' : '#8fd694', drunk ? 18 : 14, '', u - lastTriple); if (u - lastTriple < 0.25) { g.fillStyle = `rgba(255,255,255,${0.4 * (1 - (u - lastTriple) / 0.25)})`; g.fillRect(0, 0, W, H); } }
   if (!drunk) { say(u, 2.5, 5.5, '…고기는 비싸. 먹어라.', 6, 50, 92); say(u, 10, 12.5, '…그걸 다 먹었냐.', 6, 50, 80); say(u, 12.6, 14.6, '(우물우물)', 206, 40, 48, { bg: '#d9d0bd' }); }
   else { say(u, 1, 4, '(우물우물)', 206, 40, 48, { bg: '#d9d0bd' }); say(u, 4.5, 7.5, '…다음 달까지만 나온다.', 6, 50, 92, { shake: level > 2 ? 1 : 0 }); say(u, 11.5, 13.5, '(우물우물)', 206, 40, 48, { bg: '#d9d0bd' }); }
   hud(drunk ? '회전초밥 · 23:50' : '회전초밥 · 19:40', '콤보 ' + items.filter(it => it.who === 'player' && u >= itemArrive(it)).length);
