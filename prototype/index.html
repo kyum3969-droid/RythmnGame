@@ -718,7 +718,7 @@ const LEVELS = [
     // gets lost in his and his belt goes ragged; 반장 gets up to cover it and 하은 snaps. '…누나는 꿈 없어요?' The music stops.
     // 하은 has none (she never had room for one) and from there her belt breaks down more, the way she does. 반장 bangs the
     // machine (쾅), the lamp dies, and he taps them back onto his straight beat.
-    lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, bossSeat: { x: 22, stand: [[84, 89]] }, vibe: [[72, 104]],
+    lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, bossSeat: { x: 22, stand: [[84, 89], [143.7, 145.3]] }, vibe: [[72, 104]],
     surge: { x: 190, fix: 144.5 },
     heads: { h: [82, 44], j: [58, 80], b: [22, 98] }, phone: [[120, 121.5], [136, 137.5]], phoneLane: 0,
     clock:'03:20', title:'꿈', offTilt: true,
@@ -1673,7 +1673,7 @@ const SURGE_FIX = { done: false };
 function drawBossSeat(beat, nowMs, active) {
   // 1-5: he winds up and bangs the end post of the belt with the side of his fist (쾅); the broken belt stops throwing
   const bang = active && L.surge ? beat - L.surge.fix : -9;
-  if (bang >= 0 && bang < 1 && !SURGE_FIX.done) { SURGE_FIX.done = true; if (ctx) thud(ctx.currentTime, 1.1); FX.shakeUntil = nowMs + 200; spawn(47, BELT_Y - 2, 8, ['#8a7a68', '#6d6052', '#c9ad4c'], -40, 40, -70, -20, 300, 420); }
+  if (bang >= 0 && bang < 1 && !SURGE_FIX.done) { SURGE_FIX.done = true; if (ctx) { thud(ctx.currentTime, 1.3); noise(ctx.currentTime, 'bandpass', 1400, 0.25, 0.12, 3, bus); } FX.shakeUntil = nowMs + 280; spawn(50, BELT_Y - 2, 16, ['#8a7a68', '#6d6052', '#c9ad4c', '#efe6d2'], -60, 60, -110, -30, 320, 520); const X = L.surge.x + 7; spawn(farX(X), farY(BELT_Y - 28), 10, ['#ffd27a', '#fff4d8', '#ff9a3a'], -40, 40, -40, 10, 340, 600, [1, 1]); }
   const S = L.bossSeat, standing = active && inRange(beat, S.stand), ph = beat - Math.floor(beat), own = sectionAt(Math.floor(beat / 4)) === 'boss';
   const dx = S.x - BOSS_X + (standing ? 8 : 0), dy = standing ? 0 : 14, tap = active && !standing && ph < (own ? 0.22 : 0.14) ? (own ? 3 : 2) : 0;
   const pose = { hand: { x: BOSS_X + 13, y: 0 }, carry: null, wince: standing, dip: 0, bob: 0, nod: 0, doze: false, phone: false, lane: 1, beat };
@@ -1682,8 +1682,12 @@ function drawBossSeat(beat, nowMs, active) {
   const top = bodyTop(90, pose);
   PARTNERS.boss.arm({ ...pose, back: true, hand: { x: BOSS_X - 6, y: top + 34 } });
   const wind = bang > -0.7 && bang < 0, hit = bang >= 0 && bang < 0.6;
-  PARTNERS.boss.arm({ ...pose, hand: wind ? { x: BOSS_X + 14, y: top + 6 } : hit ? { x: BOSS_X + 24, y: BELT_Y - 2 - dy } : standing ? { x: BOSS_X + 24, y: top + 30 } : { x: BOSS_X + 12, y: top + 40 - tap } });
+  PARTNERS.boss.arm({ ...pose, hand: wind ? { x: BOSS_X + 14, y: top + 6 } : hit ? { x: BOSS_X + 24 - (dx - (S.x - BOSS_X)), y: BELT_Y - 2 - dy } : standing ? { x: BOSS_X + 24, y: top + 30 } : { x: BOSS_X + 12, y: top + 40 - tap } });
   g.restore();
+  if (bang >= 0 && bang < 0.3) {   // the impact, on the belt's end post
+    const k = 1 - bang / 0.3, px = 46, py = BELT_Y - 1, r = Math.round(4 + (1 - k) * 8);
+    g.save(); g.globalAlpha = k; for (const [ax, ay] of [[1, 0], [-1, 0], [0, -1], [0.7, -0.7], [-0.7, -0.7], [0.7, 0.7], [-0.7, 0.7]]) thick(px + ax * r * 0.5, py + ay * r * 0.5, px + ax * r, py + ay * r, 1, '#fff4d8'); g.restore();
+  }
   // the crate (it hides his legs while he sits)
   const cx = S.x - 14; R(cx, 140, 30, 20, '#7d5a37'); R(cx, 140, 30, 2, '#a07a4a'); R(cx + 2, 146, 26, 1, '#5e4329'); R(cx + 2, 152, 26, 1, '#5e4329');
 }
