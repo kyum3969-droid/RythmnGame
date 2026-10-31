@@ -763,8 +763,9 @@ const LEVELS = [
     // phase 2 runs away with her, a step at a time, up to 112 for the last four bars
     tempo: [[0, 104], [124, 106], [132, 108], [148, 110], [188, 112]],
     // upper belt: 하은, on the beat (8 cells; h= a long crate, held). Phase 1: her taps and long crates on their own, and alone
-    // through his doze. Phase 2 (bars 29-50, her alone in the middle on both belts, all on the beat): long crates trading with
-    // the lower belt's, taps trading a beat each, the breakdowns' four-beat crates, the builds, the peaks; then the last hit on
+    // through his doze. Phase 2 (bars 29-50, her alone in the middle on both belts, all on the beat) follows the metal's guitar:
+    // a tap on each bar's first chug, a long crate where a chord rings (riff A: G on the third beat, a beat long; riff B: D on
+    // the third beat; the breakdowns: the two big chords, two beats each), taps on the short accents; then the last hit on
     // both belts at once
     bars: [
       '........', '........',
@@ -772,10 +773,10 @@ const LEVELS = [
       'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.', 'h=====..', 'x.x.x...', '..x.x...', 'x.x.....',
       '........', '........', 'x...x...', 'x...x...', 'h===..x.', 'x...x...', '........', '........',
       '........', '........', '........',
-      '........', '..x...x.', 'h===....', 'x...x...', 'h===....', 'x...x...',
-      'h=======', '........', 'x...x...', 'x.x.x.x.', 'h===....', 'h=..h=..',
-      'h===....', 'x...x...', '........', 'h=======', '..x...x.', 'x.x.x.x.',
-      'h===....', 'h=..h=..', 'h===....', 'h=..h=..', 'x.......',
+      '........', '..x...x.', 'x.....x.', 'x...h=..', 'x.....x.', 'x...h=..',
+      'h===....', 'h===....', 'x.....x.', 'x...h=..', 'x.....x.', 'x.....x.',
+      'x.....x.', 'x.....x.', 'h===....', 'h===....', 'x.....x.', 'x...h=..',
+      'x.....x.', 'x.....x.', 'x.....x.', 'x.....x.', 'x.......',
       '........', '........', '........'
     ],
     // lower belt (8 cells, written straight; every 'and' lands two thirds into the beat; a long crate here starts and ends on
@@ -787,10 +788,10 @@ const LEVELS = [
       '........', '........', '........', '........', '........', '........', '.x.x.x.x', '.....x..',
       '........', '........', '.x.x..x.', '.......x', '.....x.x', '..x..x..', '........', '........',
       '........', '........', '........',
-      '........', '........', '....h===', '..x...x.', '....h===', '..x...x.',
-      '........', 'h=======', '..x...x.', '........', '....h===', '..h=..h=',
-      '....h===', '..x...x.', 'h=======', '........', 'x...x...', '........',
-      '....h===', '..h=..h=', '....h===', '..h=....', 'x.......',
+      '........', '........', '....h=..', '......x.', '....h=..', '......x.',
+      '....h===', '....h===', '..x.h=..', '..x...x.', '....x...', '....x...',
+      '....x...', '....x...', '....h===', '....h===', '..x.h=..', '..x...x.',
+      '....x...', '....x...', '....x...', '....x...', 'x.......',
       '........', '........', '........'
     ],
     // [beat, text, beats shown, lane, speaker]: 'h' 하은 (upper loading end), 'j' 지우 (lower), 'b' 반장 (on his crate)
@@ -4598,7 +4599,7 @@ function judgeNote(target, t) {
     const dark = blackout(target.beat);
     const hype = inRange(target.beat, L.hype);
     if (!pairQuiet) popJudge(hype ? (isBam(target) ? 'bam' : 'hook') : j, milestone || (dark ? '소리로' : target.heavy ? '두 손' : j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''), target.lane);
-    if (target.len) { target.state = 'holding'; if (inRange(target.beat, L.hype)) { startHypeHold(target.end - target.arr); } else startHold(target.beat); } else target.state = 'hit';
+    if (target.len) { target.state = 'holding'; target.holdSide = L.oneButton ? PRESS_SIDE : null; if (inRange(target.beat, L.hype)) { startHypeHold(target.end - target.arr); } else startHold(target.beat); } else target.state = 'hit';
     if (inRange(target.beat, L.hype) && !target.len) hypeHit(target, j === 'perfect' && stats.combo % 4 === 0);
     if (L.practiceOf && TUT.phase === 'run' && TUT.run.includes(target) && TUT.run.every(n => n === target || n.state === 'hit')) tutSlow(target, t);
     if (target.i === notes.length - 1 && j === 'perfect' && !L.practiceOf) FX.shakeUntil = now + 220;
@@ -4645,9 +4646,11 @@ function pairFx(a, b) {
   osc('sine', 1480, tc, 0.003, 0.06, 0.1, bus); osc('sine', 1976, tc + 0.03, 0.003, 0.05, 0.1, bus);
 }
 // heavy boxes need two different keys inside a short window; one hand alone drops it
+let PRESS_SIDE = null;   // which hand pressed (one-button mode), so a long crate is held and let go by that hand
 function onHit(ts, key, lane = 0) {
   const t = songAt(ts) - offsetMs / 1000;
   if (L.oneButton) {
+    PRESS_SIDE = lane === 'L' || lane === 'R' ? lane : null;
     const now = performance.now(); lastPress = now;
     const tg = findTargetAny(t); if (!tg) { click(ctx.currentTime); return; }
     if (tg.lane === 0) lastPressUpper = now;
@@ -4710,7 +4713,7 @@ function completeHold(n) {
 function onRelease(ts, lane = 0) {
   const t = songAt(ts) - offsetMs / 1000;
   for (const n of notes) {
-    if (n.state !== 'holding' || (!L.oneButton && n.lane !== lane)) continue;
+    if (n.state !== 'holding' || (!L.oneButton && n.lane !== lane) || (L.oneButton && n.holdSide && n.holdSide !== lane)) continue;
     if (t >= n.end - WIN_REL) completeHold(n);
     else {
       n.state = 'broken'; n.brokeAt = t; stats.tailBroken++; stopHold();
@@ -5029,7 +5032,8 @@ $('board').addEventListener('click', e => { e.stopPropagation(); openBoard(); })
 const held = new Map();
 const LEFT_KEYS = new Set(['KeyF', 'KeyD']);
 const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyD', 'KeyK']);
-function laneOf(side) { if (L.oneButton) return 1; return L.lanes === 2 ? (L.autoLane != null ? 1 - L.autoLane : side === 'L' ? 0 : 1) : 0; }
+// one-button mode: each hand is its own input (the side), any belt
+function laneOf(side) { if (L.oneButton) return side; return L.lanes === 2 ? (L.autoLane != null ? 1 - L.autoLane : side === 'L' ? 0 : 1) : 0; }
 function handLabels() {}
 function press(ts, key, lane) {
   if (state === 'play' && TUT.on && TUT.phase === 'talk') tutAdvance();
