@@ -97,13 +97,13 @@ const C = {
 const SCAN_X = 300, BELT_Y = 146;
 
 // ---------- the song (the heartbeat rows' chart, the same as stage1-6.html) ----------
-// The whole cutscene is the movie under 1-6's heartbeat rows, so it runs to the song's length on the song's clock.
+// The rows run on this chart while the cutscene plays under them. The cutscene keeps its own length and timing: the song is
+// going to be made again, so nothing in the pictures waits on it (only the ward's monitor blips along with the rows).
 const SEG = [62, 62, 62, 62, 62, 68, 68, 56, 72, 60, 60, 66, 58, 64, 64, 64, 64, 60, 60, 60];
 const LEAD = 2.4;
 const SEGT = []; { let t = LEAD; for (const b of SEG) { SEGT.push(t); t += 8 * 60 / b; } SEGT.push(t); }
 const beatT = b => { const s = clamp(Math.floor(b / 8), 0, SEG.length - 1); return SEGT[s] + (b - s * 8) * 60 / SEG[s]; };
 const tBeat = t => { if (t < LEAD) return (t - LEAD) * SEG[0] / 60; let s = 0; while (s < SEG.length - 1 && t >= SEGT[s + 1]) s++; return s * 8 + (t - SEGT[s]) * SEG[s] / 60; };
-const SONG_END = beatT(SEG.length * 8) + 1.2;
 
 // ---------- the timeline ----------
 // One long take, no cuts: the same frame from the empty belt to the street. The chapters only mark where to jump to.
@@ -116,9 +116,9 @@ const SHOTS = [
   { id: 'alley', t0: 52.0, t1: 66.0, name: '골목길', note: '배경만 아침 골목으로 바뀌고 하은이 걷는다. 빨간 벽돌 담장과 화분, 다세대 주택, 전봇대와 전깃줄, 볼록거울, 담장 위 고양이, 작은 슈퍼.' },
   { id: 'hospital', t0: 66.0, t1: 70.2, name: '병원', note: '골목 끝에 병원이 나온다. 하은이 병원 앞에서 멈추고 건물을 올려다본다.' },
   { id: 'corridor', t0: 70.2, t1: 86.0, name: '병원 복도', note: '병원 앞이 암전되고, 깜깜한 복도에서 천장 등이 하나씩 켜진다. 하은이 걸어가 502호 문 앞에서 멈춘다.' },
-  { id: 'ward', t0: 86.0, t1: 157.2, name: '병실', note: '배경만 502호 병실로 바뀐다. 침상에 누운 어머니, 머리맡 심박 모니터, 창으로 들어오는 아침 해. 하은은 침상 옆에 섰다가 의자에 앉아 어머니 손을 잡고, 침상 가장자리에 머리를 기댄다(하은의 심장도 뛰는 대목). \'괜찮아\'에서 고개를 든다.' }
+  { id: 'ward', t0: 86.0, t1: 118, name: '병실', note: '배경만 502호 병실로 바뀐다. 침상에 누운 어머니, 머리맡 심박 모니터, 창으로 들어오는 아침 해. 하은은 침상 옆에 섰다가 의자에 앉아 어머니 손을 잡고, 침상 쪽으로 고개를 숙였다가, 어머니 손가락이 움직이자 고개를 든다.' }
 ];
-const END = SONG_END;   // about 157 s: the song's length
+const END = 118;   // the cutscene's own length (not the song's)
 // at the belt (seconds)
 const S1 = { beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], letGo: 9.6 };
 // she stands at x 222 the whole take; once she walks the world slides by. d = how far she has walked (px), easing into her pace
@@ -147,9 +147,9 @@ const walk2D = t => { const v = WALK2.v, r = WALK2.ramp, b = WALK2.t0 + r, c = W
   const u = Math.min(t, WALK2.stop) - c; return dC + v * u - v * u * u / (2 * r); };
 // then the hospital's corridor, dark this early: the lights come on one panel at a time ahead of her as she walks, to 502
 const CORR = { t0: 70.2, t1: 71.3 };
-// the ward: background only again, then she sits, takes her mother's hand, rests her head on the bed when her own heart joins the
-// rows (beat 106), and lifts it at '괜찮아' (beat 136)
-const WARD = { t0: 86.0, t1: 89.0, sit: 94.5, hold: 97.0, rest: beatT(106) - 0.8, lift: beatT(136), squeeze: beatT(128) };   // the hospital front fades to full black, then the corridor's lights come on one at a time
+// the ward: background only again, then she sits, takes her mother's hand, bows her head toward the bed, feels the hand close a
+// little and lifts her head (fixed times, not tied to the song)
+const WARD = { t0: 86.0, t1: 89.0, sit: 93.5, hold: 96.0, rest: 100.0, squeeze: 106.5, lift: 108.0 };   // the hospital front fades to full black, then the corridor's lights come on one at a time
 const WALK3 = { t0: 73.4, ramp: 0.9, v: 30, stop: 84.2 };
 const walk3D = t => { const v = WALK3.v, r = WALK3.ramp, b = WALK3.t0 + r, c = WALK3.stop - r, dB = v * r / 2, dC = dB + v * (c - b);
   if (t <= WALK3.t0) return 0; if (t < b) return v * (t - WALK3.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
@@ -883,7 +883,7 @@ function alleyScene(t) {
 // (the same light as the first shot), a curtain. 하은 faces the bed from the right.
 const WDW = document.createElement('canvas'); WDW.width = W; WDW.height = H; const wdctx = WDW.getContext('2d');
 const MOM_HAND = { x: 197, y: 124 };
-const wardSun = t => 0.15 + 0.85 * ease(seg(t, WARD.t1, WARD.lift + 6));
+const wardSun = t => 0.15 + 0.85 * ease(seg(t, WARD.t1, WARD.lift + 5));
 function ward(t) {
   const sun = wardSun(t);
   R(0, 0, W, 150, '#d9dfdc'); R(0, 150, W, 66, '#c2ccc7'); R(0, 150, W, 2, '#a9b4ae'); R(0, 140, W, 10, '#c9d2ce');
