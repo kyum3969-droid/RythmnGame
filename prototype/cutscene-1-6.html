@@ -146,9 +146,13 @@ function haeun(cx, top, o = {}) {
   const look = o.look || 0, sw = o.sway || 0;
   const hx = look < -0.5 ? -1 : 0, hy = look < -0.25 ? Math.round(-look * 2) : look > 0.5 ? -1 : 0, tilt = look < -0.5 ? 1 : look > 0.5 ? -1 : 0;
   g.save(); if (o.mirror) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
-  // legs: standing, or the game's two-frame stride while she walks (only seen where nothing in front hides them)
-  const st = o.stride == null ? 0 : o.stride ? 3 : -3;
-  R(cx - 5 + st, top + 38, 5, 16, leg); R(cx + 2 - st, top + 38, 5, 15, leg); R(cx - 6 + st, top + 53, 6, 3, shoe); R(cx + 2 - st, top + 52, 6, 3, shoe);
+  // legs: standing, or walking one leg at a time (o.stride = { leg: 0 near / 1 far, p: 0..1 through the step }): the moving
+  // leg lifts and swings forward in an arc and sets down, the other stays planted; the next step it's the other leg's turn
+  const sw_ = o.stride ? Math.sin(Math.PI * o.stride.p) : 0, fwd = Math.round(3 * sw_), lift = Math.round(2 * sw_);
+  const nx = o.stride && o.stride.leg === 0 ? -fwd : 0, ny = o.stride && o.stride.leg === 0 ? -lift : 0;
+  const fx_ = o.stride && o.stride.leg === 1 ? -fwd : 0, fy_ = o.stride && o.stride.leg === 1 ? -lift : 0;
+  R(cx + 2 + fx_, top + 38, 5, 15 + fy_, leg); R(cx + 2 + fx_, top + 52 + fy_, 6, 3, shoe);
+  R(cx - 5 + nx, top + 38, 5, 16 + ny, leg); R(cx - 6 + nx, top + 53 + ny, 6, 3, shoe);
   // only the back hair: long and straight, falling down her back past the shoulders (nothing in front of the face)
   R(cx + 6 + sw, top + 14, 4, 18, hair); R(cx + 8 + sw, top + 16, 1, 12, hairL);
   // sky-blue tee with the white stripe over black sleeves, black bottoms
@@ -423,7 +427,7 @@ function walking(d, start, look) {
   const k = Math.floor(d / STRIDE), sp = (d / STRIDE) % 1, e = ease(sp);
   const reach = (i, a) => (i % 2 ? -1 : 1) * (0.7 + rnd(i + 1, a * 17 + 3) * 1.6);
   const fN = lerp(reach(k, 1), reach(k + 1, 1), e) * start, fF = lerp(reach(k, 2), reach(k + 1, 2), e) * start;
-  return { o: { mirror: true, look, arms: 'walk', fN, fF, sway: fN > 0.8 ? 1 : 0, stride: start > 0.2 ? k % 2 : null }, top: HTOP + (sp > 0.25 && sp < 0.75 && start > 0.3 ? -1 : 0) };
+  return { o: { mirror: true, look, arms: 'walk', fN, fF, sway: fN > 0.8 ? 1 : 0, stride: start > 0.2 ? { leg: k % 2, p: sp } : null }, top: HTOP + (sp > 0.25 && sp < 0.75 && start > 0.3 ? -1 : 0) };
 }
 function street(t) {
   const d = walkD(t), bx = Math.round(WALK.door - d + HX), sun = sunAt(t);

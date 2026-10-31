@@ -1689,7 +1689,11 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
   const hair = '#17121a', hairL = '#2e2630', shirt = '#1e1a1a', shirtD = '#121010', cap = '#d8463b', capD = '#a83328', brim = '#c43d33', glove = C.skin, sky = '#86c3e8', tee = '#e9f3f7', leg = '#3a3f45', shoe = '#1e1a1a';
   g.save(); if (o.mirror) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
   // legs: weight on the near leg, or a stride
-  if (o.step != null) { const st = o.step ? 3 : -3; R(cx - 5 + st, top + 38, 5, 16, leg); R(cx + 2 - st, top + 38, 5, 15, leg); R(cx - 6 + st, top + 53, 6, 3, shoe); R(cx + 2 - st, top + 52, 6, 3, shoe); }
+  // walking, one leg at a time: the moving leg lifts and swings forward in an arc and sets down while the other stays planted,
+  // then the other leg's turn (a step every 0.3 s)
+  if (o.step != null) { const ph = (nowMs / 300) % 2, lg = Math.floor(ph), a = Math.sin(Math.PI * (ph - lg)), fw = Math.round(3 * a), li = Math.round(2 * a);
+    const nx = lg === 0 ? -fw : 0, ny = lg === 0 ? -li : 0, fx = lg === 1 ? -fw : 0, fy = lg === 1 ? -li : 0;
+    R(cx + 2 + fx, top + 38, 5, 15 + fy, leg); R(cx + 2 + fx, top + 52 + fy, 6, 3, shoe); R(cx - 5 + nx, top + 38, 5, 16 + ny, leg); R(cx - 6 + nx, top + 53 + ny, 6, 3, shoe); }
   else { R(cx - 5, top + 38, 5, 16, leg); R(cx + 2, top + 38, 5, 15, leg); R(cx - 6, top + 53, 6, 3, shoe); R(cx + 2, top + 52, 6, 3, shoe); }
   // only the back hair, long and straight down her back past the shoulders, swaying a little when she fires or strides
   const sw = Math.round(kick * 2) + bob + (o.step != null ? 1 : 0);
