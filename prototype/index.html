@@ -719,9 +719,10 @@ const LEVELS = [
     // has none (she never had room for one) and from there she loads unevenly. 반장 bangs the machine (쾅), the lamp dies, and
     // for his straight beat at the end both belts are on the beat together.
     lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, bossSeat: { x: 22, stand: [[84, 89], [143.7, 145.3]] }, vibe: [[72, 104]],
-    // the thrown box's ride: belt speed for `slow` beats after it is set down, then speeding up steadily, then from the seam (x)
-    // a dash of `dash` beats (슉) onto the scanner
-    surge: { x: 232, slow: 0.25, dash: 0.25, fix: 144.5 },
+    // a box on the broken belt has two parts to its ride. It is set down on a beat `ride + dash` beats before it lands and for
+    // `ride` beats it crawls, juddering (덜컥) on every sixteenth and slowing down (to `ease` of the speed it starts at), as far
+    // as the seam (x); then on the beat it shoots (슉), smoothly, `dash` beats onto the scanner and lands on the off-beat
+    surge: { x: 170, ride: 2, dash: 0.5, ease: 0.3, fix: 144.5 },
     heads: { h: [82, 44], j: [58, 80], b: [22, 98] }, phone: [[120, 121.5], [136, 137.5]], phoneLane: 0,
     clock:'03:20', title:'꿈', offTilt: true,
     chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4,
@@ -731,14 +732,14 @@ const LEVELS = [
     // upper belt: 하은 (16 cells), written where the boxes land. Until the fix every box is thrown, so they are all off-beats (she
     // sets each down on a beat; the belt makes it half a beat early). Her bars in the trade, interlocking with his through
     // 'both', keeping clear of his ragged off-beats while he is lost, uneven after the question (nothing while she looks at her
-    // watch), and after 반장 fixes it in bar 36, his quarters on the beat with 지우's
+    // watch: bars 30 and 34 are 지우's alone), and after 반장 fixes it in bar 36, his quarters on the beat with 지우's
     bars: [
       '................', '................',
       '................', '................', '..x...x...x...x.', '..x...x...x.....', '................', '................', '..x.......x...x.', '..x...x...x...x.',
       '..x.......x.....', '..x...x...x.....', '..x.......x...x.', '......x...x...x.', '..x.......x.....', '..x...x...x...x.', '..x.......x...x.', '..x...x.........',
       '..x.......x...x.', '..x...x...x...x.', '..x.......x...x.', '..x.............', '..x...x...x...x.', '......x...x...x.', '..x...x.......x.', '..x.............',
       '................', '................', '................',
-      '..x.......x.....', '..............x.', '..x...x...x.....', '......x.........', '..x.......x...x.', '..............x.', '..x...x.........', '................',
+      '..x.......x.....', '................', '..x...x...x.....', '......x.........', '..x.......x...x.', '................', '..x...x.........', '................',
       'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...............',
       '................', '................'
     ],
@@ -750,7 +751,7 @@ const LEVELS = [
       'x...x...', 'x...x.x.', 'x...x...', 'x.x.x...', 'x...x...', 'x...x.x.', 'x...x...', 'x.x.....',
       'x..x..x.', '........', 'x.xx....', '...x.x.x', '........', 'xx......', '..x..x..', '........',
       '........', '........', '........',
-      'x.......', '........', 'x.......', '........', 'x.......', '........', 'x.......', '........',
+      'x.......', 'x...x...', 'x.......', '........', 'x.......', 'x...x...', 'x.......', '........',
       'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x.......',
       '........', '........'
     ],
@@ -822,10 +823,9 @@ function loadLevel(level) {
     // seam, where the belt lurches and throws it on so it lands on the off-beat it is charted at (n.t1 = when it reaches the seam)
     if (level.surge && n.lane === 0 && n.beat < level.surge.fix) n.surge = true;
     if (n.surge && level.surge) {
-      const S = level.surge; n.a0 = timeAt(n.beat + 0.5); n.place = n.a0 - TRAVEL * SPB; n.t1 = timeAt(n.beat - S.dash);
-      n.tS = n.place + S.slow * SPB; n.xS = PLACE_X + S.slow * SPB * SPEED;
-      const T = n.t1 - n.tS; n.acc = 2 * (S.x - n.xS - SPEED * T) / (T * T);   // the steady speed-up that reaches the seam on time
-      const ride = n.t1 - n.place; n.jP = ride / Math.max(1, Math.round(ride / (SPB / 4)));   // the belt catches (덜컥) on every sixteenth
+      const S = level.surge; n.place = timeAt(n.beat - S.dash - S.ride); n.t1 = timeAt(n.beat - S.dash);
+      const T = n.t1 - n.place; n.v0 = 2 * (S.x - PLACE_X) / ((1 + S.ease) * T); n.dec = n.v0 * (1 - S.ease) / T;   // the crawl, slowing
+      n.jP = T / Math.max(1, Math.round(T / (SPB / 4)));   // the belt catches (덜컥) on every sixteenth
     }
     if (n.len) { n.w = Math.round((n.end - n.arr) * SPEED) + 16; n.h = 12; }
     else if (n.heavy) { n.w = 26 + Math.floor(rnd(i, 1) * 5); n.h = 17 + Math.floor(rnd(i, 2) * 4); }
@@ -1645,22 +1645,17 @@ function drawHaeunScene(beat, kick, nowMs, active) {
     drawHaeunAt(BOSS_X + LANE_DX[0], 50 + (frozen ? 0 : bob), nowMs, { mirror: tapping || taking, tap: tapping ? pulseAt(beat, L.tapBelt, 0.3) : null, rest: !tapping });
   }
 }
-// 1-5: the upper belt has been broken all along. Every box on it rattles from the moment it is set down (the seam's lamp
-// blinks, the belt goes 덜덜), rides at belt speed for a moment, picks up speed steadily, and at the seam the belt lurches (슉):
-// a short dash onto the scanner, half a beat early, on the off-beat. Then belt speed again. 반장 bangs the machine at
-// L.surge.fix and it stops.
+// 1-5: the upper belt has been broken all along. Every box on it crawls first: set down on a beat, it judders along (덜컥 on
+// every sixteenth: a jerk forward, a hop and a rock, then it sticks) and keeps slowing down, the seam's lamp blinking, until
+// it reaches the seam on a beat; there the belt lurches (슉) and it shoots, smooth and fast, half a beat onto the scanner, on
+// the off-beat. Then belt speed again. 반장 bangs the machine at L.surge.fix and it stops.
 // the box hops as the belt catches it (-2 then -1), and sits still while it sticks
 function surgeHop(n, t) { const { f } = jerkPhase(n, t); return f < 0.14 ? -2 : f < 0.28 ? -1 : 0; }
-function surgeBase(n, t) {
-  if (t < n.tS) return SCAN_X + (t - n.a0) * SPEED;
-  const d = t - n.tS; return n.xS + SPEED * d + 0.5 * n.acc * d * d;
-}
-// 덜컥덜컥: on the way to the seam the belt catches the box on every sixteenth and jerks it forward, then it sticks (creeps)
-// till the next; it keeps to the speed-up on average and is exactly at the seam when the dash starts
+function surgeBase(n, t) { const d = t - n.place; return PLACE_X + n.v0 * d - 0.5 * n.dec * d * d; }
 function jerkPhase(n, t) { const u = (t - n.place) / n.jP, k = Math.floor(u); return { k, f: u - k }; }
 function surgedX(n, t) {
   const X = L.surge.x;
-  if (t < n.place) return SCAN_X + (t - n.a0) * SPEED;
+  if (t < n.place) return PLACE_X;
   if (t < n.t1) { const { k, f } = jerkPhase(n, t), q = f < 0.4 ? 0.85 * f / 0.4 : 0.85 + 0.15 * (f - 0.4) / 0.6; return surgeBase(n, n.place + (k + q) * n.jP); }
   if (t < n.arr) return X + (t - n.t1) / (n.arr - n.t1) * (SCAN_X - X);
   return SCAN_X + (t - n.arr) * SPEED;
