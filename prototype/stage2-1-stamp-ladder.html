@@ -137,8 +137,15 @@ const bass = (t, m, dur, a = 0.16) => { tone(t, 'sine', mtof(m - 12), a, dur); t
 // your stamp is 이모's sound, a little brighter, in the middle
 function call(t, who) {
   if (who === 'park') { const d = panTo(out, 0.45); tone(t, 'sine', 90, 0.6, 0.22, d, 45); nz(t, 'lowpass', 300, 0.35, 0.14, d); tone(t + 0.01, 'square', 420, 0.05, 0.08, d); nz(t + 0.01, 'bandpass', 2600, 0.08, 0.05, d, 3); }
-  else { const d = panTo(out, -0.4); tone(t, 'sine', 160, 0.5, 0.12, d, 75); nz(t, 'bandpass', 1100, 0.32, 0.06, d, 1.4); nz(t + 0.004, 'lowpass', 600, 0.2, 0.08, d); }
+  else { const d = panTo(out, LV.canon ? -0.35 : -0.15); imoStamp(t, d); }
+  duck(t);
 }
+// 이모's stamp: the rubber block hitting paper on wood, a sharp woody crack on top of a body thump, loud enough to stand above
+// the band
+function imoStamp(t, d) { tone(t, 'sine', 170, 0.9, 0.13, d, 80); tone(t, 'triangle', 980, 0.42, 0.05, d, 700); nz(t, 'bandpass', 1700, 0.55, 0.05, d, 2.2); nz(t, 'highpass', 3800, 0.18, 0.025, d); nz(t + 0.004, 'lowpass', 700, 0.3, 0.09, d); }
+// the band dips for a moment under each call
+function duck(t) { mus.gain.setTargetAtTime(0.32, t - 0.005, 0.005); mus.gain.setTargetAtTime(MUSV, t + 0.09, 0.08); }
+let MUSV = 0.75;
 function myStamp(t) { tone(t, 'sine', 190, 0.45, 0.12, out, 90); nz(t, 'bandpass', 1500, 0.3, 0.06, out, 1.4); nz(t + 0.004, 'lowpass', 600, 0.18, 0.08, out); }
 function scheduleMusic() {
   const now = ac.currentTime, horizon = now + 0.3;
@@ -148,8 +155,9 @@ function scheduleMusic() {
     const sg = segAt(tb + 0.01);
     if (!sg) { if (k === 0 && tb < END_T - 1) { kick(T, 0.6); rhodes(T, CHORDS[0], SPB * 4, 0.06); bass(T, 50, SPB * 3); } continue; }
     const full = sg.kind !== 'call';
-    if (k === 0) kick(T, full ? 0.7 : 0.5); if (full && k === 2) kick(T + SPB * 0.5, 0.45);
-    if (k === 1 || k === 3) rim(T, full ? 0.2 : 0.12);
+    if (k === 0) { MUSV = full ? 0.75 : 0.45; mus.gain.setTargetAtTime(MUSV, T, 0.05); }
+    if (full && k === 0) kick(T, 0.7); if (full && k === 2) kick(T + SPB * 0.5, 0.45);
+    if (full && (k === 1 || k === 3)) rim(T, 0.2);
     hat(T, 0.05); hat(T + SPB * 0.62, full ? 0.035 : 0.02);
     if (k === 0) { rhodes(T, ch, SPB * 1.6); bass(T, ch[0], SPB * 1.4); }
     if (k === 1) rhodes(T + SPB * 0.5, ch, SPB * 1.2, 0.04);

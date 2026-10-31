@@ -126,7 +126,13 @@ const hat = (t, a = 0.05) => nz(t, 'highpass', 7500, a, 0.04);
 function rhodes(t, ch, dur, a = 0.05) { for (const m of ch) { const o = ac.createOscillator(), o2 = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o2.type = 'sine'; o.frequency.value = mtof(m + 12); o2.frequency.value = mtof(m + 12) * 2.01; const g2 = ac.createGain(); g2.gain.value = 0.18; o2.connect(g2); g2.connect(gn); o.connect(gn); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(a, t + 0.01); gn.gain.exponentialRampToValueAtTime(a * 0.4, t + 0.4); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur); gn.connect(mus); o.start(t); o2.start(t); o.stop(t + dur + 0.05); o2.stop(t + dur + 0.05); } }
 const bass = (t, m, dur, a = 0.16) => { tone(t, 'sine', mtof(m - 12), a, dur); tone(t, 'triangle', mtof(m), a * 0.25, dur * 0.5); };
 // her stamp: a wooden thunk on the sheet; yours: the same thunk a little brighter, so the answer sounds like her call
-function stamp(t, mine, a = 1) { tone(t, 'sine', mine ? 190 : 160, 0.5 * a, 0.12, out, mine ? 90 : 75); nz(t, 'bandpass', mine ? 1500 : 1100, 0.32 * a, 0.06, out, 1.4); nz(t + 0.004, 'lowpass', 600, 0.2 * a, 0.08, out); }
+function stamp(t, mine, a = 1) {
+  if (mine) { tone(t, 'sine', 190, 0.5 * a, 0.12, out, 90); nz(t, 'bandpass', 1500, 0.32 * a, 0.06, out, 1.4); nz(t + 0.004, 'lowpass', 600, 0.2 * a, 0.08, out); return; }
+  // hers: a sharp woody crack on top of a body thump, loud enough to stand above the band, which dips under it
+  tone(t, 'sine', 170, 0.9, 0.13, out, 80); tone(t, 'triangle', 980, 0.42, 0.05, out, 700); nz(t, 'bandpass', 1700, 0.55, 0.05, out, 2.2); nz(t, 'highpass', 3800, 0.18, 0.025, out); nz(t + 0.004, 'lowpass', 700, 0.3, 0.09, out);
+  mus.gain.setTargetAtTime(0.32, t - 0.005, 0.005); mus.gain.setTargetAtTime(MUSV, t + 0.09, 0.08);
+}
+let MUSV = 0.8;
 function scheduleMusic() {
   const now = ac.currentTime, horizon = now + 0.3;
   while (startAt + nextBeat * SPB < horizon && nextBeat * SPB < END_T) {
@@ -135,8 +141,9 @@ function scheduleMusic() {
     const ph = phaseAt(tb + 0.01), full = ph === 'resp';
     if (ph === 'end') { if (k === 0 && tb < END_T - 1) { kick(T, 0.6); rhodes(T, CHORDS[0], SPB * 4, 0.06); bass(T, 50, SPB * 3); } continue; }
     // drums: lighter under her call so the stamps stand out, full under the answer
-    if (k === 0) kick(T, full ? 0.7 : 0.5); if (full && k === 2) kick(T + SPB * 0.5, 0.45);
-    if (k === 1 || k === 3) rim(T, full ? 0.2 : 0.12);
+    if (k === 0) { MUSV = full ? 0.8 : 0.45; mus.gain.setTargetAtTime(MUSV, T, 0.05); }
+    if (full && k === 0) kick(T, 0.7); if (full && k === 2) kick(T + SPB * 0.5, 0.45);
+    if (full && (k === 1 || k === 3)) rim(T, 0.2);
     hat(T, 0.05); hat(T + SPB * 0.62, full ? 0.035 : 0.02);
     // rhodes on 1 and the and of 2, bass on 1 and 3
     if (k === 0) { rhodes(T, ch, SPB * 1.6); bass(T, ch[0], SPB * 1.4); }
