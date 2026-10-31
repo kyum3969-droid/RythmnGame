@@ -782,15 +782,15 @@ const LEVELS = [
     // said either way. up = 하은's belt, lo = 지우's (his boxes land two thirds into the beat). Then the shift proper
     practice: {
       talk: [
-        { spk:'j', text:'어? 어어? 반장님! 제 벨트 왜 이래요?!' },
-        { spk:'j', text:'막 덜컹덜컹해요! 이거 고장 난 거 아니에요?' },
-        { spk:'b', text:'…모터가 맛이 갔네. 어쩔 수 없지.', stand: true },
-        { spk:'b', text:'그래도 돌아가긴 하니까.' },
+        { spk:'j', text:'어? 어어? 반장님! 제 벨트 왜 이래요?!', cam: { x: 66, y: 126, k: 1.7 } },
+        { spk:'j', text:'막 덜컹덜컹해요! 이거 고장 난 거 아니에요?', cam: { x: 66, y: 126, k: 1.7 } },
+        { spk:'b', text:'…모터가 맛이 갔네. 어쩔 수 없지.', stand: true, cam: { x: 48, y: 126, k: 1.7 } },
+        { spk:'b', text:'그래도 돌아가긴 하니까.', cam: { x: 48, y: 126, k: 1.7 } },
         { spk:'b', text:'신입, 할 수 있지?' }],
       drills: [
         { lo: ['.....x..'], loop: true, ok: [{ spk:'b', text:'어때, 할 만하지?' }], fail: [{ spk:'b', text:'타이밍 잘 맞춰 봐.' }] },
         { lo: ['...x....'], loop: true, ok: [{ spk:'b', text:'이제 좀 할 만하지?' }, { spk:'b', text:'자, 이번엔 연속으로 가 볼까?' }], fail: [{ spk:'b', text:'조금만 더 집중해 봐.' }] },
-        { lo: ['.x.x.x..'], loop: true, ok: [{ spk:'b', text:'좋아.' }, { spk:'h', text:'…위는 멀쩡해.' }], fail: [{ spk:'b', text:'조금만 더 집중해 봐.' }] },
+        { lo: ['.x.x.x..'], loop: true, ok: [{ spk:'b', text:'좋아.' }, { spk:'h', text:'여기는 정상이네.', cam: { x: 92, y: 64, k: 2 } }], fail: [{ spk:'b', text:'조금만 더 집중해 봐.' }] },
         { up: ['x...x...', 'x.x.x.x.'], after: [
           { spk:'j', text:'앗, 근데 저희 둘이 동시에 보내면 어떡해요?', cam: { x: 58, y: 108, k: 2 } },
           { spk:'h', text:'바보냐? 두 손으로 타닥 누르면 되잖아.', cam: { x: 92, y: 64, k: 2 } }] },
@@ -3976,14 +3976,40 @@ function buildEvents() {
         continue;
       }
       if (sec === 'metal' || sec === 'together') {
-        // E minor power-chord riff, a root a bar (the last bar of each four turns around), up a whole step for the last four
-        const rel = (bar - 29) % 8, up = sec === 'together' && bar >= 41 ? Math.pow(2, 2 / 12) : 1, RR = [82.41, 82.41, 98, 110, 82.41, 82.41, 65.41, 73.42];
-        const r = RR[rel] * up, crashBar = bar === 29 || bar === 33 || bar === 37 || bar === 41, gv = sec === 'together' ? 0.045 : 0.06;
-        if (crashBar && inBar === 0) E(0, T => crash(T));
-        E(0, T => { kick(T, 1); gtrDist(T, r, s * 0.55, gv); gtrDist(T, r * 1.5, s * 0.55, gv * 0.6); });
-        E(AND, T => { kick(T, 0.75); gtrDist(T, r, s * 0.25, gv * 0.8); });
-        if (inBar === 1 || inBar === 3) E(0, T => { snare(T); noise(T, 'bandpass', 1800, 0.25, 0.16, 0.9, bus); });
-        E(0, T => sub808(T, r, s * 0.8, 0.14));
+        // 하은's metal (an original riff in E minor, shaped like a mid-tempo heavy rock song: a clean intro that builds, then the
+        // riff over a rock beat). Bar 29 a clean guitar alone, ringing an arpeggio; bar 30 the bass and the toms come up under it
+        // with a snare roll into bar 31, where the band lands. The riff swings with the motor: palm-muted chugs on the beat and two
+        // thirds in, rests, chords left to ring (G, the B-flat against E, A, D, C, B). Kick 1, the swung 'and' of 2 and 3, snare
+        // on 2 and 4, swung hats, a crash every two bars, a tom fill into each four. In phase 3 the riff carries on under 지우's
+        // synth lead, a step higher for the last four bars.
+        const up = sec === 'together' && bar >= 41 ? Math.pow(2, 2 / 12) : 1, gv = sec === 'together' ? 0.045 : 0.06;
+        const chug = (dt, f) => E(dt, T => { gtrDist(T, f * up, 0.16, gv); gtrDist(T, f * 1.5 * up, 0.16, gv * 0.55); bass(T, f * up / 2, 0.16, 400); });
+        const ring = (dt, f, d) => E(dt, T => { gtrDist(T, f * up, d, gv * 1.1); gtrDist(T, f * 1.5 * up, d, gv * 0.6); gtrDist(T, f * 2 * up, d, gv * 0.4); bass(T, f * up / 2, d, 400); });
+        if (bar === 29 || bar === 30) {
+          const ARP = [[164.81, 246.94], [392, 246.94], [369.99, 246.94], [bar === 29 ? 329.63 : 233.08, 246.94]];
+          E(0, T => gtrLead(T, ARP[inBar][0], s * 1.4, 0.05)); E(AND, T => gtrLead(T, ARP[inBar][1], s * 0.9, 0.035));
+          E(0, T => hat(T, 0.025));
+          if (bar === 30) { E(0, T => { tom(T, 90 + inBar * 25, 0.25 + inBar * 0.08); bass(T, 41.2, s * 0.9, 300); }); if (inBar === 3) [0, 1 / 3, 2 / 3].forEach(k => E(k * s, T => snare(T, 0.18 + k * 0.2))); }
+          continue;
+        }
+        const rel = (bar - 31) % 2;
+        if (rel === 0) {        // E E | . G~ | E E | Bb~ A~
+          if (inBar === 0 || inBar === 2) { chug(0, 82.41); chug(AND, 82.41); }
+          if (inBar === 1) ring(AND, 98, s * 0.9);
+          if (inBar === 3) { ring(0, 116.54, s * 0.6); ring(AND, 110, s * 0.4); }
+        } else {                // E E | E D~ | . C~ | B~~
+          if (inBar === 0) { chug(0, 82.41); chug(AND, 82.41); }
+          if (inBar === 1) { chug(0, 82.41); ring(AND, 73.42, s * 0.5); }
+          if (inBar === 2) ring(AND, 65.41, s * 0.6);
+          if (inBar === 3) ring(0, 61.74, s * 0.95);
+        }
+        // the rock beat
+        if (inBar === 0 || inBar === 2) E(0, T => kick(T, 1)); if (inBar === 1) E(AND, T => kick(T, 0.8));
+        if (inBar === 1 || inBar === 3) E(0, T => { snare(T, 0.42); noise(T, 'bandpass', 1800, 0.22, 0.16, 0.9, bus); });
+        E(0, T => hat(T, 0.05)); E(AND, T => hat(T, 0.035));
+        if (inBar === 0 && (bar - 31) % 2 === 0) E(0, T => crash(T));
+        // a tom fill at the end of every four bars (swung triplets, high to low)
+        if ((bar - 31) % 4 === 1 && inBar >= 2 && bar !== 44) [0, 1 / 3, 2 / 3].forEach((k, j) => E(k * s, T => tom(T, [240, 200, 170, 140, 115, 95][(inBar - 2) * 3 + j], 0.38)));
         if (sec === 'together') {
           // his synth lead over it from its second bar: a four-bar line, then again a step higher
           const line = [[0, 659.25, 1], [1, 783.99, 0.67], [1.67, 880, 1.33], [3, 987.77, 1], [4, 1174.66, 1.5], [5.67, 987.77, 0.33], [6, 880, 1], [7, 783.99, 1],
