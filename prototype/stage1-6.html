@@ -240,7 +240,7 @@ function beatPts(amp) {
 function rowPts(row, amp) {
   const pts = [[X0, 0]];
   for (let k = 0; k <= HEART; k++) {
-    const x = SPOT(k), on = k < HEART && !row.skip.includes(k);
+    const x = SPOT(k), j = row.tg.judge, on = k < HEART ? !row.skip.includes(k) : (j && j !== 'miss');
     if (!on) continue;
     for (const [dx, dy] of beatPts(k === HEART ? amp * 1.2 : amp)) pts.push([x + dx, dy]);
   }
@@ -291,7 +291,7 @@ function drawLane(lane, y, t, show) {
   if (r) txt(String(SEG[clamp(Math.floor(r.b0 / 8), 0, SEG.length - 1)]), HX - 14, y - 27, 'rgba(160,240,170,.75)', 6, 'right', '500', '"IBM Plex Mono", monospace');
   // beat by beat, drawn on like a monitor: a pen point sweeps through each row and traces each heartbeat as it passes (the R tip
   // lands exactly on the beat), then that peak cools and fades while the pen traces the next one a spot further. Beats 1 to 3
-  // are traced by themselves; at the 4th spot, in the column, an empty outline waits and a closing ring counts it in, and the
+  // are traced by themselves; at the 4th spot, in the column, a closing ring counts it in, and the
   // player's press is what the pen traces there, white and tall. A skipped beat's spot stays dark.
   // where this lane's pen is now (the row it is drawing), so older traces are erased just ahead of it, like a monitor's sweep
   let penNow = -99; for (const row of ROWS) { if (row.lane !== lane) continue; const kf = tBeat(t) - row.b0, pen = SPOT(0) + kf * GAP; if (pen >= X0 && pen < HX - 12) penNow = pen; }
@@ -317,10 +317,10 @@ function drawLane(lane, y, t, show) {
       if (k === HEART) {
         const tgk = row.tg, waiting = !tgk.judge || (tgk.judge === 'demo' && t < tgk.t);
         if (waiting && kf > HEART - 1.6) {
-          const a = 0.55 + 0.45 * Math.sin(t * 14); wave(x, y, 28, '#ffffff', '#bff6ff', show * a * 0.8, [1.2, 1.6]);
+          
           const sp = beatT(row.b0 + HEART) - beatT(row.b0 + HEART - 1), p = clamp(1 + dt / sp, 0, 1);
           if (p > 0 && p < 1) { g.save(); g.globalAlpha = show * (0.3 + 0.7 * p); g.strokeStyle = '#d8fbff'; g.lineWidth = 0.8; g.beginPath(); g.arc(x, y - 9, 4 + 20 * (1 - p), 0, Math.PI * 2); g.stroke(); g.restore(); }
-        } else if (tgk.judge && tgk.judge !== 'miss') { const dh = t - tgk.hitT, f7 = clamp(1 - (dh - 0.06) / 0.28, 0, 1); if (f7 > 0) { g.save(); g.beginPath(); g.rect(x - BEAT_W, y - 40, (drawing ? Math.min(pen, x + BEAT_W) : x + BEAT_W) - (x - BEAT_W), 60); g.clip(); wave(x, y, 28.8, tgk.judge === 'good' ? '#e2fff0' : '#ffffff', tgk.judge === 'good' ? '#9cf0c8' : '#d8fbff', show * f7); g.restore(); } }
+        } else if (tgk.judge && tgk.judge !== 'miss') { const dh = t - tgk.hitT, f7 = clamp(1 - (dh - 0.3) / 0.9, 0, 1); if (f7 > 0) { g.save(); g.beginPath(); g.rect(x - BEAT_W, y - 40, (drawing ? Math.min(pen, x + BEAT_W) : x + BEAT_W) - (x - BEAT_W), 60); g.clip(); wave(x, y, 28.8, tgk.judge === 'good' ? '#e2fff0' : '#ffffff', tgk.judge === 'good' ? '#9cf0c8' : '#d8fbff', show * f7); g.restore(); } }
         else if (tgk.judge === 'miss' && t - tgk.t < 1.2) { const f = clamp(1 - (t - tgk.t - 0.4) / 0.8, 0, 1); g.save(); g.globalAlpha = show * f; g.strokeStyle = '#ff5a5a'; g.lineWidth = 0.9; g.beginPath(); for (let i = -BEAT_W; i <= BEAT_W; i += 2) g.lineTo(x + i, y + (rnd(i, Math.floor(now / 50)) - 0.5) * 2.4); g.stroke(); g.restore(); }
       }
       // the first two rows count out loud as each peak is traced, like the nurse
