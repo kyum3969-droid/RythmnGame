@@ -96,25 +96,26 @@ const SCAN_X = 300, BELT_Y = 146;
 // One long take, no cuts: the same frame from the empty belt to the street. The chapters only mark where to jump to.
 const SHOTS = [
   { id: 'belt', t0: 0, t1: 10.2, name: '빈 벨트', note: '벨트가 서고 등이 하나씩 꺼진다. 높은 창으로 햇살이 든다. 하은이 벨트를 두 번 두드리고, 빛 쪽으로 고개를 든다.' },
-  { id: 'walk', t0: 10.2, t1: 22.55, name: '공장 밖으로', note: '컷 없이 이어서 걸어 나간다. 하은은 화면 제자리, 배경이 흐른다(창과 선반, 앞의 빈 라인, 기둥). 다리는 벨트와 담장 뒤로 가려진다. 셔터 밑을 지나 바깥 새벽으로.' },
-  { id: 'station', t0: 22.55, t1: 31, name: '지하철역', note: '하은이 걸음을 멈추면 배경이 그라데이션으로 샥 쓸려 지하철역 승강장으로 바뀐다. 하은은 그 자리 그대로 스크린도어 앞에 서서 시계를 보고, 유리 너머로 첫차가 들어온다.' }
+  { id: 'walk', t0: 10.2, t1: 24.5, name: '공장 밖으로', note: '컷 없이 이어서 걸어 나간다. 하은은 화면 제자리, 배경이 흐른다(창과 선반, 앞의 빈 라인, 기둥). 다리는 벨트와 담장 뒤로 가려진다. 셔터 밑을 지나 바깥 새벽으로.' },
+  { id: 'station', t0: 24.5, t1: 33.5, name: '지하철역', note: '새벽 거리(울타리, 셔터 내린 가게, 24시 편의점)를 한참 걷다가 걸음이 느려지는 동안 배경만 부드러운 그라데이션으로 지하철역 승강장으로 바뀐다. 하은은 그대로 스크린도어 앞에 서서 시계를 보고, 유리 너머로 첫차가 들어온다.' }
 ];
-const END = 31;
+const END = 33.5;
 // at the belt (seconds)
 const S1 = { beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], letGo: 9.6 };
 // she stands at x 222 the whole take; once she walks the world slides by. d = how far she has walked (px), easing into her pace
 const HX = 222, HTOP = 106;
 // she eases into her pace over WALK.ramp and eases out of it again, standing still at WALK.stop
-const WALK = { t0: 10.2, ramp: 0.8, v: 30, door: 210, step: 0.55, lampOff: 21.0, stop: 22.9 };
+const WALK = { t0: 10.2, ramp: 0.8, v: 30, door: 210, step: 0.55, lampOff: 21.0, stop: 25.2 };
 const WB_ = WALK.t0 + WALK.ramp, WC_ = WALK.stop - WALK.ramp, dB_ = WALK.v * WALK.ramp / 2, dC_ = dB_ + WALK.v * (WC_ - WB_);
 const walkD = t => { const v = WALK.v, r = WALK.ramp;
   if (t <= WALK.t0) return 0; if (t < WB_) return v * (t - WALK.t0) ** 2 / (2 * r); if (t < WC_) return dB_ + v * (t - WB_);
   const u = Math.min(t, WALK.stop) - WC_; return dC_ + v * u - v * u * u / (2 * r); };
 const walkT = d => { let a = WALK.t0, b = WALK.stop; for (let i = 0; i < 40; i++) { const m = (a + b) / 2; if (walkD(m) < d) a = m; else b = m; } return b; };   // the time she has walked d
-// then the background sweeps from the street to the station platform (a soft gradient edge from the right): she waits at the
-// screen doors, checks her watch, and the first train pulls in behind the glass
-const WIPE = { t0: 22.55, t1: 23.15 };
-const ST = { chime: 24.2, watch: [24.7, 26.2], light: 26.3, arrive: [27.1, 29.7] };
+// as she slows down on the street, only the background changes: the station platform comes in behind her through a wide soft
+// gradient while she stays as she is. She waits at the screen doors, checks her watch, and the first train pulls in behind the glass
+const WIPE = { t0: 24.5, t1: 26.1 };
+const ST = { chime: 26.6, watch: [27.0, 28.4], light: 28.6, arrive: [29.4, 32.0] };
+const D_STOP = walkD(WALK.stop);
 const doorT = walkT(WALK.door);   // when she passes under the shutter
 const STRIDE = WALK.v * WALK.step;  // px per step
 
@@ -319,6 +320,7 @@ function meshPat() {
   return (MESH = wctx.createPattern(c, 'repeat'));
 }
 const SUN = { x: 318, y: 112 };
+const FENCE_END = 230;   // the yard's fence stops here and the shops begin
 function exterior(d, t) {
   // the dawn sky, low sun ahead of her
   const gr = g.createLinearGradient(0, 0, 0, 150); gr.addColorStop(0, '#3e5a90'); gr.addColorStop(0.45, '#c98e94'); gr.addColorStop(0.78, '#ffd3a2'); gr.addColorStop(1, '#fff0c8');
@@ -340,11 +342,28 @@ function exterior(d, t) {
   for (let q = -250; q < 900; q += 34) { const x = Math.round(nr(q)), h = 8 + Math.floor(rnd(q, 3) * 14); if (x > W || x + 36 < 0) continue;
     if (rnd(q, 4) < 0.45) { for (let k = 0; k < 4; k++) R(x + 4 + k * 3, 152 - h - k * 2, 24 - k * 6, h + k * 2, '#5a4656'); }
     else { R(x, 152 - h, 34, h, '#5a4656'); R(x - 2, 152 - h, 38, 2, '#4a3a48'); } }
-  // the yard's fence behind her, posts and chain-link
-  const fc = lay(d, 0.85);
-  g.save(); g.translate(-Math.round(d * 0.85) % 6, 0); g.fillStyle = meshPat(); g.globalAlpha = 0.22; g.fillRect(0, 106, W + 6, 44); g.restore();
-  R(0, 104, W, 2, '#4a4448');
-  for (let q = -250; q < 900; q += 32) { const x = Math.round(fc(q)); if (x > -3 && x < W) { R(x, 104, 2, 46, '#3a3436'); R(x, 104, 1, 46, '#5a5458'); } }
+  // the yard's fence behind her, posts and chain-link, as far as the yard goes
+  const fc = lay(d, 0.85), fEnd = Math.round(fc(FENCE_END));
+  if (fEnd > 0) {
+    g.save(); g.beginPath(); g.rect(0, 0, Math.min(W, fEnd), H); g.clip();
+    g.save(); g.translate(-Math.round(d * 0.85) % 6, 0); g.fillStyle = meshPat(); g.globalAlpha = 0.22; g.fillRect(0, 106, W + 6, 44); g.restore();
+    R(0, 104, W, 2, '#4a4448'); g.restore();
+    for (let q = -250; q <= FENCE_END; q += 32) { const x = Math.round(fc(q)); if (x > -3 && x < W) { R(x, 104, 2, 46, '#3a3436'); R(x, 104, 1, 46, '#5a5458'); } }
+  }
+  // then the street's shops: low buildings with their shutters down, one 24-hour store lit up
+  for (let i = 0; i < 6; i++) {
+    const q = FENCE_END + 6 + i * 70, x = Math.round(fc(q)); if (x > W || x + 70 < 0) continue;
+    const h = 64 + Math.floor(rnd(i, 51) * 22), top = 150 - h, store = i === 2;
+    R(x, top, 68, h, ['#6e5e6a', '#66586a', '#735f62'][i % 3]); R(x, top, 68, 2, '#8a7884');
+    for (let wy = top + 6; wy < 92; wy += 12) for (let wx = x + 6; wx < x + 62; wx += 14) R(wx, wy, 8, 6, rnd(wx + wy, i) < 0.15 ? '#ffd27a' : '#4c4250');
+    R(x + 2, 96, 64, 10, store ? '#2f8a5a' : ['#8a5a4a', '#4a6a8a', '#7a7a4a', '#5a4a6a'][i % 4]); R(x + 2, 105, 64, 1, '#2a2228');
+    if (store) {
+      R(x + 6, 99, 30, 2, '#f4f1ea'); R(x + 2, 103, 64, 1, '#f0a03a');
+      R(x + 4, 107, 60, 43, '#dff0e6'); for (let k = 0; k < 3; k++) R(x + 8 + k * 19, 114, 14, 30, '#b9d4c4');
+      for (let k = 0; k < 9; k++) R(x + 9 + (k % 3) * 19 + Math.floor(rnd(k, 52) * 8), 117 + Math.floor(k / 3) * 9, 4, 3, ['#e86a4a', '#f2c84a', '#5aa0d8'][k % 3]);
+      R(x + 32, 107, 2, 43, '#9ab0a4');
+    } else { R(x + 4, 107, 60, 43, '#7d8288'); for (let y = 108; y < 150; y += 2) R(x + 4, y, 60, 1, '#6c7177'); R(x + 30, 142, 8, 2, '#4c5157'); }
+  }
   // a street lamp still burning, then clicking off in the daylight
   const lx = Math.round(fc(380)), on = t < WALK.lampOff;
   R(lx, 40, 2, 110, '#3a3436'); R(lx, 40, 9, 2, '#3a3436'); R(lx + 6, 42, 6, 2, on ? '#ffe2a0' : '#6a6466');
@@ -421,6 +440,20 @@ function street(t) {
   putRim(HX, top, 1, outK > 0.5 ? 0 : -1, outK > 0.5 ? '#ffe6b4' : '#ffd9a0', Math.max((0.12 + 0.45 * lightIn) * sun, 0.6 * spill, 0.7 * outK), BELT_Y - 2);
   // a pillar passing close to the lens (inside only)
   inside(() => { for (const q of [200]) { const x = Math.round(q - d * 1.45 + HX); if (x < -20 || x > W) continue; R(x, 0, 14, H, '#0f0c0b'); R(x + 13, 0, 1, H, '#1d1714'); for (let y = 120; y < 128; y += 4) { R(x, y, 14, 2, '#c99a1e'); R(x, y + 2, 14, 2, '#15110e'); } } });
+  // once she is out, the cutaway closes: B동's outside wall fades in over the inside (corrugated panels, the sign, the morning on
+  // it) with the low wall and the road running on in front of it
+  const fa = seg(t, doorT + 0.2, doorT + 1.4);
+  if (fa > 0) inside(() => {
+    g.globalAlpha = fa;
+    R(0, 0, bx, 176, '#7c8188'); R(0, 0, bx, 10, '#5d6168'); R(0, 10, bx, 2, '#9aa0a6');
+    for (let x = bx - 4; x > -4; x -= 4) R(x, 12, 1, 164, '#6a6f76');
+    R(0, 60, bx, 3, '#666b72'); R(0, 63, bx, 1, '#9aa0a6');
+    const sx = bx - 96; R(sx, 24, 40, 22, '#eef0ec'); R(sx, 24, 40, 2, '#3a6db0');
+    g.font = '700 13px "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'center'; g.fillStyle = '#1b1d1e'; g.fillText('B동', sx + 20, 36); g.textAlign = 'left';
+    g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(255,190,140,.12)'; g.fillRect(0, 0, bx, 176); g.globalCompositeOperation = 'source-over';
+    lowWall(d);
+    g.globalAlpha = 1;
+  });
   // the exposure blows out as she walks under the shutter into the morning
   const ex = clamp(1 - Math.abs(HX - bx) / 22, 0, 1);
   if (ex > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,200,${0.3 * ex * ex})`; g.fillRect(0, 0, W, H); g.restore(); }
@@ -434,9 +467,12 @@ const SCRW = document.createElement('canvas'); SCRW.width = W; SCRW.height = H; 
 const LINE = '#3a9a4e';   // the line's colour (the train's stripe, the badge)
 function trainX(t) { const p = seg(t, ST.arrive[0], ST.arrive[1]); return Math.round(lerp(W + 8, 14, 1 - (1 - p) * (1 - p))); }   // the train's nose, braking to a stop
 function station(t) {
+  // the platform slides in step with her last few steps, then holds still
+  const so = Math.round(Math.max(0, D_STOP - walkD(t)));
+  g.save(); g.translate(so, 0);
   // the tunnel behind the glass, its lamps, and the train when it comes
-  R(0, 40, W, 116, '#14191c'); R(0, 72, W, 1, '#1f272b'); R(0, 76, W, 1, '#1b2226'); R(0, 136, W, 20, '#101416');
-  for (let x = 30; x < W; x += 120) { R(x, 58, 6, 2, '#c9a35a'); }
+  R(-200, 40, W + 400, 116, '#14191c'); R(-200, 72, W + 400, 1, '#1f272b'); R(-200, 76, W + 400, 1, '#1b2226'); R(-200, 136, W + 400, 20, '#101416');
+  for (let x = -210; x < W; x += 120) { R(x, 58, 6, 2, '#c9a35a'); }
   const tx = trainX(t);
   if (tx < W) {
     const L = W - tx + 40;
@@ -449,39 +485,43 @@ function station(t) {
   const hl = seg(t, ST.light, ST.arrive[0] + 0.4) * (1 - seg(t, ST.arrive[1] - 0.4, ST.arrive[1] + 0.6));
   if (hl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; glow(Math.min(W + 30, tx), 130, 70, '255,236,190', 0.5 * hl); g.restore(); }
   // the band over the doors: LED board (amber dots running), the line badge, the station sign
-  R(0, 0, W, 22, '#2b2f32'); for (let x = 10; x < W; x += 74) { R(x, 9, 52, 3, '#f2f4ee'); R(x, 12, 52, 1, '#b9bdb8'); }
-  R(0, 22, W, 18, '#3a4044'); R(0, 22, W, 1, '#4a5156');
+  R(-200, 0, W + 400, 22, '#2b2f32'); for (let x = -138; x < W; x += 74) { R(x, 9, 52, 3, '#f2f4ee'); R(x, 12, 52, 1, '#b9bdb8'); }
+  R(-200, 22, W + 400, 18, '#3a4044'); R(-200, 22, W + 400, 1, '#4a5156');
   R(150, 25, 96, 11, '#0b0c0c');
   for (let k = 0; k < 30; k++) { const x = 152 + ((k * 7 - Math.floor(t * 18)) % 92 + 92) % 92; if (rnd(k, 41) < 0.8) R(x, 27 + (k % 3) * 2, 4, 1, '#ffb43a'); }
   R(30, 25, 11, 11, LINE); R(31, 24, 9, 13, LINE); R(29, 26, 13, 9, LINE); R(33, 28, 2, 5, '#f4f1ea'); R(36, 28, 2, 5, '#f4f1ea');
   R(268, 24, 88, 14, '#eef0ec'); R(268, 24, 88, 2, LINE); R(296, 29, 32, 4, '#1b1d1e'); R(274, 32, 14, 2, '#8a8f8c'); R(338, 32, 14, 2, '#8a8f8c'); R(270, 32, 3, 2, '#8a8f8c'); R(353, 32, 3, 2, '#8a8f8c');
   // the screen doors: the track along the top, posts, each pair's seam, the stickers, the glass sheen, the sill
-  R(0, 40, W, 6, '#9aa3a6'); R(0, 45, W, 1, '#6f777a');
+  R(-200, 40, W + 400, 6, '#9aa3a6'); R(-200, 45, W + 400, 1, '#6f777a');
   g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(170,200,210,.08)'; g.fillRect(0, 46, W, 104);
-  for (let x = -40; x < W; x += 64) { g.fillStyle = 'rgba(255,255,255,.05)'; g.beginPath(); g.moveTo(x, 46); g.lineTo(x + 14, 46); g.lineTo(x + 44, 150); g.lineTo(x + 30, 150); g.closePath(); g.fill(); }
+  for (let x = -232; x < W; x += 64) { g.fillStyle = 'rgba(255,255,255,.05)'; g.beginPath(); g.moveTo(x, 46); g.lineTo(x + 14, 46); g.lineTo(x + 44, 150); g.lineTo(x + 30, 150); g.closePath(); g.fill(); }
   g.restore();
-  for (let x = 0; x < W + 64; x += 64) {
+  for (let x = -192; x < W + 64; x += 64) {
     R(x - 2, 40, 5, 116, '#aab3b6'); R(x - 2, 40, 1, 116, '#d3d9db');
     R(x + 31, 46, 2, 104, '#7f888b');
     R(x + 12, 96, 8, 3, '#e8c440'); R(x + 44, 96, 8, 3, '#e8c440'); R(x + 14, 44, 4, 2, '#f4f1ea');
   }
-  R(0, 150, W, 6, '#7d8588'); R(0, 150, W, 1, '#a9b0b2');
+  R(-200, 150, W + 400, 6, '#7d8588'); R(-200, 150, W + 400, 1, '#a9b0b2');
   // the stone floor, its tactile strip along the doors
-  R(0, 156, W, 60, '#b9b6ad'); R(0, 156, W, 1, '#8d8a82');
-  for (let x = 0; x < W; x += 32) R(x, 168, 1, 48, '#aaa79e'); R(0, 186, W, 1, '#aaa79e'); R(0, 206, W, 1, '#aaa79e');
-  R(0, 158, W, 7, '#e0b93a'); for (let x = 1; x < W; x += 3) { R(x, 159, 1, 1, '#c79f25'); R(x + 1, 162, 1, 1, '#c79f25'); }
+  R(-200, 156, W + 400, 60, '#b9b6ad'); R(-200, 156, W + 400, 1, '#8d8a82');
+  for (let x = -192; x < W; x += 32) R(x, 168, 1, 48, '#aaa79e'); R(-200, 186, W + 400, 1, '#aaa79e'); R(-200, 206, W + 400, 1, '#aaa79e');
+  R(-200, 158, W + 400, 7, '#e0b93a'); for (let x = -200; x < W; x += 3) { R(x, 159, 1, 1, '#c79f25'); R(x + 1, 162, 1, 1, '#c79f25'); }
   // a tiled pillar
   R(88, 0, 20, 158, '#d6d1c3'); R(88, 0, 2, 158, '#ebe7dc'); R(106, 0, 2, 158, '#b3ae9f'); for (let y = 6; y < 156; y += 8) R(90, y, 16, 1, '#c4bfb0');
-  // her: waiting, the watch checked once
-  const w = seg(t, ST.watch[0], ST.watch[0] + 0.35) * (1 - seg(t, ST.watch[1] - 0.35, ST.watch[1]));
-  haeunSprite({ mirror: true, look: w > 0.5 ? -0.4 : 0.2, arms: w > 0 ? 'watch' : undefined, watch: w, sway: 0 });
-  tintSprite('#eef0ec');
-  putSprite(HX, HTOP);
+  g.restore();
+  // her: her last steps, then waiting, the watch checked once
+  const { o, top } = stationPose(t);
+  haeunSprite(o); tintSprite('#eef0ec'); putSprite(HX, top);
   // the station's flat cool light, and the train's headlight on her when it comes in
   g.save(); g.globalCompositeOperation = 'lighter';
   for (let x = 10; x < W; x += 74) glow(x + 26, 12, 46, '230,236,240', 0.1);
   g.restore();
   putRim(HX, HTOP, 1, 0, '#fff1d0', 0.6 * hl);
+}
+function stationPose(t) {
+  if (t < WALK.stop) return haeunPose(t, walkD(t));
+  const w = seg(t, ST.watch[0], ST.watch[0] + 0.35) * (1 - seg(t, ST.watch[1] - 0.35, ST.watch[1]));
+  return { o: { mirror: true, look: w > 0.5 ? -0.4 : 0.2, arms: w > 0 ? 'watch' : undefined, watch: w, sway: 0 }, top: HTOP };
 }
 function render(t) {
   g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false;
@@ -490,16 +530,18 @@ function render(t) {
   if (t > WIPE.t0) {
     if (t >= WIPE.t1) { g = wctx; station(t); }
     else {
-      // the sweep: the station comes in from the right behind a soft gradient edge, with a bright band riding the edge
+      // only the background changes: the station comes in behind a wide soft gradient drifting from right to left, and she is
+      // drawn again on top (down to her waist), so she stays exactly as she is while the street turns into the platform
       g = subctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, W, H); station(t);
-      const p = ease(seg(t, WIPE.t0, WIPE.t1)), e = lerp(W + 70, -70, p);
+      const p = ease(seg(t, WIPE.t0, WIPE.t1)), e = lerp(W + 180, -180, p);
       subctx.globalCompositeOperation = 'destination-in';
-      const m = subctx.createLinearGradient(e - 50, 0, e + 50, 0); m.addColorStop(0, 'rgba(0,0,0,0)'); m.addColorStop(1, 'rgba(0,0,0,1)');
+      const m = subctx.createLinearGradient(e - 170, 0, e + 170, 0); m.addColorStop(0, 'rgba(0,0,0,0)'); m.addColorStop(1, 'rgba(0,0,0,1)');
       subctx.fillStyle = m; subctx.fillRect(0, 0, W, H); subctx.globalCompositeOperation = 'source-over';
       g = wctx; g.drawImage(SCRW, 0, 0);
-      g.save(); g.globalCompositeOperation = 'lighter';
-      const band = g.createLinearGradient(e - 40, 0, e + 40, 0); band.addColorStop(0, 'rgba(220,235,255,0)'); band.addColorStop(0.5, 'rgba(220,235,255,.45)'); band.addColorStop(1, 'rgba(220,235,255,0)');
-      g.fillStyle = band; g.fillRect(e - 40, 0, 80, H); g.restore();
+      const { o, top } = stationPose(t);
+      haeunSprite(o); tintSprite(mix('#fff0e0', '#eef0ec', p));
+      g.save(); g.beginPath(); g.rect(0, 0, W, BELT_Y - 2); g.clip(); putSprite(HX, top); g.restore();
+      putRim(HX, top, 1, 0, '#ffe6b4', 0.7 * (1 - p), BELT_Y - 2);
     }
   }
   // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
@@ -560,7 +602,6 @@ EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: 
   { t: doorT, fn: 'pad', dur: WIPE.t0 - doorT, notes: [98, 146.83, 220, 246.94, 329.63] },   // G6/9 in the morning
   { t: WIPE.t0, fn: 'pad', dur: END - WIPE.t0 - 1.2, notes: [110, 164.81, 196, 246.94, 261.63] },   // Am9 on the platform
   { t: ST.chime, fn: 'chime' }, { t: ST.light, fn: 'approach', dur: ST.arrive[1] - ST.light }, { t: ST.arrive[1] - 1.3, fn: 'brake' },
-  { t: WIPE.t0 - 0.1, fn: 'swish' },
   { t: doorT - 0.5, fn: 'whoosh' }, { t: 19.2, fn: 'bird' }, { t: 21.4, fn: 'bird' }, { t: 23.1, fn: 'bird' }, { t: WALK.lampOff, fn: 'lamp' });
 for (let k = 1; ; k++) { const t = walkT(k * STRIDE); if (t > WALK.stop - 0.05) break; EV.push({ t, fn: 'step', out: t > doorT }); }
 EV.sort((a, b) => a.t - b.t);
