@@ -709,6 +709,63 @@ const LEVELS = [
       { who:'심사위원', text:'…네, 감사합니다. 다음.' },
       { who:'지우', text:'(작게) …괜찮아요, 형. 다음에 또 하면 돼요.' }]
   }
+  ,{
+    id:'s1-5', stageNo:'1-5', who:'지우 + 하은', role:'지우 · 하은 · 104 BPM · 벨트 둘', tag:'벨트 둘 · 버튼 하나 · 꿈', bpm:104, style:'duo15', fxTheme:'blues',
+    // 지우 is back. 반장 sits on a crate with his back and only keeps time; 하은 loads the upper belt and 지우 the lower, and you scan
+    // both with one button as in 1-4. Their tracks trade (지우's EDM, 하은's boom bap), then 지우 gets lost in his and his belt goes
+    // ragged; 반장 gets up to cover it and 하은 snaps. '…누나는 꿈 없어요?' The music stops. 하은 has none (she never had room for
+    // one) and from there her belt wavers, three against four. 반장 taps them back onto his straight beat.
+    lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, bossSeat: { x: 22, stand: [[84, 89]] }, vibe: [[72, 104]],
+    heads: { h: [82, 44], j: [58, 80], b: [22, 98] }, phone: [[120, 121.5], [136, 137.5]], phoneLane: 0,
+    clock:'03:20', title:'꿈', offTilt: true,
+    chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4,
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 180,
+    hints: false, special:['양쪽 동시에 찍은 상자', 'pair2', '한 번에'],
+    sections: [[0, 'intro'], [2, 'trade'], [10, 'both'], [18, 'drunk'], [26, 'clash'], [27, 'silence'], [29, 'waver'], [37, 'boss'], [45, 'outro']],
+    // upper belt: 하은 (16 cells). Her bars in the trade, steady through 지우's drift, then wavering (12-cell bars: three against
+    // four) after the question, then 반장's quarters
+    bars: [
+      '................', '................',
+      '................', '................', 'x...x...x...x...', 'x...x...x.x.x...', '................', '................', 'x...x.x.x...x...', 'x...x...x.x.x.x.',
+      'x...x...x...x...', 'x.......x.x.....', 'x...x...x...x...', 'x...x.x.....x...', 'x...x...x...x...', 'x.......x.x.x...', 'x...x...x...x...', 'x.x.x...x.......',
+      'x...x...x...x...', 'x.x.x...x.x.x...', 'x...x...x...x...', 'x.x.x...x.x.x...', 'x...x...x...x...', 'x...x...x...x...', 'x.x.x...x...x...', 'x...............',
+      '................', '................', '................',
+      'x.......x.......', 'x...x...x...', 'x...x...x...x...', 'x....x...x..', 'x.......x.......', 'x...x...x...', 'x...x...x...x...', 'x...........',
+      'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...............',
+      '................', '................'
+    ],
+    // lower belt: 지우 (8 cells, his straight eighths). His bars in the trade, beats with her, ragged while he is lost in it,
+    // sheepish after, then 반장's beat
+    bars2: [
+      '........', '........',
+      'x...x...', 'x.x.x...', '........', '........', 'x...x.x.', 'x.x.x.x.', '........', '........',
+      'x...x...', 'x...x.x.', 'x...x...', 'x.x.x...', 'x...x...', 'x...x.x.', 'x...x...', 'x.x.....',
+      'x..x..x.', '........', 'x.xx....', '...x.x.x', '........', 'xx......', '..x..x..', '........',
+      '........', '........', '........',
+      'x.......', '........', 'x.......', '........', 'x.......', '........', 'x.......', '........',
+      'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x.......',
+      '........', '........'
+    ],
+    // [beat, text, beats shown, lane, speaker]: 'h' 하은 (upper loading end), 'j' 지우 (lower), 'b' 반장 (on his crate)
+    say: [[9, '누나, 이 비트 들어봐요!', 3, 1, 'j'], [12.5, '…일해.', 2, 0, 'h'],
+          [73, '(흥얼흥얼) 여기서 드롭…!', 3, 1, 'j'], [84, '…내가 한다.', 2, 1, 'b'], [86.5, '반장님 앉아 계세요.', 2.5, 0, 'h'],
+          [100.5, '야. 반장님 허리 다친 거 안 보여? 정신 차려.', 3.5, 0, 'h'], [104.5, '…아 진짜. 누나는 꿈 없어요?', 3, 1, 'j'], [107.8, '저는 이거 하나 보고 사는 거예요.', 3.2, 1, 'j'],
+          [124, '(작게) …꿈 같은 소리.', 3, 0, 'h'],
+          [145.5, '…둘 다. 박 봐라.', 2.5, 1, 'b']],
+    comfort: ['…괜찮다. 다음 거.', '…박 봐라.'],
+    intro: [
+      { who:'', text:'며칠 뒤. 명절 물량은 그대로다. 반장님은 허리 때문에 의자에 앉았다.' },
+      { who:'지우', text:'반장님! 저 왔어요! …허리 왜 그러세요?' },
+      { who:'반장', text:'…됐다. 오늘은 너희 둘이 싣는다.' },
+      { who:'지우', text:'누나가 하은 누나죠? 지우예요! 잘 부탁해요!' },
+      { who:'하은', text:'(시계를 본다) …응. 위는 내가.' }],
+    outro: (good) => good ? [
+      { who:'', text:'일이 끝났다. 아무도 먼저 말하지 않았다.' },
+      { who:'하은', text:'(시계를 본다) 먼저 갈게.' },
+      { who:'지우', text:'…형, 저 말 심했어요?' },
+      { who:'반장', text:'…내일 사과해라.' }] : [
+      { who:'반장', text:'…다시. 박부터.' }]
+  }
 ];
 // the stage board. Locked entries show what is coming.
 const STAGE1 = [
@@ -716,6 +773,7 @@ const STAGE1 = [
   { level: LEVELS[1] },
   { level: LEVELS[2] },
   { level: LEVELS[3] },
+  { level: LEVELS.find(l => l.id === 's1-5') },
   { level: LEVELS[4], stage2: true }
 ];
 
@@ -1569,6 +1627,21 @@ function drawHaeunScene(beat, kick, nowMs, active) {
     drawHaeunAt(BOSS_X + LANE_DX[0], 50 + (frozen ? 0 : bob), nowMs, { mirror: tapping || taking, tap: tapping ? pulseAt(beat, L.tapBelt, 0.3) : null, rest: !tapping });
   }
 }
+// 1-5: 반장 sits on a crate by the stack with a hand on his back and taps the beat on his knee (harder on his own straight beat at
+// the end); once, when 지우's belt goes ragged, he gets up to load it himself and 하은 sits him back down
+function drawBossSeat(beat, nowMs, active) {
+  const S = L.bossSeat, standing = active && inRange(beat, S.stand), ph = beat - Math.floor(beat), own = sectionAt(Math.floor(beat / 4)) === 'boss';
+  const dx = S.x - BOSS_X + (standing ? 8 : 0), dy = standing ? 0 : 14, tap = active && !standing && ph < (own ? 0.22 : 0.14) ? (own ? 3 : 2) : 0;
+  const pose = { hand: { x: BOSS_X + 13, y: 0 }, carry: null, wince: standing, dip: 0, bob: 0, nod: 0, doze: false, phone: false, lane: 1, beat };
+  g.save(); g.translate(dx, dy);
+  PARTNERS.boss.draw(pose, nowMs, active);
+  const top = bodyTop(90, pose);
+  PARTNERS.boss.arm({ ...pose, back: true, hand: { x: BOSS_X - 6, y: top + 34 } });
+  PARTNERS.boss.arm({ ...pose, hand: standing ? { x: BOSS_X + 24, y: top + 30 } : { x: BOSS_X + 12, y: top + 40 - tap } });
+  g.restore();
+  // the crate (it hides his legs while he sits)
+  const cx = S.x - 14; R(cx, 140, 30, 20, '#7d5a37'); R(cx, 140, 30, 2, '#a07a4a'); R(cx + 2, 146, 26, 1, '#5e4329'); R(cx + 2, 152, 26, 1, '#5e4329');
+}
 // the truck's driver: climbs down out of the trailer into the dock door (in from the right), points up at the departure board,
 // hands on hips while 반장 answers, waves them on to hurry, and climbs back in. A trucker: grey beanie, stubble, navy padded vest
 // over a red flannel, jeans. He stands behind the upper belt like 하은 at her gate, so its front hides his legs.
@@ -1923,7 +1996,7 @@ const shadeBuf = document.createElement('canvas'); shadeBuf.width = W / 4; shade
 function drawIdleShade(t, nowMs, active) {
   const dt = Math.min(0.1, Math.max(0, (nowMs - IDLE.last) / 1000)), beat = active ? beatAt(t) : -1; IDLE.last = nowMs;
   for (const lane of [0, 1]) {
-    const want = active && ((lane === 0 && beat < L.autoUntil) || (DUO.mode === 'two' && beat >= L.autoUntil + 4 && laneIdle(lane, t))) ? 1 : 0;
+    const want = active && ((lane === 0 && beat < L.autoUntil) || (DUO.mode === 'two' && beat >= (L.autoUntil != null ? L.autoUntil + 4 : 0) && laneIdle(lane, t))) ? 1 : 0;
     IDLE.k[lane] += (want - IDLE.k[lane]) * Math.min(1, dt * 5);
     if (lane === 0 && active && beat >= L.autoUntil && beat < L.autoUntil + 4) IDLE.k[0] = 0;   // hers is switched on, not faded
   }
@@ -2286,7 +2359,10 @@ function drawDockFront(beat, t, nowMs, active) {
     if (face > 0.85) { g.fillStyle = `rgba(${B.c},${0.5 * on * face})`; g.fillRect(B.x - 4, B.y - 4, 10, 9); }
     g.restore();
   }
-  // a pair scanned at once: a bolt joins the two gates on their shared vertical
+  drawPairBolt(nowMs);
+}
+// a pair scanned at once: a bolt joins the two gates on their shared vertical (1-4, 1-5)
+function drawPairBolt(nowMs) {
   const ba = (nowMs - (FX.boltAt || -1e9)) / 170;
   if (ba >= 0 && ba < 1) {
     const x0 = farX(SCAN_X), y0 = farY(BELT_Y - 14), y1 = BELT_Y - 12, a = 1 - ba, seg = 7;
@@ -2714,6 +2790,7 @@ function drawScene(t, bt, active, nowMs) {
       drawLiftDrop(active ? mb : -1, t);
     }
     drawLane(0, poses[0], t, beltT, active, nowMs, laneFx);
+    if (L.bossSeat) drawBossSeat(mb, nowMs, active);
     // the driver stands between the belts, in front of the upper one (it is empty while he is there)
     if (active) drawDriver(mb, nowMs);
   }
@@ -2725,7 +2802,7 @@ function drawScene(t, bt, active, nowMs) {
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
   if (L.lanes === 2) drawIdleShade(t, nowMs, active);
-  if (L.dock) drawDockFront(dockBeat, t, nowMs, active);
+  if (L.dock) drawDockFront(dockBeat, t, nowMs, active); else if (L.lanes === 2) drawPairBolt(nowMs);
   drawGauge(nowMs);
   if (!L.daw) { drawBin(laneFx.binned, nowMs); drawPallet(laneFx.delivered); }
   for (const [n, f, dy] of laneFx.falling) { g.save(); g.translate(f.x, f.y + dy - n.h / 2); g.rotate(f.rot); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); }
@@ -3022,6 +3099,7 @@ function feverHit(t, beat, j) {
 const inFever = beat => !!L.fever && inRange(beat, L.fever);
 function hitSound(j, tones, beat, done, lane = -1) {
   const t = ctx.currentTime, th = fxTheme(beat), f = tones[(stats.combo + (done ? 1 : 0)) % Math.min(3, tones.length)], good = j === 'good';
+  if (L.laneSound && lane >= 0) { if (lane === 0) haeunHit(t, tones, j, done); else { sfxPluck(t, f * 4, good ? 0.05 : 0.075, 0.22); if (done) tones.slice(0, 3).forEach(x => sfxPluck(t, x * 4, 0.04, 0.3)); } return; }
   if (L.dock && lane === 0 && beat >= L.autoUntil) { if (inFever(beat) && !done) feverHit(t, beat, j); else haeunHit(t, tones, j, done); return; }
   if (phase3(beat) && beat >= 200) { climaxHit(t, tones, j, done, beat); return; }
   if (phase3(beat)) { if (done) gtr(t, tones.slice(0, 3).map(x => x * 2), 0.9, 0.04); else gtrLead(t, f * 2, good ? 0.3 : 0.42, good ? 0.034 : 0.044, false); return; }
@@ -3650,6 +3728,43 @@ function buildEvents() {
       const mel = chorus ? PMEL_B : PMEL_A, rel = (b - (sec === 'a1' ? 8 : sec === 'a2' ? 40 : sec === 'b1' ? 72 : sec === 'a3' ? 120 : 152)) % 32;
       for (const [ob, nm, len] of mel) if (Math.floor(ob) === rel) E((ob - rel) * s, T => trotLead(T, PN[nm] * up, len * s * 0.92, chorus ? 0.06 : 0.05));
       if (chorus && sec === 'b2') for (const [ob, nm, len] of mel) if (Math.floor(ob) === rel && len >= 1.5) E((ob - rel) * s, T => accord(T, [PN[nm] * up / 2], len * s * 0.9, 0.018));
+    } else if (style === 'duo15') {
+      // 1-5: 지우's EDM (four on the floor, open hats on the 'and', a supersaw pad, plucks) and 하은's boom bap (kick on 1 and the 'and'
+      // of 2, snare and clap on 2 and 4, swung hats, the 808, rhodes) trade two bars each, then share the drums with his pad on top.
+      // Lost in his own track he takes over (louder pad, sixteenth plucks, his hook hummed) while her drums thin. On the question the
+      // band stops dead; two bars of rollers. Then her boom bap alone, quiet and unsure, and 반장's straight four to finish.
+      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), sw = s / 4 * 0.2, ch = chords[ci], rt = roots[ci];
+      if (sec === 'intro' || sec === 'outro') { E(0, T => roller(T, 0.03)); E(s / 2, T => roller(T, 0.02)); continue; }
+      if (sec === 'clash') { if (inBar === 0) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(0.0001, T); }); E(0, T => roller(T, 0.04)); continue; }
+      if (sec === 'silence') { E(0, T => roller(T, 0.04)); E(s / 2, T => roller(T, 0.03)); continue; }
+      if (sec === 'waver' && bar === 29 && inBar === 0) E(0, T => mus.gain.setValueAtTime(0.7, T));
+      if (sec === 'boss' && bar === 37 && inBar === 0) E(0, T => { mus.gain.setValueAtTime(1, T); crash(T); });
+      const turnJ = sec === 'trade' ? ((bar - 2) >> 1) % 2 === 0 : false;
+      const edm = (sec === 'trade' && turnJ) || sec === 'both' || sec === 'drunk', bb = (sec === 'trade' && !turnJ) || sec === 'both' || sec === 'drunk' || sec === 'waver';
+      if (sec === 'boss') {
+        // 반장: kick 1 and 3, snare 2 and 4, even hats, a root on every beat, the organ
+        if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.75)); if (inBar === 1 || inBar === 3) E(0, T => snare(T, 0.2));
+        E(0, T => hat(T, 0.045)); E(s / 2, T => hat(T, 0.03)); E(0, T => bass(T, rt, s * 0.6, 320));
+        E(s / 2, T => organ(T, ch, s * 0.25, 0.024)); if (inBar === 0) E(0, T => organ(T, ch, s * 4, 0.012));
+        continue;
+      }
+      if (edm && !(sec === 'both' || sec === 'drunk')) {
+        E(0, T => kick(T, 0.8)); E(s / 2, T => openHat(T, 0.05)); if (inBar === 1 || inBar === 3) E(0, T => clap(T, 0.16));
+        E(s / 2, T => bass(T, rt, s * 0.4, 600));
+      }
+      if (edm) {
+        const loud = sec === 'drunk';
+        if (inBar === 0) E(0, T => supersaw(T, ch, s * 4, loud ? 0.016 : 0.009, loud ? 2600 : 1600));
+        const per = loud ? 4 : 2; for (let k = 0; k < per; k++) { const f = ch[(inBar * per + k) % ch.length] * 4; E(k * s / per, T => pluck(T, f, s * 0.3, loud ? 0.02 : 0.014)); }
+        if (loud && bar >= 20 && inBar === 0) E(0, T => whistle(T, ch[2] * 2, s * 1.6, 0.04));
+      }
+      if (bb) {
+        const thin = sec === 'drunk', quiet = sec === 'waver';
+        if (!thin) { if (inBar === 0) E(0, T => bbKick(T, quiet ? 0.7 : 0.95)); if (inBar === 1) E(s / 2, T => bbKick(T, quiet ? 0.6 : 0.85)); if (inBar === 2) E(0, T => bbKick(T, 0.7)); }
+        if (inBar === 1 || inBar === 3) E(0, T => { bbSnare(T, thin ? 0.12 : quiet ? 0.2 : 0.3); clap(T, thin ? 0.05 : 0.1); });
+        E(0, T => hat(T, quiet ? 0.03 : 0.05)); E(s / 2 + sw, T => hat(T, quiet ? 0.02 : 0.035));
+        if (!thin) { if (inBar === 0) E(0, T => sub808(T, rt * 2, s * 1.3)); if (inBar === 1 || inBar === 3) E(s / 2 + sw, T => rhodes(T, ch, s * 0.45, quiet ? 0.024 : 0.032)); if (inBar === 0) E(0, T => vinyl(T, s * 4)); }
+      }
     } else if (style === 'duo14') {
       // 반장's straight four (kick 1 and 3, snare 2 and 4, even hats, a root on every beat, organ, a guitar lick every fourth bar)
       // sped up each time 하은 pushes (104, 108) until his back goes and the band thins to bass, organ and hats. 하은 counts the line back in and from bar 16 it is boom bap
@@ -3970,7 +4085,7 @@ function hitPair(a, b, t) {
 function pairFx(a, b) {
   const now = performance.now(), tc = ctx.currentTime, th = THEME[fxTheme(a.beat)], fs = CHORDS[chordIdx(a.beat)], both = a.judge === 'perfect' && b.judge === 'perfect';
   FX.goodBoth = now; FX.hypeBig = both;
-  if (L.dock) { FX.boltAt = now; FX.boltBig = both; FX.boltJ = Array.from({ length: 8 }, () => Math.round((Math.random() * 2 - 1) * 5)); } else FX.hypeAt = now;
+  if (L.dock || L.lanes === 2) { FX.boltAt = now; FX.boltBig = both; FX.boltJ = Array.from({ length: 8 }, () => Math.round((Math.random() * 2 - 1) * 5)); } else FX.hypeAt = now;
   FX.shakeUntil = now + (both ? 240 : 160); FX.shakeAmp = both ? 3 : 2; FX.punchAt = now; FX.punch = both ? 2.8 : 2;
   FX.react[0] = { type: 'nod', at: now }; FX.react[1] = { type: 'nod', at: now };
   ring('#ffffff', 0); ring('#ffffff', 1);
@@ -3979,6 +4094,7 @@ function pairFx(a, b) {
   popPair(a.lane === 0 ? a : b, a.lane === 0 ? b : a);
   thud(tc, 1.3); organ(tc, fs.map(f => f * 2), 0.45, 0.06); noise(tc, 'highpass', 2600, 0.22, 0.14, 0.8, bus);
   if (L.dock) { const up = a.lane === 0 ? a : b; if (inFever(up.beat)) feverHit(tc, up.beat, up.judge); else haeunHit(tc, fs, both ? 'perfect' : 'good', false); }
+  else if (L.laneSound) { haeunHit(tc, fs, both ? 'perfect' : 'good', false); sfxPluck(tc, fs[0] * 4, 0.06, 0.22); }
   osc('sine', 1480, tc, 0.003, 0.06, 0.1, bus); osc('sine', 1976, tc + 0.03, 0.003, 0.05, 0.1, bus);
 }
 // heavy boxes need two different keys inside a short window; one hand alone drops it
@@ -4112,6 +4228,7 @@ function updateHud(t) {
   }
   if (line && line[4] === 'h' && L.coScanner) placeHaeunBubble(beat);
   if (line && line[4] === 'd' && L.driver) placeHeadBubble(driverHead(beat));
+  if (line && L.heads && L.heads[line[4]]) { const [hx, hy] = L.heads[line[4]], up = line[4] === 'b' && L.bossSeat && inRange(beat, L.bossSeat.stand) ? 14 : 0; placeHeadBubble({ x: hx + (up ? 6 : 0), y: hy - up }); }
   let h = '';
   if (L.tutorial) for (let i = 0; i < 3; i++) { const n = notes[i]; if (n && n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 터치'; break; } }
   const hintFor = (key, text, holdText) => {
