@@ -51,6 +51,14 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 
 .tutskip{position:absolute;top:6cqw;right:2.2cqw;z-index:6;font:inherit;font-size:max(11px,1.7cqw);padding:.35em .8em;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(10,8,8,.6);color:#f4ead8;cursor:pointer}
 .tutskip:hover{background:rgba(40,30,26,.8)}
+/* developer mode: a faint button in the corner opens a panel to jump to a part of the shift or straight to an ending */
+.devbtn{position:absolute;left:1.2cqw;bottom:1.2cqw;z-index:7;font:inherit;font-size:max(10px,1.3cqw);padding:.2em .55em;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(10,8,8,.45);color:rgba(244,234,216,.6);cursor:pointer}
+.devbtn:hover,.devbtn.on{color:#f4ead8;background:rgba(40,30,26,.85)}
+.devpanel{position:absolute;left:1.2cqw;bottom:5.2cqw;z-index:7;display:flex;flex-direction:column;gap:.3em;max-height:80%;overflow:auto;padding:.5em;border-radius:8px;background:rgba(10,8,8,.85);border:1px solid rgba(255,255,255,.2);font-size:max(10px,1.4cqw)}
+.devpanel button{font:inherit;text-align:left;padding:.3em .7em;border-radius:5px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#f4ead8;cursor:pointer;white-space:nowrap}
+.devpanel button:hover{background:rgba(255,255,255,.16)}
+.devpanel .end{border-color:rgba(143,214,148,.5)}.devpanel .end.bad{border-color:rgba(216,90,80,.5)}
+.devpanel b{color:rgba(244,234,216,.55);font-weight:normal;font-size:.9em;padding:.2em .2em 0}
 .hud{position:absolute;top:1.6cqw;left:2.2cqw;right:2.2cqw;display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);
   font-size:clamp(9px,1.5cqw,15px);line-height:1.3;letter-spacing:.06em;color:var(--ink);pointer-events:none;font-variant-numeric:tabular-nums}
 .hud span{display:inline-block;background:rgba(13,10,9,.62);padding:.15em .6em;border-radius:3px;transition:background-color .2s,color .2s}
@@ -171,6 +179,8 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   <div class="stage" id="stage">
     <canvas id="cv" width="384" height="216" aria-label="컨베이어 벨트 작업 화면"></canvas>
     <button class="tutskip" id="tutskip" type="button" hidden>튜토리얼 건너뛰기 ▸</button>
+    <button class="devbtn" id="devbtn" type="button" hidden>DEV</button>
+    <div class="devpanel" id="devpanel" hidden></div>
     <div class="hud" id="hud" hidden><span id="clock">B동 3번 라인 · 03:12</span><span id="combo">콤보 0</span></div>
     <div class="bubble" id="bubble" hidden></div>
     <div class="judge" id="judge"></div>
@@ -1054,6 +1064,7 @@ const LEVELS = [
     camPlay: [[40.5, 46, { x: 54, y: 102, k: 2.2 }], [46, 57, { x: 92, y: 84, k: 2 }], [57, 62.5, { x: 72, y: 98, k: 1.5 }],
       [72, 78, { x: 58, y: 112, k: 1.6 }], [96, 122.3, { x: 70, y: 114, k: 1.4 }], [122.3, 128, { x: 46, y: 108, k: 1.6 }]],
     cutscene: [[40.5, 62.5], [96, 128]],   // letterboxed
+    devMarks: [[0, '처음'], [16, '꿈 질문'], [36, '졸음 컷씬'], [68, '지우 음악'], [92, '이어폰·다툼·밀치기'], [128, '2페이즈 메탈'], [164, '정점 1'], [196, '정점 2 (전조)'], [212, '마지막 한 방']],
     farBeltLeft: 14,   // the upper belt runs on to the left, past her legs
     beltSwing: { lane: 1, until: Infinity }, fixAt: Infinity,   // the motor is never fixed
     heads: { h: [92, 60], j: [50, 92], b: [22, 98], v: [80, 80], k: [24, 90] },
@@ -5634,6 +5645,58 @@ function skipPractice() {
   TUT.on = false; TUT.line = null; TUT.count = null; CAM.to = null; SLOW.on = false; stopHum(); stopHold(); loadLevel(TUT.lvl); startPlay();
 }
 $('tutskip').addEventListener('click', e => { e.stopPropagation(); skipPractice(); $('tutskip').blur(); });
+// ---------- developer mode ----------
+// The DEV button (corner, during a shift) opens a panel: jump to a part of the shift (the level's devMarks, else the starts of
+// its music sections), or end it now with the good or the bad ending. Boxes before the jump count as perfect, so the jump
+// does not fail the run; a forced ending is not saved to progress.
+const DEV = { open: false };
+const SEC_KO = { intro: '인트로', outro: '아웃트로', end: '끝', finale: '마지막 한 방', lofi: '로파이', funk: '지우 음악', clash: '이어폰', silence: '정적', metal: '메탈' };
+function devMarks() {
+  if (L.devMarks) return L.devMarks;
+  return (L.sections || []).map(([bar, name]) => [bar * 4, (SEC_KO[name] || name) + ' · ' + bar + '마디']).filter(([b], i, a) => i === 0 || b !== a[i - 1][0]);
+}
+function devSeek(beat) {
+  if (state !== 'play' || !ctx) return;
+  if (TUT.on) { skipPractice(); if (state !== 'play') return; }
+  const tB = timeAt(beat);
+  stopHold(); CAM.to = null; SLOW.on = false;
+  notes.forEach(n => { const past = n.arr < tB - 0.02; Object.assign(n, { state: past ? 'hit' : 'pending', judge: past ? 'perfect' : null, hitAt: past ? n.arr : null, doneAt: past ? n.end : null, binSfx: past, missKind: '', jamFx: past, tossFx: past, letGo: false, holdSide: null }); });
+  const done = notes.filter(n => !isAuto(n) && n.state === 'hit');
+  stats = { perfect: done.length, good: 0, miss: 0, tailOk: done.filter(n => n.len).length, tailBroken: 0, combo: done.length, maxCombo: done.length, special: 0, missStreak: 0 };
+  T0 = ctx.currentTime + 0.06 - tB; evI = events.findIndex(e => e[0] >= tB); if (evI < 0) evI = events.length;
+  // the sound back to plain (a jump can land past a muffle, a cut or a sag that was set before it)
+  const now = ctx.currentTime;
+  musF.frequency.cancelScheduledValues(now); musF.frequency.setValueAtTime(L.lofi || 20000, now);
+  musHP.frequency.cancelScheduledValues(now); musHP.frequency.setValueAtTime(20, now);
+  mus.gain.cancelScheduledValues(now); mus.gain.setValueAtTime(1, now);
+  if (L.visit) { FX.yankFx = L.visit.yank != null && beat > L.visit.yank; FX.shoveFx = L.visit.shove != null && beat > L.visit.shove; }
+  DEV.open = false; devSync();
+}
+function devEnd(good) {
+  if (state !== 'play') return;
+  if (TUT.on) { skipPractice(); if (state !== 'play') return; }
+  if (good) { notes.forEach(n => { if (n.state === 'pending' || n.state === 'holding') { n.state = 'hit'; n.judge = 'perfect'; } }); const mine = notes.filter(n => !isAuto(n)); stats.perfect = mine.length; stats.good = 0; stats.miss = 0; stats.tailOk = mine.filter(n => n.len).length; stats.tailBroken = 0; }
+  finishPlay(!!good);
+}
+function devSync() {
+  const btn = $('devbtn'), pan = $('devpanel'), show = state === 'play';
+  if (btn.hidden === show) btn.hidden = !show;
+  btn.classList.toggle('on', DEV.open);
+  if (!show || !DEV.open) { pan.hidden = true; return; }
+  if (!pan.hidden) return;
+  pan.innerHTML = '';
+  const add = (label, fn, cls) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; if (cls) b.className = cls; b.addEventListener('click', e => { e.stopPropagation(); fn(); b.blur(); }); pan.appendChild(b); };
+  const head = t => { const h = document.createElement('b'); h.textContent = t; pan.appendChild(h); };
+  head('여기로 이동');
+  if (TUT.on) add('튜토리얼 건너뛰기', () => { skipPractice(); DEV.open = false; devSync(); });
+  for (const [b, label] of devMarks()) add(label, () => devSeek(b));
+  head('엔딩으로');
+  add('성공 엔딩 ▸', () => devEnd(true), 'end');
+  add('실패 엔딩 ▸', () => devEnd(false), 'end bad');
+  pan.hidden = false;
+}
+$('devbtn').addEventListener('click', e => { e.stopPropagation(); DEV.open = !DEV.open; $('devpanel').hidden = true; devSync(); $('devbtn').blur(); });
+for (const id of ['devbtn', 'devpanel']) $(id).addEventListener('pointerdown', e => e.stopPropagation());
 addEventListener('keydown', e => { if (e.code === 'Escape' && TUT.on) { e.preventDefault(); skipPractice(); } });
 function tutSay(lines, done) {
   if (!lines || !lines.length) { done(); return; }
@@ -5716,11 +5779,11 @@ function startPlay() {
   hud.hidden = false; state = 'play'; startHum();
 }
 function accuracy() { const mine = notes.filter(n => !isAuto(n)); return (stats.perfect + stats.good * 0.6 + stats.tailOk) / (mine.length + mine.filter(n => n.len).length); }
-function finishPlay() {
-  state = 'outro'; stopHum(); stopHold(); bubble.hidden = true; hint.hidden = true;
+function finishPlay(force) {
+  state = 'outro'; stopHum(); stopHold(); bubble.hidden = true; hint.hidden = true; CAM.to = null; SLOW.on = false; DEV.open = false; devSync();
   const acc = accuracy();
-  try { if ((progress[L.id] || 0) < acc) { progress[L.id] = acc; localStorage.setItem('belt.progress', JSON.stringify(progress)); } } catch (e) {}
-  runDialog(L.outro(acc >= 0.8, stats.special), showResult);
+  if (force == null) try { if ((progress[L.id] || 0) < acc) { progress[L.id] = acc; localStorage.setItem('belt.progress', JSON.stringify(progress)); } } catch (e) {}
+  runDialog(L.outro(force != null ? force : acc >= 0.8, stats.special), showResult);
 }
 let runNo = 0;
 function showResult() {
@@ -5814,6 +5877,7 @@ function frame(now) {
   drawLetterbox(now);
   drawSlowFx(now);
   const ts = $('tutskip'), showSkip = state === 'play' && TUT.on; if (ts.hidden === showSkip) ts.hidden = !showSkip;
+  devSync();
 }
 requestAnimationFrame(frame);
 })();
