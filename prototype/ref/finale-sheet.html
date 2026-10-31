@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>1-5 연출 시안</title>
+<title>1-6 연출 시안</title>
 <style>
 :root{--bg:#1b1716;--ink:#efe6d2;--muted:#b8a998;--card:#241f1d;--accent:#cfe04a}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1b1716}}
@@ -21,7 +21,7 @@ ul{margin:0 0 12px 18px;color:var(--ink)} li{margin:2px 0}
 </style>
 </head>
 <body>
-<h1>1-5 하은의 새벽 · 연출 시안</h1>
+<h1>1-6 하은의 새벽 · 연출 시안</h1>
 <p>게임 화면 크기(384×216) 그대로 그린 장면 목업. 흐름: 1-4 엔딩("신입, 너 그쪽 방면이지. 하은이 따라가.") → 퇴근길(하은을 따라 역까지, 플레이) → 첫차(졸음, 플레이) → 하은이 혼자 내림 → 걷기 컷씬 → 병원 → 병실 심장박동 → 새벽. 회식은 뺐다. 퇴근길과 첫차의 움직이는 그림은 애니매틱(finale-anim.html)에 있다.</p>
 <div class="row" id="rows"></div>
 <script>
@@ -274,7 +274,7 @@ function drawGun(gx, gy, kick) {
   R(gx, gy + 2, 3, 3, C.skin);
 }
 
-// ---------- 1-5 연출 시안: 장면 그리기 (chars.js의 캐릭터 코드를 그대로 씀) ----------
+// ---------- 1-6 연출 시안: 장면 그리기 (chars.js의 캐릭터 코드를 그대로 씀) ----------
 const W = 384, H = 216;
 let g = null;
 const FX = { react: [{ type: '', at: -1e9 }, { type: '', at: -1e9 }, { type: '', at: -1e9 }], playerNod: -1e9, flinch: -1e9 };
@@ -320,8 +320,7 @@ function warehouse() {
   g.drawImage(bg, 0, 0);
   for (const x of [60, 180, 300]) { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, '#fff3c8'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, 18, 0, 150); gr.addColorStop(0, 'rgba(255,236,170,.14)'); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 86, 150); g.lineTo(x - 40, 150); g.closePath(); g.fill(); g.restore(); }
 }
-// 1-5 has no opening of its own: it starts at the dinner 반장 promised at the end of 1-4. This frame is that promise, on the empty
-// belt after the truck has gone; the cut dissolves it into the three sushi belts.
+// The end of 하은's last shift (1-6): 반장 sends 신입 after her, on the empty belt; the cut dissolves it into the dawn street.
 function drawAfterShift() {
   warehouse();
   beltAt(BELT_Y, 48, 1);
@@ -330,7 +329,7 @@ function drawAfterShift() {
   drawPlayer(0, 0); haeunBeside({ watch: true });
   bubble('신입, 너 그쪽 방면이지. 하은이 따라가.', 92, 50, 150);
   bubble('(시계를 본다) 먼저 갈게.', 250, 40, 90, { bg: '#d9d0bd' });
-  hud('3번 라인 · 04:38', '');
+  hud('3번 라인 · 04:40', '');
 }
 
 // ---------- 지하철 ----------
@@ -416,8 +415,8 @@ function drawWard(dawn) {
 
 // ---------- 시트 ----------
 const SCENES = [
-  { id: 'open', title: '0. 1-4 엔딩에서: "하은이 따라가."', sub: '1-5는 1-4 성공 엔딩 바로 뒤, 같이 퇴근하는 길에서 시작한다. 트럭이 떠난 뒤의 빈 벨트가 새벽 거리로 녹아든다.', draw: drawAfterShift,
-    notes: ['1-4 아웃트로: 파스, 벨트 두드림, 반장 "…수고했다. 들어가라." 하은 "(시계를 본다) 먼저 갈게." 반장 "신입, 너 그쪽 방면이지. 하은이 따라가."', '회식, 지우, 반장 은퇴 고백은 스테이지 1에서 뺌. 둘만 남는다: 1-4에서 반장 허리를 다치게 한 하은과, 아무것도 모르는 신입.', '퇴근길(플레이): 새벽 거리를 역까지. 하은 걸음에 맞춰 한 번 누르면 한 걸음. 하은이 시계를 보고 "…첫차 놓치면 30분이야." 걸음이 빨라지고 신입이 처지면, 하은이 멈춰 돌아보고 그 뒤로는 신입 걸음에 맞춰 걷는다(남의 박자를 재촉하던 사람이 처음으로 맞춰 준다).', '첫차(플레이, 짧게): 터널 불빛이 박. 맞추면 신입이 고개를 들고, 졸음이 점점 이겨서 결국 하은 어깨에 기대 잠든다. 하은은 가만히 둔다.'] },
+  { id: 'open', title: '0. 마지막 근무 끝: "하은이 따라가."', sub: '하은의 마지막 근무(플레이)가 끝나고, 같이 퇴근하는 길로 이어진다. 빈 벨트가 새벽 거리로 녹아든다.', draw: drawAfterShift,
+    notes: ['마지막 근무 끝: 위 벨트 등이 하나씩 꺼지고 하은이 벨트를 한 번 두드린다. 반장 "신입, 너 그쪽 방면이지. 하은이 따라가."', '퇴근길부터는 둘만: 하은과, 아무것도 모르는 신입. 1-5에서 지우가 던진 "누나는 꿈 없어요?"가 아직 남아 있다.', '퇴근길(플레이): 새벽 거리를 역까지. 하은 걸음에 맞춰 한 번 누르면 한 걸음. 하은이 시계를 보고 "…첫차 놓치면 30분이야." 걸음이 빨라지고 신입이 처지면, 하은이 멈춰 돌아보고 그 뒤로는 신입 걸음에 맞춰 걷는다(남의 박자를 재촉하던 사람이 처음으로 맞춰 준다).', '첫차(플레이, 짧게): 터널 불빛이 박. 맞추면 신입이 고개를 들고, 졸음이 점점 이겨서 결국 하은 어깨에 기대 잠든다. 하은은 가만히 둔다.'] },
   { id: 'subway', title: '3. 새벽 첫 지하철: "…이제 내려요."', sub: '밤샘에 지친 신입이 하은 옆자리에서 잔다. 하은이 일어서서 "이제 내려요" 하고 혼자 내린다. 조작 없음.', draw: drawSubway,
     notes: ['첫차에서 졸다 잠든 그대로. 신입은 하은 옆에 기대 자고 있고(zZ), 하은은 가방을 들고 일어선다.', '"…이제 내려요." 신입은 못 듣는다. 문이 열리고 하은만 내린다. 창 너머로 자는 신입을 두고 열차가 떠나면서 시점이 완전히 하은에게.', '다음 역 표시는 아직 병원이라고 보여주지 않는다(노선도의 빨간 점만).'] },
   { id: 'walk', title: '4. 걷기 컷씬: 역에서 병원까지, 노래가 시작된다', sub: '리듬 없음. 하은이 새벽 거리를 걷는 동안 매우 감미로운 노래가 시작된다. 길 끝에 병원.', draw: drawWalk,

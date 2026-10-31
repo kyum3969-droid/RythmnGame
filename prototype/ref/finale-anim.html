@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>1-5 애니매틱</title>
+<title>1-6 애니매틱</title>
 <style>
 :root{--bg:#1b1716;--ink:#efe6d2;--muted:#b8a998;--card:#241f1d;--accent:#cfe04a}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1b1716}}
@@ -29,8 +29,8 @@ ul{color:var(--muted);font-size:13px;margin:8px 0 0 18px}
 </head>
 <body>
 <div class="wrap">
-<h1>1-5 첫 회식 · 애니매틱</h1>
-<p>1-4 엔딩의 빈 벨트 → 매치 컷 → 초밥 벨트 둘 → 소주잔과 취기, 그리고 하은의 밤: 창 → 문 → 계단 → 가로등 → 횡단보도 → 웅덩이 → 복도 → 손 → 병실 → 새벽 → 탁자. 약 2분 40초. 하은의 밤은 컷과 클로즈업으로 가고, 박자 모티프가 창의 불빛 → 횡단보도 신호음 → 복도의 일곱 등 → 심전도로 이어집니다. 재생을 누르면 효과음이 납니다.</p>
+<h1>1-6 하은의 새벽 · 애니매틱</h1>
+<p>하은의 마지막 근무 끝의 빈 벨트 → 퇴근길 → 첫차 → 소주잔과 취기, 그리고 하은의 밤: 창 → 문 → 계단 → 가로등 → 횡단보도 → 웅덩이 → 복도 → 손 → 병실 → 새벽 → 탁자. 약 2분 40초. 하은의 밤은 컷과 클로즈업으로 가고, 박자 모티프가 창의 불빛 → 횡단보도 신호음 → 복도의 일곱 등 → 심전도로 이어집니다. 재생을 누르면 효과음이 납니다.</p>
 <canvas id="cv" width="384" height="216"></canvas>
 <div class="bar"><button id="play">▶ 재생</button><input id="seek" type="range" min="0" max="100" step="0.05" value="0"><span id="lbl"></span><select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></div>
 <div class="jumps" id="jumps"></div>
@@ -327,7 +327,7 @@ const bg = document.createElement('canvas'); bg.width = W; bg.height = H;
   sb(1, 145); sb(17, 145); sb(1, 132); sb(17, 132); sb(9, 119);
 })();
 
-// ---------- 1-5 애니매틱: 장면이 시간 축 위에서 움직인다 ----------
+// ---------- 1-6 애니매틱: 장면이 시간 축 위에서 움직인다 ----------
 let g = null;
 const FX = { react: [{ type: '', at: -1e9 }, { type: '', at: -1e9 }, { type: '', at: -1e9 }], playerNod: -1e9, flinch: -1e9 };
 const stats = { combo: 0 }, SPB = 0.6, BOSS_X = 46, PLAYER_X = 340, state = 'play';
@@ -406,14 +406,14 @@ function warehouse() {
   for (const x of [60, 180, 300]) { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, '#fff3c8'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, 18, 0, 150); gr.addColorStop(0, 'rgba(255,236,170,.14)'); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 86, 150); g.lineTo(x - 40, 150); g.closePath(); g.fill(); g.restore(); }
 }
 
-// ---------- 0. 1-4 엔딩의 빈 벨트 (매치 컷의 출발점) ----------
-// 1-5 has no opening of its own: it starts at the dinner 반장 promised at the end of 1-4 ('…오늘 고생했다. 저녁에 밥 사마.').
-// The cut starts on that empty belt after the truck has gone, still rolling, and dissolves into the three sushi belts.
+// ---------- 0. 하은의 마지막 근무 끝, 빈 벨트 (매치 컷의 출발점) ----------
+// 1-6 is 하은's last night. After the shift (its playable part is in the plan, not in this animatic) 반장 sends 신입 after her
+// ('신입, 너 그쪽 방면이지. 하은이 따라가.'); the empty belt, still rolling, dissolves into the dawn street.
 function drawAfterShift(u) {
   warehouse();
   beltAt(BELT_Y, 48, 1, u * 60);
   gate(SCAN_X, BELT_Y, 38, true, 0);
-  hud('3번 라인 · 04:38', '');
+  hud('3번 라인 · 04:40', '');
 }
 
 let offC = null;
