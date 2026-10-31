@@ -227,6 +227,17 @@ function putRim(x, top, dx, dy, color, a, clipY = H) {
   g.save(); g.beginPath(); g.rect(0, 0, W, clipY); g.clip(); g.globalAlpha = a; g.drawImage(rb, Math.round(x) - SPR_CX, Math.round(top) - SPR_TOP); g.restore();
 }
 
+// ---------- a 3x5 pixel font for the few words on signs (English, for a global release) ----------
+const FONT = { A: '010101111101101', B: '110101110101110', C: '011100100100011', D: '110101101101110', E: '111100110100111', F: '111100110100100',
+  G: '011100101101011', H: '101101111101101', I: '111010010010111', J: '001001001101010', K: '101101110101101', L: '100100100100111',
+  M: '101111111101101', N: '110101101101101', O: '010101101101010', P: '110101110100100', Q: '010101101110011', R: '110101110101101',
+  S: '011100010001110', T: '111010010010010', U: '101101101101111', V: '101101101101010', W: '101101111111101', X: '101101010101101',
+  Y: '101101010010010', Z: '111001010100111', 0: '111101101101111', 1: '010110010010111', 2: '110001010100111', 3: '110001010001110',
+  4: '101101111001001', 5: '111100110001110', 6: '011100111101111', 7: '111001010010010', 8: '111101111101111', 9: '111101111001110',
+  ':': '000010000010000', '.': '000000000000010', '-': '000000111000000', '>': '100010001010100', ' ': '000000000000000' };
+const pixTextW = str => str.length * 4 - 1;
+function pixText(str, x, y, c) { [...str.toUpperCase()].forEach((ch, i) => { const f = FONT[ch] || FONT[' ']; for (let k = 0; k < 15; k++) if (f[k] === '1') R(x + i * 4 + (k % 3), y + Math.floor(k / 3), 1, 1, c); }); }
+
 // ---------- shared pieces: belt, scanner, windows, light ----------
 const MARK = 29.25;   // the belt's paint every 16th at the game's 100 BPM
 // a high window: frame, mullions, glass that goes from pre-dawn blue to sunlit gold
@@ -489,7 +500,7 @@ function street(t) {
     for (let x = bx - 4; x > -4; x -= 4) R(x, 12, 1, 164, '#6a6f76');
     R(0, 60, bx, 3, '#666b72'); R(0, 63, bx, 1, '#9aa0a6');
     const sx = bx - 96; R(sx, 24, 40, 22, '#eef0ec'); R(sx, 24, 40, 2, '#3a6db0');
-    g.font = '700 13px "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'center'; g.fillStyle = '#1b1d1e'; g.fillText('B동', sx + 20, 36); g.textAlign = 'left';
+    ['110', '101', '110', '101', '110'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') R(sx + 15 + x * 3, 28 + y * 3, 3, 3, '#1b1d1e'); }));   // building B
     g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(255,190,140,.12)'; g.fillRect(0, 0, bx, 176); g.globalCompositeOperation = 'source-over';
     lowWall(d);
     g.globalAlpha = 1;
@@ -535,10 +546,13 @@ function station(t, dest) {
   // the band over the doors: LED board (amber dots running), the line badge, the station sign
   R(-200, 0, W + 400, 22, '#2b2f32'); for (let x = -138; x < W; x += 74) { R(x, 9, 52, 3, '#f2f4ee'); R(x, 12, 52, 1, '#b9bdb8'); }
   R(-200, 22, W + 400, 18, '#3a4044'); R(-200, 22, W + 400, 1, '#4a5156');
+  // the LED board: a message running right to left in amber dots
   R(150, 25, 96, 11, '#0b0c0c');
-  for (let k = 0; k < 30; k++) { const x = 152 + ((k * 7 - Math.floor(t * 18)) % 92 + 92) % 92; if (rnd(k, 41) < 0.8) R(x, 27 + (k % 3) * 2, 4, 1, '#ffb43a'); }
-  R(30, 25, 11, 11, LINE); R(31, 24, 9, 13, LINE); R(29, 26, 13, 9, LINE); R(33, 28, 2, 5, '#f4f1ea'); R(36, 28, 2, 5, '#f4f1ea');
-  R(268, 24, 88, 14, '#eef0ec'); R(268, 24, 88, 2, LINE); R(296, 29, 32, 4, '#1b1d1e'); R(274, 32, 14, 2, '#8a8f8c'); R(338, 32, 14, 2, '#8a8f8c'); R(270, 32, 3, 2, '#8a8f8c'); R(353, 32, 3, 2, '#8a8f8c');
+  { const msg = dest ? 'WAY OUT >   MIND THE GAP   ' : 'TRAIN APPROACHING   STAND BEHIND THE LINE   ', mw = pixTextW(msg) + 12, off = Math.floor(t * 16) % mw;
+    g.save(); g.beginPath(); g.rect(152, 27, 92, 7); g.clip(); pixText(msg, 244 - off, 28, '#ffb43a'); pixText(msg, 244 - off + mw, 28, '#ffb43a'); g.restore(); }
+  R(30, 25, 11, 11, LINE); R(31, 24, 9, 13, LINE); R(29, 26, 13, 9, LINE); pixText('2', 34, 28, '#f4f1ea');
+  // the station sign: the name, the line's colour along its top
+  R(268, 24, 88, 14, '#eef0ec'); R(268, 24, 88, 2, LINE); { const nm = dest ? 'MEDICAL CENTER' : 'INDUSTRIAL PARK'; pixText(nm, 312 - Math.floor(pixTextW(nm) / 2), 29, '#1b1d1e'); }
   // the screen doors: the track along the top, posts, each pair's seam, the stickers, the glass sheen, the sill
   R(-200, 40, W + 400, 6, '#9aa3a6'); R(-200, 45, W + 400, 1, '#6f777a');
   g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(170,200,210,.08)'; g.fillRect(0, 46, W, 104);
@@ -724,7 +738,7 @@ function alley(t) {
   if (hx < W + 10) {
     R(hx, -4, 300, 154, '#e3e7e6'); R(hx, -4, 4, 154, '#c9cfce');
     for (let r = 0; r < 7; r++) for (let c = 0; c < 9; c++) { const wx = hx + 14 + c * 30, wy = 4 + r * 14; if (wy > 92) continue; R(wx, wy, 20, 8, winLit(r * 13 + c + 7000, 0.25, t + 40) ? '#ffe9b8' : '#8fa6b6'); R(wx, wy, 20, 1, '#6f8696'); }
-    R(hx + 20, 96, 140, 16, '#2f6f9a'); g.font = '700 11px "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillStyle = '#f4f8fa'; g.fillText('병원', hx + 46, 104);
+    R(hx + 20, 96, 140, 16, '#2f6f9a'); R(hx + 20, 96, 140, 1, '#4a8ab4');   // the sign band (no words: the red cross says it)
     R(hx + 26, 98, 12, 12, '#f4f8fa'); R(hx + 30, 99, 4, 10, '#d8463b'); R(hx + 27, 102, 10, 4, '#d8463b');   // the red cross
     R(hx + 60, 114, 80, 4, '#9aa6ad'); R(hx + 62, 118, 2, 32, '#9aa6ad'); R(hx + 136, 118, 2, 32, '#9aa6ad');   // the entrance canopy
     R(hx + 70, 120, 60, 30, '#fff2cf'); R(hx + 99, 120, 2, 30, '#c9b88a'); R(hx + 76, 128, 10, 14, '#e8d8b0'); R(hx + 112, 126, 8, 16, '#e8d8b0');   // lit lobby behind glass doors
@@ -778,7 +792,7 @@ function corridor(t) {
   for (let k = -3; k < 3; k++) {
     const q = DOOR502 - 128 * k, x = L(q) - 16; if (x > W || x + 36 < 0) continue;
     R(x - 2, 56, 36, 94, '#a8b4b0'); R(x, 58, 32, 92, '#d8c8a8'); R(x + 15, 58, 2, 92, '#bba98a'); R(x + 4, 66, 8, 20, '#9fb8c4'); R(x + 26, 100, 3, 8, '#8a8f8c');
-    R(x + 2, 44, 28, 9, '#2f6f9a'); g.font = '600 7px "IBM Plex Mono", monospace'; g.textBaseline = 'middle'; g.textAlign = 'center'; g.fillStyle = '#f4f8fa'; g.fillText(String(502 + k), x + 16, 49); g.textAlign = 'left';
+    R(x + 2, 44, 28, 9, '#2f6f9a'); pixText(String(502 + k), x + 11, 46, '#f4f8fa');
   }
   // a wheelchair, a bench, a hand-sanitiser on the wall, the green exit sign far down
   const wx = L(150); if (wx > -30 && wx < W) { R(wx, 128, 18, 3, '#5a6064'); R(wx + 14, 112, 3, 18, '#5a6064'); R(wx + 2, 120, 14, 8, '#2f4f6a'); for (const [cx, r] of [[wx + 4, 6], [wx + 14, 4]]) { R(cx - r, 140 - r, 2 * r, 2, '#3a3e42'); R(cx - r, 138 + r, 2 * r, 2, '#3a3e42'); R(cx - r, 140 - r, 2, 2 * r, '#3a3e42'); R(cx + r - 2, 140 - r, 2, 2 * r, '#3a3e42'); } }
@@ -794,10 +808,10 @@ function corridor(t) {
 // stronger straight down (a downlight), hitting the wall square-on and the floor from above. So the wall glows brightest just
 // under the fixture and fades in a scallop, the floor gets a wide soft pool, the ceiling a halo. Panels add up where they meet.
 const LSTAMP = (() => {
-  const w = 520, c = document.createElement('canvas'); c.width = w; c.height = H; const x = c.getContext('2d'), im = x.createImageData(w, H), D = 24, Y0 = 27, K = 6500;
+  const w = 520, c = document.createElement('canvas'); c.width = w; c.height = H; const x = c.getContext('2d'), im = x.createImageData(w, H), D = 30, Y0 = 27, K = 4200;
   for (let y = 0; y < H; y++) for (let i = 0; i < w; i++) {
     const dx = i - w / 2; let E;
-    if (y < 29) E = 1.2 * Math.exp(-Math.abs(dx) / 24) * (0.4 + 0.6 * y / 29);
+    if (y < 29) E = 0.5 * Math.exp(-Math.abs(dx) / 20) * (0.3 + 0.7 * y / 29);
     else if (y < 150) { const dy = y - Y0, r2 = dx * dx + dy * dy + D * D, r = Math.sqrt(r2); E = (0.3 + 0.7 * dy / r) * (D / r) / r2 * K; }
     else { const z = (y - 150) * 2, hh = 150 - Y0, dz = z - D, r2 = dx * dx + hh * hh + dz * dz, r = Math.sqrt(r2); E = (0.3 + 0.7 * hh / r) * (hh / r) / r2 * K; }
     const edge = Math.max(0, 1 - (dx / (w / 2)) ** 2) ** 2;   // fades out before the stamp's edge, so no seams
@@ -805,21 +819,21 @@ const LSTAMP = (() => {
   }
   x.putImageData(im, 0, 0); return c;
 })();
-// the dark over it all, opened up under each lit panel (a soft cone of light down to the floor)
 // The light over the scene: black where no panel reaches (the corridor is fully dark before the first one), each lit panel's
 // light added on, and the scene multiplied by it. Then the panels themselves glow and shine on the polished floor.
 const LMAP = document.createElement('canvas'); LMAP.width = W; LMAP.height = H; const lmctx = LMAP.getContext('2d');
 function corridorLight(t) {
   const d = walk3D(t);
-  lmctx.globalCompositeOperation = 'source-over'; lmctx.globalAlpha = 1; lmctx.fillStyle = '#020304'; lmctx.fillRect(0, 0, W, H);
+  // light bouncing off the walls and floor: the more panels are on, the less black the corners
+  const lit = LIGHT_Q.reduce((a, q) => a + lightI(q, t), 0);
+  lmctx.globalCompositeOperation = 'source-over'; lmctx.globalAlpha = 1; lmctx.fillStyle = mix('#020304', '#3a4044', Math.min(1, lit / 6)); lmctx.fillRect(0, 0, W, H);
   lmctx.globalCompositeOperation = 'lighter';
   for (const q of LIGHT_Q) { const I = lightI(q, t), x = Math.round(q - d + HX); if (I <= 0 || x < -260 || x > W + 260) continue; lmctx.globalAlpha = I; lmctx.drawImage(LSTAMP, x - 260, 0); }
   lmctx.globalAlpha = 1; lmctx.globalCompositeOperation = 'source-over';
   g.save(); g.globalCompositeOperation = 'multiply'; g.drawImage(LMAP, 0, 0); g.restore();
   g.save(); g.globalCompositeOperation = 'lighter';
   for (const q of LIGHT_Q) { const I = lightI(q, t), x = Math.round(q - d + HX) - 15; if (I <= 0 || x < -40 || x > W) continue;
-    R(x, 24, 30, 4, `rgba(255,255,250,${I})`); glow(x + 15, 27, 18, '240,248,255', 0.35 * I);
-    g.fillStyle = `rgba(230,240,245,${0.14 * I})`; g.fillRect(x + 9, 156, 12, 2); g.fillRect(x + 11, 160, 8, 18); g.fillRect(x + 13, 180, 4, 14); }
+    R(x, 24, 30, 4, `rgba(255,255,250,${I})`); glow(x + 15, 28, 12, '240,248,255', 0.18 * I); }
   g.restore();
 }
 function corridorPose(t) {
