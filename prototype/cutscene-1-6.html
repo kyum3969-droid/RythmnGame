@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
 <style>
-/* 1-6 cutscene, drawn live in the game's own pixels: the same 384x216 screen, the same 하은, belt and warehouse as index.html.
-   Close shots crop that pixel screen and blow it up, so the dots stay the game's dots. */
+/* 1-6 cutscene, drawn live in the game's own pixels: the same 384x216 screen, the same 하은, belt and warehouse as index.html,
+   at the game's own scale the whole way through (no zoom, no crop). */
 :root{
   --night:#15110e; --panel:#1f1915; --line:#3a2f28; --ink:#efe6d2; --muted:#a6978a; --accent:#d9a520;
   --display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
@@ -95,13 +95,13 @@ const SCAN_X = 300, BELT_Y = 146;
 // ---------- the timeline ----------
 const SHOTS = [
   { id: 'belt', t0: 0, t1: 11, name: '빈 벨트', note: '벨트가 서고 등이 하나씩 꺼진다. 높은 창으로 햇살이 든다. 하은이 벨트를 두 번 두드리고, 빛 속에서 고개를 든다.' },
-  { id: 'walk', t0: 11, t1: 26, name: '공장 밖으로', note: '허리샷으로 따라간다. 하은은 제자리, 배경이 흐른다(창과 선반, 빈 라인, 기둥). 셔터 밑을 지나 바깥 새벽으로.' }
+  { id: 'walk', t0: 11, t1: 26, name: '공장 밖으로', note: '하은은 화면 제자리, 배경이 흐른다(창과 선반, 앞의 빈 라인, 기둥). 다리는 벨트와 담장 뒤로 가려진다. 셔터 밑을 지나 바깥 새벽으로.' }
 ];
 const END = 26;
 // shot 1 cues (seconds)
-const S1 = { cx: 222, top: 106, beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], push: [6.0, 9.4] };
+const S1 = { cx: 222, top: 106, beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7] };
 // shot 2: she stays put in the frame and the world slides by. d = how far she has walked (px at 1x)
-const S2 = { cx: 176, top: 84, v: 30, door: 205, step: 0.55, lampOff: 21.0 };
+const S2 = { cx: 170, top: 106, v: 30, door: 205, step: 0.55, lampOff: 21.0 };
 const doorT = SHOTS[1].t0 + S2.door / S2.v;   // when she passes under the shutter
 
 // ---------- the warehouse, as in the game (index.html's static background) ----------
@@ -153,21 +153,22 @@ function haeun(cx, top, o = {}) {
   R(cx + 6 + sw, top + 14, 4, 18, hair); R(cx + 8 + sw, top + 16, 1, 12, hairL);
   // sky-blue tee with the white stripe over black sleeves, black bottoms
   R(cx - 7, top + 16, 14, 23, shirt); R(cx - 7, top + 15, 14, 16, sky); R(cx - 7, top + 27, 14, 2, tee); R(cx - 7, top + 30, 14, 9, shirtD);
-  // the head: face, side hair, cap, bangs. Tipped down it sinks two pixels into the collar and leans one forward.
+  // the head, smaller than the rest of the cast (a 10x12 face under a 12-wide cap, chin where theirs is). Tipped down it sinks
+  // two pixels into the collar and leans one forward.
   const fx = cx + hx, ft = top + hy;
-  R(fx + 4, ft + 1, 5, 15, hair);   // the back of her head under the cap, running into the hair down her back
-  R(fx - 6, ft + 1, 12, 14, C.skin);
-  R(fx - 7, ft - 2, 14, 6, cap); R(fx - 6, ft - 3, 12, 1, cap); R(fx - 7, ft + 3, 14, 1, capD); R(fx - 2, ft - 3, 1, 7, capD); R(fx - 1, ft - 4, 2, 1, capD);
-  R(fx - 6, ft - 1, 4, 2, '#f4e6e0');
+  R(fx + 3, ft + 3, 4, 12, hair);   // the back of her head under the cap, running into the hair down her back
+  R(fx - 5, ft + 3, 10, 12, C.skin);
+  R(fx - 6, ft, 12, 6, cap); R(fx - 5, ft - 1, 10, 1, cap); R(fx - 6, ft + 5, 12, 1, capD); R(fx - 2, ft - 1, 1, 7, capD); R(fx - 1, ft - 2, 2, 1, capD);
+  R(fx - 5, ft + 1, 3, 2, '#f4e6e0');
   // the brim: its tip dips with the head or tilts up with it
-  R(fx - 10, ft + 2, 4, 2, brim); R(fx - 10, ft + 2, 4, 1, cap); R(fx - 10, ft + 4, 4, 1, capD);
-  R(fx - 15, ft + 2 + tilt, 5, 2, brim); R(fx - 15, ft + 2 + tilt, 5, 1, cap); R(fx - 15, ft + 4 + tilt, 5, 1, capD);
+  R(fx - 9, ft + 4, 3, 2, brim); R(fx - 9, ft + 4, 3, 1, cap); R(fx - 9, ft + 6, 3, 1, capD);
+  R(fx - 13, ft + 4 + tilt, 4, 2, brim); R(fx - 13, ft + 4 + tilt, 4, 1, cap); R(fx - 13, ft + 6 + tilt, 4, 1, capD);
   // the cap's shadow over the eyes, always: deep under the brim, softening down to the cheeks
-  R(fx - 6, ft + 4, 12, 3, '#3a2622'); R(fx - 6, ft + 7, 12, 1, '#8a5a44');
+  R(fx - 5, ft + 6, 10, 3, '#3a2622'); R(fx - 5, ft + 9, 10, 1, '#8a5a44');
   // a thin dark line down the front of her face, from under the brim to the chin
-  R(fx - 7, ft + 4, 1, 11, '#1b1716');
-  FACE_LINE = { x: o.mirror ? 2 * cx - (fx - 7) - 1 : fx - 7, y: ft + 4, h: 11 };   // where it lands on the sheet, so the rim light leaves it dark
-  R(fx - 3, ft + 9, 2, 1, '#b07a58'); R(fx - 3, ft + 11, 2, 1, '#b2565a');
+  R(fx - 6, ft + 6, 1, 9, '#1b1716');
+  FACE_LINE = { x: o.mirror ? 2 * cx - (fx - 6) - 1 : fx - 6, y: ft + 6, h: 9 };   // where it lands on the sheet, so the rim light leaves it dark
+  R(fx - 3, ft + 10, 2, 1, '#b07a58'); R(fx - 3, ft + 12, 2, 1, '#b2565a');
   // arms
   if (o.arms === 'belt') {
     const ly = Math.round((o.tap || 0) * 9);
@@ -314,43 +315,58 @@ function shot1(t) {
   dust(t, shafts, sun, { x: 40, y: 30, w: 344, h: 170 });
   putRim(S1.cx, top, 1, -1, '#ffd9a0', 0.12 + 0.38 * sun, BELT_Y);
 }
-function cam1(t) {
-  const p = ease(seg(t, S1.push[0], S1.push[1])), k = Math.exp(lerp(0, Math.log(10 / 3), p));
-  return { x: lerp(W / 2, S1.cx + 6, p), y: lerp(H / 2, S1.top + 14, p), k };
-}
 
-// ---------- shot 2: out of the factory (a waist shot that keeps her in frame; the world slides past) ----------
+// ---------- shot 2: out of the factory ----------
+// Same scale as the game. She stays put in the frame and the world slides past in layers; her legs stay hidden behind
+// what is in front of her: the line's belt inside, a low block wall outside. d = how far she has walked (px).
 const walkD = t => S2.v * (t - SHOTS[1].t0);
+const lay = (d, f, sx) => q => q - d * f + sx;
 function interior(d, t, sx) {
-  const L = f => q => q - d * f + sx;
-  // back wall, seams
+  const wl = lay(d, 0.7, sx);
   R(0, 0, W, H, '#231b17');
-  const wl = L(0.7);
-  for (let q = 0; q < 900; q += 64) R(wl(q), 0, 1, H, '#2a211c');
-  // high windows and the racks under them
+  // ceiling band with its trusses, the dead tubes, the high windows between them
+  R(0, 0, W, 34, '#191311');
+  for (let q = 0; q < 900; q += 48) { const x = Math.round(wl(q)); if (x > -4 && x < W) R(x, 0, 3, 34, '#211915'); }
+  R(0, 34, W, 2, '#2e241f');
   const wins = [];
-  for (let q = 40; q < 900; q += 90) { const x = wl(q); if (x > -60 && x < W + 10) { drawWindow(x, 58, 40, 16, 1); wins.push([x, 58, 40, 16]); } }
+  for (let q = 0; q < 900; q += 120) {
+    const x = Math.round(wl(q));
+    if (x > -60 && x < W + 10) { drawWindow(x, 5, 50, 22, 1); wins.push([x, 5, 50, 22]); }
+    const tx = Math.round(wl(q + 64)); if (tx > -50 && tx < W) { R(tx + 4, 0, 1, 13, '#3a332c'); R(tx + 41, 0, 1, 13, '#3a332c'); R(tx - 2, 13, 50, 2, '#3a332c'); R(tx, 15, 46, 3, '#5d5446'); }
+  }
+  // the wall's seams and the racks of boxes
+  for (let q = 24; q < 900; q += 64) { const x = Math.round(wl(q)); if (x >= 0 && x < W) R(x, 36, 1, 132, '#2a211c'); }
   for (let q = 10; q < 900; q += 180) {
-    const x0 = wl(q); if (x0 > W || x0 + 150 < 0) continue;
-    R(x0, 80, 3, 80, '#41332a'); R(x0 + 147, 80, 3, 80, '#41332a');
-    for (const y of [100, 128]) {
-      let x = x0 + 5, s = q * 7 + y;
-      while (x < x0 + 134) { const bw = 9 + Math.floor(rnd(s, 3) * 12), bh = 8 + Math.floor(rnd(s, 4) * 14), c = ['#5b4330', '#4f3a2a', '#66503a'][Math.floor(rnd(s, 5) * 3)];
-        R(x, y - bh, bw, bh, c); R(x, y - bh, bw, 1, '#76604a'); R(x + (bw >> 1), y - bh, 1, bh, '#6e5a42'); x += bw + 2 + Math.floor(rnd(s, 6) * 5); s++; }
+    const x0 = Math.round(wl(q)); if (x0 > W || x0 + 150 < 0) continue;
+    R(x0, 44, 3, 124, '#41332a'); R(x0 + 147, 44, 3, 124, '#41332a');
+    for (const y of [64, 100, 136]) {
+      let x = x0 + 5, sd = q * 7 + y;
+      while (x < x0 + 134) { const bw = 9 + Math.floor(rnd(sd, 3) * 12), bh = 8 + Math.floor(rnd(sd, 4) * 16), c = ['#5b4330', '#4f3a2a', '#66503a'][Math.floor(rnd(sd, 5) * 3)];
+        R(x, y - bh, bw, bh, c); R(x, y - bh, bw, 1, '#76604a'); R(x + (bw >> 1), y - bh, 1, bh, '#6e5a42'); x += bw + 2 + Math.floor(rnd(sd, 6) * 5); sd++; }
       R(x0, y, 150, 3, '#4a3a2f'); R(x0, y + 3, 150, 1, '#1d1714');
     }
   }
-  // the line sign
-  const sg = L(0.78)(150); R(sg + 6, 50, 1, 8, '#4a4038'); R(sg + 20, 50, 1, 8, '#4a4038'); R(sg, 58, 27, 15, '#d9a520'); R(sg, 72, 27, 1, '#8a6a12');
-  ['111', '001', '111', '001', '111'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') R(sg + 10 + x * 2, 60 + y * 2, 2, 2, '#1d1815'); }));
-  // the empty line behind her, standing still, its scanner gates dark
-  const bl = L(0.88);
-  R(0, 112, W, 4, C.belt); R(0, 112, W, 1, '#4a403b');
-  for (let k = 0; k < 24; k++) { const x = Math.round(bl(k * MARK)); if (x >= 0 && x < W) { if (k % 4 === 0) { R(x - 1, 112, 3, 4, '#a08a3c'); R(x - 1, 112, 3, 1, '#c9ad4c'); } else R(x, 113, 1, 3, C.slat); } }
-  R(0, 116, W, 12, C.face);
-  for (let q = 0; q < 900; q += 14) { const x = Math.round(bl(q)); if (x > -8 && x < W) { R(x, 120, 8, 4, '#2b2422'); R(x + 2, 121, 2, 2, '#4a403b'); } }
-  for (let q = 120; q < 900; q += 220) { const x = Math.round(bl(q)); if (x < -20 || x > W) continue; R(x - 11, 76, 4, 40, '#555a5f'); R(x - 11, 73, 24, 5, C.metal); R(x + 8, 76, 4, 52, '#7b8288'); R(x, 81, 1, 31, '#3a2422'); }
+  // the 3라인 sign
+  const sg = Math.round(wl(176)); R(sg + 6, 36, 1, 8, '#4a4038'); R(sg + 20, 36, 1, 8, '#4a4038'); R(sg, 44, 27, 15, '#d9a520'); R(sg, 58, 27, 1, '#8a6a12');
+  ['111', '001', '111', '001', '111'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') R(sg + 10 + x * 2, 46 + y * 2, 2, 2, '#1d1815'); }));
+  // the floor and its painted walkway
+  R(0, 168, W, 48, '#18120f'); R(0, 168, W, 1, '#2e241f');
+  const fl = lay(d, 1.15, sx); for (let q = -14; q < 900; q += 14) { const x = Math.round(fl(q)); if (x > -8 && x < W) R(x, 200, 8, 3, '#c99a1e'); }
   return wins;
+}
+// the line's belt in front of her, standing still, its scanner gates dark (a gate's back post goes behind her)
+const GATES = [150, 340];
+function lineBelt(d, sx, front) {
+  const bl = lay(d, 1.0, sx);
+  if (!front) { for (const q of GATES) { const x = Math.round(bl(q)); if (x > -20 && x < W + 20) { R(x - 11, 108, 4, 40, '#555a5f'); R(x - 11, 105, 24, 5, C.metal); R(x - 2, 110, 6, 3, '#2b2e31'); } } return; }
+  R(0, BELT_Y, W, 4, C.belt); R(0, BELT_Y, W, 1, '#4a403b');
+  for (let k = 0; k < 34; k++) { const x = Math.round(bl(k * MARK - 40)); if (x < -3 || x >= W) continue; const q = k % 4;
+    if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); } else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44'); else R(x, BELT_Y + 1, 1, 3, C.slat); }
+  R(0, BELT_Y + 4, W, 12, C.face);
+  for (let q = -14; q < 900; q += 14) { const x = Math.round(bl(q)); if (x > -8 && x < W) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); } }
+  R(0, BELT_Y + 15, W, 1, '#0c0a09');
+  for (let q = 0; q < 900; q += 80) { const x = Math.round(bl(q)); if (x > -4 && x < W) R(x, BELT_Y + 16, 4, 10, '#2b2422'); }
+  for (const q of GATES) { const x = Math.round(bl(q)); if (x > -20 && x < W + 20) { R(x + 8, 108, 4, 56, '#7b8288'); R(x + 8, 108, 4, 2, '#9aa1a6'); R(x, 113, 1, 33, '#3a2422'); R(x + 2, 103, 5, 2, '#2b2422'); } }
 }
 // chain-link: one 6x6 diamond tile, repeated
 let MESH = null;
@@ -360,99 +376,101 @@ function meshPat() {
   for (let k = 0; k < 6; k++) { m.fillRect(k, k, 1, 1); m.fillRect(5 - k, k, 1, 1); }
   return (MESH = wctx.createPattern(c, 'repeat'));
 }
+const SUN = { x: 318, y: 112 };
 function exterior(d, t, sx) {
-  const L = f => q => q - d * f + sx;
   // the dawn sky, low sun ahead of her
-  const gr = g.createLinearGradient(0, 20, 0, 130); gr.addColorStop(0, '#4a679c'); gr.addColorStop(0.45, '#d99a8e'); gr.addColorStop(0.8, '#ffd9a6'); gr.addColorStop(1, '#fff0c8');
+  const gr = g.createLinearGradient(0, 0, 0, 150); gr.addColorStop(0, '#3e5a90'); gr.addColorStop(0.45, '#c98e94'); gr.addColorStop(0.78, '#ffd3a2'); gr.addColorStop(1, '#fff0c8');
   g.fillStyle = gr; g.fillRect(0, 0, W, H);
-  const sunX = 232, sunY = 92;
-  g.save(); g.globalCompositeOperation = 'lighter'; glow(sunX, sunY, 70, '255,214,150', 0.45); glow(sunX, sunY, 22, '255,240,200', 0.7); g.restore();
-  R(sunX - 5, sunY - 7, 10, 14, '#fff8e4'); R(sunX - 7, sunY - 5, 14, 10, '#fff8e4'); R(sunX - 6, sunY - 6, 12, 12, '#fff8e4');
+  g.save(); g.globalCompositeOperation = 'lighter'; glow(SUN.x, SUN.y, 90, '255,214,150', 0.45); glow(SUN.x, SUN.y, 26, '255,240,200', 0.7); g.restore();
+  R(SUN.x - 5, SUN.y - 7, 10, 14, '#fff8e4'); R(SUN.x - 7, SUN.y - 5, 14, 10, '#fff8e4'); R(SUN.x - 6, SUN.y - 6, 12, 12, '#fff8e4');
   // long thin clouds
-  const cl = L(0.06); for (const [q, y, w] of [[60, 70, 40], [150, 64, 60], [260, 76, 34], [330, 68, 50]]) { R(cl(q), y, w, 2, '#f3c3a4'); R(cl(q) + 6, y + 2, w - 12, 1, '#e8b39a'); }
+  const cl = lay(d, 0.06, sx); for (const [q, y, w] of [[-120, 40, 50], [-20, 58, 70], [90, 34, 44], [170, 72, 60], [260, 50, 40]]) { const x = Math.round(cl(q)); R(x, y, w, 2, '#f3c3a4'); R(x + 6, y + 2, w - 12, 1, '#e8b39a'); }
   // birds crossing
-  for (let i = 0; i < 3; i++) { const x = ((300 - (t - 17) * (9 + i * 3) + i * 40) % 460 + 460) % 460 - 40, y = Math.round(70 + i * 5 + Math.sin(t * 2 + i) * 2), up = Math.floor(t * 5 + i) % 2;
+  for (let i = 0; i < 3; i++) { const x = Math.round(((420 - (t - 17) * (10 + i * 3) + i * 50) % 520 + 520) % 520 - 60), y = Math.round(52 + i * 7 + Math.sin(t * 2 + i) * 2), up = Math.floor(t * 5 + i) % 2;
     if (up) { R(x - 1, y, 1, 1, '#4a3a48'); R(x + 1, y, 1, 1, '#4a3a48'); R(x, y + 1, 1, 1, '#4a3a48'); } else R(x - 1, y + 1, 3, 1, '#4a3a48'); }
   // far apartment blocks in the haze, a few windows still lit
-  const fa = L(0.22);
-  for (let q = 0; q < 700; q += 46) { const h = 18 + Math.floor(rnd(q, 1) * 18), w = 26 + Math.floor(rnd(q, 2) * 12), x = Math.round(fa(q)), y = 112 - h;
-    if (x > W || x + w < 0) continue; R(x, y, w, 60, '#8a7184'); R(x, y, w, 1, '#a48a96');
-    for (let r = 0; r < h - 4; r += 4) for (let c = 2; c < w - 2; c += 4) if (rnd(q + r, c) < 0.07) R(x + c, y + 3 + r, 2, 2, '#ffd27a'); }
+  const fa = lay(d, 0.22, sx);
+  for (let q = -200; q < 700; q += 46) { const h = 30 + Math.floor(rnd(q, 1) * 32), w = 26 + Math.floor(rnd(q, 2) * 12), x = Math.round(fa(q)), y = 150 - h;
+    if (x > W || x + w < 0) continue; R(x, y, w, h, '#8a7184'); R(x, y, w, 1, '#a48a96');
+    for (let r = 0; r < h - 6; r += 4) for (let c = 2; c < w - 2; c += 4) if (rnd(q + r, c) < 0.07) R(x + c, y + 3 + r, 2, 2, '#ffd27a'); }
   // nearer roofs and trees
-  const nr = L(0.5);
-  for (let q = 0; q < 900; q += 34) { const x = Math.round(nr(q)), h = 6 + Math.floor(rnd(q, 3) * 10); if (x > W || x + 36 < 0) continue;
-    if (rnd(q, 4) < 0.45) { for (let k = 0; k < 4; k++) R(x + 4 + k * 3, 118 - h - k * 2, 18 - k * 6 + 6, h + k * 2, '#5a4656'); }
-    else { R(x, 118 - h, 34, h + 20, '#5a4656'); R(x - 2, 118 - h, 38, 2, '#4a3a48'); } }
-  // the fence along the yard, posts and chain-link
-  const fc = L(0.9);
-  g.save(); g.translate(-Math.round(d * 0.9) % 6, 0); g.fillStyle = meshPat(); g.globalAlpha = 0.2; g.fillRect(0, 98, W + 6, 42); g.restore();
-  R(0, 97, W, 2, '#4a4448');
-  for (let q = 0; q < 900; q += 32) { const x = Math.round(fc(q)); if (x > -3 && x < W) { R(x, 96, 2, 50, '#3a3436'); R(x, 96, 1, 50, '#5a5458'); } }
+  const nr = lay(d, 0.5, sx);
+  for (let q = -200; q < 900; q += 34) { const x = Math.round(nr(q)), h = 8 + Math.floor(rnd(q, 3) * 14); if (x > W || x + 36 < 0) continue;
+    if (rnd(q, 4) < 0.45) { for (let k = 0; k < 4; k++) R(x + 4 + k * 3, 152 - h - k * 2, 24 - k * 6, h + k * 2, '#5a4656'); }
+    else { R(x, 152 - h, 34, h, '#5a4656'); R(x - 2, 152 - h, 38, 2, '#4a3a48'); } }
+  // the yard's fence behind her, posts and chain-link
+  const fc = lay(d, 0.85, sx);
+  g.save(); g.translate(-Math.round(d * 0.85) % 6, 0); g.fillStyle = meshPat(); g.globalAlpha = 0.22; g.fillRect(0, 106, W + 6, 44); g.restore();
+  R(0, 104, W, 2, '#4a4448');
+  for (let q = -200; q < 900; q += 32) { const x = Math.round(fc(q)); if (x > -3 && x < W) { R(x, 104, 2, 46, '#3a3436'); R(x, 104, 1, 46, '#5a5458'); } }
   // a street lamp still burning, then clicking off in the daylight
-  const lx = Math.round(fc(473)), on = t < S2.lampOff;
-  R(lx, 60, 2, 80, '#3a3436'); R(lx, 60, 9, 2, '#3a3436'); R(lx + 6, 62, 6, 2, on ? '#ffe2a0' : '#6a6466');
-  if (on) { g.save(); g.globalCompositeOperation = 'lighter'; glow(lx + 9, 64, 16, '255,190,110', 0.35); g.restore(); }
+  const lx = Math.round(fc(500)), on = t < S2.lampOff;
+  R(lx, 40, 2, 110, '#3a3436'); R(lx, 40, 9, 2, '#3a3436'); R(lx + 6, 42, 6, 2, on ? '#ffe2a0' : '#6a6466');
+  if (on) { g.save(); g.globalCompositeOperation = 'lighter'; glow(lx + 9, 44, 18, '255,190,110', 0.35); g.restore(); }
+}
+// outside, in front of her: a low block wall along the pavement, then the road
+function lowWall(d, sx) {
+  const wl = lay(d, 1.0, sx), rd = lay(d, 1.15, sx);
+  R(0, 176, W, 40, '#3a3436'); R(0, 176, W, 2, '#6a605c');
+  for (let q = -40; q < 1000; q += 30) { const x = Math.round(rd(q)); if (x > -16 && x < W) R(x, 198, 14, 2, '#d8cfa0'); }
+  R(0, BELT_Y - 2, W, 3, '#a39890'); R(0, BELT_Y + 1, W, 29, '#7d726c'); R(0, BELT_Y + 1, W, 1, '#5a504c');
+  R(0, BELT_Y + 15, W, 1, '#6a605c');
+  for (let q = -20; q < 1000; q += 16) { const x = Math.round(wl(q)); if (x > -2 && x < W) { R(x, BELT_Y + 2, 1, 13, '#6a605c'); R(x + 8, BELT_Y + 16, 1, 14, '#6a605c'); } }
+  for (let q = -20; q < 1000; q += 37) { const x = Math.round(wl(q)); if (x > -4 && x < W) R(x + 3, BELT_Y + 4 + Math.floor(rnd(q, 9) * 20), 2 + Math.floor(rnd(q, 8) * 3), 1, '#6e6560'); }
 }
 function shot2(t) {
   const d = walkD(t), sx = S2.cx, bx = Math.round(S2.door - d + S2.cx);
   const sp = ((t - SHOTS[1].t0) / S2.step) % 1, cyc = ((t - SHOTS[1].t0) / (S2.step * 2)) % 1;
-  const bob = sp > 0.2 && sp < 0.7 ? -1 : 0;
-  const top = S2.top + bob;
-  // inside, up to the end wall
+  const top = S2.top + (sp > 0.2 && sp < 0.7 ? -1 : 0);
+  const inside = (fn) => { if (bx <= 0) return; g.save(); g.beginPath(); g.rect(0, 0, bx, H); g.clip(); fn(); g.restore(); };
+  const outside_ = (fn) => { if (bx >= W) return; g.save(); g.beginPath(); g.rect(bx, 0, W - bx, H); g.clip(); fn(); g.restore(); };
   let wins = [];
-  g.save(); g.beginPath(); g.rect(0, 0, Math.max(0, bx), H); g.clip();
-  wins = interior(d, t, sx);
-  ambient('#8695bb', wins);
-  g.restore();
-  // outside, past it
-  if (bx < W) { g.save(); g.beginPath(); g.rect(bx, 0, W - bx, H); g.clip(); exterior(d, t, sx); g.restore(); }
-  // the end wall above the door: lintel and the rolled-up shutter
+  inside(() => { wins = interior(d, t, sx); lineBelt(d, sx, false); });
+  outside_(() => exterior(d, t, sx));
+  // the end wall: lintel over the door and the rolled-up shutter, the door's rails
   if (bx > -20 && bx < W + 20) {
-    R(bx - 6, 0, 14, 74, '#2e2521'); R(bx - 6, 0, 2, 74, '#3d322c'); R(bx + 6, 0, 2, 74, '#1a1412');
-    R(bx - 10, 62, 22, 12, '#5b5e63'); for (let y = 63; y < 74; y += 2) R(bx - 10, y, 22, 1, '#45484d'); R(bx - 10, 73, 22, 1, '#2b2e31');
-    R(bx - 9, 74, 1, 70, '#3a3d42'); R(bx + 10, 74, 1, 70, '#3a3d42');
+    R(bx - 6, 0, 14, 98, '#2e2521'); R(bx - 6, 0, 2, 98, '#3d322c'); R(bx + 6, 0, 2, 98, '#1a1412');
+    R(bx - 10, 86, 22, 12, '#5b5e63'); for (let y = 87; y < 98; y += 2) R(bx - 10, y, 22, 1, '#45484d'); R(bx - 10, 97, 22, 1, '#2b2e31');
+    R(bx - 9, 98, 1, 70, '#3a3d42'); R(bx + 10, 98, 1, 70, '#3a3d42');
   }
   // her
   const swing = Math.sin(cyc * Math.PI * 2);
-  const outside = clamp((S2.cx - bx + 6) / 12, 0, 1), spill = clamp(1 - (bx - S2.cx) / 70, 0, 1);
+  const outK = clamp((S2.cx - bx + 6) / 12, 0, 1), spill = clamp(1 - (bx - S2.cx) / 70, 0, 1);
   haeunSprite({ mirror: true, look: 0.2, arms: 'walk', swing, sway: Math.round(-swing * 0.5 + 0.5) });
-  tintSprite(outside > 0.5 ? '#fff0e0' : mix('#8695bb', '#e8d8c8', spill * 0.8));
+  tintSprite(outK > 0.5 ? '#fff0e0' : mix('#8695bb', '#e8d8c8', spill * 0.8));
   putSprite(S2.cx, top);
-  // light: shafts inside, the doorway spilling in, the sun outside; then her rim
-  g.save(); g.globalCompositeOperation = 'lighter';
-  g.save(); g.beginPath(); g.rect(0, 0, Math.max(0, bx), H); g.clip();
+  // what hides her legs: the belt inside, the low wall outside
+  inside(() => { lineBelt(d, sx, true); ambient('#8695bb', wins); });
+  outside_(() => lowWall(d, sx));
+  // light: shafts inside, the doorway spilling in, the sun's haze outside; then her rim
   const shafts = wins.map(([x, y, w, h]) => ({ x: x + 1, y: y + h, w: w - 2 }));
-  for (const s of shafts) shaft(s.x, s.y, s.w, 216, 0.17);
-  for (const [x, y, w, h] of wins) glow(x + w / 2, y + h / 2, w * 0.8, '255,214,150', 0.16);
-  const gr = g.createLinearGradient(bx - 90, 0, bx, 0); gr.addColorStop(0, 'rgba(255,214,160,0)'); gr.addColorStop(1, 'rgba(255,214,160,.28)'); g.fillStyle = gr; g.fillRect(bx - 90, 0, 90, H);
-  g.restore();
-  g.restore();
-  g.save(); g.beginPath(); g.rect(0, 0, Math.max(0, bx - 6), H); g.clip(); dust(t, shafts, 0.9, { x: 60, y: 50, w: 260, h: 100, ox: d * 0.8 }); g.restore();
-  const headY = top + 6;
-  let lightIn = 0; for (const s of shafts) lightIn = Math.max(lightIn, inShaft(S2.cx, headY, s.x, s.y, s.w));
-  putRim(S2.cx, top, 1, outside > 0.5 ? 0 : -1, outside > 0.5 ? '#ffe6b4' : '#ffd9a0', Math.max(0.12 + 0.45 * lightIn, 0.6 * spill, 0.7 * outside));
-  if (outside > 0) { g.save(); g.globalCompositeOperation = 'lighter'; glow(S2.cx + 4, top + 12, 26, '255,190,130', 0.18 * outside); g.restore(); }
+  inside(() => {
+    g.globalCompositeOperation = 'lighter';
+    for (const s of shafts) shaft(s.x, s.y, s.w, 216, 0.17);
+    for (const [x, y, w, h] of wins) glow(x + w / 2, y + h / 2, w * 0.8, '255,214,150', 0.16);
+    const gr = g.createLinearGradient(bx - 110, 0, bx, 0); gr.addColorStop(0, 'rgba(255,214,160,0)'); gr.addColorStop(1, 'rgba(255,214,160,.28)'); g.fillStyle = gr; g.fillRect(bx - 110, 0, 110, H);
+    g.globalCompositeOperation = 'source-over';
+    dust(t, shafts, 0.9, { x: 0, y: 30, w: W, h: 170, ox: d * 0.8 });
+  });
+  outside_(() => { g.globalCompositeOperation = 'lighter'; glow(SUN.x, SUN.y + 20, 160, '255,200,140', 0.12); });
+  let lightIn = 0; for (const s of shafts) lightIn = Math.max(lightIn, inShaft(S2.cx, top + 8, s.x, s.y, s.w));
+  putRim(S2.cx, top, 1, outK > 0.5 ? 0 : -1, outK > 0.5 ? '#ffe6b4' : '#ffd9a0', Math.max(0.12 + 0.45 * lightIn, 0.6 * spill, 0.7 * outK), BELT_Y - 2);
   // pillars passing close to the lens (inside only)
-  g.save(); g.beginPath(); g.rect(0, 0, Math.max(0, bx - 8), H); g.clip();
-  for (const q of [70, 190]) { const x = Math.round(q - d * 1.45 + sx); if (x < -20 || x > W) continue; R(x, 0, 14, H, '#0f0c0b'); R(x + 13, 0, 1, H, '#1d1714'); for (let y = 104; y < 112; y += 4) { R(x, y, 14, 2, '#c99a1e'); R(x, y + 2, 14, 2, '#15110e'); } }
-  g.restore();
+  inside(() => { for (const q of [70, 190]) { const x = Math.round(q - d * 1.45 + sx); if (x < -20 || x > W) continue; R(x, 0, 14, H, '#0f0c0b'); R(x + 13, 0, 1, H, '#1d1714'); for (let y = 120; y < 128; y += 4) { R(x, y, 14, 2, '#c99a1e'); R(x, y + 2, 14, 2, '#15110e'); } } });
   // the exposure blows out as she walks under the shutter into the morning
   const ex = clamp(1 - Math.abs(S2.cx - bx) / 22, 0, 1);
   if (ex > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,200,${0.3 * ex * ex})`; g.fillRect(0, 0, W, H); g.restore(); }
 }
-function cam2(t) { const tl = t - SHOTS[1].t0; return { x: S2.cx + 10 + Math.sin(tl * 0.7) * 0.6, y: S2.top + 8 + Math.sin(tl * 0.9 + 1) * 0.4, k: 10 / 3 }; }
 
 // ---------- render ----------
 function shotAt(t) { return t < SHOTS[1].t0 ? 0 : 1; }
 function render(t) {
   g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false;
   g.clearRect(0, 0, W, H);
-  const s = shotAt(t); let cam;
-  if (s === 0) { shot1(t); cam = cam1(t); } else { shot2(t); cam = cam2(t); }
-  const cw = W / cam.k, ch = H / cam.k, x0 = clamp(cam.x - cw / 2, 0, W - cw), y0 = clamp(cam.y - ch / 2, 0, H - ch);
+  if (shotAt(t) === 0) shot1(t); else shot2(t);
+  // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
-  out.fillStyle = '#000'; out.fillRect(0, 0, cv.width, cv.height);
-  out.drawImage(wb, x0, y0, cw, ch, 0, 0, cv.width, cv.height);
+  out.drawImage(wb, 0, 0, W, H, 0, 0, cv.width, cv.height);
   // fade in from black, a two-frame dip at the cut, fade out at the end
   const fade = Math.max(1 - seg(t, 0.2, 1.8), seg(t, END - 1.5, END - 0.1), Math.abs(t - SHOTS[1].t0) < 0.04 ? 1 : 0);
   if (fade > 0) { out.fillStyle = `rgba(0,0,0,${fade})`; out.fillRect(0, 0, cv.width, cv.height); }
