@@ -324,6 +324,17 @@ const VOX = [
 // her track's chords: Em | C | G | D
 // a whole step: 1-3's second drop lifts by this for its last eight bars
 const LIFT = Math.pow(2, 2 / 12);
+// 1-5's song, its own: E minor. lofi (his lazy start): Em9 | Cmaj7 | Am7 | B7. funk (지우's future-funk track, in G, the
+// relative major): Cmaj7 | D6 | Bm7 | Em7, with his hook. The metal is a riff of its own (in the music); in phase 3 his hook
+// comes back over it.
+const S15 = {
+  lofi: { ch: [[164.81, 196, 246.94, 293.66, 369.99], [130.81, 164.81, 196, 246.94], [110, 130.81, 164.81, 196], [123.47, 155.56, 185, 220]], rt: [82.41, 65.41, 55, 61.74] },
+  funk: { ch: [[261.63, 329.63, 392, 493.88], [293.66, 369.99, 440, 493.88], [246.94, 293.66, 369.99, 440], [329.63, 392, 493.88, 587.33]], rt: [65.41, 73.42, 61.74, 82.41] },
+  // the lofi tune, sparse, four bars over the four chords: [beat in the phrase, Hz, beats]; every note on a beat or two thirds in
+  lead: [[0.67, 493.88, 1.3], [2, 587.33, 0.6], [2.67, 493.88, 1.2], [4.67, 392, 2], [7, 329.63, 0.9], [8, 523.25, 1], [9.67, 493.88, 0.3], [10, 440, 1.6], [12.67, 440, 1], [14, 369.99, 1.8]],
+  // 지우's hook, two bars: on the beat and two thirds in, the way his belt lands
+  hook: [[0, 987.77, 0.5], [0.67, 880, 0.3], [1, 783.99, 0.5], [1.67, 659.25, 1.2], [3, 587.33, 0.5], [3.67, 659.25, 0.3], [4, 783.99, 0.5], [4.67, 880, 0.3], [5, 987.77, 0.5], [5.67, 1174.66, 1.2], [7, 987.77, 0.5], [7.67, 880, 0.3]]
+};
 const CHILL = { chords: [[164.81, 196, 246.94], [130.81, 164.81, 196], [196, 246.94, 293.66], [146.83, 185, 220]], roots: [82.41, 65.41, 98, 73.42] };
 // 반장 humming his blues (two bars), for the last stretch of the blues in 1-3
 const HUM = [[0, 'A4', 1], [1, 'C5', 0.5], [1.5, 'D5', 0.5], [2, 'E5', 1.5], [4, 'E5', 1], [5, 'D5', 1], [6, 'C5', 0.5], [6.5, 'A4', 1.5]];
@@ -729,7 +740,7 @@ const LEVELS = [
     beltSwing: { lane: 1, until: Infinity }, fixAt: Infinity,   // the motor is never fixed
     heads: { h: [82, 44], j: [50, 92], b: [22, 98] },
     clock:'03:20', title:'꿈', offTilt: true,
-    chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4,
+    chords: S15.lofi.ch, roots: S15.lofi.rt, chordAt: bar => bar % 4,
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 180,
     hints: false, special:['밀린 박', 'swung', '개'],
     sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [29, 'metal'], [37, 'together'], [45, 'outro']],
@@ -3081,6 +3092,65 @@ const kick = (t, v = 0.9) => { const o = osc('sine', 150, t, 0.003, v, 0.28); o.
 const snare = (t, v = 0.32) => { noise(t, 'highpass', 1500, v, 0.14); osc('triangle', 190, t, 0.002, v * 0.55, 0.08); };
 const hat = (t, v) => noise(t, 'highpass', 7500, v, 0.035);
 const rim = (t, v) => noise(t, 'bandpass', 2600, v, 0.03, 4);
+// ---- 1-5's heavy kit. Measured off the reference: the weight is in 60-250 Hz (bass, the guitars' bottom, kick and snare
+// body) and 250 Hz-4 kHz is full and flat - two rhythm guitars filling the mids. So: a drum bus with a compressor and a short
+// room; rhythm guitars as whole chords through one drive each (the notes rub, the way a power chord growls), double-tracked
+// left and right a hair apart, palm mutes darker and shorter, a pick on every attack; a driven bass with a sub under it.
+let K15 = null;
+function k15() {
+  if (K15) return K15;
+  const curve = new Float32Array(4096); for (let i = 0; i < 4096; i++) { const x = i / 2047.5 - 1; curve[i] = Math.tanh(x * 6) * 0.9 + 0.1 * Math.sign(x) * Math.min(1, Math.abs(x) * 12); }
+  const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 4; comp.attack.value = 0.003; comp.release.value = 0.12;
+  const drum = ctx.createGain(); drum.gain.value = 1; drum.connect(comp); comp.connect(mus);
+  const room = ctx.createGain(); room.gain.value = 0.22; const d1 = ctx.createDelay(0.2), d2 = ctx.createDelay(0.2), fb = ctx.createGain(), rl = ctx.createBiquadFilter();
+  d1.delayTime.value = 0.023; d2.delayTime.value = 0.041; fb.gain.value = 0.35; rl.type = 'lowpass'; rl.frequency.value = 4200;
+  room.connect(d1); d1.connect(d2); d2.connect(rl); rl.connect(fb); fb.connect(d1); rl.connect(comp);
+  const gtr = ctx.createGain(); gtr.gain.value = 1; const ghp = ctx.createBiquadFilter(); ghp.type = 'highpass'; ghp.frequency.value = 75; gtr.connect(ghp); ghp.connect(mus);
+  return (K15 = { curve, drum, room, gtr });
+}
+function mKick(t, v = 1) {
+  const K = k15(), o = osc('sine', 115, t, 0.002, v * 0.58, 0.28, K.drum); o.frequency.exponentialRampToValueAtTime(44, t + 0.06);
+  osc('sine', 52, t, 0.004, v * 0.32, 0.26, K.drum); noise(t, 'highpass', 3200, v * 0.55, 0.012, 0.7, K.drum); osc('triangle', 1700, t, 0.001, v * 0.22, 0.012, K.drum);
+}
+function mSnare(t, v = 1) {
+  const K = k15(), o = osc('triangle', 210, t, 0.001, v * 0.95, 0.16, K.drum); o.frequency.exponentialRampToValueAtTime(165, t + 0.08);
+  osc('sine', 330, t, 0.001, v * 0.3, 0.06, K.drum);
+  noise(t, 'bandpass', 4200, v * 0.95, 0.22, 0.55, K.drum); noise(t, 'highpass', 7000, v * 0.4, 0.09, 0.7, K.drum);
+  noise(t, 'bandpass', 2600, v * 0.5, 0.16, 0.6, K.room);
+}
+// metal cymbals: six detuned squares (the 808 way) through a bandpass, short for a closed hat, long for an open one or a crash
+function metallic(t, v, dec, hp, dest) {
+  const bp = ctx.createBiquadFilter(), hi = ctx.createBiquadFilter(), gn = ctx.createGain(); bp.type = 'bandpass'; bp.frequency.value = 10000; bp.Q.value = 0.9; hi.type = 'highpass'; hi.frequency.value = hp;
+  env(gn, t, 0.001, v, dec); bp.connect(hi); hi.connect(gn); gn.connect(dest);
+  for (const r of [2, 3, 4.16, 5.43, 6.79, 8.21]) { const o = ctx.createOscillator(); o.type = 'square'; o.frequency.value = 80 * r; o.connect(bp); o.start(t); o.stop(t + dec + 0.05); }
+}
+const mHat = (t, v = 0.16, open = false) => metallic(t, v * 1.7, open ? 0.32 : 0.05, 7000, k15().drum);
+const mCrash = (t, v = 0.45) => { metallic(t, v, 1.7, 4500, k15().drum); noise(t, 'highpass', 5200, v * 0.9, 1.5, 0.7, k15().drum); };
+function mTom(t, f, v = 0.7) { const K = k15(), o = osc('sine', f, t, 0.002, v, 0.36, K.drum); o.frequency.exponentialRampToValueAtTime(f * 0.62, t + 0.22); noise(t, 'lowpass', 900, v * 0.25, 0.05, 0.7, K.drum); }
+// the rhythm guitars: a power chord (root, fifth, octave) into one drive per side; mute = palm-muted
+function mGtr(t, root, d, mute = false, v = 0.1) {
+  const K = k15(), notes = [root, root * 1.4983, root * 2];
+  for (const [pan, dt, cents] of [[-0.75, 0, -5], [0.75, 0.011, 6]]) {
+    const T = t + dt, pre = ctx.createGain(), hp = ctx.createBiquadFilter(), tone = ctx.createBiquadFilter(), drv = ctx.createGain(), ws = ctx.createWaveShaper();
+    const lows = ctx.createBiquadFilter(), mid = ctx.createBiquadFilter(), cab = ctx.createBiquadFilter(), cab2 = ctx.createBiquadFilter(), out = ctx.createGain(), pn = ctx.createStereoPanner();
+    hp.type = 'highpass'; hp.frequency.value = 90; const box = ctx.createBiquadFilter(); box.type = 'peaking'; box.frequency.value = 380; box.Q.value = 1.4; box.gain.value = -3; tone.type = 'lowpass'; tone.frequency.value = mute ? 1100 : 5200; drv.gain.value = mute ? 16 : 24; ws.curve = K.curve; ws.oversample = '2x';
+    lows.type = 'peaking'; lows.frequency.value = 160; lows.Q.value = 0.9; lows.gain.value = mute ? 5 : 4; mid.type = 'peaking'; mid.frequency.value = 2600; mid.Q.value = 0.6; mid.gain.value = 8;
+    cab.type = 'lowpass'; cab.frequency.value = 6200; cab.Q.value = 0.7; cab2.type = 'lowpass'; cab2.frequency.value = 9000; pn.pan.value = pan;
+    const len = mute ? Math.min(d, 0.13) : d;
+    pre.gain.setValueAtTime(0.0001, T); pre.gain.exponentialRampToValueAtTime(1, T + 0.003); pre.gain.setValueAtTime(1, T + Math.max(0.004, len - 0.04)); pre.gain.exponentialRampToValueAtTime(0.0001, T + len + (mute ? 0.02 : 0.12));
+    out.gain.value = v * 1.7 * (mute ? 1.1 : 1);
+    pre.connect(hp); hp.connect(tone); tone.connect(drv); drv.connect(ws); ws.connect(box); box.connect(lows); lows.connect(mid); mid.connect(cab); cab.connect(cab2); cab2.connect(out); out.connect(pn); pn.connect(K.gtr);
+    for (const f of notes) { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = cents; const g0 = ctx.createGain(); g0.gain.value = 0.3; o.connect(g0); g0.connect(pre); o.start(T); o.stop(T + len + 0.2); }
+    noise(T, 'bandpass', 2400, 0.35, 0.012, 1.2, pre);   // the pick
+  }
+}
+// the bass: two saws a hair apart, driven a little, a sub sine under it
+function mBass(t, f, d, v = 0.2) {
+  const K = k15(), lp = ctx.createBiquadFilter(), ws = ctx.createWaveShaper(), gn = ctx.createGain(); lp.type = 'lowpass'; lp.frequency.value = 900; ws.curve = K.curve;
+  env(gn, t, 0.004, v * 1.3, d + 0.05); lp.connect(ws); ws.connect(gn); gn.connect(mus);
+  for (const det of [-6, 6]) { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = det; const g0 = ctx.createGain(); g0.gain.value = 0.18; o.connect(g0); g0.connect(lp); o.start(t); o.stop(t + d + 0.15); }
+  osc('sine', f, t, 0.004, v * 0.45, d, mus);
+}
 const conga = (t, f, v) => { const o = osc('sine', f, t, 0.002, v, 0.12); o.frequency.exponentialRampToValueAtTime(f * 0.7, t + 0.1); };
 const crash = t => noise(t, 'highpass', 4000, 0.22, 1.4);
 // the bad motor under 지우's belt: a low knock and a rattle
@@ -3950,74 +4020,71 @@ function buildEvents() {
       // the tutorial: a plain shuffle to practise to. A kick on every beat (her boxes), the hats long-short, a woodblock where his
       // boxes land (two thirds in), claps on 2 and 4, the bass and rhodes on 1 and 3, a pad under it
       if (sec === 'tutor') { E(0, T => kick(T, 0.9)); E(0, T => hat(T, 0.05)); E(AND, T => hat(T, 0.1)); E(AND, T => tak(T, 0.14)); if (inBar === 1 || inBar === 3) E(0, T => clap(T, 0.14));
-        if (inBar === 0 || inBar === 2) E(0, T => { bass(T, rt, s * 0.9, 520); rhodes(T, ch, s * 1.6, 0.03); }); if (inBar === 0) E(0, T => pad(T, ch, s * 4, 'triangle', 0.03)); continue; }
+        if (inBar === 0 || inBar === 2) E(0, T => { bass(T, S15.lofi.rt[bar % 4], s * 0.9, 520); rhodes(T, S15.lofi.ch[bar % 4], s * 1.6, 0.03); }); if (inBar === 0) E(0, T => pad(T, S15.lofi.ch[bar % 4], s * 4, 'triangle', 0.03)); continue; }
       if (sec === 'clash') { if (inBar === 0) E(0, T => { scratch(T); mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); mus.gain.setValueAtTime(0.0001, T + 0.32); }); E(0, T => roller(T, 0.04)); continue; }
       if (sec === 'silence') { E(0, T => roller(T, 0.04)); E(s / 2, T => roller(T, 0.03)); continue; }
       if (sec === 'metal' && bar === 29 && inBar === 0) E(0, T => mus.gain.setValueAtTime(1, T));
       if (sec === 'lofi') {
-        // while he dozes the tape sags: everything pitched down a little more each beat and muffled; it snaps back when he wakes
+        // his lazy start: Em9 Cmaj7 Am7 B7 on a rhodes, a sub, soft swung drums, vinyl; from bar 6 the sparse tune on top.
+        // While he dozes the tape sags (pitched down a little more each beat, muffled) and snaps back when he wakes
         const dz = L.doze && L.doze.find(([a0, z]) => b >= a0 && b < z), sag = dz ? 1 - 0.1 * (b - dz[0] + 1) / (dz[1] - dz[0]) : 1;
+        const lc = S15.lofi.ch[bar % 4], lr = S15.lofi.rt[bar % 4];
         if (dz && b === dz[0]) E(0, T => { musF.frequency.cancelScheduledValues(T); musF.frequency.setValueAtTime(L.lofi || 20000, T); musF.frequency.exponentialRampToValueAtTime(700, T + (dz[1] - dz[0]) * s); });
         if (L.doze && L.doze.some(([, z]) => b === z)) E(0, T => { musF.frequency.cancelScheduledValues(T); musF.frequency.setValueAtTime(L.lofi || 20000, T); noise(T, 'bandpass', 2400, 0.12, 0.05, 2, bus); });
-        if (inBar === 0 || inBar === 2) E(0, T => bbKick(T, inBar === 0 ? 0.7 : 0.55)); if (inBar === 1) E(AND, T => bbKick(T, 0.45));
-        if (inBar === 1 || inBar === 3) E(0, T => bbSnare(T, 0.18));
-        E(0, T => hat(T, 0.03)); E(AND, T => hat(T, 0.05));
-        if (inBar === 0) E(0, T => { rhodes(T, ch.map(f => f * sag), s * 2.2, 0.03); vinyl(T, s * 4); sub808(T, rt * 2 * sag, s * 1.6, 0.16); });
-        if (inBar === 2) E(AND, T => rhodes(T, ch.map(f => f * 2 * sag), s * 1.2, 0.016));
+        if (inBar === 0 || inBar === 2) E(0, T => bbKick(T, inBar === 0 ? 0.75 : 0.6)); if (inBar === 1) E(AND, T => bbKick(T, 0.45));
+        if (inBar === 1 || inBar === 3) E(0, T => bbSnare(T, 0.2));
+        E(0, T => hat(T, 0.03)); E(AND, T => hat(T, 0.055));
+        if (inBar === 0) E(0, T => { rhodes(T, lc.map(f => f * sag), s * 3.4, 0.026); vinyl(T, s * 4); sub808(T, lr * sag, s * 1.8, 0.2); });
+        if (inBar === 2) E(AND, T => { rhodes(T, lc.slice(1).map(f => f * 2 * sag), s * 0.9, 0.014); sub808(T, lr * sag, s * 0.9, 0.14); });
+        if (bar >= 6) { const off = (bar - 6) % 4 * 4 + inBar; for (const [ob, f, len] of S15.lead) if (Math.floor(ob) === off) E((ob - off) * s, T => rhodes(T, [f * sag], len * s, 0.032)); }
         continue;
       }
       if (sec === 'funk') {
+        // his future-funk track: Cmaj7 D6 Bm7 Em7, four on the floor, claps, swung open hats, a popping octave bass, bright stabs
+        // on the 'and', and from bar 20 his hook (he hums it)
+        const fc = S15.funk.ch[bar % 4], fr = S15.funk.rt[bar % 4];
         if (bar === 18 && inBar === 0) E(0, T => { crash(T); noise(T, 'highpass', 1200, 0.12, 0.4, 0.7, bus); });
-        E(0, T => kick(T, 0.85)); E(AND, T => openHat(T, 0.06)); if (inBar === 1 || inBar === 3) E(0, T => clap(T, 0.15));
-        E(0, T => bass(T, rt, s * 0.3, 900)); E(AND, T => bass(T, rt * 2, s * 0.25, 1200));
-        E(AND, T => supersaw(T, ch.map(f => f * 2), s * 0.28, 0.012, 3600));
-        for (let k = 0; k < 2; k++) { const f = ch[(inBar * 2 + k) % ch.length] * 4; E(k ? AND : 0, T => pluck(T, f, s * 0.3, 0.016)); }
-        if (bar >= 20 && inBar === 0) E(0, T => whistle(T, ch[2] * 2, s * 1.6, 0.04));
+        E(0, T => kick(T, 0.85)); E(0, T => hat(T, 0.04)); E(AND, T => openHat(T, 0.06)); if (inBar === 1 || inBar === 3) E(0, T => clap(T, 0.16));
+        E(0, T => mBass(T, fr, s * 0.3, 0.16)); E(AND, T => mBass(T, fr * 2, s * 0.22, 0.12));
+        E(AND, T => supersaw(T, fc, s * 0.3, 0.013, 4200));
+        if (inBar === 0) E(0, T => pad(T, fc, s * 4, 'triangle', 0.018));
+        if (bar >= 20) { const off = (bar - 20) % 2 * 4 + inBar; for (const [ob, f, len] of S15.hook) if (Math.floor(ob) === off) E((ob - off) * s, T => synthLead(T, f, len * s, 0.034)); }
         continue;
       }
       if (sec === 'metal' || sec === 'together') {
         // 하은's metal (an original riff in E minor, shaped like a mid-tempo heavy rock song: a clean intro that builds, then the
-        // riff over a rock beat). Bar 29 a clean guitar alone, ringing an arpeggio; bar 30 the bass and the toms come up under it
-        // with a snare roll into bar 31, where the band lands. The riff swings with the motor: palm-muted chugs on the beat and two
-        // thirds in, rests, chords left to ring (G, the B-flat against E, A, D, C, B). Kick 1, the swung 'and' of 2 and 3, snare
-        // on 2 and 4, swung hats, a crash every two bars, a tom fill into each four. In phase 3 the riff carries on under 지우's
-        // synth lead, a step higher for the last four bars.
-        const up = sec === 'together' && bar >= 41 ? Math.pow(2, 2 / 12) : 1, gv = sec === 'together' ? 0.045 : 0.06;
-        const chug = (dt, f) => E(dt, T => { gtrDist(T, f * up, 0.16, gv); gtrDist(T, f * 1.5 * up, 0.16, gv * 0.55); bass(T, f * up / 2, 0.16, 400); });
-        const ring = (dt, f, d) => E(dt, T => { gtrDist(T, f * up, d, gv * 1.1); gtrDist(T, f * 1.5 * up, d, gv * 0.6); gtrDist(T, f * 2 * up, d, gv * 0.4); bass(T, f * up / 2, d, 400); });
+        // riff over a rock beat). Bar 29 a clean guitar alone; bar 30 the bass and toms come up under it, a snare roll into 31,
+        // where the band lands. The riff swings with the motor: palm-muted chugs on the beat and two thirds in, rests, chords
+        // left to ring (G, the B-flat against E, A / D, C, B), the bass doubling. Kick 1, the swung 'and' of 2, 3; snare 2 and 4;
+        // swung hats; a crash every two bars; a tom fill into each four. In phase 3 his hook comes back over the riff, a step
+        // higher for the last four bars.
+        const up = sec === 'together' && bar >= 41 ? Math.pow(2, 2 / 12) : 1, gv = sec === 'together' ? 0.085 : 0.1;
+        const chug = (dt, f) => E(dt, T => { mGtr(T, f * up, 0.14, true, gv); mBass(T, f * up / 2, 0.14, 0.2); });
+        const ring = (dt, f, d) => E(dt, T => { mGtr(T, f * up, d, false, gv); mBass(T, f * up / 2, d, 0.2); });
         if (bar === 29 || bar === 30) {
           const ARP = [[164.81, 246.94], [392, 246.94], [369.99, 246.94], [bar === 29 ? 329.63 : 233.08, 246.94]];
           E(0, T => gtrLead(T, ARP[inBar][0], s * 1.4, 0.05)); E(AND, T => gtrLead(T, ARP[inBar][1], s * 0.9, 0.035));
-          E(0, T => hat(T, 0.025));
-          if (bar === 30) { E(0, T => { tom(T, 90 + inBar * 25, 0.25 + inBar * 0.08); bass(T, 41.2, s * 0.9, 300); }); if (inBar === 3) [0, 1 / 3, 2 / 3].forEach(k => E(k * s, T => snare(T, 0.18 + k * 0.2))); }
+          if (bar === 30) { E(0, T => { mTom(T, 90 + inBar * 22, 0.35 + inBar * 0.12); mBass(T, 41.2, s * 0.9, 0.12 + inBar * 0.03); }); if (inBar === 3) [0, 1 / 3, 2 / 3].forEach(k => E(k * s, T => mSnare(T, 0.35 + k * 0.6))); }
+          else E(0, T => mHat(T, 0.06));
           continue;
         }
         const rel = (bar - 31) % 2;
         if (rel === 0) {        // E E | . G~ | E E | Bb~ A~
           if (inBar === 0 || inBar === 2) { chug(0, 82.41); chug(AND, 82.41); }
           if (inBar === 1) ring(AND, 98, s * 0.9);
-          if (inBar === 3) { ring(0, 116.54, s * 0.6); ring(AND, 110, s * 0.4); }
+          if (inBar === 3) { ring(0, 116.54, s * 0.6); ring(AND, 110, s * 0.35); }
         } else {                // E E | E D~ | . C~ | B~~
           if (inBar === 0) { chug(0, 82.41); chug(AND, 82.41); }
           if (inBar === 1) { chug(0, 82.41); ring(AND, 73.42, s * 0.5); }
           if (inBar === 2) ring(AND, 65.41, s * 0.6);
           if (inBar === 3) ring(0, 61.74, s * 0.95);
         }
-        // the rock beat
-        if (inBar === 0 || inBar === 2) E(0, T => kick(T, 1)); if (inBar === 1) E(AND, T => kick(T, 0.8));
-        if (inBar === 1 || inBar === 3) E(0, T => { snare(T, 0.42); noise(T, 'bandpass', 1800, 0.22, 0.16, 0.9, bus); });
-        E(0, T => hat(T, 0.05)); E(AND, T => hat(T, 0.035));
-        if (inBar === 0 && (bar - 31) % 2 === 0) E(0, T => crash(T));
-        // a tom fill at the end of every four bars (swung triplets, high to low)
-        if ((bar - 31) % 4 === 1 && inBar >= 2 && bar !== 44) [0, 1 / 3, 2 / 3].forEach((k, j) => E(k * s, T => tom(T, [240, 200, 170, 140, 115, 95][(inBar - 2) * 3 + j], 0.38)));
-        if (sec === 'together') {
-          // his synth lead over it from its second bar: a four-bar line, then again a step higher
-          const line = [[0, 659.25, 1], [1, 783.99, 0.67], [1.67, 880, 1.33], [3, 987.77, 1], [4, 1174.66, 1.5], [5.67, 987.77, 0.33], [6, 880, 1], [7, 783.99, 1],
-                        [8, 659.25, 1], [9, 783.99, 0.67], [9.67, 880, 1.33], [11, 987.77, 1], [12, 880, 1], [13, 783.99, 0.67], [13.67, 659.25, 2.33]];
-          const off = (bar - 37) % 4 * 4 + inBar;
-          if (bar >= 38) for (const [ob, f, len] of line) if (Math.floor(ob) === off) E((ob - off) * s, T => synthLead(T, f * up, len * s * 0.95, 0.04));
-          if (inBar === 0) E(0, T => supersaw(T, ch.map(f => f * 2 * up), s * 4, 0.007, 2400));
-        }
+        if (inBar === 0 || inBar === 2) E(0, T => mKick(T, 1)); if (inBar === 1) E(AND, T => mKick(T, 0.85));
+        if (inBar === 1 || inBar === 3) E(0, T => mSnare(T, 1));
+        E(0, T => mHat(T, 0.15)); E(AND, T => mHat(T, 0.1));
+        if (inBar === 0 && (bar - 31) % 2 === 0) E(0, T => mCrash(T));
+        if ((bar - 31) % 4 === 1 && inBar >= 2 && bar !== 44) [0, 1 / 3, 2 / 3].forEach((k, j) => E(k * s, T => mTom(T, [230, 190, 160, 130, 108, 90][(inBar - 2) * 3 + j], 0.75)));
+        if (sec === 'together' && bar >= 38) { const off = (bar - 38) % 2 * 4 + inBar; for (const [ob, f, len] of S15.hook) if (Math.floor(ob) === off) E((ob - off) * s, T => synthLead(T, f * up, len * s, 0.04)); }
         continue;
       }
     } else if (style === 'duo14') {
