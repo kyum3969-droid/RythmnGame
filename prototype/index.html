@@ -779,6 +779,70 @@ const LEVELS = [
       { who:'반장', text:'…내일 사과해라.' }] : [
       { who:'반장', text:'…다시. 박부터.' }]
   }
+  // ---- 시안: four ways a belt can vary the beat, one belt each. Short single-belt stages to try them by hand.
+  ,{
+    id:'lab-dark', stageNo:'시안 A1', who:'지우', role:'100 BPM · 벨트 하나', tag:'어둠 · 스캐너 불빛만 · 놓는 소리로', bpm:100, style:'duo', lab:true,
+    // A1 어둠: the power goes twice. Only the scanner's glow is left, so a box shows only as it reaches the gate; the cue is the
+    // thud of it being set down two beats before
+    clock:'03:00', title:'어둠', partners:['jiwoo'], chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4, hints:false,
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 76, crazy: [[24, 40], [48, 64]],
+    special:['어둠 속 상자', 'range', '개', [24, 64]],
+    sections: [[0, 'intro'], [2, 'a'], [6, 'dark'], [10, 'b'], [12, 'dark2'], [16, 'outro']],
+    bars: ['........', '........', 'x...x...', 'x...x...', 'x.x.x...', 'x...x.x.',
+           'x...x...', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.', 'x...x.x.',
+           'x...x.x.', 'x.x...x.', 'x.x.x.x.', 'x...x.x.', 'x.......', '........', '........'],
+    say: [], comfort: ['…다음 거.'],
+    intro: [{ who:'', text:'시안 A1 · 어둠. 두 번 정전된다. 스캐너 불빛만 남는다.' }],
+    outro: (good) => [{ who:'', text: good ? '시안 A1 끝.' : '시안 A1 끝. (다시 해보기)' }]
+  }
+  ,{
+    id:'lab-stop', stageNo:'시안 A2', who:'지우', role:'100 BPM · 벨트 하나', tag:'멈춤 → 재가동 · 실린 상자는 그대로 멈춤', bpm:100, style:'straight', lab:true,
+    // A2 멈춤 → 재가동: the belt stops dead (the motor dies) with boxes on it and they wait; on the last beat before it starts
+    // the lamp goes green and the motor winds up, and it starts on the beat. Whatever was on it lands that many beats later
+    clock:'03:00', title:'멈춤', partners:['jiwoo'], chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4, hints:false,
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 76, beltStop: [[31, 4], [54, 2]],
+    special:['멈췄다 온 상자', 'range', '개', [35, 40]],
+    sections: [[0, 'intro'], [2, 'a'], [16, 'outro']],
+    // landings as they happen (boxes on the belt at a stop land later by the stop's length; nothing lands while it is stopped)
+    bars: ['........', '........', 'x...x...', 'x...x...', 'x.x.x...', 'x...x.x.',
+           'x.x.x.x.', 'x...x...', '........', 'x.x.x.x.', 'x...x...', 'x.x.x...',
+           'x...x...', 'x.x.....', 'x.x.x.x.', 'x...x.x.', 'x...x...', 'x.......', '........', '........'],
+    say: [], comfort: ['…다음 거.'],
+    intro: [{ who:'', text:'시안 A2 · 멈춤 → 재가동. 벨트가 서면 실린 상자도 선다. 초록 불, 모터 소리, 다시 출발.' }],
+    outro: (good) => [{ who:'', text: good ? '시안 A2 끝.' : '시안 A2 끝. (다시 해보기)' }]
+  }
+  ,{
+    id:'lab-jam', stageNo:'시안 B1', who:'지우', role:'100 BPM · 벨트 하나', tag:'정체 → 쏟아짐 · 쌓인 만큼 연타', bpm:100, style:'straight', lab:true,
+    // B1 정체 → 쏟아짐: a roller sticks. Boxes pile up behind it (its lamp blinks red), one set down a beat, with nothing else
+    // coming; on the beat before the run it lets go (덜컹) and they come off one every half beat. As many hits as boxes held
+    clock:'03:00', title:'쏟아짐', partners:['jiwoo'], chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4, hints:false,
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 76, jam: { x: 170, dash: 0.5 },
+    special:['쏟아진 상자', 'jam', '개'],
+    sections: [[0, 'intro'], [2, 'a'], [16, 'outro']],
+    // j = a jammed box, written where it lands (a run of them half a beat apart); the bar before each run stays empty
+    bars: ['........', '........', 'x...x...', 'x...x.x.', 'x...x...', 'x.x.....',
+           '........', '.jjj....', 'x...x...', 'x...x...', '........', '.jjjj...',
+           'x...x...', 'x.x.....', '........', '.jjjjj..', 'x...x...', 'x.......', '........', '........'],
+    say: [], comfort: ['…다음 거.'],
+    intro: [{ who:'', text:'시안 B1 · 정체 → 쏟아짐. 롤러에 걸린 상자가 쌓였다가, 덜컹 하고 반 박 간격으로 쏟아진다.' }],
+    outro: (good) => [{ who:'', text: good ? '시안 B1 끝.' : '시안 B1 끝. (다시 해보기)' }]
+  }
+  ,{
+    id:'lab-swing', stageNo:'시안 B2', who:'지우', role:'100 BPM · 벨트 하나', tag:'스윙 · 길게 짧게 울컥 · 엇박은 뒤로', bpm:100, style:'straight', lab:true, beltSwing: true,
+    // B2 스윙: the belt chugs, long-short on every beat (it drags for two thirds of the beat, then rushes), so a box set down on
+    // the 'and' lands late, two thirds into the beat. The band swings with it
+    clock:'03:00', title:'스윙', partners:['jiwoo'], chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4, hints:false,
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 76,
+    special:['스윙 박', 'off', '개'],
+    sections: [[0, 'intro'], [2, 'a'], [16, 'outro']],
+    // written straight; the 'and's land swung
+    bars: ['........', '........', 'x...x...', 'x...x...', 'x...x.x.', 'x...x...',
+           'x.x.x...', 'x...x.x.', 'x.x.x.x.', 'x...x...', 'x.x.x.x.', 'x.x.x.x.',
+           'x...x.x.', 'x.x...x.', 'x.x.x.x.', 'x.x.x.x.', 'x...x...', 'x.......', '........', '........'],
+    say: [], comfort: ['…다음 거.'],
+    intro: [{ who:'', text:'시안 B2 · 스윙. 벨트가 박마다 길게-짧게 울컥 돈다. 엇박 상자는 조금 늦게, 박의 3분의 2 지점에 닿는다.' }],
+    outro: (good) => [{ who:'', text: good ? '시안 B2 끝.' : '시안 B2 끝. (다시 해보기)' }]
+  }
 ];
 // the stage board. Locked entries show what is coming.
 const STAGE1 = [
@@ -787,6 +851,7 @@ const STAGE1 = [
   { level: LEVELS[2] },
   { level: LEVELS[3] },
   { level: LEVELS.find(l => l.id === 's1-5') },
+  ...LEVELS.filter(l => l.lab).map(level => ({ level, lab: true })),
   { level: LEVELS[4], stage2: true }
 ];
 
@@ -815,10 +880,15 @@ function loadLevel(level) {
       const ch = bar[c]; if (ch === '.' || ch === '=') continue;
       let len = 0;
       if (ch === 'h') { let k = c + 1, cnt = 1; while (bar[k] === '=' || bar[k] === 'o') { cnt++; k++; } len = cnt / div; }
-      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : 0), len, late: ch === 'L', heavy: ch === 'H', gtr: ch === 'G', shuffle: div === 3 && c % 3 === 2, off: (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane });
+      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : 0), len, late: ch === 'L', heavy: ch === 'H', gtr: ch === 'G', jam: ch === 'j', shuffle: div === 3 && c % 3 === 2, off: (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane });
     }
   }));
+  // a swung belt: a box written on the 'and' lands two thirds into the beat
+  if (level.beltSwing) notes.forEach(n => { n.beat = realBeat(n.beat); });
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
+  // jams: a run of 'j' boxes (half a beat apart or closer) piles up behind the stuck roller and is let go one by one
+  if (level.jam) { let grp = []; const flush = () => { grp.forEach((n, k) => { n.jk = k; n.jg = grp; }); grp = []; };
+    notes.forEach(n => { if (!n.jam) return; if (grp.length && n.beat - grp[grp.length - 1].beat > 0.51) flush(); grp.push(n); }); flush(); }
   notes.forEach(n => { n.pair = !isAuto(n) && notes.some(m => m !== n && m.lane !== n.lane && !isAuto(m) && Math.abs(m.beat - n.beat) < 1e-6); n.pair2 = n.pair && n.lane === 1; });
   notes.forEach((n, i) => {
     n.i = i; n.arr = timeAt(n.beat); n.place = n.arr - TRAVEL * SPB; n.end = timeAt(n.beat + n.len);
@@ -828,6 +898,12 @@ function loadLevel(level) {
     if (n.surge && level.surge) {
       const S = level.surge; n.place = timeAt(n.beat - S.dash - S.ride); n.t1 = timeAt(n.beat - S.dash);
     }
+    // a belt that stops or swings runs on its own clock (n.bb = the belt beat it arrives at); she sets each box down two belt
+    // beats ahead of that
+    if (level.beltStop || level.beltSwing) { n.bb = beltBeat(n.beat); n.place = timeAt(realBeat(n.bb - TRAVEL)); }
+    // a jammed box: set down on a beat, one a beat, so the jam fills up before the release (the beat before the first leaves),
+    // and leaves the roller `dash` beats before it lands
+    if (n.jam && level.jam) { const m = n.jg.length, R = n.jg[0].beat - level.jam.dash; n.leave = timeAt(n.beat - level.jam.dash); n.jR = timeAt(R); n.place = timeAt(Math.floor(R - 1) - (m - 1 - n.jk)); }
     if (n.len) { n.w = Math.round((n.end - n.arr) * SPEED) + 16; n.h = 12; }
     else if (n.heavy) { n.w = 26 + Math.floor(rnd(i, 1) * 5); n.h = 17 + Math.floor(rnd(i, 2) * 4); }
     else if (level.small) { n.w = 8 + Math.floor(rnd(i, 1) * 5); n.h = 7 + Math.floor(rnd(i, 2) * 4); }
@@ -1650,6 +1726,46 @@ function drawHaeunScene(beat, kick, nowMs, active) {
 // each following beat the belt catches it (덜컥: a short jerk, a 1px hop, a clack on the beat) and it sticks again, each jerk
 // shorter than the last; on the beat it reaches the seam the belt lurches (슉) and it shoots, smooth and fast, onto the
 // scanner half a beat later, on the 'and'. Then belt speed again. 반장 bangs the machine at L.surge.fix and it stops.
+// belt variations (the 시안 stages). The belt's own clock in beats: it stands still through each stop, and a swung belt drags
+// through the first two thirds of every beat (half a beat's worth) and rushes through the last third (the other half)
+function beltBeat(b) {
+  if (L.beltStop) { let r = b; for (const [s0, len] of L.beltStop) r -= Math.max(0, Math.min(len, b - s0)); return r; }
+  if (L.beltSwing) { const k = Math.floor(b), f = b - k; return k + (f < 2 / 3 ? f * 0.75 : 0.5 + (f - 2 / 3) * 1.5); }
+  return b;
+}
+function realBeat(x) {
+  if (L.beltStop) { let r = x; for (const [s0, len] of L.beltStop) if (r > s0) r += len; return r; }
+  if (L.beltSwing) { const k = Math.floor(x), f = x - k; return k + (f < 0.5 ? f / 0.75 : 2 / 3 + (f - 0.5) / 1.5); }
+  return x;
+}
+const beltClockT = t => timeAt(beltBeat(beatAt(t)));
+// a jammed box rides at belt speed until it meets the queue behind the stuck roller (x), moves up as the ones ahead are let go,
+// and is let go itself `dash` beats before it lands: a quick run onto the scanner
+const JAM_GAP = 24;
+function jamX(n, t) {
+  const J = L.jam.x;
+  if (t >= n.arr) return SCAN_X + (t - n.arr) * SPEED;
+  if (t >= n.leave) return J + (t - n.leave) / (n.arr - n.leave) * (SCAN_X - J);
+  let ahead = 0; for (let j = 0; j < n.jk; j++) { const m = n.jg[j]; ahead += t < m.leave ? 1 : Math.max(0, 1 - (t - m.leave) / 0.14); }
+  return Math.min(PLACE_X + (t - n.place) * SPEED, J - JAM_GAP * ahead);
+}
+// the stuck roller: a bar across the belt and a lamp that blinks while boxes are held, flashes as it lets go
+function drawJamRoller(t, nowMs, active) {
+  const J = L.jam.x + 12; let held = false, go = 0;
+  if (active) for (const n of notes) { if (!n.jam) continue; if (t >= n.place && t < n.leave) held = true; if (t >= n.leave && t < n.leave + 0.15) go = Math.max(go, 1 - (t - n.leave) / 0.15); }
+  R(J, BELT_Y - 3, 3, 7, '#6b6f75'); R(J, BELT_Y - 3, 3, 1, '#8c9096'); R(J + 4, BELT_Y - 30, 2, 27, '#3d3431'); R(J + 1, BELT_Y - 35, 8, 6, '#2b2422');
+  const on = go > 0 ? 1 : held ? (Math.floor(nowMs / 110) % 2 ? 1 : 0.3) : 0.15;
+  R(J + 2, BELT_Y - 34, 6, 4, go > 0 ? '#fff4d8' : on > 0.5 ? '#ff5a3a' : '#5a2a22');
+  if (on > 0.25) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(J + 5, BELT_Y - 32, 0, J + 5, BELT_Y - 32, 18); gr.addColorStop(0, go > 0 ? 'rgba(255,240,210,.5)' : `rgba(255,90,60,${0.3 * on})`); gr.addColorStop(1, 'rgba(255,90,60,0)'); g.fillStyle = gr; g.fillRect(J - 20, BELT_Y - 56, 50, 50); g.restore(); }
+}
+// a stopping belt: the lamp over the loading end goes red while it is stopped, blinks on each beat, green on the last one
+function drawStopLamp(t, active) {
+  const b = active ? beatAt(t) : -1, x = PLACE_X + 6, y = BELT_Y - 40;
+  let col = '#2a3a2a', glow = null;
+  for (const [s0, len] of L.beltStop) { if (b < s0 || b >= s0 + len) continue; const k = b - s0, ph = k % 1, last = k >= len - 1; col = ph < 0.35 ? (last ? '#7dff9a' : '#ff4a3a') : (last ? '#2d6a3a' : '#6a2a22'); glow = ph < 0.35 ? (last ? '125,255,154' : '255,74,58') : null; }
+  R(x - 1, y + 5, 2, BELT_Y - y - 5, '#3d3431'); R(x - 4, y - 1, 8, 6, '#2b2422'); R(x - 3, y, 6, 4, col);
+  if (glow) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y + 2, 0, x, y + 2, 20); gr.addColorStop(0, `rgba(${glow},.45)`); gr.addColorStop(1, `rgba(${glow},0)`); g.fillStyle = gr; g.fillRect(x - 22, y - 20, 44, 44); g.restore(); }
+}
 function surgePhase(n, t) { const u = (t - n.place) / SPB, k = Math.floor(u); return { k, f: u - k }; }
 const JERK = 0.15;   // how much of a beat a 덜컥 takes
 function surgeHop(n, t) { const { k, f } = surgePhase(n, t); return k >= 1 && f < JERK ? -1 : 0; }
@@ -1666,6 +1782,7 @@ function surgedX(n, t) {
   if (t < n.arr) return X + (t - n.t1) / (n.arr - n.t1) * (SCAN_X - X);
   return SCAN_X + (t - n.arr) * SPEED;
 }
+const jamSfx = first => { if (!ctx) return; const t = ctx.currentTime; if (first) { thud(t, 0.8); noise(t, 'bandpass', 900, 0.2, 0.1, 2, bus); } noise(t, 'bandpass', 2200, 0.06, 0.06, 1.2, bus); };
 const surgeSfx = () => { if (!ctx) return; const t = ctx.currentTime; noise(t, 'bandpass', 2600, 0.07, 0.09, 1.2, bus); noise(t + 0.02, 'highpass', 5200, 0.03, 0.06, 0.7, bus); osc('square', 70, t, 0.003, 0.025, 0.06, bus); };
 // a 덜컥 on each beat the belt catches the box, scheduled from when it is set down
 const rattleSfx = (n, now) => { if (!ctx) return; const t0 = ctx.currentTime; for (let k = 1; k < L.surge.ride; k++) { const at = n.place + k * SPB - now; if (at >= 0) { noise(t0 + at, 'bandpass', 1000 + (k % 2) * 300, 0.035, 0.05, 2.2, bus); osc('square', 85, t0 + at, 0.002, 0.014, 0.04, bus); } } };
@@ -2096,6 +2213,8 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   drawScannerBack(0);
   (L.daw ? drawDawTop : drawBeltTop)(beltT, active);
   if (far && L.surge) drawSurgeSeam(t, nowMs, active);
+  if (L.jam) drawJamRoller(t, nowMs, active);
+  if (L.beltStop) drawStopLamp(t, active);
   let holding = false;
   if (active) {
     drawRingsAt(dy, nowMs);
@@ -2105,7 +2224,8 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
     for (const n of notes) {
       if (n.lane !== lane) continue;
       if (t < n.place) break;
-      let cx = n.surge && n.t1 != null ? surgedX(n, t) : SCAN_X + (t - n.arr) * SPEED;
+      let cx = n.surge && n.t1 != null ? surgedX(n, t) : n.jam && L.jam ? jamX(n, t) : n.bb != null ? SCAN_X + (beltBeat(beatAt(t)) - n.bb) * SPEED * SPB : SCAN_X + (t - n.arr) * SPEED;
+      if (n.jam && L.jam && active && !n.jamFx && t >= n.leave) { n.jamFx = true; jamSfx(n.jk === 0); }
       if (n.surge && active && n.t1 != null) {
         if (!n.rattleFx && t >= n.place) { n.rattleFx = true; rattleSfx(n, t); }
         if (!n.surgeFx && t >= n.t1) { n.surgeFx = true; surgeSfx(); const X = L.surge.x; spawn(far ? farX(X) : X, (far ? farY(BELT_Y) : BELT_Y) - 1, 6, ['#ffd27a', '#fff4d8', '#ff9a3a'], -30, 70, -70, -20, 260, 260, [1, 1]); }
@@ -2142,7 +2262,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
     }
     for (const [n, x, sq, rat] of boxQ) {
       // an off-beat box was set down crooked: it leans, and its tape is red
-      if (n.surge && t >= n.t1 && t < n.arr) for (let k = 0; k < 3; k++) R(Math.round(x - n.w / 2 - 6 - k * 5), BELT_Y - 4 - k * 4, 4 + k, 1, 'rgba(255,255,255,.55)');   // thrown: speed lines
+      if (((n.surge && t >= n.t1) || (n.jam && t >= n.leave)) && t < n.arr) for (let k = 0; k < 3; k++) R(Math.round(x - n.w / 2 - 6 - k * 5), BELT_Y - 4 - k * 4, 4 + k, 1, 'rgba(255,255,255,.55)');   // thrown: speed lines
       if (rat) { g.save(); g.translate(x, BELT_Y + rat); g.rotate(rat * 0.025); drawBox(n, 0, 0, n.state, t, sq); g.restore(); continue; }   // the bad belt catches it: a hop and a rock
       if (n.off && L.offTilt && !n.top && !(n.surge && t < n.t1)) { g.save(); g.translate(x, BELT_Y); g.rotate((n.i % 2 ? 1 : -1) * 0.12); drawBox(n, 0, 0, n.state, t, sq); g.restore(); }
       else drawBox(n, x, n.top ? BELT_Y - 12 : BELT_Y, n.state, t, sq);
@@ -2852,7 +2972,7 @@ function drawScene(t, bt, active, nowMs) {
   const lanes = L.lanes === 2 ? [0, 1] : [0];
   const poses = lanes.map(lane => { const p = partnerPose(t, bt, active, lane); p.nod = FX.react[lane].type === 'nod' && nowMs - FX.react[lane].at < 130 ? 1 : 0; return p; });
   const kick = Math.max(0, 1 - (nowMs - lastPress) / 140), upperKick = Math.max(0, 1 - (nowMs - lastPressUpper) / 140);
-  const beltT = active ? t : bt;
+  const beltT = active ? (L.beltStop || L.beltSwing ? beltClockT(t) : t) : bt;
   const laneFx = { delivered: 0, binned: 0, falling: [] };
   if (L.lanes === 2) {
     const mb = castBeatAt(t, active); DUO.mode = duoMode(mb); DUO.p = L.handover ? Math.max(0, Math.min(1, (mb - L.handover[0]) / (L.handover[1] - L.handover[0]))) : 1;
@@ -3419,14 +3539,15 @@ function buildEvents() {
     for (let k = 0; k < 4; k++) E(k * s / 4, T => { if (stats.combo >= 8) noise(T, 'highpass', 6000, k % 2 ? 0.035 : 0.06, 0.03); });
     if (inBar === 0) E(0, T => { if (stats.combo >= 20) { osc('sine', chords[ci][2] * 4, T, 0.003, 0.05, 0.6); osc('sine', chords[ci][0] * 4, T + s / 2, 0.003, 0.035, 0.5); } });
     if (style === 'straight') {
+      const AND = L.beltSwing ? s * 2 / 3 : s / 2;   // a swung belt swings the band too
       if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4));
-      if (b < 8) { E(s / 2, T => hat(T, 0.06)); continue; }
+      if (b < 8) { E(AND, T => hat(T, 0.06)); continue; }
       E(0, T => kick(T, quiet ? 0.4 : 0.9));
       if (!quiet && (inBar === 1 || inBar === 3)) E(0, T => snare(T));
-      E(0, T => hat(T, quiet ? 0.03 : 0.07)); E(s / 2, T => hat(T, quiet ? 0.05 : 0.11));
+      E(0, T => hat(T, quiet ? 0.03 : 0.07)); E(AND, T => hat(T, quiet ? 0.05 : 0.11));
       if (quiet) { if (inBar === 0) E(0, T => bass(T, roots[ci], s * 3.5)); }
-      else { E(0, T => bass(T, roots[ci], s * 0.4)); E(s / 2, T => bass(T, inBar === 3 ? roots[ci] * 2 : roots[ci], s * 0.4)); }
-      if ((b >= 24 && b < 40) || (b >= 64 && b < 80)) for (let k = 0; k < 2; k++) { const f = chords[ci][arp[inBar * 2 + k]] * 2; E(k * s / 2, T => lead(T, f, s * 0.4)); }
+      else { E(0, T => bass(T, roots[ci], s * 0.4)); E(AND, T => bass(T, inBar === 3 ? roots[ci] * 2 : roots[ci], s * 0.4)); }
+      if ((b >= 24 && b < 40) || (b >= 64 && b < 80)) for (let k = 0; k < 2; k++) { const f = chords[ci][arp[inBar * 2 + k]] * 2; E(k ? AND : 0, T => lead(T, f, s * 0.4)); }
     } else if (style === 'offbeat') {
       if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4, 'triangle', 0.05));
       if (b < 8) { E(0, T => hat(T, 0.05)); E(s / 2, T => hat(T, 0.09)); continue; }
@@ -3953,6 +4074,12 @@ function buildEvents() {
       if (b >= 80) for (let k = 0; k < 2; k++) { const f = chords[ci][arp[inBar * 2 + k]] * 2; E(k * s / 2, T => lead(T, f, s * 0.4)); }
     }
   }
+  // a stopping belt: the motor dies (a falling whine), and on the last beat before it starts it winds back up, 철컥 on the restart
+  if (L.beltStop) for (const [s0, len] of L.beltStop) {
+    ev.push([timeAt(s0), T => { const o = osc('sawtooth', 130, T, 0.01, 0.07, SPB * 1.4, bus); o.frequency.exponentialRampToValueAtTime(30, T + SPB * 1.4); noise(T, 'lowpass', 400, 0.3, 0.2, 0.7, bus); }]);
+    ev.push([timeAt(s0 + len - 1), T => { const o = osc('sawtooth', 35, T, 0.05, 0.06, SPB * 1.02, bus); o.frequency.exponentialRampToValueAtTime(150, T + SPB); }]);
+    ev.push([timeAt(s0 + len), T => { thud(T, 0.9); noise(T, 'bandpass', 1500, 0.22, 0.08, 2.5, bus); }]);
+  }
   if (L.crazy) for (const [cs, ce] of L.crazy) {
     ev.push([timeAt(cs) - 0.05, T => { const o = osc('sawtooth', 320, T, 0.01, 0.12, 0.7, bus); o.frequency.exponentialRampToValueAtTime(30, T + 0.7); noise(T, 'lowpass', 300, 0.5, 0.25, 0.7, bus); }]);
     ev.push([timeAt(ce), T => { for (let k = 0; k < 4; k++) noise(T + k * 0.09, 'highpass', 3000, 0.12, 0.03, 0.7, bus); osc('sine', 1760, T + 0.4, 0.005, 0.05, 0.3, bus); }]);
@@ -4032,7 +4159,7 @@ let progress = {};
 try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}; } catch (e) {}
 
 function resetRun() {
-  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.surgeFx = false; n.rattleFx = false; }); SURGE_FIX.done = false;
+  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.surgeFx = false; n.rattleFx = false; n.jamFx = false; }); SURGE_FIX.done = false;
   FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.splashes = []; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9; FX.goodBoth = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
   rings = []; heavyPend = null;
@@ -4382,6 +4509,7 @@ function buildCards() {
   STAGE1.forEach((it, i) => {
     const lv = it.level, locked = !lv;
     if (it.stage2) { const dv = document.createElement('div'); dv.className = 'divider'; dv.textContent = '스테이지 2 · 본선'; cardsEl.append(dv); }
+    if (it.lab && !(STAGE1[i - 1] || {}).lab) { const dv = document.createElement('div'); dv.className = 'divider'; dv.textContent = '시안 · 벨트 변주'; cardsEl.append(dv); }
     const b = document.createElement('button'); b.type = 'button'; b.className = 'card' + (it.boss ? ' boss' : ''); b.style.setProperty('--tilt', ((i * 7) % 5 - 2) * 0.5 + 'deg');
     if (locked) b.disabled = true;
     const c = document.createElement('canvas'); c.width = 40; c.height = 64;
