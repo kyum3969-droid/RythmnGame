@@ -86,7 +86,7 @@ dl{display:grid;grid-template-columns:auto 1fr;gap:.15em 1.2em;margin:.5em 0 1em
 const $ = id => document.getElementById(id);
 const W = 384, H = 216, MOV_H = 216;
 const SC = 3;   // the canvas is three times the game's 384x216; everything is laid out in game pixels and drawn at SC
-const cv = $('cv'), g = cv.getContext('2d'); g.setTransform(SC, 0, 0, SC, 0, 0); g.imageSmoothingEnabled = false;
+const cv = $('cv'), G0 = cv.getContext('2d'); let g = G0; g.setTransform(SC, 0, 0, SC, 0, 0); g.imageSmoothingEnabled = false;
 const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
 
@@ -226,7 +226,8 @@ const X0 = 8, HEART = 3, HX = 356, COL = 292, GAP = (COL - X0 - 26) / 3, SPOT = 
 const ease = p => p < 0 ? 0 : p > 1 ? 1 : p * p * (3 - 2 * p);
 const rnd = (i, k) => { const s = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return s - Math.floor(s); };
 const LANE = [{ name: '어머니', tag: '502호' }, { name: '하은', tag: '보호자' }];
-function txt(s, x, y, c, size = 7, align = 'left', weight = '600', font = '"IBM Plex Sans KR", sans-serif') { g.font = `${weight} ${size}px ${font}`; g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = c; g.fillText(s, x, y); g.textAlign = 'left'; }
+function txt(s, x, y, c, size = 7, align = 'left', weight = '600', font = '"IBM Plex Sans KR", sans-serif') {
+  if (LOW.on) { const m = g.getTransform(); LOW.text.push({ s, x, y, c, size, align, weight, font, m, a: g.globalAlpha, sc: g.shadowColor, sb: g.shadowBlur }); return; } g.font = `${weight} ${size}px ${font}`; g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = c; g.fillText(s, x, y); g.textAlign = 'left'; }
 function glowTxt(s, x, y, c, size, align, font, glow) { g.save(); g.shadowColor = glow; g.shadowBlur = 6 * SC; txt(s, x, y, c, size, align, '400', font); g.restore(); txt(s, x, y, c, size, align, '400', font); }
 // one heartbeat on the line at x (the R peak), sharp like a monitor's: a small P, the flat PR, a little Q, a needle-thin R, a deep
 // S, the ST segment and a low T; amp is the R peak's height
@@ -251,7 +252,7 @@ function wave(x, y, amp, core, bloom, alpha = 1, dash = null) {
   const pts = beatPts(amp), path = () => { g.beginPath(); pts.forEach(([dx, dy], i) => i ? g.lineTo(x + dx, y + dy) : g.moveTo(x + dx, y + dy)); };
   g.save(); g.lineJoin = 'round'; g.lineCap = 'round'; if (dash) g.setLineDash(dash);
   if (bloom) { g.globalCompositeOperation = 'lighter'; g.strokeStyle = bloom; g.globalAlpha = alpha * 0.16; g.lineWidth = 4.5; path(); g.stroke(); g.globalAlpha = alpha * 0.32; g.lineWidth = 2; path(); g.stroke(); g.globalCompositeOperation = 'source-over'; }
-  g.globalAlpha = alpha; g.strokeStyle = core; g.lineWidth = 0.8; g.lineJoin = 'miter'; g.miterLimit = 12; g.lineCap = 'butt'; path(); g.stroke(); g.restore();
+  g.globalAlpha = alpha; g.strokeStyle = core; g.lineWidth = 1.1; g.lineJoin = 'miter'; g.miterLimit = 12; g.lineCap = 'butt'; path(); g.stroke(); g.restore();
 }
 const mixc = (a, b, p) => { const A = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), B = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16)); return '#' + A.map((v, i) => Math.round(lerp(v, B[i], clamp(p, 0, 1))).toString(16).padStart(2, '0')).join(''); };
 // a fresh peak is near white; it cools to green and then to a dim green as it fades
@@ -286,6 +287,7 @@ function drawLane(lane, y, t, show) {
   { const band = g.createLinearGradient(0, 0, W, 0); band.addColorStop(0, 'rgba(4,10,8,0)'); band.addColorStop(0.08, 'rgba(4,10,8,.5)'); band.addColorStop(0.92, 'rgba(4,10,8,.5)'); band.addColorStop(1, 'rgba(4,10,8,0)'); g.fillStyle = band; g.fillRect(0, y - 30, W, 44);
     g.fillStyle = 'rgba(80,160,110,.07)'; for (let x = X0; x < HX; x += 6) g.fillRect(x, y - 28, 0.34, 40); for (let yy = y - 28; yy < y + 12; yy += 6) g.fillRect(X0, yy, HX - X0, 0.34);
     g.fillStyle = 'rgba(80,160,110,.13)'; for (let x = X0; x < HX; x += 30) g.fillRect(x, y - 28, 0.34, 40); }
+  { const sa = g.globalAlpha; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; scanBox(Math.round(y - 30), Math.round(y + 14), false); g.restore(); g.globalAlpha = sa; }
   // who this row is, and the rate, like the bedside monitor's corner
   txt(LANE[lane].name, X0 + 2, y - 27, 'rgba(160,240,170,.75)', 6, 'left', '600'); txt(LANE[lane].tag, X0 + 2 + (lane ? 14 : 20), y - 27, 'rgba(120,180,130,.5)', 5, 'left', '400');
   if (r) txt(String(SEG[clamp(Math.floor(r.b0 / 8), 0, SEG.length - 1)]), HX - 14, y - 27, 'rgba(160,240,170,.75)', 6, 'right', '500', '"IBM Plex Mono", monospace');
@@ -309,7 +311,7 @@ function drawLane(lane, y, t, show) {
       const pts = rowPts(row, 24), path = () => { g.beginPath(); pts.forEach(([x, dy], i) => i ? g.lineTo(x, y + dy) : g.moveTo(x, y + dy)); };
       g.save(); g.beginPath(); g.rect(lo, y - 40, x1 - lo, 60); g.clip(); g.globalAlpha = show;
       g.globalCompositeOperation = 'lighter'; g.strokeStyle = gr; g.lineJoin = 'round'; g.lineCap = 'round'; g.globalAlpha = show * 0.16; g.lineWidth = 4.5; path(); g.stroke(); g.globalAlpha = show * 0.32; g.lineWidth = 2; path(); g.stroke();
-      g.globalCompositeOperation = 'source-over'; g.globalAlpha = show; g.lineJoin = 'miter'; g.miterLimit = 12; g.lineCap = 'butt'; g.lineWidth = 0.85; path(); g.stroke();
+      g.globalCompositeOperation = 'source-over'; g.globalAlpha = show; g.lineJoin = 'miter'; g.miterLimit = 12; g.lineCap = 'butt'; g.lineWidth = 1.1; path(); g.stroke();
       g.restore();
     }
     for (let k = 0; k <= HEART; k++) {
@@ -319,7 +321,7 @@ function drawLane(lane, y, t, show) {
         if (waiting && kf > HEART - 1.6) {
           
           const sp = beatT(row.b0 + HEART) - beatT(row.b0 + HEART - 1), p = clamp(1 + dt / sp, 0, 1);
-          if (p > 0 && p < 1) { g.save(); g.globalAlpha = show * (0.3 + 0.7 * p); g.strokeStyle = '#d8fbff'; g.lineWidth = 0.8; g.beginPath(); g.arc(x, y - 9, 4 + 20 * (1 - p), 0, Math.PI * 2); g.stroke(); g.restore(); }
+          if (p > 0 && p < 1) { g.save(); g.globalAlpha = show * (0.4 + 0.6 * p); g.strokeStyle = '#3a2408'; g.lineWidth = 1.4; g.beginPath(); g.arc(x, y - 9, 4 + 20 * (1 - p), 0, Math.PI * 2); g.stroke(); g.restore(); }
         } else if (tgk.judge && tgk.judge !== 'miss') { const dh = t - tgk.hitT, f7 = clamp(1 - (dh - 0.3) / 0.9, 0, 1); if (f7 > 0) { g.save(); g.beginPath(); g.rect(x - BEAT_W, y - 40, (drawing ? Math.min(pen, x + BEAT_W) : x + BEAT_W) - (x - BEAT_W), 60); g.clip(); wave(x, y, 28.8, tgk.judge === 'good' ? '#e2fff0' : '#ffffff', tgk.judge === 'good' ? '#9cf0c8' : '#d8fbff', show * f7); g.restore(); } }
         else if (tgk.judge === 'miss' && t - tgk.t < 1.2) { const f = clamp(1 - (t - tgk.t - 0.4) / 0.8, 0, 1); g.save(); g.globalAlpha = show * f; g.strokeStyle = '#ff5a5a'; g.lineWidth = 0.9; g.beginPath(); for (let i = -BEAT_W; i <= BEAT_W; i += 2) g.lineTo(x + i, y + (rnd(i, Math.floor(now / 50)) - 0.5) * 2.4); g.stroke(); g.restore(); }
       }
@@ -343,18 +345,34 @@ function drawLane(lane, y, t, show) {
   for (const p of FX.pops) { if (p.lane !== lane) continue; const age = (now - p.at) / 650, a = 1 - age; if (a <= 0) continue; const sc = 1 + 0.8 * clamp(1 - age / 0.15, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(COL - 22, y - 28 - age * 4); g.scale(sc, sc); glowTxt(p.text, 0, -7, p.c, 15, 'center', '"Black Han Sans", sans-serif', p.text === '놓침' ? 'rgba(255,60,60,.8)' : 'rgba(180,255,200,.8)'); if (p.sub) txt(p.sub, 0, 7, p.c, 5, 'center', '400'); g.restore(); }
   g.restore();
 }
+const LOW = { on: false, text: [], cv: null, g: null }, BOX = { col: '#c8961c' };
+// the yellow scan box, or the part of it between y0 and y1 (redrawn over each row's band so it stays solid)
+function scanBox(y0, y1, cap) {
+  const bw = 34, bx = COL - bw / 2, col = BOX.col;
+  R(bx - 1, y0 - (cap ? 1 : 0), 1, y1 - y0 + 1, '#3a2a08'); R(bx + bw, y0 - (cap ? 1 : 0), 1, y1 - y0 + 1, '#3a2a08'); if (cap) R(bx - 1, y0 - 1, bw + 2, 1, '#3a2a08');
+  R(bx, y0, bw, y1 - y0, col); if (cap) R(bx, y0, bw, 1, mixc(col, '#ffffff', 0.5)); R(bx, y0, 1, y1 - y0, mixc(col, '#ffffff', 0.35)); R(bx + bw - 1, y0, 1, y1 - y0, mixc(col, '#000000', 0.25));
+  for (let yy = Math.ceil(y0 / 4) * 4; yy < y1; yy += 4) R(bx + 2, yy, bw - 4, 1, mixc(col, '#000000', 0.06));
+}
 function drawRows(t) {
+  if (!LOW.cv) { LOW.cv = document.createElement('canvas'); LOW.cv.width = W; LOW.cv.height = H; LOW.g = LOW.cv.getContext('2d'); }
+  const lg = LOW.g; lg.setTransform(1, 0, 0, 1, 0, 0); lg.globalAlpha = 1; lg.globalCompositeOperation = 'source-over'; lg.clearRect(0, 0, W, H);
+  LOW.on = true; LOW.text = []; g = lg;
+  try { drawRowsAt(t); } finally { g = G0; LOW.on = false; }
+  // step the alpha into a few levels so soft glows read as pixel bands
+  const im = lg.getImageData(0, 0, W, H), d = im.data; for (let i = 3; i < d.length; i += 4) { const a = d[i]; d[i] = a < 22 ? 0 : a > 200 ? 255 : Math.round(a / 56) * 56 + 31; } lg.putImageData(im, 0, 0);
+  g.save(); g.imageSmoothingEnabled = false; g.drawImage(LOW.cv, 0, 0, W, H); g.restore();
+  for (const q of LOW.text) { g.save(); g.transform(q.m.a, q.m.b, q.m.c, q.m.d, q.m.e, q.m.f); g.globalAlpha = q.a; g.shadowColor = q.sc; g.shadowBlur = q.sb; txt(q.s, q.x, q.y, q.c, q.size, q.align, q.weight, q.font); g.restore(); }
+}
+function drawRowsAt(t) {
   // a soft shade over the lower part of the scene so the rows read
   const sh = g.createLinearGradient(0, 96, 0, H); sh.addColorStop(0, 'rgba(6,10,9,0)'); sh.addColorStop(1, 'rgba(6,10,9,.6)'); g.fillStyle = sh; g.fillRect(0, 96, W, H - 96);
   const two = clamp((t - TWO_AT) / 0.6, 0, 1), e2 = ease(two);
   const y0 = lerp(186, 162, e2), y1 = lerp(246, 204, e2); LANEY[0] = y0; LANEY[1] = y1;
-  // the 4th beat's column, across every row: a beam fading upward with soft edges and slow rising lines; brighter as the beat
-  // comes, a flash on a press
+  // the 4th beat's column, across every row: a wide solid yellow box with a dark rim and a lit edge; it brightens as the beat
+  // comes and flashes white on a press
   const near = Math.max(...[0, 1].map(l => { const r = laneRow(l, t); return r ? clamp(1 - Math.abs(t - r.tg.t) / 0.5, 0, 1) : 0; })), fl = clamp(1 - (performance.now() - FX.flashAt) / 220, 0, 1);
-  { const top = 120, a = 0.14 + 0.14 * near + 0.3 * fl, beam = g.createLinearGradient(0, top, 0, H); beam.addColorStop(0, 'rgba(120,225,235,0)'); beam.addColorStop(0.25, `rgba(120,225,235,${a})`); beam.addColorStop(1, `rgba(120,225,235,${a * 1.3})`);
-    g.fillStyle = beam; g.fillRect(COL - 9, top, 18, H - top); if (fl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fx = g.createRadialGradient(COL, (LANEY[0] + LANEY[1]) / 2, 0, COL, (LANEY[0] + LANEY[1]) / 2, 70); fx.addColorStop(0, `rgba(190,255,235,${0.35 * fl})`); fx.addColorStop(1, 'rgba(190,255,235,0)'); g.fillStyle = fx; g.fillRect(COL - 70, 100, 140, H - 100); g.restore(); }
-    const edge = (x, dir) => { const e = g.createLinearGradient(x, 0, x + dir * 4, 0); e.addColorStop(0, `rgba(210,250,255,${0.35 + 0.35 * fl})`); e.addColorStop(1, 'rgba(210,250,255,0)'); g.fillStyle = e; g.fillRect(dir > 0 ? x : x - 4, top + 20, 4, H - top - 20); }; edge(COL - 9, 1); edge(COL + 9, -1);
-    g.fillStyle = `rgba(220,252,255,${0.08 + 0.1 * near})`; for (let k = 0; k < 6; k++) { const yy = H - ((performance.now() / 40 + k * 17) % (H - top)); g.fillRect(COL - 8, yy, 16, 0.34); } }
+  { const top = 124; BOX.col = mixc(mixc('#c8961c', '#f2c43a', near), '#fff6c8', fl); scanBox(top, H, true);
+    if (fl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fx = g.createRadialGradient(COL, (LANEY[0] + LANEY[1]) / 2, 0, COL, (LANEY[0] + LANEY[1]) / 2, 70); fx.addColorStop(0, `rgba(255,240,170,${0.4 * fl})`); fx.addColorStop(1, 'rgba(255,240,170,0)'); g.fillStyle = fx; g.fillRect(COL - 70, 100, 140, H - 100); g.restore(); } }
   drawLane(0, y0, t, 1);
   if (two > 0) drawLane(1, y1, t, e2);
   const now = performance.now();
