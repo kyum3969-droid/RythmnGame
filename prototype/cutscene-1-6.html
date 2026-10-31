@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>1-6 컷씬 · 새벽</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+/* 1-6 cutscene, drawn live in the game's own pixels: the same 384x216 screen, the same 하은, belt and warehouse as index.html.
+   Close shots crop that pixel screen and blow it up, so the dots stay the game's dots. */
+:root{
+  --night:#15110e; --panel:#1f1915; --line:#3a2f28; --ink:#efe6d2; --muted:#a6978a; --accent:#d9a520;
+  --display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--night:#15110e}}
+:root[data-theme="dark"]{--night:#15110e}
+[hidden]{display:none!important}
+html,body{height:100%} body{box-sizing:border-box;margin:0}
+body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding:10px 16px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.page{width:min(100%,calc((100dvh - 150px) * 16 / 9));max-width:100%;display:flex;flex-direction:column;gap:10px}
+.stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:#000;
+  box-shadow:0 0 0 1px #000,0 0 40px rgba(0,0,0,.6);cursor:pointer;user-select:none;-webkit-user-select:none}
+.stage canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.big{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(6,5,4,.45)}
+.big span{font:400 clamp(18px,4vw,34px) var(--display);background:var(--ink);color:#1d1815;padding:.35em 1em;border-radius:3px}
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{font:600 14px var(--body);min-height:36px;padding:0 14px;border-radius:3px;border:0;background:var(--ink);color:#1d1815;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px var(--accent);color:var(--accent)}
+.btn:focus-visible,input:focus-visible{outline:2px solid #2f6f8a;outline-offset:2px}
+.time{font:500 13px var(--mono);color:var(--muted);min-width:7.5em}
+.scrub{position:relative;flex:1 1 220px;min-width:160px}
+.scrub input{width:100%;margin:0;accent-color:var(--accent)}
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.shot{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:8px 10px;cursor:pointer;text-align:left;color:var(--ink);font:inherit}
+.shot.on{border-color:var(--accent)}
+.shot b{font:400 16px var(--display);letter-spacing:.01em}
+.shot .t{font:500 12px var(--mono);color:var(--muted);margin-left:6px}
+.shot p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="stage" id="stage">
+    <canvas id="cv" width="1152" height="648" aria-label="1-6 컷씬: 빈 벨트 앞에서 하은이 고개를 들고, 공장 밖으로 걸어 나간다"></canvas>
+    <div class="big" id="big"><span>▶ 재생</span></div>
+  </div>
+  <div class="bar">
+    <button class="btn" id="play" type="button">재생</button>
+    <button class="btn ghost" id="restart" type="button">처음부터</button>
+    <div class="scrub"><input id="seek" type="range" min="0" max="26" step="0.01" value="0" aria-label="재생 위치"></div>
+    <span class="time" id="time">00.0 / 26.0</span>
+    <button class="btn ghost" id="snd" type="button" aria-pressed="true">소리</button>
+  </div>
+  <div class="shots" id="shots"></div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const W = 384, H = 216, SC = 3;
+const cv = $('cv'), out = cv.getContext('2d');
+// every shot is drawn at the game's 1x into this buffer; the camera crops it and blows it up without smoothing
+const wb = document.createElement('canvas'); wb.width = W; wb.height = H; const wctx = wb.getContext('2d');
+// 하은 is drawn on her own small sheet first, so her outline can catch the light (the rim pass)
+const SPR_W = 64, SPR_H = 96, SPR_CX = 32, SPR_TOP = 24;
+const sb = document.createElement('canvas'); sb.width = SPR_W; sb.height = SPR_H; const sctx = sb.getContext('2d');
+const rb = document.createElement('canvas'); rb.width = SPR_W; rb.height = SPR_H; const rctx = rb.getContext('2d');
+let g = wctx;
+
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+const lerp = (a, b, p) => a + (b - a) * p;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease = p => p <= 0 ? 0 : p >= 1 ? 1 : p * p * (3 - 2 * p);
+const seg = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+const rnd = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
+const thick = (x1, y1, x2, y2, s, c) => { const d = Math.max(1, Math.hypot(x2 - x1, y2 - y1)); for (let k = 0; k <= d; k++) { const p = k / d; R(lerp(x1, x2, p) - s / 2, lerp(y1, y2, p) - s / 2, s, s, c); } };
+const hex = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+const mix = (a, b, p) => { const A = hex(a), B = hex(b); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], p))).join(',')})`; };
+
+// the game's palette (index.html C)
+const C = {
+  kraft:'#c48b52', kraftTop:'#d9a468', kraftDark:'#8f6236', tape:'#e6c88f', ink:'#1b1716', skin:'#d9a27a', skinDark:'#b98260',
+  laser:'#ff4a3d', ok:'#8fd694', belt:'#38302c', slat:'#2a2320', face:'#171312', metal:'#6a7075'
+};
+const SCAN_X = 300, BELT_Y = 146;
+
+// ---------- the timeline ----------
+const SHOTS = [
+  { id: 'belt', t0: 0, t1: 11, name: '빈 벨트', note: '벨트가 서고 등이 하나씩 꺼진다. 높은 창으로 햇살이 든다. 하은이 벨트를 두 번 두드리고, 빛 속에서 고개를 든다.' },
+  { id: 'walk', t0: 11, t1: 26, name: '공장 밖으로', note: '허리샷으로 따라간다. 하은은 제자리, 배경이 흐른다(창과 선반, 빈 라인, 기둥). 셔터 밑을 지나 바깥 새벽으로.' }
+];
+const END = 26;
+// shot 1 cues (seconds)
+const S1 = { cx: 222, top: 106, beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], blink: 9.8, push: [6.0, 9.4] };
+// shot 2: she stays put in the frame and the world slides by. d = how far she has walked (px at 1x)
+const S2 = { cx: 176, top: 84, v: 30, door: 205, step: 0.55, lampOff: 21.0 };
+const doorT = SHOTS[1].t0 + S2.door / S2.v;   // when she passes under the shutter
+
+// ---------- the warehouse, as in the game (index.html's static background) ----------
+const bgFactory = document.createElement('canvas'); bgFactory.width = W; bgFactory.height = H;
+(() => {
+  const b = bgFactory.getContext('2d');
+  const r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  r(0, 0, W, H, '#231b17');
+  r(0, 0, W, 34, '#191311');
+  for (let x = 0; x < W; x += 48) r(x, 0, 3, 34, '#211915');
+  r(0, 34, W, 2, '#2e241f');
+  for (let x = 24; x < W; x += 64) r(x, 36, 1, 132, '#2a211c');
+  let seed = 1;
+  for (const [x0, w] of [[66, 128], [214, 150]]) {
+    r(x0, 44, 3, 124, '#41332a'); r(x0 + w - 3, 44, 3, 124, '#41332a');
+    for (const y of [64, 100, 136]) {
+      let x = x0 + 5;
+      while (x < x0 + w - 16) {
+        const bw = 9 + Math.floor(rnd(seed, 3) * 12), bh = 8 + Math.floor(rnd(seed, 4) * 16);
+        const c = ['#5b4330', '#4f3a2a', '#66503a'][Math.floor(rnd(seed, 5) * 3)];
+        r(x, y - bh, bw, bh, c); r(x, y - bh, bw, 1, '#76604a'); r(x + (bw >> 1), y - bh, 1, bh, '#6e5a42');
+        x += bw + 2 + Math.floor(rnd(seed, 6) * 5); seed++;
+      }
+      r(x0, y, w, 3, '#4a3a2f'); r(x0, y + 3, w, 1, '#1d1714');
+    }
+  }
+  r(186, 36, 1, 8, '#4a4038'); r(200, 36, 1, 8, '#4a4038');
+  r(180, 44, 27, 15, '#d9a520'); r(180, 58, 27, 1, '#8a6a12');
+  ['111', '001', '111', '001', '111'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') r(190 + x * 2, 46 + y * 2, 2, 2, '#1d1815'); }));
+  r(0, 168, W, 48, '#18120f'); r(0, 168, W, 1, '#2e241f');
+  for (let x = 0; x < W; x += 14) r(x, 200, 8, 3, '#c99a1e');
+  r(0, 158, 34, 4, '#6b4a2e'); r(0, 162, 34, 2, '#4a3220'); r(2, 164, 4, 4, '#4a3220'); r(28, 164, 4, 4, '#4a3220');
+  const sbx = (x, y) => { r(x, y, 15, 13, C.kraft); r(x, y, 15, 2, C.kraftTop); r(x + 13, y + 2, 2, 11, C.kraftDark); r(x + 6, y, 3, 13, C.tape); };
+  sbx(1, 145); sbx(17, 145); sbx(1, 132); sbx(17, 132); sbx(9, 119);
+})();
+
+// ---------- 하은 (index.html drawHaeunAt, with a head that can tip down and lift) ----------
+// o.mirror: facing right. o.look: -1 head down over the belt, 0 level, 1 lifted into the light (the bangs part, the eyes show).
+// o.arms: 'belt' both hands on the belt edge (o.tap lifts the near one), 'walk' the near arm swings (o.swing -1..1) and the
+// other hand stays in her pocket. o.sway moves the hair. o.blink, o.glint (sunlight caught in her eyes).
+function haeun(cx, top, o = {}) {
+  const hair = '#17121a', hairL = '#2e2630', shirt = '#1e1a1a', shirtD = '#121010', cap = '#d8463b', capD = '#a83328', brim = '#c43d33', sky = '#86c3e8', tee = '#e9f3f7', leg = '#3a3f45', shoe = '#1e1a1a';
+  const look = o.look || 0, sw = o.sway || 0;
+  const hx = look < -0.5 ? -1 : 0, hy = look < -0.25 ? Math.round(-look * 2) : look > 0.5 ? -1 : 0, tilt = look < -0.5 ? 1 : look > 0.5 ? -1 : 0;
+  g.save(); if (o.mirror) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
+  R(cx - 5, top + 38, 5, 16, leg); R(cx + 2, top + 38, 5, 15, leg); R(cx - 6, top + 53, 6, 3, shoe); R(cx + 2, top + 52, 6, 3, shoe);
+  // long straight hair behind, down past the shoulders
+  R(cx - 9, top + 3, 18, 28, hair); R(cx + 7 + sw, top + 14, 3, 18, hair); R(cx - 10, top + 14, 3, 17, hair);
+  R(cx + 8 + sw, top + 16, 1, 12, hairL); R(cx - 9, top + 16, 1, 11, hairL);
+  // sky-blue tee with the white stripe over black sleeves, black bottoms
+  R(cx - 7, top + 16, 14, 23, shirt); R(cx - 7, top + 15, 14, 16, sky); R(cx - 7, top + 27, 14, 2, tee); R(cx - 7, top + 30, 14, 9, shirtD);
+  // the head: face, side hair, cap, bangs. Tipped down it sinks two pixels into the collar and leans one forward.
+  const fx = cx + hx, ft = top + hy;
+  R(fx - 6, ft + 1, 12, 14, C.skin); R(fx - 8, ft + 3, 3, 15, hair); R(fx + 5, ft + 3, 3, 15, hair); R(fx - 7, ft + 6, 1, 10, hairL);
+  R(fx - 7, ft - 2, 14, 6, cap); R(fx - 6, ft - 3, 12, 1, cap); R(fx - 7, ft + 3, 14, 1, capD); R(fx - 2, ft - 3, 1, 7, capD); R(fx - 1, ft - 4, 2, 1, capD);
+  R(fx - 6, ft - 1, 4, 2, '#f4e6e0');
+  // the brim: its tip dips with the head or tilts up with it
+  R(fx - 10, ft + 2, 4, 2, brim); R(fx - 10, ft + 2, 4, 1, cap); R(fx - 10, ft + 4, 4, 1, capD);
+  R(fx - 15, ft + 2 + tilt, 5, 2, brim); R(fx - 15, ft + 2 + tilt, 5, 1, cap); R(fx - 15, ft + 4 + tilt, 5, 1, capD);
+  if (look > 0.5) {
+    // looking up, the bangs fall back off her eyes
+    R(fx - 6, ft + 4, 12, 2, hair); R(fx - 6, ft + 6, 12, 1, '#6b4631');
+    if (o.blink) { R(fx - 5, ft + 7, 2, 1, C.skinDark); R(fx, ft + 7, 2, 1, C.skinDark); }
+    else { R(fx - 5, ft + 7, 2, 1, '#2a1d1a'); R(fx, ft + 7, 2, 1, '#2a1d1a'); if (o.glint) { R(fx - 5, ft + 7, 1, 1, '#fff1d0'); R(fx, ft + 7, 1, 1, '#fff1d0'); } }
+  } else { R(fx - 6, ft + 4, 12, 3, hair); R(fx - 6, ft + 7, 12, 1, '#6b4631'); }
+  R(fx - 3, ft + 9, 2, 1, '#b07a58'); R(fx - 3, ft + 11, 2, 1, '#b2565a');
+  // arms
+  if (o.arms === 'belt') {
+    const ly = Math.round((o.tap || 0) * 9);
+    thick(cx - 6, top + 22, cx - 11, top + 38 - ly, 4, shirt); R(cx - 13, top + 37 - ly, 4, 3, C.skin);
+    thick(cx + 6, top + 22, cx + 9, top + 38, 4, shirt); R(cx + 8, top + 37, 4, 3, C.skin);
+  } else if (o.arms === 'walk') {
+    const s = Math.round((o.swing || 0) * 4);
+    thick(cx - 6, top + 22, cx - 8 + s, top + 33, 4, shirt); R(cx - 10 + s, top + 32, 4, 3, C.skin);
+    thick(cx + 6, top + 22, cx + 8, top + 32, 4, shirt); R(cx + 6, top + 31, 4, 3, C.skin);
+  } else {
+    thick(cx - 6, top + 22, cx - 8, top + 34, 4, shirt); R(cx - 10, top + 33, 4, 3, C.skin);
+    thick(cx + 6, top + 22, cx + 8, top + 32, 4, shirt); R(cx + 6, top + 31, 4, 3, C.skin);
+  }
+  g.restore();
+}
+// draw her on her sheet; returns a function that puts her (and later her rim light) into the shot
+function haeunSprite(o) {
+  sctx.clearRect(0, 0, SPR_W, SPR_H); const keep = g; g = sctx; haeun(SPR_CX, SPR_TOP, o); g = keep;
+}
+// light her sheet like the room around her (multiply, kept inside her outline)
+function tintSprite(color) {
+  if (color === '#ffffff') return;
+  rctx.globalCompositeOperation = 'source-over'; rctx.clearRect(0, 0, SPR_W, SPR_H); rctx.drawImage(sb, 0, 0);
+  sctx.globalCompositeOperation = 'multiply'; sctx.fillStyle = color; sctx.fillRect(0, 0, SPR_W, SPR_H);
+  sctx.globalCompositeOperation = 'destination-in'; sctx.drawImage(rb, 0, 0); sctx.globalCompositeOperation = 'source-over';
+}
+function putSprite(x, top) { g.drawImage(sb, Math.round(x) - SPR_CX, Math.round(top) - SPR_TOP); }
+// rim light: the pixels of her outline that face the light (dx, dy) lit in a warm line
+function putRim(x, top, dx, dy, color, a, clipY = H) {
+  if (a <= 0.01) return;
+  rctx.globalCompositeOperation = 'source-over'; rctx.clearRect(0, 0, SPR_W, SPR_H); rctx.drawImage(sb, 0, 0);
+  rctx.globalCompositeOperation = 'source-in'; rctx.fillStyle = color; rctx.fillRect(0, 0, SPR_W, SPR_H);
+  rctx.globalCompositeOperation = 'destination-out'; rctx.drawImage(sb, -dx, -dy); rctx.globalCompositeOperation = 'source-over';
+  g.save(); g.beginPath(); g.rect(0, 0, W, clipY); g.clip(); g.globalAlpha = a; g.drawImage(rb, Math.round(x) - SPR_CX, Math.round(top) - SPR_TOP); g.restore();
+}
+
+// ---------- shared pieces: belt, scanner, windows, light ----------
+const MARK = 29.25;   // the belt's paint every 16th at the game's 100 BPM
+function drawBelt(off) {
+  R(48, BELT_Y, W - 48, 4, C.belt); R(48, BELT_Y, W - 48, 1, '#4a403b');
+  const k0 = Math.ceil((SCAN_X + off - W) / MARK), k1 = Math.floor((SCAN_X + off - 49) / MARK);
+  for (let k = k0; k <= k1; k++) {
+    const x = Math.round(SCAN_X + off - k * MARK), q = ((k % 4) + 4) % 4;
+    if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); }
+    else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44'); else R(x, BELT_Y + 1, 1, 3, C.slat);
+  }
+  R(46, BELT_Y + 4, W - 46, 12, C.face);
+  const ro = ((off % 14) + 14) % 14;
+  for (let x = 50 + ro - 14; x < W; x += 14) if (x >= 48) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); }
+  R(46, BELT_Y + 15, W - 46, 1, '#0c0a09');
+  for (const x of [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422');
+  R(44, BELT_Y - 1, 5, 17, '#3d3431');
+}
+function drawScanner(on) {
+  R(SCAN_X - 11, 108, 4, 40, '#555a5f'); R(SCAN_X - 11, 105, 24, 5, C.metal); R(SCAN_X - 2, 110, 6, 3, '#2b2e31');
+  if (on) { g.globalAlpha = 0.22; R(SCAN_X - 2, 113, 5, 33, C.laser); g.globalAlpha = 1; }
+  R(SCAN_X + 8, 108, 4, 56, '#7b8288'); R(SCAN_X + 8, 108, 4, 2, '#9aa1a6');
+  R(SCAN_X, 113, 1, 33, on ? C.laser : '#3a2422');
+  R(SCAN_X + 2, 103, 5, 2, on ? '#5a2b27' : '#2b2422');
+}
+// a high window: frame, mullions, glass that goes from pre-dawn blue to sunlit gold
+function drawWindow(x, y, w, h, k) {
+  R(x - 2, y - 2, w + 4, h + 4, '#3a2f28');
+  const hh = h >> 1;
+  R(x, y, w, hh, mix('#2b3550', '#fff0c4', k)); R(x, y + hh, w, h - hh, mix('#232b44', '#ffd690', k));
+  for (let mx = x + 15; mx < x + w - 4; mx += 16) R(mx, y, 2, h, '#3a2f28');
+  R(x, y + hh - 1, w, 2, '#3a2f28');
+  for (let i = 0; i < 5; i++) R(x + 2 + Math.floor(rnd(x + i, 7) * (w - 4)), y + 1 + Math.floor(rnd(x + i, 8) * (h - 2)), 1, 1, mix('#1c2238', '#e8c27a', k));
+}
+// a slanted shaft of light from a window's sill down to the floor (light from the upper right, falling to the lower left)
+const SLOPE = 0.5;
+function shaft(x, y, w, yEnd, a) {
+  if (a <= 0.005) return;
+  const dx = (yEnd - y) * SLOPE;
+  const gr = g.createLinearGradient(0, y, 0, yEnd); gr.addColorStop(0, `rgba(255,206,140,${a})`); gr.addColorStop(1, `rgba(255,190,120,${a * 0.18})`);
+  g.fillStyle = gr; g.beginPath(); g.moveTo(x, y); g.lineTo(x + w, y); g.lineTo(x + w - dx, yEnd); g.lineTo(x - dx, yEnd); g.closePath(); g.fill();
+  // a softer, wider halo around it
+  const gr2 = g.createLinearGradient(0, y, 0, yEnd); gr2.addColorStop(0, `rgba(255,190,130,${a * 0.35})`); gr2.addColorStop(1, 'rgba(255,190,130,0)');
+  g.fillStyle = gr2; g.beginPath(); g.moveTo(x - 6, y); g.lineTo(x + w + 6, y); g.lineTo(x + w + 14 - dx, yEnd); g.lineTo(x - 14 - dx, yEnd); g.closePath(); g.fill();
+}
+const inShaft = (px, py, x, y, w) => { if (py < y) return 0; const s = (py - y) * SLOPE, a = x - s, b = x + w - s; return px < a || px > b ? 0 : Math.min(1, (px - a) / 6, (b - px) / 6); };
+// dust hanging in the light
+function dust(t, shafts, a, area) {
+  if (a <= 0.01) return;
+  for (let i = 0; i < 90; i++) {
+    const x = area.x + ((rnd(i, 1) * area.w + t * (2 + rnd(i, 2) * 3) * (rnd(i, 5) < 0.5 ? -1 : 1) - (area.ox || 0)) % area.w + area.w) % area.w;
+    const y = area.y + rnd(i, 3) * area.h + Math.sin(t * (0.4 + rnd(i, 4) * 0.5) + i) * 3 - t * 0.8;
+    let m = 0; for (const s of shafts) m = Math.max(m, inShaft(x, y, s.x, s.y, s.w));
+    if (m <= 0) continue;
+    const tw = 0.5 + 0.5 * Math.sin(t * (1.5 + rnd(i, 6) * 2) + i * 3);
+    g.globalAlpha = a * m * (0.35 + 0.65 * tw); R(x, y, 1, 1, '#fff1c8');
+  }
+  g.globalAlpha = 1;
+}
+// multiply a cool dawn over the room, except where the window glass is
+function ambient(color, holes = []) {
+  if (color === '#ffffff') return;
+  g.save(); g.globalCompositeOperation = 'multiply'; g.fillStyle = color; g.beginPath(); g.rect(0, 0, W, H);
+  for (const [x, y, w, h] of holes) g.rect(x + w, y, -w, h);
+  g.fill('evenodd'); g.restore();
+}
+function glow(x, y, r, rgb, a) { if (a <= 0.005) return; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
+
+// ---------- shot 1: the empty belt ----------
+const TUBES = [60, 180, 300];
+const WINS1 = [[116, 5, 50, 22], [236, 5, 54, 22], [352, 5, 32, 22]];
+const tubeOn = (k, t) => 1 - seg(t, S1.tubesOff[k], S1.tubesOff[k] + 0.22);
+function beltOff1(t) { const v0 = 150, T = S1.beltStop, p = Math.min(t, T); return v0 * (p - p * p / (2 * T)); }
+function shot1(t) {
+  const sun = 0.22 + 0.78 * ease(seg(t, 4.4, 8.6));
+  const lit = TUBES.map((_, k) => tubeOn(k, t)), dark = 1 - (lit[0] + lit[1] + lit[2]) / 3;
+  g.drawImage(bgFactory, 0, 0);
+  for (const w of WINS1) drawWindow(w[0], w[1], w[2], w[3], sun);
+  // the tubes: fixture, wires and the tube itself, lit or dead (a last flicker as each one goes)
+  TUBES.forEach((x, k) => {
+    const off = S1.tubesOff[k], fl = t > off - 0.18 && t < off && Math.sin(t * 90 + k) > 0.2;
+    R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c');
+    R(x, 15, 46, 3, lit[k] > 0.5 && !fl ? '#fff3c8' : '#5d5446');
+  });
+  drawScanner(t < S1.laserOff);
+  // 하은 behind the belt, both hands on its edge, head down; two pats on the empty belt; she lifts her head into the light
+  const tap = Math.max(...S1.taps.map(a => { const d = t - a; return d < -0.35 ? 0 : d < 0 ? ease((d + 0.35) / 0.35) : d < 0.12 ? 1 - d / 0.12 : 0; }));
+  const lk = lerp(-1, 1, ease(seg(t, S1.look[0], S1.look[1])));
+  const blink = t > S1.blink && t < S1.blink + 0.13;
+  const top = S1.top - (lk > 0.5 ? 1 : 0);
+  haeunSprite({ mirror: true, look: lk, arms: 'belt', tap, blink, glint: sun > 0.7, sway: 0 });
+  putSprite(S1.cx, top);
+  drawBelt(beltOff1(t));
+  // light: the tubes' cones, then the dawn, then the sun shafts and the dust in them
+  g.save(); g.globalCompositeOperation = 'lighter';
+  TUBES.forEach((x, k) => { if (lit[k] <= 0) return; const gr = g.createLinearGradient(0, 18, 0, 170); gr.addColorStop(0, `rgba(255,236,170,${0.15 * lit[k]})`); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 88, 170); g.lineTo(x - 42, 170); g.closePath(); g.fill(); });
+  if (t < S1.laserOff) glow(SCAN_X, 130, 18, '255,74,61', 0.12);
+  g.restore();
+  ambient(mix('#ffffff', '#7685b0', 0.25 + 0.6 * dark), WINS1);
+  g.save(); g.globalCompositeOperation = 'lighter';
+  const shafts = WINS1.map(([x, y, w, h]) => ({ x: x + 1, y: y + h, w: w - 2 }));
+  for (const s of shafts) shaft(s.x, s.y, s.w, 216, 0.2 * sun);
+  // where the light lands on the floor
+  for (const s of shafts) { const y0 = 170, d0 = (y0 - s.y) * SLOPE; g.fillStyle = `rgba(255,200,130,${0.08 * sun})`; g.beginPath(); g.moveTo(s.x - d0, y0); g.lineTo(s.x + s.w - d0, y0); g.lineTo(s.x + s.w - d0 - 23, 216); g.lineTo(s.x - d0 - 23, 216); g.closePath(); g.fill(); }
+  for (const [x, y, w, h] of WINS1) glow(x + w / 2, y + h / 2, w * 0.9, '255,214,150', 0.18 * sun);
+  // her face in the light once she lifts it
+  glow(S1.cx + 3, top + 7, 14, '255,210,150', 0.22 * sun * ease(seg(lk, 0.2, 1)));
+  g.restore();
+  dust(t, shafts, sun, { x: 40, y: 30, w: 344, h: 170 });
+  putRim(S1.cx, top, 1, -1, '#ffd9a0', 0.12 + 0.38 * sun, BELT_Y);
+}
+function cam1(t) {
+  const p = ease(seg(t, S1.push[0], S1.push[1])), k = Math.exp(lerp(0, Math.log(10 / 3), p));
+  return { x: lerp(W / 2, S1.cx + 6, p), y: lerp(H / 2, S1.top + 14, p), k };
+}
+
+// ---------- shot 2: out of the factory (a waist shot that keeps her in frame; the world slides past) ----------
+const walkD = t => S2.v * (t - SHOTS[1].t0);
+function interior(d, t, sx) {
+  const L = f => q => q - d * f + sx;
+  // back wall, seams
+  R(0, 0, W, H, '#231b17');
+  const wl = L(0.7);
+  for (let q = 0; q < 900; q += 64) R(wl(q), 0, 1, H, '#2a211c');
+  // high windows and the racks under them
+  const wins = [];
+  for (let q = 40; q < 900; q += 90) { const x = wl(q); if (x > -60 && x < W + 10) { drawWindow(x, 58, 40, 16, 1); wins.push([x, 58, 40, 16]); } }
+  for (let q = 10; q < 900; q += 180) {
+    const x0 = wl(q); if (x0 > W || x0 + 150 < 0) continue;
+    R(x0, 80, 3, 80, '#41332a'); R(x0 + 147, 80, 3, 80, '#41332a');
+    for (const y of [100, 128]) {
+      let x = x0 + 5, s = q * 7 + y;
+      while (x < x0 + 134) { const bw = 9 + Math.floor(rnd(s, 3) * 12), bh = 8 + Math.floor(rnd(s, 4) * 14), c = ['#5b4330', '#4f3a2a', '#66503a'][Math.floor(rnd(s, 5) * 3)];
+        R(x, y - bh, bw, bh, c); R(x, y - bh, bw, 1, '#76604a'); R(x + (bw >> 1), y - bh, 1, bh, '#6e5a42'); x += bw + 2 + Math.floor(rnd(s, 6) * 5); s++; }
+      R(x0, y, 150, 3, '#4a3a2f'); R(x0, y + 3, 150, 1, '#1d1714');
+    }
+  }
+  // the line sign
+  const sg = L(0.78)(150); R(sg + 6, 50, 1, 8, '#4a4038'); R(sg + 20, 50, 1, 8, '#4a4038'); R(sg, 58, 27, 15, '#d9a520'); R(sg, 72, 27, 1, '#8a6a12');
+  ['111', '001', '111', '001', '111'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') R(sg + 10 + x * 2, 60 + y * 2, 2, 2, '#1d1815'); }));
+  // the empty line behind her, standing still, its scanner gates dark
+  const bl = L(0.88);
+  R(0, 112, W, 4, C.belt); R(0, 112, W, 1, '#4a403b');
+  for (let k = 0; k < 24; k++) { const x = Math.round(bl(k * MARK)); if (x >= 0 && x < W) { if (k % 4 === 0) { R(x - 1, 112, 3, 4, '#a08a3c'); R(x - 1, 112, 3, 1, '#c9ad4c'); } else R(x, 113, 1, 3, C.slat); } }
+  R(0, 116, W, 12, C.face);
+  for (let q = 0; q < 900; q += 14) { const x = Math.round(bl(q)); if (x > -8 && x < W) { R(x, 120, 8, 4, '#2b2422'); R(x + 2, 121, 2, 2, '#4a403b'); } }
+  for (let q = 120; q < 900; q += 220) { const x = Math.round(bl(q)); if (x < -20 || x > W) continue; R(x - 11, 76, 4, 40, '#555a5f'); R(x - 11, 73, 24, 5, C.metal); R(x + 8, 76, 4, 52, '#7b8288'); R(x, 81, 1, 31, '#3a2422'); }
+  return wins;
+}
+// chain-link: one 6x6 diamond tile, repeated
+let MESH = null;
+function meshPat() {
+  if (MESH) return MESH;
+  const c = document.createElement('canvas'); c.width = 6; c.height = 6; const m = c.getContext('2d'); m.fillStyle = '#4a4448';
+  for (let k = 0; k < 6; k++) { m.fillRect(k, k, 1, 1); m.fillRect(5 - k, k, 1, 1); }
+  return (MESH = wctx.createPattern(c, 'repeat'));
+}
+function exterior(d, t, sx) {
+  const L = f => q => q - d * f + sx;
+  // the dawn sky, low sun ahead of her
+  const gr = g.createLinearGradient(0, 20, 0, 130); gr.addColorStop(0, '#4a679c'); gr.addColorStop(0.45, '#d99a8e'); gr.addColorStop(0.8, '#ffd9a6'); gr.addColorStop(1, '#fff0c8');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  const sunX = 232, sunY = 92;
+  g.save(); g.globalCompositeOperation = 'lighter'; glow(sunX, sunY, 70, '255,214,150', 0.45); glow(sunX, sunY, 22, '255,240,200', 0.7); g.restore();
+  R(sunX - 5, sunY - 7, 10, 14, '#fff8e4'); R(sunX - 7, sunY - 5, 14, 10, '#fff8e4'); R(sunX - 6, sunY - 6, 12, 12, '#fff8e4');
+  // long thin clouds
+  const cl = L(0.06); for (const [q, y, w] of [[60, 70, 40], [150, 64, 60], [260, 76, 34], [330, 68, 50]]) { R(cl(q), y, w, 2, '#f3c3a4'); R(cl(q) + 6, y + 2, w - 12, 1, '#e8b39a'); }
+  // birds crossing
+  for (let i = 0; i < 3; i++) { const x = ((300 - (t - 17) * (9 + i * 3) + i * 40) % 460 + 460) % 460 - 40, y = Math.round(70 + i * 5 + Math.sin(t * 2 + i) * 2), up = Math.floor(t * 5 + i) % 2;
+    if (up) { R(x - 1, y, 1, 1, '#4a3a48'); R(x + 1, y, 1, 1, '#4a3a48'); R(x, y + 1, 1, 1, '#4a3a48'); } else R(x - 1, y + 1, 3, 1, '#4a3a48'); }
+  // far apartment blocks in the haze, a few windows still lit
+  const fa = L(0.22);
+  for (let q = 0; q < 700; q += 46) { const h = 18 + Math.floor(rnd(q, 1) * 18), w = 26 + Math.floor(rnd(q, 2) * 12), x = Math.round(fa(q)), y = 112 - h;
+    if (x > W || x + w < 0) continue; R(x, y, w, 60, '#8a7184'); R(x, y, w, 1, '#a48a96');
+    for (let r = 0; r < h - 4; r += 4) for (let c = 2; c < w - 2; c += 4) if (rnd(q + r, c) < 0.07) R(x + c, y + 3 + r, 2, 2, '#ffd27a'); }
+  // nearer roofs and trees
+  const nr = L(0.5);
+  for (let q = 0; q < 900; q += 34) { const x = Math.round(nr(q)), h = 6 + Math.floor(rnd(q, 3) * 10); if (x > W || x + 36 < 0) continue;
+    if (rnd(q, 4) < 0.45) { for (let k = 0; k < 4; k++) R(x + 4 + k * 3, 118 - h - k * 2, 18 - k * 6 + 6, h + k * 2, '#5a4656'); }
+    else { R(x, 118 - h, 34, h + 20, '#5a4656'); R(x - 2, 118 - h, 38, 2, '#4a3a48'); } }
+  // the fence along the yard, posts and chain-link
+  const fc = L(0.9);
+  g.save(); g.translate(-Math.round(d * 0.9) % 6, 0); g.fillStyle = meshPat(); g.globalAlpha = 0.2; g.fillRect(0, 98, W + 6, 42); g.restore();
+  R(0, 97, W, 2, '#4a4448');
+  for (let q = 0; q < 900; q += 32) { const x = Math.round(fc(q)); if (x > -3 && x < W) { R(x, 96, 2, 50, '#3a3436'); R(x, 96, 1, 50, '#5a5458'); } }
+  // a street lamp still burning, then clicking off in the daylight
+  const lx = Math.round(fc(473)), on = t < S2.lampOff;
+  R(lx, 60, 2, 80, '#3a3436'); R(lx, 60, 9, 2, '#3a3436'); R(lx + 6, 62, 6, 2, on ? '#ffe2a0' : '#6a6466');
+  if (on) { g.save(); g.globalCompositeOperation = 'lighter'; glow(lx + 9, 64, 16, '255,190,110', 0.35); g.restore(); }
+}
+function shot2(t) {
+  const d = walkD(t), sx = S2.cx, bx = Math.round(S2.door - d + S2.cx);
+  const sp = ((t - SHOTS[1].t0) / S2.step) % 1, cyc = ((t - SHOTS[1].t0) / (S2.step * 2)) % 1;
+  const bob = sp > 0.2 && sp < 0.7 ? -1 : 0;
+  const top = S2.top + bob;
+  // inside, up to the end wall
+  let wins = [];
+  g.save(); g.beginPath(); g.rect(0, 0, Math.max(0, bx), H); g.clip();
+  wins = interior(d, t, sx);
+  ambient('#8695bb', wins);
+  g.restore();
+  // outside, past it
+  if (bx < W) { g.save(); g.beginPath(); g.rect(bx, 0, W - bx, H); g.clip(); exterior(d, t, sx); g.restore(); }
+  // the end wall above the door: lintel and the rolled-up shutter
+  if (bx > -20 && bx < W + 20) {
+    R(bx - 6, 0, 14, 74, '#2e2521'); R(bx - 6, 0, 2, 74, '#3d322c'); R(bx + 6, 0, 2, 74, '#1a1412');
+    R(bx - 10, 62, 22, 12, '#5b5e63'); for (let y = 63; y < 74; y += 2) R(bx - 10, y, 22, 1, '#45484d'); R(bx - 10, 73, 22, 1, '#2b2e31');
+    R(bx - 9, 74, 1, 70, '#3a3d42'); R(bx + 10, 74, 1, 70, '#3a3d42');
+  }
+  // her
+  const swing = Math.sin(cyc * Math.PI * 2);
+  const outside = clamp((S2.cx - bx + 6) / 12, 0, 1), spill = clamp(1 - (bx - S2.cx) / 70, 0, 1);
+  haeunSprite({ mirror: true, look: 0.2, arms: 'walk', swing, sway: Math.round(-swing * 0.5 + 0.5) });
+  tintSprite(outside > 0.5 ? '#fff0e0' : mix('#8695bb', '#e8d8c8', spill * 0.8));
+  putSprite(S2.cx, top);
+  // light: shafts inside, the doorway spilling in, the sun outside; then her rim
+  g.save(); g.globalCompositeOperation = 'lighter';
+  g.save(); g.beginPath(); g.rect(0, 0, Math.max(0, bx), H); g.clip();
+  const shafts = wins.map(([x, y, w, h]) => ({ x: x + 1, y: y + h, w: w - 2 }));
+  for (const s of shafts) shaft(s.x, s.y, s.w, 216, 0.17);
+  for (const [x, y, w, h] of wins) glow(x + w / 2, y + h / 2, w * 0.8, '255,214,150', 0.16);
+  const gr = g.createLinearGradient(bx - 90, 0, bx, 0); gr.addColorStop(0, 'rgba(255,214,160,0)'); gr.addColorStop(1, 'rgba(255,214,160,.28)'); g.fillStyle = gr; g.fillRect(bx - 90, 0, 90, H);
+  g.restore();
+  g.restore();
+  g.save(); g.beginPath(); g.rect(0, 0, Math.max(0, bx - 6), H); g.clip(); dust(t, shafts, 0.9, { x: 60, y: 50, w: 260, h: 100, ox: d * 0.8 }); g.restore();
+  const headY = top + 6;
+  let lightIn = 0; for (const s of shafts) lightIn = Math.max(lightIn, inShaft(S2.cx, headY, s.x, s.y, s.w));
+  putRim(S2.cx, top, 1, outside > 0.5 ? 0 : -1, outside > 0.5 ? '#ffe6b4' : '#ffd9a0', Math.max(0.12 + 0.45 * lightIn, 0.6 * spill, 0.7 * outside));
+  if (outside > 0) { g.save(); g.globalCompositeOperation = 'lighter'; glow(S2.cx + 4, top + 12, 26, '255,190,130', 0.18 * outside); g.restore(); }
+  // pillars passing close to the lens (inside only)
+  g.save(); g.beginPath(); g.rect(0, 0, Math.max(0, bx - 8), H); g.clip();
+  for (const q of [70, 190]) { const x = Math.round(q - d * 1.45 + sx); if (x < -20 || x > W) continue; R(x, 0, 14, H, '#0f0c0b'); R(x + 13, 0, 1, H, '#1d1714'); for (let y = 104; y < 112; y += 4) { R(x, y, 14, 2, '#c99a1e'); R(x, y + 2, 14, 2, '#15110e'); } }
+  g.restore();
+  // the exposure blows out as she walks under the shutter into the morning
+  const ex = clamp(1 - Math.abs(S2.cx - bx) / 22, 0, 1);
+  if (ex > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,200,${0.3 * ex * ex})`; g.fillRect(0, 0, W, H); g.restore(); }
+}
+function cam2(t) { const tl = t - SHOTS[1].t0; return { x: S2.cx + 10 + Math.sin(tl * 0.7) * 0.6, y: S2.top + 8 + Math.sin(tl * 0.9 + 1) * 0.4, k: 10 / 3 }; }
+
+// ---------- render ----------
+function shotAt(t) { return t < SHOTS[1].t0 ? 0 : 1; }
+function render(t) {
+  g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false;
+  g.clearRect(0, 0, W, H);
+  const s = shotAt(t); let cam;
+  if (s === 0) { shot1(t); cam = cam1(t); } else { shot2(t); cam = cam2(t); }
+  const cw = W / cam.k, ch = H / cam.k, x0 = clamp(cam.x - cw / 2, 0, W - cw), y0 = clamp(cam.y - ch / 2, 0, H - ch);
+  out.imageSmoothingEnabled = false; out.globalAlpha = 1;
+  out.fillStyle = '#000'; out.fillRect(0, 0, cv.width, cv.height);
+  out.drawImage(wb, x0, y0, cw, ch, 0, 0, cv.width, cv.height);
+  // fade in from black, a two-frame dip at the cut, fade out at the end
+  const fade = Math.max(1 - seg(t, 0.2, 1.8), seg(t, END - 1.5, END - 0.1), Math.abs(t - SHOTS[1].t0) < 0.04 ? 1 : 0);
+  if (fade > 0) { out.fillStyle = `rgba(0,0,0,${fade})`; out.fillRect(0, 0, cv.width, cv.height); }
+}
+
+// ---------- sound ----------
+let ac = null, master = null, bus = null, amb = null, NB = null, schedTo = 0, soundOn = true;
+const EV = [];
+function initAudio() {
+  if (ac) return; ac = new (window.AudioContext || window.webkitAudioContext)();
+  master = ac.createGain(); master.gain.value = soundOn ? 0.85 : 0; const comp = ac.createDynamicsCompressor(); master.connect(comp); comp.connect(ac.destination);
+  NB = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate); const d = NB.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const loop = (type, f, q) => { const s = ac.createBufferSource(); s.buffer = NB; s.loop = true; const fl = ac.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const gn = ac.createGain(); gn.gain.value = 0; s.connect(fl); fl.connect(gn); gn.connect(master); s.start(); return gn; };
+  const buzzO = ac.createOscillator(); buzzO.type = 'sawtooth'; buzzO.frequency.value = 120; const bl = ac.createBiquadFilter(); bl.type = 'lowpass'; bl.frequency.value = 420; const buzz = ac.createGain(); buzz.gain.value = 0; buzzO.connect(bl); bl.connect(buzz); buzz.connect(master); buzzO.start();
+  amb = { room: loop('lowpass', 240, 0.7), wind: loop('bandpass', 520, 0.6), buzz };
+}
+function newBus() { if (bus) { const b = bus; b.gain.setTargetAtTime(0, ac.currentTime, 0.03); setTimeout(() => b.disconnect(), 500); } bus = ac.createGain(); bus.connect(master); }
+function thump(t, f, amp, dec) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f * 1.6, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.04); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.006); gn.gain.exponentialRampToValueAtTime(0.0001, t + dec); o.connect(gn); gn.connect(bus); o.start(t); o.stop(t + dec + 0.05); }
+function noise(t, dur, amp, type, f, q = 1) { const s = ac.createBufferSource(); s.buffer = NB; const fl = ac.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const gn = ac.createGain(); gn.gain.setValueAtTime(amp, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(fl); fl.connect(gn); gn.connect(bus); s.start(t, Math.random() * 1.5); s.stop(t + dur + 0.02); }
+function tone(t, type, f0, f1, amp, dur) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = type; o.frequency.setValueAtTime(f0, t); if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.005); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(gn); gn.connect(bus); o.start(t); o.stop(t + dur + 0.03); }
+const SFX = {
+  // the belt motor winding down to a stop, the rollers rattling out
+  beltDown(t, e, into) { if (into > 0) return; const T = S1.beltStop, o = ac.createOscillator(), lp = ac.createBiquadFilter(), gn = ac.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(64, t); o.frequency.exponentialRampToValueAtTime(20, t + T); lp.type = 'lowpass'; lp.frequency.value = 320; gn.gain.setValueAtTime(0.06, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + T + 0.3); o.connect(lp); lp.connect(gn); gn.connect(bus); o.start(t); o.stop(t + T + 0.4);
+    for (let k = 0; k < 16; k++) { const tk = t + T * (1 - Math.pow(1 - k / 16, 0.6)); noise(tk, 0.02, 0.05 * (1 - k / 16), 'bandpass', 1400, 2); } },
+  tap(t) { thump(t, 150, 0.22, 0.1); tone(t, 'triangle', 540, 540, 0.025, 0.35); noise(t, 0.02, 0.08, 'bandpass', 2200, 1.5); },
+  laserOff(t) { tone(t, 'sine', 1200, 260, 0.03, 0.16); },
+  tube(t) { noise(t, 0.025, 0.22, 'highpass', 3000); thump(t, 110, 0.07, 0.07); tone(t + 0.01, 'sine', 2400, 2300, 0.008, 0.25); },
+  pad(t, e, into) { const left = e.dur - into, atk = into > 0 ? 0.3 : 1.6;
+    for (const f of e.notes) for (const [type, det, a] of [['sine', 0, 0.018], ['triangle', 4, 0.008]]) {
+      const o = ac.createOscillator(), lp = ac.createBiquadFilter(), gn = ac.createGain(); o.type = type; o.frequency.value = f; o.detune.value = det; lp.type = 'lowpass'; lp.frequency.value = 1300;
+      gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(a, t + atk); gn.gain.setValueAtTime(a, t + Math.max(atk, left)); gn.gain.linearRampToValueAtTime(0.0001, t + left + 1.8);
+      o.connect(lp); lp.connect(gn); gn.connect(bus); o.start(t); o.stop(t + left + 2); } },
+  // her steps: inside they ring off the concrete (two echoes), outside they are softer and gritty
+  step(t, e) { if (e.out) { noise(t, 0.05, 0.05, 'bandpass', 900, 0.8); thump(t, 80, 0.06, 0.06); return; }
+    for (const [dt, k] of [[0, 1], [0.11, 0.3], [0.23, 0.1]]) { noise(t + dt, 0.035, 0.07 * k, 'bandpass', 2200, 1.2); thump(t + dt, 90, 0.09 * k, 0.07); } },
+  whoosh(t) { const s = ac.createBufferSource(); s.buffer = NB; const fl = ac.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(300, t); fl.frequency.exponentialRampToValueAtTime(3000, t + 0.9); const gn = ac.createGain(); gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.06, t + 0.5); gn.gain.linearRampToValueAtTime(0.0001, t + 1.2); s.connect(fl); fl.connect(gn); gn.connect(bus); s.start(t); s.stop(t + 1.3); },
+  bird(t) { for (let k = 0; k < 3; k++) tone(t + k * 0.09, 'sine', 2800 + k * 200, 3900, 0.014, 0.06); },
+  lamp(t) { noise(t, 0.02, 0.07, 'highpass', 2500); }
+};
+EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: S1.laserOff, fn: 'laserOff' }, ...S1.tubesOff.map(t => ({ t, fn: 'tube' })),
+  { t: 7.4, fn: 'pad', dur: 3.7, notes: [174.61, 220, 261.63, 329.63] },               // Fmaj7 as she lifts her head
+  { t: 11, fn: 'pad', dur: doorT - 11, notes: [130.81, 196, 246.94, 329.63] },          // Cmaj7 walking out
+  { t: doorT, fn: 'pad', dur: END - doorT - 1.2, notes: [98, 146.83, 220, 246.94, 329.63] },   // G6/9 in the morning
+  { t: doorT - 0.5, fn: 'whoosh' }, { t: 19.2, fn: 'bird' }, { t: 21.4, fn: 'bird' }, { t: 23.1, fn: 'bird' }, { t: S2.lampOff, fn: 'lamp' });
+for (let t = SHOTS[1].t0; t < END - 1.4; t += S2.step) EV.push({ t, fn: 'step', out: t > doorT });
+EV.sort((a, b) => a.t - b.t);
+function audioStart(t) {
+  if (!ac) return; ac.resume(); newBus(); schedTo = t;
+  for (const e of EV) if (e.dur && e.t < t && e.t + e.dur > t) SFX[e.fn](ac.currentTime + 0.02, e, t - e.t);
+}
+function audioStop() { if (!ac) return; newBus(); for (const k in amb) amb[k].gain.setTargetAtTime(0, ac.currentTime, 0.05); }
+function audioTick(t) {
+  if (!ac || !playing) return;
+  const until = t + 0.25;
+  for (const e of EV) if (e.t >= schedTo && e.t < until) SFX[e.fn](ac.currentTime + Math.max(0, e.t - t), e, 0);
+  schedTo = until;
+  // beds: room tone indoors, the tubes' buzz while they burn, wind outside
+  const outK = t > doorT ? 1 : 0, lit = t < SHOTS[1].t0 ? TUBES.reduce((s, _, k) => s + tubeOn(k, t), 0) : 0;
+  amb.room.gain.setTargetAtTime(0.05 * (1 - outK), ac.currentTime, 0.2);
+  amb.buzz.gain.setTargetAtTime(0.004 * lit, ac.currentTime, 0.02);
+  amb.wind.gain.setTargetAtTime(outK * (0.025 + 0.012 * Math.sin(t * 0.8)), ac.currentTime, 0.4);
+}
+
+// ---------- playback ----------
+let T = 10.2, playing = false, last = performance.now(), started = false;
+const seek = $('seek'), playBtn = $('play');
+function setPlaying(p) {
+  if (p && T >= END - 0.01) T = 0;
+  playing = p; playBtn.textContent = p ? '일시정지' : '재생'; $('big').hidden = p || started;
+  if (p) { started = true; $('big').hidden = true; initAudio(); audioStart(T); } else audioStop();
+}
+function jump(t) { T = clamp(t, 0, END); if (playing) audioStart(T); }
+playBtn.onclick = () => setPlaying(!playing);
+$('stage').onclick = () => { if (!started) T = 0; setPlaying(!playing); };
+$('restart').onclick = () => { jump(0); if (!playing) setPlaying(true); };
+let dragging = false;
+seek.addEventListener('pointerdown', () => { dragging = true; });
+addEventListener('pointerup', () => { dragging = false; });
+seek.oninput = () => { started = true; $('big').hidden = true; jump(+seek.value); };
+$('snd').onclick = () => { soundOn = !soundOn; $('snd').setAttribute('aria-pressed', soundOn); if (master) master.gain.setTargetAtTime(soundOn ? 0.85 : 0, ac.currentTime, 0.05); };
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' && e.code !== 'Space') return;
+  if (e.code === 'Space') { e.preventDefault(); if (!started) T = 0; setPlaying(!playing); }
+  else if (e.code === 'ArrowLeft') jump(T - 1); else if (e.code === 'ArrowRight') jump(T + 1);
+});
+const shotsEl = $('shots');
+SHOTS.forEach((s, i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'shot';
+  b.innerHTML = `<b>${i + 1}. ${s.name}</b><span class="t">${s.t0.toFixed(1)}–${s.t1.toFixed(1)}초</span><p>${s.note}</p>`;
+  b.onclick = () => { started = true; $('big').hidden = true; jump(s.t0); if (!playing) setPlaying(true); };
+  shotsEl.appendChild(b);
+});
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  if (playing) { T += dt; if (T >= END) { T = END; setPlaying(false); } }
+  render(T); audioTick(T);
+  if (!dragging) seek.value = T;
+  $('time').textContent = `${T.toFixed(1).padStart(4, '0')} / ${END.toFixed(1)}`;
+  const si = shotAt(T); [...shotsEl.children].forEach((c, i) => c.classList.toggle('on', i === si));
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
