@@ -742,7 +742,6 @@ const LEVELS = [
     // Phase 2 (악바리, heavy metal): she loads both belts on her own, long crates and taps trading between them, the tempo
     // creeping up; a key change for the last stretch and a last hit on both belts; then only the motor.
     // The motor is never fixed: his belt swings to the end.
-    missMuffle: false,
     show: true,   // 1-5's light show (drawShow15) and her rage aura
     lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, allLit: true, bossSeat: { x: 22, stand: [[86, 91]] }, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 220]],
     // 하은 goes over to him (she leaves her belt, walks down to beside him), stands there through the row, pulls his earbud out
@@ -774,8 +773,8 @@ const LEVELS = [
       '........', '........', 'x...x...', 'x...x...', 'h===..x.', 'x...x...', '........', '........',
       '........', '........', '........',
       '........', '..x...x.', 'h===....', 'x...x...', 'h===....', 'x...x...',
-      'h===....', 'h===....', 'x...x...', 'x.x.x.x.', 'h===....', 'h=..h=..',
-      'h===....', 'x...x...', 'h===....', 'h===....', 'x...x...', 'x.x.x.x.',
+      'h=======', '........', 'x...x...', 'x.x.x.x.', 'h===....', 'h=..h=..',
+      'h===....', 'x...x...', '........', 'h=======', '..x...x.', 'x.x.x.x.',
       'h===....', 'h=..h=..', 'h===....', 'h=..h=..', 'x.......',
       '........', '........', '........'
     ],
@@ -789,8 +788,8 @@ const LEVELS = [
       '........', '........', '.x.x..x.', '.......x', '.....x.x', '..x..x..', '........', '........',
       '........', '........', '........',
       '........', '........', '....h===', '..x...x.', '....h===', '..x...x.',
-      '....h===', '....h===', '..x...x.', '........', '....h===', '..h=..h=',
-      '....h===', '..x...x.', '....h===', '....h===', '..x...x.', '........',
+      '........', 'h=======', '..x...x.', '........', '....h===', '..h=..h=',
+      '....h===', '..x...x.', 'h=======', '........', 'x...x...', '........',
       '....h===', '..h=..h=', '....h===', '..h=....', 'x.......',
       '........', '........', '........'
     ],
@@ -3289,55 +3288,6 @@ function vox(t, f, d = 0.18, v = 0.05) {
   env(gn, t, 0.008, v, d); o.connect(f1); o.connect(f2); f1.connect(gn); f2.connect(gn); gn.connect(K.pump); const sd = ctx.createGain(); sd.gain.value = 0.5; gn.connect(sd); sd.connect(K.verb);
   o.start(t); o.stop(t + d + 0.1);
 }
-// ---- one beat of 하은's metal (bars 29-50), shared by the game and the preview renderer
-function metalBeat15(E, b, bar, inBar, s, AND) {
-  // 하은's metal (an original riff in E minor, shaped like a mid-tempo heavy rock song), bars 29-50: 29 a clean guitar
-  // alone while she takes the middle; 30 the bass and toms come up under it, a snare roll into 31 where the band lands;
-  // 31-34 the riff; 35-36 a half-time breakdown (huge ringing chords); 37-38 a build (the snare to every 'and', then
-  // triplets, a riser); 39-42 the riff galloping hard; 43-44 the breakdown again; 45-46 the build again; 47-50 a step
-  // up (the key change) and the gallop to the end. The riff (S15.riff) swings on a triplet grid: palm-muted chugs on low E
-  // (the beat and two thirds in hard, a ghost between), chords left to ring, the bass an octave down; the kick gallops
-  // with it, and on every triplet in the hard parts.
-  const up = bar >= 47 ? Math.pow(2, 2 / 12) : 1, gv = 0.1;
-  const ring = (dt, f, d) => E(dt, T => { mGtr(T, f * up, d, false, d > s * 1.2 ? gv * 0.82 : gv); mBass(T, f * up / 2, d, d > s * 1.2 ? 0.28 : 0.2); });
-  if (bar === 29 || bar === 30) {
-    const ARP = [[164.81, 246.94], [392, 246.94], [369.99, 246.94], [bar === 29 ? 329.63 : 233.08, 246.94]];
-    E(0, T => gtrLead(T, ARP[inBar][0], s * 1.4, 0.05)); E(AND, T => gtrLead(T, ARP[inBar][1], s * 0.9, 0.035));
-    if (bar === 30) { E(0, T => { mTom(T, 90 + inBar * 22, 0.35 + inBar * 0.12); mBass(T, 41.2, s * 0.9, 0.12 + inBar * 0.03); }); if (inBar === 3) [0, 1 / 3, 2 / 3].forEach(k => E(k * s, T => mSnare(T, 0.35 + k * 0.6))); }
-    else E(0, T => mHat(T, 0.06));
-    return;
-  }
-  const breakdown = bar === 35 || bar === 36 || bar === 43 || bar === 44, build = bar === 37 || bar === 38 || bar === 45 || bar === 46, peak = (bar >= 39 && bar <= 42) || bar >= 47;
-  // the long crates lead: a pick scrape sliding in, then a power chord held as long as the crate (upper belt E, or A on the
-  // riff's turnaround bars; lower belt G, or B-flat), and the chugging rests under it
-  for (const c of crates15(b)) {
-    const f = c.lane === 0 ? ((bar - 31) % 2 ? 110 : 82.41) : ((bar - 31) % 2 ? 116.54 : 98);
-    E(-0.17, T => mScrape(T, 0.17, 0.07)); ring(0, f, c.len * s * 0.97);
-  }
-  if (breakdown) {
-    // the breakdown: half time under the crates' chords
-    if (inBar === 0) E(0, T => { mKick(T, 1.1); mCrash(T, 0.5); });
-    if (inBar === 2) E(0, T => mSnare(T, 1.15));
-    E(0, T => mHat(T, 0.1, true));
-    return;
-  }
-  const rs = peak ? S15.riff.peak : (bar - 31) % 2 ? S15.riff.B : S15.riff.A;
-  for (let k = 0; k < 3; k++) {
-    const c = rs[inBar * 3 + k], f = S15.riff.notes[c]; if (!f || crateRinging15(b + k / 3)) return;
-    if (c === 'x') E(k * s / 3, T => { mGtr(T, f * up, 0.11, true, gv, k === 1 ? 0.7 : 1); mBass(T, f * up / 2, 0.12, k === 1 ? 0.13 : 0.2); });
-    else { let n = 1; while (inBar * 3 + k + n < 12 && rs[inBar * 3 + k + n] === '.') n++; ring(k * s / 3, f, n * s / 3); }
-  }
-  if (peak) [0, 1, 2].forEach(k => E(k * s / 3, T => mKick(T, k === 1 ? 0.7 : 0.95)));   // the double kick on every slot
-  else { E(0, T => mKick(T, 1)); E(AND, T => mKick(T, 0.75)); }   // the gallop: on the beat and two thirds in
-  if (inBar === 1 || inBar === 3) E(0, T => mSnare(T, 1));
-  E(0, T => mHat(T, 0.15)); E(AND, T => mHat(T, 0.1));
-  if (inBar === 0 && (peak || (bar - 31) % 2 === 0)) E(0, T => mCrash(T));
-  if (bar === 37 || bar === 45) E(AND, T => mSnare(T, 0.45 + inBar * 0.1));
-  if (bar === 38 || bar === 46) { [0, 1 / 3, 2 / 3].forEach(k => E(k * s, T => mSnare(T, 0.4 + inBar * 0.15 + k * 0.1))); if (inBar === 0) E(0, T => { const o = osc('sawtooth', 200, T, s * 3.5, 0.05, 0.3); o.frequency.exponentialRampToValueAtTime(2400, T + s * 4); }); }
-  if ((bar === 34 || bar === 42 || bar === 50) && inBar >= 2) [0, 1 / 3, 2 / 3].forEach((k, j) => E(k * s, T => mTom(T, [230, 190, 160, 130, 108, 90][(inBar - 2) * 3 + j], 0.75)));
-  if (bar === 47 && inBar === 0) E(0, T => { mCrash(T, 0.6); noise(T, 'highpass', 900, 0.25, 0.6, 0.7); });
-  return;
-}
 // ---- one beat of each, shared by the game and the preview renderer. E(dt, fn) schedules fn at the beat's time + dt; s is the
 // beat's length, AND where his 'and' falls (two thirds in), sag the tape's pitch (1, lower while he dozes)
 function lofiBeat15(E, bar, inBar, s, AND, sag = 1) {
@@ -3409,23 +3359,6 @@ function mGtr(t, root, d, mute = false, v = 0.1, acc = 1) {
     for (const f of notes) { const src = ctx.createBufferSource(); src.buffer = ksBuf(f * det, len + 0.3, { a: 0.62, decay: mute ? 0.02 : 0.25 }); src.connect(pre); src.start(T); src.stop(T + len + 0.3); }
     noise(T, 'bandpass', 2600, 0.5 * acc, 0.01, 1.2, pre);   // the pick
   }
-}
-// a pick scrape: the pick dragged down the wound strings, through the same drive, sliding into the next chord
-function mScrape(t, d = 0.18, v = 0.06) {
-  const K = k15(), src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), drv = ctx.createGain(), ws = ctx.createWaveShaper(), lp = ctx.createBiquadFilter(), gn = ctx.createGain();
-  src.buffer = nbuf; bp.type = 'bandpass'; bp.Q.value = 5; bp.frequency.setValueAtTime(4200, t); bp.frequency.exponentialRampToValueAtTime(500, t + d);
-  drv.gain.value = 30; ws.curve = K.curve; lp.type = 'lowpass'; lp.frequency.value = 5000; env(gn, t, 0.01, v, d);
-  src.connect(bp); bp.connect(drv); drv.connect(ws); ws.connect(lp); lp.connect(gn); gn.connect(K.gtr); src.start(t, Math.random() * 0.5); src.stop(t + d + 0.05);
-}
-// 1-5's long crates read off the chart: those starting on beat b (belt and length in beats), and whether one is still running
-function crates15(b) {
-  const out = [], bar = Math.floor(b / 4), c = (b - bar * 4) * 2;
-  [[L.bars, 0], [L.bars2 || [], 1]].forEach(([bars, lane]) => { const row = bars[bar]; if (!row || row[c] !== 'h') return; let k = c + 1, n = 1; while (row[k] === '=') { n++; k++; } out.push({ lane, len: n / 2 }); });
-  return out;
-}
-function crateRinging15(x) {
-  for (let b = Math.floor(x); b > Math.floor(x) - 5; b--) for (const c of crates15(b)) if (x >= b && x < b + c.len - 0.05) return true;
-  return false;
 }
 // the bass: two saws a hair apart, driven a little, a sub sine under it
 function mBass(t, f, d, v = 0.2) {
@@ -4329,7 +4262,49 @@ function buildEvents() {
         continue;
       }
       if (sec === 'end') continue;
-      if (sec === 'metal') { metalBeat15(E, b, bar, inBar, s, AND); continue; }
+      if (sec === 'metal') {
+        // 하은's metal (an original riff in E minor, shaped like a mid-tempo heavy rock song), bars 29-50: 29 a clean guitar
+        // alone while she takes the middle; 30 the bass and toms come up under it, a snare roll into 31 where the band lands;
+        // 31-34 the riff; 35-36 a half-time breakdown (huge ringing chords); 37-38 a build (the snare to every 'and', then
+        // triplets, a riser); 39-42 the riff galloping hard; 43-44 the breakdown again; 45-46 the build again; 47-50 a step
+        // up (the key change) and the gallop to the end. The riff (S15.riff) swings on a triplet grid: palm-muted chugs on low E
+        // (the beat and two thirds in hard, a ghost between), chords left to ring, the bass an octave down; the kick gallops
+        // with it, and on every triplet in the hard parts.
+        const up = bar >= 47 ? Math.pow(2, 2 / 12) : 1, gv = 0.1;
+        const ring = (dt, f, d) => E(dt, T => { mGtr(T, f * up, d, false, gv); mBass(T, f * up / 2, d, 0.2); });
+        if (bar === 29 || bar === 30) {
+          const ARP = [[164.81, 246.94], [392, 246.94], [369.99, 246.94], [bar === 29 ? 329.63 : 233.08, 246.94]];
+          E(0, T => gtrLead(T, ARP[inBar][0], s * 1.4, 0.05)); E(AND, T => gtrLead(T, ARP[inBar][1], s * 0.9, 0.035));
+          if (bar === 30) { E(0, T => { mTom(T, 90 + inBar * 22, 0.35 + inBar * 0.12); mBass(T, 41.2, s * 0.9, 0.12 + inBar * 0.03); }); if (inBar === 3) [0, 1 / 3, 2 / 3].forEach(k => E(k * s, T => mSnare(T, 0.35 + k * 0.6))); }
+          else E(0, T => mHat(T, 0.06));
+          continue;
+        }
+        const breakdown = bar === 35 || bar === 36 || bar === 43 || bar === 44, build = bar === 37 || bar === 38 || bar === 45 || bar === 46, peak = (bar >= 39 && bar <= 42) || bar >= 47;
+        if (breakdown) {
+          // the breakdown: half time, the chords as big as they get
+          const first = bar === 35 || bar === 43;
+          if (inBar === 0) { ring(0, first ? 82.41 : 116.54, s * 1.9); E(0, T => { mKick(T, 1.1); mCrash(T, 0.5); }); }
+          if (inBar === 2) { ring(0, first ? 98 : 110, s * 1.9); E(0, T => mSnare(T, 1.15)); }
+          E(0, T => mHat(T, 0.1, true));
+          continue;
+        }
+        const rs = peak ? S15.riff.peak : (bar - 31) % 2 ? S15.riff.B : S15.riff.A;
+        for (let k = 0; k < 3; k++) {
+          const c = rs[inBar * 3 + k], f = S15.riff.notes[c]; if (!f) continue;
+          if (c === 'x') E(k * s / 3, T => { mGtr(T, f * up, 0.11, true, gv, k === 1 ? 0.7 : 1); mBass(T, f * up / 2, 0.12, k === 1 ? 0.13 : 0.2); });
+          else { let n = 1; while (inBar * 3 + k + n < 12 && rs[inBar * 3 + k + n] === '.') n++; ring(k * s / 3, f, n * s / 3); }
+        }
+        if (peak) [0, 1, 2].forEach(k => E(k * s / 3, T => mKick(T, k === 1 ? 0.7 : 0.95)));   // the double kick on every slot
+        else { E(0, T => mKick(T, 1)); E(AND, T => mKick(T, 0.75)); }   // the gallop: on the beat and two thirds in
+        if (inBar === 1 || inBar === 3) E(0, T => mSnare(T, 1));
+        E(0, T => mHat(T, 0.15)); E(AND, T => mHat(T, 0.1));
+        if (inBar === 0 && (peak || (bar - 31) % 2 === 0)) E(0, T => mCrash(T));
+        if (bar === 37 || bar === 45) E(AND, T => mSnare(T, 0.45 + inBar * 0.1));
+        if (bar === 38 || bar === 46) { [0, 1 / 3, 2 / 3].forEach(k => E(k * s, T => mSnare(T, 0.4 + inBar * 0.15 + k * 0.1))); if (inBar === 0) E(0, T => { const o = osc('sawtooth', 200, T, s * 3.5, 0.05, 0.3); o.frequency.exponentialRampToValueAtTime(2400, T + s * 4); }); }
+        if ((bar === 34 || bar === 42 || bar === 50) && inBar >= 2) [0, 1 / 3, 2 / 3].forEach((k, j) => E(k * s, T => mTom(T, [230, 190, 160, 130, 108, 90][(inBar - 2) * 3 + j], 0.75)));
+        if (bar === 47 && inBar === 0) E(0, T => { mCrash(T, 0.6); noise(T, 'highpass', 900, 0.25, 0.6, 0.7); });
+        continue;
+      }
     } else if (style === 'duo14') {
       // 반장's straight four (kick 1 and 3, snare 2 and 4, even hats, a root on every beat, organ, a guitar lick every fourth bar)
       // sped up each time 하은 pushes (104, 108) until his back goes and the band thins to bass, organ and hats. 하은 counts the line back in and from bar 16 it is boom bap
@@ -4570,7 +4545,7 @@ function failFx(kind, judgeKind, sub, d, lane = 0) {
   if (d != null) FX.marks.push({ d, at: now, c: C.laser });
   if (ctx) {
     if (kind === 'pass') errBeep(ctx.currentTime); else if (kind === 'broken') glass(ctx.currentTime); else buzz(ctx.currentTime);
-    if (L.missMuffle !== false) muffle();   // (a level can keep the music clear on a miss, so the beat is never lost)
+    muffle();
     if (lost >= 10) comboBreak(ctx.currentTime + 0.06);
   }
   if (lost >= 10) { comboEl.classList.remove('pulse', 'broke'); void comboEl.offsetWidth; comboEl.classList.add('broke'); }
