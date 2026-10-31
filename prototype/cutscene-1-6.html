@@ -133,7 +133,7 @@ const walk2D = t => { const v = WALK2.v, r = WALK2.ramp, b = WALK2.t0 + r, c = W
   if (t <= WALK2.t0) return 0; if (t < b) return v * (t - WALK2.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
   const u = Math.min(t, WALK2.stop) - c; return dC + v * u - v * u * u / (2 * r); };
 // then the hospital's corridor, dark this early: the lights come on one panel at a time ahead of her as she walks, to 502
-const CORR = { t0: 70.2, t1: 73.2 };
+const CORR = { t0: 70.2, t1: 71.3 };   // the hospital front fades to full black, then the corridor's lights come on one at a time
 const WALK3 = { t0: 73.4, ramp: 0.9, v: 30, stop: 84.2 };
 const walk3D = t => { const v = WALK3.v, r = WALK3.ramp, b = WALK3.t0 + r, c = WALK3.stop - r, dB = v * r / 2, dC = dB + v * (c - b);
   if (t <= WALK3.t0) return 0; if (t < b) return v * (t - WALK3.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
@@ -762,13 +762,11 @@ function alleyPose(t) {
 // ---------- the hospital corridor ----------
 // Side on: the ceiling with its light panels, pale walls, a wooden handrail over the wainscot, ward doors with their number
 // plates, a wheelchair and a bench, the glossy floor. Dark at first; each panel switches on (a flicker, a tick) when she comes
-// within reach of it, so the lights come on one at a time down the corridor ahead of her. She stops at 502.
-const CRW = document.createElement('canvas'); CRW.width = W; CRW.height = H; const crctx = CRW.getContext('2d');
-const DARK = document.createElement('canvas'); DARK.width = W; DARK.height = H; const dkctx = DARK.getContext('2d');
+// within reach of it, or in turn down the corridor, so the lights come on one at a time ahead of her. She stops at 502.
 const LIGHT_Q = Array.from({ length: 12 }, (_, k) => k * 64);   // the panels (on the 1.0 layer, from where she comes in)
 const DOOR502 = Math.round(walk3D(WALK3.stop)) + 34;   // the door she stops at (just ahead of her); the ones she passes are 503, 504...
 // when each panel comes on: the one over her and the next as the corridor comes in, then each as she gets within 70 px
-const lightOn = q => q === 0 ? CORR.t0 + 1.2 : q === 64 ? CORR.t0 + 2.2 : walk3T(q - 70);
+const lightOn = q => Math.min(CORR.t1 + 0.8 + (q / 64) * 0.85, q - 70 > 0 ? walk3T(q - 70) : Infinity);
 function lightI(q, t) { const u = t - lightOn(q); if (u < 0) return 0; if (u < 0.36) return [1, 0, 1, 0, 0, 1][Math.floor(u / 0.06)] * 0.85; return 1; }
 function corridor(t) {
   const d = walk3D(t), L = q => Math.round(q - d + HX);
@@ -789,34 +787,51 @@ function corridor(t) {
   const ex = L(720); if (ex > -20 && ex < W) { R(ex, 34, 22, 9, '#2f9a5a'); R(ex + 3, 36, 4, 5, '#f4f8fa'); R(ex + 9, 37, 10, 3, '#f4f8fa'); }
   // floor
   R(0, 150, W, 66, '#c6d0cb'); R(0, 150, W, 2, '#9aa6a0'); for (let q = -64; q < 900; q += 32) { const x = L(q); if (x > -2 && x < W) R(x, 152, 1, 64, '#b9c4bf'); } R(0, 180, W, 1, '#b9c4bf');
-  // the panels, lit or dark, and their reflections on the floor
-  for (const q of LIGHT_Q) { const x = L(q) - 15, I = lightI(q, t); if (x < -40 || x > W) continue;
-    R(x, 24, 30, 4, I > 0.5 ? '#f8fcf8' : '#aab3af'); if (I > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const cg = g.createLinearGradient(0, 28, 0, 150); cg.addColorStop(0, `rgba(240,250,245,${0.1 * I})`); cg.addColorStop(1, 'rgba(240,250,245,0)'); g.fillStyle = cg; g.beginPath(); g.moveTo(x, 28); g.lineTo(x + 30, 28); g.lineTo(x + 52, 150); g.lineTo(x - 22, 150); g.closePath(); g.fill(); g.restore(); }
-    if (I > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,255,255,${0.18 * I})`; g.fillRect(x + 8, 154, 14, 40); g.restore(); } }
+  // the fixtures (dark housings; they glow once the light is applied)
+  for (const q of LIGHT_Q) { const x = L(q) - 15; if (x > -40 && x < W) { R(x - 1, 23, 32, 6, '#9aa3a0'); R(x, 24, 30, 4, '#c9d0cd'); } }
 }
+// One ceiling panel's light, worked out once: light falling off with distance from a fixture hung a little in front of the wall,
+// stronger straight down (a downlight), hitting the wall square-on and the floor from above. So the wall glows brightest just
+// under the fixture and fades in a scallop, the floor gets a wide soft pool, the ceiling a halo. Panels add up where they meet.
+const LSTAMP = (() => {
+  const w = 520, c = document.createElement('canvas'); c.width = w; c.height = H; const x = c.getContext('2d'), im = x.createImageData(w, H), D = 24, Y0 = 27, K = 6500;
+  for (let y = 0; y < H; y++) for (let i = 0; i < w; i++) {
+    const dx = i - w / 2; let E;
+    if (y < 29) E = 1.2 * Math.exp(-Math.abs(dx) / 24) * (0.4 + 0.6 * y / 29);
+    else if (y < 150) { const dy = y - Y0, r2 = dx * dx + dy * dy + D * D, r = Math.sqrt(r2); E = (0.3 + 0.7 * dy / r) * (D / r) / r2 * K; }
+    else { const z = (y - 150) * 2, hh = 150 - Y0, dz = z - D, r2 = dx * dx + hh * hh + dz * dz, r = Math.sqrt(r2); E = (0.3 + 0.7 * hh / r) * (hh / r) / r2 * K; }
+    const edge = Math.max(0, 1 - (dx / (w / 2)) ** 2) ** 2;   // fades out before the stamp's edge, so no seams
+    const a = (1 - Math.exp(-E * 1.2)) * edge, o = (y * w + i) * 4; im.data[o] = 255; im.data[o + 1] = 250; im.data[o + 2] = 242; im.data[o + 3] = Math.round(255 * Math.min(1, a));
+  }
+  x.putImageData(im, 0, 0); return c;
+})();
 // the dark over it all, opened up under each lit panel (a soft cone of light down to the floor)
-function corridorDark(t) {
+// The light over the scene: black where no panel reaches (the corridor is fully dark before the first one), each lit panel's
+// light added on, and the scene multiplied by it. Then the panels themselves glow and shine on the polished floor.
+const LMAP = document.createElement('canvas'); LMAP.width = W; LMAP.height = H; const lmctx = LMAP.getContext('2d');
+function corridorLight(t) {
   const d = walk3D(t);
-  dkctx.globalCompositeOperation = 'source-over'; dkctx.clearRect(0, 0, W, H); dkctx.fillStyle = 'rgba(8,12,18,.8)'; dkctx.fillRect(0, 0, W, H);
-  dkctx.globalCompositeOperation = 'destination-out';
-  // each panel lights its own cell: a tall soft oval of light from the ceiling down to the floor, just touching the next one
-  for (const q of LIGHT_Q) { const I = lightI(q, t); if (I <= 0) continue; const x = q - d + HX;
-    dkctx.save(); dkctx.translate(x, 96); dkctx.scale(1, 2.1);
-    const gr = dkctx.createRadialGradient(0, 0, 4, 0, 0, 40); gr.addColorStop(0, `rgba(0,0,0,${I})`); gr.addColorStop(0.6, `rgba(0,0,0,${0.8 * I})`); gr.addColorStop(1, 'rgba(0,0,0,0)');
-    dkctx.fillStyle = gr; dkctx.fillRect(-44, -48, 88, 96); dkctx.restore(); }
-  dkctx.globalCompositeOperation = 'source-over';
-  g.drawImage(DARK, 0, 0);
+  lmctx.globalCompositeOperation = 'source-over'; lmctx.globalAlpha = 1; lmctx.fillStyle = '#020304'; lmctx.fillRect(0, 0, W, H);
+  lmctx.globalCompositeOperation = 'lighter';
+  for (const q of LIGHT_Q) { const I = lightI(q, t), x = Math.round(q - d + HX); if (I <= 0 || x < -260 || x > W + 260) continue; lmctx.globalAlpha = I; lmctx.drawImage(LSTAMP, x - 260, 0); }
+  lmctx.globalAlpha = 1; lmctx.globalCompositeOperation = 'source-over';
+  g.save(); g.globalCompositeOperation = 'multiply'; g.drawImage(LMAP, 0, 0); g.restore();
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (const q of LIGHT_Q) { const I = lightI(q, t), x = Math.round(q - d + HX) - 15; if (I <= 0 || x < -40 || x > W) continue;
+    R(x, 24, 30, 4, `rgba(255,255,250,${I})`); glow(x + 15, 27, 18, '240,248,255', 0.35 * I);
+    g.fillStyle = `rgba(230,240,245,${0.14 * I})`; g.fillRect(x + 9, 156, 12, 2); g.fillRect(x + 11, 160, 8, 18); g.fillRect(x + 13, 180, 4, 14); }
+  g.restore();
 }
 function corridorPose(t) {
-  if (t < WALK3.t0) { const look = lerp(1, 0.2, ease(seg(t, CORR.t0, CORR.t0 + 1))); return { o: { mirror: true, look, sway: 0 }, top: HTOP - (look > 0.5 ? 1 : 0) }; }
+  if (t < WALK3.t0) { const look = lerp(1, 0.2, ease(seg(t, CORR.t1, CORR.t1 + 0.6))); return { o: { mirror: true, look, sway: 0 }, top: HTOP - (look > 0.5 ? 1 : 0) }; }
   if (t >= WALK3.stop) return { o: { mirror: true, look: lerp(0.2, 0.6, ease(seg(t, WALK3.stop + 0.5, WALK3.stop + 1.3))), sway: 0 }, top: HTOP };
   const d = walk3D(t); return walking(d, Math.min(1, d / STRIDE, (WALK3.stop - t) / WALK3.ramp), 0.2);
 }
 function corridorScene(t) {
   corridor(t);
   const { o, top } = corridorPose(t);
-  haeunSprite(o); tintSprite('#eef4f2'); putSprite(HX, top);
-  corridorDark(t);
+  haeunSprite(o); putSprite(HX, top);
+  corridorLight(t);
 }
 function alleyScene(t) {
   alley(t);
@@ -861,7 +876,7 @@ function render(t) {
   if (t >= DEST.t1 && t < ALLEY.t1) { g = wctx; station(t, true); }
   if (t > ALLEY.t0 && t < ALLEY.t1) crossTo(t, ALLEY.t0, ALLEY.t1, alctx, ALW, alleyScene, alleyPose(t), '#eef0ec', '#fff6ec', BELT_Y - 3, alleyWall);
   if (t >= ALLEY.t1 && t < CORR.t1) { g = wctx; alleyScene(t); }
-  if (t > CORR.t0 && t < CORR.t1) crossTo(t, CORR.t0, CORR.t1, crctx, CRW, corridorScene, corridorPose(t), '#fff6ec', '#eef4f2', BELT_Y - 3);
+  if (t > CORR.t0 && t < CORR.t1) { g.fillStyle = `rgba(0,0,0,${ease(seg(t, CORR.t0, CORR.t1 - 0.1))})`; g.fillRect(0, 0, W, H); }   // fading to full black
   if (t >= CORR.t1) { g = wctx; corridorScene(t); }
   // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
