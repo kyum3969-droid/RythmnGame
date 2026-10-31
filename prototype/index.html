@@ -227,7 +227,8 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 (() => {
 'use strict';
 // ---------- constants ----------
-const W = 384, H = 216, TRAVEL = 2;
+const W = 384, H = 216;
+let TRAVEL = 2;   // beats a box rides the belt from the loader to the gate (2-1: one bar, so her stamps arrive a bar later)
 const PLACE_X = 66, SCAN_X = 300, BELT_Y = 146, BOSS_X = 46, PLAYER_X = 340;
 let WIN_P = 0.05, WIN_G = 0.10, WIN_M = 0.16, WIN_REL = 0.12, WIN_OFF = 1;
 // off-beat boxes (the shuffle's 2/3, the 8th 'and') get their windows widened by the level's win.off
@@ -672,19 +673,19 @@ const LEVELS = [
       { who:'반장', text:'내 무릎 탓이다. 내일 또 하자.' }]
   }
   ,{
-    id:'s2-1', stageNo:'2-1', who:'순자 이모', role:'반장 · 순자 이모 · 92→98 BPM', tag:'소울 알앤비 · 검수 도장 · 듣고 따라 찍기', bpm:92, style:'soul21', fxTheme:'warm', inspector: true, callResp: true,
-    // 2-1 검수: the morning after the 회식, 순자 이모 joins the line as the inspector at a post halfway along the belt. The rule is
-    // call and response: for one bar she stamps a rhythm on her sheet (loud, the band stepping back for it), and in the next bar
-    // 반장's boxes reach the gate on that same rhythm and you stamp them. You hear it first, then play it. It starts on the beat,
-    // brings in her own 탁, 탁탁, 탁, then the off-beats. Phase 2 after her phone call: 98 BPM, double-time hats.
-    tempo: [[0, 92], [120, 98]], clock:'02:40', title:'검수', partners:['boss'], hints:true,
+    id:'s2-1', stageNo:'2-1', who:'순자 이모', role:'반장 · 순자 이모 · 92→98 BPM', tag:'소울 알앤비 · 검수 도장 · 듣고 따라 찍기', bpm:92, style:'soul21', fxTheme:'warm', callResp: true, travel: 4,
+    // 2-1 검수: the morning after the 회식, 순자 이모 takes the loading end of the line as the inspector: she stamps each box and
+    // puts it on the belt (loud, the band stepping back for it), and the belt takes exactly a bar to bring it to you. So the
+    // rhythm she stamps in her bar arrives at your gate in the next, and you stamp it again. You hear it first, then play it.
+    // It starts on the beat, brings in her own 탁, 탁탁, 탁, then the off-beats. Phase 2 after her phone call: 98 BPM.
+    tempo: [[0, 92], [120, 98]], clock:'02:40', title:'검수', partners:['sunja'], hints:true,
     chords: SOUL.chords, roots: SOUL.roots,
     chordAt: bar => bar < 2 ? 0 : bar < 18 ? SOUL.verse[(bar - 2) % 4] : bar < 26 ? SOUL.chorus[(bar - 18) % 4] : bar < 30 ? 0 : bar < 38 ? SOUL.verse[(bar - 30) % 4] : bar < 46 ? 5 + SOUL.chorus[(bar - 38) % 4] : 5,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 184,
     // the grandchild calls in the break: she answers, nothing gets stamped, the band thins to the Rhodes
     phone: [[106, 118]], special:['엇박 도장', 'offb', '받아냄'],
     sections: [[0, 'intro'], [2, 'a1'], [10, 'a2'], [18, 'b1'], [26, 'call'], [30, 'a3'], [38, 'b2'], [46, 'outro']],
-    // her bars: she stamps there the rhythm of the bar after it, and that bar's boxes come on it
+    // her bars: the boxes she stamps and loads there reach you in the bar after
     calls: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 30, 32, 34, 36, 38, 40, 42, 44],
     // 8 cells per bar, on the beat; her bars stay empty
     bars: [
@@ -1020,7 +1021,7 @@ function spbAt(t) { let s = tempoSeg[0]; for (const x of tempoSeg) if (t >= x.t)
 
 function loadLevel(level) {
   const w = level.win || {}; WIN_P = w.p || 0.05; WIN_G = w.g || 0.10; WIN_M = w.m || 0.16; WIN_REL = w.release || 0.12; WIN_OFF = w.off || 1;
-  L = level; setTempo(level); SPB = 60 / level.bpm; SPEED = (SCAN_X - PLACE_X) / (TRAVEL * SPB); CHORDS = level.chords;
+  L = level; TRAVEL = level.travel || 2; setTempo(level); SPB = 60 / level.bpm; SPEED = (SCAN_X - PLACE_X) / (TRAVEL * SPB); CHORDS = level.chords;
   notes = [];
   [level.bars, level.bars2 || []].forEach((bars, lane) => bars.forEach((bar, bi) => {
     const div = bar.length / 4;
@@ -1038,6 +1039,8 @@ function loadLevel(level) {
   notes.forEach(n => { n.pair = !isAuto(n) && notes.some(m => m !== n && m.lane !== n.lane && !isAuto(m) && Math.abs(m.beat - n.beat) < 1e-6); n.pair2 = n.pair && n.lane === 1; });
   notes.forEach((n, i) => {
     n.i = i; n.arr = timeAt(n.beat); n.place = n.arr - TRAVEL * SPB; n.end = timeAt(n.beat + n.len);
+    // call and response: the box is loaded (and stamped) exactly a bar before, on her beat, and rides at whatever speed that takes
+    if (level.callResp) { n.place = timeAt(n.beat - TRAVEL); n.spd = (SCAN_X - PLACE_X) / (n.arr - n.place); }
     // a pushed box is loaded for its written beat and rides normally to the inspector; from there it covers the rest at the speed
     // that lands it half a beat early (twice the belt's, with the inspector at the midpoint)
     if (n.push) { n.arr0 = timeAt(n.beat0); n.place = n.arr0 - TRAVEL * SPB; n.tPush = n.arr0 - (SCAN_X - INSPECT_X) / SPEED; n.k = (SCAN_X - INSPECT_X) / ((n.arr - n.tPush) * SPEED); }
@@ -1892,6 +1895,7 @@ function drawBox(n, cx, bottom, mark, t, sq = 0) {
   R(x + (w >> 1) - 1, y, 3, h, n.off && L.offTilt ? '#d8463b' : L.lanes === 2 ? (n.lane === 0 ? C.vest : C.vest2) : C.tape);
   if (n.pair && L.oneButton) R(x, y, w, 2, '#ffe9a8');
   if (n.grab && t >= n.tRel) { R(x + 2, y + 2, 5, 4, '#d8463b'); R(x + 3, y + 3, 3, 2, '#f08a7a'); }
+  if (L.callResp) { R(x + 2, y + 3, 6, 5, '#c8372d'); R(x + 3, y + 4, 4, 3, C.kraft); R(x + 4, y + 5, 2, 1, '#c8372d'); }
   const lw = Math.min(7, w - 4);
   if (lw >= 3) { R(x + 2, y + h - 6, lw, 4, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink); }
   if (n.heavy) { R(x + 2, y + 3, w - 4, 4, '#1b1716'); for (let k = 2; k < w - 5; k += 4) R(x + k + 1, y + 4, 2, 2, '#f0b429'); }
@@ -2087,6 +2091,7 @@ const passAt = n => (n.push || n.grab ? n.arr0 : n.arr) - (SCAN_X - INSPECT_X) /
 function noteX(n, t) {
   if (n.push && t < n.arr) return t < n.tPush ? SCAN_X + (t - n.arr0) * SPEED : INSPECT_X + (t - n.tPush) * SPEED * n.k;
   if (n.grab && t < n.tRel) return t < n.tPass ? SCAN_X + (t - n.arr0) * SPEED : INSPECT_X;
+  if (n.spd && t < n.arr) return SCAN_X + (t - n.arr) * n.spd;
   return SCAN_X + (t - n.arr) * SPEED;
 }
 const shoop = t => { const fl = ctx.createBiquadFilter(); fl.type = 'bandpass'; fl.Q.value = 1.2; fl.frequency.setValueAtTime(2200, t); fl.frequency.exponentialRampToValueAtTime(500, t + 0.14); fl.connect(bus); noise(t, 'highpass', 300, 0.3, 0.14, 0.7, fl); roller(t + 0.03, 0.05); };
@@ -2716,6 +2721,7 @@ function drawScene(t, bt, active, nowMs) {
   else if (!(L.lanes === 2 && DUO.mode !== 'two')) { const o = L.lanes === 2 ? placerOff(1) : { dx: 0, dy: 0 }; g.save(); g.translate(laneSlide(lo, t, active) + o.dx, o.dy); drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); g.restore(); drawObserver(t, nowMs, active); }
   if (L.daw) drawLaptop(t, active, nowMs);
   if (L.inspector) drawInspector(t, active, nowMs);
+  if (L.callResp && active) for (const sb of L.stampBeats) { const rel = t - timeAt(sb); if (rel >= 0 && rel < 0.16) { const k = rel / 0.16, c = `rgba(255,233,168,${1 - k})`; for (const [dx, dy] of [[-9, -4], [-5, -9], [0, -11], [5, -9], [9, -4]]) { g.fillStyle = c; g.fillRect(PLACE_X + dx * (1 + 0.4 * k), BELT_Y - 10 + dy * (1 + 0.4 * k), 1, 2); } } }
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
   drawGauge(nowMs);
@@ -4215,7 +4221,7 @@ function updateHud(t) {
     bubble.style.bottom = L.lanes === 2 ? (lane === 0 ? '78%' : '58%') : '61%';
     let bx = null;
     if (L.cast && L.cast.seq && spk) bx = spk === 's' ? INSPECT_X - 24 : 0; else if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X; else if (spk === 'h') { if (duoMode(beat) === 'one') { bx = HAEUN_X - 70; bubble.style.bottom = '84%'; } else { bx = 0; bubble.style.bottom = '78%'; } }
-    if (spk === 's') { bx = INSPECT_X - 24; bubble.style.bottom = '66%'; }
+    if (spk === 's') { bx = L.inspector ? INSPECT_X - 24 : 0; bubble.style.bottom = '66%'; }
     if (L.daw) { if (spk === 'b') { bx = 0; bubble.style.bottom = '32%'; } else if (spk === 'h') { bx = 34; bubble.style.bottom = '32%'; } else if (spk === 'd') { bx = 200; bubble.style.bottom = '19%'; } }
     bubble.style.left = bx == null || bx < 60 ? '3cqw' : (bx / W * 100 - 5).toFixed(1) + '%';
     bubble.classList.toggle('obs', !!(spk && (L.cast ? (spk === 'b') !== (castPlacer(beat) === 'boss') : spk === 'b' || spk === 's' || (L.daw && spk !== 'j'))));
