@@ -323,6 +323,34 @@ const LIFT = Math.pow(2, 2 / 12);
 const CHILL = { chords: [[164.81, 196, 246.94], [130.81, 164.81, 196], [196, 246.94, 293.66], [146.83, 185, 220]], roots: [82.41, 65.41, 98, 73.42] };
 // 반장 humming his blues (two bars), for the last stretch of the blues in 1-3
 const HUM = [[0, 'A4', 1], [1, 'C5', 0.5], [1.5, 'D5', 0.5], [2, 'E5', 1.5], [4, 'E5', 1], [5, 'D5', 1], [6, 'C5', 0.5], [6.5, 'A4', 1.5]];
+// 2-1 본선: 지우's audition piece, a gospel stomp in G at 112. A stomp on every beat, claps on 2 and 4, tambourine 8ths, organ and
+// piano, a choir hook over G | Em | C | D; 반장's guitar on a 12-bar gospel blues in G in the middle; the last eight bars a whole step
+// up, the gospel modulation. None of 1-3's tune, lead or chords.
+const GN = { D4: 293.66, E4: 329.63, F4: 349.23, Fs4: 369.99, G4: 392, A4: 440, Bb4: 466.16, B4: 493.88, C5: 523.25, Cs5: 554.37, D5: 587.33, Ds5: 622.25, E5: 659.25, F5: 698.46, Fs5: 739.99, G5: 783.99, A5: 880, Bb5: 932.33 };
+const GOS = {
+  // 0 G, 1 Em, 2 C, 3 D (the song); 4 G7, 5 C7, 6 D7 (the blues); 7-10 the song a whole step up (A, F#m, D, E)
+  chords: [[196, 246.94, 293.66], [164.81, 196, 246.94], [196, 261.63, 329.63], [220, 293.66, 369.99],
+           [196, 246.94, 293.66, 349.23], [233.08, 261.63, 329.63, 392], [220, 261.63, 293.66, 369.99]],
+  roots: [98, 82.41, 65.41, 73.42, 98, 65.41, 73.42]
+};
+GOS.chords.push(...GOS.chords.slice(0, 4).map(c => c.map(f => f * LIFT))); GOS.roots.push(...GOS.roots.slice(0, 4).map(f => f * LIFT));
+// the choir hook, 8 bars over G | Em | C | D: [beat, note, length]
+const HOOK21 = [[0, 'D5', 1.5], [1.5, 'B4', 0.5], [2, 'D5', 1], [3, 'G5', 1], [4, 'E5', 1.5], [5.5, 'D5', 0.5], [6, 'B4', 2], [8, 'C5', 1], [9, 'E5', 1], [10, 'G5', 1.5], [11.5, 'E5', 0.5], [12, 'D5', 1], [13, 'A4', 0.5], [13.5, 'B4', 0.5], [14, 'A4', 2],
+  [16, 'G4', 0.5], [16.5, 'B4', 0.5], [17, 'D5', 1], [18, 'G5', 2], [20, 'E5', 1], [21, 'G5', 1], [22, 'A5', 2], [24, 'G5', 1], [25, 'E5', 1], [26, 'C5', 0.5], [26.5, 'D5', 0.5], [27, 'E5', 1], [28, 'D5', 3], [31, 'B4', 0.5], [31.5, 'C5', 0.5]];
+// the verse, sung softly over the same chords
+const VERSE21 = [[0.5, 'B4', 0.5], [1, 'D5', 1], [2, 'B4', 1], [3, 'G4', 1], [4, 'G4', 0.5], [4.5, 'A4', 0.5], [5, 'B4', 2], [8, 'C5', 1], [9, 'B4', 0.5], [9.5, 'A4', 0.5], [10, 'G4', 2], [12, 'A4', 1], [13, 'Fs4', 1], [14, 'A4', 1.5],
+  [16.5, 'B4', 0.5], [17, 'D5', 1], [18, 'E5', 1], [19, 'D5', 1], [20, 'B4', 1.5], [21.5, 'A4', 0.5], [22, 'G4', 2], [24, 'E5', 1], [25, 'D5', 0.5], [25.5, 'C5', 0.5], [26, 'B4', 1], [27, 'A4', 1], [28, 'G4', 3]];
+// 반장's guitar over the 12-bar gospel blues in G (G blues scale, bends into the long notes): [beat from the top, note, length, bend]
+const GLEAD21 = [
+  [0, 'D5', 1, 1], [1, 'F5', 0.5], [1.5, 'D5', 0.5], [2, 'Bb4', 1], [3, 'G4', 1], [4.5, 'Bb4', 0.5], [5, 'C5', 0.33], [5.33, 'Cs5', 0.33], [5.67, 'D5', 1.3, 1],
+  [8, 'F5', 1, 1], [9, 'D5', 0.5], [9.5, 'C5', 0.5], [10, 'Bb4', 1], [11, 'G4', 1.5], [13, 'G4', 0.5], [13.5, 'Bb4', 0.5], [14, 'C5', 2, 1],
+  [16, 'G5', 1.5, 1], [17.5, 'F5', 0.5], [18, 'D5', 1], [19, 'C5', 1], [20.5, 'C5', 0.33], [20.83, 'Ds5', 0.67], [21.5, 'F5', 1.5, 1], [23, 'D5', 1],
+  [24, 'D5', 2, 1], [26, 'Bb4', 0.5], [26.5, 'G4', 0.5], [27, 'F4', 1], [28.5, 'G4', 3],
+  [32, 'A5', 0.5], [32.5, 'Fs5', 1.5, 1], [34, 'D5', 0.5], [34.5, 'C5', 0.5], [35, 'A4', 1], [36, 'C5', 1], [37, 'Ds5', 0.5], [37.5, 'C5', 0.5], [38, 'Bb4', 0.5], [38.5, 'G4', 1.5],
+  [40, 'Bb4', 0.33], [40.33, 'B4', 0.33], [40.67, 'D5', 1.5, 1], [42.5, 'Bb4', 0.5], [43, 'G4', 1], [44, 'D4', 0.5], [44.5, 'Fs4', 0.5], [45, 'G4', 2.5, 1]
+];
+// his answers in the chorus, in the gaps the choir leaves (bar 4 and bar 8 of the hook)
+const GANS21 = [[13, 'F5', 0.5], [13.5, 'D5', 0.5], [14, 'Bb4', 1.5, 1], [29, 'G5', 0.5], [29.5, 'F5', 0.5], [30, 'D5', 1.5, 1]];
 // chorus hook, 8 bars: [beat offset inside the 8 bars, note, length in beats]
 const HOOK = [
   [0, 'E5', 1.5], [1.5, 'C5', 0.5], [2, 'B4', 1], [3, 'A4', 1],
@@ -557,20 +585,20 @@ const LEVELS = [
       { who:'반장', text:'내 무릎 탓이다. 내일 또 하자.' }]
   }
   ,{
-    id:'s2-1', stageNo:'2-1', who:'지우', role:'지우 · 본선 · 112 BPM', tag:'런치패드 · 반장 기타 클립 · 정박', bpm:112, style:'final21', daw:true, place:'본선 무대',
+    id:'s2-1', stageNo:'2-1', who:'지우', role:'지우 · 본선 · 112 BPM', tag:'가스펠 스톰프 · 반장 기타 클립 · 정박', bpm:112, style:'final21', daw:true, place:'본선 무대',
     // the audition final: 지우 on stage with her laptop, you beside her on the launchpad. The belt is the LED runway across the
     // stage floor: clips glide from her laptop to the playhead and you fire them. Her set is 1-3 compressed, with a kick from the
     // first bar; the amber clips are 반장's guitar (the blues chorus at double time), and the last eight bars go a whole step up.
-    tempo: [[0, 112]], fxTheme: beat => beat < 104 ? 'chill' : beat < 160 ? 'blues' : 'neon',
+    tempo: [[0, 112]], fxTheme: beat => beat < 104 ? 'chill' : beat < 160 ? 'blues' : 'gold',
     clock:'19:40', title:'본선', partners:['jiwoo'], hints:false,
-    chords: [...CHILL.chords, ...BLUES.chords, ...BLUES.chords.map(c => c.map(f => f * LIFT))], roots: [...CHILL.roots, ...BLUES.roots, ...BLUES.roots.map(f => f * LIFT)],
-    // bars 28-51 are one blues chorus (a blues bar = two bars at 112); the lift repeats the top of the chorus a whole step up
-    chordAt: bar => bar < 28 ? ((bar - 2) % 4 + 4) % 4 : bar < 52 ? 4 + BLUES.prog[((bar - 28) >> 1) % 12] : bar < 60 ? 7 + BLUES.prog[((bar - 52) >> 1) % 12] : 7,
+    chords: GOS.chords, roots: GOS.roots,
+    // the song over G | Em | C | D; bars 28-39 a 12-bar gospel blues in G; the chorus again, a four-bar vamp, then the song a whole step up
+    chordAt: bar => bar < 2 ? 0 : bar < 28 ? (bar - 2) % 4 : bar < 40 ? 4 + BLUES.prog[(bar - 28) % 12] : bar < 52 ? (bar - 40) % 4 : bar < 60 ? 7 + (bar - 52) % 4 : 7,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 }, endAt: 240,
     special:['반장 기타 클립', 'gtr', '얹음'],
     // who slips in at the hall door, and when (beats): 반장 as his guitar comes in, 하은 late from the hospital
     guests: { boss: 112, haeun: 176 },
-    sections: [[0, 'intro'], [2, 'verse'], [10, 'build'], [18, 'drop'], [26, 'break'], [28, 'blues'], [40, 'drop2'], [52, 'lift'], [60, 'outro']],
+    sections: [[0, 'intro'], [2, 'verse'], [10, 'build'], [18, 'drop'], [26, 'break'], [28, 'blues'], [40, 'drop2'], [48, 'vamp'], [52, 'lift'], [60, 'outro']],
     // 8 cells per bar, everything on the beat (the tester's note on 1-3). 'G' = a guitar clip
     bars: [
       '........', '........',
@@ -1693,6 +1721,7 @@ function stageMood(beat, active) {
     : sec === 'break' ? { c: '60,70,120', a: 0.03, pulse: 0, j: 0.2, p: 0.04 }
     : sec === 'blues' ? { c: '255,176,70', a: 0.1, pulse: 0.05, j: 0.1, p: 0.08 }
     : sec === 'drop2' ? { c: Math.floor(beat) % 2 ? '255,176,70' : '79,227,255', a: 0.13, pulse: 0.13, j: 0.12, p: 0.12 }
+    : sec === 'vamp' ? { c: '255,200,120', a: 0.12, pulse: 0.16, j: 0.14, p: 0.12 }
     : sec === 'lift' ? { c: '255,236,170', a: 0.15, pulse: 0.16, j: 0.14, p: 0.14 }
     : { c: '90,120,200', a: 0.06, pulse: 0, j: 0.1, p: 0 };
 }
@@ -2480,7 +2509,8 @@ const THEME = {
   warm: { ring: ['#8fd694', '#ffe9a8'], bits: ['#ffe9a8', '#efe6d2', '#efe6d2'], spark: ['#8fd694', '#ffe9a8'], glow: '#8fd694' },
   neon: { ring: ['#ff4fa3', '#4fe3ff'], bits: ['#ff4fa3', '#4fe3ff', '#cfe04a', '#ffffff'], spark: ['#ff4fa3', '#4fe3ff'], glow: '#4fe3ff' },
   blues: { ring: ['#f0b429', '#ffe9a8'], bits: ['#f0b429', '#ffe9a8', '#efe6d2'], spark: ['#f0b429', '#ff8a3d'], glow: '#f0b429' },
-  chill: { ring: ['#9db4ff', '#e8e0ff'], bits: ['#9db4ff', '#e8e0ff', '#ffffff'], spark: ['#9db4ff', '#78dcff'], glow: '#9db4ff' }
+  chill: { ring: ['#9db4ff', '#e8e0ff'], bits: ['#9db4ff', '#e8e0ff', '#ffffff'], spark: ['#9db4ff', '#78dcff'], glow: '#9db4ff' },
+  gold: { ring: ['#ffd36a', '#ffffff'], bits: ['#ffd36a', '#fff6d8', '#ffffff'], spark: ['#ffd36a', '#ff8a3d'], glow: '#ffd36a' }
 };
 // the climax hit answers by where the box falls. On the beat it is 반장: a driven power chord on the chord's root with a low thump,
 // the band ducking under it. Off the beat it is 지우: a bright piano chord stab (her instrument, below the synth lead) with a short
@@ -2517,9 +2547,9 @@ function sfxPluck(t, f, v, d) {
 }
 // 2-1: a guitar clip fired on time plays a bluesy answer on 반장's guitar (clean while his clip is just arriving, driven from the
 // second drop, a whole step up after the lift); the band ducks for a breath under it
-const GSAMPLE = ['E5', 'G5', 'D5', 'A4'];
+const GSAMPLE = ['D5', 'F5', 'Bb4', 'G5'];
 function gtrSample(j, beat) {
-  const t = ctx.currentTime, lf = beat >= 208 ? LIFT : 1, f = N_[GSAMPLE[stats.special % GSAMPLE.length]] * lf, big = j === 'perfect';
+  const t = ctx.currentTime, lf = beat >= 208 ? LIFT : 1, f = GN[GSAMPLE[stats.special % GSAMPLE.length]] * lf, big = j === 'perfect';
   if (beat >= 160) { gtrDist(t, f, big ? 0.6 : 0.42, big ? 0.075 : 0.06, true, bus); gtrDist(t, f / 2, 0.4, 0.03, false, bus); }
   else { gtrLead(t, f, big ? 0.7 : 0.5, big ? 0.07 : 0.055, true); }
   noise(t, 'bandpass', 2400, 0.1, 0.025, 4, bus);
@@ -3040,69 +3070,81 @@ function buildEvents() {
         else gtrDist(T, N_[nm], len * 2 * s * 0.96, 0.055, !!bend);
       });
     } else if (style === 'final21') {
-      // 2-1 본선: 지우's set for the judges, 1-3 compressed. The piano tune with a kick under it from the first bar, the build,
-      // her drop, a tape stop and a breath; then 반장's guitar comes in as a clip over her beat (the blues chorus at double time,
-      // one blues bar = two bars), the second drop puts the synth on top of it, and the last eight bars go a whole step up.
-      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4);
-      if (sec === 'intro') { if (b === 4) E(0, T => noise(T, 'bandpass', 900, 0.04, s * 3.5, 0.5)); if (bar === 1 && inBar === 0) E(0, T => piano(T, chords[ci], s * 3.5, 0.035)); continue; }
+      // 2-1 본선: a gospel stomp in G. The stomp on every beat, snaps then claps on 2 and 4, tambourine, organ and piano under a sung
+      // verse; the choir hook for the chorus; a tape stop and 반장's pickup; a 12-bar gospel blues with his guitar on top of the
+      // stomp; the chorus again with his answers; a four-bar vamp; and the hook a whole step up with claps on every beat.
+      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), lift = sec === 'lift', lf = lift ? LIFT : 1;
+      const stomp = (T, v) => { kick(T, v); noise(T, 'lowpass', 220, v * 0.5, 0.09, 0.7); };
+      const tamb = (T, v) => { noise(T, 'highpass', 6500, v, 0.05, 0.7); noise(T + 0.012, 'highpass', 8000, v * 0.6, 0.04, 0.7); };
+      const choir = (T, f, d, v) => { voice(T, f, d, v); voice(T + 0.01, f / 2, d, v * 0.5); piano(T, [f], d * 0.6, v * 0.8); };
+      if (sec === 'intro') { if (b === 4) E(0, T => { noise(T, 'bandpass', 900, 0.04, s * 3.5, 0.5); organ(T, chords[0], s * 2, 0.02); }); if (b === 6) E(0, T => organ(T, chords[3], s * 2, 0.024)); continue; }
       if (sec === 'outro') continue;
       if (sec === 'verse' || sec === 'build' || sec === 'drop') {
         const drop = sec === 'drop', build = sec === 'build', rel = (b - 8) % 32, bb = bar - 10;
-        if (inBar === 0) E(0, T => piano(T, chords[ci], s * 1.8, drop ? 0.05 : 0.045)); if (inBar === 1) E(s / 2, T => piano(T, chords[ci].slice(1), s * 1.2, 0.035)); if (inBar === 3) E(0, T => piano(T, chords[ci], s * 1.4, 0.04));
-        if (!drop && inBar === 0) E(0, T => pad(T, chords[ci], s * 4, 'sawtooth', build ? 0.022 : 0.012));
-        // the final's version has a kick from the first bar
-        if (!drop) { E(0, T => kick(T, build ? 0.7 + bb * 0.03 : 0.5)); E(s / 2, T => hat(T, build ? 0.035 : 0.02)); if (inBar === 0) E(0, T => bass(T, roots[ci], build ? s * 0.45 : s * 1.6, 420)); }
+        // piano: the chord on 1 and the 'and' of 2, the bass octave on 3; the organ held under the bar
+        if (inBar === 0) E(0, T => piano(T, chords[ci], s * 1.8, drop ? 0.05 : 0.04)); if (inBar === 1) E(s / 2, T => piano(T, chords[ci].slice(1), s * 1.2, 0.03)); if (inBar === 2) E(0, T => piano(T, [roots[ci] * 2, roots[ci] * 4], s * 1.2, 0.035));
+        if (inBar === 0) E(0, T => organ(T, chords[ci], s * 4, drop ? 0.03 : build ? 0.02 : 0.012));
+        // the stomp, soft in the verse and hard in the chorus; finger snaps, then claps, on 2 and 4; shaker, then tambourine
+        E(0, T => stomp(T, drop ? 0.95 : build ? 0.6 + bb * 0.04 : 0.45));
+        if (inBar === 1 || inBar === 3) { if (drop || bb >= 2) E(0, T => { clap(T, drop ? 0.26 : 0.16); snare(T, drop ? 0.16 : 0.08); }); else E(0, T => rim(T, 0.3)); }
+        if (drop || bb >= 4) { E(0, T => tamb(T, drop ? 0.06 : 0.04)); E(s / 2, T => tamb(T, drop ? 0.045 : 0.03)); } else E(s / 2, T => shaker(T, 0.03));
+        if (drop) { E(s / 4, T => hat(T, 0.02)); E(3 * s / 4, T => hat(T, 0.02)); }
+        // bass: the root on 1, the fifth on 3 in the chorus
+        if (inBar === 0) E(0, T => bass(T, roots[ci], drop ? s * 0.8 : s * 1.6, 420)); if (inBar === 2) E(0, T => bass(T, roots[ci] * (drop ? 1.5 : 1), s * 0.8, 420)); if (drop && inBar === 3) E(s / 2, T => bass(T, roots[ci], s * 0.4, 420));
         if (build) {
-          if (bb >= 2 && (inBar === 1 || inBar === 3)) E(0, T => { snare(T, 0.16); noise(T, 'highpass', 3000, 0.04, 0.5, 0.7); });
-          if (bb >= 2) { E(s / 2, T => bass(T, roots[ci], s * 0.4, 420)); if (inBar) E(0, T => bass(T, roots[ci], s * 0.45, 420)); }
-          if (bb >= 4) E(0, T => hat(T, 0.025));
+          if (bb >= 4 && inBar === 0) E(0, T => pad(T, chords[ci].map(f => f * 2), s * 4, 'triangle', 0.02));
           if (bb === 6 && inBar === 0) E(0, T => riser(T, s * 8, 0.05));
-          if (bb === 7) for (let k = 0; k < (inBar < 2 ? 2 : 4); k++) E(k * s / (inBar < 2 ? 2 : 4), T => snare(T, 0.1 + inBar * 0.03));
+          if (bb === 7 && inBar >= 2) for (let k = 0; k < 4; k++) E(k * s / 4, T => tom(T, 200 - k * 30 - (inBar - 2) * 40, 0.35));
         }
-        if (drop) {
-          if (b === 72) E(0, T => { crash(T); subDrop(T); });
-          E(0, T => kick(T, 0.95)); E(0, T => hat(T, 0.025)); E(s / 2, T => openHat(T, 0.05));
-          if (inBar === 1 || inBar === 3) E(0, T => { clap(T, 0.2); snare(T, 0.16); });
-          E(s / 2, T => bass(T, roots[ci], s * 0.4, 650)); if (bar >= 22) E(s / 4, T => bass(T, roots[ci] * 2, s * 0.15, 900));
-          if (inBar === 0) E(0, T => pumpPad(T, chords[ci], s, 0.011));
-          const rd = (b - 72) % 16; for (const [ob, nm, len] of VOX) if (ob < 16 && Math.floor(ob) === rd) E((ob - rd) * s, T => { piano(T, [N_[nm] * 2], len * s * 0.9, 0.06); chop(T, N_[nm] * 2, 0.03); });
-        } else for (const [ob, nm, len] of VOX) if (Math.floor(ob) === rel) E((ob - rel) * s, T => piano(T, [N_[nm] * 2], len * s * 0.95, build ? 0.05 : 0.045));
+        if (drop) { if (b === 72) E(0, T => { crash(T); subDrop(T); }); else if (inBar === 0 && bar % 4 === 0) E(0, T => crash(T, 0.6)); }
+        // the tune: sung softly in the verse with the piano on it, the choir hook in the chorus
+        if (drop) { for (const [ob, nm, len] of HOOK21) if (Math.floor(ob) === rel) E((ob - rel) * s, T => choir(T, GN[nm], len * s * 0.95, 0.03)); }
+        else for (const [ob, nm, len] of VERSE21) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { voice(T, GN[nm], len * s * 0.95, build ? 0.028 : 0.022); piano(T, [GN[nm]], len * s * 0.9, 0.03); });
         continue;
       }
       if (sec === 'break') {
-        // the tape stops on her last chord, a breath, one clean guitar note from the clip, two rims, and the band is back
-        if (b === 104) E(0, T => { scratch(T); tapeStop(T, chords[ci].map(f => f * 2)); mus.gain.setValueAtTime(0.0001, T + 0.05); });
-        if (b === 110) E(0, T => { mus.gain.setValueAtTime(1, T); gtrLead(T, N_.E5, s * 1.8, 0.05, true); });
+        // the last chord of the chorus rings and dies; a breath; 반장's guitar picks up from the clip; two rims and the band is back
+        if (b === 104) E(0, T => { crash(T); organ(T, chords[0], s * 2.5, 0.03); piano(T, chords[0], s * 2, 0.05); choir(T, GN.G5, s * 2.4, 0.03); bass(T, roots[0], s * 2, 420); });
+        if (b === 109) E(s / 2, T => { gtrLead(T, GN.Bb4, s * 0.4, 0.05); gtrLead(T + s * 0.4, GN.B4, s * 0.4, 0.05); gtrLead(T + s * 0.8, GN.D5, s * 1.6, 0.06, true); });
         if (b === 111) { E(0, T => rim(T, 0.35)); E(s / 2, T => rim(T, 0.35)); }
         continue;
       }
-      // the blues chorus at double time under her beat, growing from a soft kick to the full second drop
-      const d2 = sec === 'drop2', lift = sec === 'lift', lf = lift ? LIFT : 1, st = lift ? 3.5 : d2 ? (bar >= 46 ? 3 : 2) : (bar >= 34 ? 1.5 : 1);
-      const pb = bar - 28, half = pb % 2, walk = [1, 1.189, 1.498, 1.682][half * 2 + (inBar >> 1)];
-      if (b === 112) E(0, T => { crash(T); gtrLead(T, N_.A4, s * 3, 0.05, true); });
-      if (b === 160) E(0, T => { crash(T); subDrop(T); synthLead(T, N_.E5, s * 3, 0.045); });
-      if (b === 208) E(0, T => { crash(T); subDrop(T); whoosh(T, s * 2, true); synthLead(T, N_.E5 * LIFT, s * 3, 0.045); });
-      if (inBar === 0) E(0, T => piano(T, chords[ci], s * 1.8, 0.03 + st * 0.005)); if (inBar === 1) E(s / 2, T => piano(T, chords[ci].slice(1), s * 1.2, 0.028)); if (inBar === 3) E(0, T => piano(T, chords[ci], s * 1.4, 0.03));
-      if (inBar === 1 || inBar === 3) E(s / 3, T => gtr(T, chords[ci].slice(1), s * 0.7, 0.02));
-      if (inBar === 0) E(0, T => pumpPad(T, chords[ci], s, 0.005 + st * 0.003));
-      E(0, T => kick(T, 0.55 + st * 0.13)); E(0, T => hat(T, 0.02)); E(s / 2, T => hat(T, 0.025 + st * 0.006));
-      E(0, T => bass(T, roots[ci] * walk, s * 0.45, 400 + st * 80)); E(s / 2, T => bass(T, roots[ci] * walk, s * 0.4, 400 + st * 80));
-      if (inBar === 2) { E(0, T => snare(T, 0.1 + st * 0.05)); E(0, T => noise(T, 'highpass', 3000, 0.03, 0.5, 0.7)); if (st >= 2) E(0, T => clap(T, 0.14 + st * 0.03)); }
-      if (st >= 1.5) { E(s / 4, T => bass(T, roots[ci] * walk * 2, s * 0.15, 900)); E(3 * s / 4, T => bass(T, roots[ci] * walk * 2, s * 0.15, 900)); }
-      if (st >= 2) { if (inBar === 0) E(0, T => osc('sine', roots[ci], T, 0.005, 0.24, s * 0.9)); for (let k = 0; k < 4; k++) E(k * s / 4 + s / 8, T => hat(T, 0.018)); }
-      if (st >= 2 && half === 1 && inBar === 3) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.1 + k * 0.035));
-      if (st >= 3 && (inBar === 1 || inBar === 3)) E(s / 2, T => clap(T, 0.18));
-      if ((d2 || lift) && bar > 40 && (bar - 40) % 4 === 0 && inBar === 0) E(0, T => { crash(T); whoosh(T, s * 2, true); });
-      if (lift && bar >= 56) E(0, T => clap(T, 0.15));
-      if (lift && bar === 58 && inBar === 0) E(0, T => riser(T, s * 8, 0.07));
-      if (lift && bar === 59 && inBar === 2) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.08 + k * 0.03));
-      // 반장's guitar, the clip: the chorus at double time, clean while it is only his clip, driven with the synth on it from the
-      // second drop, the synth an octave up for the last stretches; after the lift the chorus starts again from its top
-      const hi = (d2 && bar >= 46) || (lift && bar >= 56), relL = lift ? b - 208 : b - 112;
-      if (relL >= 2) for (const [ob, nm, len, bend] of GLEAD) if (Math.floor(ob * 2) === relL) E((ob * 2 - relL) * s, T => {
-        if (d2 || lift) { gtrDist(T, N_[nm] * lf, len * 2 * s * 0.96, 0.05, !!bend); synthLead(T, N_[nm] * lf * (hi ? 2 : 1), len * 2 * s * 0.96, hi ? 0.03 : 0.024); }
-        else gtrLead(T, N_[nm], len * 2 * s * 0.96, 0.055, !!bend);
-      });
+      const d2 = sec === 'drop2', blues = sec === 'blues', vamp = sec === 'vamp', sw = s / 4 * 0.18, walk = [1, 1.26, 1.5, 1.782][inBar];
+      if (b === 112) E(0, T => crash(T));
+      if (b === 160) E(0, T => { crash(T); subDrop(T); });
+      if (b === 208) E(0, T => { crash(T); subDrop(T); whoosh(T, s * 2, true); });
+      // the stomp through all of it; claps on 2 and 4, on every beat in the vamp and the last four bars; tambourine, swung in the blues
+      E(0, T => stomp(T, blues ? 0.7 : 0.95));
+      if (inBar === 1 || inBar === 3 || vamp || (lift && bar >= 56)) E(0, T => { clap(T, blues ? 0.18 : 0.26); snare(T, blues ? 0.1 : 0.16); });
+      E(0, T => tamb(T, blues ? 0.04 : 0.06)); E(s / 2 + (blues ? sw : 0), T => tamb(T, blues ? 0.03 : 0.045));
+      if (!blues) { E(s / 4, T => hat(T, 0.02)); E(3 * s / 4, T => hat(T, 0.02)); }
+      if ((lift && (bar - 52) % 2 === 1 && inBar === 3) || (vamp && bar === 51 && inBar >= 2)) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.1 + k * 0.035));
+      if (vamp && bar === 51 && inBar >= 2) for (let k = 0; k < 4; k++) E(k * s / 4, T => tom(T, 200 - k * 30 - (inBar - 2) * 40, 0.35));
+      if ((d2 || lift) && inBar === 0 && (bar - 40) % 4 === 0 && bar > 40 && bar !== 52) E(0, T => crash(T, 0.6));
+      if (vamp && bar === 50 && inBar === 0) E(0, T => riser(T, s * 8, 0.07));
+      // bass: walking quarters under the blues, root and fifth in the chorus
+      if (blues) E(0, T => bass(T, roots[ci] * walk, s * 0.85, 320));
+      else { if (inBar === 0) E(0, T => bass(T, roots[ci], s * 0.8, 420)); if (inBar === 2) E(0, T => bass(T, roots[ci] * 1.5, s * 0.8, 420)); if (inBar === 3) E(s / 2, T => bass(T, roots[ci], s * 0.4, 420)); }
+      // organ and piano; the rhythm guitar on the swung 'and' in the blues
+      if (inBar === 0) E(0, T => organ(T, chords[ci], s * 4, blues ? 0.016 : vamp ? 0.036 : 0.03));
+      if (inBar === 0) E(0, T => piano(T, chords[ci], s * 1.8, blues ? 0.035 : 0.05)); if (inBar === 1) E(s / 2 + (blues ? sw : 0), T => piano(T, chords[ci].slice(1), s * 1.2, 0.03)); if (inBar === 2) E(0, T => piano(T, [roots[ci] * 2, roots[ci] * 4], s * 1.2, 0.035));
+      if (blues && (inBar === 1 || inBar === 3)) E(s / 2 + sw, T => gtr(T, chords[ci].slice(1), s * 0.6, 0.02));
+      if (blues) {
+        // 반장's guitar, clean, the whole chorus through
+        const relL = b - 112; for (const [ob, nm, len, bend] of GLEAD21) if (Math.floor(ob) === relL) E((ob - relL) * s, T => gtrLead(T, GN[nm], len * s * 0.96, 0.055, !!bend));
+      } else if (vamp) {
+        // the vamp: choir chords on 1 and 3, his lick on 2's 'and' every other bar, everyone leaning into the lift
+        if (inBar === 0 || inBar === 2) E(0, T => chords[ci].forEach(f => voice(T, f * 2, s * 1.6, 0.016)));
+        if ((bar - 48) % 2 === 0 && inBar === 1) E(s / 2, T => { gtrDist(T, GN.F5, s * 0.5, 0.05); gtrDist(T + s * 0.5, GN.D5, s * 0.5, 0.05); gtrDist(T + s, GN.Bb4, s * 1.5, 0.055, true); });
+        if (bar === 51 && inBar === 0) E(0, T => chords[ci].forEach(f => voice(T, f * 2, s * 4, 0.02)));
+      } else {
+        // the chorus, with his driven guitar answering the held notes; the lift takes the hook a whole step up, a pad under its end
+        const rel = (b - (lift ? 208 : 160)) % 32;
+        for (const [ob, nm, len] of HOOK21) if (Math.floor(ob) === rel) E((ob - rel) * s, T => choir(T, GN[nm] * lf, len * s * 0.95, lift ? 0.034 : 0.03));
+        for (const [ob, nm, len, bend] of GANS21) if (Math.floor(ob) === rel) E((ob - rel) * s, T => gtrDist(T, GN[nm] * lf, len * s * 0.95, 0.055, !!bend));
+        if (lift && bar >= 56 && inBar === 0) E(0, T => pad(T, chords[ci].map(f => f * 2), s * 4, 'triangle', 0.02));
+        if (lift && bar === 58 && inBar === 0) E(0, T => riser(T, s * 8, 0.07));
+      }
     } else if (style === 'duo14') {
       // 반장's straight four (kick 1 and 3, snare 2 and 4, even hats, a root on every beat, organ, a guitar lick every fourth bar)
       // until his knee goes and the band thins to bass, organ and hats. 하은 counts the line back in and from bar 16 it is boom bap
@@ -3189,8 +3231,9 @@ function buildEvents() {
     if (L.style === 'night1') { kick(T, 0.8); crash(T); rhodes(T, NIGHT.chords[3], SPB * 7, 0.055); rhodes(T, NIGHT.chords[3].map(f => f * 2), SPB * 5, 0.02); bass(T, NIGHT.roots[3], SPB * 5, 300); whistle(T, N_.C5, SPB * 4, 0.05); forklift(T + SPB * 5, 0.02); forklift(T + SPB * 5.75, 0.02); return; }
     if (L.style === 'mix13') { kick(T, 0.8); crash(T); organ(T, chords[7], SPB * 7, 0.03); bass(T, roots[7], SPB * 5, 300); gtrDist(T, N_.A4 * LIFT, SPB * 6, 0.08, true); return; }
     if (L.style === 'final21') {
-      // the last chord, then the hall: applause if the set landed, a cough and a chair if it didn't
-      kick(T, 0.8); crash(T); organ(T, chords[7], SPB * 7, 0.03); piano(T, chords[7], SPB * 4, 0.05); bass(T, roots[7], SPB * 5, 300); gtrDist(T, N_.A4 * LIFT, SPB * 6, 0.08, true);
+      // the last chord in A with the choir on it, then the hall: applause if the set landed, a cough and a chair if it didn't
+      kick(T, 0.8); crash(T); organ(T, chords[7], SPB * 7, 0.03); piano(T, chords[7], SPB * 4, 0.05); bass(T, roots[7], SPB * 5, 420); gtrDist(T, 440, SPB * 6, 0.08, true);
+      voice(T, 880, SPB * 5, 0.03); voice(T + 0.02, 554.37, SPB * 5, 0.022); voice(T + 0.04, 659.25, SPB * 5, 0.02);
       if (accuracy() >= 0.75) for (let k = 0; k < 40; k++) noise(T + SPB * 2.2 + k * 0.09 + Math.random() * 0.06, 'bandpass', 1400 + Math.random() * 1800, 0.035 + Math.random() * 0.03, 0.05 + Math.random() * 0.06, 0.9, bus);
       else { noise(T + SPB * 2.5, 'bandpass', 700, 0.08, 0.12, 1.5, bus); noise(T + SPB * 3.4, 'lowpass', 500, 0.14, 0.09, 0.7, bus); }
       return;
