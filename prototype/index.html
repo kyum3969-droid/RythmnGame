@@ -674,8 +674,8 @@ const LEVELS = [
   }
   ,{
     id:'s2-1', stageNo:'2-1', who:'순자 이모', role:'반장 · 순자 이모 · 92→98 BPM', tag:'소울 알앤비 · 검수 도장 · 듣고 따라 찍기', bpm:92, style:'soul21', fxTheme:'warm', callResp: true, travel: 4,
-    // 2-1 검수: the morning after the 회식, 순자 이모 takes the loading end of the line as the inspector: she stamps each box and
-    // puts it on the belt (loud, the band stepping back for it), and the belt takes exactly a bar to bring it to you. So the
+    // 2-1 검수: the morning after the 회식, 순자 이모 stands at the start of the line as the inspector: the boxes ride in on the
+    // belt and she stamps each one as it passes her (loud, the band stepping back for it); the belt takes exactly a bar from her to you. So the
     // rhythm she stamps in her bar arrives at your gate in the next, and you stamp it again. You hear it first, then play it.
     // It starts on the beat, brings in her own 탁, 탁탁, 탁, then the off-beats. Phase 2 after her phone call: 98 BPM.
     tempo: [[0, 92], [120, 98]], clock:'02:40', title:'검수', partners:['sunja'], hints:true,
@@ -685,7 +685,7 @@ const LEVELS = [
     // the grandchild calls in the break: she answers, nothing gets stamped, the band thins to the Rhodes
     phone: [[106, 118]], special:['엇박 도장', 'offb', '받아냄'],
     sections: [[0, 'intro'], [2, 'a1'], [10, 'a2'], [18, 'b1'], [26, 'call'], [30, 'a3'], [38, 'b2'], [46, 'outro']],
-    // her bars: the boxes she stamps and loads there reach you in the bar after
+    // her bars: the boxes she stamps there reach you in the bar after
     calls: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 30, 32, 34, 36, 38, 40, 42, 44],
     // 8 cells per bar, on the beat; her bars stay empty
     bars: [
@@ -1060,6 +1060,8 @@ const firstWith = key => notes.find(n => n[key]);
 
 // ---------- static background ----------
 const bg = document.createElement('canvas'); bg.width = W; bg.height = H;
+// the same room without the loader's stack of boxes (2-1: nobody loads, the boxes come in on the belt)
+const bgNoPile = document.createElement('canvas'); bgNoPile.width = W; bgNoPile.height = H;
 (() => {
   const b = bg.getContext('2d');
   const r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
@@ -1089,6 +1091,7 @@ const bg = document.createElement('canvas'); bg.width = W; bg.height = H;
   three.forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') r(190 + x * 2, 46 + y * 2, 2, 2, '#1d1815'); }));
   r(0, 168, W, 48, '#18120f'); r(0, 168, W, 1, '#2e241f');
   for (let x = 0; x < W; x += 14) r(x, 200, 8, 3, '#c99a1e');
+  bgNoPile.getContext('2d').drawImage(bg, 0, 0);
   r(0, 158, 34, 4, '#6b4a2e'); r(0, 162, 34, 2, '#4a3220'); r(2, 164, 4, 4, '#4a3220'); r(28, 164, 4, 4, '#4a3220');
   const sb = (x, y) => { r(x, y, 15, 13, C.kraft); r(x, y, 15, 2, C.kraftTop); r(x + 13, y + 2, 2, 11, C.kraftDark); r(x + 6, y, 3, 13, C.tape); };
   sb(1, 145); sb(17, 145); sb(1, 132); sb(17, 132); sb(9, 119);
@@ -1453,6 +1456,7 @@ function partnerPose(t, bt, active, lane = 0) {
     const nxt = notes.find(n => n.lane === lane && n.state === 'pending' && n.place > t);
     if (nxt && nxt.place - t < SPB * 1.5 && !notes.some(n => n.lane === lane && n.place < nxt.place && n.place > nxt.place - 4 * SPB)) pose.wave = true;
   }
+  if (L.callResp) return stampPose(pose, t);
   if (!cur) return pose;
   if (L.daw) {
     // she launches the clip from the laptop: the hand drops onto the keys around the launch and comes back
@@ -1470,6 +1474,19 @@ function partnerPose(t, bt, active, lane = 0) {
     const from = cur.len ? push : { x: PLACE_X - cur.w / 2 + 1, y: BELT_Y - cur.h / 2 + 2 };
     pose.hand = { x: lerp(from.x, IDLE_HAND.x, p), y: lerp(from.y, IDLE_HAND.y, p) };
   }
+  return pose;
+}
+// 2-1: 순자 이모 at the start of the belt holds her stamp; it lifts before each passing box and drops on it on her beat
+function stampPose(pose, t) {
+  let best = null, br = 9;
+  for (const n of notes) { const rel = t - n.place; if (rel > -0.3 * SPB && rel < 0.3 * SPB && Math.abs(rel) < Math.abs(br)) { best = n; br = rel; } }
+  pose.hand = { x: BOSS_X + 14, y: 122 };
+  if (best) {
+    const up = BELT_Y - best.h - 16, down = BELT_Y - best.h - 7, d = 0.06;
+    const y = br < -d ? up : br < 0 ? lerp(up, down, ease((br + d) / d)) : br < 0.12 * SPB ? down : lerp(down, up, ease(Math.min(1, (br - 0.12 * SPB) / (0.12 * SPB))));
+    pose.hand = { x: PLACE_X - 1, y }; pose.stampDown = br >= 0 && br < 0.12 * SPB;
+  }
+  pose.stamp = true;
   return pose;
 }
 function carryPos(n, p) {
@@ -1614,6 +1631,7 @@ const PARTNERS = {
       const d = Math.max(1, Math.hypot(pose.hand.x - sx, pose.hand.y - sy));
       for (let k = 3; k < d; k += 5) { const p = k / d; R(lerp(sx, pose.hand.x, p) - 1, lerp(sy, pose.hand.y, p) - 1, 1, 1, '#f5d0dc'); }
       R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
+      if (pose.stamp) { R(pose.hand.x - 1, pose.hand.y + 2, 3, 3, '#6a4a30'); R(pose.hand.x - 3, pose.hand.y + 5, 7, 2, '#c8372d'); }
     }
   },
   chief: {
@@ -1826,27 +1844,29 @@ function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
 
 // belt top doubles as a beat grid: bright paint = beat, mid = 8th, dim = 16th
 function drawBeltTop(time, active) {
-  R(48, BELT_Y, W - 48, 4, C.belt);
-  R(48, BELT_Y, W - 48, 1, '#4a403b');
+  const x0 = L.callResp ? 0 : 48;
+  R(x0, BELT_Y, W - x0, 4, C.belt);
+  R(x0, BELT_Y, W - x0, 1, '#4a403b');
   const beat = active ? beatAt(time) : time / SPB;
   const k0 = Math.floor(beat * 4);
   for (let m = -56; m <= 12; m++) {
     const k = k0 + m, q = ((k % 4) + 4) % 4;
     const tk = active ? timeAt(k / 4) : (k / 4) * SPB;
     const x = Math.round(SCAN_X + (time - tk) * SPEED);
-    if (x < 49 || x >= W) continue;
+    if (x < x0 + 1 || x >= W) continue;
     if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); }
     else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44');
     else R(x, BELT_Y + 1, 1, 3, C.slat);
   }
 }
 function drawBeltFront(time) {
-  R(46, BELT_Y + 4, W - 46, 12, C.face);
+  const x0 = L.callResp ? 0 : 46;
+  R(x0, BELT_Y + 4, W - x0, 12, C.face);
   const ro = (((time * SPEED) % 14) + 14) % 14;
-  for (let x = 50 + ro - 14; x < W; x += 14) if (x >= 48) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); }
-  R(46, BELT_Y + 15, W - 46, 1, '#0c0a09');
-  for (const x of [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422');
-  R(44, BELT_Y - 1, 5, 17, '#3d3431');
+  for (let x = 50 + ro - (L.callResp ? 56 : 14); x < W; x += 14) if (x >= x0 + 2) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); }
+  R(x0, BELT_Y + 15, W - x0, 1, '#0c0a09');
+  for (const x of L.callResp ? [10, 70, 150, 230, 352] : [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422');
+  if (!L.callResp) R(44, BELT_Y - 1, 5, 17, '#3d3431');
 }
 function drawLaserGlow(flash) {
   g.globalAlpha = 0.22 + 0.4 * flash;
@@ -1895,7 +1915,7 @@ function drawBox(n, cx, bottom, mark, t, sq = 0) {
   R(x + (w >> 1) - 1, y, 3, h, n.off && L.offTilt ? '#d8463b' : L.lanes === 2 ? (n.lane === 0 ? C.vest : C.vest2) : C.tape);
   if (n.pair && L.oneButton) R(x, y, w, 2, '#ffe9a8');
   if (n.grab && t >= n.tRel) { R(x + 2, y + 2, 5, 4, '#d8463b'); R(x + 3, y + 3, 3, 2, '#f08a7a'); }
-  if (L.callResp) { R(x + 2, y + 3, 6, 5, '#c8372d'); R(x + 3, y + 4, 4, 3, C.kraft); R(x + 4, y + 5, 2, 1, '#c8372d'); }
+  if (L.callResp && t >= n.place) { R(x + 2, y + 3, 6, 5, '#c8372d'); R(x + 3, y + 4, 4, 3, C.kraft); R(x + 4, y + 5, 2, 1, '#c8372d'); }
   const lw = Math.min(7, w - 4);
   if (lw >= 3) { R(x + 2, y + h - 6, lw, 4, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink); }
   if (n.heavy) { R(x + 2, y + 3, w - 4, 4, '#1b1716'); for (let k = 2; k < w - 5; k += 4) R(x + k + 1, y + 4, 2, 2, '#f0b429'); }
@@ -2023,11 +2043,12 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   if (active) {
     drawRingsAt(dy, nowMs);
     drawLaserGlow(mine ? Math.max(0, 1 - (nowMs - lastGood) / 160) : 0);
-    g.save(); g.beginPath(); g.rect(49, -dy, W, H); g.clip();
+    g.save(); g.beginPath(); g.rect(L.callResp ? 0 : 49, -dy, W, H); g.clip();
     const boxQ = [];
     for (const n of notes) {
       if (n.lane !== lane) continue;
-      if (t < n.place) break;
+      // 2-1: nobody loads; the boxes ride in from the start of the belt and she stamps each one as it passes her
+      if (t < n.place - (n.spd ? (PLACE_X + 14) / n.spd : 0)) break;
       let cx = noteX(n, t);
       if (n.state === 'hit' && n.hitAt != null && !n.len) cx -= SPEED * hitLag(t - n.hitAt, n.judge === 'perfect' ? HITSTOP : HITSTOP * 0.6);
       if (n.len) {
@@ -2694,7 +2715,7 @@ function drawScene(t, bt, active, nowMs) {
   const al = active ? alleyState(beatAt(t)) : null;
   // the downpour thumps with the kick, one pixel
   if (al && !reduce && al.beat >= 200 && al.beat < 280) g.translate(0, Math.round(Math.max(0, 1 - (al.beat % 1) * 4)));
-  if (al) drawAlleyBack(al, t, nowMs); else g.drawImage(L.daw ? bgStage : bg, 0, 0);
+  if (al) drawAlleyBack(al, t, nowMs); else g.drawImage(L.daw ? bgStage : L.callResp ? bgNoPile : bg, 0, 0);
   if (L.daw) drawStageLights(bt, t, active); else drawLights(bt, t, active, al);
   if (al) drawAlleyRain(al, t, nowMs);
   rings = rings.filter(r => nowMs - r.at < 420);
@@ -2721,7 +2742,7 @@ function drawScene(t, bt, active, nowMs) {
   else if (!(L.lanes === 2 && DUO.mode !== 'two')) { const o = L.lanes === 2 ? placerOff(1) : { dx: 0, dy: 0 }; g.save(); g.translate(laneSlide(lo, t, active) + o.dx, o.dy); drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); g.restore(); drawObserver(t, nowMs, active); }
   if (L.daw) drawLaptop(t, active, nowMs);
   if (L.inspector) drawInspector(t, active, nowMs);
-  if (L.callResp && active) for (const sb of L.stampBeats) { const rel = t - timeAt(sb); if (rel >= 0 && rel < 0.16) { const k = rel / 0.16, c = `rgba(255,233,168,${1 - k})`; for (const [dx, dy] of [[-9, -4], [-5, -9], [0, -11], [5, -9], [9, -4]]) { g.fillStyle = c; g.fillRect(PLACE_X + dx * (1 + 0.4 * k), BELT_Y - 10 + dy * (1 + 0.4 * k), 1, 2); } } }
+  if (L.callResp && active) for (const n of notes) { const rel = t - n.place; if (rel >= 0 && rel < 0.16) { const k = rel / 0.16, c = `rgba(255,233,168,${1 - k})`; for (const [dx, dy] of [[-9, -2], [-5, -6], [0, -8], [5, -6], [9, -2]]) { g.fillStyle = c; g.fillRect(PLACE_X + dx * (1 + 0.4 * k), BELT_Y - n.h - 4 + dy * (1 + 0.4 * k), 1, 2); } } }
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
   drawGauge(nowMs);
@@ -3933,7 +3954,7 @@ function buildEvents() {
     if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
     kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4);
   }]);
-  notes.forEach(n => ev.push([n.place, T => thud(T, n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1)]));
+  if (!L.callResp) notes.forEach(n => ev.push([n.place, T => thud(T, n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1)]));
   if (L.inspector) for (const n of notes) { if (n.top || inRange(n.beat0, L.phone)) continue; if (n.grab) { ev.push([passAt(n), T => { rim(T, 0.4); rim(T + 0.11, 0.4); }]); ev.push([n.tRel, T => roller(T, 0.06)]); } else ev.push([passAt(n), n.push ? T => { tak(T, 0.3); shoop(T); } : T => tak(T, 0.3)]); }
   return ev.sort((a, b) => a[0] - b[0]);
 }
