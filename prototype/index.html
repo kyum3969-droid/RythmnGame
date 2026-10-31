@@ -702,7 +702,7 @@ const LEVELS = [
     ],    say: [[4, '탁, 탁탁, 탁.', 3, 0, 's'], [34, '지게차 저 양반, 팔레트 삐뚤게 놓네.', 3.5, 0, 's'], [40, '느린 건 내가 민다?', 3, 0, 's'], [104, '(전화) 어, 우리 강아지. 할머니 일하지.', 4, 0, 's'], [112, '…응, 응. 끊어. 할머니 일해.', 3.5, 0, 's'], [122, '자, 이제 제대로 민다!', 3, 0, 's'], [168, '총각, 손 잘 보네.', 3, 0, 's']],
     comfort: ['괜찮아, 다음 거.', '총각! 손 봐, 손!'],
     intro: [
-      { who:'', text:'회식 다음 날 새벽 2시 40분. 오배송 클레임 때문에 소장이 라인에 검수를 붙였다.' },
+      { who:'', text:'하은이 그만둔 다음 주, 새벽 2시 40분. 오배송 클레임 때문에 소장이 라인에 검수를 붙였다.' },
       { who:'순자 이모', text:'검수 순자. 오늘부터 내가 보고 넘긴다.' },
       { who:'순자 이모', text:'탁, 탁탁, 탁. 내 손만 보면 돼. 느린 건 민다.' },
       { who:'반장', text:'(작게) …말 많은 양반 왔네.' }],
@@ -755,18 +755,19 @@ const LEVELS = [
       { who:'순자 이모', text:'…내일은 손만 봐.' }]
   }
   ,{
-    id:'s2-3', stageNo:'2-3', who:'반장 + 하은', role:'반장 · 하은 · 순자 이모 · 96 BPM · 벨트 둘', tag:'레게톤 · 버튼 둘 · 하은의 전화', bpm:96, style:'dembow23', fxTheme:'neon', inspector: true,
-    // 2-3 두 벨트: 2라인 is swamped, so 하은 comes over and loads the upper belt while 반장 loads the lower one. Two buttons again
-    // (left hand the upper gate, right hand the lower). 순자 이모 stands between the belts and pushes or grabs on either. Halfway
-    // through, the hospital calls 하은: her belt stops while she talks, and her hands are late for a while after.
-    lanes: 2, partners: ['haeun', 'boss'], tempo: [[0, 96]], clock:'02:10', title:'두 벨트', hints:true,
+    id:'s2-3', stageNo:'2-3', who:'반장 + 지우', role:'반장 · 지우 · 순자 이모 · 96 BPM · 벨트 둘', tag:'레게톤 · 버튼 둘 · 본선 사흘 전', bpm:96, style:'dembow23', fxTheme:'neon', inspector: true,
+    // 2-3 두 벨트: peak season opens a second belt; 지우 loads the upper one, three nights before her final, while 반장 loads
+    // the lower one. Two buttons again (left hand the upper gate, right hand the lower). 순자 이모 stands between the belts and
+    // pushes or grabs on either. Halfway through 지우 stops to stare at her phone (the final's notice): her belt goes quiet, and
+    // her hands are late for a while after.
+    lanes: 2, partners: ['jiwoo', 'boss'], tempo: [[0, 96]], clock:'02:10', title:'두 벨트', hints:true,
     chords: DEM.chords, roots: DEM.roots,
     chordAt: bar => bar < 2 ? 0 : bar < 10 ? DEM.verse[(bar - 2) % 4] : bar < 14 ? DEM.pre[(bar - 10) % 4] : bar < 22 ? DEM.chorus[(bar - 14) % 4] : bar < 30 ? DEM.verse[(bar - 22) % 4] : bar < 34 ? DEM.pre[(bar - 30) % 4] : bar < 42 ? DEM.chorus[(bar - 34) % 4] : bar < 46 ? DEM.verse[(bar - 42) % 4] : bar < 54 ? DEM.chorus[(bar - 46) % 4] : 0,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 216,
-    phone: [[88, 104]], phoneLane: 0, lateHint: '하은 손이 늦어요. 손을 봐요',
+    phone: [[88, 104]], phoneLane: 0, lateHint: '지우가 본선 생각에… 손이 늦어요. 손을 봐요',
     special:['밀리거나 붙잡힌 상자', 'off', '받아냄'],
     sections: [[0, 'intro'], [2, 'v1'], [10, 'pre1'], [14, 'ch1'], [22, 'v2'], [30, 'pre2'], [34, 'ch2'], [42, 'bridge'], [46, 'ch3'], [54, 'outro']],
-    // lower belt (반장, right hand) and upper belt (하은, left hand). 'P' pushed, 'R' grabbed, 'L' late (하은 after the call)
+    // lower belt (반장, right hand) and upper belt (지우, left hand). 'P' pushed, 'R' grabbed, 'L' late (지우 after the phone)
     bars: [
       '........', '........',
       'x...x...', 'x.x.x...', 'x...P...', 'x.x.x...', 'x...x.x.', 'R...x...', 'x.x.x...', 'x...P...',
@@ -792,19 +793,20 @@ const LEVELS = [
       '........', '........'
     ],
     say: [[8, '왼손 위, 오른손 아래.', 3, 1], [40, '(지게차 소리) …어, 저 양반 오늘은 반듯하네.', 3.5, 0, 's'], [60, '둘 다 본다. 손 봐.', 2.5, 0, 's'],
-          [86, '(전화) …네. 네, 알아요. 지금은…', 4, 0, 'h'], [96, '…끊을게요.', 2.5, 0, 'h'], [104, '…미안. 다시 해.', 3, 0, 'h'], [112, '…엄마가 좀 아파.', 3.5, 0, 'h'],
-          [168, '위에 늦는다! 신입, 손 봐.', 3, 1], [200, '…됐다. 수고.', 2.5, 0, 'h']],
+          [86, '(폰을 본다) …본선 공지 떴다. 사흘 뒤.', 4, 0, 'j'], [96, '형, 나 손 떨려.', 2.5, 0, 'j'], [104, '…미안해요. 다시 할게요.', 3, 0, 'j'], [112, '(작게) …붙으면 뭐 하지.', 3.5, 0, 'j'],
+          [168, '위에 늦는다! 신입, 손 봐.', 3, 1], [200, '…됐다. 고마워요, 형.', 2.5, 0, 'j']],
     comfort: ['괜찮아. 다음 거 봐.', '신입! 위도 봐!'],
     intro: [
-      { who:'', text:'셋째 밤, 새벽 2시 10분. 2라인이 터져서 하은이 넘어왔다. 벨트가 둘.' },
-      { who:'반장', text:'위는 하은이 싣는다. 왼손 위, 오른손 아래.' },
-      { who:'하은', text:'…빨리 끝내자.' },
-      { who:'순자 이모', text:'둘 다 내가 본다. 손 봐.' }],
+      { who:'', text:'셋째 밤, 새벽 2시 10분. 성수기라 벨트를 하나 더 열었다. 위는 지우.' },
+      { who:'반장', text:'위는 지우가 싣는다. 왼손 위, 오른손 아래.' },
+      { who:'지우', text:'본선 사흘 전인데 야간이라니…' },
+      { who:'순자 이모', text:'노래하는 애? 둘 다 내가 본다. 손 봐.' }],
     outro: (good, sp) => good ? [
-      { who:'하은', text:'…고마워. 위에.' },
+      { who:'지우', text:'…고마워요, 형. 위에.' },
       { who:'반장', text:'…잘 받았다.' },
-      { who:'', text:'이모는 하은을 한 번 보고 아무 말도 하지 않았다. 지게차가 둘째 벨트 자리에 팔레트를 딱 맞춰 놓고 갔다.' }] : [
-      { who:'하은', text:'…내일은 내가 더 빨리 실을게.' }]
+      { who:'순자 이모', text:'노래하는 애가 손은 빠르네.' },
+      { who:'', text:'지게차가 둘째 벨트 자리에 팔레트를 딱 맞춰 놓고 갔다.' }] : [
+      { who:'지우', text:'…내일은 더 빨리 실을게요.' }]
   }
   ,{
     id:'s2-4', stageNo:'2-4', who:'박씨', role:'박씨 · 순자 이모 · 84→96→104 BPM', tag:'하드 록 · 중량물 두 손 · 템포 상승', bpm:84, style:'rock22', fxTheme:'rock', inspector: true,
@@ -883,7 +885,7 @@ const LEVELS = [
       { who:'', text:'라디오 너머로 박수. 전화가 울렸다.' },
       { who:'지우', text:'(전화) 반장님!!! 붙었어요!!! 기타 누구 거냐고 물어봤어요!!!' },
       { who:'반장', text:'…마음대로 해.' },
-      { who:'', text:'이모는 비어 있는 지게차 자리를 보지 않았다. 하은의 전화기도 울렸다. 하은은 받지 않고 나갔다.' }] : [
+      { who:'', text:'이모는 비어 있는 지게차 자리를 보지 않았다.' }] : [
       { who:'반장', text:'…라디오 꺼.' },
       { who:'순자 이모', text:'…내일 또 보자.' }]
   }
@@ -1539,10 +1541,12 @@ const PARTNERS = {
       if (pose.unplug) { R(cx + 5, top + 18, 2, 2, '#f4f1ea'); for (let k = 0; k < 8; k++) R(cx + 6 + (k % 2), top + 10 + k, 1, 1, '#f4f1ea'); }
       else { R(cx + 5, top + 8, 2, 2, '#f4f1ea'); for (let k = 0; k < 10; k++) R(cx + 6 + (k % 2), top + 10 + k, 1, 1, '#f4f1ea'); }
       R(cx - 8, top + 8, 2, 2, '#f4f1ea');
+      if (pose.phone) { R(cx + 8, top + 5, 4, 7, '#1e1a1a'); R(cx + 9, top + 6, 2, 4, '#8fe3f0'); }
       if (!pose.doze && active && pose.bob) R(cx - 9, top + 6, 2, 1, hoodD);
     },
     arm(pose) {
       const top = bodyTop(84, pose);
+      if (pose.phone) { thick(BOSS_X + 5, top + 23, BOSS_X + 9, top + 11, 4, '#6b2f3f'); R(BOSS_X + 7, top + 9, 4, 4, C.skin); return; }
       const free = pose.hype && !pose.carry && Math.abs(pose.hand.x - (BOSS_X + 13)) < 2 && Math.abs(pose.hand.y - 134) < 2;
       if (free) { const up = pose.bob < 0 ? -6 : 0; thick(BOSS_X + 5, top + 23, BOSS_X + 8, top + 4 + up, 4, '#6b2f3f'); R(BOSS_X + 6, top + 1 + up, 5, 5, C.skin); return; }
       thick(BOSS_X + 5, top + 23, pose.hand.x, pose.hand.y, 4, '#6b2f3f'); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
