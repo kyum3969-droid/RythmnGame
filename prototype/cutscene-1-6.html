@@ -1102,7 +1102,7 @@ const HB = (() => {
   const ROW = 4;   // beats from a row's start to its arrival: three heartbeats come in by themselves, the 4th is the player's
   const ROWS = [];
   SEG.forEach((_, s) => { for (const h of [0, 4]) { const b0 = s * 8 + h, first = h === 0; ROWS.push({ lane: 0, b0, demo: b0 === 0, skip: (first ? { 9: [1], 10: [0, 2], 11: [2] } : { 9: [2], 10: [1], 12: [1] })[s] || [], cue: first ? { 0: '보세요: 네 번째 박은 하은이 이어 줍니다', 1: '네 번째 박에!', 5: '빨라진다', 7: '느려진다', 9: '한 박이 빠져도, 세던 대로', 17: '괜찮아' }[s] : undefined }); } });
-  for (const b0 of [106, 110, 114, 118, 122, 128, 132, 136, 140, 144, 148, 152, 156]) ROWS.push({ lane: 1, b0, skip: [], cue: { 106: '하은의 심장도 뛴다', 128: '같은 박으로' }[b0] });
+  // (in the cutscene there is one row only, her mother's: 하은's second row is left out)
   const TWO_AT = beatT(106) - 1.4;
   let EV = [], TARGETS = [], END_T = 0;
   function compile() {
@@ -1138,9 +1138,11 @@ const HB = (() => {
     while (evI < EV.length && startAt + EV[evI].t < horizon) {
       const e = EV[evI++], at = startAt + e.t; if (at < now - 0.05) continue;
       // only the heart monitor: a soft beep on every heartbeat (하은's a little higher), a brighter one on the 4th
-      if (e.type === 'pulse') monBeep(at, e.lane === 1 ? 988 : 880, 0.045);
-      else if (e.type === 'click') monBeep(at, 660, 0.025);
-      else if (e.type === 'demo') monBeep(at, 1175, 0.07);
+      // until the ward, a heart's lub-dub with the monitor's beep faint under it; in the ward, the monitor
+      const ward = e.t >= WARD.t0;
+      if (e.type === 'pulse') { if (ward) monBeep(at, 880, 0.045); else { heart(at, 0.55); monBeep(at, 880, 0.01); } }
+      else if (e.type === 'click') { if (ward) monBeep(at, 660, 0.025); else heart(at, 0.25); }
+      else if (e.type === 'demo') { if (ward) monBeep(at, 1175, 0.07); else { heart(at, 0.85, true); monBeep(at, 1175, 0.015); } }
     }
   }
   const songT = () => ac ? ac.currentTime - startAt : -99;
@@ -1160,7 +1162,7 @@ const HB = (() => {
       for (const tg of same) { tg.judge = j; tg.d = d; tg.hitT = t; stats[j]++; stats.combo++; FX.lane[tg.lane].hitAt = now; burst(COL, LANEY[tg.lane], j); FX.pops.push({ lane: tg.lane, text: j === 'perfect' ? '딱' : '좋아', sub: j === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: now, c: j === 'perfect' ? '#ffffff' : '#cfe8d6' }); }
       stats.best = Math.max(stats.best, stats.combo); FX.flashAt = now; FX.kickAt = now;
       if (stats.combo > 0 && stats.combo % 8 === 0) FX.milestone = { n: stats.combo, at: now };
-      monBeep(ac.currentTime, 1175, 0.07);
+      if (ac.currentTime - startAt >= WARD.t0) monBeep(ac.currentTime, 1175, 0.07); else { heart(ac.currentTime, 0.9, true); monBeep(ac.currentTime, 1175, 0.015); }
     } else for (const tg of same) { tg.d = d; missIt(tg, d < 0 ? '빠름' : '늦음'); }
   }
   function missIt(tg, why) { tg.judge = 'miss'; stats.miss++; stats.combo = 0; FX.lane[tg.lane].missAt = performance.now(); FX.pops.push({ lane: tg.lane, text: '놓침', sub: why, at: performance.now(), c: '#ff6a5a' }); }
@@ -1296,21 +1298,20 @@ const HB = (() => {
   const LOW = { on: false, text: [], cv: null, g: null }, BOX = { rgb: '242,196,58', a: 0.3, near: 0, fl: 0 };
   // the yellow scan box, or the part of it between y0 and y1 (redrawn over each row's band so it stays solid)
   function laneBand(y, show) {
-    const BT = Math.round(y) - 22, BH = 31, band = g.createLinearGradient(0, 0, W, 0); band.addColorStop(0, 'rgba(4,10,8,0)'); band.addColorStop(0.06, 'rgba(4,10,8,.5)'); band.addColorStop(0.94, 'rgba(4,10,8,.5)'); band.addColorStop(1, 'rgba(4,10,8,0)');
-    g.save(); g.globalAlpha = show; g.fillStyle = band; g.fillRect(0, BT, W, BH);
-    g.fillStyle = 'rgba(80,160,110,.09)'; for (let x = X0; x < HXR; x += 6) g.fillRect(x, BT + 2, 1, BH - 4); for (let yy = BT + 3; yy < BT + BH - 2; yy += 6) g.fillRect(X0, yy, HXR - X0, 1);
+    // a slim dark band just around the trace (from the left edge to the end of the 4th peak), its ends fading
+    const BT = Math.round(y) - 21, BH = 28, x0 = X0 - 6, x1 = XE + 6, band = g.createLinearGradient(x0, 0, x1, 0); band.addColorStop(0, 'rgba(4,10,8,0)'); band.addColorStop(0.05, 'rgba(4,10,8,.4)'); band.addColorStop(0.95, 'rgba(4,10,8,.4)'); band.addColorStop(1, 'rgba(4,10,8,0)');
+    g.save(); g.globalAlpha = show; g.fillStyle = band; g.fillRect(x0, BT, x1 - x0, BH);
+    g.fillStyle = 'rgba(80,160,110,.08)'; for (let x = X0; x < XE; x += 6) g.fillRect(x, BT + 2, 1, BH - 4); for (let yy = BT + 3; yy < BT + BH - 2; yy += 6) g.fillRect(X0, yy, XE - X0, 1);
     g.restore();
   }
   // the scan point: a soft column of warm light, brightest down the middle and fading out to both sides and toward the top, a
   // thin brighter line down its centre; it swells as the beat comes and flares on a press
   function scanBox(y0, y1) {
-    const hw = 22 + 6 * BOX.near + 10 * BOX.fl, a = BOX.a, col = BOX.rgb;
-    const v = g.createLinearGradient(0, y0 - 14, 0, y1); v.addColorStop(0, `rgba(${col},0)`); v.addColorStop(0.3, `rgba(${col},1)`); v.addColorStop(1, `rgba(${col},1)`);
-    g.save(); g.beginPath(); g.rect(COL - hw, y0 - 14, hw * 2, y1 - y0 + 14); g.clip();
-    const hz = g.createLinearGradient(COL - hw, 0, COL + hw, 0); hz.addColorStop(0, `rgba(${col},0)`); hz.addColorStop(0.3, `rgba(${col},${a * 0.55})`); hz.addColorStop(0.5, `rgba(${col},${a})`); hz.addColorStop(0.7, `rgba(${col},${a * 0.55})`); hz.addColorStop(1, `rgba(${col},0)`);
-    g.fillStyle = hz; g.fillRect(COL - hw, y0 - 14, hw * 2, y1 - y0 + 14);
-    g.globalCompositeOperation = 'destination-in'; g.fillStyle = v; g.fillRect(COL - hw, y0 - 14, hw * 2, y1 - y0 + 14); g.restore();
-    g.save(); const c2 = g.createLinearGradient(0, y0, 0, y1); c2.addColorStop(0, `rgba(255,244,200,0)`); c2.addColorStop(0.35, `rgba(255,244,200,${0.35 + 0.4 * BOX.fl})`); c2.addColorStop(1, `rgba(255,244,200,${0.35 + 0.4 * BOX.fl})`); g.fillStyle = c2; g.fillRect(COL, y0, 1, y1 - y0); g.restore();
+    const k = Math.max(BOX.near, BOX.fl), col = BOX.fl > 0.3 ? '255,244,200' : '242,196,58';
+    g.save();
+    g.fillStyle = `rgba(${col},${0.18 + 0.2 * k})`; g.fillRect(COL - 2, y0, 5, y1 - y0);
+    g.fillStyle = `rgba(${col},${0.6 + 0.4 * k})`; g.fillRect(COL, y0, 1, y1 - y0); g.fillRect(COL - 2, y0, 5, 1); g.fillRect(COL - 2, y1 - 1, 5, 1);
+    g.restore();
   }
   function drawRows(t) {
     if (!LOW.cv) { LOW.cv = document.createElement('canvas'); LOW.cv.width = W; LOW.cv.height = H; LOW.g = LOW.cv.getContext('2d'); }
@@ -1324,15 +1325,14 @@ const HB = (() => {
   }
   function drawRowsAt(t) {
     // a soft shade over the lower part of the scene so the rows read
-    const sh = g.createLinearGradient(0, 96, 0, H); sh.addColorStop(0, 'rgba(6,10,9,0)'); sh.addColorStop(1, 'rgba(6,10,9,.6)'); g.fillStyle = sh; g.fillRect(0, 96, W, H - 96);
-    const two = clamp((t - TWO_AT) / 0.6, 0, 1), e2 = ease(two);
+    const two = 0, e2 = 0;   // one row only
     const y0 = lerp(186, 162, e2), y1 = lerp(246, 204, e2); LANEY[0] = y0; LANEY[1] = y1;
     // the 4th beat's column, across every row: a wide solid yellow box with a dark rim and a lit edge; it brightens as the beat
     // comes and flashes white on a press
     const near = Math.max(...[0, 1].map(l => { const r = laneRow(l, t); return r ? clamp(1 - Math.abs(t - r.tg.t) / 0.5, 0, 1) : 0; })), fl = clamp(1 - (performance.now() - FX.flashAt) / 220, 0, 1);
     for (const [yy, sh2] of [[y0, 1], [y1, e2]]) if (sh2 > 0) laneBand(yy, sh2);
-    { const top = Math.round(lerp(158, 134, e2)); BOX.near = near; BOX.fl = fl; BOX.rgb = fl > 0.3 ? '255,236,150' : '242,196,58'; BOX.a = 0.32 + 0.16 * near + 0.3 * fl; scanBox(top, H);
-      if (fl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fx = g.createRadialGradient(COL, (LANEY[0] + LANEY[1]) / 2, 0, COL, (LANEY[0] + LANEY[1]) / 2, 70); fx.addColorStop(0, `rgba(255,240,170,${0.4 * fl})`); fx.addColorStop(1, 'rgba(255,240,170,0)'); g.fillStyle = fx; g.fillRect(COL - 70, 100, 140, H - 100); g.restore(); } }
+    { const top = Math.round(lerp(158, 134, e2)); BOX.near = near; BOX.fl = fl; BOX.rgb = fl > 0.3 ? '255,236,150' : '242,196,58'; BOX.a = 0.32 + 0.16 * near + 0.3 * fl; scanBox(Math.round(y0) - 21, Math.round(y0) + 7);
+      if (fl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fx = g.createRadialGradient(COL, y0 - 7, 0, COL, y0 - 7, 26); fx.addColorStop(0, `rgba(255,240,170,${0.4 * fl})`); fx.addColorStop(1, 'rgba(255,240,170,0)'); g.fillStyle = fx; g.fillRect(COL - 26, y0 - 33, 52, 52); g.restore(); } }
     drawLane(0, y0, t, 1);
     if (two > 0) drawLane(1, y1, t, e2);
     const now = performance.now();
