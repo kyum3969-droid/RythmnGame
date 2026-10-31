@@ -187,19 +187,30 @@ function haeun(cx, top, o = {}) {
   // the head, smaller than the rest of the cast (a 10x12 face under a 12-wide cap, chin where theirs is). Tipped down it sinks
   // two pixels into the collar and leans one forward.
   const fx = cx + hx, ft = top + hy;
-  R(fx + 3, ft + 3, 4, 12, hair);   // the back of her head under the cap, running into the hair down her back
-  R(fx - 5, ft + 3, 10, 12, C.skin);
-  R(fx - 6, ft, 12, 6, cap); R(fx - 5, ft - 1, 10, 1, cap); R(fx - 6, ft + 5, 12, 1, capD); R(fx - 2, ft - 1, 1, 7, capD); R(fx - 1, ft - 2, 2, 1, capD);
-  R(fx - 5, ft + 1, 3, 2, '#f4e6e0');
-  // the brim: its tip dips with the head or tilts up with it
-  R(fx - 9, ft + 4, 3, 2, brim); R(fx - 9, ft + 4, 3, 1, cap); R(fx - 9, ft + 6, 3, 1, capD);
-  R(fx - 13, ft + 4 + tilt, 4, 2, brim); R(fx - 13, ft + 4 + tilt, 4, 1, cap); R(fx - 13, ft + 6 + tilt, 4, 1, capD);
-  // the cap's shadow over the eyes, always: deep under the brim, softening down to the cheeks
-  R(fx - 5, ft + 6, 10, 3, '#3a2622'); R(fx - 5, ft + 9, 10, 1, '#8a5a44');
-  // a thin dark line down the front of her face, from under the brim to the chin
-  R(fx - 6, ft + 6, 1, 9, '#1b1716');
-  FACE_LINE = { x: o.mirror ? 2 * cx - (fx - 6) - 1 : fx - 6, y: ft + 6, h: 9 };   // where it lands on the sheet, so the rim light leaves it dark
-  R(fx - 3, ft + 10, 2, 1, '#b07a58'); R(fx - 3, ft + 12, 2, 1, '#b2565a');
+  if (o.headFront) {
+    // the head turned to us, halfway through turning round: the cap square on, its brim straight across, the shadow under it,
+    // nose and mouth in the middle (no face line: that is her profile's edge)
+    R(fx - 5, ft + 3, 10, 12, C.skin);
+    R(fx - 6, ft, 12, 6, cap); R(fx - 5, ft - 1, 10, 1, cap); R(fx - 6, ft + 5, 12, 1, capD); R(fx - 1, ft - 2, 2, 1, capD); R(fx - 2, ft + 1, 4, 2, '#f4e6e0');
+    R(fx - 8, ft + 5, 16, 2, brim); R(fx - 8, ft + 5, 16, 1, cap); R(fx - 8, ft + 7, 16, 1, capD);
+    R(fx - 5, ft + 8, 10, 2, '#3a2622'); R(fx - 5, ft + 10, 10, 1, '#8a5a44');
+    R(fx - 1, ft + 11, 2, 1, '#b07a58'); R(fx - 1, ft + 13, 2, 1, '#b2565a');
+    FACE_LINE = null;
+  } else {
+    R(fx + 3, ft + 3, 4, 12, hair);   // the back of her head under the cap, running into the hair down her back
+    R(fx - 5, ft + 3, 10, 12, C.skin);
+    R(fx - 6, ft, 12, 6, cap); R(fx - 5, ft - 1, 10, 1, cap); R(fx - 6, ft + 5, 12, 1, capD); R(fx - 2, ft - 1, 1, 7, capD); R(fx - 1, ft - 2, 2, 1, capD);
+    R(fx - 5, ft + 1, 3, 2, '#f4e6e0');
+    // the brim: its tip dips with the head or tilts up with it
+    R(fx - 9, ft + 4, 3, 2, brim); R(fx - 9, ft + 4, 3, 1, cap); R(fx - 9, ft + 6, 3, 1, capD);
+    R(fx - 13, ft + 4 + tilt, 4, 2, brim); R(fx - 13, ft + 4 + tilt, 4, 1, cap); R(fx - 13, ft + 6 + tilt, 4, 1, capD);
+    // the cap's shadow over the eyes, always: deep under the brim, softening down to the cheeks
+    R(fx - 5, ft + 6, 10, 3, '#3a2622'); R(fx - 5, ft + 9, 10, 1, '#8a5a44');
+    // a thin dark line down the front of her face, from under the brim to the chin
+    R(fx - 6, ft + 6, 1, 9, '#1b1716');
+    FACE_LINE = { x: o.mirror ? 2 * cx - (fx - 6) - 1 : fx - 6, y: ft + 6, h: 9 };   // where it lands on the sheet, so the rim light leaves it dark
+    R(fx - 3, ft + 10, 2, 1, '#b07a58'); R(fx - 3, ft + 12, 2, 1, '#b2565a');
+  }
   // arms, hung from the shoulders at the sides of her body (3 px sleeves, 3 px hands)
   const arm = (sx, hx, hy) => { thick(sx, top + 17, hx, hy, 3, shirt); R(hx - 1, hy - 1, 3, 3, C.skin); };
   if (o.arms === 'belt') {
@@ -245,7 +256,7 @@ function putRim(x, top, dx, dy, color, a, clipY = H) {
   rctx.globalCompositeOperation = 'source-over'; rctx.clearRect(0, 0, SPR_W, SPR_H); rctx.drawImage(sb, 0, 0);
   rctx.globalCompositeOperation = 'source-in'; rctx.fillStyle = color; rctx.fillRect(0, 0, SPR_W, SPR_H);
   rctx.globalCompositeOperation = 'destination-out'; rctx.drawImage(sb, -dx, -dy); rctx.globalCompositeOperation = 'source-over';
-  if (FACE_LINE) rctx.clearRect(FACE_LINE.x, FACE_LINE.y, 1, FACE_LINE.h);
+  if (FACE_LINE) rctx.clearRect(FACE_LINE.x, FACE_LINE.y, 1, FACE_LINE.h);   // (null while her head faces us)
   g.save(); g.beginPath(); g.rect(0, 0, W, clipY); g.clip(); g.globalAlpha = a; g.drawImage(rb, Math.round(x) - SPR_CX, Math.round(top) - SPR_TOP); g.restore();
 }
 
@@ -918,13 +929,19 @@ function ward(t) {
   R(206, 144, 24, 3, '#6a7a86'); R(206, 118, 3, 28, '#6a7a86'); R(208, 147, 2, 12, '#55636c'); R(226, 147, 2, 12, '#55636c');
 }
 function wardPose(t) {
+  const reach = tp => ({ dx: HX - MOM_HAND.x - 1, dy: MOM_HAND.y - tp });   // her hand on her mother's (she faces right: measured mirrored)
   if (t < WARD.sit) return { o: { mirror: true, look: -0.3, sway: 0 }, top: HTOP };
   const top = HTOP + 2;   // sitting: the lap on the chair at y 144
   if (t < WARD.hold) return { o: { mirror: true, look: -0.3, seated: true, sway: 0 }, top };
-  const reach = tp => ({ dx: HX - MOM_HAND.x - 1, dy: MOM_HAND.y - tp });   // her hand on her mother's (she faces right: measured mirrored)
   if (t < WARD.rest) return { o: { mirror: true, look: -0.4, seated: true, arms: 'reach', reach: reach(top), sway: 0 }, top };
   if (t < WARD.lift) { const k = ease(seg(t, WARD.rest, WARD.rest + 1.2)), tp = top + Math.round(4 * k); return { o: { mirror: true, look: lerp(-0.4, -1, k), seated: true, arms: 'reach', reach: reach(tp), sway: 0 }, top: tp }; }
-  if (t >= WARD.turn) return { o: { mirror: false, look: 0.2, seated: true, sway: 0 }, top };   // a knock: she lets go and turns to the door behind her
+  if (t >= WARD.turn) {
+    // a knock: slowly, she lets go of the hand (0.5 s), her head comes round to face us (from 0.5 s), her body follows (from 1.1 s),
+    // and her head goes on round to the door behind her (from 1.7 s)
+    const u = t - WARD.turn, k = ease(seg(u, 0, 0.5)), r = reach(top);
+    const arms = u < 0.5 ? { arms: 'reach', reach: { dx: Math.round(lerp(r.dx, -6, k)), dy: Math.round(lerp(r.dy, 33, k)) } } : {};
+    return { o: { mirror: u < 1.1, look: lerp(-0.1, 0.2, seg(u, 0.5, 1.7)), headFront: u >= 0.5 && u < 1.7, seated: true, sway: 0, ...arms }, top: top - (u >= 1.0 && u < 1.25 ? 1 : 0) };
+  }
   const k = ease(seg(t, WARD.lift, WARD.lift + 1.4)), tp = top + Math.round(4 * (1 - k)); return { o: { mirror: true, look: lerp(-1, 0.1, k), seated: true, arms: 'reach', reach: reach(tp), sway: 0 }, top: tp };
 }
 function wardScene(t) {
@@ -1047,6 +1064,7 @@ const SFX = {
   // a heartbeat, faint, from behind the door (the next stage's beat)
   heartbeat(t, e, into) { const left = e.dur - into; for (let c = 0; c < left - 0.2; c += 60 / 62) { const a = 0.05 + 0.08 * Math.min(1, c / 2); thump(t + c, 58, a, 0.22); thump(t + c + 0.14, 50, a * 0.6, 0.18); } },
   // knuckles on the ward door, three times
+  rustle(t) { noise(t, 0.35, 0.025, 'bandpass', 2400, 0.7); noise(t + 0.6, 0.3, 0.02, 'bandpass', 1800, 0.7); },
   knock(t) { for (const dt of [0, 0.26, 0.52]) { thump(t + dt, 170, 0.16, 0.08); noise(t + dt, 0.04, 0.09, 'bandpass', 900, 1.5); noise(t + dt + 0.09, 0.05, 0.02, 'bandpass', 700, 1); } },
   meow(t) { tone(t, 'triangle', 700, 520, 0.02, 0.35); tone(t + 0.05, 'sine', 1400, 1000, 0.006, 0.3); },
   // the brakes' squeal as it stops
@@ -1062,7 +1080,7 @@ EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: 
   { t: DEST.t0, fn: 'pad', dur: ALLEY.t0 - DEST.t0, notes: [110, 164.81, 196, 246.94, 261.63] },   // Am9 getting off
   { t: ALLEY.t0, fn: 'pad', dur: WALK2.stop - ALLEY.t0, notes: [130.81, 196, 246.94, 293.66, 329.63] },   // Cmaj9 down the alley
   { t: WALK2.stop, fn: 'pad', dur: CORR.t0 + 1 - WALK2.stop, notes: [110, 164.81, 220, 246.94, 261.63] },   // A minor (add9) at the hospital
-  { t: WARD.knock, fn: 'knock' },
+  { t: WARD.knock, fn: 'knock' }, { t: WARD.turn + 0.4, fn: 'rustle' },
   { t: CORR.t0 + 1, fn: 'pad', dur: WARD.t0 - CORR.t0 - 1, notes: [146.83, 174.61, 220, 261.63, 329.63] },   // Dm9 down the corridor
   { t: RIDE.stop - 1.4, fn: 'brake' }, { t: RIDE.open, fn: 'doors' }, { t: DEST.close, fn: 'doors' }, { t: DEST.leave, fn: 'leaving' },
   { t: 56.5, fn: 'bird' }, { t: 59.8, fn: 'bird' }, { t: 63.1, fn: 'bird' }, { t: 56.2, fn: 'meow' },
