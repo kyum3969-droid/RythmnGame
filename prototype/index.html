@@ -398,6 +398,29 @@ const RSOLO = [[0, 'E5', 0.5, 1], [0.5, 'G5', 0.5], [1, 'E5', 0.5], [1.5, 'D5', 
   [8, 'A4', 0.5], [8.5, 'B4', 0.5], [9, 'Cs5', 1, 1], [10, 'E5', 0.5], [10.5, 'Cs5', 0.5], [11, 'A4', 1], [12, 'C5', 0.5], [12.5, 'E5', 0.5], [13, 'G5', 1.5, 1], [14.5, 'E5', 0.5], [15, 'D5', 1],
   [16, 'B5', 2, 1], [18, 'A5', 0.5], [18.5, 'G5', 0.5], [19, 'E5', 1], [20, 'G5', 0.5], [20.5, 'A5', 0.5], [21, 'B5', 1, 1], [22, 'A5', 0.5], [22.5, 'G5', 0.5], [23, 'E5', 1],
   [24, 'E5', 0.25], [24.25, 'Fs5', 0.25], [24.5, 'G5', 0.25], [24.75, 'A5', 0.25], [25, 'B5', 1, 1], [26, 'A5', 0.5], [26.5, 'G5', 0.5], [27, 'E5', 1], [28, 'G5', 0.5], [28.5, 'E5', 0.5], [29, 'D5', 0.5], [29.5, 'B4', 0.5], [30, 'E5', 2, 1]];
+// 2-2 재검: 순자 이모's second night, disco funk in G minor at 112. Four on the floor with the open hat on every 'and', a slap
+// bass, a clavinet riff, guitar chops on the 16ths, strings and horns in the chorus, a sung verse and hook, a filtered
+// breakdown with claps and a build back into the last choruses. Gm7 | C7 for the verse, Ebmaj7 | F7 | Gm7 for the chorus.
+const FN = { G3: 196, Bb3: 233.08, C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392, A4: 440, Bb4: 466.16, C5: 523.25, D5: 587.33, Eb5: 622.25, F5: 698.46, G5: 783.99 };
+const DISCO = {
+  // 0 Gm7, 1 C7, 2 Ebmaj7, 3 F7, 4 Cm7, 5 D7
+  chords: [[196, 233.08, 293.66, 349.23], [233.08, 261.63, 329.63, 392], [233.08, 293.66, 311.13, 392], [261.63, 311.13, 349.23, 440], [261.63, 311.13, 392, 466.16], [220, 261.63, 293.66, 369.99]],
+  roots: [98, 65.41, 77.78, 87.31, 65.41, 73.42],
+  verse: [0, 1, 0, 1], chorus: [2, 3, 0, 0], bridge: [4, 5, 4, 5],
+  // the clavinet riff and the slap bass, one bar each, as [beat, semitones above the root, length]
+  clav: [[0, 0, 0.25], [0.25, 0, 0.25], [0.75, 3, 0.25], [1, 0, 0.25], [1.5, 7, 0.25], [1.75, 5, 0.25], [2, 0, 0.25], [2.5, 10, 0.25], [3, 7, 0.25], [3.5, 3, 0.25], [3.75, 0, 0.25]],
+  slap: [[0, 0, 0.5], [0.75, 12, 0.25], [1.5, 0, 0.5], [2, 0, 0.25], [2.5, 12, 0.25], [3, 10, 0.5], [3.5, 0, 0.5]]
+};
+const DMEL_A = [[0.5, 'D4', 0.5], [1, 'F4', 0.5], [1.5, 'G4', 1], [3, 'F4', 0.5], [3.5, 'D4', 0.5], [4, 'E4', 1], [5, 'G4', 0.5], [5.5, 'E4', 0.5], [6, 'C4', 1.5],
+  [8.5, 'G4', 0.5], [9, 'Bb4', 0.5], [9.5, 'A4', 1], [11, 'G4', 0.5], [11.5, 'F4', 0.5], [12, 'E4', 1.5], [13.5, 'G4', 0.5], [14, 'C4', 2],
+  [16.5, 'D4', 0.5], [17, 'F4', 0.5], [17.5, 'G4', 1], [19, 'Bb4', 0.5], [19.5, 'A4', 0.5], [20, 'G4', 1], [21, 'E4', 0.5], [21.5, 'G4', 0.5], [22, 'E4', 1.5],
+  [24.5, 'C5', 0.5], [25, 'Bb4', 0.5], [25.5, 'A4', 1], [27, 'G4', 0.5], [27.5, 'F4', 0.5], [28, 'G4', 2.5]];
+const DMEL_B = [[0, 'G4', 0.5], [0.5, 'Bb4', 0.5], [1, 'D5', 1.5], [2.5, 'C5', 0.5], [3, 'Bb4', 1], [4, 'A4', 0.5], [4.5, 'C5', 0.5], [5, 'A4', 1], [6, 'F4', 2],
+  [8, 'G4', 0.5], [8.5, 'A4', 0.5], [9, 'Bb4', 1.5], [10.5, 'D5', 0.5], [11, 'C5', 1], [12, 'Bb4', 0.5], [12.5, 'A4', 0.5], [13, 'G4', 3],
+  [16, 'Eb5', 1], [17, 'D5', 0.5], [17.5, 'Bb4', 0.5], [18, 'G4', 1], [19, 'Bb4', 1], [20, 'C5', 1], [21, 'A4', 0.5], [21.5, 'C5', 0.5], [22, 'F5', 2],
+  [24, 'D5', 1], [25, 'Bb4', 0.5], [25.5, 'D5', 0.5], [26, 'G5', 1.5], [27.5, 'F5', 0.5], [28, 'D5', 0.5], [28.5, 'Bb4', 0.5], [29, 'G4', 3]];
+// horn answers in the hook's gaps, for the last chorus
+const DHORN = [[6.5, 'F4', 0.25], [6.75, 'A4', 0.25], [7, 'C5', 1], [14, 'D5', 0.5], [14.5, 'F5', 0.5], [15, 'G5', 1], [22.5, 'F5', 0.5], [23, 'C5', 1], [29.5, 'G4', 0.5], [30, 'Bb4', 0.5], [30.5, 'D5', 1.5]];
 // chorus hook, 8 bars: [beat offset inside the 8 bars, note, length in beats]
 const HOOK = [
   [0, 'E5', 1.5], [1.5, 'C5', 0.5], [2, 'B4', 1], [3, 'A4', 1],
@@ -667,11 +690,48 @@ const LEVELS = [
     outro: good => good ? [{ who:'순자 이모', text:'…손이 빠르네, 총각.' }] : [{ who:'순자 이모', text:'…내일 또 보자.' }]
   }
   ,{
-    id:'s2-2', stageNo:'2-2', who:'박씨', role:'박씨 · 84→96→104 BPM', tag:'하드 록 · 중량물 두 손 · 템포 상승', bpm:84, style:'rock22', fxTheme:'rock',
+    id:'s2-2', stageNo:'2-2', who:'순자 이모', role:'반장 · 순자 이모 · 112 BPM', tag:'디스코 펑크 · 밀기와 붙잡기', bpm:112, style:'disco22', fxTheme:'neon', inspector: true,
+    // 2-2 재검: 순자 이모's second night. 소장 wants a second look at anything odd, so to her push she adds the grab ('R'): she
+    // takes a box off the belt as it passes, looks it over for half a beat (two stamps, a question mark), and sends it on half a
+    // beat late with her red mark on it. Her hand now says early or late. 반장 loads.
+    tempo: [[0, 112]], clock:'02:20', title:'재검', partners:['boss'], hints:true,
+    chords: DISCO.chords, roots: DISCO.roots,
+    chordAt: bar => bar < 2 ? 0 : bar < 10 ? DISCO.verse[(bar - 2) % 4] : bar < 18 ? DISCO.chorus[(bar - 10) % 4] : bar < 26 ? DISCO.verse[(bar - 18) % 4] : bar < 34 ? DISCO.chorus[(bar - 26) % 4] : bar < 40 ? DISCO.bridge[(bar - 34) % 4] : bar < 56 ? DISCO.chorus[(bar - 40) % 4] : 0,
+    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 224,
+    special:['밀리거나 붙잡힌 상자', 'off', '받아냄'],
+    sections: [[0, 'intro'], [2, 'v1'], [10, 'ch1'], [18, 'v2'], [26, 'ch2'], [34, 'break'], [38, 'build'], [40, 'ch3'], [48, 'ch4'], [56, 'outro']],
+    // 8 cells per bar, on the beat. 'P' = pushed (half a beat early), 'R' = grabbed (half a beat late). No box in the cell before
+    // a 'P' or the cell after an 'R'; arrivals stay at least half a beat apart (the chart checker).
+    bars: [
+      '........', '........',
+      // verse 1: the push, as last night
+      'x...x...', 'x...P...', 'x.x.x...', 'P...x...', 'x...x.x.', 'x...P...', 'x.x.x...', 'x...P.x.',
+      // chorus 1: the grab comes in
+      'x...R...', 'x.x.x...', 'R...x...', 'x...x.R.', 'x...R...', 'x.R.x...', 'x.x.x...', 'R...x...',
+      // verse 2: both
+      'x...P...', 'x...R...', 'P...x.R.', 'x.x.x...', 'R...P...', 'x...x.P.', 'x.R.x...', 'P...x...',
+      // chorus 2: thicker
+      'x...R...', 'P...x.x.', 'x.R.x...', 'x...P.P.', 'R...x...', 'x...R.x.', 'P.x.P...', 'x.x.x.x.',
+      // the breakdown and the build: she lets the line breathe, then the floor
+      'x.......', 'x.......', 'x...x...', 'x...x...', 'x.x.x.x.', 'x.x.x.x.',
+      // the last two choruses: everything
+      'x...P...', 'R...x.x.', 'x...R.x.', 'P...P...', 'x.R.x...', 'x...P.R.', 'x.x.x...', 'R...x.P.',
+      'P...R...', 'x.x.x.x.', 'x...P.P.', 'R...x...', 'x.P.x...', 'x...R...', 'P...x.P.', 'x.x.x.x.',
+      '........', '........'
+    ],
+    say: [[4, '(임시) 소장이 재검 돌리래. 이상한 건 내가 잡는다.', 4, 0, 's'], [40, '(임시) 잡으면 늦게 간다. 알지?', 3, 0, 's'], [72, '(임시) 빠른 거, 늦은 거. 손 봐.', 3, 0, 's'], [136, '(임시) …숨 좀 돌리자.', 3, 0, 's'], [160, '(임시) 자, 간다!', 2.5, 0, 's']],
+    comfort: ['괜찮아, 다음 거.', '총각! 내 손 봐, 손!'],
+    intro: [
+      { who:'', text:'(임시) 새벽 2시 20분. 둘째 밤. 소장이 재검을 돌리라고 했다.' },
+      { who:'순자 이모', text:'(임시) 이상한 건 내가 잡아 본다. 잡힌 건 늦게 가. 민 건 빨리 가고.' }],
+    outro: good => good ? [{ who:'순자 이모', text:'(임시) …내 손 잘 보네, 총각.' }] : [{ who:'순자 이모', text:'(임시) …내일은 손만 봐.' }]
+  }
+  ,{
+    id:'s2-4', stageNo:'2-4', who:'박씨', role:'박씨 · 84→96→104 BPM', tag:'하드 록 · 중량물 두 손 · 템포 상승', bpm:84, style:'rock22', fxTheme:'rock',
     // 2-2 중량: peak season starts and 박씨 brings the pallets. Heavy boxes take both hands (two keys at once); the line speeds
     // up twice as the backlog grows, and the song, 박씨's cassette, moves up with it. The music comes first; the chart below is a
     // placeholder with heavies and a few crates.
-    tempo: [[0, 84], [96, 96], [176, 104]], clock:'01:30', title:'중량', partners:['park'], hints:true,
+    tempo: [[0, 84], [96, 96], [176, 104]], clock:'00:50', title:'중량', partners:['park'], hints:true,
     chords: ROCK.chords, roots: ROCK.roots,
     chordAt: bar => bar < 8 ? 0 : bar < 16 ? ROCK.verse[(bar - 8) % 4] : bar < 24 ? ROCK.chorus[(bar - 16) % 4] : bar < 28 ? ROCK.bridge[(bar - 24) % 4] : bar < 36 ? ROCK.verse[(bar - 28) % 4] : bar < 44 ? ROCK.chorus[(bar - 36) % 4] : bar < 52 ? ROCK.verse[(bar - 44) % 4] : bar < 60 ? 6 + ROCK.chorus[(bar - 52) % 4] : 6,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 }, endAt: 240,
@@ -760,7 +820,8 @@ const STAGE1 = [
   { level: LEVELS[2] },
   { level: LEVELS[3] },
   { level: LEVELS[4], stage2: true },
-  { level: LEVELS[5] }
+  { level: LEVELS[5] },
+  { level: LEVELS[6] }
 ];
 
 // ---------- tempo + chart ----------
@@ -788,7 +849,7 @@ function loadLevel(level) {
       const ch = bar[c]; if (ch === '.' || ch === '=') continue;
       let len = 0;
       if (ch === 'h') { let k = c + 1, cnt = 1; while (bar[k] === '=' || bar[k] === 'o') { cnt++; k++; } len = cnt / div; }
-      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : ch === 'P' ? -0.5 : 0), beat0: bi * 4 + c / div, push: ch === 'P', len, late: ch === 'L', heavy: ch === 'H', gtr: ch === 'G', shuffle: div === 3 && c % 3 === 2, off: ch === 'P' || (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane });
+      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : ch === 'P' ? -0.5 : ch === 'R' ? 0.5 : 0), beat0: bi * 4 + c / div, push: ch === 'P', grab: ch === 'R', len, late: ch === 'L', heavy: ch === 'H', gtr: ch === 'G', shuffle: div === 3 && c % 3 === 2, off: ch === 'P' || ch === 'R' || (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane });
     }
   }));
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
@@ -798,6 +859,8 @@ function loadLevel(level) {
     // a pushed box is loaded for its written beat and rides normally to the inspector; from there it covers the rest at the speed
     // that lands it half a beat early (twice the belt's, with the inspector at the midpoint)
     if (n.push) { n.arr0 = timeAt(n.beat0); n.place = n.arr0 - TRAVEL * SPB; n.tPush = n.arr0 - (SCAN_X - INSPECT_X) / SPEED; n.k = (SCAN_X - INSPECT_X) / ((n.arr - n.tPush) * SPEED); }
+    // a grabbed box rides to her post, waits there in her hand for the half beat, and goes on at the belt's speed
+    if (n.grab) { n.arr0 = timeAt(n.beat0); n.place = n.arr0 - TRAVEL * SPB; n.tPass = n.arr0 - (SCAN_X - INSPECT_X) / SPEED; n.tRel = n.tPass + (n.arr - n.arr0); }
     if (n.len) { n.w = Math.round((n.end - n.arr) * SPEED) + 16; n.h = 12; }
     else if (n.heavy) { n.w = 26 + Math.floor(rnd(i, 1) * 5); n.h = 17 + Math.floor(rnd(i, 2) * 4); }
     else if (level.small) { n.w = 8 + Math.floor(rnd(i, 1) * 5); n.h = 7 + Math.floor(rnd(i, 2) * 4); }
@@ -1643,6 +1706,7 @@ function drawBox(n, cx, bottom, mark, t, sq = 0) {
   R(x, y, w, h, C.kraft); R(x, y, w, 2, C.kraftTop); R(x + w - 2, y + 2, 2, h - 2, C.kraftDark);
   R(x + (w >> 1) - 1, y, 3, h, n.off && L.offTilt ? '#d8463b' : L.lanes === 2 ? (n.lane === 0 ? C.vest : C.vest2) : C.tape);
   if (n.pair && L.oneButton) R(x, y, w, 2, '#ffe9a8');
+  if (n.grab && t >= n.tRel) { R(x + 2, y + 2, 5, 4, '#d8463b'); R(x + 3, y + 3, 3, 2, '#f08a7a'); }
   const lw = Math.min(7, w - 4);
   if (lw >= 3) { R(x + 2, y + h - 6, lw, 4, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink); }
   if (n.heavy) { R(x + 2, y + 3, w - 4, 4, '#1b1716'); for (let k = 2; k < w - 5; k += 4) R(x + k + 1, y + 4, 2, 2, '#f0b429'); }
@@ -1834,9 +1898,10 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
 // pushes get her hand instead: it winds up half a beat before the box reaches her, shoves as it passes, and the box skids to the
 // gate half a beat early. Reading her hand is the level's rule. On the phone she stamps nothing and pushes nothing.
 const INSPECT_X = 184;
-const passAt = n => (n.push ? n.arr0 : n.arr) - (SCAN_X - INSPECT_X) / SPEED;
+const passAt = n => (n.push || n.grab ? n.arr0 : n.arr) - (SCAN_X - INSPECT_X) / SPEED;
 function noteX(n, t) {
   if (n.push && t < n.arr) return t < n.tPush ? SCAN_X + (t - n.arr0) * SPEED : INSPECT_X + (t - n.tPush) * SPEED * n.k;
+  if (n.grab && t < n.tRel) return t < n.tPass ? SCAN_X + (t - n.arr0) * SPEED : INSPECT_X;
   return SCAN_X + (t - n.arr) * SPEED;
 }
 const shoop = t => { const fl = ctx.createBiquadFilter(); fl.type = 'bandpass'; fl.Q.value = 1.2; fl.frequency.setValueAtTime(2200, t); fl.frequency.exponentialRampToValueAtTime(500, t + 0.14); fl.connect(bus); noise(t, 'highpass', 300, 0.3, 0.14, 0.7, fl); roller(t + 0.03, 0.05); };
@@ -1847,11 +1912,12 @@ function drawInspector(t, active, nowMs) {
   R(INSPECT_X - 2, 112, 30, 3, '#5b4a3a'); R(INSPECT_X + 1, 115, 24, 2, '#3f3328'); R(INSPECT_X + 10, 117, 6, 29, '#3f3328'); R(INSPECT_X + 4, 113, 12, 2, '#efe6d2'); R(INSPECT_X + 18, 112, 7, 3, '#8a2f2a');
   R(INSPECT_X + 25, 94, 2, 18, '#6a7075'); R(INSPECT_X + 20, 92, 12, 3, '#3a3d45'); R(INSPECT_X + 22, 95, 8, 1, '#ffe9a8');
   // her hand: idle on the sheet; the stamp drops on a passing box; the shove winds up and goes
-  let hand = { x: BOSS_X + 10, y: 110 }, act = null;
+  let hand = { x: BOSS_X + 14, y: 116 }, act = null;   // resting on the sheet
   if (active) for (const n of notes) {
     if (n.state === 'pending' || n.state === 'hit' || n.state === 'miss' || n.state === 'holding') {
       const tp = passAt(n), rel = t - tp;
-      if (n.push) { if (rel >= -0.5 * SPB && rel < 0.35 * SPB) { act = rel < 0 ? 'wind' : 'shove'; hand = rel < 0 ? { x: BOSS_X - 4 - 6 * (-rel / (0.5 * SPB)), y: 104 - 8 * (-rel / (0.5 * SPB)) } : { x: BOSS_X + 24 - 10 * (rel / (0.35 * SPB)), y: 116 }; break; } }
+      if (n.grab) { if (rel >= -0.15 * SPB && t < n.tRel + 0.12 * SPB) { act = t < n.tRel ? 'grab' : 'let'; hand = t < n.tRel ? { x: BOSS_X + 12, y: 119 } : { x: BOSS_X + 16, y: 114 }; break; } }
+      else if (n.push) { if (rel >= -0.5 * SPB && rel < 0.35 * SPB) { act = rel < 0 ? 'wind' : 'shove'; hand = rel < 0 ? { x: BOSS_X - 4 - 6 * (-rel / (0.5 * SPB)), y: 104 - 8 * (-rel / (0.5 * SPB)) } : { x: BOSS_X + 24 - 10 * (rel / (0.35 * SPB)), y: 116 }; break; } }
       else if (!onPhone && !n.top && rel >= -0.2 * SPB && rel < 0.25 * SPB) { act = 'stamp'; hand = rel < 0 ? { x: BOSS_X + 12, y: 104 } : { x: BOSS_X + 12, y: 118 }; break; }
     }
   }
@@ -1862,6 +1928,7 @@ function drawInspector(t, active, nowMs) {
     PARTNERS.sunja.arm(pose);
     if (act === 'stamp' && hand.y > 110) { R(hand.x - 3, hand.y + 2, 6, 2, '#8a2f2a'); }
     if (act === 'wind') { R(hand.x + 2, hand.y - 6, 1, 1, '#ffe9a8'); R(hand.x + 5, hand.y - 4, 1, 1, '#ffe9a8'); }
+    if (act === 'grab') { R(BOSS_X + 9, top - 10, 3, 1, '#efe6d2'); R(BOSS_X + 12, top - 9, 1, 2, '#efe6d2'); R(BOSS_X + 11, top - 7, 1, 1, '#efe6d2'); R(BOSS_X + 10, top - 5, 1, 1, '#efe6d2'); R(BOSS_X + 10, top - 3, 1, 1, '#efe6d2'); }
   });
 }
 // ---------- 2-1 stage (the audition hall) ----------
@@ -2714,6 +2781,11 @@ function gtrSample(j, beat) {
   mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(0.7, t); mus.gain.linearRampToValueAtTime(1, t + 0.16);
 }
 // 2-1: a brass stab, 순자 이모's finger snap 탁, a tambourine, and the phone in her apron pocket
+function clav(t, f, d, v = 0.03) {
+  const fl = ctx.createBiquadFilter(); fl.type = 'bandpass'; fl.frequency.value = 1400; fl.Q.value = 1.6; fl.connect(mus);
+  osc('sawtooth', f, t, 0.003, v, d, fl); osc('square', f * 2, t, 0.003, v * 0.35, d * 0.6, fl);
+}
+const slap = (t, f, d, v = 1) => { bass(t, f, d, 1100); noise(t, 'highpass', 2500, 0.05 * v, 0.012, 1); };
 function brassStab(t, fs, d, v = 0.03) {
   const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(900, t); fl.frequency.exponentialRampToValueAtTime(2600, t + 0.05); fl.frequency.exponentialRampToValueAtTime(1200, t + d); fl.connect(mus);
   fs.forEach(f => { osc('sawtooth', f, t, 0.012, v, d, fl); osc('sawtooth', f * 1.006, t, 0.012, v * 0.7, d, fl); });
@@ -3368,6 +3440,51 @@ function buildEvents() {
       const rel = (b - (sec === 'a1' ? 8 : sec === 'a2' ? 40 : sec === 'b1' ? 72 : sec === 'a3' ? 120 : 152)) % 32;
       if (chorus) { for (const [ob, nm, len, fall] of SMEL_B) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { sax(T, SN[nm] * up, len * s * 0.92, p2 ? 0.055 : 0.05, !!fall); if (len >= 1.5) voice(T, SN[nm] * up / 2, len * s * 0.9, 0.012); if (p2 && len >= 1.5) brassStab(T, [SN[nm] * up, SN[nm] * up * 1.26], len * s * 0.6, 0.016); }); }
       else for (const [ob, nm, len] of SMEL_A) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { voice(T, SN[nm], len * s * 0.95, sec === 'a1' ? 0.026 : 0.03); ep(T, [SN[nm]], len * s * 0.8, p2 ? 0.018 : 0.012); if (p2) sax(T, SN[nm], len * s * 0.9, 0.028); });
+    } else if (style === 'disco22') {
+      // 2-2 재검: disco funk. Four on the floor, the open hat on every 'and', closed 16ths, clap and snare on 2 and 4; a slap bass
+      // and a clavinet riff on the chord's root; guitar chops on the 'e' and 'a'; strings and horns in the chorus; the verse and
+      // hook sung; her snaps from verse 2; a filtered breakdown on claps and bass, a build, and the last two choruses with horns.
+      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), chorus = sec.startsWith('ch'), verse = sec.startsWith('v'), brk = sec === 'break', build = sec === 'build';
+      const st = f => k => f * Math.pow(2, k / 12), root2 = roots[ci] * 2;
+      if (sec === 'intro') {
+        E(0, T => roller(T, 0.03)); if (b === 1) E(0, T => forklift(T));
+        if (b >= 4) { E(0, T => hat(T, 0.04)); E(s / 2, T => openHat(T, 0.05)); for (const [ob, k, len] of DISCO.clav) if (Math.floor(ob) === inBar) E((ob - inBar) * s, T => clav(T, st(root2)(k), len * s * 0.8, 0.022)); }
+        if (b === 7) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.1 + k * 0.05));
+        continue;
+      }
+      if (sec === 'outro') continue;
+      if (b === 8 || b === 40 || b === 72 || b === 104 || b === 160 || b === 192) E(0, T => crash(T));
+      if (b === 136) E(0, T => { musF.frequency.setValueAtTime(900, T); });
+      if (b === 152) E(0, T => { musF.frequency.setValueAtTime(900, T); musF.frequency.exponentialRampToValueAtTime(20000, T + s * 8); });
+      if (brk) {
+        // the breakdown: the floor and the claps, the bass, the clavinet far away
+        E(0, T => kick(T, 0.8)); E(0, T => clap(T, 0.22)); if (inBar === 1 || inBar === 3) E(0, T => snare(T, 0.12));
+        E(s / 2, T => hat(T, 0.03));
+        for (const [ob, k, len] of DISCO.slap) if (Math.floor(ob) === inBar) E((ob - inBar) * s, T => slap(T, st(roots[ci])(k), len * s * 0.8));
+        if (inBar === 0) E(0, T => pad(T, chords[ci].map(f => f * 2), s * 4, 'sawtooth', 0.012));
+        continue;
+      }
+      // the floor
+      E(0, T => kick(T, 0.9)); E(s / 2, T => openHat(T, chorus || build ? 0.07 : 0.055)); E(s / 4, T => hat(T, 0.02)); E(3 * s / 4, T => hat(T, 0.03));
+      if (inBar === 1 || inBar === 3) E(0, T => { snare(T, 0.26); clap(T, chorus || build ? 0.24 : 0.16); });
+      if (build) { E(0, T => clap(T, 0.22)); if (bar === 39) for (let k = 0; k < 8; k++) E(k * s / 8, T => snare(T, 0.07 + k * 0.03)); if (inBar === 0) E(0, T => riser(T, s * 8, 0.045)); }
+      if (inBar === 3 && bar % 8 === 7) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.1 + k * 0.05));
+      // slap bass and the clavinet, both off the chord's root
+      for (const [ob, k, len] of DISCO.slap) if (Math.floor(ob) === inBar) E((ob - inBar) * s, T => slap(T, st(roots[ci])(k), len * s * 0.8));
+      for (const [ob, k, len] of DISCO.clav) if (Math.floor(ob) === inBar) E((ob - inBar) * s, T => clav(T, st(root2)(k), len * s * 0.8, chorus ? 0.02 : 0.026));
+      // guitar chops on the 'e' and the 'a'
+      E(s / 4, T => gtr(T, chords[ci].slice(1), s * 0.12, 0.016)); E(3 * s / 4, T => gtr(T, chords[ci].slice(1), s * 0.12, 0.013));
+      // strings under the chorus, string stabs on the 'and' of 4 in the build, horns on 1 and the 'and' of 2 in the last choruses
+      if (chorus && inBar === 0) E(0, T => supersaw(T, chords[ci].map(f => f * 2), s * 4, 0.009, 2200));
+      if (build && inBar === 3) E(s / 2, T => supersaw(T, chords[ci].map(f => f * 2), s * 0.4, 0.016, 3000));
+      if (sec === 'ch4' && (inBar === 0 || inBar === 1)) E(inBar ? s / 2 : 0, T => brassStab(T, chords[ci].slice(0, 3).map(f => f * 2), s * 0.25, 0.02));
+      // 탁, 탁탁, 탁: her snaps from the second verse
+      if (!verse || sec === 'v2') { if (inBar === 0 || inBar === 2) E(0, T => tak(T, 0.14)); if (inBar === 1) { E(0, T => tak(T, 0.14)); E(s / 4, T => tak(T, 0.12)); } }
+      // the tune
+      const rel = (b - (sec === 'v1' ? 8 : sec === 'ch1' ? 40 : sec === 'v2' ? 72 : sec === 'ch2' ? 104 : sec === 'ch3' ? 160 : 192)) % 32;
+      if (verse) for (const [ob, nm, len] of DMEL_A) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { voice(T, FN[nm], len * s * 0.9, 0.03); ep(T, [FN[nm]], len * s * 0.7, 0.012); });
+      if (chorus) for (const [ob, nm, len] of DMEL_B) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { voice(T, FN[nm], len * s * 0.92, 0.034); voice(T + 0.015, FN[nm] / 2, len * s * 0.9, 0.012); if (sec === 'ch4') supersaw(T, [FN[nm] * 2], len * s * 0.9, 0.006, 2600); });
+      if (sec === 'ch4') for (const [ob, nm, len] of DHORN) if (Math.floor(ob) === rel) E((ob - rel) * s, T => brassStab(T, [FN[nm], FN[nm] * 1.5], len * s * 0.9, 0.026));
     } else if (style === 'rock22') {
       // 2-2 중량: 80s hard rock off 박씨's cassette. Forklift beeps count it in; the riff on power chords with the bass in unison
       // over half-time drums at 84; a sung verse over palm-muted 8ths and a clean arpeggio; the anthem chorus with the big snare,
@@ -3512,6 +3629,7 @@ function buildEvents() {
       return;
     }
     if (L.style === 'soul21') { kick(T, 0.8); crash(T, 0.7); rhodes(T, chords[5], SPB * 6, 0.045); sub808(T, roots[5], SPB * 4, 0.22); brassStab(T, chords[5].slice(0, 3).map(f => f * 2), SPB * 1.2, 0.03); sax(T, SN.D5 * SOUL.half, SPB * 3.5, 0.05, true); chords[5].slice(0, 3).forEach(f => voice(T, f * 2, SPB * 5, 0.01)); tak(T + SPB * 4, 0.3); tak(T + SPB * 5, 0.3); tak(T + SPB * 5.25, 0.26); tak(T + SPB * 6, 0.3); return; }
+    if (L.style === 'disco22') { kick(T, 0.9); crash(T); clap(T, 0.25); supersaw(T, chords[0].map(f => f * 2), SPB * 5, 0.014, 2600, true); brassStab(T, chords[0].slice(0, 3).map(f => f * 2), SPB * 1.5, 0.03); slap(T, roots[0], SPB * 3); voice(T, FN.G4, SPB * 4, 0.03); voice(T + 0.02, FN.D5, SPB * 4, 0.02); tak(T + SPB * 3, 0.2); tak(T + SPB * 4, 0.2); tak(T + SPB * 4.25, 0.17); tak(T + SPB * 5, 0.2); return; }
     if (L.style === 'rock22') { kick(T, 0.9); crash(T); [1, 1.5, 2, 4].forEach((m, i) => gtrDist(T, roots[6] * 2 * m, SPB * 6, [0.07, 0.055, 0.04, 0.02][i], i === 3)); bass(T, roots[6], SPB * 4, 600); supersaw(T, chords[6].map(f => f * 2), SPB * 5, 0.012, 2600, true); truckHorn(T + SPB * 3); forklift(T + SPB * 5, 0.04); forklift(T + SPB * 5.5, 0.04); return; }
     if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[4], SPB * 4, 0.016, 2400); anthem(T, N_.D5, SPB * 3, 2); return; }
     if (L.style === 'duo14') { bbKick(T, 0.9); crash(T); organ(T, chords[0], SPB * 6, 0.035); sub808(T, roots[0], SPB * 4); gtrLead(T, N_.A4, SPB * 4, 0.05, true); forklift(T + SPB * 4.5, 0.02); return; }
@@ -3519,7 +3637,7 @@ function buildEvents() {
     kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4);
   }]);
   notes.forEach(n => ev.push([n.place, T => thud(T, n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1)]));
-  if (L.inspector) for (const n of notes) { if (n.top || inRange(n.beat0, L.phone)) continue; ev.push([passAt(n), n.push ? T => { tak(T, 0.3); shoop(T); } : T => tak(T, 0.3)]); }
+  if (L.inspector) for (const n of notes) { if (n.top || inRange(n.beat0, L.phone)) continue; if (n.grab) { ev.push([passAt(n), T => { rim(T, 0.4); rim(T + 0.11, 0.4); }]); ev.push([n.tRel, T => roller(T, 0.06)]); } else ev.push([passAt(n), n.push ? T => { tak(T, 0.3); shoop(T); } : T => tak(T, 0.3)]); }
   return ev.sort((a, b) => a[0] - b[0]);
 }
 let events = [], evI = 0, T0 = 0;
@@ -3824,7 +3942,7 @@ function updateHud(t) {
   hintFor('heavy', '무거운 상자: 양쪽을 같이');
   hintFor('top', '긴 화물 위 상자: 누른 채로 다른 손으로 톡');
   { const fl = firstWith('late'); if (L.id !== 'jiwoo' && fl && fl.state === 'pending' && t > fl.place - SPB) h = L.lateHint || '반장님 손이 늦어요. 음악 말고 손을 봐요'; }
-  if (L.id === 's2-1') { const ps = notes.filter(n => n.push).slice(0, 3), p = ps.find(n => n.state === 'pending'); if (p && t > p.place && t < p.arr) h = '이모가 미는 상자: 반 박 빨리 와요. 손을 봐요'; }
+  if (L.id === 's2-1' || L.id === 's2-2') { const ps = notes.filter(n => n.push).slice(0, 3), p = ps.find(n => n.state === 'pending'); if (p && t > p.place && t < p.arr) h = '이모가 미는 상자: 반 박 빨리 와요. 손을 봐요'; const gs = notes.filter(n => n.grab).slice(0, 3), gq = gs.find(n => n.state === 'pending'); if (gq && t > gq.place && t < gq.arr) h = '이모가 붙잡은 상자: 반 박 늦게 와요'; }
   if (L.id === 's1-4') {
     if (beat >= 2 && beat < 10) h = '위 벨트는 하은이 알아서 찍어요. 나는 아래만';
     if (beat >= 57 && beat < 72) h = '이제 양쪽 다 내가 찍어요. 버튼은 하나, 닿는 쪽';
