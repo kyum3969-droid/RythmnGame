@@ -719,10 +719,10 @@ const LEVELS = [
     // has none (she never had room for one) and from there she loads unevenly. 반장 bangs the machine (쾅), the lamp dies, and
     // for his straight beat at the end both belts are on the beat together.
     lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, bossSeat: { x: 22, stand: [[84, 89], [143.7, 145.3]] }, vibe: [[72, 104]],
-    // a box on the broken belt has two parts to its ride. It is set down on a beat `ride + dash` beats before it lands and for
+    // a box on the broken belt has two parts to its ride. It is set down `ride + dash` beats before it lands and for
     // `ride` beats it crawls, juddering (덜컥) on every sixteenth and slowing down (to `ease` of the speed it starts at), as far
     // as the seam (x); then on the beat it shoots (슉), smoothly, `dash` beats onto the scanner and lands on the off-beat
-    surge: { x: 170, ride: 2, dash: 0.5, ease: 0.3, fix: 144.5 },
+    surge: { x: 150, ride: 1.5, dash: 0.5, ease: 0.3, fix: 144.5 },
     heads: { h: [82, 44], j: [58, 80], b: [22, 98] }, phone: [[120, 121.5], [136, 137.5]], phoneLane: 0,
     clock:'03:20', title:'꿈', offTilt: true,
     chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4,
@@ -1645,24 +1645,24 @@ function drawHaeunScene(beat, kick, nowMs, active) {
     drawHaeunAt(BOSS_X + LANE_DX[0], 50 + (frozen ? 0 : bob), nowMs, { mirror: tapping || taking, tap: tapping ? pulseAt(beat, L.tapBelt, 0.3) : null, rest: !tapping });
   }
 }
-// 1-5: the upper belt has been broken all along. Every box on it crawls first: set down on a beat, it judders along (덜컥 on
+// 1-5: the upper belt has been broken all along. Every box on it crawls first: set down, it judders along (덜컥 on
 // every sixteenth: a jerk forward, a hop and a rock, then it sticks) and keeps slowing down, the seam's lamp blinking, until
 // it reaches the seam on a beat; there the belt lurches (슉) and it shoots, smooth and fast, half a beat onto the scanner, on
 // the off-beat. Then belt speed again. 반장 bangs the machine at L.surge.fix and it stops.
-// the box hops as the belt catches it (-2 then -1), and sits still while it sticks
-function surgeHop(n, t) { const { f } = jerkPhase(n, t); return f < 0.14 ? -2 : f < 0.28 ? -1 : 0; }
+// the box hops a pixel as the belt catches it, and sits still while it sticks
+function surgeHop(n, t) { const { f } = jerkPhase(n, t); return f < 0.22 ? -1 : 0; }
 function surgeBase(n, t) { const d = t - n.place; return PLACE_X + n.v0 * d - 0.5 * n.dec * d * d; }
 function jerkPhase(n, t) { const u = (t - n.place) / n.jP, k = Math.floor(u); return { k, f: u - k }; }
 function surgedX(n, t) {
   const X = L.surge.x;
   if (t < n.place) return PLACE_X;
-  if (t < n.t1) { const { k, f } = jerkPhase(n, t), q = f < 0.4 ? 0.85 * f / 0.4 : 0.85 + 0.15 * (f - 0.4) / 0.6; return surgeBase(n, n.place + (k + q) * n.jP); }
+  if (t < n.t1) { const { k, f } = jerkPhase(n, t), q = f < 0.35 ? 0.6 * f / 0.35 : 0.6 + 0.4 * (f - 0.35) / 0.65; return surgeBase(n, n.place + (k + q) * n.jP); }
   if (t < n.arr) return X + (t - n.t1) / (n.arr - n.t1) * (SCAN_X - X);
   return SCAN_X + (t - n.arr) * SPEED;
 }
 const surgeSfx = () => { if (!ctx) return; const t = ctx.currentTime; noise(t, 'bandpass', 2600, 0.07, 0.09, 1.2, bus); noise(t + 0.02, 'highpass', 5200, 0.03, 0.06, 0.7, bus); osc('square', 70, t, 0.003, 0.025, 0.06, bus); };
 // a 덜컥 each time the box jerks forward, scheduled from when it is set down
-const rattleSfx = (n, now) => { if (!ctx) return; const t0 = ctx.currentTime; for (let k = 0; n.place + k * n.jP < n.t1 - 0.02; k++) { const at = n.place + k * n.jP - now; if (at >= 0) { noise(t0 + at, 'bandpass', 1100 + (k % 2) * 450, 0.024, 0.035, 2.5, bus); osc('square', 95, t0 + at, 0.002, 0.012, 0.03, bus); } } };
+const rattleSfx = (n, now) => { if (!ctx) return; const t0 = ctx.currentTime; for (let k = 0; n.place + k * n.jP < n.t1 - 0.02; k++) { const at = n.place + k * n.jP - now; if (at >= 0) { noise(t0 + at, 'bandpass', 1100 + (k % 2) * 450, 0.016, 0.03, 2.5, bus); osc('square', 95, t0 + at, 0.002, 0.007, 0.025, bus); } } };
 // how hard the seam's lamp is going: 1 while a box it will throw is on the belt, a white flash as it throws, 0 once fixed
 function surgeLamp(t) {
   let warn = 0, thrown = 0;
@@ -2137,7 +2137,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
     for (const [n, x, sq, rat] of boxQ) {
       // an off-beat box was set down crooked: it leans, and its tape is red
       if (n.surge && t >= n.t1 && t < n.arr) for (let k = 0; k < 3; k++) R(Math.round(x - n.w / 2 - 6 - k * 5), BELT_Y - 4 - k * 4, 4 + k, 1, 'rgba(255,255,255,.55)');   // thrown: speed lines
-      if (rat) { g.save(); g.translate(x, BELT_Y + rat); g.rotate(rat * 0.04); drawBox(n, 0, 0, n.state, t, sq); g.restore(); continue; }   // the bad belt catches it: a hop and a rock
+      if (rat) { g.save(); g.translate(x, BELT_Y + rat); g.rotate(rat * 0.025); drawBox(n, 0, 0, n.state, t, sq); g.restore(); continue; }   // the bad belt catches it: a hop and a rock
       if (n.off && L.offTilt && !n.top && !(n.surge && t < n.t1)) { g.save(); g.translate(x, BELT_Y); g.rotate((n.i % 2 ? 1 : -1) * 0.12); drawBox(n, 0, 0, n.state, t, sq); g.restore(); }
       else drawBox(n, x, n.top ? BELT_Y - 12 : BELT_Y, n.state, t, sq);
     }
