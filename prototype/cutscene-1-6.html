@@ -99,7 +99,7 @@ const SHOTS = [
 ];
 const END = 26;
 // shot 1 cues (seconds)
-const S1 = { cx: 222, top: 106, beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], blink: 9.8, push: [6.0, 9.4] };
+const S1 = { cx: 222, top: 106, beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], push: [6.0, 9.4] };
 // shot 2: she stays put in the frame and the world slides by. d = how far she has walked (px at 1x)
 const S2 = { cx: 176, top: 84, v: 30, door: 205, step: 0.55, lampOff: 21.0 };
 const doorT = SHOTS[1].t0 + S2.door / S2.v;   // when she passes under the shutter
@@ -139,34 +139,30 @@ const bgFactory = document.createElement('canvas'); bgFactory.width = W; bgFacto
 })();
 
 // ---------- 하은 (index.html drawHaeunAt, with a head that can tip down and lift) ----------
-// o.mirror: facing right. o.look: -1 head down over the belt, 0 level, 1 lifted into the light (the bangs part, the eyes show).
+// o.mirror: facing right. o.look: -1 head down over the belt, 0 level, 1 lifted into the light. Her eyes are never drawn: the cap's shadow always lies across them.
 // o.arms: 'belt' both hands on the belt edge (o.tap lifts the near one), 'walk' the near arm swings (o.swing -1..1) and the
-// other hand stays in her pocket. o.sway moves the hair. o.blink, o.glint (sunlight caught in her eyes).
+// other hand stays in her pocket. o.sway moves the hair.
 function haeun(cx, top, o = {}) {
   const hair = '#17121a', hairL = '#2e2630', shirt = '#1e1a1a', shirtD = '#121010', cap = '#d8463b', capD = '#a83328', brim = '#c43d33', sky = '#86c3e8', tee = '#e9f3f7', leg = '#3a3f45', shoe = '#1e1a1a';
   const look = o.look || 0, sw = o.sway || 0;
   const hx = look < -0.5 ? -1 : 0, hy = look < -0.25 ? Math.round(-look * 2) : look > 0.5 ? -1 : 0, tilt = look < -0.5 ? 1 : look > 0.5 ? -1 : 0;
   g.save(); if (o.mirror) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
   R(cx - 5, top + 38, 5, 16, leg); R(cx + 2, top + 38, 5, 15, leg); R(cx - 6, top + 53, 6, 3, shoe); R(cx + 2, top + 52, 6, 3, shoe);
-  // long straight hair behind, down past the shoulders
-  R(cx - 9, top + 3, 18, 28, hair); R(cx + 7 + sw, top + 14, 3, 18, hair); R(cx - 10, top + 14, 3, 17, hair);
+  // long straight hair behind, down past the shoulders (nothing black beside the face: it starts below the chin)
+  R(cx - 9, top + 16, 18, 15, hair); R(cx + 7 + sw, top + 14, 3, 18, hair); R(cx - 10, top + 14, 3, 17, hair);
   R(cx + 8 + sw, top + 16, 1, 12, hairL); R(cx - 9, top + 16, 1, 11, hairL);
   // sky-blue tee with the white stripe over black sleeves, black bottoms
   R(cx - 7, top + 16, 14, 23, shirt); R(cx - 7, top + 15, 14, 16, sky); R(cx - 7, top + 27, 14, 2, tee); R(cx - 7, top + 30, 14, 9, shirtD);
   // the head: face, side hair, cap, bangs. Tipped down it sinks two pixels into the collar and leans one forward.
   const fx = cx + hx, ft = top + hy;
-  R(fx - 6, ft + 1, 12, 14, C.skin); R(fx - 8, ft + 3, 3, 15, hair); R(fx + 5, ft + 3, 3, 15, hair); R(fx - 7, ft + 6, 1, 10, hairL);
+  R(fx - 6, ft + 1, 12, 14, C.skin);
   R(fx - 7, ft - 2, 14, 6, cap); R(fx - 6, ft - 3, 12, 1, cap); R(fx - 7, ft + 3, 14, 1, capD); R(fx - 2, ft - 3, 1, 7, capD); R(fx - 1, ft - 4, 2, 1, capD);
   R(fx - 6, ft - 1, 4, 2, '#f4e6e0');
   // the brim: its tip dips with the head or tilts up with it
   R(fx - 10, ft + 2, 4, 2, brim); R(fx - 10, ft + 2, 4, 1, cap); R(fx - 10, ft + 4, 4, 1, capD);
   R(fx - 15, ft + 2 + tilt, 5, 2, brim); R(fx - 15, ft + 2 + tilt, 5, 1, cap); R(fx - 15, ft + 4 + tilt, 5, 1, capD);
-  if (look > 0.5) {
-    // looking up, the bangs fall back off her eyes
-    R(fx - 6, ft + 4, 12, 2, hair); R(fx - 6, ft + 6, 12, 1, '#6b4631');
-    if (o.blink) { R(fx - 5, ft + 7, 2, 1, C.skinDark); R(fx, ft + 7, 2, 1, C.skinDark); }
-    else { R(fx - 5, ft + 7, 2, 1, '#2a1d1a'); R(fx, ft + 7, 2, 1, '#2a1d1a'); if (o.glint) { R(fx - 5, ft + 7, 1, 1, '#fff1d0'); R(fx, ft + 7, 1, 1, '#fff1d0'); } }
-  } else { R(fx - 6, ft + 4, 12, 3, hair); R(fx - 6, ft + 7, 12, 1, '#6b4631'); }
+  // the cap's shadow over the eyes, always: deep under the brim, softening down to the cheeks
+  R(fx - 6, ft + 4, 12, 3, '#3a2622'); R(fx - 6, ft + 7, 12, 1, '#8a5a44');
   R(fx - 3, ft + 9, 2, 1, '#b07a58'); R(fx - 3, ft + 11, 2, 1, '#b2565a');
   // arms
   if (o.arms === 'belt') {
@@ -291,9 +287,8 @@ function shot1(t) {
   // 하은 behind the belt, both hands on its edge, head down; two pats on the empty belt; she lifts her head into the light
   const tap = Math.max(...S1.taps.map(a => { const d = t - a; return d < -0.35 ? 0 : d < 0 ? ease((d + 0.35) / 0.35) : d < 0.12 ? 1 - d / 0.12 : 0; }));
   const lk = lerp(-1, 1, ease(seg(t, S1.look[0], S1.look[1])));
-  const blink = t > S1.blink && t < S1.blink + 0.13;
   const top = S1.top - (lk > 0.5 ? 1 : 0);
-  haeunSprite({ mirror: true, look: lk, arms: 'belt', tap, blink, glint: sun > 0.7, sway: 0 });
+  haeunSprite({ mirror: true, look: lk, arms: 'belt', tap, sway: 0 });
   putSprite(S1.cx, top);
   drawBelt(beltOff1(t));
   // light: the tubes' cones, then the dawn, then the sun shafts and the dust in them
