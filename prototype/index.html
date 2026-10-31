@@ -351,6 +351,27 @@ const GLEAD21 = [
 ];
 // his answers in the chorus, in the gaps the choir leaves (bar 4 and bar 8 of the hook)
 const GANS21 = [[13, 'F5', 0.5], [13.5, 'D5', 0.5], [14, 'Bb4', 1.5, 1], [29, 'G5', 0.5], [29.5, 'F5', 0.5], [30, 'D5', 1.5, 1]];
+// 2-1 검수: 순자 이모's night, a 뽕짝 disco in A minor at 104. 쿵짝 bass, accordion on the 'and', trot lead with the 꺾기 vibrato,
+// brass stabs and claps in the chorus, her "탁, 탁탁, 탁" on a woodblock, the grandchild's phone call, and the second chorus a
+// half step up, the way a trot medley turns over.
+const PN = { D4: 293.66, E4: 329.63, F4: 349.23, G4: 392, Gs4: 415.3, A4: 440, B4: 493.88, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880 };
+const PPONG = {
+  // 0 Am, 1 Dm, 2 E7, 3 G, 4 C; 5-9 the same a half step up
+  chords: [[220, 261.63, 329.63], [220, 293.66, 349.23], [207.65, 246.94, 293.66, 329.63], [196, 246.94, 293.66], [261.63, 329.63, 392]],
+  roots: [110, 73.42, 82.41, 98, 65.41],
+  verse: [0, 0, 1, 0, 2, 2, 0, 0], chorus: [1, 0, 2, 0, 3, 4, 2, 0], half: Math.pow(2, 1 / 12)
+};
+PPONG.chords.push(...PPONG.chords.map(c => c.map(f => f * PPONG.half))); PPONG.roots.push(...PPONG.roots.map(f => f * PPONG.half));
+// the verse tune, 8 bars (Am Am Dm Am | E7 E7 Am Am): [beat, note, length]
+const PMEL_A = [[0, 'E4', 1], [1, 'A4', 0.5], [1.5, 'B4', 0.5], [2, 'C5', 1.5], [3.5, 'B4', 0.5], [4, 'A4', 2], [6, 'E4', 0.5], [6.5, 'G4', 0.5], [7, 'A4', 1],
+  [8, 'D5', 1], [9, 'C5', 0.5], [9.5, 'A4', 0.5], [10, 'F4', 1.5], [11.5, 'E4', 0.5], [12, 'A4', 1], [13, 'C5', 0.5], [13.5, 'B4', 0.5], [14, 'A4', 2],
+  [16, 'B4', 1], [17, 'E5', 1], [18, 'D5', 0.5], [18.5, 'B4', 0.5], [19, 'Gs4', 1], [20, 'B4', 1.5], [21.5, 'A4', 0.5], [22, 'Gs4', 2],
+  [24, 'A4', 1], [25, 'C5', 1], [26, 'B4', 0.5], [26.5, 'A4', 0.5], [27, 'E4', 1], [28, 'A4', 3]];
+// the chorus, 8 bars (Dm Am E7 Am | G C E7 Am)
+const PMEL_B = [[0, 'D5', 1], [1, 'F5', 0.5], [1.5, 'E5', 0.5], [2, 'D5', 1], [3, 'A4', 1], [4, 'C5', 1.5], [5.5, 'B4', 0.5], [6, 'A4', 2],
+  [8, 'B4', 1], [9, 'Gs4', 0.5], [9.5, 'B4', 0.5], [10, 'E5', 1.5], [11.5, 'D5', 0.5], [12, 'C5', 1], [13, 'B4', 0.5], [13.5, 'A4', 0.5], [14, 'A4', 2],
+  [16, 'G4', 0.5], [16.5, 'B4', 0.5], [17, 'D5', 1], [18, 'G5', 1.5], [19.5, 'D5', 0.5], [20, 'E5', 1], [21, 'C5', 1], [22, 'G4', 0.5], [22.5, 'C5', 0.5], [23, 'E5', 1],
+  [24, 'E5', 1], [25, 'D5', 0.5], [25.5, 'B4', 0.5], [26, 'Gs4', 1], [27, 'B4', 1], [28, 'A4', 3]];
 // chorus hook, 8 bars: [beat offset inside the 8 bars, note, length in beats]
 const HOOK = [
   [0, 'E5', 1.5], [1.5, 'C5', 0.5], [2, 'B4', 1], [3, 'A4', 1],
@@ -585,7 +606,35 @@ const LEVELS = [
       { who:'반장', text:'내 무릎 탓이다. 내일 또 하자.' }]
   }
   ,{
-    id:'s2-1', stageNo:'2-1', who:'지우', role:'지우 · 본선 · 112 BPM', tag:'가스펠 스톰프 · 반장 기타 클립 · 정박', bpm:112, style:'final21', daw:true, place:'본선 무대',
+    id:'s2-1', stageNo:'2-1', who:'순자 이모', role:'순자 이모 · 104 BPM · 검수', tag:'뽕짝 · 탁 탁탁 탁 · 검수 밀기', bpm:104, style:'ppong21', fxTheme:'warm',
+    // 2-1 검수: the morning after the 회식, 순자 이모 joins the line as the inspector. The music comes first; her push (a hand that
+    // speeds a box into an off-beat) is the level's rule and comes next. The chart below is a plain on-beat placeholder.
+    tempo: [[0, 104]], clock:'02:40', title:'검수', partners:['sunja'], hints:false,
+    chords: PPONG.chords, roots: PPONG.roots,
+    chordAt: bar => bar < 2 ? 0 : bar < 18 ? PPONG.verse[(bar - 2) % 8] : bar < 26 ? PPONG.chorus[(bar - 18) % 8] : bar < 30 ? 0 : bar < 38 ? PPONG.verse[(bar - 30) % 8] : bar < 46 ? 5 + PPONG.chorus[(bar - 38) % 8] : 5,
+    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 }, endAt: 184,
+    // the grandchild calls in the break: she answers, the band thins to the accordion
+    phone: [[106, 118]], special:['긴 화물', 'len', '끝까지'],
+    sections: [[0, 'intro'], [2, 'a1'], [10, 'a2'], [18, 'b1'], [26, 'call'], [30, 'a3'], [38, 'b2'], [46, 'outro']],
+    bars: [
+      '........', '........',
+      'x.......', 'x...x...', 'x.......', 'x...x...', 'x...x...', 'x.......', 'x...x...', 'x.......',
+      'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.', 'x...x...', 'x.x.x...', 'x...x.x.', 'h===....',
+      'x.x.x.x.', 'x...x.x.', 'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'x...x...', 'x.x.x.x.', 'x.......',
+      'x.......', '........', '........', '....x...',
+      'x...x...', 'x.x.x...', 'x...x.x.', 'h===....', 'x.x.x...', 'x...x.x.', 'x.x.x.x.', 'x.......',
+      'x.x.x.x.', 'x.x.x.x.', 'x...x.x.', 'h===..x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.',
+      '........', '........'
+    ],
+    say: [[4, '탁, 탁탁, 탁. 알았지?', 3.5], [40, '손이 느리면 내가 민다?', 3], [104, '(전화) 어, 우리 강아지. 할머니 일하지.', 4], [112, '…응, 응. 끊어. 이모 간다.', 3.5], [152, '자, 한 번 더 올려!', 3]],
+    comfort: ['괜찮아, 다음 거.', '총각! 손 봐, 손!'],
+    intro: [
+      { who:'', text:'(임시) 회식 다음 날 새벽 2시 40분. 라인에 검수가 붙었다.' },
+      { who:'순자 이모', text:'검수 순자야. 오늘부터 내가 보고 넘긴다. 탁, 탁탁, 탁!' }],
+    outro: good => good ? [{ who:'순자 이모', text:'…손이 빠르네, 총각.' }] : [{ who:'순자 이모', text:'…내일 또 보자.' }]
+  }
+  ,{
+    id:'s2-stage', stageNo:'2-무대', who:'지우', role:'지우 · 본선 · 112 BPM', tag:'가스펠 스톰프 · 반장 기타 클립 · 정박', bpm:112, style:'final21', daw:true, place:'본선 무대',
     // the audition final: 지우 on stage with her laptop, you beside her on the launchpad. The belt is the LED runway across the
     // stage floor: clips glide from her laptop to the playhead and you fire them. Her set is 1-3 compressed, with a kick from the
     // first bar; the amber clips are 반장's guitar (the blues chorus at double time), and the last eight bars go a whole step up.
@@ -2555,6 +2604,18 @@ function gtrSample(j, beat) {
   noise(t, 'bandpass', 2400, 0.1, 0.025, 4, bus);
   mus.gain.cancelScheduledValues(t); mus.gain.setValueAtTime(0.7, t); mus.gain.linearRampToValueAtTime(1, t + 0.16);
 }
+// 2-1: an accordion (two squares a hair apart), a brass stab, 순자 이모's woodblock 탁, and the phone in her apron pocket
+function accord(t, fs, d, v = 0.02) {
+  const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 2400; fl.connect(mus);
+  fs.forEach(f => { osc('square', f * 1.004, t, 0.015, v, d, fl); osc('square', f * 0.996, t, 0.015, v * 0.8, d, fl); });
+}
+function brassStab(t, fs, d, v = 0.03) {
+  const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(900, t); fl.frequency.exponentialRampToValueAtTime(2600, t + 0.05); fl.frequency.exponentialRampToValueAtTime(1200, t + d); fl.connect(mus);
+  fs.forEach(f => { osc('sawtooth', f, t, 0.012, v, d, fl); osc('sawtooth', f * 1.006, t, 0.012, v * 0.7, d, fl); });
+}
+const tamb21 = (t, v) => { noise(t, 'highpass', 6500, v, 0.05, 0.7); noise(t + 0.012, 'highpass', 8000, v * 0.6, 0.04, 0.7); };
+const tak = (t, v = 0.3) => { osc('square', 1700, t, 0.001, v * 0.25, 0.025); noise(t, 'bandpass', 3200, v, 0.02, 2); };
+function phoneRing(t) { for (let k = 0; k < 2; k++) for (let j = 0; j < 8; j++) osc('sine', j % 2 ? 1750 : 1400, t + k * 0.9 + j * 0.05, 0.004, 0.028, 0.045, bus); }
 function hitSound(j, tones, beat, done) {
   const t = ctx.currentTime, th = fxTheme(beat), f = tones[(stats.combo + (done ? 1 : 0)) % Math.min(3, tones.length)], good = j === 'good';
   if (phase3(beat) && beat >= 200) { climaxHit(t, tones, j, done, beat); return; }
@@ -3145,6 +3206,45 @@ function buildEvents() {
         if (lift && bar >= 56 && inBar === 0) E(0, T => pad(T, chords[ci].map(f => f * 2), s * 4, 'triangle', 0.02));
         if (lift && bar === 58 && inBar === 0) E(0, T => riser(T, s * 8, 0.07));
       }
+    } else if (style === 'ppong21') {
+      // 2-1 검수: 뽕짝 disco. Kick on 1 and 3 with the snare on 2 and 4, 8th hats, the bass going 쿵짝 (root, fifth), the accordion
+      // on every 'and', the trot lead singing the tune; brass stabs, claps and tambourine for the chorus; her woodblock 탁 탁탁 탁
+      // from the second verse; the phone in the break; the second chorus a half step up.
+      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), up = bar >= 38 ? PPONG.half : 1;
+      const chorus = sec === 'b1' || sec === 'b2', call = sec === 'call', fifth = roots[ci] * (ci % 5 === 2 ? 1.5 : 1.5);
+      if (sec === 'intro') {
+        E(0, T => roller(T, 0.03)); if (b === 1) E(0, T => forklift(T));
+        // her count: 탁, 탁탁, 탁, then the pickup on the lead
+        if (b === 4 || b === 6) E(0, T => tak(T, 0.35)); if (b === 5) { E(0, T => tak(T, 0.35)); E(s / 4, T => tak(T, 0.3)); }
+        if (b === 7) { E(0, T => trotLead(T, PN.E4, s * 0.5, 0.05)); E(s / 2, T => trotLead(T, PN.G4, s * 0.5, 0.05)); }
+        continue;
+      }
+      if (sec === 'outro') continue;
+      if (call) {
+        // the phone: the band drops to the accordion and a soft kick while she talks, two rings, and the lead picks the tune back up
+        if (b === 104) E(0, T => { crash(T, 0.5); accord(T, chords[ci], s * 4, 0.028); });
+        if (b === 106 || b === 108) E(0, T => phoneRing(T));
+        if (inBar === 0 && b > 104) E(0, T => accord(T, chords[ci], s * 4, 0.022));
+        if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.35));
+        E(s / 2, T => hat(T, 0.025));
+        if (b === 118) E(0, T => trotLead(T, PN.E4, s * 0.5, 0.05)); if (b === 119) { E(0, T => trotLead(T, PN.G4, s * 0.5, 0.05)); E(s / 2, T => tak(T, 0.35)); }
+        continue;
+      }
+      if (b === 8 || b === 72 || b === 120) E(0, T => crash(T));
+      if (b === 152) E(0, T => { crash(T); brassStab(T, chords[ci].map(f => f * 2), s * 1.2, 0.04); });
+      // 쿵짝
+      if (inBar === 0 || inBar === 2 || chorus) E(0, T => kick(T, chorus ? 0.9 : 0.8));
+      if (inBar === 1 || inBar === 3) E(0, T => { snare(T, chorus ? 0.3 : 0.24); rim(T, 0.2); if (chorus) clap(T, 0.2); });
+      E(0, T => hat(T, 0.035)); E(s / 2, T => hat(T, chorus ? 0.07 : 0.055)); if (chorus && inBar === 3) E(s / 2, T => openHat(T, 0.06));
+      E(0, T => bass(T, roots[ci], s * 0.45, 480)); E(s / 2, T => bass(T, fifth, s * 0.4, 480));
+      E(s / 2, T => accord(T, chords[ci], s * 0.32, chorus ? 0.024 : 0.02));
+      if (chorus) { E(0, T => tamb21(T, 0.05)); E(s / 2, T => tamb21(T, 0.04)); if (inBar === 0 || inBar === 1) E(inBar === 0 ? 0 : s / 2, T => brassStab(T, chords[ci].map(f => f * 2), s * 0.3, 0.03)); }
+      // 탁, 탁탁, 탁: her woodblock from the second verse on
+      if (sec !== 'a1') { if (inBar === 0 || inBar === 2) E(0, T => tak(T, chorus ? 0.22 : 0.28)); if (inBar === 1) { E(0, T => tak(T, 0.28)); E(s / 4, T => tak(T, 0.24)); } }
+      // the tune on the trot lead, the chorus a half step up the second time
+      const mel = chorus ? PMEL_B : PMEL_A, rel = (b - (sec === 'a1' ? 8 : sec === 'a2' ? 40 : sec === 'b1' ? 72 : sec === 'a3' ? 120 : 152)) % 32;
+      for (const [ob, nm, len] of mel) if (Math.floor(ob) === rel) E((ob - rel) * s, T => trotLead(T, PN[nm] * up, len * s * 0.92, chorus ? 0.06 : 0.05));
+      if (chorus && sec === 'b2') for (const [ob, nm, len] of mel) if (Math.floor(ob) === rel && len >= 1.5) E((ob - rel) * s, T => accord(T, [PN[nm] * up / 2], len * s * 0.9, 0.018));
     } else if (style === 'duo14') {
       // 반장's straight four (kick 1 and 3, snare 2 and 4, even hats, a root on every beat, organ, a guitar lick every fourth bar)
       // until his knee goes and the band thins to bass, organ and hats. 하은 counts the line back in and from bar 16 it is boom bap
@@ -3238,6 +3338,7 @@ function buildEvents() {
       else { noise(T + SPB * 2.5, 'bandpass', 700, 0.08, 0.12, 1.5, bus); noise(T + SPB * 3.4, 'lowpass', 500, 0.14, 0.09, 0.7, bus); }
       return;
     }
+    if (L.style === 'ppong21') { kick(T, 0.8); crash(T); accord(T, chords[5], SPB * 4, 0.03); brassStab(T, chords[5].map(f => f * 2), SPB * 1.5, 0.04); bass(T, roots[5], SPB * 3, 480); trotLead(T, PN.A4 * PPONG.half, SPB * 3, 0.06); tak(T + SPB * 3, 0.35); tak(T + SPB * 4, 0.35); tak(T + SPB * 4.25, 0.3); tak(T + SPB * 5, 0.35); return; }
     if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[4], SPB * 4, 0.016, 2400); anthem(T, N_.D5, SPB * 3, 2); return; }
     if (L.style === 'duo14') { bbKick(T, 0.9); crash(T); organ(T, chords[0], SPB * 6, 0.035); sub808(T, roots[0], SPB * 4); gtrLead(T, N_.A4, SPB * 4, 0.05, true); forklift(T + SPB * 4.5, 0.02); return; }
     if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
