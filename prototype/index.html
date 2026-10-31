@@ -716,44 +716,48 @@ const LEVELS = [
     // both with one button as in 1-4, every light on the whole way. The rule: 지우's belt has a bad motor. It chugs, long-short on
     // every beat (it drags for two thirds of the beat and rushes the last third: you hear it, 쿵-딱, and its lamp blinks with it),
     // so his boxes, set down on the 'and', land late, two thirds into the beat. 하은's belt is fine and she loads on the beat.
-    // A tutorial first (see practice). Then the shift: their bars trade; 지우 nods off and 하은 calls him on it (he wakes with a
-    // rush of boxes); he puts his earbuds in and loads to his own track, ragged, and won't take them out; 반장 gets up to cover it
-    // and 하은 snaps. 지우 snaps back (누나나 악바리로 해요. 저는 제가 하고 싶은 대로 할 거라구요.) and the music stops; 하은:
-    // 니 맘대로 할 거면… 꺼져, 그냥. He pulls his earbuds out and stands there, hands off, while she works both alone; 반장 says
-    // his name and he goes back to it without a word. The motor is never fixed: his belt swings to the end.
-    lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, allLit: true, bossSeat: { x: 22, stand: [[84, 89]] }, vibe: [[72, 104]], doze: [[56, 62]], unplug: [[108, 129]],
+    // A tutorial first (see practice). Then the shift, in three phases, the music changing genre as the row grows.
+    // Phase 1 (lo-fi): their bars trade over a sleepy lo-fi shuffle; 지우 nods off (the music sags like a slow tape and snaps
+    // back when he wakes) and 하은 calls him on it; he puts his earbuds in and his own future-funk track takes the room over; he
+    // won't take them out, 반장 gets up, 하은 snaps, he snaps back (누나나 악바리로 해요...) - a record scratch, the band cut;
+    // she: 니 맘대로 할 거면… 꺼져, 그냥. Only the motor. Phase 2 (악바리, heavy metal): he stands there with his earbuds
+    // out and she works both belts alone, tossing his boxes onto his belt, the riff chugging on the motor's long-short and the
+    // tempo running away with her; 반장: …지우야. Phase 3 (합): he goes back to it without a word; they trade bars, then the
+    // 타닥 run together, his synth lead over the metal, a key change; the band drops out and the motor chugs on alone.
+    // The motor is never fixed: his belt swings to the end.
+    lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, allLit: true, bossSeat: { x: 22, stand: [[84, 89]] }, vibe: [[72, 104]], doze: [[56, 62]], unplug: [[108, 148]], toss: [[116, 148]],
     beltSwing: { lane: 1, until: Infinity }, fixAt: Infinity,   // the motor is never fixed
-    heads: { h: [82, 44], j: [50, 92], b: [22, 98] }, phone: [[120, 121.5], [136, 137.5]], phoneLane: 0,
+    heads: { h: [82, 44], j: [50, 92], b: [22, 98] },
     clock:'03:20', title:'꿈', offTilt: true,
     chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4,
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 180,
     hints: false, special:['밀린 박', 'swung', '개'],
-    sections: [[0, 'intro'], [2, 'trade'], [10, 'both'], [18, 'drunk'], [26, 'clash'], [27, 'silence'], [29, 'waver'], [37, 'boss'], [45, 'outro']],
-    // upper belt: 하은, on the beat (8 cells). Her bars in the trade; mixed in with his; she covers while he dozes off and keeps
-    // steady while he plays with his music; after the row she works hard and alone, every beat (nothing set down while she looks
-    // at her watch); 반장's quarters at the end
+    sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [29, 'metal'], [37, 'together'], [45, 'outro']],
+    // phase 2 runs away with her (104 up to 112, a step a bar); phase 3 settles back to 104 once he is with her again
+    tempo: [[0, 104], [120, 105], [124, 106], [128, 107], [132, 108], [136, 109], [140, 110], [144, 112], [148, 108], [152, 104]],
+    // upper belt: 하은, on the beat (8 cells). Phase 1 as before; phase 2 every beat (she does it all); phase 3 trading with him,
+    // then every beat
     bars: [
       '........', '........',
       '........', '........', 'x...x...', 'x.x.x...', '........', '........', 'x.x.x.x.', 'x...x.x.',
       'x...x...', 'x.x.....', 'x...x...', '....x.x.', 'x...x...', 'x.x.x.x.', 'x...x...', 'x.x.....',
       'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x.......',
       '........', '........', '........',
-      'x.x.x.x.', 'x.x.....', 'x.x.x.x.', 'x...x...', 'x...x.x.', 'x.x.....', 'x...x...', '........',
-      'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x.......',
+      'x...x...', 'x.x.x...', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.....',
+      'x.x.x.x.', '........', 'x...x...', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.......',
       '........', '........'
     ],
-    // lower belt: 지우, on his chugging belt (8 cells, written straight; every 'and' lands two thirds into the beat). His bars in
-    // the trade; then he nods off (bars 14-15 empty) and wakes in a hurry, four in a row; with his earbuds in he loads to his own
-    // track, ragged; after the row nothing (bars 29-31) till 반장 says his name, then back to it, quietly; his swung 'and's
-    // between her beats to the end
+    // lower belt (8 cells, written straight; every 'and' lands two thirds into the beat). Phase 1: 지우's bars, his nod-off
+    // (bars 14-15 empty) and his rush on waking, ragged with his earbuds in; phase 2: the boxes 하은 tosses on (toss), building
+    // to every 'and'; phase 3: 지우 again, trading then every 'and'
     bars2: [
       '........', '........',
       '.x...x..', '.x.x.x..', '........', '........', '.x.x.x.x', '.x...x.x', '........', '........',
       '.x...x..', '.....x.x', '...x...x', '.x.x....', '........', '........', '.x.x.x.x', '.....x..',
       '.x.x..x.', '.......x', '.x.x.x.x', '...x....', '.x.x...x', '..x..x.x', '.x......', '........',
       '........', '........', '........',
-      '........', '........', '........', '.....x..', '.x...x..', '.x.x.x..', '.x...x..', '........',
-      '.x...x..', '.x...x..', '.x...x..', '.x...x..', '.x...x..', '.x...x..', '.x...x..', '.x......',
+      '.x...x..', '.x.x....', '.x...x..', '.x.x.x..', '.x.x.x.x', '.x.x.x.x', '.x.x.x.x', '........',
+      '........', '.x.x.x.x', '.x...x..', '.x.x.x.x', '.x.x.x.x', '.x.x.x.x', '.x.x.x.x', '........',
       '........', '........'
     ],
     // [beat, text, beats shown, lane, speaker]: 'h' 하은 (upper loading end), 'j' 지우 (lower), 'b' 반장 (on his crate)
@@ -763,7 +767,7 @@ const LEVELS = [
           [84, '…내가 한다.', 2, 1, 'b'], [86.5, '반장님 앉아 계세요.', 2.5, 0, 'h'],
           [100.5, '야. 반장님 허리 다친 거 안 보여? 정신 차려.', 3.5, 0, 'h'], [104.5, '아 진짜, 누나나 악바리로 해요.', 3, 1, 'j'], [107.8, '저는 제가 하고 싶은 대로 할 거라구요.', 3.2, 1, 'j'],
           [111.5, '니 맘대로 할 거면…', 2.5, 0, 'h'], [114.5, '꺼져, 그냥.', 2.5, 0, 'h'],
-          [124, '…지우야.', 2.5, 1, 'b']],
+          [140, '…지우야.', 2.5, 1, 'b']],
     comfort: ['…괜찮다. 다음 거.', '…박 봐라.'],
     intro: [
       { who:'', text:'며칠 뒤. 명절 물량은 그대로다. 반장님은 허리 때문에 의자에 앉았다.' },
@@ -907,6 +911,8 @@ function loadLevel(level) {
   }));
   // a swung belt: a box written on the 'and' lands two thirds into the beat
   if (level.beltSwing) notes.forEach(n => { n.beat = realBeat(n.beat, n.lane); if (n.off && swingOn(n.lane, n.beat)) n.swung = true; });
+  // boxes she throws onto the lower belt (1-5's phase 2): his hand doesn't carry them
+  if (level.toss) notes.forEach(n => { if (n.lane === 1 && inRange(n.beat, level.toss)) n.toss = true; });
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
   // jams: a run of 'j' boxes (half a beat apart or closer) piles up behind the stuck roller and is let go one by one
   if (level.jam) { let grp = []; const flush = () => { grp.forEach((n, k) => { n.jk = k; n.jg = grp; }); grp = []; };
@@ -1377,12 +1383,12 @@ function basePose(t, bt, active, lane = 0) {
   if (pose.doze) pose.bob = 0;
   let cur = null;
   for (const n of notes) {
-    if (n.lane !== lane) continue;
+    if (n.lane !== lane || n.toss) continue;
     if (n.late && t > n.place - SPB && t < n.place + 0.4 * SPB) { pose.wince = !pose.doze && !pose.vibe; pose.dip = pose.vibe ? 0 : 2; }
     if (n.place - n.carry <= t) cur = n;
   }
   if (L.lanes === 2) {
-    const nxt = notes.find(n => n.lane === lane && n.state === 'pending' && n.place > t);
+    const nxt = notes.find(n => n.lane === lane && !n.toss && n.state === 'pending' && n.place > t);
     if (nxt && nxt.place - t < SPB * 1.5 && !notes.some(n => n.lane === lane && n.place < nxt.place && n.place > nxt.place - 4 * SPB)) pose.wave = true;
   }
   if (!cur) return pose;
@@ -1754,6 +1760,17 @@ function realBeat(x, lane = 0) {
   return x;
 }
 const beltClockT = (t, lane = 0) => timeAt(beltBeat(beatAt(t), lane));
+// 1-5 phase 2: 하은 throws his boxes onto his belt herself, an arc from her hands at the upper belt down to its loading end
+// over the half beat before each lands there (a whoosh as it leaves her)
+function drawTosses(t) {
+  const fly = 0.5 * SPB, x0 = BOSS_X + LANE_DX[0] + 12, y0 = 98, x1 = PLACE_X + LANE_DX[1], y1 = BELT_Y;
+  for (const n of notes) {
+    if (!n.toss || t < n.place - fly || t >= n.place) continue;
+    if (!n.tossFx) { n.tossFx = true; if (ctx) noise(ctx.currentTime, 'bandpass', 1200, 0.06, 0.12, 1.4, bus); }
+    const p = (t - (n.place - fly)) / fly, x = lerp(x0, x1, p), y = lerp(y0, y1, p) - Math.sin(Math.PI * p) * 16;
+    g.save(); g.translate(x, y); g.rotate((1 - p) * -0.6); drawBox(n, 0, 0, '', t); g.restore();
+  }
+}
 // 1-5: 지우's belt's bad motor, hung under the loading end of the lower belt: a housing that shudders on every chug (a heavy one
 // on the beat, a light one two thirds in), an amber lamp that blinks long-short with it and a puff now and then; after 반장's
 // bang it hums steady and the lamp is green
@@ -2986,6 +3003,7 @@ function drawScene(t, bt, active, nowMs) {
   if (L.bossSeat && L.lanes !== 2) drawBossSeat(castBeatAt(t, active), nowMs, active);
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
+  if (L.toss && active) drawTosses(t);
   if (L.lanes === 2 && !L.allLit) drawIdleShade(t, nowMs, active);
   if (L.dock) drawDockFront(dockBeat, t, nowMs, active); else if (L.lanes === 2) drawPairBolt(nowMs);
   drawGauge(nowMs);
@@ -3917,12 +3935,15 @@ function buildEvents() {
       for (const [ob, nm, len] of mel) if (Math.floor(ob) === rel) E((ob - rel) * s, T => trotLead(T, PN[nm] * up, len * s * 0.92, chorus ? 0.06 : 0.05));
       if (chorus && sec === 'b2') for (const [ob, nm, len] of mel) if (Math.floor(ob) === rel && len >= 1.5) E((ob - rel) * s, T => accord(T, [PN[nm] * up / 2], len * s * 0.9, 0.018));
     } else if (style === 'duo15') {
-      // 1-5: 지우's EDM (four on the floor, open hats on the 'and', a supersaw pad, plucks) and 하은's boom bap (kick on 1 and the 'and'
-      // of 2, snare and clap on 2 and 4, swung hats, the 808, rhodes) trade two bars each, then share the drums with his pad on top.
-      // Lost in his own track he takes over (louder pad, sixteenth plucks, his hook hummed) while her drums thin. On the question the
-      // band stops dead; two bars of rollers. Then her boom bap alone, quiet and unsure, and 반장's straight four to finish.
-      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), sw = s / 4 * 0.2, ch = chords[ci], rt = roots[ci];
-      // 지우's belt chugs, heavy on the beat and light two thirds in, till 반장 fixes it; his EDM swings its 'and's the same way
+      // 1-5, the genre changing with the row. Under all of it 지우's bad motor chugs, heavy on the beat and light two thirds in,
+      // and every 'and' in the band swings with it. lofi: a sleepy lo-fi shuffle (soft kick and snare, swung hats, rhodes, a
+      // bass, vinyl), sagging like a slow tape while he dozes and snapping back when he wakes. funk: his own future-funk track,
+      // leaking from his earbuds, takes the room (four on the floor, claps, swung open hats, slap octave bass, bright chord stabs
+      // on the 'and', plucks, his hum). clash: a record scratch and the band cut; silence: the motor and the rollers. metal:
+      // 하은 alone, heavy metal on the motor's shuffle (palm-muted power chords on the beat and two thirds in, a double kick
+      // galloping with them, a big snare on 2 and 4, crashes). together: the metal with his synth lead over it, a key change
+      // for the last four bars. outro: the motor alone, then nothing. The tutorial's practice runs have their own bare shuffle.
+      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), ch = chords[ci], rt = roots[ci];
       const swung = b < L.fixAt, AND = swung ? s * 2 / 3 : s / 2;
       if (swung && sec !== 'clash') { E(0, T => motorChug(T, 1)); E(s * 2 / 3, T => motorChug(T, 0.55)); }
       if (sec === 'intro' || sec === 'outro') { E(0, T => roller(T, 0.03)); E(s / 2, T => roller(T, 0.02)); continue; }
@@ -3930,36 +3951,48 @@ function buildEvents() {
       // boxes land (two thirds in), claps on 2 and 4, the bass and rhodes on 1 and 3, a pad under it
       if (sec === 'tutor') { E(0, T => kick(T, 0.9)); E(0, T => hat(T, 0.05)); E(AND, T => hat(T, 0.1)); E(AND, T => tak(T, 0.14)); if (inBar === 1 || inBar === 3) E(0, T => clap(T, 0.14));
         if (inBar === 0 || inBar === 2) E(0, T => { bass(T, rt, s * 0.9, 520); rhodes(T, ch, s * 1.6, 0.03); }); if (inBar === 0) E(0, T => pad(T, ch, s * 4, 'triangle', 0.03)); continue; }
-      if (sec === 'trade' && bar === 2 && L.practice && inBar === 0) E(0, T => crash(T));
-      if (sec === 'clash') { if (inBar === 0) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(0.0001, T); }); E(0, T => roller(T, 0.04)); continue; }
+      if (sec === 'clash') { if (inBar === 0) E(0, T => { scratch(T); mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); mus.gain.setValueAtTime(0.0001, T + 0.32); }); E(0, T => roller(T, 0.04)); continue; }
       if (sec === 'silence') { E(0, T => roller(T, 0.04)); E(s / 2, T => roller(T, 0.03)); continue; }
-      if (sec === 'waver' && bar === 29 && inBar === 0) E(0, T => mus.gain.setValueAtTime(0.7, T));
-      if (sec === 'boss' && bar === 37 && inBar === 0) E(0, T => { mus.gain.setValueAtTime(1, T); crash(T); });
-      const turnJ = sec === 'trade' ? ((bar - 2) >> 1) % 2 === 0 : false;
-      const edm = ((sec === 'trade' && turnJ) || sec === 'both' || sec === 'drunk') && !inRange(b, L.doze), bb = (sec === 'trade' && !turnJ) || sec === 'both' || sec === 'drunk' || sec === 'waver';
-      if (sec === 'boss') {
-        // 반장: kick 1 and 3, snare 2 and 4, even hats, a root on every beat, the organ
-        if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.75)); if (inBar === 1 || inBar === 3) E(0, T => snare(T, 0.2));
-        E(0, T => hat(T, 0.045)); E(AND, T => hat(T, 0.03)); E(0, T => bass(T, rt, s * 0.6, 320));
-        E(AND, T => organ(T, ch, s * 0.25, 0.024)); if (inBar === 0) E(0, T => organ(T, ch, s * 4, 0.012));
+      if (sec === 'metal' && bar === 29 && inBar === 0) E(0, T => mus.gain.setValueAtTime(1, T));
+      if (sec === 'lofi') {
+        // while he dozes the tape sags: everything pitched down a little more each beat and muffled; it snaps back when he wakes
+        const dz = L.doze && L.doze.find(([a0, z]) => b >= a0 && b < z), sag = dz ? 1 - 0.1 * (b - dz[0] + 1) / (dz[1] - dz[0]) : 1;
+        if (dz && b === dz[0]) E(0, T => { musF.frequency.cancelScheduledValues(T); musF.frequency.setValueAtTime(L.lofi || 20000, T); musF.frequency.exponentialRampToValueAtTime(700, T + (dz[1] - dz[0]) * s); });
+        if (L.doze && L.doze.some(([, z]) => b === z)) E(0, T => { musF.frequency.cancelScheduledValues(T); musF.frequency.setValueAtTime(L.lofi || 20000, T); noise(T, 'bandpass', 2400, 0.12, 0.05, 2, bus); });
+        if (inBar === 0 || inBar === 2) E(0, T => bbKick(T, inBar === 0 ? 0.7 : 0.55)); if (inBar === 1) E(AND, T => bbKick(T, 0.45));
+        if (inBar === 1 || inBar === 3) E(0, T => bbSnare(T, 0.18));
+        E(0, T => hat(T, 0.03)); E(AND, T => hat(T, 0.05));
+        if (inBar === 0) E(0, T => { rhodes(T, ch.map(f => f * sag), s * 2.2, 0.03); vinyl(T, s * 4); sub808(T, rt * 2 * sag, s * 1.6, 0.16); });
+        if (inBar === 2) E(AND, T => rhodes(T, ch.map(f => f * 2 * sag), s * 1.2, 0.016));
         continue;
       }
-      if (edm && !(sec === 'both' || sec === 'drunk')) {
-        E(0, T => kick(T, 0.8)); E(AND, T => openHat(T, 0.05)); if (inBar === 1 || inBar === 3) E(0, T => clap(T, 0.16));
-        E(AND, T => bass(T, rt, s * 0.4, 600));
+      if (sec === 'funk') {
+        if (bar === 18 && inBar === 0) E(0, T => { crash(T); noise(T, 'highpass', 1200, 0.12, 0.4, 0.7, bus); });
+        E(0, T => kick(T, 0.85)); E(AND, T => openHat(T, 0.06)); if (inBar === 1 || inBar === 3) E(0, T => clap(T, 0.15));
+        E(0, T => bass(T, rt, s * 0.3, 900)); E(AND, T => bass(T, rt * 2, s * 0.25, 1200));
+        E(AND, T => supersaw(T, ch.map(f => f * 2), s * 0.28, 0.012, 3600));
+        for (let k = 0; k < 2; k++) { const f = ch[(inBar * 2 + k) % ch.length] * 4; E(k ? AND : 0, T => pluck(T, f, s * 0.3, 0.016)); }
+        if (bar >= 20 && inBar === 0) E(0, T => whistle(T, ch[2] * 2, s * 1.6, 0.04));
+        continue;
       }
-      if (edm) {
-        const loud = sec === 'drunk';
-        if (inBar === 0) E(0, T => supersaw(T, ch, s * 4, loud ? 0.016 : 0.009, loud ? 2600 : 1600));
-        const per = loud ? 4 : 2; for (let k = 0; k < per; k++) { const f = ch[(inBar * per + k) % ch.length] * 4; E(per === 2 && k ? AND : k * s / per, T => pluck(T, f, s * 0.3, loud ? 0.02 : 0.014)); }
-        if (loud && bar >= 20 && inBar === 0) E(0, T => whistle(T, ch[2] * 2, s * 1.6, 0.04));
-      }
-      if (bb) {
-        const thin = sec === 'drunk', quiet = sec === 'waver';
-        if (!thin) { if (inBar === 0) E(0, T => bbKick(T, quiet ? 0.7 : 0.95)); if (inBar === 1) E(s / 2, T => bbKick(T, quiet ? 0.6 : 0.85)); if (inBar === 2) E(0, T => bbKick(T, 0.7)); }
-        if (inBar === 1 || inBar === 3) E(0, T => { bbSnare(T, thin ? 0.12 : quiet ? 0.2 : 0.3); clap(T, thin ? 0.05 : 0.1); });
-        E(0, T => hat(T, quiet ? 0.03 : 0.05)); E(s / 2 + sw, T => hat(T, quiet ? 0.02 : 0.035));
-        if (!thin) { if (inBar === 0) E(0, T => sub808(T, rt * 2, s * 1.3)); if (inBar === 1 || inBar === 3) E(s / 2 + sw, T => rhodes(T, ch, s * 0.45, quiet ? 0.024 : 0.032)); if (inBar === 0) E(0, T => vinyl(T, s * 4)); }
+      if (sec === 'metal' || sec === 'together') {
+        // E minor power-chord riff, a root a bar (the last bar of each four turns around), up a whole step for the last four
+        const rel = (bar - 29) % 8, up = sec === 'together' && bar >= 41 ? Math.pow(2, 2 / 12) : 1, RR = [82.41, 82.41, 98, 110, 82.41, 82.41, 65.41, 73.42];
+        const r = RR[rel] * up, crashBar = bar === 29 || bar === 33 || bar === 37 || bar === 41, gv = sec === 'together' ? 0.045 : 0.06;
+        if (crashBar && inBar === 0) E(0, T => crash(T));
+        E(0, T => { kick(T, 1); gtrDist(T, r, s * 0.55, gv); gtrDist(T, r * 1.5, s * 0.55, gv * 0.6); });
+        E(AND, T => { kick(T, 0.75); gtrDist(T, r, s * 0.25, gv * 0.8); });
+        if (inBar === 1 || inBar === 3) E(0, T => { snare(T); noise(T, 'bandpass', 1800, 0.25, 0.16, 0.9, bus); });
+        E(0, T => sub808(T, r, s * 0.8, 0.14));
+        if (sec === 'together') {
+          // his synth lead over it from its second bar: a four-bar line, then again a step higher
+          const line = [[0, 659.25, 1], [1, 783.99, 0.67], [1.67, 880, 1.33], [3, 987.77, 1], [4, 1174.66, 1.5], [5.67, 987.77, 0.33], [6, 880, 1], [7, 783.99, 1],
+                        [8, 659.25, 1], [9, 783.99, 0.67], [9.67, 880, 1.33], [11, 987.77, 1], [12, 880, 1], [13, 783.99, 0.67], [13.67, 659.25, 2.33]];
+          const off = (bar - 37) % 4 * 4 + inBar;
+          if (bar >= 38) for (const [ob, f, len] of line) if (Math.floor(ob) === off) E((ob - off) * s, T => synthLead(T, f * up, len * s * 0.95, 0.04));
+          if (inBar === 0) E(0, T => supersaw(T, ch.map(f => f * 2 * up), s * 4, 0.007, 2400));
+        }
+        continue;
       }
     } else if (style === 'duo14') {
       // 반장's straight four (kick 1 and 3, snare 2 and 4, even hats, a root on every beat, organ, a guitar lick every fourth bar)
@@ -4156,7 +4189,7 @@ let progress = {};
 try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}; } catch (e) {}
 
 function resetRun() {
-  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.jamFx = false; }); BANG.done = false;
+  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.jamFx = false; n.tossFx = false; }); BANG.done = false;
   FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.splashes = []; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9; FX.goodBoth = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
   rings = []; heavyPend = null;
