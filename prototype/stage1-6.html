@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>1-6 하은의 새벽 · 심박</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+/* 1-6's screen: the cutscene movie fills the top, the mother's heartbeat runs along a monitor strip at the bottom. One button:
+   press on the seventh beat of each row (a homage to Rhythm Doctor). Same 384x216 pixel canvas and the same look as the game. */
+:root{
+  --night:#15110e; --panel:#1f1915; --line:#3a2f28; --ink:#efe6d2; --muted:#a6978a;
+  --paper:#efe6d2; --paper-ink:#1d1815; --paper-muted:#6d6156; --ok:#8fd694; --stamp:#c8372d;
+  --display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%} body{box-sizing:border-box;margin:0}
+body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;padding:10px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden}
+.page{width:min(100%,calc((100dvh - 20px) * 16 / 9));max-width:100%}
+.stage{position:relative;width:100%;aspect-ratio:16/9;container-type:inline-size;overflow:hidden;border-radius:4px;background:#0d0a09;
+  box-shadow:0 0 0 1px #000,0 0 40px rgba(0,0,0,.6);touch-action:manipulation;user-select:none;-webkit-user-select:none;cursor:pointer}
+.stage canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(6,9,8,.72);cursor:default}
+.label{width:min(78%,560px);background:var(--paper);color:var(--paper-ink);border-radius:3px;padding:2.4cqw 3cqw;box-shadow:0 6px 30px rgba(0,0,0,.5)}
+.label .kicker{display:flex;justify-content:space-between;font-family:var(--mono);font-size:clamp(10px,1.5cqw,14px);color:var(--paper-muted)}
+.label h2{font-family:var(--display);font-weight:400;font-size:clamp(20px,4cqw,38px);margin:.2em 0 .1em;letter-spacing:.01em}
+.label p{margin:.3em 0 .8em;font-size:clamp(12px,1.75cqw,16px)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.btn{font:600 clamp(13px,1.8cqw,17px) var(--body);padding:.45em 1.1em;border-radius:3px;border:0;background:#1d1815;color:var(--paper);cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--paper-ink);box-shadow:inset 0 0 0 1.5px #1d1815}
+.btn:focus-visible,.sync button:focus-visible{outline:2px solid #2f6f8a;outline-offset:2px}
+.sync{font-family:var(--mono);font-size:clamp(11px,1.5cqw,14px);display:inline-flex;align-items:center;gap:4px;color:var(--paper-muted)}
+.sync button{width:30px;height:30px;border-radius:3px;border:1.5px solid #1d1815;background:transparent;color:#1d1815;font:600 15px var(--mono);cursor:pointer}
+.sync output{min-width:4.2em;text-align:center;color:var(--paper-ink)}
+.file{font-size:clamp(11px,1.5cqw,14px);color:var(--paper-muted)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:.15em 1.2em;margin:.5em 0 1em;font-size:clamp(12px,1.75cqw,16px)} dt{color:var(--paper-muted)} dd{margin:0;font-family:var(--mono)}
+.help{font-size:13px;color:var(--muted);text-align:center;max-width:60em}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="stage" id="stage">
+    <canvas id="cv" width="384" height="216" aria-label="1-6 화면: 위는 컷씬 영상, 아래는 어머니의 심박 모니터"></canvas>
+    <video id="mov" playsinline muted preload="auto" hidden></video>
+
+    <div class="overlay" id="title">
+      <div class="label">
+        <div class="kicker"><span>스테이지 1-6 · 하은의 새벽</span><span>502호 · 05:40</span></div>
+        <h2>어머니의 박자</h2>
+        <p>아래 모니터에 어머니의 심박이 일곱 칸을 지나갑니다. 여섯 번 뛰고, <b>일곱 번째 박에 화면을 터치</b>(또는 스페이스)해서 하은이 박을 이어 주세요. 첫 줄은 보여 주기만 합니다.</p>
+        <div class="row">
+          <button class="btn" id="start" type="button">시작</button>
+          <label class="btn ghost" for="file">컷씬 영상 불러오기</label>
+          <input id="file" type="file" accept="video/*" hidden>
+          <span class="sync">싱크 <button id="sm" type="button" aria-label="보정값 낮추기">−</button><output id="sv">0 ms</output><button id="sp" type="button" aria-label="보정값 높이기">+</button></span>
+        </div>
+        <p class="file" id="fname">영상이 없으면 위쪽에 임시 병실 화면이 나옵니다.</p>
+      </div>
+    </div>
+
+    <div class="overlay" id="result" hidden>
+      <div class="label">
+        <div class="kicker"><span>간호 기록</span><span>502호</span></div>
+        <h2 id="r-title">심박 안정</h2>
+        <dl>
+          <dt>이어 준 박</dt><dd id="r-counts">딱 0 · 좋아 0 · 놓침 0</dd>
+          <dt>정확도</dt><dd id="r-acc">0%</dd>
+          <dt>최대 연속</dt><dd id="r-combo">0</dd>
+        </dl>
+        <div class="row"><button class="btn" id="retry" type="button">다시 하기</button><button class="btn ghost" id="back" type="button">처음으로</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="help">시안 페이지 · 위 136줄은 컷씬 영상 자리(16:9 영상은 가운데를 잘라 씀), 아래 80줄은 심박 모니터. 영상은 소리 없이 노래 시간에 맞춰 재생됩니다.</p>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const W = 384, H = 216, MOV_H = 136, TRK_Y = 136;
+const cv = $('cv'), g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
+
+// ---------- the chart: rows of seven beats and a breath ----------
+// Each row: six heartbeats you hear, the seventh is yours, the eighth is a rest before the next row. The first row only shows how.
+// Then steady, then the doctor's "오늘 좀 흔들려요": rows that come faster or slower than the last, rows with a beat that never
+// comes (the seventh still falls where the count says), and at the end the rate settles.
+const ROWS = [
+  { bpm: 62, demo: true, cue: '보세요: 일곱 번째 박은 하은이 이어 줍니다' },
+  { bpm: 62, cue: '일곱 번째 박에 터치' },
+  { bpm: 62 }, { bpm: 62 }, { bpm: 62 },
+  { bpm: 68, cue: '빨라진다' }, { bpm: 68 },
+  { bpm: 56, cue: '느려진다' }, { bpm: 72 },
+  { bpm: 60, skip: [3], cue: '한 박이 빠져도, 세던 대로' }, { bpm: 60, skip: [2, 4] },
+  { bpm: 66, skip: [5] }, { bpm: 58 },
+  { bpm: 60, cue: '괜찮아' }, { bpm: 60 }, { bpm: 60, last: true }
+];
+const LEAD = 2.4;   // a count-in before the first row (two soft clicks)
+let EV = [], TARGETS = [], END_T = 0;
+function compile() {
+  EV = []; TARGETS = []; let t = LEAD;
+  ROWS.forEach((r, ri) => {
+    const spb = 60 / r.bpm; r.t0 = t; r.spb = spb;
+    EV.push({ t, type: 'chord', row: ri, dur: spb * 8 });
+    for (let k = 0; k < 6; k++) if (!(r.skip || []).includes(k)) EV.push({ t: t + k * spb, type: 'pulse', row: ri, k });
+    const tg = { t: t + 6 * spb, row: ri, demo: !!r.demo, judge: null, d: 0 }; TARGETS.push(tg);
+    if (r.demo) EV.push({ t: tg.t, type: 'demo', row: ri, tg });
+    t += 8 * spb;
+  });
+  EV.push({ t: LEAD - 1.2, type: 'click' }, { t: LEAD - 0.6, type: 'click' });
+  END_T = t + 1.2; EV.sort((a, b) => a.t - b.t);
+}
+compile();
+
+// ---------- audio: the heartbeat (lub-dub), a soft pad under each row, the monitor's beep ----------
+let ac = null, out = null, startAt = 0, evI = 0, playing = false, syncMs = 0;
+function audio() { if (ac) return; ac = new (window.AudioContext || window.webkitAudioContext)(); out = ac.createGain(); out.gain.value = 0.9; const comp = ac.createDynamicsCompressor(); out.connect(comp); comp.connect(ac.destination); }
+function thump(t, f, amp, dec) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f * 1.6, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.04); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.008); gn.gain.exponentialRampToValueAtTime(0.0001, t + dec); o.connect(gn); gn.connect(out); o.start(t); o.stop(t + dec + 0.05); }
+function heart(t, amp = 0.9, bright = false) { thump(t, 58, amp, 0.22); thump(t + 0.14, 50, amp * 0.6, 0.18); if (bright) { thump(t, 120, amp * 0.35, 0.08); } }
+function beep(t, f = 1046, amp = 0.08, dur = 0.09) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'square'; o.frequency.value = f; const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400; gn.gain.setValueAtTime(amp, t); gn.gain.setValueAtTime(amp, t + dur * 0.8); gn.gain.linearRampToValueAtTime(0.0001, t + dur); o.connect(lp); lp.connect(gn); gn.connect(out); o.start(t); o.stop(t + dur + 0.02); }
+const CHORDS = [[57, 60, 64], [53, 57, 60], [48, 52, 55, 59], [55, 59, 62]];   // Am F Cmaj7 G
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+function pad(t, ri, dur) {
+  const ch = CHORDS[ri % 4];
+  for (const m of ch) for (const det of [-4, 4]) { const o = ac.createOscillator(), gn = ac.createGain(), lp = ac.createBiquadFilter(); o.type = 'triangle'; o.frequency.value = mtof(m); o.detune.value = det; lp.type = 'lowpass'; lp.frequency.value = 900; gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.022, t + 0.8); gn.gain.setValueAtTime(0.022, t + dur - 0.6); gn.gain.linearRampToValueAtTime(0.0001, t + dur + 0.4); o.connect(lp); lp.connect(gn); gn.connect(out); o.start(t); o.stop(t + dur + 0.5); }
+  const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.value = mtof(ch[0] + 24); gn.gain.setValueAtTime(0.05, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + 2.2); o.connect(gn); gn.connect(out); o.start(t); o.stop(t + 2.3);
+}
+function schedule() {
+  const now = ac.currentTime, horizon = now + 0.25;
+  while (evI < EV.length && startAt + EV[evI].t < horizon) {
+    const e = EV[evI++], at = startAt + e.t; if (at < now - 0.05) continue;
+    if (e.type === 'pulse') heart(at);
+    else if (e.type === 'chord') pad(at, e.row, e.dur);
+    else if (e.type === 'click') beep(at, 660, 0.04, 0.05);
+    else if (e.type === 'demo') { heart(at, 0.9, true); beep(at + 0.02, 1046, 0.06); }
+  }
+}
+const songT = () => ac ? ac.currentTime - startAt : -99;
+
+// ---------- input and judging ----------
+const WIN_P = 0.05, WIN_G = 0.11, WIN_M = 0.18;
+const stats = { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 };
+const FX = { pops: [], beatAt: -9, hitAt: -9 };
+function press(tIn) {
+  if (!playing) return;
+  const t = tIn - syncMs / 1000;
+  let best = null, bd = 1e9; for (const tg of TARGETS) { if (tg.demo || tg.judge) continue; const d = Math.abs(t - tg.t); if (d < bd) { bd = d; best = tg; } }
+  if (!best || bd > WIN_M) { FX.pops.push({ text: '…', at: performance.now(), c: '#6a7a72' }); return; }
+  const d = t - best.t; best.d = d; best.hitT = t;
+  if (Math.abs(d) <= WIN_G) {
+    best.judge = Math.abs(d) <= WIN_P ? 'perfect' : 'good'; stats[best.judge]++; stats.combo++; stats.best = Math.max(stats.best, stats.combo);
+    heart(ac.currentTime, 0.9, true); if (best.judge === 'perfect') beep(ac.currentTime + 0.02, 1046, 0.06);
+    FX.hitAt = performance.now(); FX.pops.push({ text: best.judge === 'perfect' ? '딱' : '좋아', sub: best.judge === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: performance.now(), c: best.judge === 'perfect' ? '#eaffef' : '#bfe8c8' });
+  } else { missIt(best, d < 0 ? '너무 빠름' : '너무 늦음'); }
+}
+function missIt(tg, why) { tg.judge = 'miss'; stats.miss++; stats.combo = 0; if (ac) beep(ac.currentTime, 330, 0.05, 0.25); FX.pops.push({ text: '놓침', sub: why, at: performance.now(), c: '#ff7a6a' }); }
+function tick(t) {
+  for (const tg of TARGETS) {
+    if (tg.judge) continue;
+    if (tg.demo && t >= tg.t) { tg.judge = 'demo'; tg.d = 0; tg.hitT = tg.t; FX.hitAt = performance.now(); continue; }
+    if (!tg.demo && t > tg.t + WIN_M) missIt(tg, '');
+  }
+}
+const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyK', 'KeyD']);
+addEventListener('keydown', e => { if (!KEYS.has(e.code) || e.repeat) return; if (!playing) return; e.preventDefault(); press(songT() + (e.timeStamp - performance.now()) / 1000); });
+$('stage').addEventListener('pointerdown', e => { if (!playing || e.target.closest('.overlay')) return; e.preventDefault(); press(songT() + (e.timeStamp - performance.now()) / 1000); });
+
+// ---------- the movie on top ----------
+const mov = $('mov'); let movOK = false;
+$('file').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; mov.src = URL.createObjectURL(f); mov.load(); mov.onloadeddata = () => { movOK = true; $('fname').textContent = '영상: ' + f.name + ` (${mov.videoWidth}×${mov.videoHeight}, ${mov.duration.toFixed(1)}초)`; }; });
+function drawMovie(t) {
+  if (movOK) {
+    if (playing && t >= 0) { if (mov.paused) mov.play().catch(() => {}); if (Math.abs(mov.currentTime - t) > 0.2 && t < mov.duration) mov.currentTime = t; }
+    // cover-crop the movie into the top band, then let the pixel canvas carry it
+    const vw = mov.videoWidth, vh = mov.videoHeight, s = Math.max(W / vw, MOV_H / vh), sw = W / s, sh = MOV_H / s;
+    g.imageSmoothingEnabled = true; g.drawImage(mov, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, W, MOV_H); g.imageSmoothingEnabled = false;
+    return;
+  }
+  placeholderWard(t);
+}
+// stand-in until the movie exists: the ward before dawn, the blinds letting in more light as the song goes, the bedside monitor
+// beating with the strip below, 하은 asleep sitting up with her head on the bed's edge
+function placeholderWard(t) {
+  const p = clamp(t / END_T, 0, 1);
+  R(0, 0, W, MOV_H, '#141a24'); R(0, 100, W, 36, '#10151c');
+  const sky = ['#1a2440', '#2a3466', '#5a4e7e', '#b07a7a'].map(c => c);
+  for (let i = 0; i < 4; i++) R(236, 14 + i * 16, 112, 16, lerpCol('#121a2c', sky[i], p));
+  for (let y = 18; y < 78; y += 6) R(236, y, 112, 2, '#0c1018');
+  R(234, 12, 116, 2, '#2a303a'); R(234, 78, 116, 2, '#2a303a'); R(234, 12, 2, 68, '#2a303a'); R(348, 12, 2, 68, '#2a303a');
+  g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,200,160,${0.06 + 0.12 * p})`; g.beginPath(); g.moveTo(236, 80); g.lineTo(348, 80); g.lineTo(300, 136); g.lineTo(150, 136); g.closePath(); g.fill(); g.restore();
+  R(60, 82, 190, 22, '#cfd6e0'); R(60, 82, 190, 3, '#e8eef4'); R(60, 104, 190, 6, '#8a94a2'); R(64, 110, 4, 26, '#5a6270'); R(242, 110, 4, 26, '#5a6270');
+  R(70, 72, 46, 14, '#e8eef4'); R(72, 74, 30, 8, '#c49a80');
+  for (let x = 110; x < 246; x += 2) R(x, 78 + Math.round(Math.sin(x / 22) * 2), 2, 6, '#9fb4cc');
+  R(170, 80, 34, 22, '#1e1a1a'); R(172, 70, 22, 12, '#3a2a24'); R(168, 66, 28, 8, '#d8463b'); R(160, 102, 44, 34, '#1e1a1a'); R(164, 102, 36, 20, '#7ec8e3');
+  const beat = Math.max(0, 1 - (performance.now() - FX.beatAt) / 250);
+  R(20, 30, 40, 30, '#0c0f10'); R(22, 32, 36, 26, '#06120c'); R(38, 60, 4, 50, '#3a3f45');
+  g.fillStyle = `rgba(143,214,148,${0.5 + 0.5 * beat})`; for (let x = 0; x < 34; x++) { const d = Math.abs(x - 17), y = 45 - (d < 2 ? 9 * beat : 0); g.fillRect(23 + x, y, 1, 1); }
+  g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(40, 45, 2, 40, 45, 50); gr.addColorStop(0, `rgba(143,214,148,${0.12 + 0.12 * beat})`); gr.addColorStop(1, 'rgba(143,214,148,0)'); g.fillStyle = gr; g.fillRect(0, 0, 100, 110); g.restore();
+  g.font = '7px "IBM Plex Mono", monospace'; g.textBaseline = 'top'; g.fillStyle = 'rgba(239,230,210,.45)'; g.fillText('컷씬 영상 자리 (임시 병실)', 6, 122);
+}
+function lerpCol(a, b, p) { const A = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), B = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16)); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], p))).join(',')})`; }
+
+// ---------- the heartbeat strip ----------
+// A monitor at the bottom: ECG paper, the patient card on the left (a heart that beats, the rate), and the row: seven slots, the
+// sweep moving across them beat by beat, the trace drawn behind it with a spike on each heartbeat, last row's trace still
+// fading ahead of it; the seventh slot is the box to fill.
+const SX = k => 82 + k * 42, BASE = TRK_Y + 46;
+let monoFont = '8px "IBM Plex Mono", monospace';
+function rowAt(t) { let ri = 0; for (let i = 0; i < ROWS.length; i++) if (t >= ROWS[i].t0 - 1e-6) ri = i; return ri; }
+function spike(x, y, amp, c) { // P, QRS, T in a few pixels
+  const pts = [[-8, 0], [-6, -1], [-5, 0], [-2, 0], [-1, 2], [0, -amp], [1, 4], [2, 0], [5, 0], [7, -2], [9, 0]];
+  g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); pts.forEach(([dx, dy], i) => i ? g.lineTo(x + dx + 0.5, y + dy + 0.5) : g.moveTo(x + dx + 0.5, y + dy + 0.5)); g.stroke();
+}
+function traceRow(ri, upToX, c, dim) {
+  const r = ROWS[ri]; if (!r) return;
+  g.save(); g.beginPath(); g.rect(SX(0) - 10, TRK_Y, upToX - (SX(0) - 10), 80); g.clip();
+  g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); g.moveTo(SX(0) - 10, BASE + 0.5); g.lineTo(376, BASE + 0.5); g.stroke();
+  for (let k = 0; k < 6; k++) if (!(r.skip || []).includes(k)) { R(SX(k) - 9, BASE, 19, 1, '#06100d'); spike(SX(k), BASE, 16, c); }
+  const tg = TARGETS[ri];
+  if (tg.judge && tg.judge !== 'miss') { const x = SX(6) + clamp(tg.d / r.spb, -0.5, 0.5) * 42; R(x - 9, BASE, 19, 1, '#06100d'); spike(Math.round(x), BASE, 22, dim ? c : tg.judge === 'good' ? '#bfe8c8' : '#ffffff'); }
+  if (tg.judge === 'miss') { g.strokeStyle = dim ? c : '#ff6a5a'; g.beginPath(); g.moveTo(SX(6) - 4.5, BASE - 4.5); g.lineTo(SX(6) + 4.5, BASE + 4.5); g.moveTo(SX(6) + 4.5, BASE - 4.5); g.lineTo(SX(6) - 4.5, BASE + 4.5); g.stroke(); }
+  g.restore();
+}
+function drawStrip(t) {
+  R(0, TRK_Y, W, H - TRK_Y, '#06100d');
+  for (let x = 0; x < W; x += 6) R(x, TRK_Y, 1, H - TRK_Y, x % 30 === 0 ? '#11261d' : '#0a1914');
+  for (let y = TRK_Y; y < H; y += 6) R(0, y, W, 1, (y - TRK_Y) % 30 === 0 ? '#11261d' : '#0a1914');
+  R(0, TRK_Y, W, 2, '#1d2a25'); R(0, TRK_Y + 2, W, 1, '#2f4a3e');
+  const ri = rowAt(t), r = ROWS[ri], kf = t < LEAD ? -1 : (t - r.t0) / r.spb;   // beats into this row
+  // the patient card
+  R(4, TRK_Y + 6, 66, 70, '#0b1813'); R(4, TRK_Y + 6, 66, 1, '#2f4a3e'); R(4, TRK_Y + 75, 66, 1, '#2f4a3e'); R(4, TRK_Y + 6, 1, 70, '#2f4a3e'); R(69, TRK_Y + 6, 1, 70, '#2f4a3e');
+  g.font = '600 8px "IBM Plex Sans KR", sans-serif'; g.textBaseline = 'top'; g.fillStyle = '#cfe8d6'; g.fillText('어머니', 10, TRK_Y + 9);
+  g.font = monoFont; g.fillStyle = '#6a9a80'; g.fillText('502호', 42, TRK_Y + 10);
+  const since = (performance.now() - FX.beatAt) / 1000, pulse = Math.max(0, 1 - since / 0.25);
+  heartIcon(22, TRK_Y + 38, 1 + pulse * 0.35, pulse);
+  g.font = '700 16px "IBM Plex Mono", monospace'; g.fillStyle = '#8fd694'; g.fillText(String(t < LEAD ? ROWS[0].bpm : r.bpm), 36, TRK_Y + 28);
+  g.font = monoFont; g.fillStyle = '#6a9a80'; g.fillText('BPM', 38, TRK_Y + 46);
+  g.fillText(`${Math.min(ri + 1, ROWS.length)}/${ROWS.length}`, 10, TRK_Y + 62);
+  // slot ticks, numbers, the seventh's box
+  for (let k = 0; k < 7; k++) { const skip = (r.skip || []).includes(k); R(SX(k), BASE + 10, 1, 3, skip ? '#2a3a32' : '#3f6a55'); g.font = monoFont; g.fillStyle = skip ? '#2a3a32' : '#3f6a55'; g.fillText(String(k + 1), SX(k) - 2, BASE + 14); }
+  const near = clamp(1 - Math.abs(kf - 6) / 1.5, 0, 1), boxC = lerpCol('#3f6a55', '#e8fff0', near);
+  g.strokeStyle = boxC; g.lineWidth = 1; g.strokeRect(SX(6) - 11.5, BASE - 25.5, 23, 34); if (near > 0.3) { g.strokeStyle = `rgba(232,255,240,${near * 0.35})`; g.strokeRect(SX(6) - 13.5, BASE - 27.5, 27, 38); }
+  if (r.demo && kf > 5 && kf < 7.5) { g.font = '600 8px "IBM Plex Sans KR", sans-serif'; g.fillStyle = '#e8fff0'; g.textAlign = 'center'; g.fillText('하은', SX(6), BASE - 37); g.textAlign = 'left'; }
+  // last row's trace fades ahead of the sweep, this row's trace behind it, the sweep and its erase bar
+  if (t >= LEAD) {
+    const sx = SX(0) - 10 + clamp((kf + 0.25) / 8, 0, 1) * (376 - SX(0) + 10);
+    if (ri > 0) { g.save(); g.beginPath(); g.rect(sx + 8, TRK_Y, 400, 80); g.clip(); traceRow(ri - 1, 400, '#1f4a36', true); g.restore(); }
+    traceRow(ri, sx, '#8fd694', false);
+    R(sx, TRK_Y + 8, 8, 64, '#06100d'); R(sx, BASE - 30, 1, 46, '#cfe8d6');
+  } else { g.strokeStyle = '#1f4a36'; g.beginPath(); g.moveTo(SX(0) - 10, BASE + 0.5); g.lineTo(376, BASE + 0.5); g.stroke(); }
+  // judgement pops over the box
+  const nowMs = performance.now(); FX.pops = FX.pops.filter(p => nowMs - p.at < 700);
+  for (const p of FX.pops) { const a = 1 - (nowMs - p.at) / 700, y = BASE - 40 - (1 - a) * 8; g.globalAlpha = a; g.textAlign = 'center'; g.font = '16px "Black Han Sans", sans-serif'; g.fillStyle = p.c; g.fillText(p.text, SX(6), y - 6); if (p.sub) { g.font = monoFont; g.fillText(p.sub, SX(6), y + 12); } g.textAlign = 'left'; g.globalAlpha = 1; }
+  // the row's cue line
+  if (r.cue && kf >= 0 && kf < 3) { g.globalAlpha = clamp(Math.min(kf * 3, (3 - kf) * 2), 0, 1); g.font = '600 8px "IBM Plex Sans KR", sans-serif'; g.fillStyle = '#cfe8d6'; g.fillText(r.cue, SX(0) - 8, TRK_Y + 8); g.globalAlpha = 1; }
+  if (stats.combo > 1) { g.font = monoFont; g.fillStyle = '#6a9a80'; g.textAlign = 'right'; g.fillText(`연속 ${stats.combo}`, 378, TRK_Y + 8); g.textAlign = 'left'; }
+}
+function heartIcon(cx, cy, s, glow) {
+  const c = glow > 0.2 ? '#ff6a6a' : '#c8403c';
+  const pts = [[0, 4], [-6, -2], [-6, -5], [-4, -7], [-1, -7], [0, -5], [1, -7], [4, -7], [6, -5], [6, -2]];
+  g.fillStyle = c; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(cx + x * s, cy + y * s) : g.moveTo(cx + x * s, cy + y * s)); g.closePath(); g.fill();
+  R(cx - 4 * s, cy - 5 * s, 2, 1, '#ffb0a8');
+  if (glow > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(cx, cy - 2, 1, cx, cy - 2, 16); gr.addColorStop(0, `rgba(255,90,90,${0.35 * glow})`); gr.addColorStop(1, 'rgba(255,90,90,0)'); g.fillStyle = gr; g.fillRect(cx - 18, cy - 20, 36, 36); g.restore(); }
+}
+
+// ---------- flow ----------
+let pulseI = 0;
+function start() {
+  audio(); if (ac.state === 'suspended') ac.resume();
+  for (const tg of TARGETS) { tg.judge = null; tg.d = 0; }
+  Object.assign(stats, { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 }); FX.pops = [];
+  startAt = ac.currentTime + 0.3; evI = 0; pulseI = 0; playing = true;
+  if (movOK) { mov.currentTime = 0; mov.pause(); }
+  $('title').hidden = true; $('result').hidden = true;
+}
+function finish() {
+  playing = false; if (movOK) mov.pause();
+  const n = stats.perfect + stats.good + stats.miss, acc = n ? Math.round((stats.perfect + stats.good * 0.6) / n * 100) : 0;
+  $('r-counts').textContent = `딱 ${stats.perfect} · 좋아 ${stats.good} · 놓침 ${stats.miss}`; $('r-acc').textContent = acc + '%'; $('r-combo').textContent = stats.best;
+  $('r-title').textContent = stats.miss <= 2 ? '심박 안정' : '다시, 옆에서 같이';
+  $('result').hidden = false;
+}
+$('start').onclick = start; $('retry').onclick = start; $('back').onclick = () => { $('result').hidden = true; $('title').hidden = false; };
+const showSync = () => $('sv').textContent = (syncMs > 0 ? '+' : '') + syncMs + ' ms';
+$('sm').onclick = () => { syncMs -= 10; showSync(); }; $('sp').onclick = () => { syncMs += 10; showSync(); };
+
+function frame() {
+  requestAnimationFrame(frame);
+  const t = playing ? songT() : -1;
+  if (playing) {
+    schedule(); tick(t);
+    // the heart icon and the ward's monitor beat with the heard pulses and with her presses
+    const pulses = EV.filter(e => e.type === 'pulse' || e.type === 'demo');
+    while (pulseI < pulses.length && pulses[pulseI].t <= t) { FX.beatAt = performance.now(); pulseI++; }
+    if (FX.hitAt > FX.beatAt) FX.beatAt = FX.hitAt;
+    if (t > END_T) finish();
+  }
+  drawMovie(t); drawStrip(playing ? t : 0);
+  if (t > ROWS[ROWS.length - 1].t0 + ROWS[ROWS.length - 1].spb * 7) { g.globalAlpha = clamp((t - ROWS[ROWS.length - 1].t0 - ROWS[ROWS.length - 1].spb * 7) / 0.8, 0, 1); g.font = '600 9px "IBM Plex Sans KR", sans-serif'; g.fillStyle = '#e8fff0'; g.textAlign = 'center'; g.fillText('— 심박 안정 —', W / 2, MOV_H / 2); g.textAlign = 'left'; g.globalAlpha = 1; }
+}
+requestAnimationFrame(frame);
+// for testing: window.__16 exposes the chart and a press at a song time
+window.__16 = { ROWS, TARGETS, stats, END_T, press: t => press(t), songT, start, jump: t => { startAt = ac.currentTime - t; evI = EV.findIndex(e => e.t >= t); pulseI = 0; } };
+})();
+</script>
+</body>
+</html>
