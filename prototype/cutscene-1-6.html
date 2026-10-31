@@ -56,8 +56,8 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   <div class="bar">
     <button class="btn" id="play" type="button">재생</button>
     <button class="btn ghost" id="restart" type="button">처음부터</button>
-    <div class="scrub"><input id="seek" type="range" min="0" max="158" step="0.01" value="0" aria-label="재생 위치"></div>
-    <span class="time" id="time">00.0 / 157.2</span>
+    <div class="scrub"><input id="seek" type="range" min="0" max="118" step="0.01" value="0" aria-label="재생 위치"></div>
+    <span class="time" id="time">00.0 / 118.0</span>
     <button class="btn ghost" id="hb" type="button" aria-pressed="true">심박 줄</button>
     <button class="btn ghost" id="snd" type="button" aria-pressed="true">소리</button>
   </div>
@@ -952,8 +952,7 @@ function crossTo(t, t0, t1, ctx, canvas, drawNext, pose, tintA, tintB, clipY, dr
   ctx.fillStyle = m; ctx.fillRect(0, 0, W, H); ctx.globalCompositeOperation = 'source-over';
   g = wctx; g.drawImage(canvas, 0, 0);
   const { o, top } = pose;
-  haeunSprite(o); tintSprite(mix(tintA, tintB, p));
-  g.save(); g.beginPath(); g.rect(0, 0, W, clipY); g.clip(); putSprite(HX, top); g.restore();
+  if (clipY > 0) { haeunSprite(o); tintSprite(mix(tintA, tintB, p)); g.save(); g.beginPath(); g.rect(0, 0, W, clipY); g.clip(); putSprite(HX, top); g.restore(); }
   // (the next place's foreground, e.g. the alley wall's pots and the cat, goes back over her the same way, so it does not vanish)
   if (drawFront) {
     g = frctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, W, H); drawFront(t);
@@ -979,7 +978,7 @@ function render(t) {
   if (t >= ALLEY.t1 && t < CORR.t1) { g = wctx; alleyScene(t); }
   if (t > CORR.t0 && t < CORR.t1) { g.fillStyle = `rgba(0,0,0,${ease(seg(t, CORR.t0, CORR.t1 - 0.1))})`; g.fillRect(0, 0, W, H); }   // fading to full black
   if (t >= CORR.t1 && t < WARD.t1) { g = wctx; corridorScene(t); }
-  if (t > WARD.t0 && t < WARD.t1) crossTo(t, WARD.t0, WARD.t1, wdctx, WDW, wardScene, wardPose(t), '#eef4f2', '#f2ece4', H);
+  if (t > WARD.t0 && t < WARD.t1) crossTo(t, WARD.t0, WARD.t1, wdctx, WDW, wardScene, wardPose(t), '#eef4f2', '#f2ece4', 0);   // (she turns to the bed here, so both whole scenes cross; redrawn on top she'd jump out of the corridor's light)
   if (t >= WARD.t1) { g = wctx; wardScene(t); }
   // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
@@ -1175,7 +1174,8 @@ const HB = (() => {
     // each lane's heart beats with its heard pulses
     for (const e of EV) { if (e.type !== 'pulse' && e.type !== 'demo') continue; if (e.t > t) break; if (!e.seen) { e.seen = 1; FX.lane[e.lane].beatAt = performance.now(); } }
   }
-  const X0 = 8, HEART = 3, HXR = 356, COL = 292, XE = COL + 32, GAP = (COL - X0 - 26) / 3, SPOT = k => Math.round(X0 + 26 + k * GAP);   // the four spots along the line (the 4th is the column) and the gap between them
+  // (in the cutscene the row is centred and narrower: 86 to 298)
+  const X0 = 86, HEART = 3, COL = 266, XE = COL + 32, HXR = XE + 12, GAP = (COL - X0 - 26) / 3, SPOT = k => Math.round(X0 + 26 + k * GAP);   // the four spots along the line (the 4th is the column) and the gap between them
   const LANE = [{ name: '어머니', tag: '502호' }, { name: '하은', tag: '보호자' }];
   function txt(s, x, y, c, size = 7, align = 'left', weight = '600', font = '"IBM Plex Sans KR", sans-serif') {
     if (LOW.on) { const m = g.getTransform(); LOW.text.push({ s, x, y, c, size, align, weight, font, m, a: g.globalAlpha, sc: g.shadowColor, sb: g.shadowBlur }); return; } g.font = `${weight} ${size}px ${font}`; g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = c; g.fillText(s, x, y); g.textAlign = 'left'; }
@@ -1330,6 +1330,8 @@ const HB = (() => {
     // the 4th beat's column, across every row: a wide solid yellow box with a dark rim and a lit edge; it brightens as the beat
     // comes and flashes white on a press
     const near = Math.max(...[0, 1].map(l => { const r = laneRow(l, t); return r ? clamp(1 - Math.abs(t - r.tg.t) / 0.5, 0, 1) : 0; })), fl = clamp(1 - (performance.now() - FX.flashAt) / 220, 0, 1);
+    // a black bar across the bottom of the screen for the row to sit on, so the sides beside the narrow row are black too
+    g.fillStyle = '#000'; g.fillRect(0, Math.round(y0) - 25, W, H);
     for (const [yy, sh2] of [[y0, 1], [y1, e2]]) if (sh2 > 0) laneBand(yy, sh2);
     { const top = Math.round(lerp(158, 134, e2)); BOX.near = near; BOX.fl = fl; BOX.rgb = fl > 0.3 ? '255,236,150' : '242,196,58'; BOX.a = 0.32 + 0.16 * near + 0.3 * fl; scanBox(Math.round(y0) - 21, Math.round(y0) + 7);
       if (fl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fx = g.createRadialGradient(COL, y0 - 7, 0, COL, y0 - 7, 26); fx.addColorStop(0, `rgba(255,240,170,${0.4 * fl})`); fx.addColorStop(1, 'rgba(255,240,170,0)'); g.fillStyle = fx; g.fillRect(COL - 26, y0 - 33, 52, 52); g.restore(); } }
@@ -1345,8 +1347,8 @@ const HB = (() => {
     if (FX.milestone) { const a = (now - FX.milestone.at) / 1000; if (a < 1) { const sc = 1 + 0.6 * clamp(1 - a / 0.12, 0, 1); g.save(); g.globalAlpha = clamp(1 - (a - 0.6) / 0.4, 0, 1); g.translate(COL, Math.min(LANEY[0], LANEY[1]) - 48 - a * 6); g.scale(sc, sc); glowTxt(`연속 ${FX.milestone.n}!`, 0, -8, '#ffffff', 15, 'center', '"Black Han Sans", sans-serif', 'rgba(120,255,180,.95)'); g.restore(); } }
     // the row's cue, top right of the rows
     const cueRow = ROWS.filter(r => r.cue && t >= r.t0 - 0.2 && t < r.t0 + (r.t8 - r.t0) * 0.8).pop();
-    if (cueRow) { const a = clamp(Math.min((t - cueRow.t0 + 0.2) * 3, ((cueRow.t8 - cueRow.t0) * 0.8 - (t - cueRow.t0)) * 2), 0, 1); g.globalAlpha = a; g.save(); g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 4 * SC; txt(cueRow.cue, 378, 108, '#ffffff', 8, 'right'); g.restore(); g.globalAlpha = 1; }
-    if (stats.combo > 1) { g.save(); g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 3 * SC; txt(`연속 ${stats.combo}`, 8, 108, '#c8ffc8', 7, 'left', '500', '"IBM Plex Mono", monospace'); g.restore(); }
+    if (cueRow) { const a = clamp(Math.min((t - cueRow.t0 + 0.2) * 3, ((cueRow.t8 - cueRow.t0) * 0.8 - (t - cueRow.t0)) * 2), 0, 1); g.globalAlpha = a; g.save(); g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 4 * SC; txt(cueRow.cue, 376, Math.round(y0) - 22, '#ffffff', 8, 'right'); g.restore(); g.globalAlpha = 1; }
+    if (stats.combo > 1) { g.save(); g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 3 * SC; txt(`연속 ${stats.combo}`, 8, Math.round(y0) - 22, '#c8ffc8', 7, 'left', '500', '"IBM Plex Mono", monospace'); g.restore(); }
   }
   function reset() {
     compile(); Object.assign(stats, { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 });
