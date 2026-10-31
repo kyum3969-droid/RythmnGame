@@ -97,7 +97,7 @@ const SCAN_X = 300, BELT_Y = 146;
 const SHOTS = [
   { id: 'belt', t0: 0, t1: 10.2, name: '빈 벨트', note: '벨트가 서고 등이 하나씩 꺼진다. 높은 창으로 햇살이 든다. 하은이 벨트를 두 번 두드리고, 빛 쪽으로 고개를 든다.' },
   { id: 'walk', t0: 10.2, t1: 22.55, name: '공장 밖으로', note: '컷 없이 이어서 걸어 나간다. 하은은 화면 제자리, 배경이 흐른다(창과 선반, 앞의 빈 라인, 기둥). 다리는 벨트와 담장 뒤로 가려진다. 셔터 밑을 지나 바깥 새벽으로.' },
-  { id: 'train', t0: 22.55, t1: 31, name: '지하철', note: '하은이 걸음을 멈추면 배경이 그라데이션으로 샥 쓸려 첫차 안으로 바뀐다. 하은은 그 자리 그대로 손잡이를 잡고 선다. 창밖으로 터널 불빛이 지나간다.' }
+  { id: 'station', t0: 22.55, t1: 31, name: '지하철역', note: '하은이 걸음을 멈추면 배경이 그라데이션으로 샥 쓸려 지하철역 승강장으로 바뀐다. 하은은 그 자리 그대로 스크린도어 앞에 서서 시계를 보고, 유리 너머로 첫차가 들어온다.' }
 ];
 const END = 31;
 // at the belt (seconds)
@@ -111,9 +111,10 @@ const walkD = t => { const v = WALK.v, r = WALK.ramp;
   if (t <= WALK.t0) return 0; if (t < WB_) return v * (t - WALK.t0) ** 2 / (2 * r); if (t < WC_) return dB_ + v * (t - WB_);
   const u = Math.min(t, WALK.stop) - WC_; return dC_ + v * u - v * u * u / (2 * r); };
 const walkT = d => { let a = WALK.t0, b = WALK.stop; for (let i = 0; i < 40; i++) { const m = (a + b) / 2; if (walkD(m) < d) a = m; else b = m; } return b; };   // the time she has walked d
-// then the background sweeps from the street to the first train (a soft gradient edge from the right), and she rides it
+// then the background sweeps from the street to the station platform (a soft gradient edge from the right): she waits at the
+// screen doors, checks her watch, and the first train pulls in behind the glass
 const WIPE = { t0: 22.55, t1: 23.15 };
-const TRAIN = { strap: 23.75, clack0: 23.5, clackGap: 0.92 };
+const ST = { chime: 24.2, watch: [24.7, 26.2], light: 26.3, arrive: [27.1, 29.7] };
 const doorT = walkT(WALK.door);   // when she passes under the shutter
 const STRIDE = WALK.v * WALK.step;  // px per step
 
@@ -159,10 +160,10 @@ function haeun(cx, top, o = {}) {
     const fN = Math.round(o.fN || 0), fF = Math.round(o.fF || 0);
     arm(cx + 8, cx + 8 + fF, top + 31 - (fF <= -2 ? 1 : 0));
     arm(cx - 8, cx - 8 - fN, top + 31 - (fN >= 2 ? 1 : 0));
-  } else if (o.arms === 'strap') {
-    // the near hand goes up to a strap (o.strap 0..1 on the way up)
-    const k = ease(o.strap || 0);
-    arm(cx + 8, cx + 8, top + 31); arm(cx - 8, Math.round(lerp(cx - 8, cx - 10, k)), Math.round(lerp(top + 31, top - 2, k)));
+  } else if (o.arms === 'watch') {
+    // the near wrist brought up in front of her to read the watch (o.watch 0..1 on the way up)
+    const k = ease(o.watch || 0), hx = Math.round(lerp(cx - 8, cx - 4, k)), hy = Math.round(lerp(top + 31, top + 25, k));
+    arm(cx + 8, cx + 8, top + 31); arm(cx - 8, hx, hy); if (k > 0.5) R(hx - 1, hy - 3, 3, 2, '#d8dde0');
   } else {
     arm(cx + 8, cx + 8, top + 31); arm(cx - 8, cx - 8, top + 31);
   }
@@ -424,74 +425,78 @@ function street(t) {
   const ex = clamp(1 - Math.abs(HX - bx) / 22, 0, 1);
   if (ex > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,200,${0.3 * ex * ex})`; g.fillRect(0, 0, W, H); g.restore(); }
 }
-// ---------- the first train ----------
-// The car from inside, side on: ceiling lights, the ad strip, windows onto the dark tunnel with its lights streaking past, the
-// grab rail and its straps, the long blue bench, the floor. Early and empty. She stands where she stopped, a strap in her hand.
-const SUBW = document.createElement('canvas'); SUBW.width = W; SUBW.height = H; const subctx = SUBW.getContext('2d');
-const STRAPS = Array.from({ length: 17 }, (_, k) => 233 - 24 * 9 + 24 * k);   // one of them (x 233) is the strap she takes
-function clackAt(t) { let v = 0; for (let c = TRAIN.clack0; c < END; c += TRAIN.clackGap) for (const dt of [0, 0.18]) { const u = t - c - dt; if (u >= 0 && u < 0.09) v = 1; } return v; }
-function train(t) {
-  const jolt = clackAt(t);
-  g.save(); g.translate(0, jolt);
-  R(0, -2, W, H + 4, '#c9cfc8');
-  // ceiling and its light strip
-  R(0, -2, W, 20, '#e2e6df'); R(0, 17, W, 1, '#b5bbb5');
-  for (let x = 6; x < W; x += 64) { R(x, 7, 52, 5, '#fbfdf6'); R(x, 12, 52, 1, '#c9cec7'); }
-  // the ad strip over the windows
-  R(0, 18, W, 14, '#b9bfb9'); R(0, 31, W, 1, '#9aa09a');
-  const ADS = ['#e9d36a', '#7fb4d8', '#e58a7a', '#9ccf9a', '#f2efe6', '#c79ad9'];
-  for (let k = 0; k < 7; k++) { const x = 4 + k * 56; R(x, 20, 50, 10, ADS[k % ADS.length]); R(x + 3, 22, 18, 2, 'rgba(0,0,0,.35)'); R(x + 3, 25, 28, 1, 'rgba(0,0,0,.25)'); R(x + 38, 22, 8, 6, 'rgba(255,255,255,.45)'); }
-  // windows onto the tunnel: dark glass, cables, the tunnel lights streaking past to the left
-  for (let x0 = 92; x0 < W; x0 += 98) {
-    R(x0 - 2, 34, 80, 48, '#9aa29c'); R(x0, 36, 76, 44, '#0e1317');
-    g.save(); g.beginPath(); g.rect(x0, 36, 76, 44); g.clip();
-    R(x0, 60, 76, 1, '#1d252a'); R(x0, 66, 76, 1, '#182024');
-    for (let k = -2; k < 8; k++) { const lx = Math.round(((k * 150 - t * 620) % 900 + 900) % 900 - 120);
-      if (lx < x0 - 40 || lx > x0 + 80) continue; R(lx, 48, 34, 1, 'rgba(255,214,150,.25)'); R(lx + 24, 47, 10, 3, '#ffe6b0'); }
-    const rf = g.createLinearGradient(x0, 36, x0 + 76, 80); rf.addColorStop(0, 'rgba(200,220,230,.10)'); rf.addColorStop(1, 'rgba(200,220,230,0)'); g.fillStyle = rf; g.fillRect(x0, 36, 76, 44);
-    g.restore();
-    R(x0 + 37, 36, 2, 44, '#9aa29c');
+// ---------- the station ----------
+// The platform side on: the ceiling and its light strips, the band over the screen doors with the LED board and the signs, the
+// screen doors' glass with the dark tunnel behind it, the stone floor with its yellow tactile strip, a tiled pillar. Early and
+// empty. She stands where she stopped, checks her watch, and the first train's lights grow in the tunnel before it pulls in
+// behind the glass, slowing to a stop.
+const SCRW = document.createElement('canvas'); SCRW.width = W; SCRW.height = H; const subctx = SCRW.getContext('2d');
+const LINE = '#3a9a4e';   // the line's colour (the train's stripe, the badge)
+function trainX(t) { const p = seg(t, ST.arrive[0], ST.arrive[1]); return Math.round(lerp(W + 8, 14, 1 - (1 - p) * (1 - p))); }   // the train's nose, braking to a stop
+function station(t) {
+  // the tunnel behind the glass, its lamps, and the train when it comes
+  R(0, 40, W, 116, '#14191c'); R(0, 72, W, 1, '#1f272b'); R(0, 76, W, 1, '#1b2226'); R(0, 136, W, 20, '#101416');
+  for (let x = 30; x < W; x += 120) { R(x, 58, 6, 2, '#c9a35a'); }
+  const tx = trainX(t);
+  if (tx < W) {
+    const L = W - tx + 40;
+    R(tx, 50, L, 98, '#c3c9cc'); R(tx, 50, L, 2, '#e1e5e7'); R(tx, 112, L, 6, LINE); R(tx, 118, L, 2, '#2a6e38'); R(tx, 146, L, 2, '#8d9497');
+    for (let x = tx + 10; x < W; x += 40) { R(x, 62, 24, 26, '#f3f0da'); R(x, 62, 24, 2, '#d8d3b8'); }
+    for (let x = tx + 6; x < W; x += 80) { R(x, 56, 1, 90, '#9aa1a4'); R(x + 33, 56, 1, 90, '#9aa1a4'); }
+    R(tx, 50, 4, 98, '#9aa1a4'); R(tx + 1, 128, 3, 6, '#fff4d0');   // the nose and its headlight
   }
-  // the door at the left end, its windows, the yellow edges
-  R(10, 32, 64, 124, '#b3bab5'); R(41, 32, 2, 124, '#8d948f'); R(16, 40, 20, 34, '#0e1317'); R(48, 40, 20, 34, '#0e1317'); R(10, 32, 2, 124, '#e2c34a'); R(72, 32, 2, 124, '#e2c34a');
-  // the long bench under the windows, the heater grille under it
-  R(80, 94, W - 80, 24, '#3a6d86'); R(80, 94, W - 80, 2, '#5a8fa8'); for (let x = 80 + 44; x < W; x += 44) R(x, 96, 1, 22, '#2f5b70');
-  R(80, 118, W - 80, 10, '#4a87a5'); R(80, 118, W - 80, 1, '#6aa6c2'); R(80, 128, W - 80, 2, '#2b4f61');
-  R(80, 130, W - 80, 26, '#7d8580'); for (let y = 134; y < 154; y += 3) R(84, y, W - 88, 1, '#6c736e');
-  R(78, 88, 3, 68, '#aab3b6');   // the glass end panel's frame
-  // the floor
-  R(0, 156, W, 60, '#8b8f89'); R(0, 156, W, 2, '#6e726d'); for (let k = 0; k < 120; k++) R(Math.floor(rnd(k, 31) * W), 160 + Math.floor(rnd(k, 32) * 54), 1, 1, '#9ea29c');
-  // the grab rail and the straps (they swing a little with the car; hers stays in her hand)
-  R(0, 84, W, 2, '#aab3b6'); R(0, 84, W, 1, '#d4dadc');
-  for (const sx of STRAPS) { const mine = sx === 233 && t >= TRAIN.strap + 0.3, sw = mine ? 0 : Math.round(Math.sin(t * 2.1 + sx * 0.05) * 1.2);
-    R(sx, 86, 1, 14, '#5d6568'); R(sx - 2 + sw, 100, 5, 1, '#e9e4d6'); R(sx - 2 + sw, 104, 5, 1, '#e9e4d6'); R(sx - 2 + sw, 100, 1, 5, '#e9e4d6'); R(sx + 2 + sw, 100, 1, 5, '#e9e4d6'); }
-  // poles
-  for (const px of [130, 340]) { R(px, 32, 2, 124, '#b9c2c6'); R(px, 32, 1, 124, '#e1e6e8'); }
-  // her
-  const k = seg(t, TRAIN.strap, TRAIN.strap + 0.35);
-  haeunSprite({ mirror: true, look: 0.2, arms: k > 0 ? 'strap' : undefined, strap: k, sway: 0 });
-  tintSprite('#f2f6f4');
-  putSprite(HX, HTOP);
-  // the car's cool light
-  g.globalCompositeOperation = 'lighter';
-  for (let x = 6; x < W; x += 64) glow(x + 26, 14, 50, '230,240,235', 0.12);
-  g.globalCompositeOperation = 'source-over';
+  // the headlight's glow growing in the tunnel before the train shows, then riding in with it
+  const hl = seg(t, ST.light, ST.arrive[0] + 0.4) * (1 - seg(t, ST.arrive[1] - 0.4, ST.arrive[1] + 0.6));
+  if (hl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; glow(Math.min(W + 30, tx), 130, 70, '255,236,190', 0.5 * hl); g.restore(); }
+  // the band over the doors: LED board (amber dots running), the line badge, the station sign
+  R(0, 0, W, 22, '#2b2f32'); for (let x = 10; x < W; x += 74) { R(x, 9, 52, 3, '#f2f4ee'); R(x, 12, 52, 1, '#b9bdb8'); }
+  R(0, 22, W, 18, '#3a4044'); R(0, 22, W, 1, '#4a5156');
+  R(150, 25, 96, 11, '#0b0c0c');
+  for (let k = 0; k < 30; k++) { const x = 152 + ((k * 7 - Math.floor(t * 18)) % 92 + 92) % 92; if (rnd(k, 41) < 0.8) R(x, 27 + (k % 3) * 2, 4, 1, '#ffb43a'); }
+  R(30, 25, 11, 11, LINE); R(31, 24, 9, 13, LINE); R(29, 26, 13, 9, LINE); R(33, 28, 2, 5, '#f4f1ea'); R(36, 28, 2, 5, '#f4f1ea');
+  R(268, 24, 88, 14, '#eef0ec'); R(268, 24, 88, 2, LINE); R(296, 29, 32, 4, '#1b1d1e'); R(274, 32, 14, 2, '#8a8f8c'); R(338, 32, 14, 2, '#8a8f8c'); R(270, 32, 3, 2, '#8a8f8c'); R(353, 32, 3, 2, '#8a8f8c');
+  // the screen doors: the track along the top, posts, each pair's seam, the stickers, the glass sheen, the sill
+  R(0, 40, W, 6, '#9aa3a6'); R(0, 45, W, 1, '#6f777a');
+  g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(170,200,210,.08)'; g.fillRect(0, 46, W, 104);
+  for (let x = -40; x < W; x += 64) { g.fillStyle = 'rgba(255,255,255,.05)'; g.beginPath(); g.moveTo(x, 46); g.lineTo(x + 14, 46); g.lineTo(x + 44, 150); g.lineTo(x + 30, 150); g.closePath(); g.fill(); }
   g.restore();
+  for (let x = 0; x < W + 64; x += 64) {
+    R(x - 2, 40, 5, 116, '#aab3b6'); R(x - 2, 40, 1, 116, '#d3d9db');
+    R(x + 31, 46, 2, 104, '#7f888b');
+    R(x + 12, 96, 8, 3, '#e8c440'); R(x + 44, 96, 8, 3, '#e8c440'); R(x + 14, 44, 4, 2, '#f4f1ea');
+  }
+  R(0, 150, W, 6, '#7d8588'); R(0, 150, W, 1, '#a9b0b2');
+  // the stone floor, its tactile strip along the doors
+  R(0, 156, W, 60, '#b9b6ad'); R(0, 156, W, 1, '#8d8a82');
+  for (let x = 0; x < W; x += 32) R(x, 168, 1, 48, '#aaa79e'); R(0, 186, W, 1, '#aaa79e'); R(0, 206, W, 1, '#aaa79e');
+  R(0, 158, W, 7, '#e0b93a'); for (let x = 1; x < W; x += 3) { R(x, 159, 1, 1, '#c79f25'); R(x + 1, 162, 1, 1, '#c79f25'); }
+  // a tiled pillar
+  R(88, 0, 20, 158, '#d6d1c3'); R(88, 0, 2, 158, '#ebe7dc'); R(106, 0, 2, 158, '#b3ae9f'); for (let y = 6; y < 156; y += 8) R(90, y, 16, 1, '#c4bfb0');
+  // her: waiting, the watch checked once
+  const w = seg(t, ST.watch[0], ST.watch[0] + 0.35) * (1 - seg(t, ST.watch[1] - 0.35, ST.watch[1]));
+  haeunSprite({ mirror: true, look: w > 0.5 ? -0.4 : 0.2, arms: w > 0 ? 'watch' : undefined, watch: w, sway: 0 });
+  tintSprite('#eef0ec');
+  putSprite(HX, HTOP);
+  // the station's flat cool light, and the train's headlight on her when it comes in
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (let x = 10; x < W; x += 74) glow(x + 26, 12, 46, '230,236,240', 0.1);
+  g.restore();
+  putRim(HX, HTOP, 1, 0, '#fff1d0', 0.6 * hl);
 }
 function render(t) {
   g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false;
   g.clearRect(0, 0, W, H);
   if (t < WIPE.t1) street(t);
   if (t > WIPE.t0) {
-    if (t >= WIPE.t1) { g = wctx; train(t); }
+    if (t >= WIPE.t1) { g = wctx; station(t); }
     else {
-      // the sweep: the train comes in from the right behind a soft gradient edge, with a bright band riding the edge
-      g = subctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, W, H); train(t);
+      // the sweep: the station comes in from the right behind a soft gradient edge, with a bright band riding the edge
+      g = subctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, W, H); station(t);
       const p = ease(seg(t, WIPE.t0, WIPE.t1)), e = lerp(W + 70, -70, p);
       subctx.globalCompositeOperation = 'destination-in';
       const m = subctx.createLinearGradient(e - 50, 0, e + 50, 0); m.addColorStop(0, 'rgba(0,0,0,0)'); m.addColorStop(1, 'rgba(0,0,0,1)');
       subctx.fillStyle = m; subctx.fillRect(0, 0, W, H); subctx.globalCompositeOperation = 'source-over';
-      g = wctx; g.drawImage(SUBW, 0, 0);
+      g = wctx; g.drawImage(SCRW, 0, 0);
       g.save(); g.globalCompositeOperation = 'lighter';
       const band = g.createLinearGradient(e - 40, 0, e + 40, 0); band.addColorStop(0, 'rgba(220,235,255,0)'); band.addColorStop(0.5, 'rgba(220,235,255,.45)'); band.addColorStop(1, 'rgba(220,235,255,0)');
       g.fillStyle = band; g.fillRect(e - 40, 0, 80, H); g.restore();
@@ -539,18 +544,25 @@ const SFX = {
   lamp(t) { noise(t, 0.02, 0.07, 'highpass', 2500); },
   // the sweep into the train: a quick airy swish
   swish(t) { const s = ac.createBufferSource(); s.buffer = NB; const fl = ac.createBiquadFilter(); fl.type = 'bandpass'; fl.Q.value = 0.8; fl.frequency.setValueAtTime(4000, t); fl.frequency.exponentialRampToValueAtTime(600, t + 0.6); const gn = ac.createGain(); gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.07, t + 0.12); gn.gain.linearRampToValueAtTime(0.0001, t + 0.7); s.connect(fl); fl.connect(gn); gn.connect(bus); s.start(t); s.stop(t + 0.8); },
-  // the wheels over a rail joint (덜컹)
-  clack(t) { thump(t, 62, 0.12, 0.09); noise(t, 0.05, 0.06, 'bandpass', 500, 1.2); }
+  // the platform chime before the announcement (딩동댕)
+  chime(t) { [[783.99, 0], [659.25, 0.32], [523.25, 0.64]].forEach(([f, dt]) => { tone(t + dt, 'sine', f, f, 0.035, 0.9); tone(t + dt, 'sine', f * 2, f * 2, 0.006, 0.4); }); },
+  // the first train coming up the tunnel: a rumble that swells, then the wheels' rhythm as it slows
+  approach(t, e, into) { const left = e.dur - into, s = ac.createBufferSource(); s.buffer = NB; s.loop = true; const fl = ac.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(120, t); fl.frequency.linearRampToValueAtTime(700, t + left * 0.7); const gn = ac.createGain();
+    gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.12, t + left * 0.75); gn.gain.linearRampToValueAtTime(0.0001, t + left + 0.8); s.connect(fl); fl.connect(gn); gn.connect(bus); s.start(t); s.stop(t + left + 0.9);
+    for (let c = Math.max(0, ST.arrive[0] - e.t - into) ; c < left - 0.3; c += 0.25 + c * 0.04) { thump(t + c, 62, 0.08, 0.08); noise(t + c, 0.04, 0.04, 'bandpass', 500, 1.2); } },
+  // the brakes' squeal as it stops
+  brake(t) { const o = ac.createOscillator(), gn = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(2900, t); o.frequency.linearRampToValueAtTime(2500, t + 1.2); lfo.frequency.value = 9; lg.gain.value = 30; lfo.connect(lg); lg.connect(o.frequency);
+    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2700; bp.Q.value = 6; gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.012, t + 0.3); gn.gain.linearRampToValueAtTime(0.0001, t + 1.3); o.connect(bp); bp.connect(gn); gn.connect(bus); o.start(t); lfo.start(t); o.stop(t + 1.4); lfo.stop(t + 1.4); }
 };
 EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: S1.laserOff, fn: 'laserOff' }, ...S1.tubesOff.map(t => ({ t, fn: 'tube' })),
   { t: 7.4, fn: 'pad', dur: 3.7, notes: [174.61, 220, 261.63, 329.63] },               // Fmaj7 as she lifts her head
   { t: WALK.t0, fn: 'pad', dur: doorT - WALK.t0, notes: [130.81, 196, 246.94, 329.63] },   // Cmaj7 walking out
   { t: doorT, fn: 'pad', dur: WIPE.t0 - doorT, notes: [98, 146.83, 220, 246.94, 329.63] },   // G6/9 in the morning
-  { t: WIPE.t0, fn: 'pad', dur: END - WIPE.t0 - 1.2, notes: [110, 164.81, 196, 246.94, 261.63] },   // Am9 on the train
+  { t: WIPE.t0, fn: 'pad', dur: END - WIPE.t0 - 1.2, notes: [110, 164.81, 196, 246.94, 261.63] },   // Am9 on the platform
+  { t: ST.chime, fn: 'chime' }, { t: ST.light, fn: 'approach', dur: ST.arrive[1] - ST.light }, { t: ST.arrive[1] - 1.3, fn: 'brake' },
   { t: WIPE.t0 - 0.1, fn: 'swish' },
   { t: doorT - 0.5, fn: 'whoosh' }, { t: 19.2, fn: 'bird' }, { t: 21.4, fn: 'bird' }, { t: 23.1, fn: 'bird' }, { t: WALK.lampOff, fn: 'lamp' });
 for (let k = 1; ; k++) { const t = walkT(k * STRIDE); if (t > WALK.stop - 0.05) break; EV.push({ t, fn: 'step', out: t > doorT }); }
-for (let c = TRAIN.clack0; c < END - 0.6; c += TRAIN.clackGap) EV.push({ t: c, fn: 'clack' }, { t: c + 0.18, fn: 'clack' });
 EV.sort((a, b) => a.t - b.t);
 function audioStart(t) {
   if (!ac) return; ac.resume(); newBus(); schedTo = t;
@@ -568,7 +580,7 @@ function audioTick(t) {
   amb.buzz.gain.setTargetAtTime(0.004 * lit, ac.currentTime, 0.02);
   const onTrain = t > WIPE.t0 ? 1 : 0;
   amb.wind.gain.setTargetAtTime(outK * (1 - onTrain) * (0.025 + 0.012 * Math.sin(t * 0.8)), ac.currentTime, onTrain ? 0.08 : 0.4);
-  amb.rumble.gain.setTargetAtTime(onTrain * 0.09, ac.currentTime, 0.15);
+  amb.rumble.gain.setTargetAtTime(onTrain * 0.035, ac.currentTime, 0.15);   // the station's low hum
 }
 
 // ---------- playback ----------
