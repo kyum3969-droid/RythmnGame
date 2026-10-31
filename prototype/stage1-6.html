@@ -317,9 +317,11 @@ function drawLane(lane, y, t, show) {
     const xAt = x => beatT(row.b0 + (x - SPOT(0)) / GAP), cool = x => t - xAt(x);
     const lo = drawing ? X0 : Math.max(X0, penNow > 0 ? penNow + 8 : X0);
     if (x1 > lo + 1 && cool(x1) < 2.4) {
-      const colAt = x => { const a = Math.max(0, cool(x)), al = x > x1 + 0.5 ? 0 : clamp(1 - Math.pow(a / 2.2, 2), 0, 1); return [a < 0.12 ? mixc('#f4fff0', '#9cf58a', a / 0.12) : mixc('#9cf58a', '#3e8c38', (a - 0.12) / 1.6), al * show]; };
+      // a made 4th beat is the same trace, drawn white around the box and cooling a little slower
+      const tgr = row.tg, made = tgr.judge && tgr.judge !== 'miss', wsec = made ? t - tgr.hitT : 9;
+      const colAt = x => { let a = Math.max(0, cool(x)); const near4 = made && Math.abs(x - COL) <= BEAT_W; if (near4) a = Math.max(0, a - 0.5); const al = x > x1 + 0.5 ? 0 : clamp(1 - Math.pow(a / 2.2, 2), 0, 1); let c = a < 0.12 ? mixc('#f4fff0', '#9cf58a', a / 0.12) : mixc('#9cf58a', '#3e8c38', (a - 0.12) / 1.6); if (near4) c = mixc('#ffffff', c, clamp((wsec - 0.3) / 0.9, 0, 1)); return [c, al * show]; };
       const sp = pixSpans(rowPts(row, AMP).map(([x, dy]) => [x, y + dy]));
-      pixDraw(sp, Math.ceil(lo), Math.floor(x1), colAt, x => Math.max(0, cool(x)) < 0.3 ? '#9cf58a' : '#2a6a28');
+      pixDraw(sp, Math.ceil(lo), Math.floor(x1), colAt, () => '#0e2a10');
     }
     for (let k = 0; k <= HEART; k++) {
       const tk = beatT(row.b0 + k), x = SPOT(k), dt = t - tk;
@@ -329,7 +331,7 @@ function drawLane(lane, y, t, show) {
           
           const sp = beatT(row.b0 + HEART) - beatT(row.b0 + HEART - 1), p = clamp(1 + dt / sp, 0, 1);
           if (p > 0 && p < 1) { g.save(); g.globalAlpha = show * (0.4 + 0.6 * p); g.strokeStyle = '#fff2b8'; g.lineWidth = 1; g.beginPath(); g.arc(x, y - 9, 4 + 20 * (1 - p), 0, Math.PI * 2); g.stroke(); g.restore(); }
-        } else if (tgk.judge && tgk.judge !== 'miss') { const dh = t - tgk.hitT, f7 = clamp(1 - (dh - 0.3) / 0.9, 0, 1); if (f7 > 0) { g.save(); g.beginPath(); g.rect(x - BEAT_W, y - 40, (drawing ? Math.min(pen, x + BEAT_W) : x + BEAT_W) - (x - BEAT_W), 60); g.clip(); wave(x, y, AMP * 1.2, tgk.judge === 'good' ? '#e2fff0' : '#ffffff', tgk.judge === 'good' ? '#9cf0c8' : '#d8fbff', show * f7); g.restore(); } }
+        }
         else if (tgk.judge === 'miss' && t - tgk.t < 1.2) { const f = clamp(1 - (t - tgk.t - 0.4) / 0.8, 0, 1); g.save(); g.globalAlpha = show * f; g.strokeStyle = '#ff5a5a'; g.lineWidth = 0.9; g.beginPath(); for (let i = -BEAT_W; i <= BEAT_W; i += 2) g.lineTo(x + i, y + (rnd(i, Math.floor(now / 50)) - 0.5) * 2.4); g.stroke(); g.restore(); }
       }
       // the first two rows count out loud as each peak is traced, like the nurse
