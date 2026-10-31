@@ -231,7 +231,7 @@ function txt(s, x, y, c, size = 7, align = 'left', weight = '600', font = '"IBM 
 function glowTxt(s, x, y, c, size, align, font, glow) { g.save(); g.shadowColor = glow; g.shadowBlur = 6 * SC; txt(s, x, y, c, size, align, '400', font); g.restore(); txt(s, x, y, c, size, align, '400', font); }
 // one heartbeat on the line at x (the R peak), sharp like a monitor's: a small P, the flat PR, a little Q, a needle-thin R, a deep
 // S, the ST segment and a low T; amp is the R peak's height
-const BEAT_W = 32;
+const BEAT_W = 32, AMP = 17;   // the R peak's height in game pixels
 function beatPts(amp) {
   return [[-32, 0], [-27, -amp * 0.06], [-24, -amp * 0.11], [-21, -amp * 0.06], [-18, 0], [-5, 0], [-2.6, amp * 0.14], [0, -amp], [2.4, amp * 0.46], [4, 0], [10, -amp * 0.03],
     [13, -amp * 0.09], [16, -amp * 0.17], [19, -amp * 0.2], [22, -amp * 0.15], [25, -amp * 0.06], [28, 0], [32, 0]];
@@ -248,11 +248,23 @@ function rowPts(row, amp) {
   pts.push([HX - 12, 0]); return pts;
 }
 // the trace in three passes like phosphor: a wide soft bloom, a tighter glow, a thin bright core
-function wave(x, y, amp, core, bloom, alpha = 1, dash = null) {
-  const pts = beatPts(amp), path = () => { g.beginPath(); pts.forEach(([dx, dy], i) => i ? g.lineTo(x + dx, y + dy) : g.moveTo(x + dx, y + dy)); };
-  g.save(); g.lineJoin = 'round'; g.lineCap = 'round'; if (dash) g.setLineDash(dash);
-  if (bloom) { g.globalCompositeOperation = 'lighter'; g.strokeStyle = bloom; g.globalAlpha = alpha * 0.16; g.lineWidth = 4.5; path(); g.stroke(); g.globalAlpha = alpha * 0.32; g.lineWidth = 2; path(); g.stroke(); g.globalCompositeOperation = 'source-over'; }
-  g.globalAlpha = alpha; g.strokeStyle = core; g.lineWidth = 1.1; g.lineJoin = 'miter'; g.miterLimit = 12; g.lineCap = 'butt'; path(); g.stroke(); g.restore();
+// a trace as pixels: the polyline is sampled finely and each pixel column filled from its lowest to its highest point, so
+// steep strokes become solid pixel columns and the flat line a single pixel row; an optional halo one pixel wider all round
+function pixSpans(pts) {
+  const sp = new Map();
+  for (let i = 0; i + 1 < pts.length; i++) { const [ax, ay] = pts[i], [bx, by] = pts[i + 1], n = Math.max(1, Math.ceil(Math.abs(bx - ax) * 4 + Math.abs(by - ay) * 0.5));
+    for (let k = 0; k <= n; k++) { const x = ax + (bx - ax) * k / n, y = ay + (by - ay) * k / n, c = Math.round(x), e = sp.get(c); if (!e) sp.set(c, [y, y]); else { if (y < e[0]) e[0] = y; if (y > e[1]) e[1] = y; } } }
+  return sp;
+}
+function pixDraw(sp, lo, hi, colAt, halo) {
+  const sa = g.globalAlpha;
+  if (halo) for (const [x, [y0, y1]] of sp) { if (x < lo || x > hi) continue; const [, a] = colAt(x); if (a <= 0) continue; g.globalAlpha = sa * a * 0.4; R(x - 1, Math.round(y0) - 1, 3, Math.round(y1) - Math.round(y0) + 3, halo(x)); }
+  for (const [x, [y0, y1]] of sp) { if (x < lo || x > hi) continue; const [c, a] = colAt(x); if (a <= 0) continue; g.globalAlpha = sa * a; R(x, Math.round(y0), 1, Math.round(y1) - Math.round(y0) + 1, c); }
+  g.globalAlpha = sa;
+}
+function wave(x, y, amp, core, bloom, alpha = 1) {
+  const sp = pixSpans(beatPts(amp).map(([dx, dy]) => [x + dx, y + dy]));
+  pixDraw(sp, -1e9, 1e9, () => [core, alpha], bloom ? () => bloom : null);
 }
 const mixc = (a, b, p) => { const A = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), B = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16)); return '#' + A.map((v, i) => Math.round(lerp(v, B[i], clamp(p, 0, 1))).toString(16).padStart(2, '0')).join(''); };
 // a fresh peak is near white; it cools to green and then to a dim green as it fades
@@ -284,13 +296,12 @@ function drawLane(lane, y, t, show) {
   g.save(); g.translate(shake, 0); g.globalAlpha = show;
   const r = laneRow(lane, t), tg = r && r.tg;
   // the row's own strip of monitor: a faint grid, darker toward the row, fading out at both ends
-  { const band = g.createLinearGradient(0, 0, W, 0); band.addColorStop(0, 'rgba(4,10,8,0)'); band.addColorStop(0.08, 'rgba(4,10,8,.5)'); band.addColorStop(0.92, 'rgba(4,10,8,.5)'); band.addColorStop(1, 'rgba(4,10,8,0)'); g.fillStyle = band; g.fillRect(0, y - 30, W, 44);
-    g.fillStyle = 'rgba(80,160,110,.07)'; for (let x = X0; x < HX; x += 6) g.fillRect(x, y - 28, 0.34, 40); for (let yy = y - 28; yy < y + 12; yy += 6) g.fillRect(X0, yy, HX - X0, 0.34);
-    g.fillStyle = 'rgba(80,160,110,.13)'; for (let x = X0; x < HX; x += 30) g.fillRect(x, y - 28, 0.34, 40); }
-  { const sa = g.globalAlpha; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; scanBox(Math.round(y - 30), Math.round(y + 14), false); g.restore(); g.globalAlpha = sa; }
+  { const BT = y - 22, BH = 31, gx0 = COL - 18, gx1 = COL + 18, band = g.createLinearGradient(0, 0, W, 0); band.addColorStop(0, 'rgba(4,10,8,0)'); band.addColorStop(0.08, 'rgba(4,10,8,.5)'); band.addColorStop(0.92, 'rgba(4,10,8,.5)'); band.addColorStop(1, 'rgba(4,10,8,0)');
+    g.fillStyle = band; g.fillRect(0, BT, gx0, BH); g.fillRect(gx1, BT, W - gx1, BH);
+    g.fillStyle = 'rgba(80,160,110,.09)'; for (let x = X0; x < HX; x += 6) if (x < gx0 || x > gx1) g.fillRect(x, BT + 2, 1, BH - 4); for (let yy = BT + 3; yy < BT + BH - 2; yy += 6) { g.fillRect(X0, yy, gx0 - X0, 1); g.fillRect(gx1, yy, HX - gx1, 1); } }
   // who this row is, and the rate, like the bedside monitor's corner
-  txt(LANE[lane].name, X0 + 2, y - 27, 'rgba(160,240,170,.75)', 6, 'left', '600'); txt(LANE[lane].tag, X0 + 2 + (lane ? 14 : 20), y - 27, 'rgba(120,180,130,.5)', 5, 'left', '400');
-  if (r) txt(String(SEG[clamp(Math.floor(r.b0 / 8), 0, SEG.length - 1)]), HX - 14, y - 27, 'rgba(160,240,170,.75)', 6, 'right', '500', '"IBM Plex Mono", monospace');
+  txt(LANE[lane].name, X0 + 2, y - 21, 'rgba(160,240,170,.75)', 6, 'left', '600'); txt(LANE[lane].tag, X0 + 2 + (lane ? 14 : 20), y - 21, 'rgba(120,180,130,.5)', 5, 'left', '400');
+  if (r) txt(String(SEG[clamp(Math.floor(r.b0 / 8), 0, SEG.length - 1)]), HX - 14, y - 21, 'rgba(160,240,170,.75)', 6, 'right', '500', '"IBM Plex Mono", monospace');
   // beat by beat, drawn on like a monitor: a pen point sweeps through each row and traces each heartbeat as it passes (the R tip
   // lands exactly on the beat), then that peak cools and fades while the pen traces the next one a spot further. Beats 1 to 3
   // are traced by themselves; at the 4th spot, in the column, a closing ring counts it in, and the
@@ -306,13 +317,9 @@ function drawLane(lane, y, t, show) {
     const xAt = x => beatT(row.b0 + (x - SPOT(0)) / GAP), cool = x => t - xAt(x);
     const lo = drawing ? X0 : Math.max(X0, penNow > 0 ? penNow + 8 : X0);
     if (x1 > lo + 1 && cool(x1) < 2.4) {
-      const gr = g.createLinearGradient(X0, 0, HX - 12, 0), st = (x, c) => gr.addColorStop(clamp((x - X0) / (HX - 12 - X0), 0, 1), c);
-      for (let x = X0; x <= HX - 12; x += 8) { const a = Math.max(0, cool(x)), al = x > x1 + 0.5 ? 0 : clamp(1 - Math.pow(a / 2.2, 2), 0, 1); const c = a < 0.12 ? mixc('#f4fff0', '#9cf58a', a / 0.12) : mixc('#9cf58a', '#3e8c38', (a - 0.12) / 1.6); st(x, `rgba(${parseInt(c.slice(1, 3), 16)},${parseInt(c.slice(3, 5), 16)},${parseInt(c.slice(5, 7), 16)},${al})`); }
-      const pts = rowPts(row, 24), path = () => { g.beginPath(); pts.forEach(([x, dy], i) => i ? g.lineTo(x, y + dy) : g.moveTo(x, y + dy)); };
-      g.save(); g.beginPath(); g.rect(lo, y - 40, x1 - lo, 60); g.clip(); g.globalAlpha = show;
-      g.globalCompositeOperation = 'lighter'; g.strokeStyle = gr; g.lineJoin = 'round'; g.lineCap = 'round'; g.globalAlpha = show * 0.16; g.lineWidth = 4.5; path(); g.stroke(); g.globalAlpha = show * 0.32; g.lineWidth = 2; path(); g.stroke();
-      g.globalCompositeOperation = 'source-over'; g.globalAlpha = show; g.lineJoin = 'miter'; g.miterLimit = 12; g.lineCap = 'butt'; g.lineWidth = 1.1; path(); g.stroke();
-      g.restore();
+      const colAt = x => { const a = Math.max(0, cool(x)), al = x > x1 + 0.5 ? 0 : clamp(1 - Math.pow(a / 2.2, 2), 0, 1); return [a < 0.12 ? mixc('#f4fff0', '#9cf58a', a / 0.12) : mixc('#9cf58a', '#3e8c38', (a - 0.12) / 1.6), al * show]; };
+      const sp = pixSpans(rowPts(row, AMP).map(([x, dy]) => [x, y + dy]));
+      pixDraw(sp, Math.ceil(lo), Math.floor(x1), colAt, x => Math.max(0, cool(x)) < 0.3 ? '#9cf58a' : '#2a6a28');
     }
     for (let k = 0; k <= HEART; k++) {
       const tk = beatT(row.b0 + k), x = SPOT(k), dt = t - tk;
@@ -321,15 +328,15 @@ function drawLane(lane, y, t, show) {
         if (waiting && kf > HEART - 1.6) {
           
           const sp = beatT(row.b0 + HEART) - beatT(row.b0 + HEART - 1), p = clamp(1 + dt / sp, 0, 1);
-          if (p > 0 && p < 1) { g.save(); g.globalAlpha = show * (0.4 + 0.6 * p); g.strokeStyle = '#3a2408'; g.lineWidth = 1.4; g.beginPath(); g.arc(x, y - 9, 4 + 20 * (1 - p), 0, Math.PI * 2); g.stroke(); g.restore(); }
-        } else if (tgk.judge && tgk.judge !== 'miss') { const dh = t - tgk.hitT, f7 = clamp(1 - (dh - 0.3) / 0.9, 0, 1); if (f7 > 0) { g.save(); g.beginPath(); g.rect(x - BEAT_W, y - 40, (drawing ? Math.min(pen, x + BEAT_W) : x + BEAT_W) - (x - BEAT_W), 60); g.clip(); wave(x, y, 28.8, tgk.judge === 'good' ? '#e2fff0' : '#ffffff', tgk.judge === 'good' ? '#9cf0c8' : '#d8fbff', show * f7); g.restore(); } }
+          if (p > 0 && p < 1) { g.save(); g.globalAlpha = show * (0.4 + 0.6 * p); g.strokeStyle = '#fff2b8'; g.lineWidth = 1; g.beginPath(); g.arc(x, y - 9, 4 + 20 * (1 - p), 0, Math.PI * 2); g.stroke(); g.restore(); }
+        } else if (tgk.judge && tgk.judge !== 'miss') { const dh = t - tgk.hitT, f7 = clamp(1 - (dh - 0.3) / 0.9, 0, 1); if (f7 > 0) { g.save(); g.beginPath(); g.rect(x - BEAT_W, y - 40, (drawing ? Math.min(pen, x + BEAT_W) : x + BEAT_W) - (x - BEAT_W), 60); g.clip(); wave(x, y, AMP * 1.2, tgk.judge === 'good' ? '#e2fff0' : '#ffffff', tgk.judge === 'good' ? '#9cf0c8' : '#d8fbff', show * f7); g.restore(); } }
         else if (tgk.judge === 'miss' && t - tgk.t < 1.2) { const f = clamp(1 - (t - tgk.t - 0.4) / 0.8, 0, 1); g.save(); g.globalAlpha = show * f; g.strokeStyle = '#ff5a5a'; g.lineWidth = 0.9; g.beginPath(); for (let i = -BEAT_W; i <= BEAT_W; i += 2) g.lineTo(x + i, y + (rnd(i, Math.floor(now / 50)) - 0.5) * 2.4); g.stroke(); g.restore(); }
       }
       // the first two rows count out loud as each peak is traced, like the nurse
-      if ((row.demo || row.b0 === 4) && dt >= 0 && dt < 0.7) { const a = 1 - dt / 0.7, sc = 1 + 0.4 * clamp(1 - dt / 0.12, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(x, y - 34 - dt * 5); g.scale(sc, sc); glowTxt(k < HEART ? String(k + 1) : '넷!', 0, -5, '#ffffff', 9, 'center', '"Black Han Sans", sans-serif', 'rgba(160,255,160,.9)'); g.restore(); }
+      if ((row.demo || row.b0 === 4) && dt >= 0 && dt < 0.7) { const a = 1 - dt / 0.7, sc = 1 + 0.4 * clamp(1 - dt / 0.12, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(x, y - 28 - dt * 5); g.scale(sc, sc); glowTxt(k < HEART ? String(k + 1) : '넷!', 0, -5, '#ffffff', 9, 'center', '"Black Han Sans", sans-serif', 'rgba(160,255,160,.9)'); g.restore(); }
     }
     // the pen point: a hot dot with a short flare and a halo
-    if (drawing) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(pen, y, 0, pen, y, 10); gr.addColorStop(0, 'rgba(210,255,190,.75)'); gr.addColorStop(0.4, 'rgba(140,255,120,.25)'); gr.addColorStop(1, 'rgba(140,255,120,0)'); g.fillStyle = gr; g.fillRect(pen - 10, y - 10, 20, 20); g.restore(); const py = y + (rowPts(row, 24).reduce((acc, [px, dy], i, arr) => { if (i && arr[i - 1][0] <= pen && px >= pen) return arr[i - 1][1] + (dy - arr[i - 1][1]) * ((pen - arr[i - 1][0]) / Math.max(0.001, px - arr[i - 1][0])); return acc; }, 0)); g.fillStyle = '#ffffff'; g.beginPath(); g.arc(pen, py, 0.9, 0, Math.PI * 2); g.fill(); }
+    if (drawing) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(pen, y, 0, pen, y, 10); gr.addColorStop(0, 'rgba(210,255,190,.75)'); gr.addColorStop(0.4, 'rgba(140,255,120,.25)'); gr.addColorStop(1, 'rgba(140,255,120,0)'); g.fillStyle = gr; g.fillRect(pen - 10, y - 10, 20, 20); g.restore(); const py = y + (rowPts(row, AMP).reduce((acc, [px, dy], i, arr) => { if (i && arr[i - 1][0] <= pen && px >= pen) return arr[i - 1][1] + (dy - arr[i - 1][1]) * ((pen - arr[i - 1][0]) / Math.max(0.001, px - arr[i - 1][0])); return acc; }, 0)); g.fillStyle = '#ffffff'; g.beginPath(); g.arc(pen, py, 0.9, 0, Math.PI * 2); g.fill(); }
     if (row.demo && t > beatT(row.b0 + HEART - 0.6) && t < beatT(row.b0 + HEART + 1)) txt('하은이 누름', COL, y + 8, '#e8ffd8', 6, 'center', '400');
   }
   // a miss: the big X where the beat should have been, split red and cyan for a moment
@@ -345,13 +352,13 @@ function drawLane(lane, y, t, show) {
   for (const p of FX.pops) { if (p.lane !== lane) continue; const age = (now - p.at) / 650, a = 1 - age; if (a <= 0) continue; const sc = 1 + 0.8 * clamp(1 - age / 0.15, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(COL - 22, y - 28 - age * 4); g.scale(sc, sc); glowTxt(p.text, 0, -7, p.c, 15, 'center', '"Black Han Sans", sans-serif', p.text === '놓침' ? 'rgba(255,60,60,.8)' : 'rgba(180,255,200,.8)'); if (p.sub) txt(p.sub, 0, 7, p.c, 5, 'center', '400'); g.restore(); }
   g.restore();
 }
-const LOW = { on: false, text: [], cv: null, g: null }, BOX = { col: '#c8961c' };
+const LOW = { on: false, text: [], cv: null, g: null }, BOX = { col: '#f2c43a', a: 0.3 };
 // the yellow scan box, or the part of it between y0 and y1 (redrawn over each row's band so it stays solid)
-function scanBox(y0, y1, cap) {
-  const bw = 34, bx = COL - bw / 2, col = BOX.col;
-  R(bx - 1, y0 - (cap ? 1 : 0), 1, y1 - y0 + 1, '#3a2a08'); R(bx + bw, y0 - (cap ? 1 : 0), 1, y1 - y0 + 1, '#3a2a08'); if (cap) R(bx - 1, y0 - 1, bw + 2, 1, '#3a2a08');
-  R(bx, y0, bw, y1 - y0, col); if (cap) R(bx, y0, bw, 1, mixc(col, '#ffffff', 0.5)); R(bx, y0, 1, y1 - y0, mixc(col, '#ffffff', 0.35)); R(bx + bw - 1, y0, 1, y1 - y0, mixc(col, '#000000', 0.25));
-  for (let yy = Math.ceil(y0 / 4) * 4; yy < y1; yy += 4) R(bx + 2, yy, bw - 4, 1, mixc(col, '#000000', 0.06));
+function scanBox(y0, y1) {
+  const bw = 34, bx = COL - bw / 2, col = BOX.col, sa = g.globalAlpha;
+  g.globalAlpha = sa * BOX.a; R(bx, y0, bw, y1 - y0, col);
+  g.globalAlpha = sa * Math.min(1, BOX.a * 2.2); R(bx, y0, 1, y1 - y0, mixc(col, '#ffffff', 0.3)); R(bx + bw - 1, y0, 1, y1 - y0, col); R(bx, y0, bw, 1, mixc(col, '#ffffff', 0.4));
+  g.globalAlpha = sa;
 }
 function drawRows(t) {
   if (!LOW.cv) { LOW.cv = document.createElement('canvas'); LOW.cv.width = W; LOW.cv.height = H; LOW.g = LOW.cv.getContext('2d'); }
@@ -371,7 +378,7 @@ function drawRowsAt(t) {
   // the 4th beat's column, across every row: a wide solid yellow box with a dark rim and a lit edge; it brightens as the beat
   // comes and flashes white on a press
   const near = Math.max(...[0, 1].map(l => { const r = laneRow(l, t); return r ? clamp(1 - Math.abs(t - r.tg.t) / 0.5, 0, 1) : 0; })), fl = clamp(1 - (performance.now() - FX.flashAt) / 220, 0, 1);
-  { const top = 124; BOX.col = mixc(mixc('#c8961c', '#f2c43a', near), '#fff6c8', fl); scanBox(top, H, true);
+  { const top = Math.round(lerp(158, 134, e2)); BOX.col = mixc('#f2c43a', '#fff6c8', fl); BOX.a = 0.24 + 0.14 * near + 0.3 * fl; scanBox(top, H);
     if (fl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fx = g.createRadialGradient(COL, (LANEY[0] + LANEY[1]) / 2, 0, COL, (LANEY[0] + LANEY[1]) / 2, 70); fx.addColorStop(0, `rgba(255,240,170,${0.4 * fl})`); fx.addColorStop(1, 'rgba(255,240,170,0)'); g.fillStyle = fx; g.fillRect(COL - 70, 100, 140, H - 100); g.restore(); } }
   drawLane(0, y0, t, 1);
   if (two > 0) drawLane(1, y1, t, e2);
