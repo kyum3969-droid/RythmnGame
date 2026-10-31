@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>1-5 연출 시안</title>
+<title>1-6 연출 시안</title>
 <style>
 :root{--bg:#1b1716;--ink:#efe6d2;--muted:#b8a998;--card:#241f1d;--accent:#cfe04a}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1b1716}}
@@ -21,8 +21,8 @@ ul{margin:0 0 12px 18px;color:var(--ink)} li{margin:2px 0}
 </style>
 </head>
 <body>
-<h1>1-5 첫 회식 · 연출 시안</h1>
-<p>게임 화면 크기(384×216) 그대로 그린 장면 목업. 한 밤의 흐름: 벨트(지우의 합격) → 회전초밥집 두 페이즈(초밥 → 소주잔) → 지하철 → 걷기 컷씬 → 병원(리듬닥터 오마주) → 병실 심장박동 → 새벽. 색이 따뜻해졌다가 식어 가는 곡선이 이 레벨의 연출 축.</p>
+<h1>1-6 하은의 새벽 · 연출 시안</h1>
+<p>게임 화면 크기(384×216) 그대로 그린 장면 목업. 흐름: 1-4 엔딩("신입, 너 그쪽 방면이지. 하은이 따라가.") → 퇴근길(하은을 따라 역까지, 플레이) → 첫차(졸음, 플레이) → 하은이 혼자 내림 → 걷기 컷씬 → 병원 → 병실 심장박동 → 새벽. 회식은 뺐다. 퇴근길과 첫차의 움직이는 그림은 애니매틱(finale-anim.html)에 있다.</p>
 <div class="row" id="rows"></div>
 <script>
 const rnd = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
@@ -274,7 +274,7 @@ function drawGun(gx, gy, kick) {
   R(gx, gy + 2, 3, 3, C.skin);
 }
 
-// ---------- 1-5 연출 시안: 장면 그리기 (chars.js의 캐릭터 코드를 그대로 씀) ----------
+// ---------- 1-6 연출 시안: 장면 그리기 (chars.js의 캐릭터 코드를 그대로 씀) ----------
 const W = 384, H = 216;
 let g = null;
 const FX = { react: [{ type: '', at: -1e9 }, { type: '', at: -1e9 }, { type: '', at: -1e9 }], playerNod: -1e9, flinch: -1e9 };
@@ -315,96 +315,21 @@ function gate(x, y, h, on) { R(x - 11, y - h, 4, h, '#555a5f'); R(x - 11, y - h 
 function boxS(x, bottom, w = 18, h = 14) { R(x - w / 2 + 1, bottom, w, 1, 'rgba(0,0,0,.45)'); R(x - w / 2, bottom - h, w, h, C.kraft); R(x - w / 2, bottom - h, w, 2, C.kraftTop); R(x + w / 2 - 2, bottom - h + 2, 2, h - 2, C.kraftDark); R(x - 1, bottom - h, 3, h, C.tape); R(x - w / 2 + 2, bottom - 6, 7, 4, C.label); }
 function playerS() { drawPlayer(0, 0); thick(PLAYER_X - 6, 116, 326, 120, 4, C.hoodie); drawGun(324, 117, 0); }
 function haeunBeside(o = {}) { drawHaeunAt(354, 60, 0, { load: true, ...o }); if (!o.watch) { thick(348, 82, 346, 94, 4, '#1e1a1a'); R(344, 93, 4, 3, '#2a2d31'); } }
-const PLATE = { red: ['#d8463b', '1,500'], blue: ['#2f6f8a', '2,500'], gold: ['#d9a520', '4,000'], black: ['#2b2e31', '6,000'] };
-function sushiPlate(x, y, col, kind = 0, sc = 1) {
-  g.save(); g.translate(x, y); g.scale(sc, sc);
-  R(-9, -2, 18, 2, '#efe6d2'); R(-10, -3, 20, 1, PLATE[col][0]); R(-8, -4, 16, 1, '#f7f1e2'); R(-6, -7, 12, 3, '#f7f1e2'); R(-5, -8, 10, 1, '#f7f1e2');
-  const fish = ['#f08a5d', '#e04a3a', '#f3d5a0', '#c9c9c9'][kind]; R(-7, -10, 14, 3, fish); if (kind === 1) R(-7, -10, 14, 1, '#f7c0b0'); if (kind === 3) R(-6, -11, 12, 1, '#1e2a1a');
-  g.restore();
-}
-function sojuGlass(x, y, sc = 1, fill = 0.7) { g.save(); g.translate(x, y); g.scale(sc, sc); R(-3, -8, 7, 8, 'rgba(230,240,245,.55)'); R(-3, -8, 7, 1, '#e9f3f6'); R(-3, -8, 1, 8, '#e9f3f6'); R(3, -8, 1, 8, '#e9f3f6'); R(-2, -Math.round(7 * fill), 5, Math.round(7 * fill), 'rgba(255,255,255,.6)'); g.restore(); }
-const soju = (x, y) => { R(x, y - 14, 5, 14, '#bfe3d2'); R(x + 1, y - 18, 3, 5, '#bfe3d2'); R(x + 1, y - 19, 3, 1, '#2f6f4a'); R(x, y - 10, 5, 1, 'rgba(255,255,255,.35)'); };
-function plateStack(x, base, n) { for (let k = 0; k < n; k++) { const c = ['red', 'blue', 'red', 'gold', 'red', 'blue'][k % 6]; R(x - 9, base - k * 3 - 2, 18, 2, '#efe6d2'); R(x - 10, base - k * 3 - 3, 20, 1, PLATE[c][0]); } }
-
-// ---------- 도입: 벨트에서 ----------
+// ---------- 0. 1-4 엔딩에서 (매치 컷의 출발점) ----------
 function warehouse() {
   g.drawImage(bg, 0, 0);
   for (const x of [60, 180, 300]) { R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c'); R(x, 15, 46, 3, '#fff3c8'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, 18, 0, 150); gr.addColorStop(0, 'rgba(255,236,170,.14)'); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 86, 150); g.lineTo(x - 40, 150); g.closePath(); g.fill(); g.restore(); }
 }
-function drawOpening(phase) {
-  warehouse(); gate(SCAN_X, BELT_Y, 38, true);
-  if (phase === 0) {
-    actor('jiwoo', 46, { bob: -7, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 14, top + 2, 4, '#6b2f3f'); R(BOSS_X + 13, top - 2, 5, 5, C.skin); thick(BOSS_X - 7, top + 23, BOSS_X - 16, top + 4, 4, '#6b2f3f'); R(BOSS_X - 19, top, 5, 5, C.skin); });
-    g.save(); g.translate(28, 150); g.rotate(-0.3); boxS(0, 0); g.restore();
-    beltAt(BELT_Y); boxS(338, BELT_Y);
-    bubble('붙었어요!!!!', 56, 44, 78, { loud: true, size: 10, h: 18, shake: 1 });
-    for (let k = 0; k < 4; k++) text('♪', 70 + k * 14, 70 + (k % 2) * 8, k % 2 ? '#f2a6c8' : '#5ad7e8', 9);
-    playerS(); haeunBeside(); bubble('…?', 320, 44, 18, { bg: '#d9d0bd' });
-    judge('딱!', 300, 84, '#8fd694', 14); hud('3번 라인 · 04:10', '콤보 18');
-  } else if (phase === 1) {
-    actor('jiwoo', 46, { bob: -2, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 14, top + 2, 4, '#6b2f3f'); R(BOSS_X + 13, top - 2, 5, 5, C.skin); });
-    g.save(); g.translate(28, 150); g.rotate(-0.3); boxS(0, 0); g.restore();
-    beltAt(BELT_Y);
-    actor('boss', 150, { bob: 1, noArm: true }, true, top => { R(BOSS_X + 2, top + 6, 5, 1, C.hair); R(BOSS_X + 1, top + 5, 2, 1, C.hair); R(BOSS_X - 8, top + 4, 2, 3, C.sweat); thick(BOSS_X + 7, top + 22, BOSS_X + 28, top + 14, 4, C.shirt); R(BOSS_X + 27, top + 11, 5, 5, C.skin); });
-    bubble('…야! 벨트가 왜 비어!', 104, 64, 92, { loud: true, size: 8, h: 15 });
-    bubble('반장님! 저 붙었어요! 반장님 기타 넣은 곡으로요!', 2, 28, 184, { size: 7 });
-    playerS(); haeunBeside(); hud('3번 라인 · 04:11', '콤보 18');
-    text('(벨트는 돌지만 상자가 안 온다. 롤러 소리만.)', 60, 190, 'rgba(239,230,210,.75)', 6);
-  } else {
-    actor('jiwoo', 46, { bob: -1, vibe: true, noArm: true }, false, top => { thick(BOSS_X + 5, top + 23, BOSS_X + 13, top + 30, 4, '#6b2f3f'); R(BOSS_X + 12, top + 29, 4, 4, C.skin); });
-    beltAt(BELT_Y);
-    actor('boss', 150, { nod: 1, noArm: true }, true, top => { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); });
-    bubble('…회식이다. 오늘. 다 와.', 92, 50, 96, { size: 8, h: 15 });
-    playerS(); haeunBeside({ watch: true }); bubble('저도요? …밥은 공짜죠?', 270, 40, 90, { bg: '#d9d0bd' });
-    hud('3번 라인 · 04:12', '');
-    text('(상자는 끝까지 안 온다. 롤러만 돈다. 형광등 하나가 깜빡.)', 60, 190, 'rgba(239,230,210,.75)', 6);
-  }
-}
-
-// ---------- 회전초밥집: 벨트 셋, 반장이 뿌린다 ----------
-const LANES = [{ y: 110, k: 0.7 }, { y: 128, k: 0.85 }, { y: 146, k: 1 }];
-const laneX = (x, k) => SCAN_X + k * (x - SCAN_X);
-function sushiRoom() {
-  R(0, 0, W, H, '#f0e6d2'); R(0, 0, W, 30, '#2a1d16'); R(0, 30, W, 2, '#8a5a34'); R(0, 80, W, 66, '#c9b48a'); R(0, 80, W, 2, '#8a5a34'); for (let x = 0; x < W; x += 20) R(x, 82, 1, 64, '#b9a47a');
-  for (let k = 0; k < 4; k++) { const x = 70 + k * 84; R(x, 30, 1, 6, '#3a2a20'); R(x - 7, 36, 15, 10, '#f2d35a'); R(x - 7, 36, 15, 1, '#fff3c8'); R(x - 6, 46, 13, 1, '#b8762e'); text('寿', x - 3, 37, '#9a2f22', 6); }
-  R(240, 40, 100, 36, '#f7f1e2'); R(240, 40, 100, 2, '#8a5a34'); text('접시 가격', 290, 43, '#1b1716', 6, 'center', true);
-  Object.entries(PLATE).forEach(([k, [c, won]], i) => { R(246 + (i % 2) * 48, 53 + Math.floor(i / 2) * 11, 14, 2, c); R(246 + (i % 2) * 48, 51 + Math.floor(i / 2) * 11, 14, 1, '#efe6d2'); text(won, 263 + (i % 2) * 48, 49 + Math.floor(i / 2) * 11, '#1b1716', 6); });
-  R(0, 158, W, 58, '#d9b98a'); R(0, 158, W, 3, '#8a5a34'); R(0, 176, W, 40, '#1a1210'); for (let x = 0; x < W; x += 36) R(x, 178, 1, 38, '#231a15');
-  for (let x = 20; x < W; x += 24) R(x, 172, 2, 2, x % 48 === 20 ? '#ffe9a8' : '#b07a48');
-}
-function drawSushi(phase) {
-  const drunk = phase === 2;
-  sushiRoom();
-  actor('jiwoo', 232, { hand: { x: 248, y: 104 }, wince: !drunk, bob: drunk ? -2 : 0, unplug: true, dip: -14 }, false, top => { if (drunk) sojuGlass(248, 102); });
-  bubble(drunk ? '반장님 기타, 진짜 샘플로 썼어요!' : '회식인데 웬 회전초밥이에요…', 118, 58, drunk ? 118 : 112, { shake: drunk ? 1 : 0 });
-  const items = drunk ? [[[150, 'g'], [250, 'g']], [[200, 'g']], [[120, 'g'], [296, 'g'], [346, 's']]] : [[[140, 'red', 0], [250, 'blue', 1]], [[190, 'gold', 2]], [[112, 'red', 0], [296, 'red', 1], [346, 'black', 3]]];
-  LANES.forEach((L, i) => {
-    const x0 = laneX(48, L.k); beltAt(L.y, Math.round(x0), 0.75 + i * 0.125);
-    for (const [x, kind, f] of items[i]) { const sx = laneX(x, L.k); if (kind === 'g') sojuGlass(sx, L.y, L.k); else if (kind === 's') soju(sx, L.y); else sushiPlate(sx, L.y, kind, f, L.k); }
-    gate(SCAN_X, L.y, i === 2 ? 38 : 16, true);
-  });
-  actor('boss', 46, { hand: { x: 78, y: 86 }, bob: drunk ? 1 : 0, noArm: true }, false, top => { thick(BOSS_X + 7, top + 22, BOSS_X + 30, top - 2, 4, C.shirt); R(BOSS_X + 29, top - 5, 5, 5, C.skin); });
-  if (drunk) { sojuGlass(92, 74, 0.8); sojuGlass(104, 88, 0.9); sojuGlass(96, 112, 1); soju(20, 146); soju(28, 146); } else { sushiPlate(92, 76, 'red', 0, 0.8); sushiPlate(106, 92, 'blue', 1, 0.9); sushiPlate(98, 114, 'red', 2, 1); }
-  for (let k = 0; k < 3; k++) { g.strokeStyle = 'rgba(255,233,168,.5)'; g.setLineDash([2, 3]); g.beginPath(); g.moveTo(80, 86); g.quadraticCurveTo(110, 60 + k * 18, laneX(150, LANES[k].k), LANES[k].y - 6); g.stroke(); g.setLineDash([]); }
-  bubble(drunk ? '…다음 달까지만 나온다.' : '…고기는 비싸. 받아라.', 6, 50, 92);
-  drawPlayer(0, 0); thick(PLAYER_X - 6, 116, 316, 136, 4, C.hoodie); R(314, 134, 4, 4, C.skin); R(313, 128, 1, 8, '#efe6d2'); R(315, 128, 1, 8, '#efe6d2');
-  thick(PLAYER_X - 5, 114, 318, 104, 4, C.hoodie); R(316, 102, 4, 4, C.skin);
-  if (drunk) { R(PLAYER_X + 6, 98, 2, 3, '#e07070'); R(PLAYER_X - 8, 98, 2, 3, '#e07070'); }
-  haeunSharp(drunk);
-  plateStack(326, 172, drunk ? 3 : 1);
-  if (drunk) for (let k = 0; k < 3; k++) sojuGlass(296 + k * 8, 172, 0.9, 0);
-  hud(drunk ? '회전초밥 · 00:30' : '회전초밥 · 23:40', drunk ? '콤보 24' : '콤보 6');
-  judge(drunk ? '짠!!' : '쏙', 300, drunk ? 84 : 96, drunk ? '#ffe9a8' : '#8fd694', drunk ? 22 : 14, drunk ? '24 콤보' : '');
-}
-function haeunSharp(drunk) { haeunBeside({ watch: false }); thick(348, 82, 342, 70, 4, '#1e1a1a'); R(340, 68, 4, 4, '#2a2d31'); R(343, 64, 1, 6, '#efe6d2'); R(345, 64, 1, 6, '#efe6d2'); R(342, 62, 6, 2, '#f08a5d'); plateStack(362, 172, drunk ? 14 : 4); if (drunk) bubble('(우물우물)', 326, 44, 48, { bg: '#d9d0bd' }); }
-function drunkFx(src, level, sharp) {
-  const k = level;
-  g.save(); g.translate(W / 2, H / 2); g.rotate(0.02 * k); g.translate(-W / 2, -H / 2); g.drawImage(src, 0, 0); g.restore();
-  g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.28 * k; g.filter = 'blur(3px)'; g.drawImage(src, 0, 0); g.filter = 'none'; g.restore();
-  g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,140,60,${0.1 * k})`; g.fillRect(0, 0, W, H); g.restore();
-  if (k >= 2) { g.save(); g.globalAlpha = 0.22; g.drawImage(src, 3, 1); g.restore(); }
-  if (sharp) sharp();
-  vignette(0.25 * k);
+// The end of 하은's last shift (1-6): 반장 sends 신입 after her, on the empty belt; the cut dissolves it into the dawn street.
+function drawAfterShift() {
+  warehouse();
+  beltAt(BELT_Y, 48, 1);
+  gate(SCAN_X, BELT_Y, 38, true);
+  actor('boss', 120, { noArm: true }, false, top => { thick(BOSS_X - 6, top + 22, BOSS_X - 10, top + 34, 4, C.shirt); R(BOSS_X - 12, top + 33, 4, 4, C.skin); thick(BOSS_X + 7, top + 22, BOSS_X + 9, top + 40, 4, C.shirt); R(BOSS_X + 8, top + 39, 4, 4, C.skin); });
+  drawPlayer(0, 0); haeunBeside({ watch: true });
+  bubble('신입, 너 그쪽 방면이지. 하은이 따라가.', 92, 50, 150);
+  bubble('(시계를 본다) 먼저 갈게.', 250, 40, 90, { bg: '#d9d0bd' });
+  hud('3번 라인 · 04:40', '');
 }
 
 // ---------- 지하철 ----------
@@ -483,25 +408,17 @@ function drawWard(dawn) {
   R(16, 126, 34, 24, '#c9bfae'); R(16, 126, 34, 2, '#e0d8c8'); R(20, 118, 20, 9, '#f7f1e2'); R(23, 120, 14, 1, '#8a8a8a'); R(23, 123, 10, 1, '#8a8a8a'); text('납부', 24, 124, '#d8463b', 4); R(42, 122, 6, 4, '#d8dde0');
   if (!dawn) { R(0, 0, W, H, 'rgba(10,20,30,.28)'); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(195, 55, 4, 195, 55, 90); gr.addColorStop(0, 'rgba(143,214,148,.22)'); gr.addColorStop(1, 'rgba(143,214,148,0)'); g.fillStyle = gr; g.fillRect(90, 0, 220, 150); g.restore(); }
   else { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(366, 0, 200, 0); gr.addColorStop(0, 'rgba(255,226,176,.4)'); gr.addColorStop(1, 'rgba(255,226,176,0)'); g.fillStyle = gr; g.fillRect(160, 0, 220, 216); g.restore(); }
-  if (!dawn) { bubble('…밥은 먹었니.', 22, 98, 56, { bg: '#f2ead6', size: 6 }); bubble('회식. 공짜.', 96, 76, 48, { bg: '#d9d0bd', size: 6 }); judge('7', 238, 20, '#ffffff', 12); }
+  if (!dawn) { bubble('…밥은 먹었니.', 22, 98, 56, { bg: '#f2ead6', size: 6 }); bubble('…응.', 96, 76, 26, { bg: '#d9d0bd', size: 6 }); judge('7', 238, 20, '#ffffff', 12); }
   if (!dawn) caption('리듬닥터 오마주: 모니터가 벨트. 심장박동이 1·2·3·4·5·6·7, 일곱 번째 박에 누른다. 일곱 박이 한 상자.', '맞추면 심박이 고르게, 놓치면 한 마디 흔들린다(부정맥 모양, 소리도). 판정 글자는 숫자 7 하나.');
   else caption('엔딩: 창이 밝아오고 모니터는 어두워진다. 하은 시점에서 끝. 결과 화면 없이 타이틀로.', '마지막 소리: 모니터 삑 하나, 그리고 새 소리. 감미로운 노래가 다시 한 소절.');
 }
 
 // ---------- 시트 ----------
 const SCENES = [
-  { id: 'open1', title: '0-1. 벨트: 지우가 뛴다', sub: '평소처럼 지우의 상자를 받다가, 지우가 갑자기 점프하면서 소리를 지른다. 오디션에 붙었다.', draw: () => drawOpening(0),
-    notes: ['레벨은 1-2 그루브로 시작(지우 곡, 116). 8마디쯤 받다가 상자 하나가 지우 손에서 바닥에 떨어지고, 지우가 뛴다. 외침 말풍선과 화면 흔들림.', '그 순간부터 벨트에 상자가 안 온다. 롤러 소리만 남고 음악은 끊긴다. 플레이어는 스캐너를 들고 서 있고, 판정은 아무것도 안 뜸.', '하은은 1-4 자리(신입 뒤 오른쪽 한 단 위)에 그대로.'] },
-  { id: 'open2', title: '0-2. 반장이 뿔나서 온다', sub: '빈 벨트를 보고 반장이 오른쪽에서 걸어 들어온다. "벨트가 왜 비어!" 지우는 아직 뛰고 있다.', draw: () => drawOpening(1),
-    notes: ['반장은 1-2처럼 화면 오른쪽 밖에서 걸어 들어와 지우 앞에 선다. 땀 한 방울, 눈썹.', '지우 "반장님! 저 붙었어요! 반장님 기타 넣은 곡으로요!" 반장이 멈춘다. 한 박 정적.', '조작 없음 구간이지만 플레이어는 계속 스캐너를 들고 있음: 손이 놀고 있다는 느낌 자체가 연출.'] },
-  { id: 'open3', title: '0-3. "회식이다."', sub: '반장이 팔짱을 끼고 한참 있다가 "…회식이다. 오늘. 다 와." 신입 옆의 하은까지 합류.', draw: () => drawOpening(2),
-    notes: ['반장의 뿔이 풀리는 걸 말이 아니라 자세로: 삿대질 → 팔짱 → 고개 한 번 끄덕.', '하은 "저도요? …밥은 공짜죠?" 반장 "공짜다." 하은이 시계를 보고 따라나선다(첫 번째 시계).', '벨트가 그 자리에서 초밥 벨트 셋으로 바뀜(매치 컷). 롤러 소리가 그대로 이어지고 첫 상자 자리에 첫 접시.'] },
-  { id: 'sushi1', title: '1. 회전초밥집 1페이즈: 벨트 셋, 반장이 초밥을 뿌린다', sub: '세 벨트가 1-4처럼 원근으로 겹치고 게이트는 한 수직선 위. 반장이 싣는 자리에서 접시를 세 벨트에 던져 넣고, 닿는 쪽을 집는다("쏙").', draw: () => drawSushi(1),
-    notes: ['버튼 하나(1-4 그대로). 세 벨트 중 닿아 있는 접시를 집고, 둘이나 셋이 같은 박에 닿으면 한 번에("양쪽!" → "세 개!").', '반장이 접시를 뿌리는 동작은 1-1부터의 "상자 올리기" 팔 그대로. 점선 궤적은 시안용이고 게임에서는 접시가 포물선으로 날아 벨트에 "탁" 하고 앉는다.', '접시 색이 상자 종류: 빨강 보통, 파랑 늦은 접시, 금색 두 손(큰 접시), 검정 긴 화물(장어 한 줄).', '지우는 먼 벨트 뒤에서 "회식인데 웬 회전초밥이에요…" 반장 "…고기는 비싸. 받아라." 하은은 신입 옆(1-4 자리)에서 말없이 먹고, 접시가 쌓이기 시작한다.'] },
-  { id: 'sushi2', title: '2. 회전초밥집 2페이즈: 소주잔을 뿌린다', sub: '접시 대신 소주잔이 세 벨트를 타고 온다. 잔이 닿으면 "짠". 취기가 오르고, 하은만 선명하다.', draw: () => { const off = document.createElement('canvas'); off.width = W; off.height = H; const g0 = g; g = off.getContext('2d'); drawSushi(2); g = g0; drunkFx(off, 2, () => haeunSharp(true)); },
-    notes: ['2페이즈 전환: 반장이 접시 대신 소주잔을 집어 던지기 시작한다. 첫 잔이 벨트에 앉는 순간 음악이 바뀌고, 잔이 닿을 때마다 "짠"과 함께 취기 한 칸.', '취기는 시간으로 올라가고 되돌아가지 않는다: 1단계 색 온도, 2단계 블룸과 느린 기울기(±1.5도), 3단계 잔상과 말풍선 겹침·흔들림. 신입 볼이 붉어진다.', '하은만 블룸과 잔상에서 뺀다: 화면이 흐려질수록 하은 혼자 또렷하고, 소주잔은 안 받고 접시만 계속 쌓인다(열네 장). 그녀의 말풍선은 끝까지 작고 흔들리지 않는다.', '하은이 시계를 볼 때마다 소리가 반 박 가라앉는다. 반장 "…다음 달까지만 나온다." 지우 "반장님 기타, 진짜 샘플로 썼어요!"', '끝: 화면이 완전히 뭉개지면서 암전. 다음 컷이 지하철.'] },
-  { id: 'subway', title: '3. 새벽 첫 지하철: "…이제 내려요."', sub: '취한 신입이 하은 옆자리에서 잔다. 하은이 일어서서 "이제 내려요" 하고 혼자 내린다. 조작 없음.', draw: drawSubway,
-    notes: ['노래방은 뺌. 초밥집 암전에서 바로 지하철. 신입은 하은 옆에 기대 자고 있고(볼 붉음, zZ), 하은은 가방을 들고 일어선다.', '"…이제 내려요." 신입은 못 듣는다. 문이 열리고 하은만 내린다. 창 너머로 자는 신입을 두고 열차가 떠나면서 시점이 완전히 하은에게.', '다음 역 표시는 아직 병원이라고 보여주지 않는다(노선도의 빨간 점만).'] },
+  { id: 'open', title: '0. 마지막 근무 끝: "하은이 따라가."', sub: '하은의 마지막 근무(플레이)가 끝나고, 같이 퇴근하는 길로 이어진다. 빈 벨트가 새벽 거리로 녹아든다.', draw: drawAfterShift,
+    notes: ['마지막 근무 끝: 위 벨트 등이 하나씩 꺼지고 하은이 벨트를 한 번 두드린다. 반장 "신입, 너 그쪽 방면이지. 하은이 따라가."', '퇴근길부터는 둘만: 하은과, 아무것도 모르는 신입. 1-5에서 지우가 던진 "누나는 꿈 없어요?"가 아직 남아 있다.', '퇴근길(플레이): 새벽 거리를 역까지. 하은 걸음에 맞춰 한 번 누르면 한 걸음. 하은이 시계를 보고 "…첫차 놓치면 30분이야." 걸음이 빨라지고 신입이 처지면, 하은이 멈춰 돌아보고 그 뒤로는 신입 걸음에 맞춰 걷는다(남의 박자를 재촉하던 사람이 처음으로 맞춰 준다).', '첫차(플레이, 짧게): 터널 불빛이 박. 맞추면 신입이 고개를 들고, 졸음이 점점 이겨서 결국 하은 어깨에 기대 잠든다. 하은은 가만히 둔다.'] },
+  { id: 'subway', title: '3. 새벽 첫 지하철: "…이제 내려요."', sub: '밤샘에 지친 신입이 하은 옆자리에서 잔다. 하은이 일어서서 "이제 내려요" 하고 혼자 내린다. 조작 없음.', draw: drawSubway,
+    notes: ['첫차에서 졸다 잠든 그대로. 신입은 하은 옆에 기대 자고 있고(zZ), 하은은 가방을 들고 일어선다.', '"…이제 내려요." 신입은 못 듣는다. 문이 열리고 하은만 내린다. 창 너머로 자는 신입을 두고 열차가 떠나면서 시점이 완전히 하은에게.', '다음 역 표시는 아직 병원이라고 보여주지 않는다(노선도의 빨간 점만).'] },
   { id: 'walk', title: '4. 걷기 컷씬: 역에서 병원까지, 노래가 시작된다', sub: '리듬 없음. 하은이 새벽 거리를 걷는 동안 매우 감미로운 노래가 시작된다. 길 끝에 병원.', draw: drawWalk,
     notes: ['이 레벨에서 처음 나오는 "들려주기만 하는" 음악. 피아노와 현, 느린 템포, 가사 없음(1-3 지우 곡의 선율을 느리게 변주하면 전체가 한 곡으로 묶임).', '카메라가 하은을 따라 옆으로 흐르고(1-3 거리 걷기 재료 재활용), 가로등 아래를 지날 때마다 밝아졌다 어두워진다. 하늘이 밝아오기 시작.', '병원 간판이 보이는 순간까지 어디로 가는지 말하지 않는다. 건물의 빨간 십자가가 먼저 보이고, 이름은 가까이 가서야.', '길이: 노래 한 절(30초 안팎). 플레이어는 보기만 한다. 건너뛰기 없음.'] },
   { id: 'doctor', title: '5. 병원: 리듬닥터 오마주', sub: '입구에서 흰 가운의 의사가 기다린다. "어머님 리듬이 오늘 좀 흔들려요. 일곱 번째에 맞춰요."', draw: drawDoctor,
