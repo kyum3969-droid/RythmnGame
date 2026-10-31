@@ -570,6 +570,7 @@ const LEVELS = [
     // both belts with one button: a press goes to whichever gate has a box at it, and two boxes landing on the same beat are
     // scanned together. In the rush she spends her speed on her own belt instead (her fever, 176-208).
     lanes: 2, partners: ['haeun', 'boss'], onePlacer: true, handover: [84, 88], coScanner: 'haeun', autoLane: 0, autoUntil: 92, oneButton: true,
+    farLoaderDy: 14, farLoaderDx: 10, farBeltLeft: 14,   // she stands lower behind her belt, at its loading end; it runs on past her legs
     haeunCross: [62, 65], knock: [25, 25.5], haeunWatch: [[41, 42.4], [60.4, 61.6]], tapBelt: [65.3, 65.65], lift: [69, 72], hurt: [[72, 84]],
     driver: [76, 89.5], hurt2: [[160, 176]],
     haeunLook: [[160.5, 163.5], [166.5, 169.4]], capFlip: 170.3, fever: [[176, 208]], rummage: [[28.5, 30.5], [45.3, 46.9], [54.5, 66.8]],
@@ -750,7 +751,7 @@ const LEVELS = [
     // ...then shoves him aside (he stumbles back behind 반장 and stays there, his earbud hanging) and takes the middle, between
     // the belts, from where she loads both on her own (soloFrom: one loader, 하은)
     visit: { go: [96, 99.5], back: [116.8, 118], x: 80, top: 86, yank: 104, shove: 116.2, to: 'center' },
-    soloFrom: 118, farLoaderDy: 14,
+    soloFrom: 118, farLoaderDy: 14, farLoaderDx: 10, oneSpot: { x: 80, top: 96 },
     camPlay: [[72, 78, { x: 58, y: 112, k: 1.6 }], [96, 118, { x: 70, y: 114, k: 1.4 }]],   // no box lands while it is in close or easing out
     farBeltLeft: 14,   // the upper belt runs on to the left, past her legs
     beltSwing: { lane: 1, until: Infinity }, fixAt: Infinity,   // the motor is never fixed
@@ -1351,6 +1352,9 @@ function blackoutAmount(t) {
 
 // ---------- partner pose (shared by every coworker) ----------
 const IDLE_HAND = { x: BOSS_X + 13, y: 134 };
+// where a loader's hand rests between boxes, in its belt's coordinates: on the belt's loading end, or for 하은 alone between the
+// belts down by her sides
+const idleHand = lane => L.lanes === 2 && L.oneSpot && DUO.mode !== 'two' ? (lane === 0 ? { x: 44, y: 166 } : { x: 70, y: 130 }) : IDLE_HAND;
 function partnerPose(t, bt, active, lane = 0) {
   const pose = basePose(t, bt, active, lane);
   if (!active || L.lanes !== 2) return pose;
@@ -1408,7 +1412,7 @@ function drawLiftDrop(beat, t) {
   g.save(); g.translate(top.x + p * 6, lerp(top.y + LIFT_BOX.h / 2, 190, p * p)); g.rotate(p * 0.7); drawBox(LIFT_BOX, 0, 0, '', t); g.restore();
 }
 function basePose(t, bt, active, lane = 0) {
-  const pose = { hand: IDLE_HAND, carry: null, wince: false, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: false, beat: 0, lane };
+  const IDLE_HAND = idleHand(lane), pose = { hand: IDLE_HAND, carry: null, wince: false, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: false, beat: 0, lane };
   if (!active) { pose.bob = Math.sin(bt * 1.7 + lane) > 0.85 ? 1 : 0; return pose; }
   const beat = beatAt(t), ph = beat - Math.floor(beat);
   pose.beat = beat;
@@ -1446,9 +1450,16 @@ function basePose(t, bt, active, lane = 0) {
   }
   return pose;
 }
+// where a carried box starts, in its belt's coordinates: from the stack beside the loader, or for 하은 lowered behind the upper
+// belt from her hip, and alone between the belts from beside her on either side
+function carryFrom(n) {
+  if (L.lanes === 2 && DUO.mode !== 'two' && L.oneSpot) return n.lane === 0 ? { x: 47, y: 155, arc: 8 } : { x: 70, y: 122, arc: 6 };
+  if (L.lanes === 2 && DUO.mode === 'two' && n.lane === 0 && L.farLoaderDy) return { x: 54, y: 132, arc: 8 };
+  return { x: L.lanes === 2 ? 28 : 16, y: 112, arc: 14 };
+}
 function carryPos(n, p) {
-  const q = Math.max(0, Math.min(1, p));
-  return { x: lerp(L.lanes === 2 ? 28 : 16, PLACE_X, q), y: lerp(112, BELT_Y - n.h / 2, ease(q)) - Math.sin(Math.PI * q) * 14 };
+  const q = Math.max(0, Math.min(1, p)), f = carryFrom(n);
+  return { x: lerp(f.x, PLACE_X, q), y: lerp(f.y, BELT_Y - n.h / 2, ease(q)) - Math.sin(Math.PI * q) * f.arc };
 }
 const bodyTop = (base, pose) => base + pose.dip + pose.bob + pose.nod;
 
@@ -1543,9 +1554,11 @@ const PARTNERS = {
       const top = bodyTop(86, pose), shirt = '#1e1a1a', glove = C.skin;
       if (pose.phone) return;
       if (pose.wave && !pose.carry) { thick(BOSS_X + 5, top + 23, BOSS_X + 9, top + 2, 4, shirt); R(BOSS_X + 7, top - 2, 5, 5, glove); return; }
-      // two bones with an elbow (as long as her arm, no longer), a hand, the watch on the wrist
-      const h = elbowArm(BOSS_X + 5, top + 23, pose.hand.x, pose.hand.y, shirt, 15); R(h.x - 2, h.y - 2, 4, 4, glove);
-      R(lerp(BOSS_X + 5, h.x, 0.8) - 1, lerp(top + 23, h.y, 0.8) - 1, 3, 3, '#d8dde0');
+      // an arm her own size (it cannot stretch past its reach), from the front shoulder or, for the lower belt when she feeds
+      // both, the back one; a hand, the watch on the wrist
+      const sx = BOSS_X + (pose.left ? -5 : 5), sy = top + 23;
+      const h = reachArm(sx, sy, pose.hand.x, pose.hand.y, shirt, pose.reach || 22); R(h.x - 2, h.y - 2, 4, 4, glove);
+      R(lerp(sx, h.x, 0.8) - 1, lerp(sy, h.y, 0.8) - 1, 3, 3, '#d8dde0');
     }
   },
   park: {
@@ -1622,6 +1635,15 @@ function elbowArm(sx, sy, hx, hy, col, seg = 16) {
   thick(sx, sy, elx, ely, 4, col); thick(elx, ely, hx2, hy2, 4, col);
   return { x: hx2, y: hy2 };
 }
+// a straight arm with a slight bend at the elbow, never longer than its reach; returns where the hand ends up
+function reachArm(sx, sy, hx, hy, col, reach) {
+  let dx = hx - sx, dy = hy - sy; const d = Math.hypot(dx, dy) || 1;
+  if (d > reach) { dx *= reach / d; dy *= reach / d; }
+  let px = -dy / d, py = dx / d; if (py < 0 || (py === 0 && px > 0)) { px = -px; py = -py; }
+  const b = Math.min(3, d / 5), elx = Math.round(sx + dx / 2 + px * b), ely = Math.round(sy + dy / 2 + py * b), hx2 = Math.round(sx + dx), hy2 = Math.round(sy + dy);
+  thick(sx, sy, elx, ely, 4, col); thick(elx, ely, hx2, hy2, 4, col);
+  return { x: hx2, y: hy2 };
+}
 function drawPartnerBody(id, pose, nowMs, active) { PARTNERS[id].draw(pose, nowMs, active); }
 const OBS_X = 168;
 function drawObserver(t, nowMs, active) {
@@ -1650,6 +1672,7 @@ function drawObserver(t, nowMs, active) {
 function drawPartnerArmOf(id, pose, lane = 0) {
   if (SCENE.walk) return;
   if (L.cast) { if (CAST.hideArm) return; g.save(); g.translate(CAST.dx, 0); PARTNERS[id].arm(pose); g.restore(); return; }
+  if (L.lanes === 2 && L.oneSpot && DUO.mode !== 'two') pose = { ...pose, left: true, reach: 26 };
   if (L.lanes === 2) { const o = placerOff(lane), sx = o.dx, sy = o.dy - LANE_DY[lane]; g.save(); g.translate(sx, sy); PARTNERS[id].arm({ ...pose, hand: { x: pose.hand.x - sx, y: pose.hand.y - sy } }); g.restore(); return; }
   PARTNERS[id].arm(pose);
 }
@@ -1768,6 +1791,8 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
 // tapping the empty belt in front of him, then facing him, frozen when his back goes, and turning to the belt as she takes it
 const pulseAt = (b, hits, len = 0.25) => { let v = 0; for (const h of hits || []) { const d = b - h; if (d >= 0 && d < len) v = Math.max(v, Math.sin(Math.PI * d / len)); } return v; };
 function haeunSpot(beat) { const c = L.haeunCross; return !c || beat < c[0] ? 'gate' : beat < c[1] ? 'cross' : 'side'; }
+// a level that lowers her behind the upper belt cuts her off at its top
+function clipBehindUpper() { if (L.farLoaderDy) { g.beginPath(); g.rect(0, 0, W, farY(BELT_Y) + 2); g.clip(); } }
 function drawHaeunScene(beat, kick, nowMs, active) {
   const ph = beat - Math.floor(beat), bob = active && ph < 0.18 ? 1 : 0, spot = active ? haeunSpot(beat) : 'gate';
   if (spot === 'gate') {
@@ -1775,10 +1800,12 @@ function drawHaeunScene(beat, kick, nowMs, active) {
     drawHaeunAt(HAEUN_X, HAEUN_TOP + bob + (kick > 0.5 ? 1 : 0), nowMs, { gun: watch ? null : kick, watch, knock });
   } else if (spot === 'cross') {
     const { x, top } = haeunWalkPos((beat - L.haeunCross[0]) / (L.haeunCross[1] - L.haeunCross[0]));
-    drawHaeunAt(x, top, nowMs, { step: Math.floor(nowMs / 150) % 2 });
+    g.save(); clipBehindUpper(); drawHaeunAt(x, top, nowMs, { step: Math.floor(nowMs / 150) % 2 }); g.restore();
   } else {
+    g.save(); clipBehindUpper();
     const tapping = L.tapBelt && beat < L.tapBelt[1] + 0.45, taking = beat >= L.handover[0], frozen = inRange(beat, L.hurt);
-    drawHaeunAt(BOSS_X + LANE_DX[0], 50 + (frozen ? 0 : bob), nowMs, { mirror: tapping || taking, tap: tapping ? pulseAt(beat, L.tapBelt, 0.3) : null, rest: !tapping });
+    drawHaeunAt(haeunHome().x, haeunHome().top + (frozen ? 0 : bob), nowMs, { mirror: tapping || taking, tap: tapping ? pulseAt(beat, L.tapBelt, 0.3) : null, rest: !tapping });
+    g.restore();
   }
 }
 // belt variations (the 시안 stages). The belt's own clock in beats: it stands still through each stop, and a swung belt drags
@@ -1847,7 +1874,7 @@ function drawRage15(t, nowMs, who) {
   if (who === 'h') k = sec === 'metal' ? (bar < 31 ? 0.25 : bar === 35 || bar === 36 ? 0.95 : 0.7) : sec === 'together' ? 0.6 : sec === 'finale' ? 0.9 : 0;
   else k = sec === 'together' && bar >= 42 ? 0.6 : sec === 'finale' ? 0.9 : 0;
   if (k <= 0) return;
-  const solo = DUO.mode === 'one', hx = who === 'h' ? (solo ? BOSS_X + ONE.dx : BOSS_X + LANE_DX[0]) : BOSS_X + LANE_DX[1], cy = who === 'h' ? (solo ? 96 : 74 + (L.farLoaderDy || 0)) : 118, col = who === 'h' ? '255,90,40' : '80,210,255';
+  const solo = DUO.mode === 'one', hx = who === 'h' ? (solo ? soloSpot().x : haeunHome().x) : BOSS_X + LANE_DX[1], cy = who === 'h' ? (solo ? soloSpot().top + 24 : haeunHome().top + 24) : 118, col = who === 'h' ? '255,90,40' : '80,210,255';
   g.save(); g.globalCompositeOperation = 'lighter';
   const gr = g.createRadialGradient(hx, cy, 3, hx, cy, 36 + 8 * e); gr.addColorStop(0, `rgba(${col},${(0.45 + 0.3 * e) * k})`); gr.addColorStop(1, `rgba(${col},0)`);
   g.fillStyle = gr; g.beginPath(); g.ellipse(hx, cy, 24 + 6 * e, 40 + 6 * e, 0, 0, Math.PI * 2); g.fill();
@@ -1858,7 +1885,7 @@ function drawRage15(t, nowMs, who) {
 // over the half beat before each lands there (a whoosh as it leaves her)
 function visitAt(b) {
   const V = L.visit; if (!V || b < V.go[0] || b >= V.back[1]) return null;
-  const home = { x: BOSS_X + LANE_DX[0], top: 50 + (L.farLoaderDy || 0) }, dest = { x: V.x, top: V.top }, end = V.to === 'center' ? { x: BOSS_X + ONE.dx, top: 86 + ONE.dy } : home;
+  const home = haeunHome(), dest = { x: V.x, top: V.top }, end = V.to === 'center' ? soloSpot() : home;
   if (b < V.go[1]) { const p = ease((b - V.go[0]) / (V.go[1] - V.go[0])); return { x: lerp(home.x, dest.x, p), top: lerp(home.top, dest.top, p), walk: true, back: false }; }
   const hit = at => at != null && b >= at - 0.5 && b < at + 0.6 ? Math.max(0, 1 - Math.abs(b - at) * 2) : null;
   if (b < V.back[0]) return { x: dest.x, top: dest.top, walk: false, yank: hit(V.yank) ?? hit(V.shove) };
@@ -1879,7 +1906,7 @@ function drawVisit(b, nowMs) {
   if (L.visit.yank != null && Math.abs(b - L.visit.yank) < 0.02 && ctx && !FX.yankFx) { FX.yankFx = true; noise(ctx.currentTime, 'bandpass', 3000, 0.2, 0.05, 2, bus); }
 }
 function drawTosses(t) {
-  const fly = 0.5 * SPB, x0 = BOSS_X + LANE_DX[0] + 12, y0 = 98, x1 = PLACE_X + LANE_DX[1], y1 = BELT_Y;
+  const fly = 0.5 * SPB, x0 = haeunHome().x + 12, y0 = haeunHome().top + 48, x1 = PLACE_X + LANE_DX[1], y1 = BELT_Y;
   for (const n of notes) {
     if (!n.toss || n.len || t < n.place - fly || t >= n.place) continue;
     if (!n.tossFx) { n.tossFx = true; if (ctx) noise(ctx.currentTime, 'bandpass', 1200, 0.06, 0.12, 1.4, bus); }
@@ -1988,14 +2015,14 @@ const driverHead = beat => ({ x: driverAt(beat).x, y: 86 });
 // crossing to the upper belt's loading end in a hurry, along behind the upper belt
 function haeunWalkPos(p) {
   const e = lerp(p, ease(p), 0.5);
-  return { x: Math.round(lerp(HAEUN_X, BOSS_X + LANE_DX[0], e)), top: Math.round(lerp(HAEUN_TOP, 50, e)) };
+  const h = haeunHome(); return { x: Math.round(lerp(HAEUN_X, h.x, e)), top: Math.round(lerp(HAEUN_TOP, h.top, e)) };
 }
 // where her head is at a beat, for her speech bubble: beside you, on the way, or at the upper belt's loading end
 function haeunHead(beat) {
   const spot = haeunSpot(beat);
   if (spot === 'gate') return { x: HAEUN_X, y: HAEUN_TOP - 4 };
   if (spot === 'cross') { const w = haeunWalkPos((beat - L.haeunCross[0]) / (L.haeunCross[1] - L.haeunCross[0])); return { x: w.x, y: w.top - 4 }; }
-  return { x: BOSS_X + LANE_DX[0], y: 46 };
+  return { x: haeunHome().x, y: haeunHome().top - 4 };
 }
 const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
 function drawPlayer(kick, nowMs) {
@@ -2198,6 +2225,10 @@ let rings = [];
 const HITSTOP = reduce ? 0 : 0.085;
 function hitLag(dt, hs) { return Math.max(0, Math.min(dt, hs)); }
 const LANE_DY = [-36, 0], LANE_DX = [36, 6];
+// 하은's spot at her own (upper) belt: a level can lower her behind it so the belt hides her legs (farLoaderDy) and bring her up
+// to its loading end so her arm reaches it (farLoaderDx); and where the one loader stands between the belts (oneSpot)
+const haeunHome = () => ({ x: BOSS_X + LANE_DX[0] + (L.farLoaderDx || 0), top: 50 + (L.farLoaderDy || 0) });
+const soloSpot = () => L.oneSpot ? { x: L.oneSpot.x, top: L.oneSpot.top } : { x: BOSS_X + ONE.dx, top: 86 + ONE.dy };
 // the upper belt is the far one: drawn smaller, converging on the middle of the screen
 const FAR = { k: 0.82 };
 // the far belt is scaled about the scan line: both gates sit on the same vertical, so two boxes due on the same beat arrive stacked
@@ -2212,7 +2243,8 @@ function duoMode(beat) { if (L.soloFrom != null) return beat >= L.soloFrom ? 'on
 const isAuto = n => n.lane === L.autoLane && (L.autoUntil == null || n.beat < L.autoUntil);
 // where a belt's loader stands, in screen offsets from the single-belt spot
 function placerOff(lane) {
-  if (DUO.mode === 'two') return { dx: LANE_DX[lane], dy: LANE_DY[lane] };
+  if (DUO.mode === 'two') { if (lane === 0) { const h = haeunHome(); return { dx: h.x - BOSS_X, dy: h.top - 86 }; } return { dx: LANE_DX[lane], dy: LANE_DY[lane] }; }
+  if (L.oneSpot) { const s = soloSpot(); return { dx: s.x - BOSS_X, dy: s.top - 86 }; }
   const p = DUO.mode === 'walk' ? ease(DUO.p) : 0;
   return { dx: lerp(ONE.dx, LANE_DX[1], p), dy: lerp(ONE.dy, 0, p) };
 }
@@ -2231,7 +2263,7 @@ function laneSlide(lane, t, active) {
 // flaring on the entry (behind her body first, the motes over it after)
 const feverAura = beat => { if (!L.fever) return 0; const fr = L.fever.find(([a, z]) => beat >= a && beat < z + 0.5); if (!fr) return 0; const entry = Math.max(0, 1 - (beat - fr[0]) / 1.5); return Math.min(1, Math.max(0.75, feverRamp(beat, fr)) + entry) * Math.min(1, (fr[1] + 0.5 - beat) * 2); };
 function drawHaeunAura(beat, k, nowMs, front) {
-  const hx = BOSS_X + LANE_DX[0], cy = 76, e = Math.max(0, 1 - ((beat * 2) % 1) * 3);
+  const hx = haeunHome().x, cy = haeunHome().top + 26, e = Math.max(0, 1 - ((beat * 2) % 1) * 3);
   g.save(); g.globalCompositeOperation = 'lighter';
   if (!front) {
     const gr = g.createRadialGradient(hx, cy, 4, hx, cy, 34 + 8 * e); gr.addColorStop(0, `rgba(160,230,255,${(0.6 + 0.3 * e) * k})`); gr.addColorStop(0.55, `rgba(90,180,255,${0.32 * k})`); gr.addColorStop(1, 'rgba(90,180,255,0)');
@@ -2246,10 +2278,10 @@ function drawHaeunAura(beat, k, nowMs, front) {
 // the moment it starts: a sky flash, a ring out from her, a light wiping across the room
 function drawFeverEntry(beat) {
   if (!L.fever) return; const d = beat - L.fever[0][0]; if (d < 0 || d >= 1.4) return;
-  const a = 1 - d / 1.4, hx = BOSS_X + LANE_DX[0];
+  const a = 1 - d / 1.4, hx = haeunHome().x;
   g.save(); g.globalCompositeOperation = 'lighter';
   g.fillStyle = `rgba(120,200,255,${0.45 * a * a})`; g.fillRect(0, 0, W, H);
-  if (!reduce) { g.strokeStyle = `rgba(170,230,255,${0.75 * a})`; g.lineWidth = 8 * a + 1; g.beginPath(); g.arc(hx, 74, 12 + d * 280, 0, Math.PI * 2); g.stroke();
+  if (!reduce) { g.strokeStyle = `rgba(170,230,255,${0.75 * a})`; g.lineWidth = 8 * a + 1; g.beginPath(); g.arc(hx, haeunHome().top + 24, 12 + d * 280, 0, Math.PI * 2); g.stroke();
     const wx = lerp(-60, W + 60, Math.min(1, d / 0.8)), gr = g.createLinearGradient(wx - 40, 0, wx + 40, 0); gr.addColorStop(0, 'rgba(200,240,255,0)'); gr.addColorStop(0.5, `rgba(200,240,255,${0.35 * a})`); gr.addColorStop(1, 'rgba(200,240,255,0)'); g.fillStyle = gr; g.fillRect(wx - 40, 0, 80, H); }
   g.restore();
 }
@@ -2282,7 +2314,7 @@ function drawFeverBack(beat, nowMs) {
     for (let k = 0; k < 10; k++) { const row = [58, 76, 96, 118][k % 4], sp = 90 + (k * 37) % 70, x = W - ((nowMs / 1000 * sp + k * 53) % (W + 40)); g.fillStyle = `rgba(160,220,255,${0.16 * env})`; g.fillRect(Math.round(x), row, 14, 2); g.fillStyle = `rgba(160,220,255,${0.07 * env})`; g.fillRect(Math.round(x) + 14, row, 18, 2); }
   }
   // her glow at the loading end
-  const hx = BOSS_X + LANE_DX[0], rg = g.createRadialGradient(hx, 74, 4, hx, 74, 40 + 50 * env + 14 * e); rg.addColorStop(0, `rgba(120,200,255,${(0.2 + 0.15 * e) * env})`); rg.addColorStop(1, 'rgba(120,200,255,0)'); g.fillStyle = rg; g.fillRect(hx - 80, 0, 160, 168);
+  const hx = haeunHome().x, hy = haeunHome().top + 24, rg = g.createRadialGradient(hx, hy, 4, hx, hy, 40 + 50 * env + 14 * e); rg.addColorStop(0, `rgba(120,200,255,${(0.2 + 0.15 * e) * env})`); rg.addColorStop(1, 'rgba(120,200,255,0)'); g.fillStyle = rg; g.fillRect(hx - 80, 0, 160, 168);
   g.restore();
 }
 // the end of her fever: on its last beat the built-up light bursts: a white-blue flash, a ring out from her loading end, and the
@@ -2290,10 +2322,10 @@ function drawFeverBack(beat, nowMs) {
 function drawFeverBurst(beat, nowMs) {
   if (!L.fever) return;
   const f1 = L.fever[0][1], d = beat - f1; if (d < 0 || d >= 1.5) return;
-  const a = 1 - d / 1.5, hx = BOSS_X + LANE_DX[0];
+  const a = 1 - d / 1.5, hx = haeunHome().x;
   g.save(); g.globalCompositeOperation = 'lighter';
   g.fillStyle = `rgba(210,240,255,${0.9 * Math.pow(Math.max(0, 1 - d / 0.6), 2)})`; g.fillRect(0, 0, W, H);
-  if (!reduce) for (const [k, w] of [[0, 10], [0.18, 5]]) { const r = 10 + Math.max(0, d - k) * 300; g.strokeStyle = `rgba(170,230,255,${0.8 * a})`; g.lineWidth = w * a + 1; g.beginPath(); g.arc(hx, 74, r, 0, Math.PI * 2); g.stroke(); }
+  if (!reduce) for (const [k, w] of [[0, 10], [0.18, 5]]) { const r = 10 + Math.max(0, d - k) * 300; g.strokeStyle = `rgba(170,230,255,${0.8 * a})`; g.lineWidth = w * a + 1; g.beginPath(); g.arc(hx, haeunHome().top + 24, r, 0, Math.PI * 2); g.stroke(); }
   // out of the blue into the warm of the last stretch together
   g.fillStyle = `rgba(255,190,110,${0.16 * Math.sin(Math.PI * Math.min(1, d / 1.5))})`; g.fillRect(0, 0, W, H);
   g.restore();
@@ -2396,11 +2428,22 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   (L.daw ? drawDawFront : drawBeltFront)(beltT); if (far) drawBeltLegs();
   BELT_L = 48;
   if (!far && L.fixAt != null && L.lanes === 2) drawBadMotor(t, nowMs, active);
+  // 하은 alone between the belts carries the lower belt's box in front of her, her arm behind it
+  const armFirst = !far && L.oneSpot && DUO.mode !== 'two';
+  if (armFirst) drawPartnerArmOf(pid, pose, lane);
   if (pose.carry) drawBox(pose.carry.n, pose.carry.x, pose.carry.y + pose.carry.n.h / 2, '', t);
-  if (!far && !(active && L.visit && L.visit.shove != null && beatAt(t) >= L.visit.shove && DUO.mode === 'two')) drawPartnerArmOf(pid, pose, lane);
+  if (!far && !armFirst && !(active && L.visit && L.visit.shove != null && beatAt(t) >= L.visit.shove && DUO.mode === 'two')) drawPartnerArmOf(pid, pose, lane);
   g.restore();
   // the arm to the far belt is drawn in screen space so it stays on the body; only the hand goes through the perspective
-  if (far && DUO.mode === 'two' && !(active && L.visit && visitAt(castBeatAt(t, active)))) { const who = pid, o0 = placerOff(0), o = { dx: o0.dx, dy: o0.dy + (L.farLoaderDy || 0) }, h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
+  if (far && DUO.mode === 'two' && !(active && L.visit && visitAt(castBeatAt(t, active)))) { const who = pid, o = placerOff(0), h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
+}
+// 1-5 phase 2: 하은 alone between the belts, in front of the upper one (her far arm over its front edge) and behind the lower
+// one, which hides her legs
+function drawSoloLoader(poses, nowMs, active) {
+  const o = placerOff(1), bp = { ...poses[1], wince: poses[0].wince || poses[1].wince, dip: Math.max(poses[0].dip, poses[1].dip), nod: Math.max(poses[0].nod, poses[1].nod) };
+  const fp = poses[0], h = { x: farX(fp.hand.x), y: farY(fp.hand.y) };
+  g.save(); g.translate(o.dx, o.dy); PARTNERS[L.partners[1]].arm({ ...bp, carry: fp.carry, wave: fp.wave, back: true, reach: 26, hand: { x: h.x - o.dx, y: h.y - o.dy } });
+  drawPartnerBody(L.partners[1], bp, nowMs, active); g.restore();
 }
 // ---------- 2-1 stage (the audition hall) ----------
 const LAPTOP = { x: 54, y: 112, kx: 64, ky: 121 }, PAD = { x: 314, y: 126 };
@@ -3100,8 +3143,8 @@ function drawScene(t, bt, active, nowMs) {
   if (L.lanes === 2) {
     const mb = castBeatAt(t, active); DUO.mode = duoMode(mb); if (L.soloFrom != null) L.partners[1] = active && mb >= L.soloFrom ? 'haeun' : 'jiwoo'; DUO.p = L.handover ? Math.max(0, Math.min(1, (mb - L.handover[0]) / (L.handover[1] - L.handover[0]))) : 1;
     if (DUO.mode !== 'two' && L.coScanner) drawHaeunScene(mb, upperKick, nowMs, active);
-    if (DUO.mode === 'two') { const fa = active ? feverAura(mb) : 0; if (fa) drawHaeunAura(mb, fa, nowMs, false); if (L.show && active) { drawRage15(t, nowMs, 'h'); drawRage15(t, nowMs, 'j'); } if (!(active && visitAt(mb))) { g.save(); if (L.farLoaderDy) { g.beginPath(); g.rect(0, 0, W, farY(BELT_Y) + 2); g.clip(); } g.translate(LANE_DX[0], LANE_DY[0] + (L.farLoaderDy || 0)); drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); } if (fa) drawHaeunAura(mb, fa, nowMs, true); }
-    else {
+    if (DUO.mode === 'two') { const fa = active ? feverAura(mb) : 0; if (fa) drawHaeunAura(mb, fa, nowMs, false); if (L.show && active) { drawRage15(t, nowMs, 'h'); drawRage15(t, nowMs, 'j'); } if (!(active && visitAt(mb))) { g.save(); clipBehindUpper(); { const o = placerOff(0); g.translate(o.dx, o.dy); } drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); } if (fa) drawHaeunAura(mb, fa, nowMs, true); }
+    else if (!L.oneSpot) {
       // one loader between the belts: his body follows whichever belt is busy
       const o = placerOff(1), bp = { ...poses[1], wince: poses[0].wince || poses[1].wince, dip: Math.max(poses[0].dip, poses[1].dip), nod: Math.max(poses[0].nod, poses[1].nod) };
       // his other arm, for the upper belt: from his far shoulder, drawn before his body so it goes behind him
@@ -3110,6 +3153,7 @@ function drawScene(t, bt, active, nowMs) {
       drawLiftDrop(active ? mb : -1, t);
     }
     drawLane(0, poses[0], t, beltT, active, nowMs, laneFx);
+    if (DUO.mode !== 'two' && L.oneSpot) drawSoloLoader(poses, nowMs, active);
     if (active && L.visit) drawShoved(mb, nowMs);
     if (L.bossSeat) drawBossSeat(mb, nowMs, active);
     // the driver stands between the belts, in front of the upper one (it is empty while he is there)
