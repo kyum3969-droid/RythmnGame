@@ -374,6 +374,16 @@ function gate(x, y, h, on, flash = 0) { R(x - 11, y - h, 4, h, '#555a5f'); R(x -
 function boxS(x, bottom, w = 18, h = 14, done = false) { R(x - w / 2 + 1, bottom, w, 1, 'rgba(0,0,0,.45)'); R(x - w / 2, bottom - h, w, h, C.kraft); R(x - w / 2, bottom - h, w, 2, C.kraftTop); R(x + w / 2 - 2, bottom - h + 2, 2, h - 2, C.kraftDark); R(x - 1, bottom - h, 3, h, C.tape); R(x - w / 2 + 2, bottom - 6, 7, 4, C.label); if (done) { g.fillStyle = 'rgba(143,214,148,.35)'; g.fillRect(x - w / 2, bottom - h, w, h); } }
 function playerS(kick = 0, cheeks = 0) { drawPlayer(kick, 0); if (cheeks > 0) { g.globalAlpha = cheeks; R(PLAYER_X + 6, 102, 2, 3, '#e07070'); R(PLAYER_X - 8, 102, 2, 3, '#e07070'); g.globalAlpha = 1; } const gx = 324 - kick * 4, gy = 117; thick(PLAYER_X - 6, 116, gx + 2, gy + 3, 4, C.hoodie); drawGun(gx, gy, kick); }
 function playerChop(kick = 0, cheeks = 0) { drawPlayer(kick, 0); if (cheeks > 0) { g.globalAlpha = cheeks; R(PLAYER_X + 6, 102, 2, 3, '#e07070'); R(PLAYER_X - 8, 102, 2, 3, '#e07070'); g.globalAlpha = 1; } const hx = 316 - kick * 6, hy = 136 - kick * 4; thick(PLAYER_X - 6, 116, hx, hy, 4, C.hoodie); R(hx - 2, hy - 2, 4, 4, C.skin); R(hx - 3, hy - 8, 1, 8, '#efe6d2'); R(hx - 1, hy - 8, 1, 8, '#efe6d2'); }
+// 하은 at her own seat at the sushi bar, behind the far belt where it starts, facing up the line: chopsticks to her mouth (eat 0..1),
+// or the hand resting. Her plate tower stands on the counter right in front of her.
+const SEAT = { x: 232, top: 64 };
+function haeunSeat(o = {}) {
+  const cx = SEAT.x, top = SEAT.top + (o.bob || 0);
+  drawHaeunAt(cx, top, 0, { load: true, ...o });
+  if (!o.eat) { thick(cx - 6, top + 22, cx - 8, top + 34, 4, '#1e1a1a'); R(cx - 10, top + 33, 4, 3, '#2a2d31'); return; }
+  const k = o.eat; thick(cx - 6, top + 22, cx - 12 + k * 2, top + 10 + k * 10, 4, '#1e1a1a'); R(cx - 14 + k * 2, top + 8 + k * 10, 4, 4, '#2a2d31');
+  R(cx - 11 + k * 2, top + 4 + k * 10, 1, 6, '#efe6d2'); R(cx - 9 + k * 2, top + 4 + k * 10, 1, 6, '#efe6d2'); if (k < 0.5) R(cx - 12 + k * 2, top + 2 + k * 10, 6, 2, '#f08a5d');
+}
 function haeunBeside(o = {}) { drawHaeunAt(354, 60 + (o.bob || 0), 0, { load: true, ...o }); if (!o.watch && !o.eat) { thick(348, 82, 346, 94, 4, '#1e1a1a'); R(344, 93, 4, 3, '#2a2d31'); } if (o.eat) { const k = o.eat; thick(348, 82, 342 + k * 2, 70 + k * 10, 4, '#1e1a1a'); R(340 + k * 2, 68 + k * 10, 4, 4, '#2a2d31'); R(343 + k * 2, 64 + k * 10, 1, 6, '#efe6d2'); R(345 + k * 2, 64 + k * 10, 1, 6, '#efe6d2'); if (k < 0.5) R(342 + k * 2, 62 + k * 10, 6, 2, '#f08a5d'); } }
 const PLATE = { red: ['#d8463b', '1,500'], blue: ['#2f6f8a', '2,500'], gold: ['#d9a520', '4,000'], black: ['#2b2e31', '6,000'] };
 function sushiPlate(x, y, col, kind = 0, sc = 1) {
@@ -424,6 +434,8 @@ function sushiRoom() {
   Object.entries(PLATE).forEach(([k, [c, won]], i) => { R(246 + (i % 2) * 48, 53 + Math.floor(i / 2) * 11, 14, 2, c); R(246 + (i % 2) * 48, 51 + Math.floor(i / 2) * 11, 14, 1, '#efe6d2'); text(won, 263 + (i % 2) * 48, 49 + Math.floor(i / 2) * 11, '#1b1716', 6); });
   R(0, 158, W, 58, '#d9b98a'); R(0, 158, W, 3, '#8a5a34'); R(0, 176, W, 40, '#1a1210'); for (let x = 0; x < W; x += 36) R(x, 178, 1, 38, '#231a15');
   for (let x = 20; x < W; x += 24) R(x, 172, 2, 2, x % 48 === 20 ? '#ffe9a8' : '#b07a48');
+  // the stools in front of the counter
+  for (const x of [36, 104, 172, 240, 308, 368]) { R(x - 10, 186, 20, 4, '#b8362c'); R(x - 10, 186, 20, 1, '#d85a4a'); R(x - 1, 190, 3, 17, '#4a4440'); R(x - 6, 206, 13, 2, '#4a4440'); }
 }
 
 // ---------- 0. 1-4 엔딩의 빈 벨트 (매치 컷의 출발점) ----------
@@ -453,6 +465,7 @@ function itemArrive(it) { return it.t + SUSHI.fly + (SCAN_X - SUSHI.landX) / SUS
 function drawSushi(u, phase) {
   const drunk = phase === 2, spb = 60 / SUSHI.bpm, level = drunk ? clamp(u / 16 * 3, 0, 3) : 0;
   sushiRoom();
+  if (!drunk) haeunSeat({ eat: (u % 1.4) < 0.7 ? (u % 1.4) / 0.7 : 1 - ((u % 1.4) - 0.7) / 0.7 });
   const items = THROWS[phase - 1];
   let lastPick = -9, lastTriple = -9, kick = 0, haeunStack = drunk ? 8 : 0, lastHaeun = -9, lastClink = -9;
   // belts far to near, then the items riding them, then the gates
@@ -463,25 +476,25 @@ function drawSushi(u, phase) {
     let sx, sy, sc = L.k;
     if (u < it.t + SUSHI.fly) { const p = (u - it.t) / SUSHI.fly, x0 = 80, y0 = 86, x1 = laneX(SUSHI.landX, L.k), y1 = L.y; sx = lerp(x0, x1, p); sy = lerp(y0, y1, p) - Math.sin(Math.PI * p) * (30 + it.lane * 8); sc = lerp(0.9, L.k, p); if (u > it.t + SUSHI.fly - 0.05) cue('land' + phase + it.t + it.lane, SND.thud); }
     else { const lx = SUSHI.landX + (u - it.t - SUSHI.fly) * SUSHI.speed; sx = laneX(lx, L.k); sy = L.y; if (it.who === 'player' && u >= arr) { if (it.triple) lastTriple = Math.max(lastTriple, arr); else lastPick = Math.max(lastPick, arr); kick = Math.max(kick, clamp(1 - (u - arr) / 0.14, 0, 1)); cue('pick' + phase + it.t + it.lane, drunk ? SND.clink : SND.pick); continue; }
-      if (it.who === 'haeun') { if (sx > 346) { haeunStack++; lastHaeun = Math.max(lastHaeun, u - (sx - 346) / (SUSHI.speed * L.k)); cue('haeun' + phase + it.t, SND.pick); continue; } } }
+      if (it.who === 'haeun') { if (sx > SEAT.x) { haeunStack++; lastHaeun = Math.max(lastHaeun, u - (sx - SEAT.x) / (SUSHI.speed * L.k)); cue('haeun' + phase + it.t, SND.pick); continue; } } }
     if (drunk) sojuGlass(sx, sy, sc); else sushiPlate(sx, sy, it.col, it.kind, sc);
   }
   LANES.forEach((L, i) => gate(SCAN_X, L.y, i === 2 ? 38 : 16, true, kick));
   // 반장 at the loading end: the throw is a quick arm swing on each throw time
   let swing = 0; for (const it of items) if (u >= it.t - 0.25 && u < it.t + 0.3) swing = Math.max(swing, Math.sin(Math.PI * clamp((u - it.t + 0.25) / 0.55, 0, 1)));
-  actor('boss', 46, { bob: drunk && (u % spb) < spb * 0.3 ? 1 : 0, noArm: true }, false, top => { const hx = lerp(BOSS_X + 14, BOSS_X + 30, swing), hy = lerp(top + 30, top - 2, swing); thick(BOSS_X + 7, top + 22, hx, hy, 4, C.shirt); R(hx - 1, hy - 3, 5, 5, C.skin); if (swing < 0.5) { if (drunk) sojuGlass(hx + 2, hy - 2, 0.9); else sushiPlate(hx + 2, hy - 1, 'red', 0, 0.8); } });
+  const twinge = (u % 6) < 0.7;   // his back, since 1-4
+  actor('boss', 46, { bob: drunk && (u % spb) < spb * 0.3 ? 1 : 0, noArm: true, wince: twinge, dip: twinge ? 2 : 0 }, false, top => { thick(BOSS_X - 6, top + 22, BOSS_X - 10, top + 34, 4, '#4a5560'); R(BOSS_X - 12, top + 33, 4, 4, C.skin); const hx = lerp(BOSS_X + 14, BOSS_X + 30, swing), hy = lerp(top + 30, top - 2, swing); thick(BOSS_X + 7, top + 22, hx, hy, 4, C.shirt); R(hx - 1, hy - 3, 5, 5, C.skin); if (swing < 0.5) { if (drunk) sojuGlass(hx + 2, hy - 2, 0.9); else sushiPlate(hx + 2, hy - 1, 'red', 0, 0.8); } });
   if (drunk) { soju(20, 146); soju(28, 146); if (u > 6) soju(12, 146); }
   // the player with chopsticks, 하은 eating beside him, the stacks
   const eating = drunk || (u % 1.4) < 0.7; const eatK = (u % 1.4) < 0.7 ? (u % 1.4) / 0.7 : 1 - ((u % 1.4) - 0.7) / 0.7;
   playerChop(kick, level / 3);
-  if (!drunk) haeunBeside({ eat: eatK });
   plateStack(326, 172, Math.min(5, Math.floor(u / 4) + 1)); if (drunk) for (let k = 0; k < Math.min(3, Math.floor(u / 5) + 1); k++) sojuGlass(296 + k * 8, 172, 0.9, 0);
-  if (!drunk) plateStack(362, 172, 2 + haeunStack);
+  if (!drunk) plateStack(SEAT.x, 172, 2 + haeunStack);
   // judgements and lines
   if (u - lastPick < 0.55) judge(drunk ? '짠!' : '쏙', 300, drunk ? 84 : 96, drunk ? '#ffe9a8' : '#8fd694', drunk ? 18 : 14, '', u - lastPick);
   if (u - lastTriple < 0.9) { judge(drunk ? '짠!!!' : '세 개!', 300, 60, '#ffe9a8', 24, drunk ? '셋 다 짠' : '셋 다 한 번에', u - lastTriple); if (u - lastTriple < 0.25) { g.fillStyle = `rgba(255,255,255,${0.4 * (1 - (u - lastTriple) / 0.25)})`; g.fillRect(0, 0, W, H); } }
-  if (!drunk) { say(u, 2.5, 5.5, '…고기는 비싸. 먹어라.', 6, 50, 92); say(u, 10, 12.5, '…그걸 다 먹었냐.', 6, 50, 80); say(u, 12.6, 14.6, '(우물우물)', 326, 44, 48, { bg: '#d9d0bd' }); }
-  else { say(u, 1, 4, '(우물우물)', 326, 44, 48, { bg: '#d9d0bd' }); say(u, 4.5, 7.5, '…다음 달까지만 나온다.', 6, 50, 92, { shake: level > 2 ? 1 : 0 }); say(u, 11.5, 13.5, '(우물우물)', 326, 44, 48, { bg: '#d9d0bd' }); }
+  if (!drunk) { say(u, 2.5, 5.5, '…고기는 비싸. 먹어라.', 6, 50, 92); say(u, 10, 12.5, '…그걸 다 먹었냐.', 6, 50, 80); say(u, 12.6, 14.6, '(우물우물)', 206, 40, 48, { bg: '#d9d0bd' }); }
+  else { say(u, 1, 4, '(우물우물)', 206, 40, 48, { bg: '#d9d0bd' }); say(u, 4.5, 7.5, '…다음 달까지만 나온다.', 6, 50, 92, { shake: level > 2 ? 1 : 0 }); say(u, 11.5, 13.5, '(우물우물)', 206, 40, 48, { bg: '#d9d0bd' }); }
   hud(drunk ? '회전초밥 · 23:50' : '회전초밥 · 19:40', '콤보 ' + items.filter(it => it.who === 'player' && u >= itemArrive(it)).length);
   cue('sushi-roller' + phase, () => rollerOn(true, 0.03));
   return level;
@@ -838,7 +851,7 @@ function buildTL() {
     { id: 'cut', name: '매치 컷', dur: 3, draw: u => { drawSushi(0, 1); const o = offC || (offC = Object.assign(document.createElement('canvas'), { width: W, height: H })); const oc = o.getContext('2d'); oc.clearRect(0, 0, W, H); const g0 = g; g = oc; drawAfterShift(u); g = g0; g.save(); g.globalAlpha = u < 1 ? 1 : 1 - ease((u - 1) / 2); g.drawImage(o, 0, 0); g.restore(); if (u < 0.1) cue('cut-roller', () => rollerOn(true, 0.04)); } },
     { id: 'sushi1', name: '초밥', dur: 18, draw: u => { drawSushi(u, 1); fadeBlack(0); } },
     // (소주잔: 하은 stops chewing for a moment on '…다음 달까지만 나온다.')
-    { id: 'sushi2', name: '소주잔', dur: 18, draw: u => { const lv = drawSushi(u, 2); drunkFx(lv, u, () => { const freeze = u >= 4.8 && u < 6.6; haeunBeside({ eat: freeze ? 0.55 : (u % 1.4) < 0.7 ? (u % 1.4) / 0.7 : 1 - ((u % 1.4) - 0.7) / 0.7 }); plateStack(362, 172, 10 + Math.min(6, Math.floor(u / 2.5))); }); fadeBlack(u > 16.6 ? (u - 16.6) / 1.4 : 0); if (u > 16.6) cue('sushi-off', () => rollerOn(false)); } },
+    { id: 'sushi2', name: '소주잔', dur: 18, draw: u => { const lv = drawSushi(u, 2); drunkFx(lv, u, () => { const freeze = u >= 4.8 && u < 6.6; g.save(); g.beginPath(); g.rect(0, 0, W, LANES[0].y); g.clip(); haeunSeat({ eat: freeze ? 0.55 : (u % 1.4) < 0.7 ? (u % 1.4) / 0.7 : 1 - ((u % 1.4) - 0.7) / 0.7 }); g.restore(); plateStack(SEAT.x, 172, 10 + Math.min(6, Math.floor(u / 2.5))); }); fadeBlack(u > 16.6 ? (u - 16.6) / 1.4 : 0); if (u > 16.6) cue('sushi-off', () => rollerOn(false)); } },
     { id: 'train', name: '창', dur: 10, draw: u => drawTrainClose(u) },
     { id: 'door', name: '문', dur: 10, draw: u => drawDoorOut(u) },
     { id: 'stairs', name: '계단', dur: 6, draw: u => drawStairs(u) },
