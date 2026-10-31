@@ -55,8 +55,8 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   <div class="bar">
     <button class="btn" id="play" type="button">재생</button>
     <button class="btn ghost" id="restart" type="button">처음부터</button>
-    <div class="scrub"><input id="seek" type="range" min="0" max="72" step="0.01" value="0" aria-label="재생 위치"></div>
-    <span class="time" id="time">00.0 / 72.0</span>
+    <div class="scrub"><input id="seek" type="range" min="0" max="88" step="0.01" value="0" aria-label="재생 위치"></div>
+    <span class="time" id="time">00.0 / 88.0</span>
     <button class="btn ghost" id="snd" type="button" aria-pressed="true">소리</button>
   </div>
   <div class="shots" id="shots"></div>
@@ -102,9 +102,10 @@ const SHOTS = [
   { id: 'train', t0: 35.0, t1: 46.4, name: '열차 안', note: '문이 열리면 배경만 천천히 열차 안으로 바뀐다. 출근길 사람들로 붐비는 객실. 하은은 손잡이를 잡고, 열차가 달리다 다음 역에 선다.' },
   { id: 'off', t0: 46.4, t1: 52.0, name: '내리는 역', note: '문이 열리면 배경만 내리는 역 승강장으로 바뀐다. 하은 뒤로 문이 닫히고 열차가 떠난다.' },
   { id: 'alley', t0: 52.0, t1: 66.0, name: '골목길', note: '배경만 아침 골목으로 바뀌고 하은이 걷는다. 빨간 벽돌 담장과 화분, 다세대 주택, 전봇대와 전깃줄, 볼록거울, 담장 위 고양이, 작은 슈퍼.' },
-  { id: 'hospital', t0: 66.0, t1: 72, name: '병원', note: '골목 끝에 병원이 나온다. 하은이 병원 앞에서 멈추고 건물을 올려다본다.' }
+  { id: 'hospital', t0: 66.0, t1: 70.2, name: '병원', note: '골목 끝에 병원이 나온다. 하은이 병원 앞에서 멈추고 건물을 올려다본다.' },
+  { id: 'corridor', t0: 70.2, t1: 88, name: '병원 복도', note: '배경만 어두운 병원 복도로 바뀐다. 하은이 걸어가면 앞의 천장 등이 한 칸씩 깜빡이며 켜진다. 502호 문 앞에서 멈춘다.' }
 ];
-const END = 72;
+const END = 88;
 // at the belt (seconds)
 const S1 = { beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], letGo: 9.6 };
 // she stands at x 222 the whole take; once she walks the world slides by. d = how far she has walked (px), easing into her pace
@@ -131,6 +132,13 @@ const WALK2 = { t0: 51.6, ramp: 0.9, v: 30, stop: 67.6 };   // she sets off on t
 const walk2D = t => { const v = WALK2.v, r = WALK2.ramp, b = WALK2.t0 + r, c = WALK2.stop - r, dB = v * r / 2, dC = dB + v * (c - b);
   if (t <= WALK2.t0) return 0; if (t < b) return v * (t - WALK2.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
   const u = Math.min(t, WALK2.stop) - c; return dC + v * u - v * u * u / (2 * r); };
+// then the hospital's corridor, dark this early: the lights come on one panel at a time ahead of her as she walks, to 502
+const CORR = { t0: 70.2, t1: 73.2 };
+const WALK3 = { t0: 73.4, ramp: 0.9, v: 30, stop: 84.2 };
+const walk3D = t => { const v = WALK3.v, r = WALK3.ramp, b = WALK3.t0 + r, c = WALK3.stop - r, dB = v * r / 2, dC = dB + v * (c - b);
+  if (t <= WALK3.t0) return 0; if (t < b) return v * (t - WALK3.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
+  const u = Math.min(t, WALK3.stop) - c; return dC + v * u - v * u * u / (2 * r); };
+const walk3T = d => { let a = WALK3.t0, b = WALK3.stop; for (let i = 0; i < 40; i++) { const m = (a + b) / 2; if (walk3D(m) < d) a = m; else b = m; } return b; };
 const walk2T = d => { let a = WALK2.t0, b = WALK2.stop; for (let i = 0; i < 40; i++) { const m = (a + b) / 2; if (walk2D(m) < d) a = m; else b = m; } return b; };
 const D_STOP = walkD(WALK.stop);
 const doorT = walkT(WALK.door);   // when she passes under the shutter
@@ -751,6 +759,65 @@ function alleyPose(t) {
   if (t >= WALK2.stop) { const look = lerp(0.2, 1, ease(seg(t, WALK2.stop + 0.7, WALK2.stop + 1.8))); return { o: { mirror: true, look, sway: 0 }, top: HTOP - (look > 0.5 ? 1 : 0) }; }
   const d = walk2D(t); return walking(d, Math.min(1, d / STRIDE, (WALK2.stop - t) / WALK2.ramp), 0.2);
 }
+// ---------- the hospital corridor ----------
+// Side on: the ceiling with its light panels, pale walls, a wooden handrail over the wainscot, ward doors with their number
+// plates, a wheelchair and a bench, the glossy floor. Dark at first; each panel switches on (a flicker, a tick) when she comes
+// within reach of it, so the lights come on one at a time down the corridor ahead of her. She stops at 502.
+const CRW = document.createElement('canvas'); CRW.width = W; CRW.height = H; const crctx = CRW.getContext('2d');
+const DARK = document.createElement('canvas'); DARK.width = W; DARK.height = H; const dkctx = DARK.getContext('2d');
+const LIGHT_Q = Array.from({ length: 12 }, (_, k) => k * 64);   // the panels (on the 1.0 layer, from where she comes in)
+const DOOR502 = Math.round(walk3D(WALK3.stop)) + 34;   // the door she stops at (just ahead of her); the ones she passes are 503, 504...
+// when each panel comes on: the one over her and the next as the corridor comes in, then each as she gets within 70 px
+const lightOn = q => q === 0 ? CORR.t0 + 1.2 : q === 64 ? CORR.t0 + 2.2 : walk3T(q - 70);
+function lightI(q, t) { const u = t - lightOn(q); if (u < 0) return 0; if (u < 0.36) return [1, 0, 1, 0, 0, 1][Math.floor(u / 0.06)] * 0.85; return 1; }
+function corridor(t) {
+  const d = walk3D(t), L = q => Math.round(q - d + HX);
+  R(0, 0, W, H, '#d6dfdb');
+  R(0, 0, W, 30, '#dfe4e2'); R(0, 29, W, 1, '#b9c2be');
+  R(0, 116, W, 34, '#b9c8c2'); R(0, 114, W, 3, '#c9a77a'); R(0, 117, W, 1, '#9a7a52');
+  for (let q = -64; q < 900; q += 48) { const x = L(q); if (x > -4 && x < W) R(x, 118, 2, 3, '#9a7a52'); }
+  // doors and their plates
+  for (let k = -3; k < 3; k++) {
+    const q = DOOR502 - 128 * k, x = L(q) - 16; if (x > W || x + 36 < 0) continue;
+    R(x - 2, 56, 36, 94, '#a8b4b0'); R(x, 58, 32, 92, '#d8c8a8'); R(x + 15, 58, 2, 92, '#bba98a'); R(x + 4, 66, 8, 20, '#9fb8c4'); R(x + 26, 100, 3, 8, '#8a8f8c');
+    R(x + 2, 44, 28, 9, '#2f6f9a'); g.font = '600 7px "IBM Plex Mono", monospace'; g.textBaseline = 'middle'; g.textAlign = 'center'; g.fillStyle = '#f4f8fa'; g.fillText(String(502 + k), x + 16, 49); g.textAlign = 'left';
+  }
+  // a wheelchair, a bench, a hand-sanitiser on the wall, the green exit sign far down
+  const wx = L(150); if (wx > -30 && wx < W) { R(wx, 128, 18, 3, '#5a6064'); R(wx + 14, 112, 3, 18, '#5a6064'); R(wx + 2, 120, 14, 8, '#2f4f6a'); for (const [cx, r] of [[wx + 4, 6], [wx + 14, 4]]) { R(cx - r, 140 - r, 2 * r, 2, '#3a3e42'); R(cx - r, 138 + r, 2 * r, 2, '#3a3e42'); R(cx - r, 140 - r, 2, 2 * r, '#3a3e42'); R(cx + r - 2, 140 - r, 2, 2 * r, '#3a3e42'); } }
+  const bx = L(-40); if (bx > -50 && bx < W) { R(bx, 132, 40, 4, '#8a9aa4'); R(bx + 2, 136, 3, 12, '#6a7a84'); R(bx + 35, 136, 3, 12, '#6a7a84'); }
+  const hs = L(270); if (hs > -10 && hs < W) { R(hs, 92, 6, 12, '#e8eef0'); R(hs + 2, 104, 2, 3, '#6a9ad8'); }
+  const ex = L(720); if (ex > -20 && ex < W) { R(ex, 34, 22, 9, '#2f9a5a'); R(ex + 3, 36, 4, 5, '#f4f8fa'); R(ex + 9, 37, 10, 3, '#f4f8fa'); }
+  // floor
+  R(0, 150, W, 66, '#c6d0cb'); R(0, 150, W, 2, '#9aa6a0'); for (let q = -64; q < 900; q += 32) { const x = L(q); if (x > -2 && x < W) R(x, 152, 1, 64, '#b9c4bf'); } R(0, 180, W, 1, '#b9c4bf');
+  // the panels, lit or dark, and their reflections on the floor
+  for (const q of LIGHT_Q) { const x = L(q) - 15, I = lightI(q, t); if (x < -40 || x > W) continue;
+    R(x, 24, 30, 4, I > 0.5 ? '#f8fcf8' : '#aab3af'); if (I > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const cg = g.createLinearGradient(0, 28, 0, 150); cg.addColorStop(0, `rgba(240,250,245,${0.1 * I})`); cg.addColorStop(1, 'rgba(240,250,245,0)'); g.fillStyle = cg; g.beginPath(); g.moveTo(x, 28); g.lineTo(x + 30, 28); g.lineTo(x + 52, 150); g.lineTo(x - 22, 150); g.closePath(); g.fill(); g.restore(); }
+    if (I > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,255,255,${0.18 * I})`; g.fillRect(x + 8, 154, 14, 40); g.restore(); } }
+}
+// the dark over it all, opened up under each lit panel (a soft cone of light down to the floor)
+function corridorDark(t) {
+  const d = walk3D(t);
+  dkctx.globalCompositeOperation = 'source-over'; dkctx.clearRect(0, 0, W, H); dkctx.fillStyle = 'rgba(8,12,18,.8)'; dkctx.fillRect(0, 0, W, H);
+  dkctx.globalCompositeOperation = 'destination-out';
+  // each panel lights its own cell: a tall soft oval of light from the ceiling down to the floor, just touching the next one
+  for (const q of LIGHT_Q) { const I = lightI(q, t); if (I <= 0) continue; const x = q - d + HX;
+    dkctx.save(); dkctx.translate(x, 96); dkctx.scale(1, 2.1);
+    const gr = dkctx.createRadialGradient(0, 0, 4, 0, 0, 40); gr.addColorStop(0, `rgba(0,0,0,${I})`); gr.addColorStop(0.6, `rgba(0,0,0,${0.8 * I})`); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    dkctx.fillStyle = gr; dkctx.fillRect(-44, -48, 88, 96); dkctx.restore(); }
+  dkctx.globalCompositeOperation = 'source-over';
+  g.drawImage(DARK, 0, 0);
+}
+function corridorPose(t) {
+  if (t < WALK3.t0) { const look = lerp(1, 0.2, ease(seg(t, CORR.t0, CORR.t0 + 1))); return { o: { mirror: true, look, sway: 0 }, top: HTOP - (look > 0.5 ? 1 : 0) }; }
+  if (t >= WALK3.stop) return { o: { mirror: true, look: lerp(0.2, 0.6, ease(seg(t, WALK3.stop + 0.5, WALK3.stop + 1.3))), sway: 0 }, top: HTOP };
+  const d = walk3D(t); return walking(d, Math.min(1, d / STRIDE, (WALK3.stop - t) / WALK3.ramp), 0.2);
+}
+function corridorScene(t) {
+  corridor(t);
+  const { o, top } = corridorPose(t);
+  haeunSprite(o); tintSprite('#eef4f2'); putSprite(HX, top);
+  corridorDark(t);
+}
 function alleyScene(t) {
   alley(t);
   const { o, top } = alleyPose(t);
@@ -793,7 +860,9 @@ function render(t) {
   if (t > DEST.t0 && t < DEST.t1) crossTo(t, DEST.t0, DEST.t1, subctx, SCRW, u => station(u, true), IDLE, '#f2f6f4', '#eef0ec', H);
   if (t >= DEST.t1 && t < ALLEY.t1) { g = wctx; station(t, true); }
   if (t > ALLEY.t0 && t < ALLEY.t1) crossTo(t, ALLEY.t0, ALLEY.t1, alctx, ALW, alleyScene, alleyPose(t), '#eef0ec', '#fff6ec', BELT_Y - 3, alleyWall);
-  if (t >= ALLEY.t1) { g = wctx; alleyScene(t); }
+  if (t >= ALLEY.t1 && t < CORR.t1) { g = wctx; alleyScene(t); }
+  if (t > CORR.t0 && t < CORR.t1) crossTo(t, CORR.t0, CORR.t1, crctx, CRW, corridorScene, corridorPose(t), '#fff6ec', '#eef4f2', BELT_Y - 3);
+  if (t >= CORR.t1) { g = wctx; corridorScene(t); }
   // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
   out.drawImage(wb, 0, 0, W, H, 0, 0, cv.width, cv.height);
@@ -854,6 +923,10 @@ const SFX = {
   // the train pulling away behind the glass
   leaving(t) { const sN = ac.createBufferSource(); sN.buffer = NB; sN.loop = true; const fl = ac.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(600, t); fl.frequency.linearRampToValueAtTime(150, t + 4); const gn = ac.createGain();
     gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.1, t + 0.8); gn.gain.linearRampToValueAtTime(0.0001, t + 4); sN.connect(fl); fl.connect(gn); gn.connect(bus); sN.start(t); sN.stop(t + 4.1); },
+  // a panel switching on: the starter's tick and the tube catching
+  panel(t) { noise(t, 0.02, 0.12, 'highpass', 3000); noise(t + 0.12, 0.02, 0.07, 'highpass', 3000); tone(t + 0.24, 'sine', 2400, 2300, 0.006, 0.4); thump(t + 0.24, 110, 0.04, 0.06); },
+  // a heartbeat, faint, from behind the door (the next stage's beat)
+  heartbeat(t, e, into) { const left = e.dur - into; for (let c = 0; c < left - 0.2; c += 60 / 62) { const a = 0.05 + 0.08 * Math.min(1, c / 2); thump(t + c, 58, a, 0.22); thump(t + c + 0.14, 50, a * 0.6, 0.18); } },
   meow(t) { tone(t, 'triangle', 700, 520, 0.02, 0.35); tone(t + 0.05, 'sine', 1400, 1000, 0.006, 0.3); },
   // the brakes' squeal as it stops
   brake(t) { const o = ac.createOscillator(), gn = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(2900, t); o.frequency.linearRampToValueAtTime(2500, t + 1.2); lfo.frequency.value = 9; lg.gain.value = 30; lfo.connect(lg); lg.connect(o.frequency);
@@ -867,7 +940,9 @@ EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: 
   { t: BOARD.t0, fn: 'pad', dur: DEST.t0 - BOARD.t0, notes: [87.31, 174.61, 220, 261.63, 329.63, 392] },   // Fmaj9 on the train
   { t: DEST.t0, fn: 'pad', dur: ALLEY.t0 - DEST.t0, notes: [110, 164.81, 196, 246.94, 261.63] },   // Am9 getting off
   { t: ALLEY.t0, fn: 'pad', dur: WALK2.stop - ALLEY.t0, notes: [130.81, 196, 246.94, 293.66, 329.63] },   // Cmaj9 down the alley
-  { t: WALK2.stop, fn: 'pad', dur: END - WALK2.stop - 1.2, notes: [110, 164.81, 220, 246.94, 261.63] },   // A minor (add9) at the hospital
+  { t: WALK2.stop, fn: 'pad', dur: CORR.t0 + 1 - WALK2.stop, notes: [110, 164.81, 220, 246.94, 261.63] },   // A minor (add9) at the hospital
+  { t: CORR.t0 + 1, fn: 'pad', dur: END - CORR.t0 - 2.2, notes: [146.83, 174.61, 220, 261.63, 329.63] },   // Dm9 down the corridor
+  { t: WALK3.stop + 0.8, fn: 'heartbeat', dur: END - WALK3.stop - 0.8 },
   { t: RIDE.stop - 1.4, fn: 'brake' }, { t: RIDE.open, fn: 'doors' }, { t: DEST.close, fn: 'doors' }, { t: DEST.leave, fn: 'leaving' },
   { t: 56.5, fn: 'bird' }, { t: 59.8, fn: 'bird' }, { t: 63.1, fn: 'bird' }, { t: 56.2, fn: 'meow' },
   { t: ST.open, fn: 'doors' }, { t: RIDE.close, fn: 'doors' }, { t: RIDE.depart, fn: 'pullout' }, { t: BOARD.t0 + 0.4, fn: 'murmur', dur: DEST.t0 + 1 - BOARD.t0 },
@@ -875,6 +950,8 @@ EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: 
   { t: doorT - 0.5, fn: 'whoosh' }, { t: 19.2, fn: 'bird' }, { t: 21.4, fn: 'bird' }, { t: 23.1, fn: 'bird' }, { t: WALK.lampOff, fn: 'lamp' });
 for (let k = 1; ; k++) { const t = walkT(k * STRIDE); if (t > WALK.stop - 0.05) break; EV.push({ t, fn: 'step', out: t > doorT }); }
 for (let c = RIDE.clack0; c < RIDE.slow + 1; c += RIDE.gap) EV.push({ t: c, fn: 'clack' }, { t: c + 0.18, fn: 'clack' });
+for (let k = 1; ; k++) { const t = walk3T(k * STRIDE); if (t > WALK3.stop - 0.05) break; EV.push({ t, fn: 'step', out: false }); }
+for (const q of LIGHT_Q) { const t = lightOn(q); if (t < END - 0.5) EV.push({ t, fn: 'panel' }); }
 for (let k = 1; ; k++) { const t = walk2T(k * STRIDE); if (t > WALK2.stop - 0.05) break; EV.push({ t, fn: 'step', out: t > ALLEY.t0 + 1.7 }); }   // on the platform the steps ring, in the alley they don't
 EV.sort((a, b) => a.t - b.t);
 function audioStart(t) {
@@ -892,7 +969,7 @@ function audioTick(t) {
   amb.room.gain.setTargetAtTime(0.05 * (1 - outK), ac.currentTime, 0.2);
   amb.buzz.gain.setTargetAtTime(0.004 * lit, ac.currentTime, 0.02);
   const onTrain = t > WIPE.t0 ? 1 : 0;
-  const street2 = t > ALLEY.t0 ? 1 : 0, running = t > RIDE.depart && t < RIDE.stop ? seg(t, RIDE.depart, RIDE.depart + 3) * (1 - seg(t, RIDE.slow, RIDE.stop)) : 0;
+  const street2 = t > ALLEY.t0 && t < CORR.t0 + 1.5 ? 1 : 0, running = t > RIDE.depart && t < RIDE.stop ? seg(t, RIDE.depart, RIDE.depart + 3) * (1 - seg(t, RIDE.slow, RIDE.stop)) : 0;
   amb.wind.gain.setTargetAtTime(Math.max(outK * (1 - onTrain), street2) * (0.025 + 0.012 * Math.sin(t * 0.8)), ac.currentTime, onTrain ? 0.08 : 0.4);
   amb.rumble.gain.setTargetAtTime(street2 ? 0 : onTrain * (0.035 + 0.06 * running), ac.currentTime, 0.15);   // the station's low hum, the train running
 }
