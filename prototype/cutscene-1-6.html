@@ -56,8 +56,8 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   <div class="bar">
     <button class="btn" id="play" type="button">재생</button>
     <button class="btn ghost" id="restart" type="button">처음부터</button>
-    <div class="scrub"><input id="seek" type="range" min="0" max="106" step="0.01" value="0" aria-label="재생 위치"></div>
-    <span class="time" id="time">00.0 / 106.0</span>
+    <div class="scrub"><input id="seek" type="range" min="0" max="108" step="0.01" value="0" aria-label="재생 위치"></div>
+    <span class="time" id="time">00.0 / 108.0</span>
     <button class="btn ghost" id="hb" type="button" aria-pressed="true">심박 줄</button>
     <button class="btn ghost" id="snd" type="button" aria-pressed="true">소리</button>
   </div>
@@ -116,9 +116,9 @@ const SHOTS = [
   { id: 'alley', t0: 52.0, t1: 66.0, name: '골목길', note: '배경만 아침 골목으로 바뀌고 하은이 걷는다. 빨간 벽돌 담장과 화분, 다세대 주택, 전봇대와 전깃줄, 볼록거울, 담장 위 고양이, 작은 슈퍼.' },
   { id: 'hospital', t0: 66.0, t1: 70.2, name: '병원', note: '골목 끝에 병원이 나온다. 하은이 병원 앞에서 멈추고 건물을 올려다본다.' },
   { id: 'corridor', t0: 70.2, t1: 86.0, name: '병원 복도', note: '병원 앞이 암전되고, 깜깜한 복도에서 천장 등이 하나씩 켜진다. 하은이 걸어가 502호 문 앞에서 멈춘다.' },
-  { id: 'ward', t0: 86.0, t1: 106, name: '병실', note: '배경만 502호 병실로 바뀐다. 침상에 누운 어머니, 머리맡 심박 모니터, 창으로 들어오는 아침 해. 하은은 침상 옆에 섰다가 의자에 앉아 어머니 손을 잡고, 침상 쪽으로 고개를 숙였다가, 어머니 손가락이 움직이자 고개를 든다.' }
+  { id: 'ward', t0: 86.0, t1: 108, name: '병실', note: '배경만 502호 병실로 바뀐다. 침상에 누운 어머니, 머리맡 심박 모니터, 창으로 들어오는 아침 해. 하은은 침상 옆에 섰다가 의자에 앉아 어머니 손을 잡고, 침상 쪽으로 고개를 숙였다가, 어머니 손가락이 움직이자 고개를 든다.' }
 ];
-const END = 106;   // the cutscene's own length (not the song's)
+const END = 108;   // the cutscene's own length (not the song's)
 // at the belt (seconds)
 const S1 = { beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], letGo: 9.6 };
 // she stands at x 222 the whole take; once she walks the world slides by. d = how far she has walked (px), easing into her pace
@@ -149,7 +149,7 @@ const walk2D = t => { const v = WALK2.v, r = WALK2.ramp, b = WALK2.t0 + r, c = W
 const CORR = { t0: 70.2, t1: 71.3 };
 // the ward: background only again, then she sits, takes her mother's hand, bows her head toward the bed, feels the hand close a
 // little and lifts her head (fixed times, not tied to the song)
-const WARD = { t0: 86.0, t1: 89.0, sit: 91.5, hold: 93.0, rest: 95.5, squeeze: 99.0, lift: 100.5 };   // the hospital front fades to full black, then the corridor's lights come on one at a time
+const WARD = { t0: 86.0, t1: 89.0, sit: 91.5, hold: 93.0, rest: 95.5, squeeze: 99.0, lift: 100.5, knock: 103.0, turn: 103.9 };   // the hospital front fades to full black, then the corridor's lights come on one at a time
 const WALK3 = { t0: 73.4, ramp: 0.9, v: 30, stop: 84.2 };
 const walk3D = t => { const v = WALK3.v, r = WALK3.ramp, b = WALK3.t0 + r, c = WALK3.stop - r, dB = v * r / 2, dC = dB + v * (c - b);
   if (t <= WALK3.t0) return 0; if (t < b) return v * (t - WALK3.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
@@ -882,7 +882,7 @@ function alleyScene(t) {
 // with the rows, a visitor's chair, the window with its blinds where the morning comes in, slanting light and dust over the bed
 // (the same light as the first shot), a curtain. 하은 faces the bed from the right.
 const WDW = document.createElement('canvas'); WDW.width = W; WDW.height = H; const wdctx = WDW.getContext('2d');
-const MOM_HAND = { x: 226, y: 120 };   // on the blanket by her waist, just in front of where 하은 sits
+const MOM_HAND = { x: 236, y: 130 };   // over the front edge of the mattress by her waist, just to the right of where 하은 sits
 const wardSun = t => 0.15 + 0.85 * ease(seg(t, WARD.t1, WARD.lift + 3));
 function ward(t) {
   const sun = wardSun(t);
@@ -913,7 +913,7 @@ function ward(t) {
   for (const x of [200, 222]) R(x, 113, 1, 14, '#93b0ca');
   // her arm along her side on top of the blanket, the hand by her waist that 하은 takes (it closes a little)
   const sq = clamp((t - WARD.squeeze) / 0.4, 0, 1) * (1 - clamp((t - WARD.squeeze - 1.6) / 0.6, 0, 1));
-  R(MOM_HAND.x + 2, MOM_HAND.y - 1, 24, 3, '#e8e4dc'); R(MOM_HAND.x - 2, MOM_HAND.y - 1, 5, 3, '#d8a888'); if (sq > 0.5) R(MOM_HAND.x - 3, MOM_HAND.y - 2, 2, 1, '#c99878');
+  R(MOM_HAND.x + 2, 121, 18, 3, '#e8e4dc'); R(MOM_HAND.x + 1, 123, 3, MOM_HAND.y - 123, '#e8e4dc'); R(MOM_HAND.x - 1, MOM_HAND.y - 1, 4, 4, '#d8a888'); if (sq > 0.5) R(MOM_HAND.x - 2, MOM_HAND.y + 2, 2, 1, '#c99878');   // her arm along her side, the hand over the edge
   // the visitor's chair, in front of the bed at her waist
   R(206, 144, 24, 3, '#6a7a86'); R(206, 118, 3, 28, '#6a7a86'); R(208, 147, 2, 12, '#55636c'); R(226, 147, 2, 12, '#55636c');
 }
@@ -924,6 +924,7 @@ function wardPose(t) {
   const reach = tp => ({ dx: HX - MOM_HAND.x - 1, dy: MOM_HAND.y - tp });   // her hand on her mother's (she faces right: measured mirrored)
   if (t < WARD.rest) return { o: { mirror: true, look: -0.4, seated: true, arms: 'reach', reach: reach(top), sway: 0 }, top };
   if (t < WARD.lift) { const k = ease(seg(t, WARD.rest, WARD.rest + 1.2)), tp = top + Math.round(4 * k); return { o: { mirror: true, look: lerp(-0.4, -1, k), seated: true, arms: 'reach', reach: reach(tp), sway: 0 }, top: tp }; }
+  if (t >= WARD.turn) return { o: { mirror: false, look: 0.2, seated: true, sway: 0 }, top };   // a knock: she lets go and turns to the door behind her
   const k = ease(seg(t, WARD.lift, WARD.lift + 1.4)), tp = top + Math.round(4 * (1 - k)); return { o: { mirror: true, look: lerp(-1, 0.1, k), seated: true, arms: 'reach', reach: reach(tp), sway: 0 }, top: tp };
 }
 function wardScene(t) {
@@ -1045,6 +1046,8 @@ const SFX = {
   panel(t) { noise(t, 0.02, 0.12, 'highpass', 3000); noise(t + 0.12, 0.02, 0.07, 'highpass', 3000); tone(t + 0.24, 'sine', 2400, 2300, 0.006, 0.4); thump(t + 0.24, 110, 0.04, 0.06); },
   // a heartbeat, faint, from behind the door (the next stage's beat)
   heartbeat(t, e, into) { const left = e.dur - into; for (let c = 0; c < left - 0.2; c += 60 / 62) { const a = 0.05 + 0.08 * Math.min(1, c / 2); thump(t + c, 58, a, 0.22); thump(t + c + 0.14, 50, a * 0.6, 0.18); } },
+  // knuckles on the ward door, three times
+  knock(t) { for (const dt of [0, 0.26, 0.52]) { thump(t + dt, 170, 0.16, 0.08); noise(t + dt, 0.04, 0.09, 'bandpass', 900, 1.5); noise(t + dt + 0.09, 0.05, 0.02, 'bandpass', 700, 1); } },
   meow(t) { tone(t, 'triangle', 700, 520, 0.02, 0.35); tone(t + 0.05, 'sine', 1400, 1000, 0.006, 0.3); },
   // the brakes' squeal as it stops
   brake(t) { const o = ac.createOscillator(), gn = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(2900, t); o.frequency.linearRampToValueAtTime(2500, t + 1.2); lfo.frequency.value = 9; lg.gain.value = 30; lfo.connect(lg); lg.connect(o.frequency);
@@ -1059,6 +1062,7 @@ EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: 
   { t: DEST.t0, fn: 'pad', dur: ALLEY.t0 - DEST.t0, notes: [110, 164.81, 196, 246.94, 261.63] },   // Am9 getting off
   { t: ALLEY.t0, fn: 'pad', dur: WALK2.stop - ALLEY.t0, notes: [130.81, 196, 246.94, 293.66, 329.63] },   // Cmaj9 down the alley
   { t: WALK2.stop, fn: 'pad', dur: CORR.t0 + 1 - WALK2.stop, notes: [110, 164.81, 220, 246.94, 261.63] },   // A minor (add9) at the hospital
+  { t: WARD.knock, fn: 'knock' },
   { t: CORR.t0 + 1, fn: 'pad', dur: WARD.t0 - CORR.t0 - 1, notes: [146.83, 174.61, 220, 261.63, 329.63] },   // Dm9 down the corridor
   { t: RIDE.stop - 1.4, fn: 'brake' }, { t: RIDE.open, fn: 'doors' }, { t: DEST.close, fn: 'doors' }, { t: DEST.leave, fn: 'leaving' },
   { t: 56.5, fn: 'bird' }, { t: 59.8, fn: 'bird' }, { t: 63.1, fn: 'bird' }, { t: 56.2, fn: 'meow' },
