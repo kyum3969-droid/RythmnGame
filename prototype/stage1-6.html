@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
 <style>
 /* 1-6's screen: the cutscene movie fills the top, the mother's heartbeat runs along a monitor strip at the bottom. One button:
-   press on the seventh beat of each row (a homage to Rhythm Doctor). Same 384x216 pixel canvas and the same look as the game. */
+   press on the 4th beat of each row (a homage to Rhythm Doctor). Same 384x216 pixel canvas and the same look as the game. */
 :root{
   --night:#15110e; --panel:#1f1915; --line:#3a2f28; --ink:#efe6d2; --muted:#a6978a;
   --paper:#efe6d2; --paper-ink:#1d1815; --paper-muted:#6d6156; --ok:#8fd694; --stamp:#c8372d;
@@ -53,7 +53,7 @@ dl{display:grid;grid-template-columns:auto 1fr;gap:.15em 1.2em;margin:.5em 0 1em
       <div class="label">
         <div class="kicker"><span>스테이지 1-6 · 하은의 새벽</span><span>502호 · 05:40</span></div>
         <h2>어머니의 박자</h2>
-        <p>아래 줄에서 어머니의 심박이 칸을 하나씩 건너갑니다. 여섯 번 뛰고, <b>일곱 번째 박에 화면을 터치</b>(또는 스페이스)해서 하은이 박을 이어 주세요. 첫 줄은 보여 주기만 합니다. 중간부터는 하은의 심장도 한 줄 더 뜁니다.</p>
+        <p>아래 줄에서 어머니의 심박이 칸을 하나씩 건너갑니다. 세 번 뛰고, <b>네 번째 박에 화면을 터치</b>(또는 스페이스)해서 하은이 박을 이어 주세요. 첫 줄은 보여 주기만 합니다. 중간부터는 하은의 심장도 한 줄 더 뜁니다.</p>
         <div class="row">
           <button class="btn" id="start" type="button">시작</button>
           <label class="btn ghost" for="file">컷씬 영상 불러오기</label>
@@ -90,29 +90,30 @@ const cv = $('cv'), g = cv.getContext('2d'); g.setTransform(SC, 0, 0, SC, 0, 0);
 const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
 
-// ---------- the chart (a homage to Rhythm Doctor's seventh-beat rows) ----------
-// The song runs in 8-beat segments, each at its own tempo. A row is seven beats on one patient's line: the heart beats on 1 to 6
-// (a pulse hops notch to notch) and on the 7th the player presses; the 8th is a breath. Her mother's row runs every segment, and
-// the doctor's "오늘 좀 흔들려요" plays out as rows that speed up, slow down, or skip a beat (the 7th still falls where the count
-// says). From the middle 하은's own heart joins as a second row: four beats behind at first (her 7th falls between her
-// mother's), then on the same beats, so one press keeps both.
+// ---------- the chart (after Rhythm Doctor's rows, four beats long) ----------
+// The song runs in 8-beat segments, each at its own tempo. A row is four beats on one patient's line, one bar: the heart beats
+// on 1 to 3 and on the 4th the player presses. Her mother's rows run back to back, and the doctor's "오늘 좀 흔들려요" plays out
+// as rows that speed up, slow down, or skip a beat (the 4th still falls where the count says). From the middle 하은's own
+// heart joins as a second row: two beats behind at first (her 4th falls between her mother's), then on the same beats, so one
+// press keeps both.
 const SEG = [62, 62, 62, 62, 62, 68, 68, 56, 72, 60, 60, 66, 58, 64, 64, 64, 64, 60, 60, 60];
 const LEAD = 2.4;   // a count-in before the first row (two soft clicks)
 const SEGT = []; { let t = LEAD; for (const b of SEG) { SEGT.push(t); t += 8 * 60 / b; } SEGT.push(t); }
 const beatT = b => { const s = clamp(Math.floor(b / 8), 0, SEG.length - 1); return SEGT[s] + (b - s * 8) * 60 / SEG[s]; };
 const tBeat = t => { if (t < LEAD) return (t - LEAD) * SEG[0] / 60; let s = 0; while (s < SEG.length - 1 && t >= SEGT[s + 1]) s++; return s * 8 + (t - SEGT[s]) * SEG[s] / 60; };
+const ROW = 4;   // beats from a row's start to its arrival: three heartbeats come in by themselves, the 4th is the player's
 const ROWS = [];
-SEG.forEach((_, s) => ROWS.push({ lane: 0, b0: s * 8, demo: s === 0, skip: { 9: [3], 10: [2, 4], 11: [5] }[s] || [], cue: { 0: '보세요: 일곱 번째 박은 하은이 이어 줍니다', 1: '일곱 번째 박에!', 5: '빨라진다', 7: '느려진다', 9: '한 박이 빠져도, 세던 대로', 17: '괜찮아' }[s] }));
-for (const b0 of [108, 116, 128, 136, 144, 152]) ROWS.push({ lane: 1, b0, skip: [], cue: { 108: '하은의 심장도 뛴다', 128: '같은 박으로' }[b0] });
-const TWO_AT = beatT(108) - 1.4;
+SEG.forEach((_, s) => { for (const h of [0, 4]) { const b0 = s * 8 + h, first = h === 0; ROWS.push({ lane: 0, b0, demo: b0 === 0, skip: (first ? { 9: [1], 10: [0, 2], 11: [2] } : { 9: [2], 10: [1], 12: [1] })[s] || [], cue: first ? { 0: '보세요: 네 번째 박은 하은이 이어 줍니다', 1: '네 번째 박에!', 5: '빨라진다', 7: '느려진다', 9: '한 박이 빠져도, 세던 대로', 17: '괜찮아' }[s] : undefined }); } });
+for (const b0 of [106, 110, 114, 118, 122, 128, 132, 136, 140, 144, 148, 152, 156]) ROWS.push({ lane: 1, b0, skip: [], cue: { 106: '하은의 심장도 뛴다', 128: '같은 박으로' }[b0] });
+const TWO_AT = beatT(106) - 1.4;
 let EV = [], TARGETS = [], END_T = 0;
 function compile() {
   EV = []; TARGETS = [];
   ROWS.forEach((r, ri) => {
-    r.t0 = beatT(r.b0); r.t8 = beatT(r.b0 + 8);
-    if (r.lane === 0) EV.push({ t: r.t0, type: 'chord', row: r.b0 / 8, dur: r.t8 - r.t0 });
-    for (let k = 0; k < 6; k++) if (!r.skip.includes(k)) EV.push({ t: beatT(r.b0 + k), type: 'pulse', lane: r.lane });
-    const tg = { t: beatT(r.b0 + 6), row: ri, lane: r.lane, demo: !!r.demo, judge: null, d: 0 }; TARGETS.push(tg); r.tg = tg;
+    r.t0 = beatT(r.b0); r.t8 = beatT(r.b0 + ROW);
+    if (r.lane === 0) EV.push({ t: r.t0, type: 'chord', row: r.b0 / ROW, dur: r.t8 - r.t0 });
+    for (let k = 0; k < ROW - 1; k++) if (!r.skip.includes(k)) EV.push({ t: beatT(r.b0 + k), type: 'pulse', lane: r.lane });
+    const tg = { t: beatT(r.b0 + ROW - 1), row: ri, lane: r.lane, demo: !!r.demo, judge: null, d: 0 }; TARGETS.push(tg); r.tg = tg;
     if (r.demo) EV.push({ t: tg.t, type: 'demo', lane: 0 });
   });
   EV.push({ t: LEAD - 1.2, type: 'click' }, { t: LEAD - 0.6, type: 'click' });
@@ -215,11 +216,10 @@ function placeholderWard(t) {
 function lerpCol(a, b, p) { const A = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), B = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16)); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], p))).join(',')})`; }
 
 // ---------- the patient rows (after Rhythm Doctor's) ----------
-// The rows lie over the scene itself. Each patient stands at the left end of a thin green line that runs to a big pixel heart
-// at the right; the heartbeat travels the line as an ECG wave, one hop per beat. The seventh beat sits in a pale cyan column
-// that crosses every row; past it the line turns yellow up to the heart. A press in time throws green sparks out of the
-// column and the heart pumps; a miss leaves a big pink X where the wave was and cracks the heart.
-const X0 = 8, HEART = 6, HX = 356, COL = 292, GAP = (COL - X0 - 26) / 6, SPOT = k => Math.round(X0 + 26 + k * GAP);   // the seven spots along the line (the 7th is the column) and the gap between them
+// The rows lie over the scene itself, each running to a big pixel heart at the right. A pen traces the heartbeats along the
+// row, one spot per beat; the 4th spot sits in a pale cyan column that crosses every row. A press in time throws green sparks
+// out of the column and the heart pumps; a miss leaves a big pink X where the beat should have been and cracks the heart.
+const X0 = 8, HEART = 3, HX = 356, COL = 292, GAP = (COL - X0 - 26) / 3, SPOT = k => Math.round(X0 + 26 + k * GAP);   // the four spots along the line (the 4th is the column) and the gap between them
 const ease = p => p < 0 ? 0 : p > 1 ? 1 : p * p * (3 - 2 * p);
 const rnd = (i, k) => { const s = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return s - Math.floor(s); };
 function txt(s, x, y, c, size = 7, align = 'left', weight = '600') { g.font = `${weight} ${size}px "IBM Plex Sans KR", sans-serif`; g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = c; g.fillText(s, x, y); g.textAlign = 'left'; }
@@ -261,19 +261,18 @@ function drawLane(lane, y, t, show) {
   const hurt = clamp(1 - (now - F.missAt) / 450, 0, 1), shake = hurt > 0 ? Math.round((rnd(now, lane) - 0.5) * 4 * hurt) : 0;
   g.save(); g.translate(shake, 0); g.globalAlpha = show;
   const r = laneRow(lane, t), b = tBeat(t), kf = r ? b - r.b0 : -1, tg = r && r.tg;
-  // the line: a faint flat trace, green to the column, yellow from there to the heart
   // beat by beat, drawn on like a monitor: a pen point sweeps along the line through each row and traces each heartbeat as it
   // passes (the R tip lands exactly on the beat), then that peak fades away while the pen goes on to trace the next one a spot
-  // further. Beats 1 to 6 are traced by themselves; at the 7th spot, in the column, an empty outline waits and the player's
+  // further. Beats 1 to 3 are traced by themselves; at the 4th spot, in the column, an empty outline waits and the player's
   // press is what the pen traces there, white and tall. A skipped beat's spot is traced flat.
   for (const row of ROWS) {
     if (row.lane !== lane) continue;
-    const kf = tBeat(t) - row.b0; if (kf < -0.6 || kf > 9) continue;
-    const pen = SPOT(0) + kf * GAP, drawing = kf >= -0.55 && kf < 7.5;
+    const kf = tBeat(t) - row.b0; if (kf < -0.4 || kf > ROW + 1.5) continue;
+    const pen = SPOT(0) + kf * GAP, drawing = kf >= -0.3 && kf < HEART + (HX - 8 - COL) / GAP;
     const clipTo = (x0, draw) => { g.save(); g.beginPath(); g.rect(x0 - BEAT_W - 1, y - 40, (drawing ? Math.min(pen, x0 + BEAT_W + 1) : x0 + BEAT_W + 1) - (x0 - BEAT_W - 1), 60); g.clip(); draw(); g.restore(); };
     for (let k = 0; k <= HEART; k++) {
       const tk = beatT(row.b0 + k), x = SPOT(k), dt = t - tk;
-      if (pen < x - BEAT_W && drawing) { if (k === HEART && kf > 4.5 && !row.tg.judge) { const a = 0.6 + 0.4 * Math.sin(t * 14); g.globalAlpha = show * a; g.setLineDash([2, 2]); wave(x, y, 24, '#ffffff', false); g.setLineDash([]); g.globalAlpha = show; } continue; }
+      if (pen < x - BEAT_W && drawing) { if (k === HEART && kf > HEART - 1.5 && !row.tg.judge) { const a = 0.6 + 0.4 * Math.sin(t * 14); g.globalAlpha = show * a; g.setLineDash([2, 2]); wave(x, y, 24, '#ffffff', false); g.setLineDash([]); g.globalAlpha = show; } continue; }
       const fade = clamp(1 - (dt - 0.15) / 0.6, 0, 1); if (fade <= 0 && k < HEART) continue;
       if (k < HEART) {
         if (row.skip.includes(k)) continue;
@@ -284,11 +283,11 @@ function drawLane(lane, y, t, show) {
         else if (tgk.judge !== 'miss') { const f7 = clamp(1 - (t - tgk.hitT - 0.2) / 0.7, 0, 1); if (f7 > 0) { g.globalAlpha = show * f7; clipTo(x, () => { wave(x, y, 27, tgk.judge === 'good' ? '#cfe8d6' : '#ffffff'); }); g.globalAlpha = show; } }
       }
       // the first two rows count out loud as each peak is traced, like the nurse
-      if ((row.demo || row.b0 === 8) && dt >= 0 && dt < 0.7) { g.globalAlpha = show * (1 - dt / 0.7); txt(k < HEART ? String(k + 1) : '일곱!', x, y - 34 - dt * 6, '#ffffff', 8, 'center', '700'); g.globalAlpha = show; }
+      if ((row.demo || row.b0 === 4) && dt >= 0 && dt < 0.7) { g.globalAlpha = show * (1 - dt / 0.7); txt(k < HEART ? String(k + 1) : '넷!', x, y - 34 - dt * 6, '#ffffff', 8, 'center', '700'); g.globalAlpha = show; }
     }
-    // the pen point and the short bright stretch of line it has just laid
-    if (drawing && pen > X0 && pen < HX - 8) { g.save(); g.globalCompositeOperation = 'lighter'; const tr = g.createLinearGradient(pen - 60, 0, pen, 0); tr.addColorStop(0, 'rgba(160,255,140,0)'); tr.addColorStop(1, 'rgba(160,255,140,.7)'); g.fillStyle = tr; g.fillRect(Math.max(X0, pen - 60), y - 0.15, Math.min(60, pen - X0), 0.8); const gr = g.createRadialGradient(pen, y, 0, pen, y, 7); gr.addColorStop(0, 'rgba(200,255,180,.7)'); gr.addColorStop(1, 'rgba(200,255,180,0)'); g.fillStyle = gr; g.fillRect(pen - 7, y - 7, 14, 14); g.restore(); g.fillStyle = '#f0fff0'; g.beginPath(); g.arc(pen, y + 0.25, 1.1, 0, Math.PI * 2); g.fill(); }
-    if (row.demo && t > beatT(row.b0 + 5.4) && t < beatT(row.b0 + 7)) txt('하은이 누름', COL, y + 11, '#e8ffd8', 6, 'center', '400');
+    // the pen point
+    if (drawing && pen > X0 && pen < HX - 8) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(pen, y, 0, pen, y, 7); gr.addColorStop(0, 'rgba(200,255,180,.7)'); gr.addColorStop(1, 'rgba(200,255,180,0)'); g.fillStyle = gr; g.fillRect(pen - 7, y - 7, 14, 14); g.restore(); g.fillStyle = '#f0fff0'; g.beginPath(); g.arc(pen, y + 0.25, 1.1, 0, Math.PI * 2); g.fill(); }
+    if (row.demo && t > beatT(row.b0 + HEART - 0.6) && t < beatT(row.b0 + HEART + 1)) txt('하은이 누름', COL, y + 11, '#e8ffd8', 6, 'center', '400');
   }
   // a miss: the big pink X where the beat should have been
   if (tg && tg.judge === 'miss' && t - tg.t < 1.6) { const a = clamp(1 - (t - tg.t - 1.0) / 0.6, 0, 1), xx = COL + clamp(tg.d / WIN_M, -1, 1) * 10; g.globalAlpha = show * a; g.strokeStyle = '#e8487a'; g.lineWidth = 3; g.beginPath(); g.moveTo(xx - 8, y - 8); g.lineTo(xx + 8, y + 8); g.moveTo(xx + 8, y - 8); g.lineTo(xx - 8, y + 8); g.stroke(); g.lineWidth = 1; g.globalAlpha = show; }
@@ -306,7 +305,7 @@ function drawRows(t) {
   const sh = g.createLinearGradient(0, 100, 0, H); sh.addColorStop(0, 'rgba(8,12,10,0)'); sh.addColorStop(1, 'rgba(8,12,10,.55)'); g.fillStyle = sh; g.fillRect(0, 100, W, H - 100);
   const two = clamp((t - TWO_AT) / 0.6, 0, 1), e2 = ease(two);
   const y0 = Math.round(lerp(186, 160, e2)), y1 = Math.round(lerp(246, 202, e2)); LANEY[0] = y0; LANEY[1] = y1;
-  // the seventh beat's column, across every row; brighter as the beat comes, a flash on a press
+  // the 4th beat's column, across every row; brighter as the beat comes, a flash on a press
   const near = Math.max(...[0, 1].map(l => { const r = laneRow(l, t); return r ? clamp(1 - Math.abs(t - r.tg.t) / 0.5, 0, 1) : 0; })), fl = clamp(1 - (performance.now() - FX.flashAt) / 200, 0, 1);
   g.fillStyle = `rgba(120,225,235,${0.16 + 0.12 * near + 0.25 * fl})`; g.fillRect(COL - 10, 124, 20, H - 124); g.fillStyle = `rgba(200,250,255,${0.18 + 0.2 * fl})`; g.fillRect(COL - 10, 124, 1, H - 124); g.fillRect(COL + 9, 124, 1, H - 124);
   drawLane(0, y0, t, 1);
