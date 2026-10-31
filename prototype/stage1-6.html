@@ -296,9 +296,6 @@ function drawLane(lane, y, t, show) {
   const hurt = clamp(1 - (now - F.missAt) / 450, 0, 1), shake = hurt > 0 ? (rnd(now, lane) - 0.5) * 4 * hurt : 0;
   g.save(); g.translate(shake, 0); g.globalAlpha = show;
   const r = laneRow(lane, t), tg = r && r.tg;
-  // who this row is, and the rate, like the bedside monitor's corner
-  txt(LANE[lane].name, X0 + 2, y - 21, 'rgba(160,240,170,.75)', 6, 'left', '600'); txt(LANE[lane].tag, X0 + 2 + (lane ? 14 : 20), y - 21, 'rgba(120,180,130,.5)', 5, 'left', '400');
-  if (r) txt(String(SEG[clamp(Math.floor(r.b0 / 8), 0, SEG.length - 1)]), XE + 18, y - 21, 'rgba(160,240,170,.75)', 6, 'right', '500', '"IBM Plex Mono", monospace');
   // beat by beat, drawn on like a monitor: a pen point sweeps through each row and traces each heartbeat as it passes (the R tip
   // lands exactly on the beat), then that peak cools and fades while the pen traces the next one a spot further. Beats 1 to 3
   // are traced by themselves; at the 4th spot, in the column, a closing ring counts it in, and the
