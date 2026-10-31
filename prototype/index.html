@@ -4562,6 +4562,7 @@ function judgeNote(target, t) {
     if (!pairQuiet) popJudge(hype ? (isBam(target) ? 'bam' : 'hook') : j, milestone || (dark ? '소리로' : target.heavy ? '두 손' : j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''), target.lane);
     if (target.len) { target.state = 'holding'; if (inRange(target.beat, L.hype)) { startHypeHold(target.end - target.arr); } else startHold(target.beat); } else target.state = 'hit';
     if (inRange(target.beat, L.hype) && !target.len) hypeHit(target, j === 'perfect' && stats.combo % 4 === 0);
+    if (L.practiceOf && TUT.phase === 'run' && TUT.run.includes(target) && TUT.run.every(n => n === target || n.state === 'hit')) tutSlow(target, t);
     if (target.i === notes.length - 1 && j === 'perfect' && !L.practiceOf) FX.shakeUntil = now + 220;
   } else { target.state = 'miss'; target.missKind = 'bad'; registerMiss(d < 0 ? '너무 빠름' : '너무 늦음', d, 'bad', target.lane); }
 }
@@ -4721,7 +4722,10 @@ function updateHud(t) {
   }
   if (stats.combo !== lastCombo) { comboEl.textContent = '콤보 ' + stats.combo; comboEl.classList.toggle('hot', stats.combo >= 10); lastCombo = stats.combo; }
   comboEl.classList.toggle('fever', !!(L.fever && inRange(beat, L.fever)));
-  const line = TUT.on && TUT.line ? [beat, TUT.line.text, 1, TUT.line.spk === 'h' ? 0 : 1, TUT.line.spk] : L.say.find(([b, , d]) => beat >= b && beat < b + d);
+  const cnt = TUT.on && TUT.count && !TUT.line ? TUT.count.findIndex(ct => t >= ct && t < ct + spbAt(ct) * 0.95) : -1;
+  const line = TUT.on && TUT.line ? [beat, TUT.line.text, 1, TUT.line.spk === 'h' ? 0 : 1, TUT.line.spk]
+    : cnt >= 0 ? [beat, ['하나!', '둘!', '셋!'][cnt], 1, TUT.countSpk === 'h' ? 0 : 1, TUT.countSpk]
+    : L.say.find(([b, , d]) => beat >= b && beat < b + d);
   const s = line ? line[1] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.text : '';
   if (s !== lastSay) {
     bubble.textContent = s; bubble.hidden = !s; lastSay = s;
@@ -4852,7 +4856,7 @@ function buildCards() {
 function openBoard() { ensureAudio(); sceneReset(); state = 'select'; $('title').hidden = true; $('result').hidden = true; dialogEl.hidden = true; buildCards(); $('select').hidden = false; }
 
 function beginShift(level) {
-  TUT.on = false; TUT.line = null; CAM.to = null;
+  TUT.on = false; TUT.line = null; CAM.to = null; SLOW.on = false;
   ensureAudio(); loadLevel(level); resetRun(); handLabels();
   $('title').hidden = true; $('result').hidden = true; $('select').hidden = true; state = 'intro';
   sceneReset((level.intro[0] && level.intro[0].scene) || 'line');
@@ -4871,7 +4875,9 @@ function tutSay(lines, done) {
   if (!lines || !lines.length) { done(); return; }
   Object.assign(TUT, { phase: 'talk', lines, li: 0, done }); tutShow();
 }
-function tutShow() { const l = TUT.lines[TUT.li]; TUT.line = l; TUT.at = performance.now(); TUT.stand = !!l.stand; CAM.to = l.cam || null; }
+// 반장's lines come with a close-up on him unless they bring their own
+const BOSS_CAM = { x: 40, y: 118, k: 1.9 };
+function tutShow() { const l = TUT.lines[TUT.li]; TUT.line = l; TUT.at = performance.now(); TUT.stand = !!l.stand; CAM.to = l.cam || (l.spk === 'b' ? BOSS_CAM : null); }
 function tutAdvance() {
   if (performance.now() - TUT.at < 300) return;
   if (++TUT.li < TUT.lines.length) { tutShow(); return; }
@@ -4895,14 +4901,41 @@ function tutArm() {
     c0 = Math.floor(first) - 3; if (c0 > now + 0.3) break;
   }
   TUT.count = [c0, c0 + 1, c0 + 2].map(b => timeAt(b)); TUT.miss0 = stats.miss;
-  // the count's beeps, on the beat: two the same, the last higher
-  TUT.count.forEach((ct, k) => { const T = T0 + ct; if (ctx && T > ctx.currentTime) { osc('square', k < 2 ? 880 : 1320, T, 0.002, 0.05, 0.09, bus); osc('sine', k < 2 ? 440 : 660, T, 0.002, 0.06, 0.12, bus); } });
+  // the one who sends the first box counts it in, out loud (하나, 둘, 셋) over their head, a little voice on each beat
+  const firstN = TUT.run.reduce((a, n) => { const p = realBeat(beltBeat(n.beat, n.lane) - TRAVEL, n.lane); return !a || p < a.p ? { p, lane: n.lane } : a; }, null);
+  TUT.countSpk = firstN && firstN.lane === 0 ? 'h' : 'j';
+  const pitch = TUT.countSpk === 'h' ? 330 : 392;
+  TUT.count.forEach((ct, k) => { const T = T0 + ct; if (ctx && T > ctx.currentTime) { osc('square', pitch * (k === 2 ? 1.25 : 1), T, 0.004, 0.035, 0.07, bus); osc('square', pitch * (k === 2 ? 1.5 : 1.12), T + 0.06, 0.004, 0.03, 0.06, bus); } });
   TUT.run.sort((a, b) => a.beat - b.beat || a.lane - b.lane).forEach(n => { notes.push(n); prepNote(n, notes.length - 1, L); });
   TUT.endT = Math.max(...TUT.run.map(n => n.arr)) + WIN_M + 0.35; TUT.phase = 'run';
 }
+// the tutorial's payoff: the hit that finishes a practice run goes into slow motion (the picture only; the clock and the
+// judging run on) with a close-up on its scanner, a white flash, a burst of sparks, a deep hit and the music ducking under
+const SLOW = { on: false, t0: 0, until: 0, rate: 0.22, lane: 1 };
+function tutSlow(n, t) {
+  const now = performance.now(), dur = 1100, sy = n.lane === 0 ? farY(BELT_Y) - 14 : BELT_Y - 22;
+  Object.assign(SLOW, { on: true, t0: t, until: now + dur, lane: n.lane, at: now });
+  CAM.to = { x: SCAN_X, y: sy, k: 2.3 }; CAM.k = Math.max(CAM.k, 1.5); CAM.x = SCAN_X; CAM.y = sy;
+  spawn(SCAN_X, sy + 6, 26, ['#ffffff', '#ffd27a', '#7dff9a'], -140, 140, -170, -40, 300, 900, [2, 2]);
+  if (ctx) { const T = ctx.currentTime; const o = osc('sine', 120, T, 0.003, 0.5, 0.6, bus); o.frequency.exponentialRampToValueAtTime(40, T + 0.5); noise(T, 'lowpass', 1400, 0.3, 0.5, 0.7, bus);
+    musF.frequency.cancelScheduledValues(T); musF.frequency.setValueAtTime(L.lofi || 20000, T); musF.frequency.exponentialRampToValueAtTime(500, T + 0.12); musF.frequency.setValueAtTime(500, T + dur / 1000 - 0.25); musF.frequency.exponentialRampToValueAtTime(L.lofi || 20000, T + dur / 1000); }
+}
+// the picture's clock: slowed while SLOW is on, then it eases back up to the real one
+function viewTime(t, now) {
+  if (!SLOW.on) return t;
+  if (now >= SLOW.until) { SLOW.on = false; CAM.to = null; return t; }
+  const p = (now - SLOW.at) / (SLOW.until - SLOW.at), slow = SLOW.t0 + (t - SLOW.t0) * SLOW.rate;
+  return p < 0.75 ? slow : lerp(slow, t, (p - 0.75) / 0.25);
+}
+function drawSlowFx(now) {
+  if (!SLOW.on) return; const a = Math.max(0, 1 - (now - SLOW.at) / 260);
+  if (a > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,255,255,${0.55 * a})`; g.fillRect(0, 0, W, H); g.restore(); }
+  // letterbox bars while it is slowed
+  const lb = Math.min(1, (now - SLOW.at) / 150) * Math.min(1, (SLOW.until - now) / 200) * 14; g.fillStyle = '#000'; g.fillRect(0, 0, W, lb); g.fillRect(0, H - lb, W, lb);
+}
 function tutTick(t) {
   if (TUT.phase === 'wait' && beatAt(t) >= 6) tutSay(TUT.lvl.practice.talk, tutArm);
-  if (TUT.phase === 'run' && t > TUT.endT) {
+  if (TUT.phase === 'run' && t > TUT.endT && !SLOW.on) {
     const d = TUT.lvl.practice.drills[TUT.i], ok = stats.miss === TUT.miss0 && TUT.run.every(n => n.state === 'hit');
     const next = () => { if (!ok && d.loop) tutArm(); else if (++TUT.i < TUT.lvl.practice.drills.length) tutArm(); else { TUT.on = false; stopHum(); loadLevel(TUT.lvl); startPlay(); } };
     tutSay(d.after || (ok ? d.ok : d.fail), next);
@@ -4997,11 +5030,12 @@ addEventListener('blur', () => { for (const k of [...held.keys()]) releaseKey(pe
 function frame(now) {
   requestAnimationFrame(frame);
   const active = state === 'play';
-  const t = active ? songAt(now) : -99;
+  const tReal = active ? songAt(now) : -99;
+  const t = active ? viewTime(tReal, now) : -99;
   if (active) {
-    schedule(); judgeTick(t); updateHud(t);
-    if (TUT.on && L.practiceOf) tutTick(t);
-    else if (t > timeAt(END_BEAT)) finishPlay();
+    schedule(); judgeTick(tReal); updateHud(t);
+    if (TUT.on && L.practiceOf) tutTick(tReal);
+    else if (tReal > timeAt(END_BEAT)) finishPlay();
   }
   sceneTick(now);
   if (SCENE.kind === 'office' && !active) drawOffice(now);
@@ -5009,18 +5043,7 @@ function frame(now) {
   else { drawScene(t, now / 1000, active, now); drawSceneFade(now); }
   if (active && L.show && !L.practiceOf) drawShow15(t, now);
   drawCamera(now);
-  if (active && TUT.on && TUT.count) drawCount(t);
-}
-// the tutorial's 3, 2, 1: a big number on each beat, popping in and fading
-function drawCount(t) {
-  for (let k = 0; k < 3; k++) {
-    const a = t - TUT.count[k], d = SPB * 0.92; if (a < 0 || a >= d) continue;
-    const p = a / d, sc = 1 + 0.35 * Math.max(0, 1 - p * 5), al = p < 0.7 ? 1 : 1 - (p - 0.7) / 0.3;
-    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = al; g.translate(W / 2, 64); g.scale(sc, sc);
-    g.font = '900 46px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
-    g.lineWidth = 6; g.strokeStyle = 'rgba(12,8,6,.85)'; g.strokeText(String(3 - k), 0, 0);
-    g.fillStyle = k < 2 ? '#fff4d8' : '#ffd27a'; g.fillText(String(3 - k), 0, 0); g.restore();
-  }
+  drawSlowFx(now);
 }
 requestAnimationFrame(frame);
 })();
