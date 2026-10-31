@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>2-1 검수 · 도장 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+/* 2-1 검수, call and response: 순자 이모 stamps a rhythm on her inspection sheet for one bar, then the boxes come down the
+   belt on that same rhythm and the player stamps them. The rhythm is heard first, then played. Same 384x216 pixel screen
+   as the game, drawn at three times for crisp text. */
+:root{
+  --ink:#efe6d2; --muted:#a6978a; --paper:#efe6d2; --paper-ink:#1d1815; --paper-muted:#6d6156; --stamp:#c8372d;
+  --display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%} body{box-sizing:border-box;margin:0}
+body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;padding:10px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden}
+.page{width:min(100%,calc((100dvh - 60px) * 16 / 9));max-width:100%}
+.stage{position:relative;width:100%;aspect-ratio:16/9;container-type:inline-size;overflow:hidden;border-radius:4px;background:#0d0a09;
+  box-shadow:0 0 0 1px #000,0 0 40px rgba(0,0,0,.6);touch-action:manipulation;user-select:none;-webkit-user-select:none;cursor:pointer}
+.stage canvas{display:block;width:100%;height:100%}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,8,7,.7);cursor:default}
+.label{width:min(80%,580px);background:var(--paper);color:var(--paper-ink);border-radius:3px;padding:2.4cqw 3cqw;box-shadow:0 6px 30px rgba(0,0,0,.5)}
+.label .kicker{display:flex;justify-content:space-between;font-family:var(--mono);font-size:clamp(10px,1.5cqw,14px);color:var(--paper-muted)}
+.label h2{font-family:var(--display);font-weight:400;font-size:clamp(20px,4cqw,38px);margin:.2em 0 .1em}
+.label p{margin:.3em 0 .8em;font-size:clamp(12px,1.75cqw,16px)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.btn{font:600 clamp(13px,1.8cqw,17px) var(--body);padding:.45em 1.1em;border-radius:3px;border:0;background:#1d1815;color:var(--paper);cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--paper-ink);box-shadow:inset 0 0 0 1.5px #1d1815}
+.btn:focus-visible,.sync button:focus-visible{outline:2px solid #2f6f8a;outline-offset:2px}
+.sync{font-family:var(--mono);font-size:clamp(11px,1.5cqw,14px);display:inline-flex;align-items:center;gap:4px;color:var(--paper-muted)}
+.sync button{width:30px;height:30px;border-radius:3px;border:1.5px solid #1d1815;background:transparent;color:#1d1815;font:600 15px var(--mono);cursor:pointer}
+.sync output{min-width:4.2em;text-align:center;color:var(--paper-ink)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:.15em 1.2em;margin:.5em 0 1em;font-size:clamp(12px,1.75cqw,16px)} dt{color:var(--paper-muted)} dd{margin:0;font-family:var(--mono)}
+.help{font-size:13px;color:var(--muted);text-align:center;max-width:60em;margin:0}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="stage" id="stage">
+    <canvas id="cv" width="1152" height="648" aria-label="2-1 검수 화면: 이모가 검수표에 도장으로 리듬을 찍고, 상자가 같은 리듬으로 온다"></canvas>
+    <div class="overlay" id="title">
+      <div class="label">
+        <div class="kicker"><span>작업지시서 · 2-1 검수 (시안)</span><span>B동 3번 라인</span></div>
+        <h2>이모의 도장</h2>
+        <p>순자 이모가 먼저 한 마디 동안 검수표에 <b>도장을 찍어</b> 리듬을 들려줍니다. 다음 마디에 상자가 <b>그 리듬 그대로</b> 빨간 선에 닿아요. 이모 도장 소리를 듣고, 똑같이 화면을 터치(또는 스페이스)해서 찍으세요.</p>
+        <div class="row">
+          <button class="btn" id="start" type="button">출근하기</button>
+          <span class="sync">싱크 <button id="sm" type="button" aria-label="보정값 낮추기">−</button><output id="sv">0 ms</output><button id="sp" type="button" aria-label="보정값 높이기">+</button></span>
+        </div>
+      </div>
+    </div>
+    <div class="overlay" id="result" hidden>
+      <div class="label">
+        <div class="kicker"><span>근무 확인서</span><span>검수 순자</span></div>
+        <h2 id="r-title">검수 통과</h2>
+        <dl>
+          <dt>따라 찍은 도장</dt><dd id="r-counts">딱 0 · 좋아 0 · 놓침 0</dd>
+          <dt>정확도</dt><dd id="r-acc">0%</dd>
+          <dt>최대 콤보</dt><dd id="r-combo">0</dd>
+        </dl>
+        <div class="row"><button class="btn" id="retry" type="button">다시 하기</button><button class="btn ghost" id="back" type="button">처음으로</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="help">시안 페이지 · 이모 차례(들어요) → 신입 차례(따라 찍어요)를 12번 주고받습니다. 정박에서 시작해 "탁, 탁탁, 탁", 엇박까지.</p>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const W = 384, H = 216, SC = 3;
+const cv = $('cv'), g = cv.getContext('2d'); g.setTransform(SC, 0, 0, SC, 0, 0); g.imageSmoothingEnabled = false;
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t, ease = p => p < 0 ? 0 : p > 1 ? 1 : p * p * (3 - 2 * p);
+function txt(s, x, y, c, size = 7, align = 'left', font = '600 {s}px "IBM Plex Sans KR", sans-serif') { g.font = font.replace('{s}', size); g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = c; g.fillText(s, x, y); g.textAlign = 'left'; }
+
+// ---------- the chart: call and response ----------
+// Each round is two bars: 이모 stamps a rhythm on her sheet (positions in beats within the bar), then the boxes arrive on the
+// same rhythm and the player stamps them. It starts on the beat, brings in her own 탁, 탁탁, 탁, then the off-beats.
+const BPM = 92, SPB = 60 / BPM, BAR = 4 * SPB;
+const ROUNDS = [
+  { p: [0, 1, 2, 3], say: '내 도장 소리 듣고, 똑같이 찍어.' },
+  { p: [0, 1, 2, 3] },
+  { p: [0, 1, 1.5, 2], say: '탁, 탁탁, 탁.' },
+  { p: [0, 1, 1.5, 2] },
+  { p: [0, 1, 1.5, 2, 3] },
+  { p: [0, 0.5, 1, 2], say: '빠른 건 빠르게.' },
+  { p: [0, 1.5, 2, 3] },
+  { p: [0, 1.5, 3], say: '뒤에 붙는 거, 잘 들어.' },
+  { p: [0.5, 1.5, 2, 3] },
+  { p: [0, 1, 1.5, 2.5, 3] },
+  { p: [0, 0.5, 1.5, 2, 3], say: '총각, 손 잘 보네.' },
+  { p: [0, 1, 1.5, 2], say: '탁, 탁탁, 탁. 끝.' }
+];
+const LEAD = 0.4 + BAR;   // one bar of count-in
+const callAt = i => LEAD + i * 2 * BAR, respAt = i => callAt(i) + BAR, END_T = respAt(ROUNDS.length - 1) + BAR + 1.6;
+let STAMPS = [], TARGETS = [];
+function compile() {
+  STAMPS = []; TARGETS = [];
+  ROUNDS.forEach((r, i) => { for (const b of r.p) { STAMPS.push({ t: callAt(i) + b * SPB, round: i, b }); TARGETS.push({ t: respAt(i) + b * SPB, round: i, b, judge: null, d: 0 }); } });
+}
+compile();
+const roundAt = t => clamp(Math.floor((t - LEAD) / (2 * BAR)), 0, ROUNDS.length - 1);
+const phaseAt = t => t < LEAD ? 'lead' : t >= respAt(ROUNDS.length - 1) + BAR ? 'end' : ((t - LEAD) % (2 * BAR)) < BAR ? 'call' : 'resp';
+
+// ---------- audio: a soft soul groove in D minor, her stamp and yours ----------
+let ac = null, out = null, mus = null, startAt = 0, playing = false, syncMs = 0, nextBeat = 0;
+function audio() { if (ac) return; ac = new (window.AudioContext || window.webkitAudioContext)(); out = ac.createGain(); out.gain.value = 0.9; const comp = ac.createDynamicsCompressor(); out.connect(comp); comp.connect(ac.destination); mus = ac.createGain(); mus.gain.value = 0.8; mus.connect(out); }
+let NOISE = null; const noiseBuf = () => { if (NOISE) return NOISE; NOISE = ac.createBuffer(1, ac.sampleRate * 0.5, ac.sampleRate); const d = NOISE.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; return NOISE; };
+function nz(t, type, f, amp, dec, dest = mus, q = 0.8) { const s = ac.createBufferSource(), fl = ac.createBiquadFilter(), gn = ac.createGain(); s.buffer = noiseBuf(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; gn.gain.setValueAtTime(amp, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dec); s.connect(fl); fl.connect(gn); gn.connect(dest); s.start(t); s.stop(t + dec + 0.02); }
+function tone(t, type, f, amp, dec, dest = mus, f2 = 0) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dec * 0.6); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.006); gn.gain.exponentialRampToValueAtTime(0.0001, t + dec); o.connect(gn); gn.connect(dest); o.start(t); o.stop(t + dec + 0.03); }
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+const CHORDS = [[50, 53, 57, 60], [55, 58, 62, 65], [46, 50, 53, 57], [45, 49, 52, 55]];   // Dm7 Gm7 B♭maj7 A7
+const kick = (t, a = 0.7) => tone(t, 'sine', 120, a, 0.28, mus, 48);
+const rim = (t, a = 0.18) => { nz(t, 'bandpass', 2200, a, 0.05); tone(t, 'triangle', 820, a * 0.4, 0.04); };
+const hat = (t, a = 0.05) => nz(t, 'highpass', 7500, a, 0.04);
+function rhodes(t, ch, dur, a = 0.05) { for (const m of ch) { const o = ac.createOscillator(), o2 = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o2.type = 'sine'; o.frequency.value = mtof(m + 12); o2.frequency.value = mtof(m + 12) * 2.01; const g2 = ac.createGain(); g2.gain.value = 0.18; o2.connect(g2); g2.connect(gn); o.connect(gn); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(a, t + 0.01); gn.gain.exponentialRampToValueAtTime(a * 0.4, t + 0.4); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur); gn.connect(mus); o.start(t); o2.start(t); o.stop(t + dur + 0.05); o2.stop(t + dur + 0.05); } }
+const bass = (t, m, dur, a = 0.16) => { tone(t, 'sine', mtof(m - 12), a, dur); tone(t, 'triangle', mtof(m), a * 0.25, dur * 0.5); };
+// her stamp: a wooden thunk on the sheet; yours: the same thunk a little brighter, so the answer sounds like her call
+function stamp(t, mine, a = 1) { tone(t, 'sine', mine ? 190 : 160, 0.5 * a, 0.12, out, mine ? 90 : 75); nz(t, 'bandpass', mine ? 1500 : 1100, 0.32 * a, 0.06, out, 1.4); nz(t + 0.004, 'lowpass', 600, 0.2 * a, 0.08, out); }
+function scheduleMusic() {
+  const now = ac.currentTime, horizon = now + 0.3;
+  while (startAt + nextBeat * SPB < horizon && nextBeat * SPB < END_T) {
+    const b = nextBeat++, T = startAt + b * SPB, bar = Math.floor(b / 4), k = b % 4, ch = CHORDS[bar % 4], tb = b * SPB;
+    if (tb < LEAD - 0.01) { if (b >= 0) rim(T, 0.12); continue; }   // the count-in: four rim clicks
+    const ph = phaseAt(tb + 0.01), full = ph === 'resp';
+    if (ph === 'end') { if (k === 0 && tb < END_T - 1) { kick(T, 0.6); rhodes(T, CHORDS[0], SPB * 4, 0.06); bass(T, 50, SPB * 3); } continue; }
+    // drums: lighter under her call so the stamps stand out, full under the answer
+    if (k === 0) kick(T, full ? 0.7 : 0.5); if (full && k === 2) kick(T + SPB * 0.5, 0.45);
+    if (k === 1 || k === 3) rim(T, full ? 0.2 : 0.12);
+    hat(T, 0.05); hat(T + SPB * 0.62, full ? 0.035 : 0.02);
+    // rhodes on 1 and the and of 2, bass on 1 and 3
+    if (k === 0) { rhodes(T, ch, SPB * 1.6); bass(T, ch[0], SPB * 1.4); }
+    if (k === 1) rhodes(T + SPB * 0.5, ch, SPB * 1.2, 0.04);
+    if (k === 2) bass(T, ch[0] + (bar % 2 ? 7 : 0), SPB * 1.2, 0.13);
+  }
+  for (const s of STAMPS) if (!s.sent && startAt + s.t < horizon) { s.sent = 1; stamp(startAt + s.t, false); }
+}
+const songT = () => ac ? ac.currentTime - startAt : -99;
+
+// ---------- judging ----------
+const WIN_P = 0.05, WIN_G = 0.11, WIN_M = 0.18;
+const stats = { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 };
+const FX = { pops: [], hitAt: -9, missAt: -9, stampAt: -9, flash: -9 };
+function press(tIn) {
+  if (!playing) return;
+  const t = tIn - syncMs / 1000, now = performance.now();
+  FX.stampAt = now; stamp(ac.currentTime, true, 0.9);
+  let best = null, bd = 1e9; for (const tg of TARGETS) { if (tg.judge) continue; const d = Math.abs(t - tg.t); if (d < bd) { bd = d; best = tg; } }
+  if (!best || bd > WIN_M) return;
+  const d = t - best.t;
+  if (Math.abs(d) <= WIN_G) { best.judge = Math.abs(d) <= WIN_P ? 'perfect' : 'good'; best.d = d; stats[best.judge]++; stats.combo++; stats.best = Math.max(stats.best, stats.combo); FX.hitAt = now; FX.flash = now; FX.pops.push({ text: best.judge === 'perfect' ? '딱' : '좋아', sub: best.judge === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: now, c: best.judge === 'perfect' ? '#fff4d0' : '#e8d8a8' }); }
+  else missIt(best, d < 0 ? '빠름' : '늦음');
+}
+function missIt(tg, why) { tg.judge = 'miss'; stats.miss++; stats.combo = 0; FX.missAt = performance.now(); FX.pops.push({ text: '놓침', sub: why, at: performance.now(), c: '#ff7a6a' }); }
+function tick(t) { for (const tg of TARGETS) if (!tg.judge && t > tg.t + WIN_M) missIt(tg, ''); }
+const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyK', 'KeyD']);
+addEventListener('keydown', e => { if (!KEYS.has(e.code) || e.repeat || !playing) return; e.preventDefault(); press(songT() + (e.timeStamp - performance.now()) / 1000); });
+$('stage').addEventListener('pointerdown', e => { if (!playing || e.target.closest('.overlay')) return; e.preventDefault(); press(songT() + (e.timeStamp - performance.now()) / 1000); });
+
+// ---------- the scene ----------
+const BELT_Y = 158, SCAN_X = 318, V = (SCAN_X - 40) / BAR;   // a box spends one bar on the belt before the red line
+function room() {
+  R(0, 0, W, H, '#1c1916');
+  // the warehouse wall: panels, a high window band, shelves of boxes, two hanging lamps
+  R(0, 0, W, 112, '#2a2622'); for (let x = 0; x < W; x += 48) R(x, 0, 1, 112, '#23201c');
+  R(0, 14, W, 18, '#1a2230'); for (let x = 6; x < W; x += 24) R(x, 16, 18, 14, '#24314a'); R(0, 32, W, 2, '#3a3530');
+  for (const sx of [10, 226]) { R(sx, 44, 140, 3, '#5a4a38'); R(sx, 74, 140, 3, '#5a4a38'); for (let k = 0; k < 9; k++) { const w = 12 + (k * 7) % 6; R(sx + 4 + k * 15, 32 + (k % 3), w, 12 - (k % 3), ['#9c7a4e', '#8a6a42', '#b08a58'][k % 3]); R(sx + 4 + k * 15, 62 + (k % 2), w, 12 - (k % 2), ['#8a6a42', '#b08a58', '#9c7a4e'][k % 3]); } }
+  for (const lx of [96, 288]) { R(lx, 0, 1, 8, '#111'); R(lx - 9, 8, 19, 3, '#3a3a3a'); R(lx - 7, 11, 15, 1, '#ffe9a8'); const gr = g.createRadialGradient(lx, 12, 0, lx, 12, 90); gr.addColorStop(0, 'rgba(255,233,168,.12)'); gr.addColorStop(1, 'rgba(255,233,168,0)'); g.fillStyle = gr; g.fillRect(lx - 90, 0, 180, 140); }
+  R(0, 112, W, 104, '#24201c'); R(0, 112, W, 2, '#3a342e');
+}
+function belt(t) {
+  R(0, BELT_Y - 2, W, 4, '#4a4a50'); R(0, BELT_Y + 18, W, 4, '#3a3a40');
+  R(0, BELT_Y + 2, W, 16, '#2c2c32'); const off = ((t * V) % 8 + 8) % 8; for (let x = -8 + off; x < W; x += 8) R(x, BELT_Y + 2, 1, 16, '#36363e');
+  for (let x = 6; x < W; x += 40) { R(x, BELT_Y + 22, 4, 30, '#2a2a30'); }
+  // the red scan line and the scanner bracket over it
+  R(SCAN_X - 1, BELT_Y - 26, 2, 46, '#ff4a3a'); R(SCAN_X - 6, BELT_Y - 30, 12, 5, '#3a3a40'); R(SCAN_X - 4, BELT_Y - 26, 8, 2, '#ff8a7a');
+}
+// a box: cardboard with tape, and a red 검 stamp once the player has stamped it in time
+function box(x, tg, now) {
+  const y = BELT_Y - 12;
+  R(x - 10, y, 20, 14, '#b08a58'); R(x - 10, y, 20, 2, '#c8a06a'); R(x - 10, y + 12, 20, 2, '#8a6a42'); R(x - 1, y, 2, 14, '#d8c8a0');
+  if (tg.judge === 'perfect' || tg.judge === 'good') { const a = clamp((now - (tg.hitMs || now)) / 80, 0, 1); g.save(); g.globalAlpha = 0.9; R(x - 6, y + 3, 12, 8, '#c8372d'); R(x - 5, y + 4, 10, 6, '#b08a58'); txt('검', x, y + 3.4, '#c8372d', 6, 'center', '{s}px "Black Han Sans", sans-serif'); g.restore(); }
+  if (tg.judge === 'miss') { R(x - 10, y + 6, 20, 2, 'rgba(255,90,80,.6)'); }
+}
+// 순자 이모 at her inspection post on the left: grey permed hair, glasses, a floral apron over a mauve top, the stamp in her
+// right hand. The hand comes down on each of her stamps and lifts between them
+function imo(t, now) {
+  const x = 70, y = 96;
+  let down = 0; for (const s of STAMPS) { const d = t - s.t; if (d > -0.05 && d < 0.14) down = Math.max(down, d < 0 ? 1 + d / 0.05 : 1 - d / 0.14); }
+  const lift = 1 - down, ax = x + 16, ay = y + 22 - 9 * lift;
+  // the desk with her sheet
+  R(x - 24, y + 34, 64, 6, '#5a4430'); R(x - 24, y + 34, 64, 1, '#7a5e42'); R(x - 20, y + 40, 4, 22, '#3a2a1e'); R(x + 32, y + 40, 4, 22, '#3a2a1e');
+  R(x + 6, y + 31, 26, 4, '#f2ede0'); R(x + 6, y + 31, 26, 1, '#ffffff');
+  // body and apron
+  R(x - 10, y + 14, 22, 22, '#9a6a8a'); R(x - 7, y + 16, 16, 20, '#e8dcc4'); for (const [px, py] of [[-4, 19], [3, 22], [-2, 28], [5, 30], [0, 24]]) R(x + px, y + py, 2, 2, '#d86a6a');
+  R(x - 14, y + 18, 5, 14, '#9a6a8a'); R(x - 14, y + 31, 5, 3, '#e8b898');
+  // the stamping arm
+  g.strokeStyle = '#9a6a8a'; g.lineWidth = 4; g.lineCap = 'round'; g.beginPath(); g.moveTo(x + 10, y + 18); g.lineTo(ax, ay); g.stroke(); g.lineCap = 'butt';
+  R(ax - 3, ay - 2, 6, 5, '#e8b898'); R(ax - 2, ay + 2, 4, 5, '#5a3a2a'); R(ax - 3, ay + 6, 6, 2, '#c8372d');
+  if (down > 0.8) { R(ax - 6, ay + 8, 12, 1, 'rgba(255,240,200,.6)'); }
+  // head: face, glasses, perm
+  R(x - 6, y, 13, 14, '#e8b898'); R(x - 6, y + 11, 13, 3, '#d8a888');
+  R(x - 5, y + 5, 5, 4, '#2a2a2a'); R(x + 1, y + 5, 5, 4, '#2a2a2a'); R(x - 4, y + 6, 3, 2, '#c8d8e8'); R(x + 2, y + 6, 3, 2, '#c8d8e8'); R(x, y + 6, 1, 1, '#2a2a2a');
+  R(x - 1, y + 11, 4, 1, '#a86a5a');
+  for (const [cx, cy] of [[-8, -2], [-4, -4], [0, -5], [4, -4], [8, -2], [-9, 2], [9, 2], [-8, 6], [9, 6]]) { R(x + cx - 2, y + cy - 1, 5, 5, '#8a8288'); R(x + cx - 1, y + cy - 1, 2, 2, '#aaa2a8'); }
+}
+// the inspection sheet shown large at the top: one bar in eight cells, her stamps land in it as she makes them, then the
+// playhead runs again over the same marks while the boxes come
+function sheet(t, now) {
+  const ph = phaseAt(t), i = roundAt(t), r = ROUNDS[i], x0 = 108, y0 = 34, w = 168, h = 40, cw = w / 8;
+  g.save(); g.shadowColor = 'rgba(0,0,0,.5)'; g.shadowBlur = 4 * SC; R(x0 - 4, y0 - 12, w + 8, h + 18, '#f2ede0'); g.restore();
+  R(x0 - 4, y0 - 12, w + 8, 2, '#ffffff'); R(x0 + w / 2 - 10, y0 - 16, 20, 6, '#8a8a90'); R(x0 + w / 2 - 6, y0 - 15, 12, 3, '#b8b8c0');
+  txt('검수표', x0, y0 - 9, '#6d6156', 6); txt(`${String(i + 1).padStart(2, '0')} / ${ROUNDS.length}`, x0 + w, y0 - 9, '#6d6156', 6, 'right', '500 {s}px "IBM Plex Mono", monospace');
+  for (let k = 0; k <= 8; k++) R(x0 + k * cw, y0, 1, h, k % 2 ? '#e2dccb' : '#c9c2b0'); R(x0, y0, w, 1, '#c9c2b0'); R(x0, y0 + h - 1, w, 1, '#c9c2b0');
+  for (let k = 0; k < 4; k++) txt(String(k + 1), x0 + k * cw * 2 + cw, y0 + h - 8, '#b9b2a0', 5, 'center', '500 {s}px "IBM Plex Mono", monospace');
+  if (ph === 'lead' || ph === 'end') return;
+  const cStart = callAt(i), rStart = respAt(i), barT = ph === 'call' ? cStart : rStart, p = clamp((t - barT) / BAR, 0, 1);
+  // her marks, each appearing when she stamps it; in the answer, each turns green or red as you stamp it
+  for (const b of r.p) {
+    const ts = cStart + b * SPB; if (t < ts - 0.01) continue;
+    const cx = x0 + b * 2 * cw + cw / 2, cy = y0 + h / 2 - 3, age = (t - ts), pop = 1 + 0.5 * clamp(1 - age / 0.12, 0, 1);
+    const tg = TARGETS.find(q => q.round === i && q.b === b), done = tg && tg.judge && tg.judge !== 'miss', miss = tg && tg.judge === 'miss';
+    g.save(); g.translate(cx, cy); g.scale(pop, pop); g.globalAlpha = 0.9;
+    const col = done ? '#3a9a5a' : miss ? '#c8a8a0' : '#c8372d';
+    g.strokeStyle = col; g.lineWidth = 1.4; g.beginPath(); g.arc(0, 0, 7, 0, Math.PI * 2); g.stroke();
+    txt('검', 0, -4.5, col, 8, 'center', '{s}px "Black Han Sans", sans-serif'); g.restore();
+  }
+  // the playhead
+  const px = x0 + p * w; R(px, y0 - 2, 1, h + 4, ph === 'call' ? '#c8372d' : '#2f6f8a');
+  // whose turn
+  const lab = ph === 'call' ? '이모 차례 · 들어요' : '따라 찍어요!', lc = ph === 'call' ? '#ffd8a8' : '#bff0ff';
+  g.save(); g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 3 * SC; txt(lab, W / 2, y0 + h + 6, lc, 9, 'center', '{s}px "Black Han Sans", sans-serif'); g.restore();
+  // beat dots under it
+  const bk = Math.floor((t - barT) / SPB); for (let k = 0; k < 4; k++) R(W / 2 - 15 + k * 9, y0 + h + 20, 5, 3, k === bk ? lc : 'rgba(255,255,255,.18)');
+}
+function bubble(t) {
+  const i = roundAt(t), r = ROUNDS[i], ph = phaseAt(t);
+  if (!r.say || ph !== 'call' || t - callAt(i) > BAR * 0.9) return;
+  const x = 22, y = 70, s = r.say; g.font = '600 7px "IBM Plex Sans KR", sans-serif'; const w = g.measureText(s).width + 10;
+  R(x, y, w, 13, '#fff8ec'); R(x + 30, y + 13, 5, 3, '#fff8ec'); txt(s, x + 5, y + 3, '#3a2a22', 7);
+}
+function draw(t) {
+  const now = performance.now();
+  room(); belt(t);
+  // the boxes: each answer box rides one bar down the belt and crosses the red line on its beat, then rolls on
+  for (const tg of TARGETS) { const x = SCAN_X - (tg.t - t) * V; if (x < -12 || x > W + 12) continue; box(x, tg, now); }
+  imo(t, now);
+  // you: the scanner hand by the red line, coming down when you stamp
+  { const k = clamp(1 - (now - FX.stampAt) / 120, 0, 1), hx = SCAN_X + 18, hy = BELT_Y - 34 + 10 * k; R(hx - 2, hy - 30, 8, 30, '#2a3a5a'); R(hx - 4, hy, 12, 7, '#e8b898'); R(hx - 5, hy + 6, 14, 4, '#c8372d'); }
+  // a press in time: a warm flash at the line, a ring
+  const f = clamp(1 - (now - FX.flash) / 260, 0, 1); if (f > 0) { g.save(); g.globalAlpha = f; g.strokeStyle = '#ffe8a8'; g.lineWidth = 1.2; g.beginPath(); g.ellipse(SCAN_X, BELT_Y - 4, 10 + 18 * (1 - f), 6 + 10 * (1 - f), 0, 0, Math.PI * 2); g.stroke(); g.restore(); }
+  const m = clamp(1 - (now - FX.missAt) / 300, 0, 1); if (m > 0) { g.fillStyle = `rgba(255,60,50,${0.12 * m})`; g.fillRect(0, 0, W, H); }
+  sheet(t, now); bubble(t);
+  FX.pops = FX.pops.filter(p => now - p.at < 650);
+  for (const p of FX.pops) { const a = 1 - (now - p.at) / 650; g.save(); g.globalAlpha = a; g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 3 * SC; txt(p.text, SCAN_X, BELT_Y - 58 - (1 - a) * 6, p.c, 13, 'center', '{s}px "Black Han Sans", sans-serif'); if (p.sub) txt(p.sub, SCAN_X, BELT_Y - 44, p.c, 6, 'center'); g.restore(); }
+  if (stats.combo > 1) txt(`콤보 ${stats.combo}`, W - 8, 6, '#efe6d2', 7, 'right', '500 {s}px "IBM Plex Mono", monospace');
+  txt('B동 3번 라인 · 02:40', 8, 6, 'rgba(239,230,210,.7)', 6, 'left', '500 {s}px "IBM Plex Mono", monospace');
+  if (phaseAt(t) === 'lead' && t > 0) { const k = Math.floor(t / SPB) + 1; if (k >= 1 && k <= 4) { g.save(); g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 3 * SC; txt(String(k), W / 2, 90, '#ffd8a8', 20, 'center', '{s}px "Black Han Sans", sans-serif'); g.restore(); } }
+}
+
+// ---------- flow ----------
+function start() {
+  audio(); if (ac.state === 'suspended') ac.resume();
+  compile(); Object.assign(stats, { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 }); FX.pops = [];
+  startAt = ac.currentTime + 0.3; nextBeat = 0; playing = true;
+  $('title').hidden = true; $('result').hidden = true;
+}
+function finish() {
+  playing = false;
+  const n = stats.perfect + stats.good + stats.miss, acc = n ? Math.round((stats.perfect + stats.good * 0.6) / n * 100) : 0;
+  $('r-counts').textContent = `딱 ${stats.perfect} · 좋아 ${stats.good} · 놓침 ${stats.miss}`; $('r-acc').textContent = acc + '%'; $('r-combo').textContent = stats.best;
+  $('r-title').textContent = stats.miss <= 4 ? '검수 통과' : '재검';
+  $('result').hidden = false;
+}
+$('start').onclick = start; $('retry').onclick = start; $('back').onclick = () => { $('result').hidden = true; $('title').hidden = false; };
+const showSync = () => $('sv').textContent = (syncMs > 0 ? '+' : '') + syncMs + ' ms';
+$('sm').onclick = () => { syncMs -= 10; showSync(); }; $('sp').onclick = () => { syncMs += 10; showSync(); };
+function frame() {
+  requestAnimationFrame(frame);
+  const t = playing ? songT() : -1;
+  if (playing) { scheduleMusic(); tick(t); if (t > END_T) finish(); }
+  draw(playing ? t : 0);
+}
+requestAnimationFrame(frame);
+// for testing
+window.__21 = { TARGETS: () => TARGETS, stats, press: t => press(t), songT, beatT: (i, b, resp) => (resp ? respAt(i) : callAt(i)) + b * SPB, END_T };
+})();
+</script>
+</body>
+</html>
