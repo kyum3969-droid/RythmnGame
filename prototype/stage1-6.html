@@ -53,7 +53,7 @@ dl{display:grid;grid-template-columns:auto 1fr;gap:.15em 1.2em;margin:.5em 0 1em
       <div class="label">
         <div class="kicker"><span>스테이지 1-6 · 하은의 새벽</span><span>502호 · 05:40</span></div>
         <h2>어머니의 박자</h2>
-        <p>아래 모니터에 어머니의 심박이 일곱 칸을 지나갑니다. 여섯 번 뛰고, <b>일곱 번째 박에 화면을 터치</b>(또는 스페이스)해서 하은이 박을 이어 주세요. 첫 줄은 보여 주기만 합니다.</p>
+        <p>아래 줄에서 어머니의 심박이 칸을 하나씩 건너갑니다. 여섯 번 뛰고, <b>일곱 번째 박에 화면을 터치</b>(또는 스페이스)해서 하은이 박을 이어 주세요. 첫 줄은 보여 주기만 합니다. 중간부터는 하은의 심장도 한 줄 더 뜁니다.</p>
         <div class="row">
           <button class="btn" id="start" type="button">시작</button>
           <label class="btn ghost" for="file">컷씬 영상 불러오기</label>
@@ -78,7 +78,7 @@ dl{display:grid;grid-template-columns:auto 1fr;gap:.15em 1.2em;margin:.5em 0 1em
     </div>
   </div>
 </div>
-<p class="help">시안 페이지 · 위 136줄은 컷씬 영상 자리(16:9 영상은 가운데를 잘라 씀), 아래 80줄은 심박 모니터. 영상은 소리 없이 노래 시간에 맞춰 재생됩니다.</p>
+<p class="help">시안 페이지 · 리듬닥터 오마주. 위 136줄은 컷씬 영상 자리(16:9 영상은 가운데를 잘라 씀), 아래 80줄은 환자 줄. 영상은 소리 없이 노래 시간에 맞춰 재생됩니다.</p>
 
 <script>
 (() => {
@@ -89,34 +89,33 @@ const cv = $('cv'), g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
 const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
 
-// ---------- the chart: rows of seven beats and a breath ----------
-// Each row: six heartbeats you hear, the seventh is yours, the eighth is a rest before the next row. The first row only shows how.
-// Then steady, then the doctor's "오늘 좀 흔들려요": rows that come faster or slower than the last, rows with a beat that never
-// comes (the seventh still falls where the count says), and at the end the rate settles.
-const ROWS = [
-  { bpm: 62, demo: true, cue: '보세요: 일곱 번째 박은 하은이 이어 줍니다' },
-  { bpm: 62, cue: '일곱 번째 박에 터치' },
-  { bpm: 62 }, { bpm: 62 }, { bpm: 62 },
-  { bpm: 68, cue: '빨라진다' }, { bpm: 68 },
-  { bpm: 56, cue: '느려진다' }, { bpm: 72 },
-  { bpm: 60, skip: [3], cue: '한 박이 빠져도, 세던 대로' }, { bpm: 60, skip: [2, 4] },
-  { bpm: 66, skip: [5] }, { bpm: 58 },
-  { bpm: 60, cue: '괜찮아' }, { bpm: 60 }, { bpm: 60, last: true }
-];
+// ---------- the chart (a homage to Rhythm Doctor's seventh-beat rows) ----------
+// The song runs in 8-beat segments, each at its own tempo. A row is seven beats on one patient's line: the heart beats on 1 to 6
+// (a pulse hops notch to notch) and on the 7th the player presses; the 8th is a breath. Her mother's row runs every segment, and
+// the doctor's "오늘 좀 흔들려요" plays out as rows that speed up, slow down, or skip a beat (the 7th still falls where the count
+// says). From the middle 하은's own heart joins as a second row: four beats behind at first (her 7th falls between her
+// mother's), then on the same beats, so one press keeps both.
+const SEG = [62, 62, 62, 62, 62, 68, 68, 56, 72, 60, 60, 66, 58, 64, 64, 64, 64, 60, 60, 60];
 const LEAD = 2.4;   // a count-in before the first row (two soft clicks)
+const SEGT = []; { let t = LEAD; for (const b of SEG) { SEGT.push(t); t += 8 * 60 / b; } SEGT.push(t); }
+const beatT = b => { const s = clamp(Math.floor(b / 8), 0, SEG.length - 1); return SEGT[s] + (b - s * 8) * 60 / SEG[s]; };
+const tBeat = t => { if (t < LEAD) return (t - LEAD) * SEG[0] / 60; let s = 0; while (s < SEG.length - 1 && t >= SEGT[s + 1]) s++; return s * 8 + (t - SEGT[s]) * SEG[s] / 60; };
+const ROWS = [];
+SEG.forEach((_, s) => ROWS.push({ lane: 0, b0: s * 8, demo: s === 0, skip: { 9: [3], 10: [2, 4], 11: [5] }[s] || [], cue: { 0: '보세요: 일곱 번째 박은 하은이 이어 줍니다', 1: '일곱 번째 박에!', 5: '빨라진다', 7: '느려진다', 9: '한 박이 빠져도, 세던 대로', 17: '괜찮아' }[s] }));
+for (const b0 of [108, 116, 128, 136, 144, 152]) ROWS.push({ lane: 1, b0, skip: [], cue: { 108: '하은의 심장도 뛴다', 128: '같은 박으로' }[b0] });
+const TWO_AT = beatT(108) - 1.4;
 let EV = [], TARGETS = [], END_T = 0;
 function compile() {
-  EV = []; TARGETS = []; let t = LEAD;
+  EV = []; TARGETS = [];
   ROWS.forEach((r, ri) => {
-    const spb = 60 / r.bpm; r.t0 = t; r.spb = spb;
-    EV.push({ t, type: 'chord', row: ri, dur: spb * 8 });
-    for (let k = 0; k < 6; k++) if (!(r.skip || []).includes(k)) EV.push({ t: t + k * spb, type: 'pulse', row: ri, k });
-    const tg = { t: t + 6 * spb, row: ri, demo: !!r.demo, judge: null, d: 0 }; TARGETS.push(tg);
-    if (r.demo) EV.push({ t: tg.t, type: 'demo', row: ri, tg });
-    t += 8 * spb;
+    r.t0 = beatT(r.b0); r.t8 = beatT(r.b0 + 8);
+    if (r.lane === 0) EV.push({ t: r.t0, type: 'chord', row: r.b0 / 8, dur: r.t8 - r.t0 });
+    for (let k = 0; k < 6; k++) if (!r.skip.includes(k)) EV.push({ t: beatT(r.b0 + k), type: 'pulse', lane: r.lane });
+    const tg = { t: beatT(r.b0 + 6), row: ri, lane: r.lane, demo: !!r.demo, judge: null, d: 0 }; TARGETS.push(tg); r.tg = tg;
+    if (r.demo) EV.push({ t: tg.t, type: 'demo', lane: 0 });
   });
   EV.push({ t: LEAD - 1.2, type: 'click' }, { t: LEAD - 0.6, type: 'click' });
-  END_T = t + 1.2; EV.sort((a, b) => a.t - b.t);
+  END_T = beatT(SEG.length * 8) + 1.2; EV.sort((a, b) => a.t - b.t);
 }
 compile();
 
@@ -125,6 +124,7 @@ let ac = null, out = null, startAt = 0, evI = 0, playing = false, syncMs = 0;
 function audio() { if (ac) return; ac = new (window.AudioContext || window.webkitAudioContext)(); out = ac.createGain(); out.gain.value = 0.9; const comp = ac.createDynamicsCompressor(); out.connect(comp); comp.connect(ac.destination); }
 function thump(t, f, amp, dec) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f * 1.6, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.04); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.008); gn.gain.exponentialRampToValueAtTime(0.0001, t + dec); o.connect(gn); gn.connect(out); o.start(t); o.stop(t + dec + 0.05); }
 function heart(t, amp = 0.9, bright = false) { thump(t, 58, amp, 0.22); thump(t + 0.14, 50, amp * 0.6, 0.18); if (bright) { thump(t, 120, amp * 0.35, 0.08); } }
+function heartH(t) { thump(t, 78, 0.5, 0.15); thump(t + 0.11, 68, 0.3, 0.12); }
 function beep(t, f = 1046, amp = 0.08, dur = 0.09) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'square'; o.frequency.value = f; const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400; gn.gain.setValueAtTime(amp, t); gn.gain.setValueAtTime(amp, t + dur * 0.8); gn.gain.linearRampToValueAtTime(0.0001, t + dur); o.connect(lp); lp.connect(gn); gn.connect(out); o.start(t); o.stop(t + dur + 0.02); }
 const CHORDS = [[57, 60, 64], [53, 57, 60], [48, 52, 55, 59], [55, 59, 62]];   // Am F Cmaj7 G
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
@@ -137,7 +137,7 @@ function schedule() {
   const now = ac.currentTime, horizon = now + 0.25;
   while (evI < EV.length && startAt + EV[evI].t < horizon) {
     const e = EV[evI++], at = startAt + e.t; if (at < now - 0.05) continue;
-    if (e.type === 'pulse') heart(at);
+    if (e.type === 'pulse') { if (e.lane === 1) heartH(at); else heart(at); }
     else if (e.type === 'chord') pad(at, e.row, e.dur);
     else if (e.type === 'click') beep(at, 660, 0.04, 0.05);
     else if (e.type === 'demo') { heart(at, 0.9, true); beep(at + 0.02, 1046, 0.06); }
@@ -148,26 +148,31 @@ const songT = () => ac ? ac.currentTime - startAt : -99;
 // ---------- input and judging ----------
 const WIN_P = 0.05, WIN_G = 0.11, WIN_M = 0.18;
 const stats = { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 };
-const FX = { pops: [], beatAt: -9, hitAt: -9 };
+const FX = { pops: [], lane: [{ beatAt: -9, hitAt: -9, missAt: -9 }, { beatAt: -9, hitAt: -9, missAt: -9 }], flashAt: -9 };
 function press(tIn) {
   if (!playing) return;
   const t = tIn - syncMs / 1000;
   let best = null, bd = 1e9; for (const tg of TARGETS) { if (tg.demo || tg.judge) continue; const d = Math.abs(t - tg.t); if (d < bd) { bd = d; best = tg; } }
-  if (!best || bd > WIN_M) { FX.pops.push({ text: '…', at: performance.now(), c: '#6a7a72' }); return; }
-  const d = t - best.t; best.d = d; best.hitT = t;
+  if (!best || bd > WIN_M) return;
+  const d = t - best.t, now = performance.now();
+  // a press on a beat both rows share keeps both
+  const same = TARGETS.filter(tg => !tg.demo && !tg.judge && Math.abs(tg.t - best.t) < 0.02);
   if (Math.abs(d) <= WIN_G) {
-    best.judge = Math.abs(d) <= WIN_P ? 'perfect' : 'good'; stats[best.judge]++; stats.combo++; stats.best = Math.max(stats.best, stats.combo);
-    heart(ac.currentTime, 0.9, true); if (best.judge === 'perfect') beep(ac.currentTime + 0.02, 1046, 0.06);
-    FX.hitAt = performance.now(); FX.pops.push({ text: best.judge === 'perfect' ? '딱' : '좋아', sub: best.judge === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: performance.now(), c: best.judge === 'perfect' ? '#eaffef' : '#bfe8c8' });
-  } else { missIt(best, d < 0 ? '너무 빠름' : '너무 늦음'); }
+    const j = Math.abs(d) <= WIN_P ? 'perfect' : 'good';
+    for (const tg of same) { tg.judge = j; tg.d = d; tg.hitT = t; stats[j]++; stats.combo++; FX.lane[tg.lane].hitAt = now; FX.pops.push({ lane: tg.lane, text: j === 'perfect' ? '딱' : '좋아', sub: j === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: now, c: j === 'perfect' ? '#ffffff' : '#cfe8d6' }); }
+    stats.best = Math.max(stats.best, stats.combo); FX.flashAt = now;
+    heart(ac.currentTime, 0.9, true); if (j === 'perfect') beep(ac.currentTime + 0.02, 1046, 0.06);
+  } else for (const tg of same) { tg.d = d; missIt(tg, d < 0 ? '빠름' : '늦음'); }
 }
-function missIt(tg, why) { tg.judge = 'miss'; stats.miss++; stats.combo = 0; if (ac) beep(ac.currentTime, 330, 0.05, 0.25); FX.pops.push({ text: '놓침', sub: why, at: performance.now(), c: '#ff7a6a' }); }
+function missIt(tg, why) { tg.judge = 'miss'; stats.miss++; stats.combo = 0; FX.lane[tg.lane].missAt = performance.now(); if (ac) { beep(ac.currentTime, 196, 0.06, 0.3); beep(ac.currentTime + 0.05, 185, 0.05, 0.3); } FX.pops.push({ lane: tg.lane, text: '놓침', sub: why, at: performance.now(), c: '#ff6a5a' }); }
 function tick(t) {
   for (const tg of TARGETS) {
     if (tg.judge) continue;
-    if (tg.demo && t >= tg.t) { tg.judge = 'demo'; tg.d = 0; tg.hitT = tg.t; FX.hitAt = performance.now(); continue; }
+    if (tg.demo && t >= tg.t) { tg.judge = 'demo'; tg.d = 0; tg.hitT = tg.t; FX.lane[0].hitAt = performance.now(); continue; }
     if (!tg.demo && t > tg.t + WIN_M) missIt(tg, '');
   }
+  // each lane's heart beats with its heard pulses
+  for (const e of EV) { if (e.type !== 'pulse' && e.type !== 'demo') continue; if (e.t > t) break; if (!e.seen) { e.seen = 1; FX.lane[e.lane].beatAt = performance.now(); } }
 }
 const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyK', 'KeyD']);
 addEventListener('keydown', e => { if (!KEYS.has(e.code) || e.repeat) return; if (!playing) return; e.preventDefault(); press(songT() + (e.timeStamp - performance.now()) / 1000); });
@@ -200,7 +205,7 @@ function placeholderWard(t) {
   R(70, 72, 46, 14, '#e8eef4'); R(72, 74, 30, 8, '#c49a80');
   for (let x = 110; x < 246; x += 2) R(x, 78 + Math.round(Math.sin(x / 22) * 2), 2, 6, '#9fb4cc');
   R(170, 80, 34, 22, '#1e1a1a'); R(172, 70, 22, 12, '#3a2a24'); R(168, 66, 28, 8, '#d8463b'); R(160, 102, 44, 34, '#1e1a1a'); R(164, 102, 36, 20, '#7ec8e3');
-  const beat = Math.max(0, 1 - (performance.now() - FX.beatAt) / 250);
+  const beat = Math.max(0, 1 - (performance.now() - FX.lane[0].beatAt) / 250);
   R(20, 30, 40, 30, '#0c0f10'); R(22, 32, 36, 26, '#06120c'); R(38, 60, 4, 50, '#3a3f45');
   g.fillStyle = `rgba(143,214,148,${0.5 + 0.5 * beat})`; for (let x = 0; x < 34; x++) { const d = Math.abs(x - 17), y = 45 - (d < 2 ? 9 * beat : 0); g.fillRect(23 + x, y, 1, 1); }
   g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(40, 45, 2, 40, 45, 50); gr.addColorStop(0, `rgba(143,214,148,${0.12 + 0.12 * beat})`); gr.addColorStop(1, 'rgba(143,214,148,0)'); g.fillStyle = gr; g.fillRect(0, 0, 100, 110); g.restore();
@@ -208,76 +213,105 @@ function placeholderWard(t) {
 }
 function lerpCol(a, b, p) { const A = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), B = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16)); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], p))).join(',')})`; }
 
-// ---------- the heartbeat strip ----------
-// A monitor at the bottom: ECG paper, the patient card on the left (a heart that beats, the rate), and the row: seven slots, the
-// sweep moving across them beat by beat, the trace drawn behind it with a spike on each heartbeat, last row's trace still
-// fading ahead of it; the seventh slot is the box to fill.
-const SX = k => 82 + k * 42, BASE = TRK_Y + 46;
-let monoFont = '8px "IBM Plex Mono", monospace';
-function rowAt(t) { let ri = 0; for (let i = 0; i < ROWS.length; i++) if (t >= ROWS[i].t0 - 1e-6) ri = i; return ri; }
-function spike(x, y, amp, c) { // P, QRS, T in a few pixels
-  const pts = [[-8, 0], [-6, -1], [-5, 0], [-2, 0], [-1, 2], [0, -amp], [1, 4], [2, 0], [5, 0], [7, -2], [9, 0]];
-  g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); pts.forEach(([dx, dy], i) => i ? g.lineTo(x + dx + 0.5, y + dy + 0.5) : g.moveTo(x + dx + 0.5, y + dy + 0.5)); g.stroke();
+// ---------- the patient rows ----------
+// Each patient has a row across the bottom: their portrait in a box on the left, a track with seven notches, a pulse that hops
+// one notch per heartbeat and leaves a blip, a heart at the seventh notch with the hit line through it, and a small timing
+// meter after it (early to the left, late to the right). A press in time fills the heart and sends a beat on past it; a miss
+// cracks it, shakes the row and glitches the portrait.
+const NX = k => 58 + k * 42, HEART = 6;
+const LANE = [{ name: '어머니', room: '502호', col: '#5fd0b0', dim: '#2a5a4c' }, { name: '하은', room: '보호자', col: '#ff8a7a', dim: '#5a2e2a' }];
+const ease = p => p < 0 ? 0 : p > 1 ? 1 : p * p * (3 - 2 * p);
+function txt(s, x, y, c, size = 7, align = 'left', weight = '600') { g.font = `${weight} ${size}px "IBM Plex Sans KR", sans-serif`; g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = c; g.fillText(s, x, y); g.textAlign = 'left'; }
+function heartShape(cx, cy, s, c) { const pts = [[0, 4], [-6, -2], [-6, -5], [-4, -7], [-1, -7], [0, -5], [1, -7], [4, -7], [6, -5], [6, -2]]; g.fillStyle = c; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(cx + x * s, cy + y * s) : g.moveTo(cx + x * s, cy + y * s)); g.closePath(); g.fill(); }
+function heartLine(cx, cy, s, c) { const pts = [[0, 4], [-6, -2], [-6, -5], [-4, -7], [-1, -7], [0, -5], [1, -7], [4, -7], [6, -5], [6, -2]]; g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(cx + x * s + 0.5, cy + y * s + 0.5) : g.moveTo(cx + x * s + 0.5, cy + y * s + 0.5)); g.closePath(); g.stroke(); }
+function blip(x, y, amp, c) { const pts = [[-5, 0], [-3, -1], [-2, 0], [-1, 1], [0, -amp], [1, 3], [2, 0], [4, -1], [5, 0]]; g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); pts.forEach(([dx, dy], i) => i ? g.lineTo(x + dx + 0.5, y + dy + 0.5) : g.moveTo(x + dx + 0.5, y + dy + 0.5)); g.stroke(); }
+// the two patients' portraits, 26 pixels square: her mother asleep on the pillow with the oxygen line; 하은 in her red cap
+function portrait(lane, x, y, bob, hurt) {
+  R(x, y, 26, 26, '#0a0f0e');
+  g.save(); g.beginPath(); g.rect(x, y, 26, 26); g.clip();
+  if (lane === 0) {
+    R(x, y, 26, 26, '#1a2630'); R(x + 1, y + 12, 24, 14, '#d9e2ea'); R(x + 1, y + 12, 24, 1, '#f2f6f8');
+    g.fillStyle = '#9aa0a8'; g.beginPath(); g.ellipse(x + 13, y + 11 - bob, 8, 7, 0, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#e6c0a4'; g.beginPath(); g.ellipse(x + 13, y + 14 - bob, 6, 6.5, 0, 0, Math.PI * 2); g.fill();
+    R(x + 9, y + 13 - bob, 3, 1, '#7a5a4a'); R(x + 15, y + 13 - bob, 3, 1, '#7a5a4a'); R(x + 12, y + 18 - bob, 3, 1, '#b07a6a');
+    R(x + 5, y + 17 - bob, 16, 1, '#cfe6ee'); R(x + 1, y + 21, 24, 5, '#9fc4e0'); R(x + 1, y + 21, 24, 1, '#bfdcef');
+  } else {
+    R(x, y, 26, 26, '#2a1a1e');
+    R(x + 5, y + 8 - bob, 16, 17, '#1c1a1f'); g.fillStyle = '#f0cdb6'; g.beginPath(); g.ellipse(x + 13, y + 15 - bob, 5.5, 6.5, 0, 0, Math.PI * 2); g.fill();
+    R(x + 7, y + 9 - bob, 12, 4, '#1c1a1f'); R(x + 10, y + 17 - bob, 2, 1, '#2a1a16'); R(x + 15, y + 17 - bob, 2, 1, '#2a1a16'); R(x + 12, y + 20 - bob, 3, 1, '#c84a50');
+    R(x + 5, y + 3 - bob, 16, 6, '#d8463b'); R(x + 7, y + 2 - bob, 12, 1, '#d8463b'); R(x + 4, y + 8 - bob, 19, 2, '#b8382e'); R(x + 11, y + 4 - bob, 4, 2, '#f4f1ea');
+    R(x + 3, y + 22, 20, 4, '#7ec8e3'); R(x + 3, y + 23, 20, 1, '#f4f1ea');
+  }
+  if (hurt > 0) { for (let k = 0; k < 4; k++) { const yy = y + Math.floor(rnd(k, Math.floor(performance.now() / 60)) * 26), dx = Math.round((rnd(Math.floor(performance.now() / 60), k) - 0.5) * 8 * hurt); g.drawImage(cv, x, yy, 26, 2, x + dx, yy, 26, 2); } g.fillStyle = `rgba(255,60,50,${0.35 * hurt})`; g.fillRect(x, y, 26, 26); }
+  g.restore();
+  g.strokeStyle = '#3a4a46'; g.lineWidth = 1; g.strokeRect(x - 0.5, y - 0.5, 27, 27);
 }
-function traceRow(ri, upToX, c, dim) {
-  const r = ROWS[ri]; if (!r) return;
-  g.save(); g.beginPath(); g.rect(SX(0) - 10, TRK_Y, upToX - (SX(0) - 10), 80); g.clip();
-  g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); g.moveTo(SX(0) - 10, BASE + 0.5); g.lineTo(376, BASE + 0.5); g.stroke();
-  for (let k = 0; k < 6; k++) if (!(r.skip || []).includes(k)) { R(SX(k) - 9, BASE, 19, 1, '#06100d'); spike(SX(k), BASE, 16, c); }
-  const tg = TARGETS[ri];
-  if (tg.judge && tg.judge !== 'miss') { const x = SX(6) + clamp(tg.d / r.spb, -0.5, 0.5) * 42; R(x - 9, BASE, 19, 1, '#06100d'); spike(Math.round(x), BASE, 22, dim ? c : tg.judge === 'good' ? '#bfe8c8' : '#ffffff'); }
-  if (tg.judge === 'miss') { g.strokeStyle = dim ? c : '#ff6a5a'; g.beginPath(); g.moveTo(SX(6) - 4.5, BASE - 4.5); g.lineTo(SX(6) + 4.5, BASE + 4.5); g.moveTo(SX(6) + 4.5, BASE - 4.5); g.lineTo(SX(6) - 4.5, BASE + 4.5); g.stroke(); }
+const rnd = (i, k) => { const s = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return s - Math.floor(s); };
+function laneRow(lane, t) { let r = null; for (const row of ROWS) if (row.lane === lane && row.t0 <= t + 0.001) r = row; return r && t < r.t8 + 0.6 ? r : null; }
+function drawLane(lane, yc, t, show) {
+  const L = LANE[lane], now = performance.now(), F = FX.lane[lane];
+  const hurt = clamp(1 - (now - F.missAt) / 450, 0, 1), shake = hurt > 0 ? Math.round((rnd(now, lane) - 0.5) * 4 * hurt) : 0;
+  g.save(); g.translate(shake, 0); g.globalAlpha = show;
+  // the band
+  R(0, yc - 16, W, 32, 'rgba(6,12,11,.92)'); R(0, yc - 16, W, 1, L.dim); R(0, yc + 15, W, 1, L.dim);
+  if (hurt > 0) { g.fillStyle = `rgba(255,50,40,${0.18 * hurt})`; g.fillRect(0, yc - 16, W, 32); }
+  const flash = clamp(1 - (now - F.hitAt) / 220, 0, 1); if (flash > 0) { g.fillStyle = `rgba(255,255,255,${0.12 * flash})`; g.fillRect(0, yc - 16, W, 32); }
+  const bob = clamp(1 - (now - F.beatAt) / 180, 0, 1) > 0.4 ? 1 : 0;
+  portrait(lane, 8, yc - 13, bob, hurt);
+  txt(L.name, 40, yc - 15, L.col, 7); txt(L.room, 40 + (lane ? 18 : 24), yc - 15, '#5a6a66', 6, 'left', '400');
+  const r = laneRow(lane, t), b = tBeat(t), kf = r ? b - r.b0 : -1;
+  // the track: the line, the notches (a skipped beat's notch is hollow), the heart and its hit line
+  R(NX(0) - 8, yc + 4, NX(HEART) - NX(0) + 8, 1, '#2c3f3a');
+  for (let k = 0; k < HEART; k++) { const sk = r && r.skip.includes(k); R(NX(k), yc + 2, 1, 5, sk ? '#24302d' : '#4a6a60'); if (sk) { R(NX(k) - 1, yc + 2, 3, 1, '#24302d'); R(NX(k) - 1, yc + 6, 3, 1, '#24302d'); } }
+  const near = r ? clamp(1 - Math.abs(kf - HEART) / 1.2, 0, 1) : 0, tg = r && r.tg;
+  for (let y = yc - 12; y < yc + 14; y += 2) R(NX(HEART), y, 1, 1, near > 0.2 ? L.col : '#2c3f3a');
+  const hit = tg && tg.judge && tg.judge !== 'miss', missed = tg && tg.judge === 'miss', since = hit ? (t - tg.hitT) : 9;
+  const pump = hit ? 1 + 0.35 * clamp(1 - since / 0.25, 0, 1) : 1 + 0.15 * near;
+  if (hit) heartShape(NX(HEART) + 0.5, yc + 1, pump, tg.judge === 'good' ? '#cfe8d6' : '#ffffff');
+  else if (missed) { heartLine(NX(HEART), yc + 1, 1, '#ff5a4a'); R(NX(HEART) - 1, yc - 6, 1, 3, '#ff5a4a'); R(NX(HEART), yc - 3, 1, 3, '#ff5a4a'); R(NX(HEART) + 1, yc, 1, 3, '#ff5a4a'); }
+  else heartLine(NX(HEART), yc + 1, pump, lerpCol('#4a6a60', '#ffffff', near));
+  // the timing meter
+  const mx = NX(HEART) + 26; R(mx, yc + 4, 41, 1, '#2c3f3a'); R(mx + 20, yc + 1, 1, 7, '#4a6a60'); R(mx + 12, yc + 3, 1, 3, '#2c3f3a'); R(mx + 28, yc + 3, 1, 3, '#2c3f3a');
+  if (tg && tg.judge && tg.judge !== 'demo') { const x = mx + 20 + clamp(tg.d / WIN_M, -1, 1) * 20; R(x - 1, yc - 1, 3, 9, tg.judge === 'miss' ? '#ff5a4a' : tg.judge === 'perfect' ? '#ffffff' : '#cfe8d6'); }
+  txt('빠름', mx, yc - 9, '#3a4a46', 6, 'left', '400'); txt('늦음', mx + 41, yc - 9, '#3a4a46', 6, 'right', '400');
+  if (r && kf >= 0) {
+    // the line lights up behind the pulse, a blip on each beat that came, the pulse hopping to the next notch late in each beat
+    const k = Math.floor(kf), fr = kf - k, toX = k >= HEART ? NX(HEART) : NX(k) + (NX(k + 1) - NX(k)) * ease((fr - 0.72) / 0.28);
+    R(NX(0), yc + 4, Math.min(toX, NX(HEART)) - NX(0), 1, L.dim);
+    for (let j = 0; j <= Math.min(k, HEART - 1); j++) { if (r.skip.includes(j)) continue; const age = kf - j, a = age < 0.6 ? 1 : 0.45; g.globalAlpha = show * a; blip(NX(j), yc + 4, age < 0.25 ? 12 : 8, age < 0.25 ? '#ffffff' : L.col); g.globalAlpha = show; }
+    if (k < HEART) { const onSkip = r.skip.includes(k) && fr < 0.72; R(toX - 1, yc, 3, 9, onSkip ? '#3a4a46' : '#ffffff'); if (!onSkip) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(toX - 3, yc - 2, 7, 13); g.restore(); } }
+    // the beat sent on past the heart after a good press
+    if (hit && since < 0.6) { const x = NX(HEART) + since / 0.6 * 70; g.globalAlpha = show * (1 - since / 0.6); blip(Math.round(x), yc + 4, 10, '#ffffff'); g.globalAlpha = show; }
+    // counting for the first row, like the nurse's count
+    if ((r.demo || r.b0 === 8) && k < 7) { const p = fr; g.globalAlpha = show * clamp(1 - p * 1.4, 0, 1); txt(k < 6 ? String(k + 1) : '일곱!', k < 6 ? NX(k) : NX(HEART), yc - 14 - p * 3, '#ffffff', k < 6 ? 8 : 8, 'center', '700'); g.globalAlpha = show; }
+    if (r.demo && kf > 5.6 && kf < 7.6) txt('하은이 누름', NX(HEART), yc + 8, L.col, 6, 'center', '400');
+  }
+  // judgement pops over the heart
+  for (const p of FX.pops) { if (p.lane !== lane) continue; const a = 1 - (now - p.at) / 650; if (a <= 0) continue; g.globalAlpha = show * a; g.font = '12px "Black Han Sans", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top'; g.fillStyle = p.c; g.fillText(p.text, NX(HEART) - 22, yc - 15 - (1 - a) * 4); if (p.sub) txt(p.sub, NX(HEART) - 22, yc - 2, p.c, 6, 'center', '400'); g.globalAlpha = show; }
   g.restore();
 }
-function drawStrip(t) {
-  R(0, TRK_Y, W, H - TRK_Y, '#06100d');
-  for (let x = 0; x < W; x += 6) R(x, TRK_Y, 1, H - TRK_Y, x % 30 === 0 ? '#11261d' : '#0a1914');
-  for (let y = TRK_Y; y < H; y += 6) R(0, y, W, 1, (y - TRK_Y) % 30 === 0 ? '#11261d' : '#0a1914');
-  R(0, TRK_Y, W, 2, '#1d2a25'); R(0, TRK_Y + 2, W, 1, '#2f4a3e');
-  const ri = rowAt(t), r = ROWS[ri], kf = t < LEAD ? -1 : (t - r.t0) / r.spb;   // beats into this row
-  // the patient card
-  R(4, TRK_Y + 6, 66, 70, '#0b1813'); R(4, TRK_Y + 6, 66, 1, '#2f4a3e'); R(4, TRK_Y + 75, 66, 1, '#2f4a3e'); R(4, TRK_Y + 6, 1, 70, '#2f4a3e'); R(69, TRK_Y + 6, 1, 70, '#2f4a3e');
-  g.font = '600 8px "IBM Plex Sans KR", sans-serif'; g.textBaseline = 'top'; g.fillStyle = '#cfe8d6'; g.fillText('어머니', 10, TRK_Y + 9);
-  g.font = monoFont; g.fillStyle = '#6a9a80'; g.fillText('502호', 42, TRK_Y + 10);
-  const since = (performance.now() - FX.beatAt) / 1000, pulse = Math.max(0, 1 - since / 0.25);
-  heartIcon(22, TRK_Y + 38, 1 + pulse * 0.35, pulse);
-  g.font = '700 16px "IBM Plex Mono", monospace'; g.fillStyle = '#8fd694'; g.fillText(String(t < LEAD ? ROWS[0].bpm : r.bpm), 36, TRK_Y + 28);
-  g.font = monoFont; g.fillStyle = '#6a9a80'; g.fillText('BPM', 38, TRK_Y + 46);
-  g.fillText(`${Math.min(ri + 1, ROWS.length)}/${ROWS.length}`, 10, TRK_Y + 62);
-  // slot ticks, numbers, the seventh's box
-  for (let k = 0; k < 7; k++) { const skip = (r.skip || []).includes(k); R(SX(k), BASE + 10, 1, 3, skip ? '#2a3a32' : '#3f6a55'); g.font = monoFont; g.fillStyle = skip ? '#2a3a32' : '#3f6a55'; g.fillText(String(k + 1), SX(k) - 2, BASE + 14); }
-  const near = clamp(1 - Math.abs(kf - 6) / 1.5, 0, 1), boxC = lerpCol('#3f6a55', '#e8fff0', near);
-  g.strokeStyle = boxC; g.lineWidth = 1; g.strokeRect(SX(6) - 11.5, BASE - 25.5, 23, 34); if (near > 0.3) { g.strokeStyle = `rgba(232,255,240,${near * 0.35})`; g.strokeRect(SX(6) - 13.5, BASE - 27.5, 27, 38); }
-  if (r.demo && kf > 5 && kf < 7.5) { g.font = '600 8px "IBM Plex Sans KR", sans-serif'; g.fillStyle = '#e8fff0'; g.textAlign = 'center'; g.fillText('하은', SX(6), BASE - 37); g.textAlign = 'left'; }
-  // last row's trace fades ahead of the sweep, this row's trace behind it, the sweep and its erase bar
-  if (t >= LEAD) {
-    const sx = SX(0) - 10 + clamp((kf + 0.25) / 8, 0, 1) * (376 - SX(0) + 10);
-    if (ri > 0) { g.save(); g.beginPath(); g.rect(sx + 8, TRK_Y, 400, 80); g.clip(); traceRow(ri - 1, 400, '#1f4a36', true); g.restore(); }
-    traceRow(ri, sx, '#8fd694', false);
-    R(sx, TRK_Y + 8, 8, 64, '#06100d'); R(sx, BASE - 30, 1, 46, '#cfe8d6');
-  } else { g.strokeStyle = '#1f4a36'; g.beginPath(); g.moveTo(SX(0) - 10, BASE + 0.5); g.lineTo(376, BASE + 0.5); g.stroke(); }
-  // judgement pops over the box
-  const nowMs = performance.now(); FX.pops = FX.pops.filter(p => nowMs - p.at < 700);
-  for (const p of FX.pops) { const a = 1 - (nowMs - p.at) / 700, y = BASE - 40 - (1 - a) * 8; g.globalAlpha = a; g.textAlign = 'center'; g.font = '16px "Black Han Sans", sans-serif'; g.fillStyle = p.c; g.fillText(p.text, SX(6), y - 6); if (p.sub) { g.font = monoFont; g.fillText(p.sub, SX(6), y + 12); } g.textAlign = 'left'; g.globalAlpha = 1; }
-  // the row's cue line
-  if (r.cue && kf >= 0 && kf < 3) { g.globalAlpha = clamp(Math.min(kf * 3, (3 - kf) * 2), 0, 1); g.font = '600 8px "IBM Plex Sans KR", sans-serif'; g.fillStyle = '#cfe8d6'; g.fillText(r.cue, SX(0) - 8, TRK_Y + 8); g.globalAlpha = 1; }
-  if (stats.combo > 1) { g.font = monoFont; g.fillStyle = '#6a9a80'; g.textAlign = 'right'; g.fillText(`연속 ${stats.combo}`, 378, TRK_Y + 8); g.textAlign = 'left'; }
-}
-function heartIcon(cx, cy, s, glow) {
-  const c = glow > 0.2 ? '#ff6a6a' : '#c8403c';
-  const pts = [[0, 4], [-6, -2], [-6, -5], [-4, -7], [-1, -7], [0, -5], [1, -7], [4, -7], [6, -5], [6, -2]];
-  g.fillStyle = c; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(cx + x * s, cy + y * s) : g.moveTo(cx + x * s, cy + y * s)); g.closePath(); g.fill();
-  R(cx - 4 * s, cy - 5 * s, 2, 1, '#ffb0a8');
-  if (glow > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(cx, cy - 2, 1, cx, cy - 2, 16); gr.addColorStop(0, `rgba(255,90,90,${0.35 * glow})`); gr.addColorStop(1, 'rgba(255,90,90,0)'); g.fillStyle = gr; g.fillRect(cx - 18, cy - 20, 36, 36); g.restore(); }
+function drawRows(t) {
+  R(0, TRK_Y, W, H - TRK_Y, '#040807');
+  for (let x = 0; x < W; x += 8) R(x, TRK_Y, 1, H - TRK_Y, '#08100e');
+  R(0, TRK_Y, W, 1, '#1d2a25');
+  const two = clamp((t - TWO_AT) / 0.6, 0, 1) * (t < END_T - 1.0 ? 1 : 1), e2 = ease(two);
+  const y0 = lerp(176, 157, e2), y1 = lerp(232, 195, e2);
+  drawLane(0, Math.round(y0), t, 1);
+  if (two > 0) drawLane(1, Math.round(y1), t, e2);
+  // the row's cue, top right of the strip
+  const cueRow = ROWS.filter(r => r.cue && t >= r.t0 - 0.2 && t < r.t0 + (r.t8 - r.t0) * 0.5).pop();
+  if (cueRow) { const a = clamp(Math.min((t - cueRow.t0 + 0.2) * 3, ((cueRow.t8 - cueRow.t0) * 0.5 - (t - cueRow.t0)) * 2), 0, 1); g.globalAlpha = a; txt(cueRow.cue, 378, TRK_Y + 3, '#e8fff0', 7, 'right'); g.globalAlpha = 1; }
+  if (stats.combo > 1) txt(`연속 ${stats.combo}`, 6, TRK_Y + 3, '#5a6a66', 6, 'left', '400');
+  // a white flash over everything on a good press
+  const f = clamp(1 - (performance.now() - FX.flashAt) / 120, 0, 1); if (f > 0) { g.fillStyle = `rgba(255,255,255,${0.05 * f})`; g.fillRect(0, 0, W, H); }
 }
 
 // ---------- flow ----------
-let pulseI = 0;
 function start() {
   audio(); if (ac.state === 'suspended') ac.resume();
-  for (const tg of TARGETS) { tg.judge = null; tg.d = 0; }
-  Object.assign(stats, { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 }); FX.pops = [];
-  startAt = ac.currentTime + 0.3; evI = 0; pulseI = 0; playing = true;
+  compile();
+  Object.assign(stats, { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 }); FX.pops = []; for (const l of FX.lane) Object.assign(l, { beatAt: -9, hitAt: -9, missAt: -9 });
+  startAt = ac.currentTime + 0.3; evI = 0; playing = true;
   if (movOK) { mov.currentTime = 0; mov.pause(); }
   $('title').hidden = true; $('result').hidden = true;
 }
@@ -295,20 +329,14 @@ $('sm').onclick = () => { syncMs -= 10; showSync(); }; $('sp').onclick = () => {
 function frame() {
   requestAnimationFrame(frame);
   const t = playing ? songT() : -1;
-  if (playing) {
-    schedule(); tick(t);
-    // the heart icon and the ward's monitor beat with the heard pulses and with her presses
-    const pulses = EV.filter(e => e.type === 'pulse' || e.type === 'demo');
-    while (pulseI < pulses.length && pulses[pulseI].t <= t) { FX.beatAt = performance.now(); pulseI++; }
-    if (FX.hitAt > FX.beatAt) FX.beatAt = FX.hitAt;
-    if (t > END_T) finish();
-  }
-  drawMovie(t); drawStrip(playing ? t : 0);
-  if (t > ROWS[ROWS.length - 1].t0 + ROWS[ROWS.length - 1].spb * 7) { g.globalAlpha = clamp((t - ROWS[ROWS.length - 1].t0 - ROWS[ROWS.length - 1].spb * 7) / 0.8, 0, 1); g.font = '600 9px "IBM Plex Sans KR", sans-serif'; g.fillStyle = '#e8fff0'; g.textAlign = 'center'; g.fillText('— 심박 안정 —', W / 2, MOV_H / 2); g.textAlign = 'left'; g.globalAlpha = 1; }
+  if (playing) { schedule(); tick(t); FX.pops = FX.pops.filter(p => performance.now() - p.at < 650); if (t > END_T) finish(); }
+  drawMovie(t); drawRows(playing ? t : 0);
+  const tl = beatT(SEG.length * 8 - 2);
+  if (t > tl) { g.globalAlpha = clamp((t - tl) / 0.8, 0, 1); txt('— 심박 안정 —', W / 2, MOV_H / 2 - 4, '#e8fff0', 9, 'center'); g.globalAlpha = 1; }
 }
 requestAnimationFrame(frame);
-// for testing: window.__16 exposes the chart and a press at a song time
-window.__16 = { ROWS, TARGETS, stats, END_T, press: t => press(t), songT, start, jump: t => { startAt = ac.currentTime - t; evI = EV.findIndex(e => e.t >= t); pulseI = 0; } };
+// for testing: window.__16 exposes the chart, a press at a song time and a jump
+window.__16 = { ROWS, TARGETS: () => TARGETS, stats, END_T: () => END_T, beatT, press: t => press(t), songT, start, jump: t => { startAt = ac.currentTime - t; evI = EV.findIndex(e => e.t >= t); for (const e of EV) e.seen = e.t < t ? 1 : 0; } };
 })();
 </script>
 </body>
