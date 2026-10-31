@@ -56,8 +56,8 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   <div class="bar">
     <button class="btn" id="play" type="button">재생</button>
     <button class="btn ghost" id="restart" type="button">처음부터</button>
-    <div class="scrub"><input id="seek" type="range" min="0" max="108" step="0.01" value="0" aria-label="재생 위치"></div>
-    <span class="time" id="time">00.0 / 108.0</span>
+    <div class="scrub"><input id="seek" type="range" min="0" max="125" step="0.01" value="0" aria-label="재생 위치"></div>
+    <span class="time" id="time">00.0 / 124.4</span>
     <button class="btn ghost" id="hb" type="button" aria-pressed="true">심박 줄</button>
     <button class="btn ghost" id="snd" type="button" aria-pressed="true">소리</button>
   </div>
@@ -117,8 +117,12 @@ const SHOTS = [
   { id: 'hospital', t0: 66.0, t1: 70.2, name: '병원', note: '골목 끝에 병원이 나온다. 하은이 병원 앞에서 멈추고 건물을 올려다본다.' },
   { id: 'corridor', t0: 70.2, t1: 86.0, name: '병원 복도', note: '병원 앞이 암전되고, 깜깜한 복도에서 천장 등이 하나씩 켜진다. 하은이 걸어가 502호 문 앞에서 멈춘다.' },
   { id: 'ward', t0: 86.0, t1: 108, name: '병실', note: '배경만 502호 병실로 바뀐다. 침상에 누운 어머니, 머리맡 심박 모니터, 창으로 들어오는 아침 해. 하은은 침상 옆에 섰다가 의자에 앉아 어머니 손을 잡고, 침상 쪽으로 고개를 숙였다가, 어머니 손가락이 움직이자 고개를 든다.' }
+  { id: 'clip', t0: 108.6, t1: 124.4, name: '꽃다발', note: '암전 뒤 영상: 신입이 꽃다발을 들고 병실 문을 두드리고, 하은이 문을 열고 받는다(구간별로 느리게 다듬은 영상). 심박 줄은 없음.' }
 ];
-const END = 108;   // the cutscene's own length (not the song's)
+const CUT_END = 108;   // the drawn cutscene's own length (not the song's); it fades to black here
+// then, after a beat of black, the ward-visit clip (prototype/media; slowed by section with media/retime.sh), with the rows gone
+const CLIP = { t0: CUT_END + 0.6, dur: 15.6, src: 'media/1-6-ward-visit-paced.mp4' };
+const END = CLIP.t0 + CLIP.dur + 0.2;
 // at the belt (seconds)
 const S1 = { beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], letGo: 9.6 };
 // she stands at x 222 the whole take; once she walks the world slides by. d = how far she has walked (px), easing into her pace
@@ -998,11 +1002,12 @@ function render(t) {
   if (t >= CORR.t1 && t < WARD.t1) { g = wctx; corridorScene(t); }
   if (t > WARD.t0 && t < WARD.t1) crossTo(t, WARD.t0, WARD.t1, wdctx, WDW, wardScene, wardPose(t), '#eef4f2', '#f2ece4', 0);   // (she turns to the bed here, so both whole scenes cross; redrawn on top she'd jump out of the corridor's light)
   if (t >= WARD.t1) { g = wctx; wardScene(t); }
+  if (t >= CUT_END) { out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = '#000'; out.fillRect(0, 0, cv.width, cv.height); if (t >= CLIP.t0 && clipOK) { out.imageSmoothingEnabled = true; out.drawImage(clip, 0, 0, cv.width, cv.height); out.imageSmoothingEnabled = false; } return; }
   // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
   out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = "#000"; out.fillRect(0, 0, cv.width, cv.height);
   out.drawImage(wb, 0, 0, W, H, 0, 0, cv.width, cv.height);
-  const fade = Math.max(1 - seg(t, 0.2, 1.8), seg(t, END - 1.5, END - 0.1));
+  const fade = Math.max(1 - seg(t, 0.2, 1.8), seg(t, CUT_END - 1.5, CUT_END - 0.1));
   if (fade > 0) { out.fillStyle = `rgba(0,0,0,${fade})`; out.fillRect(0, 0, cv.width, cv.height); }
 }
 
@@ -1090,7 +1095,7 @@ EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: 
 for (let k = 1; ; k++) { const t = walkT(k * STRIDE); if (t > WALK.stop - 0.05) break; EV.push({ t, fn: 'step', out: t > doorT }); }
 for (let c = RIDE.clack0; c < RIDE.slow + 1; c += RIDE.gap) EV.push({ t: c, fn: 'clack' }, { t: c + 0.18, fn: 'clack' });
 for (let k = 1; ; k++) { const t = walk3T(k * STRIDE); if (t > WALK3.stop - 0.05) break; EV.push({ t, fn: 'step', out: false }); }
-for (const q of LIGHT_Q) { const t = lightOn(q); if (t < END - 0.5) EV.push({ t, fn: 'panel' }); }
+for (const q of LIGHT_Q) { const t = lightOn(q); if (t < CUT_END - 0.5) EV.push({ t, fn: 'panel' }); }
 for (let k = 1; ; k++) { const t = walk2T(k * STRIDE); if (t > WALK2.stop - 0.05) break; EV.push({ t, fn: 'step', out: t > ALLEY.t0 + 1.7 }); }   // on the platform the steps ring, in the alley they don't
 EV.sort((a, b) => a.t - b.t);
 function audioStart(t) {
@@ -1111,6 +1116,18 @@ function audioTick(t) {
   const street2 = t > ALLEY.t0 && t < CORR.t0 + 1.5 ? 1 : 0, running = t > RIDE.depart && t < RIDE.stop ? seg(t, RIDE.depart, RIDE.depart + 3) * (1 - seg(t, RIDE.slow, RIDE.stop)) : 0;
   amb.wind.gain.setTargetAtTime(Math.max(outK * (1 - onTrain), street2) * (0.025 + 0.012 * Math.sin(t * 0.8)), ac.currentTime, onTrain ? 0.08 : 0.4);
   amb.rumble.gain.setTargetAtTime(street2 ? 0 : onTrain * (0.035 + 0.06 * running), ac.currentTime, 0.15);   // the station's low hum, the train running
+}
+
+// ---------- the clip after the cutscene ----------
+const clip = document.createElement('video'); clip.src = CLIP.src; clip.preload = 'auto'; clip.playsInline = true; let clipOK = false;
+clip.addEventListener('loadeddata', () => { clipOK = true; });
+// keep the clip on the page's clock: playing while the page plays inside its span, nudged back if it drifts
+function clipSync(t) {
+  const want = t - CLIP.t0, inside = playing && want >= 0 && want < CLIP.dur;
+  clip.muted = !soundOn;
+  if (!inside) { if (!clip.paused) clip.pause(); if (!playing && want >= 0 && want < CLIP.dur && Math.abs(clip.currentTime - want) > 0.05) clip.currentTime = want; return; }
+  if (clip.paused) { clip.currentTime = want; clip.play().catch(() => {}); }
+  else if (Math.abs(clip.currentTime - want) > 0.25) clip.currentTime = want;
 }
 
 // ---------- the heartbeat rows (from stage1-6.html, laid over the cutscene) ----------
@@ -1408,13 +1425,13 @@ let hbOn = true;
 function setPlaying(p) {
   if (p && T >= END - 0.01) T = 0;
   playing = p; playBtn.textContent = p ? '일시정지' : '재생'; $('big').hidden = p || started;
-  if (p) { started = true; $('big').hidden = true; initAudio(); audioStart(T); if (hbOn) { if (T < 0.05) HB.reset(); HB.begin(T); } } else { audioStop(); HB.halt(); }
+  if (p) { started = true; $('big').hidden = true; initAudio(); audioStart(T); if (hbOn && T < CUT_END) { if (T < 0.05) HB.reset(); HB.begin(T); } } else { audioStop(); HB.halt(); }
 }
-function jump(t) { T = clamp(t, 0, END); if (playing) { audioStart(T); if (hbOn) HB.begin(T); } }
+function jump(t) { T = clamp(t, 0, END); if (playing) { audioStart(T); if (hbOn && T < CUT_END) HB.begin(T); else HB.halt(); } }
 playBtn.onclick = () => { if (!started) T = 0; setPlaying(!playing); };   // the first play starts from the top
 const pressNow = e => HB.press(HB.clock() + (e.timeStamp - performance.now()) / 1000);
 // the picture: while playing with the rows on, a touch is a press on the beat; otherwise it plays or pauses
-$('stage').addEventListener('pointerdown', e => { if (playing && hbOn && HB.clock() != null) { e.preventDefault(); pressNow(e); return; } if (!started) T = 0; setPlaying(!playing); });
+$('stage').addEventListener('pointerdown', e => { if (playing && hbOn && T < CUT_END && HB.clock() != null) { e.preventDefault(); pressNow(e); return; } if (!started) T = 0; setPlaying(!playing); });
 $('restart').onclick = () => { HB.reset(); jump(0); if (!playing) setPlaying(true); };
 $('hb').onclick = () => { hbOn = !hbOn; $('hb').setAttribute('aria-pressed', hbOn); if (!hbOn) HB.halt(); else if (playing) HB.begin(T); };
 let dragging = false;
@@ -1425,7 +1442,7 @@ $('snd').onclick = () => { soundOn = !soundOn; $('snd').setAttribute('aria-press
 const PRESS_KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyK', 'KeyD']);
 addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' && e.code !== 'Space') return;
-  if (PRESS_KEYS.has(e.code) && playing && hbOn && HB.clock() != null) { e.preventDefault(); if (!e.repeat) pressNow(e); return; }
+  if (PRESS_KEYS.has(e.code) && playing && hbOn && T < CUT_END && HB.clock() != null) { e.preventDefault(); if (!e.repeat) pressNow(e); return; }
   if (e.code === 'Space' || e.code === 'KeyP') { e.preventDefault(); if (!started) T = 0; setPlaying(!playing); }
   else if (e.code === 'ArrowLeft') jump(T - 1); else if (e.code === 'ArrowRight') jump(T + 1);
 });
@@ -1442,9 +1459,10 @@ function showResult() {
 }
 function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
-  if (playing) { const hc = hbOn ? HB.clock() : null; T = hc != null ? hc : T + dt; if (T >= END) { T = END; setPlaying(false); showResult(); } }
-  if (hbOn) HB.update(T);
-  render(T); if (hbOn) HB.draw(T); audioTick(T);
+  if (playing) { const hc = hbOn ? HB.clock() : null; T = hc != null ? hc : T + dt; if (T >= CUT_END && hc != null) { HB.halt(); showResult(); } if (T >= END) { T = END; setPlaying(false); } }
+  const rows = hbOn && T < CUT_END;   // the rows are gone once the cutscene ends
+  if (rows) HB.update(T);
+  render(T); if (rows) HB.draw(T); audioTick(T); clipSync(T);
   if (!dragging) seek.value = T;
   $('time').textContent = `${T.toFixed(1).padStart(4, '0')} / ${END.toFixed(1)}`;
   const si = SHOTS.reduce((a, sh, i) => T >= sh.t0 ? i : a, 0); [...shotsEl.children].forEach((c, i) => c.classList.toggle('on', i === si));
