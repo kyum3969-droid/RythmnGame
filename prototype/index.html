@@ -1491,7 +1491,7 @@ const PARTNERS = {
     base: 86,
     draw(pose, nowMs, active) {
       const top = bodyTop(86, pose) + (pose.bob ? 1 : 0);
-      drawHaeunAt(BOSS_X, top, nowMs, { mirror: !pose.look, watch: pose.phone, load: true, bob: 0, rest: pose.look, eyes: active && inRange(pose.beat, L.fever) });
+      drawHaeunAt(BOSS_X, top, nowMs, { mirror: !pose.look, watch: pose.phone, load: true, bob: 0, rest: pose.look });
     },
     arm(pose) {
       const top = bodyTop(86, pose), shirt = '#1e1a1a', glove = C.skin;
@@ -1676,8 +1676,9 @@ function drawCast(t, nowMs, active, placerPose) {
 
 // 하은, the co-scanner on the upper belt. Same head as the rest of the cast (a 12x14 face under a 14-wide cap). She stands at the
 // upper belt's gate the way you stand at yours, straight above you, the upper belt's front hiding her legs, her gun on that gate.
-// Red snapback pulled low (the brim's shadow where her eyes would be), a high ponytail out the back that swings when she scans,
-// a black long sleeve under the sky-blue vest of 2번 라인, weight on one leg, the free hand in a pocket.
+// Red snapback pulled low, its shadow always across her eyes (they are never drawn). Only the back hair: long and straight from
+// under the cap down her back past the shoulders, nothing beside the face. Sky-blue tee with a white stripe over black sleeves,
+// black bottoms, weight on one leg, the free hand in a pocket. (The 1-6 cutscene draws the same 하은 from its own copy.)
 const HAEUN_X = Math.round(SCAN_X + 0.82 * (PLAYER_X - SCAN_X)), HAEUN_TOP = 56;
 // o.gun = your scan kick while she works the upper gate; o.watch = checking the time; o.step = walking (which leg is forward);
 // o.load = she is a belt's loader and the arm is drawn with the box; o.mirror = facing right (at the loading end)
@@ -1688,21 +1689,20 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
   // legs: weight on the near leg, or a stride
   if (o.step != null) { const st = o.step ? 3 : -3; R(cx - 5 + st, top + 38, 5, 16, leg); R(cx + 2 - st, top + 38, 5, 15, leg); R(cx - 6 + st, top + 53, 6, 3, shoe); R(cx + 2 - st, top + 52, 6, 3, shoe); }
   else { R(cx - 5, top + 38, 5, 16, leg); R(cx + 2, top + 38, 5, 15, leg); R(cx - 6, top + 53, 6, 3, shoe); R(cx + 2, top + 52, 6, 3, shoe); }
-  // long straight hair hanging behind her down past the shoulders, swaying a little when she fires or strides
+  // only the back hair, long and straight down her back past the shoulders, swaying a little when she fires or strides
   const sw = Math.round(kick * 2) + bob + (o.step != null ? 1 : 0);
-  R(cx - 9, top + 3, 18, 28, hair); R(cx + 7 + sw, top + 14, 3, 18, hair); R(cx - 10, top + 14, 3, 17, hair);
-  R(cx + 8 + sw, top + 16, 1, 12, hairL); R(cx - 9, top + 16, 1, 11, hairL);
+  R(cx + 6 + sw, top + 14, 4, 18, hair); R(cx + 8 + sw, top + 16, 1, 12, hairL);
   // body: the sky-blue tee with a white stripe over black sleeves, black bottoms
   R(cx - 7, top + 16, 14, 23, shirt); R(cx - 7, top + 15, 14, 16, sky); R(cx - 7, top + 27, 14, 2, tee); R(cx - 7, top + 30, 14, 9, shirtD);
-  // the face, the same 12x14 as everyone, framed by the hair to the shoulders
-  R(cx - 6, top + 1, 12, 14, C.skin); R(cx - 8, top + 3, 3, 15, hair); R(cx + 5, top + 3, 3, 15, hair); R(cx - 7, top + 6, 1, 10, hairL);
+  // the back of her head under the cap, running into the hair down her back; then the face, the same 12x14 as everyone
+  R(cx + 4, top + 1, 5, 15, hair);
+  R(cx - 6, top + 1, 12, 14, C.skin);
   // the snapback, 14 wide like 반장's cap, pulled down: front panel with a seam and a button, the patch, the brim out to the left
   R(cx - 7, top - 2, 14, 6, cap); R(cx - 6, top - 3, 12, 1, cap); R(cx - 7, top + 3, 14, 1, capD); R(cx - 2, top - 3, 1, 7, capD); R(cx - 1, top - 4, 2, 1, capD);
   R(cx - 6, top - 1, 4, 2, '#f4e6e0');
   R(cx - 15, top + 2, 9, 2, brim); R(cx - 15, top + 2, 9, 1, cap); R(cx - 15, top + 4, 9, 1, capD);
-  // bangs down over her eyes under the cap; a scan lights two pinpoints in them for a moment
-  R(cx - 6, top + 4, 12, 3, hair); R(cx - 6, top + 7, 12, 1, '#6b4631');
-  if (kick > 0.4 || o.eyes) { R(cx - 4, top + 5, 1, 1, o.eyes ? '#bfe9ff' : '#f4f1ea'); R(cx + 1, top + 5, 1, 1, o.eyes ? '#bfe9ff' : '#f4f1ea'); }
+  // the cap's shadow over her eyes, always: deep under the brim, softening down to the cheeks
+  R(cx - 6, top + 4, 12, 3, '#3a2622'); R(cx - 6, top + 7, 12, 1, '#8a5a44');
   R(cx - 3, top + 9, 2, 1, '#b07a58'); R(cx - 3, top + 11, 2, 1, '#b2565a');
   // front arm: the gun on the upper gate (kicks back toward her when a scan fires there), the watch check, a swing while walking,
   // or nothing (the loading arm is drawn with the belt). The other hand stays in a pocket.
