@@ -49,6 +49,8 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .ripple.R{border-color:#cfe04a;box-shadow:0 0 12px rgba(207,224,74,.45)}
 @keyframes rip{from{transform:scale(.25);opacity:1}to{transform:scale(1);opacity:0}}
 
+.tutskip{position:absolute;top:6cqw;right:2.2cqw;z-index:6;font:inherit;font-size:max(11px,1.7cqw);padding:.35em .8em;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(10,8,8,.6);color:#f4ead8;cursor:pointer}
+.tutskip:hover{background:rgba(40,30,26,.8)}
 .hud{position:absolute;top:1.6cqw;left:2.2cqw;right:2.2cqw;display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);
   font-size:clamp(9px,1.5cqw,15px);line-height:1.3;letter-spacing:.06em;color:var(--ink);pointer-events:none;font-variant-numeric:tabular-nums}
 .hud span{display:inline-block;background:rgba(13,10,9,.62);padding:.15em .6em;border-radius:3px;transition:background-color .2s,color .2s}
@@ -168,6 +170,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 <div class="page">
   <div class="stage" id="stage">
     <canvas id="cv" width="384" height="216" aria-label="컨베이어 벨트 작업 화면"></canvas>
+    <button class="tutskip" id="tutskip" type="button" hidden>튜토리얼 건너뛰기 ▸</button>
     <div class="hud" id="hud" hidden><span id="clock">B동 3번 라인 · 03:12</span><span id="combo">콤보 0</span></div>
     <div class="bubble" id="bubble" hidden></div>
     <div class="judge" id="judge"></div>
@@ -741,9 +744,15 @@ const LEVELS = [
     // 타닥 run together, his synth lead over the metal, a key change; the band drops out and the motor chugs on alone.
     // The motor is never fixed: his belt swings to the end.
     show: true,   // 1-5's light show (drawShow15) and her rage aura
-    lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, allLit: true, bossSeat: { x: 22, stand: [[84, 89]] }, vibe: [[72, 104]], doze: [[56, 62]], unplug: [[108, 166]], toss: [[116, 164]],
+    lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, allLit: true, bossSeat: { x: 22, stand: [[86, 91]] }, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 166]],
+    // 하은 goes over to him (she leaves her belt, walks down to beside him), stands there through the row, pulls his earbud out
+    // at the record scratch, and walks back to start her metal; the camera closes in on him when his track opens and on the two
+    // of them for the row
+    visit: { go: [96, 99.5], back: [115, 118], x: 80, top: 86, yank: 104 },
+    camPlay: [[72, 80, { x: 58, y: 112, k: 1.6 }], [96, 118, { x: 70, y: 114, k: 1.4 }]],
+    farBeltLeft: 14,   // the upper belt runs on to the left, past her legs
     beltSwing: { lane: 1, until: Infinity }, fixAt: Infinity,   // the motor is never fixed
-    heads: { h: [82, 44], j: [50, 92], b: [22, 98] },
+    heads: { h: [82, 44], j: [50, 92], b: [22, 98], v: [80, 80] },
     clock:'03:20', title:'꿈', offTilt: true,
     chords: S15.lofi.ch, roots: S15.lofi.rt, chordAt: bar => bar % 4,
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 220,
@@ -758,12 +767,12 @@ const LEVELS = [
     // hit on both belts at once
     bars: [
       '........', '........',
-      '........', '........', 'h===..x.', 'x.x.x...', '........', '........', 'x.x.h===', '..x.x.x.',
-      'x...x...', 'h===....', 'x...x...', '....x.x.', 'x...x...', 'x.x.h===', '..x.x...', 'x.x.....',
-      'x...x...', 'h=..h=..', 'x...x...', 'x...x...', 'h===..x.', 'x...x...', 'x...x...', 'x.......',
+      '........', '........', 'h===..x.', 'x.x.x...', '........', '........', 'x...x...', 'h===....',
+      'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.', 'h=====..', 'x.x.x...', '..x.x...', 'x.x.....',
+      '........', '........', 'x...x...', 'x...x...', 'h===..x.', 'x...x...', '........', '........',
       '........', '........', '........',
-      'h=======', '..x...x.', 'x...x...', 'x.x.x...', 'x.x.x.x.', 'h===..x.',
-      'h=====..', 'h=====..', 'x.x.x.x.', 'x.x.x.x.', 'h=..h=..', 'x.x.x.x.',
+      '........', '..x...x.', 'h===..x.', 'h=====..', 'x.x.h===', '..x.x.x.',
+      'h=======', '..h=====', '..x.x.x.', 'x.x.x.x.', 'h===..x.', 'h=====..',
       'x.x.x.x.', '........', 'x...x...', 'h===..x.', 'x.x.x.x.', 'h=..h=..',
       'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'h=..h=..', 'x.......',
       '........', '........', '........'
@@ -774,23 +783,25 @@ const LEVELS = [
     // last box on the beat with hers
     bars2: [
       '........', '........',
-      '.x...x..', '.x.x.x..', '........', '........', '.x.x.x.x', '.x...x.x', '........', '........',
-      '.x...x..', '.....x.x', '...x...x', '.x.x....', '........', '........', '.x.x.x.x', '.....x..',
-      '.x.x..x.', '.......x', '.x.x.x.x', '...x....', '.......x', '..x..x.x', '.x......', '........',
+      '.x...x..', '.x.x.x..', '........', '........', '.x.x.x.x', '.x...x.x', '.x...x..', '.....x.x',
+      '........', '........', '........', '........', '........', '........', '.x.x.x.x', '.....x..',
+      '........', '........', '.x.x..x.', '.......x', '.....x.x', '..x..x.x', '........', '........',
       '........', '........', '........',
-      '........', '........', '.x...x..', '.x.x....', '.x...x..', '.x.x.x..',
-      '.x...x..', '.x...x..', '.x.x.x.x', '.x.x.x.x', '.x.x.x.x', '.x.x.x..',
+      '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........',
       '........', '.x.x.x.x', '.x...x..', '.x.x.x..', '.x.x.x.x', '.x.x.x.x',
       '.x.x.x.x', '.x.x.x.x', '.x.x.x.x', '.x.x.x.x', 'x.......',
       '........', '........', '........'
     ],
     // [beat, text, beats shown, lane, speaker]: 'h' 하은 (upper loading end), 'j' 지우 (lower), 'b' 반장 (on his crate)
     say: [[9, '누나, 이 비트 들어봐요!', 3, 1, 'j'], [12.5, '…일해.', 2, 0, 'h'],
-          [57, '(꾸벅…)', 2.5, 1, 'j'], [60, '…야. 지우.', 2, 0, 'h'], [62, '넵! 안 잤어요!', 2.5, 1, 'j'], [66, '침이나 닦아.', 2, 0, 'h'],
-          [73, '(흥얼흥얼) 여기서 드롭…!', 3, 1, 'j'], [77, '이어폰 빼.', 2, 0, 'h'], [79.5, '한 곡만요, 딱 한 곡만!', 3, 1, 'j'],
-          [84, '…내가 한다.', 2, 1, 'b'], [86.5, '반장님 앉아 계세요.', 2.5, 0, 'h'],
-          [100.5, '야. 반장님 허리 다친 거 안 보여? 정신 차려.', 3.5, 0, 'h'], [104.5, '아 진짜, 누나나 악바리로 해요.', 3, 1, 'j'], [107.8, '저는 제가 하고 싶은 대로 할 거라구요.', 3.2, 1, 'j'],
-          [111.5, '니 맘대로 할 거면…', 2.5, 0, 'h'], [114.5, '꺼져, 그냥.', 2.5, 0, 'h'],
+          [41, '(꾸벅…)', 2.5, 1, 'j'], [47, '…지우?', 2, 0, 'h'], [53, '하… 진짜.', 2.5, 0, 'h'], [58.5, '(드르렁…)', 2, 1, 'j'],
+          [61, '…야. 지우.', 1.5, 0, 'h'], [62.5, '넵! 안 잤어요!', 2.5, 1, 'j'], [66, '침이나 닦아.', 2, 0, 'h'],
+          [73, '(흥얼흥얼) 여기서 드롭…!', 3.5, 1, 'j'], [81, '이어폰 빼.', 2, 0, 'h'], [83, '한 곡만요, 딱 한 곡만!', 3, 1, 'j'],
+          [86, '…내가 한다.', 2, 1, 'b'], [88.5, '반장님 앉아 계세요.', 2.5, 0, 'h'],
+          [100, '야. 반장님 허리 다친 거 안 보여? 정신 차려.', 3.5, 1, 'v'], [104, '(이어폰 줄을 확 잡아뺀다)', 2, 1, 'v'],
+          [106, '아 진짜, 누나나 악바리로 해요.', 3, 1, 'j'], [109, '저는 제가 하고 싶은 대로 할 거라구요.', 3, 1, 'j'],
+          [112, '니 맘대로 할 거면…', 2.5, 1, 'v'], [114.5, '꺼져, 그냥.', 2.5, 1, 'v'],
           [161, '…지우야.', 2.5, 1, 'b']],
     comfort: ['…괜찮다. 다음 거.', '…박 봐라.'],
     intro: [
@@ -1843,6 +1854,19 @@ function drawRage15(t, nowMs, who) {
 }
 // 1-5 phase 2: 하은 throws his boxes onto his belt herself, an arc from her hands at the upper belt down to its loading end
 // over the half beat before each lands there (a whoosh as it leaves her)
+function visitAt(b) {
+  const V = L.visit; if (!V || b < V.go[0] || b >= V.back[1]) return null;
+  const home = { x: BOSS_X + LANE_DX[0], top: 50 }, dest = { x: V.x, top: V.top };
+  if (b < V.go[1]) { const p = ease((b - V.go[0]) / (V.go[1] - V.go[0])); return { x: lerp(home.x, dest.x, p), top: lerp(home.top, dest.top, p), walk: true, back: false }; }
+  if (b < V.back[0]) return { x: dest.x, top: dest.top, walk: false, yank: V.yank != null && b >= V.yank - 0.5 && b < V.yank + 0.6 ? Math.max(0, 1 - Math.abs(b - V.yank) * 2) : null };
+  const p = ease((b - V.back[0]) / (V.back[1] - V.back[0])); return { x: lerp(dest.x, home.x, p), top: lerp(dest.top, home.top, p), walk: true, back: true };
+}
+// 하은 on her visit, drawn in front of the lower belt
+function drawVisit(b, nowMs) {
+  const v = visitAt(b); if (!v) return;
+  drawHaeunAt(Math.round(v.x), Math.round(v.top), nowMs, v.walk ? { step: Math.floor(nowMs / 150) % 2, mirror: v.back } : v.yank != null ? { tap: v.yank } : { rest: true });
+  if (L.visit.yank != null && Math.abs(b - L.visit.yank) < 0.02 && ctx && !FX.yankFx) { FX.yankFx = true; noise(ctx.currentTime, 'bandpass', 3000, 0.2, 0.05, 2, bus); }
+}
 function drawTosses(t) {
   const fly = 0.5 * SPB, x0 = BOSS_X + LANE_DX[0] + 12, y0 = 98, x1 = PLACE_X + LANE_DX[1], y1 = BELT_Y;
   for (const n of notes) {
@@ -1994,36 +2018,37 @@ function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
 }
 
 // belt top doubles as a beat grid: bright paint = beat, mid = 8th, dim = 16th
+let BELT_L = 48;   // where a belt starts on the left (a level can run its upper belt further, farBeltLeft)
 function drawBeltTop(time, active) {
-  R(48, BELT_Y, W - 48, 4, C.belt);
-  R(48, BELT_Y, W - 48, 1, '#4a403b');
+  R(BELT_L, BELT_Y, W - BELT_L, 4, C.belt);
+  R(BELT_L, BELT_Y, W - BELT_L, 1, '#4a403b');
   const beat = active ? beatAt(time) : time / SPB;
   const k0 = Math.floor(beat * 4);
   for (let m = -56; m <= 12; m++) {
     const k = k0 + m, q = ((k % 4) + 4) % 4;
     const tk = active ? timeAt(k / 4) : (k / 4) * SPB;
     const x = Math.round(SCAN_X + (time - tk) * SPEED);
-    if (x < 49 || x >= W) continue;
+    if (x < BELT_L + 1 || x >= W) continue;
     if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); }
     else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44');
     else R(x, BELT_Y + 1, 1, 3, C.slat);
   }
 }
 function drawBeltFront(time) {
-  R(46, BELT_Y + 4, W - 46, 12, C.face);
+  R(BELT_L - 2, BELT_Y + 4, W - BELT_L + 2, 12, C.face);
   const ro = (((time * SPEED) % 14) + 14) % 14;
-  for (let x = 50 + ro - 14; x < W; x += 14) if (x >= 48) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); }
-  R(46, BELT_Y + 15, W - 46, 1, '#0c0a09');
-  for (const x of [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422');
-  R(44, BELT_Y - 1, 5, 17, '#3d3431');
+  for (let x = BELT_L + 2 + ro - 14; x < W; x += 14) if (x >= BELT_L) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); }
+  R(BELT_L - 2, BELT_Y + 15, W - BELT_L + 2, 1, '#0c0a09');
+  for (const x of BELT_L < 48 ? [BELT_L + 6, 70, 150, 230, 352] : [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422');
+  R(BELT_L - 4, BELT_Y - 1, 5, 17, '#3d3431');
 }
 // the upper belt (drawn in its own perspective) is a level further back: its legs run all the way down behind the lower belt to
 // the floor with a rail across them, and the space under it is in shade, so it stands instead of hanging in the air
 function drawBeltLegs() {
   const gr = g.createLinearGradient(0, BELT_Y + 16, 0, BELT_Y + 50); gr.addColorStop(0, 'rgba(6,5,8,.55)'); gr.addColorStop(1, 'rgba(6,5,8,0)');
-  g.fillStyle = gr; g.fillRect(46, BELT_Y + 16, W - 46, 34);
-  for (const x of [70, 150, 230, 352]) { R(x, BELT_Y + 16, 4, 52, '#2b2422'); R(x, BELT_Y + 16, 1, 52, '#3d3431'); R(x - 2, BELT_Y + 66, 8, 2, '#1c1716'); }
-  R(46, BELT_Y + 44, W - 46, 3, '#2b2422'); R(46, BELT_Y + 44, W - 46, 1, '#3d3431');
+  g.fillStyle = gr; g.fillRect(BELT_L - 2, BELT_Y + 16, W - BELT_L + 2, 34);
+  for (const x of BELT_L < 48 ? [BELT_L + 6, 70, 150, 230, 352] : [70, 150, 230, 352]) { R(x, BELT_Y + 16, 4, 52, '#2b2422'); R(x, BELT_Y + 16, 1, 52, '#3d3431'); R(x - 2, BELT_Y + 66, 8, 2, '#1c1716'); }
+  R(BELT_L - 2, BELT_Y + 44, W - BELT_L + 2, 3, '#2b2422'); R(BELT_L - 2, BELT_Y + 44, W - BELT_L + 2, 1, '#3d3431');
   for (const [a, b] of [[70, 150], [150, 230], [230, 352]]) { thick(a + 4, BELT_Y + 18, b, BELT_Y + 43, 1, '#241e1c'); }
 }
 function drawLaserGlow(flash) {
@@ -2300,6 +2325,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   if (active && L.beltSwing && L.lanes === 2) beltT = beltClockT(t, lane);
   const dy = L.lanes === 2 ? LANE_DY[lane] : 0, pid = L.partners[lane], far = lane === 0 && L.lanes === 2, mine = FX.goodLane === lane || nowMs - (FX.goodBoth || -1e9) < 160;
   g.save(); g.translate(laneSlide(lane, t, active), dy); if (far) farXform();
+  BELT_L = far && L.farBeltLeft != null ? L.farBeltLeft : 48;
   drawScannerBack(0);
   (L.daw ? drawDawTop : drawBeltTop)(beltT, active);
   if (L.jam) drawJamRoller(t, nowMs, active);
@@ -2357,12 +2383,13 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   const mAge = nowMs - FX.lastMiss, missF = FX.missLane === lane && (FX.missKind === 'pass' ? mAge < 420 && mAge % 210 < 120 : mAge < 220);
   drawScannerFront(mine ? flash : 0, holding, missF, 0);
   (L.daw ? drawDawFront : drawBeltFront)(beltT); if (far) drawBeltLegs();
+  BELT_L = 48;
   if (!far && L.fixAt != null && L.lanes === 2) drawBadMotor(t, nowMs, active);
   if (pose.carry) drawBox(pose.carry.n, pose.carry.x, pose.carry.y + pose.carry.n.h / 2, '', t);
   if (!far) drawPartnerArmOf(pid, pose, lane);
   g.restore();
   // the arm to the far belt is drawn in screen space so it stays on the body; only the hand goes through the perspective
-  if (far && DUO.mode === 'two') { const who = pid, o = placerOff(0), h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
+  if (far && DUO.mode === 'two' && !(active && L.visit && visitAt(castBeatAt(t, active)))) { const who = pid, o = placerOff(0), h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
 }
 // ---------- 2-1 stage (the audition hall) ----------
 const LAPTOP = { x: 54, y: 112, kx: 64, ky: 121 }, PAD = { x: 314, y: 126 };
@@ -3062,7 +3089,7 @@ function drawScene(t, bt, active, nowMs) {
   if (L.lanes === 2) {
     const mb = castBeatAt(t, active); DUO.mode = duoMode(mb); DUO.p = L.handover ? Math.max(0, Math.min(1, (mb - L.handover[0]) / (L.handover[1] - L.handover[0]))) : 1;
     if (DUO.mode !== 'two' && L.coScanner) drawHaeunScene(mb, upperKick, nowMs, active);
-    if (DUO.mode === 'two') { const fa = active ? feverAura(mb) : 0; if (fa) drawHaeunAura(mb, fa, nowMs, false); if (L.show && active) { drawRage15(t, nowMs, 'h'); drawRage15(t, nowMs, 'j'); } g.save(); g.translate(LANE_DX[0], LANE_DY[0]); drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); if (fa) drawHaeunAura(mb, fa, nowMs, true); }
+    if (DUO.mode === 'two') { const fa = active ? feverAura(mb) : 0; if (fa) drawHaeunAura(mb, fa, nowMs, false); if (L.show && active) { drawRage15(t, nowMs, 'h'); drawRage15(t, nowMs, 'j'); } if (!(active && visitAt(mb))) { g.save(); g.translate(LANE_DX[0], LANE_DY[0]); drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); } if (fa) drawHaeunAura(mb, fa, nowMs, true); }
     else {
       // one loader between the belts: his body follows whichever belt is busy
       const o = placerOff(1), bp = { ...poses[1], wince: poses[0].wince || poses[1].wince, dip: Math.max(poses[0].dip, poses[1].dip), nod: Math.max(poses[0].nod, poses[1].nod) };
@@ -3085,6 +3112,7 @@ function drawScene(t, bt, active, nowMs) {
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
   if (L.toss && active) drawTosses(t);
+  if (L.visit && active) drawVisit(beatAt(t), nowMs);
   if (L.lanes === 2 && !L.allLit) drawIdleShade(t, nowMs, active);
   if (L.dock) drawDockFront(dockBeat, t, nowMs, active); else if (L.lanes === 2) drawPairBolt(nowMs);
   drawGauge(nowMs);
@@ -4462,7 +4490,7 @@ let progress = {};
 try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}; } catch (e) {}
 
 function resetRun() {
-  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.jamFx = false; n.tossFx = false; }); BANG.done = false;
+  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.jamFx = false; n.tossFx = false; }); BANG.done = false; FX.yankFx = false;
   FX.particles = []; FX.marks = []; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.splashes = []; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9; FX.goodBoth = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
   rings = []; heavyPend = null;
@@ -4871,6 +4899,13 @@ function startPractice(level) {
   Object.assign(TUT, { on: true, phase: 'wait', i: 0, line: null, stand: false, lvl: level, count: null });
   startPlay();
 }
+// skip the rest of the tutorial: straight to the shift
+function skipPractice() {
+  if (!TUT.on || state !== 'play') return;
+  TUT.on = false; TUT.line = null; TUT.count = null; CAM.to = null; SLOW.on = false; stopHum(); stopHold(); loadLevel(TUT.lvl); startPlay();
+}
+$('tutskip').addEventListener('click', e => { e.stopPropagation(); skipPractice(); $('tutskip').blur(); });
+addEventListener('keydown', e => { if (e.code === 'Escape' && TUT.on) { e.preventDefault(); skipPractice(); } });
 function tutSay(lines, done) {
   if (!lines || !lines.length) { done(); return; }
   Object.assign(TUT, { phase: 'talk', lines, li: 0, done }); tutShow();
@@ -5034,6 +5069,7 @@ function frame(now) {
   const t = active ? viewTime(tReal, now) : -99;
   if (active) {
     schedule(); judgeTick(tReal); updateHud(t);
+    if (L.camPlay && !L.practiceOf && !SLOW.on) { const bv = beatAt(t), c = L.camPlay.find(([a, z]) => bv >= a && bv < z); CAM.to = c ? c[2] : null; }
     if (TUT.on && L.practiceOf) tutTick(tReal);
     else if (tReal > timeAt(END_BEAT)) finishPlay();
   }
@@ -5044,6 +5080,7 @@ function frame(now) {
   if (active && L.show && !L.practiceOf) drawShow15(t, now);
   drawCamera(now);
   drawSlowFx(now);
+  const ts = $('tutskip'), showSkip = state === 'play' && TUT.on; if (ts.hidden === showSkip) ts.hidden = !showSkip;
 }
 requestAnimationFrame(frame);
 })();
