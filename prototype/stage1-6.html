@@ -78,13 +78,13 @@ dl{display:grid;grid-template-columns:auto 1fr;gap:.15em 1.2em;margin:.5em 0 1em
     </div>
   </div>
 </div>
-<p class="help">시안 페이지 · 리듬닥터 오마주. 위 136줄은 컷씬 영상 자리(16:9 영상은 가운데를 잘라 씀), 아래 80줄은 환자 줄. 영상은 소리 없이 노래 시간에 맞춰 재생됩니다.</p>
+<p class="help">시안 페이지 · 리듬닥터 오마주. 컷씬 영상이 화면 전체에 깔리고, 환자 줄은 그 아래쪽 위에 얹힙니다. 영상은 소리 없이 노래 시간에 맞춰 재생됩니다.</p>
 
 <script>
 (() => {
 'use strict';
 const $ = id => document.getElementById(id);
-const W = 384, H = 216, MOV_H = 136, TRK_Y = 136;
+const W = 384, H = 216, MOV_H = 216;
 const cv = $('cv'), g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
 const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
@@ -159,7 +159,7 @@ function press(tIn) {
   const same = TARGETS.filter(tg => !tg.demo && !tg.judge && Math.abs(tg.t - best.t) < 0.02);
   if (Math.abs(d) <= WIN_G) {
     const j = Math.abs(d) <= WIN_P ? 'perfect' : 'good';
-    for (const tg of same) { tg.judge = j; tg.d = d; tg.hitT = t; stats[j]++; stats.combo++; FX.lane[tg.lane].hitAt = now; FX.pops.push({ lane: tg.lane, text: j === 'perfect' ? '딱' : '좋아', sub: j === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: now, c: j === 'perfect' ? '#ffffff' : '#cfe8d6' }); }
+    for (const tg of same) { tg.judge = j; tg.d = d; tg.hitT = t; stats[j]++; stats.combo++; FX.lane[tg.lane].hitAt = now; burst(COL, LANEY[tg.lane]); FX.pops.push({ lane: tg.lane, text: j === 'perfect' ? '딱' : '좋아', sub: j === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: now, c: j === 'perfect' ? '#ffffff' : '#cfe8d6' }); }
     stats.best = Math.max(stats.best, stats.combo); FX.flashAt = now;
     heart(ac.currentTime, 0.9, true); if (j === 'perfect') beep(ac.currentTime + 0.02, 1046, 0.06);
   } else for (const tg of same) { tg.d = d; missIt(tg, d < 0 ? '빠름' : '늦음'); }
@@ -195,115 +195,100 @@ function drawMovie(t) {
 // beating with the strip below, 하은 asleep sitting up with her head on the bed's edge
 function placeholderWard(t) {
   const p = clamp(t / END_T, 0, 1);
-  R(0, 0, W, MOV_H, '#141a24'); R(0, 100, W, 36, '#10151c');
+  R(0, 0, W, MOV_H, '#141a24'); R(0, 100, W, 116, '#10151c'); for (let y = 140; y < H; y += 6) R(0, y, W, 1, '#141a22');
   const sky = ['#1a2440', '#2a3466', '#5a4e7e', '#b07a7a'].map(c => c);
   for (let i = 0; i < 4; i++) R(236, 14 + i * 16, 112, 16, lerpCol('#121a2c', sky[i], p));
   for (let y = 18; y < 78; y += 6) R(236, y, 112, 2, '#0c1018');
   R(234, 12, 116, 2, '#2a303a'); R(234, 78, 116, 2, '#2a303a'); R(234, 12, 2, 68, '#2a303a'); R(348, 12, 2, 68, '#2a303a');
-  g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,200,160,${0.06 + 0.12 * p})`; g.beginPath(); g.moveTo(236, 80); g.lineTo(348, 80); g.lineTo(300, 136); g.lineTo(150, 136); g.closePath(); g.fill(); g.restore();
-  R(60, 82, 190, 22, '#cfd6e0'); R(60, 82, 190, 3, '#e8eef4'); R(60, 104, 190, 6, '#8a94a2'); R(64, 110, 4, 26, '#5a6270'); R(242, 110, 4, 26, '#5a6270');
+  g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,200,160,${0.06 + 0.12 * p})`; g.beginPath(); g.moveTo(236, 80); g.lineTo(348, 80); g.lineTo(330, 216); g.lineTo(110, 216); g.closePath(); g.fill(); g.restore();
+  R(60, 82, 190, 22, '#cfd6e0'); R(60, 82, 190, 3, '#e8eef4'); R(60, 104, 190, 6, '#8a94a2'); R(64, 110, 4, 36, '#5a6270'); R(242, 110, 4, 36, '#5a6270');
   R(70, 72, 46, 14, '#e8eef4'); R(72, 74, 30, 8, '#c49a80');
   for (let x = 110; x < 246; x += 2) R(x, 78 + Math.round(Math.sin(x / 22) * 2), 2, 6, '#9fb4cc');
-  R(170, 80, 34, 22, '#1e1a1a'); R(172, 70, 22, 12, '#3a2a24'); R(168, 66, 28, 8, '#d8463b'); R(160, 102, 44, 34, '#1e1a1a'); R(164, 102, 36, 20, '#7ec8e3');
+  R(170, 80, 34, 22, '#1e1a1a'); R(172, 70, 22, 12, '#3a2a24'); R(168, 66, 28, 8, '#d8463b'); R(160, 102, 44, 44, '#1e1a1a'); R(164, 102, 36, 20, '#7ec8e3');
   const beat = Math.max(0, 1 - (performance.now() - FX.lane[0].beatAt) / 250);
   R(20, 30, 40, 30, '#0c0f10'); R(22, 32, 36, 26, '#06120c'); R(38, 60, 4, 50, '#3a3f45');
   g.fillStyle = `rgba(143,214,148,${0.5 + 0.5 * beat})`; for (let x = 0; x < 34; x++) { const d = Math.abs(x - 17), y = 45 - (d < 2 ? 9 * beat : 0); g.fillRect(23 + x, y, 1, 1); }
   g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(40, 45, 2, 40, 45, 50); gr.addColorStop(0, `rgba(143,214,148,${0.12 + 0.12 * beat})`); gr.addColorStop(1, 'rgba(143,214,148,0)'); g.fillStyle = gr; g.fillRect(0, 0, 100, 110); g.restore();
-  g.font = '7px "IBM Plex Mono", monospace'; g.textBaseline = 'top'; g.fillStyle = 'rgba(239,230,210,.45)'; g.fillText('컷씬 영상 자리 (임시 병실)', 6, 122);
+  g.font = '7px "IBM Plex Mono", monospace'; g.textBaseline = 'top'; g.fillStyle = 'rgba(239,230,210,.45)'; g.fillText('컷씬 영상 자리 (임시 병실)', 6, 6);
 }
 function lerpCol(a, b, p) { const A = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), B = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16)); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], p))).join(',')})`; }
 
-// ---------- the patient rows ----------
-// Each patient has a row across the bottom: their portrait in a box on the left, a track with seven notches, a pulse that hops
-// one notch per heartbeat and leaves a blip, a heart at the seventh notch with the hit line through it, and a small timing
-// meter after it (early to the left, late to the right). A press in time fills the heart and sends a beat on past it; a miss
-// cracks it, shakes the row and glitches the portrait.
-const NX = k => 58 + k * 42, HEART = 6;
-const LANE = [{ name: '어머니', room: '502호', col: '#5fd0b0', dim: '#2a5a4c' }, { name: '하은', room: '보호자', col: '#ff8a7a', dim: '#5a2e2a' }];
+// ---------- the patient rows (after Rhythm Doctor's) ----------
+// The rows lie over the scene itself. Each patient stands at the left end of a thin green line that runs to a big pixel heart
+// at the right; the heartbeat travels the line as an ECG wave, one hop per beat. The seventh beat sits in a pale cyan column
+// that crosses every row; past it the line turns yellow up to the heart. A press in time throws green sparks out of the
+// column and the heart pumps; a miss leaves a big pink X where the wave was and cracks the heart.
+const X0 = 30, BX = k => X0 + 14 + k * 41, HEART = 6, HX = 356, COL = BX(HEART);
 const ease = p => p < 0 ? 0 : p > 1 ? 1 : p * p * (3 - 2 * p);
-function txt(s, x, y, c, size = 7, align = 'left', weight = '600') { g.font = `${weight} ${size}px "IBM Plex Sans KR", sans-serif`; g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = c; g.fillText(s, x, y); g.textAlign = 'left'; }
-function heartShape(cx, cy, s, c) { const pts = [[0, 4], [-6, -2], [-6, -5], [-4, -7], [-1, -7], [0, -5], [1, -7], [4, -7], [6, -5], [6, -2]]; g.fillStyle = c; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(cx + x * s, cy + y * s) : g.moveTo(cx + x * s, cy + y * s)); g.closePath(); g.fill(); }
-function heartLine(cx, cy, s, c) { const pts = [[0, 4], [-6, -2], [-6, -5], [-4, -7], [-1, -7], [0, -5], [1, -7], [4, -7], [6, -5], [6, -2]]; g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(cx + x * s + 0.5, cy + y * s + 0.5) : g.moveTo(cx + x * s + 0.5, cy + y * s + 0.5)); g.closePath(); g.stroke(); }
-function blip(x, y, amp, c) { const pts = [[-5, 0], [-3, -1], [-2, 0], [-1, 1], [0, -amp], [1, 3], [2, 0], [4, -1], [5, 0]]; g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); pts.forEach(([dx, dy], i) => i ? g.lineTo(x + dx + 0.5, y + dy + 0.5) : g.moveTo(x + dx + 0.5, y + dy + 0.5)); g.stroke(); }
-// the two patients' portraits, 26 pixels square: her mother asleep on the pillow with the oxygen line; 하은 in her red cap
-function portrait(lane, x, y, bob, hurt) {
-  R(x, y, 26, 26, '#0a0f0e');
-  g.save(); g.beginPath(); g.rect(x, y, 26, 26); g.clip();
-  if (lane === 0) {
-    R(x, y, 26, 26, '#1a2630'); R(x + 1, y + 12, 24, 14, '#d9e2ea'); R(x + 1, y + 12, 24, 1, '#f2f6f8');
-    g.fillStyle = '#9aa0a8'; g.beginPath(); g.ellipse(x + 13, y + 11 - bob, 8, 7, 0, 0, Math.PI * 2); g.fill();
-    g.fillStyle = '#e6c0a4'; g.beginPath(); g.ellipse(x + 13, y + 14 - bob, 6, 6.5, 0, 0, Math.PI * 2); g.fill();
-    R(x + 9, y + 13 - bob, 3, 1, '#7a5a4a'); R(x + 15, y + 13 - bob, 3, 1, '#7a5a4a'); R(x + 12, y + 18 - bob, 3, 1, '#b07a6a');
-    R(x + 5, y + 17 - bob, 16, 1, '#cfe6ee'); R(x + 1, y + 21, 24, 5, '#9fc4e0'); R(x + 1, y + 21, 24, 1, '#bfdcef');
-  } else {
-    R(x, y, 26, 26, '#2a1a1e');
-    R(x + 5, y + 8 - bob, 16, 17, '#1c1a1f'); g.fillStyle = '#f0cdb6'; g.beginPath(); g.ellipse(x + 13, y + 15 - bob, 5.5, 6.5, 0, 0, Math.PI * 2); g.fill();
-    R(x + 7, y + 9 - bob, 12, 4, '#1c1a1f'); R(x + 10, y + 17 - bob, 2, 1, '#2a1a16'); R(x + 15, y + 17 - bob, 2, 1, '#2a1a16'); R(x + 12, y + 20 - bob, 3, 1, '#c84a50');
-    R(x + 5, y + 3 - bob, 16, 6, '#d8463b'); R(x + 7, y + 2 - bob, 12, 1, '#d8463b'); R(x + 4, y + 8 - bob, 19, 2, '#b8382e'); R(x + 11, y + 4 - bob, 4, 2, '#f4f1ea');
-    R(x + 3, y + 22, 20, 4, '#7ec8e3'); R(x + 3, y + 23, 20, 1, '#f4f1ea');
-  }
-  if (hurt > 0) { for (let k = 0; k < 4; k++) { const yy = y + Math.floor(rnd(k, Math.floor(performance.now() / 60)) * 26), dx = Math.round((rnd(Math.floor(performance.now() / 60), k) - 0.5) * 8 * hurt); g.drawImage(cv, x, yy, 26, 2, x + dx, yy, 26, 2); } g.fillStyle = `rgba(255,60,50,${0.35 * hurt})`; g.fillRect(x, y, 26, 26); }
-  g.restore();
-  g.strokeStyle = '#3a4a46'; g.lineWidth = 1; g.strokeRect(x - 0.5, y - 0.5, 27, 27);
-}
 const rnd = (i, k) => { const s = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return s - Math.floor(s); };
+function txt(s, x, y, c, size = 7, align = 'left', weight = '600') { g.font = `${weight} ${size}px "IBM Plex Sans KR", sans-serif`; g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = c; g.fillText(s, x, y); g.textAlign = 'left'; }
+// pixel sprites from string maps; '.' is empty
+const PAL = { k: '#1a1416', s: '#f2cdb6', S: '#d9a88c', g: '#b8bcc4', G: '#8a909a', b: '#9fc4e0', B: '#6f9cc0', w: '#ffffff', r: '#d8463b', R: '#9e2a24', h: '#1c1a1f', t: '#7ec8e3', T: '#4fa0c4', p: '#2a2a33', e: '#3a2a2a', m: '#c46a6a' };
+const SPR = {
+  mom: ['...kkkkk...', '..kgggggk..', '.kgGgggGgk.', '.kgsssssgk.', '.kgsesesgk.', '.kgsssssgk.', '..ksSmSsk..', '..kkbbbkk..', '.kbbBbBbbk.', 'kbsbbbbbsbk', 'kbsbBbBbsbk', '.kbbbbbbbk.', '.kbbbbbbbk.', '..kbbkbbk..', '..kssksskk.', '..kkk.kkk..'],
+  haeun: ['...kkkkk...', '..krrrrrk..', '.krrrwrrrk.', 'kRRRRRRRRk.', '.khhhhhhhk.', '.khssssshk.', '.khsesesh k', '.khsssssh..', '.khsSmSshk.', 'khkkttkkhk.', 'khttttttthk', 'khtwwwwwthk', '.kstttttsk.', '..kpppppk..', '..kppkppk..', '..kkk.kkk..']
+};
+function sprite(name, x, y, flash, sc = 2) { const m = SPR[name]; for (let j = 0; j < m.length; j++) for (let i = 0; i < m[j].length; i++) { const c = m[j][i]; if (c === '.' || c === ' ') continue; R(x + i * sc, y + j * sc, sc, sc, flash && c !== 'k' ? '#ff6a5a' : PAL[c]); } }
+// the big heart at the end of a row, 13 pixels wide; cracked after a miss
+const HEARTMAP = ['.kkk...kkk.', 'kRrrk.kRrrk', 'kRrrrkrrwrk', 'kRrrrrrrwrk', 'kRrrrrrrrrk', '.kRrrrrrrk.', '..kRrrrrk..', '...kRrrk...', '....kRk....', '.....k.....'];
+function bigHeart(cx, cy, s, cracked, pale) {
+  const m = HEARTMAP, w = m[0].length, ox = cx - (w * s) / 2, oy = cy - (m.length * s) / 2;
+  for (let j = 0; j < m.length; j++) for (let i = 0; i < w; i++) { const c = m[j][i]; if (c === '.') continue; let col = c === 'k' ? '#1a1416' : c === 'w' ? '#ffd0d0' : c === 'R' ? '#a82a2a' : '#e04040'; if (pale && c !== 'k') col = c === 'w' ? '#ffffff' : c === 'R' ? '#d89a9a' : '#f0b8b8'; R(ox + i * s, oy + j * s, Math.ceil(s), Math.ceil(s), col); }
+  if (cracked) { g.strokeStyle = '#1a1416'; g.lineWidth = 1; g.beginPath(); g.moveTo(cx - 1 + 0.5, oy + 2); g.lineTo(cx + 2.5, cy - 1); g.lineTo(cx - 1.5, cy + 2); g.lineTo(cx + 0.5, cy + 6); g.stroke(); }
+}
+// one ECG wave on the line at x: P, QRS, T; amp is the R peak
+function wave(x, y, amp, c) { const pts = [[-9, 0], [-7, -1.5], [-5, 0], [-2, 0], [-1, 2], [0, -amp], [1, amp * 0.45], [2, 0], [5, 0], [7, -2], [9, 0]]; g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); pts.forEach(([dx, dy], i) => i ? g.lineTo(x + dx + 0.5, y + dy + 0.5) : g.moveTo(x + dx + 0.5, y + dy + 0.5)); g.stroke(); }
 function laneRow(lane, t) { let r = null; for (const row of ROWS) if (row.lane === lane && row.t0 <= t + 0.001) r = row; return r && t < r.t8 + 0.6 ? r : null; }
-function drawLane(lane, yc, t, show) {
-  const L = LANE[lane], now = performance.now(), F = FX.lane[lane];
+const SPARKS = [], LANEY = [184, 204];
+function burst(x, y) { for (let i = 0; i < 26; i++) SPARKS.push({ x, y, vx: (Math.random() - 0.3) * 60, vy: (Math.random() - 0.7) * 70, at: performance.now(), life: 500 + Math.random() * 500, s: Math.random() < 0.3 ? 2 : 1 }); }
+function drawLane(lane, y, t, show) {
+  const now = performance.now(), F = FX.lane[lane];
   const hurt = clamp(1 - (now - F.missAt) / 450, 0, 1), shake = hurt > 0 ? Math.round((rnd(now, lane) - 0.5) * 4 * hurt) : 0;
   g.save(); g.translate(shake, 0); g.globalAlpha = show;
-  // the band
-  R(0, yc - 16, W, 32, 'rgba(6,12,11,.92)'); R(0, yc - 16, W, 1, L.dim); R(0, yc + 15, W, 1, L.dim);
-  if (hurt > 0) { g.fillStyle = `rgba(255,50,40,${0.18 * hurt})`; g.fillRect(0, yc - 16, W, 32); }
-  const flash = clamp(1 - (now - F.hitAt) / 220, 0, 1); if (flash > 0) { g.fillStyle = `rgba(255,255,255,${0.12 * flash})`; g.fillRect(0, yc - 16, W, 32); }
-  const bob = clamp(1 - (now - F.beatAt) / 180, 0, 1) > 0.4 ? 1 : 0;
-  portrait(lane, 8, yc - 13, bob, hurt);
-  txt(L.name, 40, yc - 15, L.col, 7); txt(L.room, 40 + (lane ? 18 : 24), yc - 15, '#5a6a66', 6, 'left', '400');
-  const r = laneRow(lane, t), b = tBeat(t), kf = r ? b - r.b0 : -1;
-  // the track: the line, the notches (a skipped beat's notch is hollow), the heart and its hit line
-  R(NX(0) - 8, yc + 4, NX(HEART) - NX(0) + 8, 1, '#2c3f3a');
-  for (let k = 0; k < HEART; k++) { const sk = r && r.skip.includes(k); R(NX(k), yc + 2, 1, 5, sk ? '#24302d' : '#4a6a60'); if (sk) { R(NX(k) - 1, yc + 2, 3, 1, '#24302d'); R(NX(k) - 1, yc + 6, 3, 1, '#24302d'); } }
-  const near = r ? clamp(1 - Math.abs(kf - HEART) / 1.2, 0, 1) : 0, tg = r && r.tg;
-  for (let y = yc - 12; y < yc + 14; y += 2) R(NX(HEART), y, 1, 1, near > 0.2 ? L.col : '#2c3f3a');
-  const hit = tg && tg.judge && tg.judge !== 'miss', missed = tg && tg.judge === 'miss', since = hit ? (t - tg.hitT) : 9;
-  const pump = hit ? 1 + 0.35 * clamp(1 - since / 0.25, 0, 1) : 1 + 0.15 * near;
-  if (hit) heartShape(NX(HEART) + 0.5, yc + 1, pump, tg.judge === 'good' ? '#cfe8d6' : '#ffffff');
-  else if (missed) { heartLine(NX(HEART), yc + 1, 1, '#ff5a4a'); R(NX(HEART) - 1, yc - 6, 1, 3, '#ff5a4a'); R(NX(HEART), yc - 3, 1, 3, '#ff5a4a'); R(NX(HEART) + 1, yc, 1, 3, '#ff5a4a'); }
-  else heartLine(NX(HEART), yc + 1, pump, lerpCol('#4a6a60', '#ffffff', near));
-  // the timing meter
-  const mx = NX(HEART) + 26; R(mx, yc + 4, 41, 1, '#2c3f3a'); R(mx + 20, yc + 1, 1, 7, '#4a6a60'); R(mx + 12, yc + 3, 1, 3, '#2c3f3a'); R(mx + 28, yc + 3, 1, 3, '#2c3f3a');
-  if (tg && tg.judge && tg.judge !== 'demo') { const x = mx + 20 + clamp(tg.d / WIN_M, -1, 1) * 20; R(x - 1, yc - 1, 3, 9, tg.judge === 'miss' ? '#ff5a4a' : tg.judge === 'perfect' ? '#ffffff' : '#cfe8d6'); }
-  txt('빠름', mx, yc - 9, '#3a4a46', 6, 'left', '400'); txt('늦음', mx + 41, yc - 9, '#3a4a46', 6, 'right', '400');
-  if (r && kf >= 0) {
-    // the line lights up behind the pulse, a blip on each beat that came, the pulse hopping to the next notch late in each beat
-    const k = Math.floor(kf), fr = kf - k, toX = k >= HEART ? NX(HEART) : NX(k) + (NX(k + 1) - NX(k)) * ease((fr - 0.72) / 0.28);
-    R(NX(0), yc + 4, Math.min(toX, NX(HEART)) - NX(0), 1, L.dim);
-    for (let j = 0; j <= Math.min(k, HEART - 1); j++) { if (r.skip.includes(j)) continue; const age = kf - j, a = age < 0.6 ? 1 : 0.45; g.globalAlpha = show * a; blip(NX(j), yc + 4, age < 0.25 ? 12 : 8, age < 0.25 ? '#ffffff' : L.col); g.globalAlpha = show; }
-    if (k < HEART) { const onSkip = r.skip.includes(k) && fr < 0.72; R(toX - 1, yc, 3, 9, onSkip ? '#3a4a46' : '#ffffff'); if (!onSkip) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(toX - 3, yc - 2, 7, 13); g.restore(); } }
-    // the beat sent on past the heart after a good press
-    if (hit && since < 0.6) { const x = NX(HEART) + since / 0.6 * 70; g.globalAlpha = show * (1 - since / 0.6); blip(Math.round(x), yc + 4, 10, '#ffffff'); g.globalAlpha = show; }
-    // counting for the first row, like the nurse's count
-    if ((r.demo || r.b0 === 8) && k < 7) { const p = fr; g.globalAlpha = show * clamp(1 - p * 1.4, 0, 1); txt(k < 6 ? String(k + 1) : '일곱!', k < 6 ? NX(k) : NX(HEART), yc - 14 - p * 3, '#ffffff', k < 6 ? 8 : 8, 'center', '700'); g.globalAlpha = show; }
-    if (r.demo && kf > 5.6 && kf < 7.6) txt('하은이 누름', NX(HEART), yc + 8, L.col, 6, 'center', '400');
+  const r = laneRow(lane, t), b = tBeat(t), kf = r ? b - r.b0 : -1, tg = r && r.tg;
+  // the line: green to the seventh beat, yellow from there to the heart, a dark shadow under it
+  R(X0, y + 1, HX - X0, 1, 'rgba(0,0,0,.45)'); R(X0, y, COL - X0, 1, '#58c84a'); R(COL, y, HX - 8 - COL, 1, '#e8c23a');
+  // the wave hopping along: it lands on each beat's spot; on a skipped beat it arrives flat
+  if (r && kf >= 0 && kf < HEART + 0.35) {
+    const k = Math.floor(kf), fr = kf - k, x = k >= HEART ? BX(HEART) : BX(k) + (BX(k + 1) - BX(k)) * ease((fr - 0.7) / 0.3);
+    const flat = k < HEART && r.skip.includes(k), amp = k >= HEART ? 0 : flat ? 1 : fr < 0.15 ? 13 : lerp(13, 6, clamp((fr - 0.15) / 0.4, 0, 1));
+    if (k < HEART) { R(x - 10, y, 21, 1, 'rgba(0,0,0,0)'); g.save(); g.globalCompositeOperation = 'source-over'; R(x - 9, y, 19, 1, '#0c160c'); g.restore(); wave(Math.round(x), y, amp, fr < 0.15 && !flat ? '#e8ffd8' : '#7ee070'); }
+    // counting the first two rows out loud, like the nurse
+    if ((r.demo || r.b0 === 8) && k < 7) { g.globalAlpha = show * clamp(1 - fr * 1.4, 0, 1); txt(k < 6 ? String(k + 1) : '일곱!', k < 6 ? BX(k) : COL, y - 22 - fr * 3, '#ffffff', 8, 'center', '700'); g.globalAlpha = show; }
+    if (r.demo && kf > 5.6) txt('하은이 누름', COL, y + 5, '#e8ffd8', 6, 'center', '400');
   }
-  // judgement pops over the heart
-  for (const p of FX.pops) { if (p.lane !== lane) continue; const a = 1 - (now - p.at) / 650; if (a <= 0) continue; g.globalAlpha = show * a; g.font = '12px "Black Han Sans", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top'; g.fillStyle = p.c; g.fillText(p.text, NX(HEART) - 22, yc - 15 - (1 - a) * 4); if (p.sub) txt(p.sub, NX(HEART) - 22, yc - 2, p.c, 6, 'center', '400'); g.globalAlpha = show; }
+  // a miss: the big pink X where the beat should have been
+  if (tg && tg.judge === 'miss' && t - tg.t < 1.6) { const a = clamp(1 - (t - tg.t - 1.0) / 0.6, 0, 1), xx = COL + clamp(tg.d / WIN_M, -1, 1) * 10; g.globalAlpha = show * a; g.strokeStyle = '#e8487a'; g.lineWidth = 3; g.beginPath(); g.moveTo(xx - 8, y - 8); g.lineTo(xx + 8, y + 8); g.moveTo(xx + 8, y - 8); g.lineTo(xx - 8, y + 8); g.stroke(); g.lineWidth = 1; g.globalAlpha = show; }
+  // a hit: the beat goes on to the heart as a tall wave
+  const hit = tg && tg.judge && tg.judge !== 'miss', since = hit ? t - tg.hitT : 9;
+  if (hit && since < 0.5) { const x = lerp(COL, HX - 8, since / 0.5); wave(Math.round(x), y, 15, '#ffffff'); }
+  // the heart: it beats with the pulses, pumps hard on a good press, cracks on a miss (until the next row)
+  const beatK = clamp(1 - (now - F.beatAt) / 200, 0, 1), pump = hit && since < 0.3 ? 1.35 - since : 1 + 0.12 * beatK;
+  bigHeart(HX, y - 1, pump * 2, !!(tg && tg.judge === 'miss'), lane === 1 && !hit && !(tg && tg.judge === 'miss') && beatK < 0.2);
+  // the patient at the start of the line
+  const bob = beatK > 0.4 ? 1 : 0; g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(6, y + 1, 22, 2); sprite(lane ? 'haeun' : 'mom', 5, y - 29 - bob, hurt > 0.3 && Math.floor(now / 70) % 2 === 0);
+  // judgement word over the column
+  for (const p of FX.pops) { if (p.lane !== lane) continue; const a = 1 - (now - p.at) / 650; if (a <= 0) continue; g.globalAlpha = show * a; g.font = '11px "Black Han Sans", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top'; g.fillStyle = '#1a1416'; g.fillText(p.text, COL + 1, y - 21 - (1 - a) * 4 + 1); g.fillStyle = p.c; g.fillText(p.text, COL, y - 21 - (1 - a) * 4); g.textAlign = 'left'; g.globalAlpha = show; }
   g.restore();
 }
 function drawRows(t) {
-  R(0, TRK_Y, W, H - TRK_Y, '#040807');
-  for (let x = 0; x < W; x += 8) R(x, TRK_Y, 1, H - TRK_Y, '#08100e');
-  R(0, TRK_Y, W, 1, '#1d2a25');
-  const two = clamp((t - TWO_AT) / 0.6, 0, 1) * (t < END_T - 1.0 ? 1 : 1), e2 = ease(two);
-  const y0 = lerp(176, 157, e2), y1 = lerp(232, 195, e2);
-  drawLane(0, Math.round(y0), t, 1);
-  if (two > 0) drawLane(1, Math.round(y1), t, e2);
-  // the row's cue, top right of the strip
+  // a soft shade over the lower part of the scene so the rows read
+  const sh = g.createLinearGradient(0, 112, 0, H); sh.addColorStop(0, 'rgba(8,12,10,0)'); sh.addColorStop(1, 'rgba(8,12,10,.55)'); g.fillStyle = sh; g.fillRect(0, 112, W, H - 112);
+  const two = clamp((t - TWO_AT) / 0.6, 0, 1), e2 = ease(two);
+  const y0 = Math.round(lerp(184, 164, e2)), y1 = Math.round(lerp(240, 204, e2)); LANEY[0] = y0; LANEY[1] = y1;
+  // the seventh beat's column, across every row; brighter as the beat comes, a flash on a press
+  const near = Math.max(...[0, 1].map(l => { const r = laneRow(l, t); return r ? clamp(1 - Math.abs(tBeat(t) - r.b0 - HEART) / 1.5, 0, 1) : 0; })), fl = clamp(1 - (performance.now() - FX.flashAt) / 200, 0, 1);
+  g.fillStyle = `rgba(120,225,235,${0.16 + 0.12 * near + 0.25 * fl})`; g.fillRect(COL - 8, 128, 16, H - 128); g.fillStyle = `rgba(200,250,255,${0.18 + 0.2 * fl})`; g.fillRect(COL - 8, 128, 1, H - 128); g.fillRect(COL + 7, 128, 1, H - 128);
+  drawLane(0, y0, t, 1);
+  if (two > 0) drawLane(1, y1, t, e2);
+  // the sparks
+  const now = performance.now();
+  for (let i = SPARKS.length - 1; i >= 0; i--) { const p = SPARKS[i], a = (now - p.at) / p.life; if (a >= 1) { SPARKS.splice(i, 1); continue; } const tt = (now - p.at) / 1000; g.globalAlpha = 1 - a; R(p.x + p.vx * tt, p.y + p.vy * tt + 40 * tt * tt, p.s, p.s, a < 0.3 ? '#d8ffb0' : '#6ad04a'); }
+  g.globalAlpha = 1;
+  // the row's cue, top right of the rows
   const cueRow = ROWS.filter(r => r.cue && t >= r.t0 - 0.2 && t < r.t0 + (r.t8 - r.t0) * 0.5).pop();
-  if (cueRow) { const a = clamp(Math.min((t - cueRow.t0 + 0.2) * 3, ((cueRow.t8 - cueRow.t0) * 0.5 - (t - cueRow.t0)) * 2), 0, 1); g.globalAlpha = a; txt(cueRow.cue, 378, TRK_Y + 3, '#e8fff0', 7, 'right'); g.globalAlpha = 1; }
-  if (stats.combo > 1) txt(`연속 ${stats.combo}`, 6, TRK_Y + 3, '#5a6a66', 6, 'left', '400');
-  // a white flash over everything on a good press
-  const f = clamp(1 - (performance.now() - FX.flashAt) / 120, 0, 1); if (f > 0) { g.fillStyle = `rgba(255,255,255,${0.05 * f})`; g.fillRect(0, 0, W, H); }
+  if (cueRow) { const a = clamp(Math.min((t - cueRow.t0 + 0.2) * 3, ((cueRow.t8 - cueRow.t0) * 0.5 - (t - cueRow.t0)) * 2), 0, 1); g.globalAlpha = a; txt(cueRow.cue, 379, 121, '#1a1416', 7, 'right'); txt(cueRow.cue, 378, 120, '#ffffff', 7, 'right'); g.globalAlpha = 1; }
+  if (stats.combo > 1) { txt(`연속 ${stats.combo}`, 379, 131, '#1a1416', 6, 'right', '400'); txt(`연속 ${stats.combo}`, 378, 130, '#e8ffd8', 6, 'right', '400'); }
 }
 
 // ---------- flow ----------
@@ -332,7 +317,7 @@ function frame() {
   if (playing) { schedule(); tick(t); FX.pops = FX.pops.filter(p => performance.now() - p.at < 650); if (t > END_T) finish(); }
   drawMovie(t); drawRows(playing ? t : 0);
   const tl = beatT(SEG.length * 8 - 2);
-  if (t > tl) { g.globalAlpha = clamp((t - tl) / 0.8, 0, 1); txt('— 심박 안정 —', W / 2, MOV_H / 2 - 4, '#e8fff0', 9, 'center'); g.globalAlpha = 1; }
+  if (t > tl) { g.globalAlpha = clamp((t - tl) / 0.8, 0, 1); txt('— 심박 안정 —', W / 2, 60, '#e8fff0', 9, 'center'); g.globalAlpha = 1; }
 }
 requestAnimationFrame(frame);
 // for testing: window.__16 exposes the chart, a press at a song time and a jump
