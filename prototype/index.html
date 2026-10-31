@@ -712,12 +712,12 @@ const LEVELS = [
   ,{
     id:'s1-5', stageNo:'1-5', who:'지우 + 하은', role:'지우 · 하은 · 104 BPM · 벨트 둘', tag:'고장 난 벨트 · 튀는 상자 · 꿈', bpm:104, style:'duo15', fxTheme:'blues',
     // 지우 is back. 반장 sits on a crate with his back and only keeps time; 하은 loads the upper belt and 지우 the lower, and you scan
-    // both with one button as in 1-4. The new rule: the upper belt is broken. Now and then a box on it rattles as it rides (its
-    // lamp blinks, 덜덜) and at the bad seam the belt lurches (슉): the box shoots ahead and lands half a beat early, on the
-    // off-beat. Only the upper belt does it; the lower stays steady. Their tracks trade (지우's EDM, 하은's boom bap), then 지우
-    // gets lost in his and his belt goes ragged; 반장 gets up to cover it and 하은 snaps. '…누나는 꿈 없어요?' The music stops.
-    // 하은 has none (she never had room for one) and from there her belt breaks down more, the way she does. 반장 bangs the
-    // machine (쾅), the lamp dies, and he taps them back onto his straight beat.
+    // both with one button as in 1-4. The rule: the upper belt has been broken all along. Every box on it rattles as it rides
+    // (the seam's lamp blinks, 덜덜) and at the bad seam the belt lurches (슉): it lands half a beat early. So her belt is always
+    // on the off-beat and his always on the beat, interlocking. Their tracks trade (지우's EDM, 하은's boom bap), then 지우 gets
+    // lost in his and his belt goes ragged; 반장 gets up to cover it and 하은 snaps. '…누나는 꿈 없어요?' The music stops. 하은
+    // has none (she never had room for one) and from there she loads unevenly. 반장 bangs the machine (쾅), the lamp dies, and
+    // for his straight beat at the end both belts are on the beat together.
     lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, bossSeat: { x: 22, stand: [[84, 89], [143.7, 145.3]] }, vibe: [[72, 104]],
     surge: { x: 190, fix: 144.5 },
     heads: { h: [82, 44], j: [58, 80], b: [22, 98] }, phone: [[120, 121.5], [136, 137.5]], phoneLane: 0,
@@ -726,17 +726,17 @@ const LEVELS = [
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 180,
     hints: false, special:['튄 상자', 'surge', '튄 박'],
     sections: [[0, 'intro'], [2, 'trade'], [10, 'both'], [18, 'drunk'], [26, 'clash'], [27, 'silence'], [29, 'waver'], [37, 'boss'], [45, 'outro']],
-    // upper belt: 하은 (16 cells). s = a box the broken belt throws, written where it lands (always an off-beat; the cells up to
-    // the beat it was heading for are empty). Her bars in the trade (the first throw in bar 5, alone), steady through 지우's
-    // drift with a throw every other bar, then after the question the belt breaks down (throws in runs) while she loads less;
-    // 반장 fixes it in bar 36 and the end is his quarters
+    // upper belt: 하은 (16 cells), written where the boxes land. Until the fix every box is thrown, so they are all off-beats (she
+    // sets each down on a beat; the belt makes it half a beat early). Her bars in the trade, interlocking with his through
+    // 'both', keeping clear of his ragged off-beats while he is lost, uneven after the question (nothing while she looks at her
+    // watch), and after 반장 fixes it in bar 36, his quarters on the beat with 지우's
     bars: [
       '................', '................',
-      '................', '................', 'x...x...x...x...', 'x...x.....s.....', '................', '................', 'x...x...x.s.....', 'x...x.s...x.x...',
-      'x...x...x...x...', 'x.......x.s.....', 'x...x...x...x...', 'x.s.....x...x...', 'x...x...x...x...', 'x...x.s.....x...', 'x...x...x...x...', 'x.x.x.....s.....',
-      'x...x...x...x...', 'x.x.x...x.s.....', 'x...x...x...x...', 'x.s.....x...x...', 'x...x...x...x...', 'x...x...x.s.....', 'x.x.x...x...x...', 'x...............',
+      '................', '................', '..x...x...x...x.', '..x...x...x.....', '................', '................', '..x.......x...x.', '..x...x...x...x.',
+      '..x.......x.....', '..x...x...x.....', '..x.......x...x.', '......x...x...x.', '..x.......x.....', '..x...x...x...x.', '..x.......x...x.', '..x...x.........',
+      '..x.......x...x.', '..x...x...x...x.', '..x.......x...x.', '..x.............', '..x...x...x...x.', '......x...x...x.', '..x...x.......x.', '..x.............',
       '................', '................', '................',
-      'x.s.....x.s.....', 'x.....s.....x...', 'x.s...s...s.....', 'x.......x.......', 'x.s.....x.s.....', '......s...s.....', 'x.s...s...s.....', '................',
+      '..x.......x.....', '..............x.', '..x...x...x.....', '......x.........', '..x.......x...x.', '..............x.', '..x...x.........', '................',
       'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x...............',
       '................', '................'
     ],
@@ -765,7 +765,7 @@ const LEVELS = [
       { who:'반장', text:'…됐다. 오늘은 너희 둘이 싣는다.' },
       { who:'지우', text:'누나가 하은 누나죠? 지우예요! 잘 부탁해요!' },
       { who:'하은', text:'(시계를 본다) …응. 위는 내가.' },
-      { who:'반장', text:'…위 벨트, 튄다. 봐라.' }],
+      { who:'반장', text:'…위 벨트는 고장이다. 튄다. 봐라.' }],
     outro: (good) => good ? [
       { who:'', text:'일이 끝났다. 아무도 먼저 말하지 않았다.' },
       { who:'하은', text:'(시계를 본다) 먼저 갈게.' },
@@ -809,7 +809,7 @@ function loadLevel(level) {
       const ch = bar[c]; if (ch === '.' || ch === '=') continue;
       let len = 0;
       if (ch === 'h') { let k = c + 1, cnt = 1; while (bar[k] === '=' || bar[k] === 'o') { cnt++; k++; } len = cnt / div; }
-      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : 0), len, late: ch === 'L', heavy: ch === 'H', gtr: ch === 'G', surge: ch === 's', shuffle: div === 3 && c % 3 === 2, off: (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane });
+      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : 0), len, late: ch === 'L', heavy: ch === 'H', gtr: ch === 'G', shuffle: div === 3 && c % 3 === 2, off: (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane });
     }
   }));
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
@@ -818,6 +818,7 @@ function loadLevel(level) {
     n.i = i; n.arr = timeAt(n.beat); n.place = n.arr - TRAVEL * SPB; n.end = timeAt(n.beat + n.len);
     // a thrown box is set down for the next on-beat (half a beat later) and rides at the belt's speed until it reaches the bad
     // seam, where the belt lurches and throws it on so it lands on the off-beat it is charted at (n.t1 = when it reaches the seam)
+    if (level.surge && n.lane === 0 && n.beat < level.surge.fix) n.surge = true;
     if (n.surge && level.surge) { n.a0 = timeAt(n.beat + 0.5); n.place = n.a0 - TRAVEL * SPB; n.t1 = n.a0 - (SCAN_X - level.surge.x) / SPEED; }
     if (n.len) { n.w = Math.round((n.end - n.arr) * SPEED) + 16; n.h = 12; }
     else if (n.heavy) { n.w = 26 + Math.floor(rnd(i, 1) * 5); n.h = 17 + Math.floor(rnd(i, 2) * 4); }
@@ -1637,7 +1638,7 @@ function drawHaeunScene(beat, kick, nowMs, active) {
     drawHaeunAt(BOSS_X + LANE_DX[0], 50 + (frozen ? 0 : bob), nowMs, { mirror: tapping || taking, tap: tapping ? pulseAt(beat, L.tapBelt, 0.3) : null, rest: !tapping });
   }
 }
-// 1-5: the upper belt is broken. A box it is going to throw rattles from the moment it is set down (the seam's lamp blinks and
+// 1-5: the upper belt has been broken all along. Every box on it rattles from the moment it is set down (the seam's lamp blinks and
 // the belt goes 덜덜); at the seam the belt lurches (슉) and the box covers the rest fast enough to make its off-beat, then rides
 // at belt speed again. 반장 bangs the machine at L.surge.fix and it stops.
 function surgedX(n, t) {
@@ -1646,8 +1647,8 @@ function surgedX(n, t) {
   if (t < n.arr) return X + (t - n.t1) / (n.arr - n.t1) * (SCAN_X - X);
   return SCAN_X + (t - n.arr) * SPEED;
 }
-const surgeSfx = () => { if (!ctx) return; const t = ctx.currentTime; noise(t, 'bandpass', 2600, 0.14, 0.11, 1.2, bus); noise(t + 0.02, 'highpass', 5200, 0.06, 0.07, 0.7, bus); osc('square', 70, t, 0.003, 0.05, 0.08, bus); };
-const rattleSfx = dur => { if (!ctx) return; const t = ctx.currentTime; for (let k = 0; t + k * 0.055 < t + dur - 0.03; k++) noise(t + k * 0.055, 'bandpass', 900 + (k % 2) * 500, 0.03, 0.05, 2, bus); };
+const surgeSfx = () => { if (!ctx) return; const t = ctx.currentTime; noise(t, 'bandpass', 2600, 0.07, 0.09, 1.2, bus); noise(t + 0.02, 'highpass', 5200, 0.03, 0.06, 0.7, bus); osc('square', 70, t, 0.003, 0.025, 0.06, bus); };
+const rattleSfx = dur => { if (!ctx) return; const t = ctx.currentTime; for (let k = 0; t + k * 0.055 < t + dur - 0.03; k++) noise(t + k * 0.055, 'bandpass', 900 + (k % 2) * 500, 0.014, 0.04, 2, bus); };
 // how hard the seam's lamp is going: 1 while a box it will throw is on the belt, a white flash as it throws, 0 once fixed
 function surgeLamp(t) {
   let warn = 0, thrown = 0;
