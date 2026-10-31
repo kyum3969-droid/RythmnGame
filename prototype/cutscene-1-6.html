@@ -112,7 +112,7 @@ const STRIDE = WALK.v * WALK.step;  // px per step
 // ---------- 하은 (index.html drawHaeunAt, with a head that can tip down and lift) ----------
 // o.mirror: facing right. o.look: -1 head down over the belt, 0 level, 1 lifted into the light. Her eyes are never drawn: the cap's shadow always lies across them.
 // o.arms: 'belt' both hands on the belt edge (o.tap lifts the near one), 'walk' both arms swing a little, opposite each
-// other (o.swing -1..1). o.sway moves the hair.
+// other (o.fN near hand forward, o.fF far hand back, in px). o.sway moves the hair.
 let FACE_LINE = null;
 function haeun(cx, top, o = {}) {
   const hair = '#17121a', hairL = '#2e2630', shirt = '#1e1a1a', shirtD = '#121010', cap = '#d8463b', capD = '#a83328', brim = '#c43d33', sky = '#86c3e8', tee = '#e9f3f7', leg = '#3a3f45', shoe = '#1e1a1a';
@@ -140,21 +140,19 @@ function haeun(cx, top, o = {}) {
   R(fx - 6, ft + 6, 1, 9, '#1b1716');
   FACE_LINE = { x: o.mirror ? 2 * cx - (fx - 6) - 1 : fx - 6, y: ft + 6, h: 9 };   // where it lands on the sheet, so the rim light leaves it dark
   R(fx - 3, ft + 10, 2, 1, '#b07a58'); R(fx - 3, ft + 12, 2, 1, '#b2565a');
-  // arms
+  // arms, hung from the shoulders at the sides of her body (3 px sleeves, 3 px hands)
+  const arm = (sx, hx, hy) => { thick(sx, top + 17, hx, hy, 3, shirt); R(hx - 1, hy - 1, 3, 3, C.skin); };
   if (o.arms === 'belt') {
     const ly = Math.round((o.tap || 0) * 9);
-    thick(cx - 6, top + 22, cx - 11, top + 38 - ly, 4, shirt); R(cx - 13, top + 37 - ly, 4, 3, C.skin);
-    thick(cx + 6, top + 22, cx + 9, top + 38, 4, shirt); R(cx + 8, top + 37, 4, 3, C.skin);
+    arm(cx - 8, cx - 12, top + 38 - ly); arm(cx + 8, cx + 10, top + 38);
   } else if (o.arms === 'walk') {
-    // both arms hang at her sides and swing a little, opposite each other: the near hand forward as the far one goes back,
-    // two pixels at most, the forward hand lifting one
-    // (f: how far the near hand is forward, toward where she faces; the far hand is as far back)
-    const f = Math.round((o.swing || 0) * 2), upN = f > 1 ? 1 : 0, upF = f < -1 ? 1 : 0;
-    thick(cx + 6, top + 22, cx + 8 + f, top + 32 - upF, 4, shirt); R(cx + 6 + f, top + 31 - upF, 4, 3, C.skin);
-    thick(cx - 6, top + 22, cx - 8 - f, top + 33 - upN, 4, shirt); R(cx - 10 - f, top + 32 - upN, 4, 3, C.skin);
+    // both arms swing a little, opposite each other: fN = how far the near hand is forward (toward where she faces), fF = how
+    // far the far hand is back. The hand that is two pixels out lifts one.
+    const fN = Math.round(o.fN || 0), fF = Math.round(o.fF || 0);
+    arm(cx + 8, cx + 8 + fF, top + 31 - (fF <= -2 ? 1 : 0));
+    arm(cx - 8, cx - 8 - fN, top + 31 - (fN >= 2 ? 1 : 0));
   } else {
-    thick(cx - 6, top + 22, cx - 8, top + 34, 4, shirt); R(cx - 10, top + 33, 4, 3, C.skin);
-    thick(cx + 6, top + 22, cx + 8, top + 32, 4, shirt); R(cx + 6, top + 31, 4, 3, C.skin);
+    arm(cx + 8, cx + 8, top + 31); arm(cx - 8, cx - 8, top + 31);
   }
   g.restore();
 }
@@ -359,8 +357,12 @@ function haeunPose(t, d) {
   const look = lerp(1, 0.2, ease(seg(t, S1.letGo, WALK.t0 + 0.4)));
   if (t < WALK.t0) return { o: { mirror: true, look, sway: 0 }, top: HTOP - (look > 0.5 ? 1 : 0) };
   // walking: the phase runs on the distance, so the steps ease in with her pace; the body rises a pixel mid-step
-  const sp = (d / STRIDE) % 1, swing = Math.sin((d / (2 * STRIDE)) * Math.PI * 2) * Math.min(1, d / STRIDE);
-  return { o: { mirror: true, look, arms: 'walk', swing, sway: swing > 0.3 ? 1 : 0 }, top: HTOP + (sp > 0.25 && sp < 0.75 ? -1 : 0) };
+  // the arms swing from one step's end to the next; each arm gets its own random reach every step (0.7 to 2.3 px), so the
+  // swing never repeats exactly. They start from hanging still as she sets off.
+  const k = Math.floor(d / STRIDE), sp = (d / STRIDE) % 1, e = ease(sp), start = Math.min(1, d / STRIDE);
+  const reach = (i, a) => (i % 2 ? -1 : 1) * (0.7 + rnd(i + 1, a * 17 + 3) * 1.6);
+  const fN = lerp(reach(k, 1), reach(k + 1, 1), e) * start, fF = lerp(reach(k, 2), reach(k + 1, 2), e) * start;
+  return { o: { mirror: true, look, arms: 'walk', fN, fF, sway: fN > 0.8 ? 1 : 0 }, top: HTOP + (sp > 0.25 && sp < 0.75 ? -1 : 0) };
 }
 function render(t) {
   g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false;
