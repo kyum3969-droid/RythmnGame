@@ -142,6 +142,7 @@ const bgFactory = document.createElement('canvas'); bgFactory.width = W; bgFacto
 // o.mirror: facing right. o.look: -1 head down over the belt, 0 level, 1 lifted into the light. Her eyes are never drawn: the cap's shadow always lies across them.
 // o.arms: 'belt' both hands on the belt edge (o.tap lifts the near one), 'walk' the near arm swings (o.swing -1..1) and the
 // other hand stays in her pocket. o.sway moves the hair.
+let FACE_LINE = null;
 function haeun(cx, top, o = {}) {
   const hair = '#17121a', hairL = '#2e2630', shirt = '#1e1a1a', shirtD = '#121010', cap = '#d8463b', capD = '#a83328', brim = '#c43d33', sky = '#86c3e8', tee = '#e9f3f7', leg = '#3a3f45', shoe = '#1e1a1a';
   const look = o.look || 0, sw = o.sway || 0;
@@ -163,6 +164,9 @@ function haeun(cx, top, o = {}) {
   R(fx - 15, ft + 2 + tilt, 5, 2, brim); R(fx - 15, ft + 2 + tilt, 5, 1, cap); R(fx - 15, ft + 4 + tilt, 5, 1, capD);
   // the cap's shadow over the eyes, always: deep under the brim, softening down to the cheeks
   R(fx - 6, ft + 4, 12, 3, '#3a2622'); R(fx - 6, ft + 7, 12, 1, '#8a5a44');
+  // a thin dark line down the front of her face, from under the brim to the chin
+  R(fx - 7, ft + 4, 1, 11, '#1b1716');
+  FACE_LINE = { x: o.mirror ? 2 * cx - (fx - 7) - 1 : fx - 7, y: ft + 4, h: 11 };   // where it lands on the sheet, so the rim light leaves it dark
   R(fx - 3, ft + 9, 2, 1, '#b07a58'); R(fx - 3, ft + 11, 2, 1, '#b2565a');
   // arms
   if (o.arms === 'belt') {
@@ -197,6 +201,7 @@ function putRim(x, top, dx, dy, color, a, clipY = H) {
   rctx.globalCompositeOperation = 'source-over'; rctx.clearRect(0, 0, SPR_W, SPR_H); rctx.drawImage(sb, 0, 0);
   rctx.globalCompositeOperation = 'source-in'; rctx.fillStyle = color; rctx.fillRect(0, 0, SPR_W, SPR_H);
   rctx.globalCompositeOperation = 'destination-out'; rctx.drawImage(sb, -dx, -dy); rctx.globalCompositeOperation = 'source-over';
+  if (FACE_LINE) rctx.clearRect(FACE_LINE.x, FACE_LINE.y, 1, FACE_LINE.h);
   g.save(); g.beginPath(); g.rect(0, 0, W, clipY); g.clip(); g.globalAlpha = a; g.drawImage(rb, Math.round(x) - SPR_CX, Math.round(top) - SPR_TOP); g.restore();
 }
 
