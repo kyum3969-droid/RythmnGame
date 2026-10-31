@@ -720,9 +720,9 @@ const LEVELS = [
     // rush of boxes); he puts his earbuds in and loads to his own track, ragged, and won't take them out; 반장 gets up to cover it
     // and 하은 snaps. 지우 snaps back (누나나 악바리로 해요. 저는 제가 하고 싶은 대로 할 거라구요.) and the music stops; 하은:
     // 니 맘대로 할 거면… 꺼져, 그냥. He pulls his earbuds out and stands there, hands off, while she works both alone; 반장 says
-    // his name and he goes back to it without a word. 반장 bangs the motor (쾅), it runs true, and they finish on his beat.
-    lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, allLit: true, bossSeat: { x: 22, stand: [[84, 89], [143.2, 144.8]] }, vibe: [[72, 104]], doze: [[56, 62]], unplug: [[108, 129]],
-    beltSwing: { lane: 1, until: 144 }, fixAt: 144,
+    // his name and he goes back to it without a word. The motor is never fixed: his belt swings to the end.
+    lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, allLit: true, bossSeat: { x: 22, stand: [[84, 89]] }, vibe: [[72, 104]], doze: [[56, 62]], unplug: [[108, 129]],
+    beltSwing: { lane: 1, until: Infinity }, fixAt: Infinity,   // the motor is never fixed
     heads: { h: [82, 44], j: [50, 92], b: [22, 98] }, phone: [[120, 121.5], [136, 137.5]], phoneLane: 0,
     clock:'03:20', title:'꿈', offTilt: true,
     chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4,
@@ -742,10 +742,10 @@ const LEVELS = [
       'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x.......',
       '........', '........'
     ],
-    // lower belt: 지우, on his chugging belt (8 cells, written straight; until the fix every 'and' lands two thirds into the beat).
-    // His bars in the trade; then he nods off (bars 14-15 empty) and wakes in a hurry, four in a row; with his earbuds in he
-    // loads to his own track, ragged; after the row nothing (bars 29-31) till 반장 says his name, then back to it, quietly; on
-    // the beat with her at the end
+    // lower belt: 지우, on his chugging belt (8 cells, written straight; every 'and' lands two thirds into the beat). His bars in
+    // the trade; then he nods off (bars 14-15 empty) and wakes in a hurry, four in a row; with his earbuds in he loads to his own
+    // track, ragged; after the row nothing (bars 29-31) till 반장 says his name, then back to it, quietly; his swung 'and's
+    // between her beats to the end
     bars2: [
       '........', '........',
       '.x...x..', '.x.x.x..', '........', '........', '.x.x.x.x', '.x...x.x', '........', '........',
@@ -753,7 +753,7 @@ const LEVELS = [
       '.x.x..x.', '.......x', '.x.x.x.x', '...x....', '.x.x...x', '..x..x.x', '.x......', '........',
       '........', '........', '........',
       '........', '........', '........', '.....x..', '.x...x..', '.x.x.x..', '.x...x..', '........',
-      'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x.......',
+      '.x...x..', '.x...x..', '.x...x..', '.x...x..', '.x...x..', '.x...x..', '.x...x..', '.x......',
       '........', '........'
     ],
     // [beat, text, beats shown, lane, speaker]: 'h' 하은 (upper loading end), 'j' 지우 (lower), 'b' 반장 (on his crate)
@@ -763,8 +763,7 @@ const LEVELS = [
           [84, '…내가 한다.', 2, 1, 'b'], [86.5, '반장님 앉아 계세요.', 2.5, 0, 'h'],
           [100.5, '야. 반장님 허리 다친 거 안 보여? 정신 차려.', 3.5, 0, 'h'], [104.5, '아 진짜, 누나나 악바리로 해요.', 3, 1, 'j'], [107.8, '저는 제가 하고 싶은 대로 할 거라구요.', 3.2, 1, 'j'],
           [111.5, '니 맘대로 할 거면…', 2.5, 0, 'h'], [114.5, '꺼져, 그냥.', 2.5, 0, 'h'],
-          [124, '…지우야.', 2.5, 1, 'b'],
-          [145.5, '…둘 다. 박 봐라.', 2.5, 1, 'b']],
+          [124, '…지우야.', 2.5, 1, 'b']],
     comfort: ['…괜찮다. 다음 거.', '…박 봐라.'],
     intro: [
       { who:'', text:'며칠 뒤. 명절 물량은 그대로다. 반장님은 허리 때문에 의자에 앉았다.' },
@@ -3941,8 +3940,8 @@ function buildEvents() {
       if (sec === 'boss') {
         // 반장: kick 1 and 3, snare 2 and 4, even hats, a root on every beat, the organ
         if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.75)); if (inBar === 1 || inBar === 3) E(0, T => snare(T, 0.2));
-        E(0, T => hat(T, 0.045)); E(s / 2, T => hat(T, 0.03)); E(0, T => bass(T, rt, s * 0.6, 320));
-        E(s / 2, T => organ(T, ch, s * 0.25, 0.024)); if (inBar === 0) E(0, T => organ(T, ch, s * 4, 0.012));
+        E(0, T => hat(T, 0.045)); E(AND, T => hat(T, 0.03)); E(0, T => bass(T, rt, s * 0.6, 320));
+        E(AND, T => organ(T, ch, s * 0.25, 0.024)); if (inBar === 0) E(0, T => organ(T, ch, s * 4, 0.012));
         continue;
       }
       if (edm && !(sec === 'both' || sec === 'drunk')) {
