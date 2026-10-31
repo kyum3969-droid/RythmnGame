@@ -218,7 +218,7 @@ function lerpCol(a, b, p) { const A = [1, 3, 5].map(i => parseInt(a.slice(i, i +
 // at the right; the heartbeat travels the line as an ECG wave, one hop per beat. The seventh beat sits in a pale cyan column
 // that crosses every row; past it the line turns yellow up to the heart. A press in time throws green sparks out of the
 // column and the heart pumps; a miss leaves a big pink X where the wave was and cracks the heart.
-const X0 = 34, HEART = 6, HX = 356, COL = 292, V = 112;   // V: how fast the peaks ride the line, pixels a second
+const X0 = 8, HEART = 6, HX = 356, COL = 292, V = 112;   // V: how fast the peaks ride the line, pixels a second
 const ease = p => p < 0 ? 0 : p > 1 ? 1 : p * p * (3 - 2 * p);
 const rnd = (i, k) => { const s = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return s - Math.floor(s); };
 function txt(s, x, y, c, size = 7, align = 'left', weight = '600') { g.font = `${weight} ${size}px "IBM Plex Sans KR", sans-serif`; g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = c; g.fillText(s, x, y); g.textAlign = 'left'; }
@@ -237,9 +237,23 @@ function bigHeart(cx, cy, s, cracked, pale) {
   if (cracked) { g.strokeStyle = '#1a1416'; g.lineWidth = 1; g.beginPath(); g.moveTo(cx - 1 + 0.5, oy + 2); g.lineTo(cx + 2.5, cy - 1); g.lineTo(cx - 1.5, cy + 2); g.lineTo(cx + 0.5, cy + 6); g.stroke(); }
 }
 // one ECG wave on the line at x: P, QRS, T; amp is the R peak
-function wave(x, y, amp, c) { const pts = [[-9, 0], [-7, -1.5], [-5, 0], [-2, 0], [-1, 2], [0, -amp], [1, amp * 0.45], [2, 0], [5, 0], [7, -2], [9, 0]]; g.strokeStyle = c; g.lineWidth = 1; g.beginPath(); pts.forEach(([dx, dy], i) => i ? g.lineTo(x + dx + 0.5, y + dy + 0.5) : g.moveTo(x + dx + 0.5, y + dy + 0.5)); g.stroke(); }
+// one heartbeat on the line at x (the R peak), 44 pixels wide: a small rounded P, the flat PR, a little Q dip, the tall R, the deep
+// S, the ST segment, a broad rounded T; amp is the R peak's height. A soft glow under the trace
+const BEAT_W = 22;
+function beatPts(amp) {
+  const pts = [[-22, 0]];
+  for (let u = 0; u <= 1; u += 0.2) pts.push([-18 + u * 7, -Math.sin(Math.PI * u) * amp * 0.16]);
+  pts.push([-7, 0], [-3, 0], [-2, amp * 0.12], [0, -amp], [2, amp * 0.38], [3.5, 0], [8, -amp * 0.04]);
+  for (let u = 0; u <= 1; u += 0.125) pts.push([8 + u * 11, -amp * 0.04 - Math.pow(Math.sin(Math.PI * u), 1.3) * amp * 0.26]);
+  pts.push([22, 0]); return pts;
+}
+function wave(x, y, amp, c, glow = true) {
+  const pts = beatPts(amp), path = () => { g.beginPath(); pts.forEach(([dx, dy], i) => i ? g.lineTo(x + dx + 0.5, y + dy + 0.5) : g.moveTo(x + dx + 0.5, y + dy + 0.5)); };
+  if (glow) { g.save(); g.globalAlpha *= 0.35; g.strokeStyle = c; g.lineWidth = 3; g.lineJoin = 'round'; path(); g.stroke(); g.restore(); }
+  g.strokeStyle = c; g.lineWidth = 1; g.lineJoin = 'miter'; path(); g.stroke();
+}
 function laneRow(lane, t) { let r = null; for (const row of ROWS) if (row.lane === lane && row.t0 <= t + 0.001) r = row; return r && t < r.t8 + 0.6 ? r : null; }
-const SPARKS = [], LANEY = [184, 204];
+const SPARKS = [], LANEY = [186, 202];
 function burst(x, y) { for (let i = 0; i < 26; i++) SPARKS.push({ x, y, vx: (Math.random() - 0.3) * 60, vy: (Math.random() - 0.7) * 70, at: performance.now(), life: 500 + Math.random() * 500, s: Math.random() < 0.3 ? 2 : 1 }); }
 function drawLane(lane, y, t, show) {
   const now = performance.now(), F = FX.lane[lane];
@@ -260,15 +274,15 @@ function drawLane(lane, y, t, show) {
       const past = x > COL, tgk = k === HEART ? row.tg : null;
       if (k < HEART && row.skip.includes(k)) { R(x, y - 1, 1, 3, '#2c4a2c'); continue; }
       // the streak behind it, the peak itself
-      g.fillStyle = 'rgba(160,240,140,.35)'; g.fillRect(Math.round(x) - 14, y, 9, 1);
-      if (k < HEART) { R(x - 9, y, 19, 1, '#0c160c'); wave(Math.round(x), y, 11, past ? '#e8ffd8' : '#7ee070'); }
-      else if (!tgk.judge || tgk.judge === 'demo' && t < tgk.t) { const a = 0.65 + 0.35 * Math.sin(t * 14); R(x - 9, y, 19, 1, '#0c160c'); g.globalAlpha = show * a; g.setLineDash([1, 1]); wave(Math.round(x), y, 15, '#ffffff'); g.setLineDash([]); g.globalAlpha = show; R(x - 1, y - 1, 3, 3, '#ffffff'); }
-      else if (tgk.judge === 'miss') { R(x - 9, y, 19, 1, '#0c160c'); wave(Math.round(x), y, 3, '#ff6a5a'); }
-      else { R(x - 9, y, 19, 1, '#0c160c'); wave(Math.round(x), y, 15, tgk.judge === 'good' ? '#cfe8d6' : '#ffffff'); }
+      g.fillStyle = 'rgba(160,240,140,.35)'; g.fillRect(Math.round(x) - 34, y, 12, 1);
+      if (k < HEART) { R(x - BEAT_W, y, BEAT_W * 2 + 1, 1, '#0c160c'); wave(Math.round(x), y, 22, past ? '#e8ffd8' : '#7ee070'); }
+      else if (!tgk.judge || tgk.judge === 'demo' && t < tgk.t) { const a = 0.65 + 0.35 * Math.sin(t * 14); R(x - BEAT_W, y, BEAT_W * 2 + 1, 1, '#0c160c'); g.globalAlpha = show * a; g.setLineDash([2, 2]); wave(Math.round(x), y, 24, '#ffffff', false); g.setLineDash([]); g.globalAlpha = show; R(x - 1, y - 1, 3, 3, '#ffffff'); }
+      else if (tgk.judge === 'miss') { R(x - BEAT_W, y, BEAT_W * 2 + 1, 1, '#0c160c'); wave(Math.round(x), y, 4, '#ff6a5a'); }
+      else { R(x - BEAT_W, y, BEAT_W * 2 + 1, 1, '#0c160c'); wave(Math.round(x), y, 27, tgk.judge === 'good' ? '#cfe8d6' : '#ffffff'); }
       // the first two rows count out loud as each peak crosses, like the nurse
-      if ((row.demo || row.b0 === 8) && t >= tk && t < tk + 0.7) { g.globalAlpha = show * (1 - (t - tk) / 0.7); txt(k < HEART ? String(k + 1) : '일곱!', COL, y - 36 - (t - tk) * 6, '#ffffff', 8, 'center', '700'); g.globalAlpha = show; }
+      if ((row.demo || row.b0 === 8) && t >= tk && t < tk + 0.7) { g.globalAlpha = show * (1 - (t - tk) / 0.7); txt(k < HEART ? String(k + 1) : '일곱!', COL + 16, y - 30 - (t - tk) * 6, '#ffffff', 8, 'center', '700'); g.globalAlpha = show; }
     }
-    if (row.demo && t > beatT(row.b0 + 5.4) && t < beatT(row.b0 + 7)) txt('하은이 누름', COL, y + 5, '#e8ffd8', 6, 'center', '400');
+    if (row.demo && t > beatT(row.b0 + 5.4) && t < beatT(row.b0 + 7)) txt('하은이 누름', COL, y + 11, '#e8ffd8', 6, 'center', '400');
   }
   if (arrive) F.arriveAt = now;
   // a miss: the big pink X where the beat should have been
@@ -278,19 +292,18 @@ function drawLane(lane, y, t, show) {
   const beatK = clamp(1 - (now - F.beatAt) / 200, 0, 1), arrK = clamp(1 - (now - (F.arriveAt || -9)) / 220, 0, 1), pump = 1 + 0.22 * arrK + (hit && since < 0.3 ? 0.2 * (1 - since / 0.3) : 0);
   bigHeart(HX, y - 1, pump * 2, !!(tg && tg.judge === 'miss'), lane === 1 && !hit && !(tg && tg.judge === 'miss') && beatK < 0.2);
   // the patient at the start of the line
-  const bob = beatK > 0.4 ? 1 : 0; g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(6, y + 1, 22, 2); sprite(lane ? 'haeun' : 'mom', 5, y - 29 - bob, hurt > 0.3 && Math.floor(now / 70) % 2 === 0);
   // judgement word over the column
-  for (const p of FX.pops) { if (p.lane !== lane) continue; const a = 1 - (now - p.at) / 650; if (a <= 0) continue; g.globalAlpha = show * a; g.font = '11px "Black Han Sans", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top'; g.fillStyle = '#1a1416'; g.fillText(p.text, COL + 1, y - 21 - (1 - a) * 4 + 1); g.fillStyle = p.c; g.fillText(p.text, COL, y - 21 - (1 - a) * 4); g.textAlign = 'left'; g.globalAlpha = show; }
+  for (const p of FX.pops) { if (p.lane !== lane) continue; const a = 1 - (now - p.at) / 650; if (a <= 0) continue; g.globalAlpha = show * a; g.font = '11px "Black Han Sans", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'top'; g.fillStyle = '#1a1416'; g.fillText(p.text, COL - 15, y - 31 - (1 - a) * 4 + 1); g.fillStyle = p.c; g.fillText(p.text, COL - 16, y - 31 - (1 - a) * 4); g.textAlign = 'left'; g.globalAlpha = show; }
   g.restore();
 }
 function drawRows(t) {
   // a soft shade over the lower part of the scene so the rows read
-  const sh = g.createLinearGradient(0, 112, 0, H); sh.addColorStop(0, 'rgba(8,12,10,0)'); sh.addColorStop(1, 'rgba(8,12,10,.55)'); g.fillStyle = sh; g.fillRect(0, 112, W, H - 112);
+  const sh = g.createLinearGradient(0, 100, 0, H); sh.addColorStop(0, 'rgba(8,12,10,0)'); sh.addColorStop(1, 'rgba(8,12,10,.55)'); g.fillStyle = sh; g.fillRect(0, 100, W, H - 100);
   const two = clamp((t - TWO_AT) / 0.6, 0, 1), e2 = ease(two);
-  const y0 = Math.round(lerp(184, 164, e2)), y1 = Math.round(lerp(240, 204, e2)); LANEY[0] = y0; LANEY[1] = y1;
+  const y0 = Math.round(lerp(186, 160, e2)), y1 = Math.round(lerp(246, 202, e2)); LANEY[0] = y0; LANEY[1] = y1;
   // the seventh beat's column, across every row; brighter as the beat comes, a flash on a press
   const near = Math.max(...[0, 1].map(l => { const r = laneRow(l, t); return r ? clamp(1 - Math.abs(t - r.tg.t) / 0.5, 0, 1) : 0; })), fl = clamp(1 - (performance.now() - FX.flashAt) / 200, 0, 1);
-  g.fillStyle = `rgba(120,225,235,${0.16 + 0.12 * near + 0.25 * fl})`; g.fillRect(COL - 8, 128, 16, H - 128); g.fillStyle = `rgba(200,250,255,${0.18 + 0.2 * fl})`; g.fillRect(COL - 8, 128, 1, H - 128); g.fillRect(COL + 7, 128, 1, H - 128);
+  g.fillStyle = `rgba(120,225,235,${0.16 + 0.12 * near + 0.25 * fl})`; g.fillRect(COL - 10, 124, 20, H - 124); g.fillStyle = `rgba(200,250,255,${0.18 + 0.2 * fl})`; g.fillRect(COL - 10, 124, 1, H - 124); g.fillRect(COL + 9, 124, 1, H - 124);
   drawLane(0, y0, t, 1);
   if (two > 0) drawLane(1, y1, t, e2);
   // the sparks
@@ -299,8 +312,8 @@ function drawRows(t) {
   g.globalAlpha = 1;
   // the row's cue, top right of the rows
   const cueRow = ROWS.filter(r => r.cue && t >= r.t0 - 0.2 && t < r.t0 + (r.t8 - r.t0) * 0.5).pop();
-  if (cueRow) { const a = clamp(Math.min((t - cueRow.t0 + 0.2) * 3, ((cueRow.t8 - cueRow.t0) * 0.5 - (t - cueRow.t0)) * 2), 0, 1); g.globalAlpha = a; txt(cueRow.cue, 379, 121, '#1a1416', 7, 'right'); txt(cueRow.cue, 378, 120, '#ffffff', 7, 'right'); g.globalAlpha = 1; }
-  if (stats.combo > 1) { txt(`연속 ${stats.combo}`, 379, 131, '#1a1416', 6, 'right', '400'); txt(`연속 ${stats.combo}`, 378, 130, '#e8ffd8', 6, 'right', '400'); }
+  if (cueRow) { const a = clamp(Math.min((t - cueRow.t0 + 0.2) * 3, ((cueRow.t8 - cueRow.t0) * 0.5 - (t - cueRow.t0)) * 2), 0, 1); g.globalAlpha = a; txt(cueRow.cue, 379, 113, '#1a1416', 7, 'right'); txt(cueRow.cue, 378, 112, '#ffffff', 7, 'right'); g.globalAlpha = 1; }
+  if (stats.combo > 1) { txt(`연속 ${stats.combo}`, 9, 113, '#1a1416', 6, 'left', '400'); txt(`연속 ${stats.combo}`, 8, 112, '#e8ffd8', 6, 'left', '400'); }
 }
 
 // ---------- flow ----------
