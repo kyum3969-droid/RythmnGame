@@ -240,7 +240,7 @@ function beatPts(amp) {
 function rowPts(row, amp) {
   const pts = [[X0, 0]];
   for (let k = 0; k <= HEART; k++) {
-    const x = SPOT(k), j = row.tg.judge, on = k < HEART ? !row.skip.includes(k) : (j && j !== 'miss');
+    const x = SPOT(k), on = k < HEART && !row.skip.includes(k);
     if (!on) continue;
     for (const [dx, dy] of beatPts(k === HEART ? amp * 1.2 : amp)) pts.push([x + dx, dy]);
   }
@@ -272,9 +272,9 @@ function laneRow(lane, t) { let r = null; for (const row of ROWS) if (row.lane =
 const SPARKS = [], RINGS = [], FLOATS = [], LANEY = [186, 202];
 function burst(x, y, j = 'perfect') {
   const big = j === 'perfect';
-  for (let i = 0; i < 10 + (big ? 8 : 0); i++) { const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.2, v = 30 + Math.random() * 60; SPARKS.push({ x, y: y - 6, vx: Math.cos(a) * v, vy: Math.sin(a) * v, at: performance.now(), life: 600 + Math.random() * 500, s: 1.6 + Math.random() * 1.2, c: Math.random() < 0.5 ? '#bfffe0' : '#ffffff', plus: true }); }
+  for (let i = 0; i < 18 + (big ? 14 : 0); i++) { const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.6, v = 50 + Math.random() * 100; SPARKS.push({ x, y: y - 6, vx: Math.cos(a) * v, vy: Math.sin(a) * v, at: performance.now(), life: 700 + Math.random() * 600, s: 2.4 + Math.random() * 1.8, c: Math.random() < 0.5 ? '#bfffe0' : '#ffffff', plus: true }); }
   if (big) RINGS.push({ x, y, at: performance.now() + 90, big: true });
-  for (let i = 0; i < (big ? 34 : 18); i++) { const a = Math.random() * Math.PI * 2, v = 20 + Math.random() * 70; SPARKS.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.8 - 20, at: performance.now(), life: 450 + Math.random() * 550, s: Math.random() < 0.25 ? 1.4 : 0.8, c: Math.random() < 0.35 ? '#ffffff' : '#7ef06a' }); }
+  for (let i = 0; i < (big ? 60 : 34); i++) { const a = Math.random() * Math.PI * 2, v = 40 + Math.random() * 120; SPARKS.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.8 - 20, at: performance.now(), life: 550 + Math.random() * 650, s: Math.random() < 0.25 ? 2.2 : 1.2, c: Math.random() < 0.35 ? '#ffffff' : '#7ef06a' }); }
   RINGS.push({ x, y, at: performance.now() });
 }
 function drawLane(lane, y, t, show) {
@@ -320,7 +320,7 @@ function drawLane(lane, y, t, show) {
           const a = 0.55 + 0.45 * Math.sin(t * 14); wave(x, y, 28, '#ffffff', '#bff6ff', show * a * 0.8, [1.2, 1.6]);
           const sp = beatT(row.b0 + HEART) - beatT(row.b0 + HEART - 1), p = clamp(1 + dt / sp, 0, 1);
           if (p > 0 && p < 1) { g.save(); g.globalAlpha = show * (0.3 + 0.7 * p); g.strokeStyle = '#d8fbff'; g.lineWidth = 0.8; g.beginPath(); g.arc(x, y - 9, 4 + 20 * (1 - p), 0, Math.PI * 2); g.stroke(); g.restore(); }
-        } else if (tgk.judge && tgk.judge !== 'miss') { const dh = t - tgk.hitT, f7 = clamp(1 - (dh - 0.3) / 0.9, 0, 1); if (f7 > 0) { g.save(); g.beginPath(); g.rect(x - BEAT_W, y - 40, (drawing ? Math.min(pen, x + BEAT_W) : x + BEAT_W) - (x - BEAT_W), 60); g.clip(); wave(x, y, 28.8, tgk.judge === 'good' ? '#e2fff0' : '#ffffff', tgk.judge === 'good' ? '#9cf0c8' : '#d8fbff', show * f7); g.restore(); } }
+        } else if (tgk.judge && tgk.judge !== 'miss') { const dh = t - tgk.hitT, f7 = clamp(1 - (dh - 0.06) / 0.28, 0, 1); if (f7 > 0) { g.save(); g.beginPath(); g.rect(x - BEAT_W, y - 40, (drawing ? Math.min(pen, x + BEAT_W) : x + BEAT_W) - (x - BEAT_W), 60); g.clip(); wave(x, y, 28.8, tgk.judge === 'good' ? '#e2fff0' : '#ffffff', tgk.judge === 'good' ? '#9cf0c8' : '#d8fbff', show * f7); g.restore(); } }
         else if (tgk.judge === 'miss' && t - tgk.t < 1.2) { const f = clamp(1 - (t - tgk.t - 0.4) / 0.8, 0, 1); g.save(); g.globalAlpha = show * f; g.strokeStyle = '#ff5a5a'; g.lineWidth = 0.9; g.beginPath(); for (let i = -BEAT_W; i <= BEAT_W; i += 2) g.lineTo(x + i, y + (rnd(i, Math.floor(now / 50)) - 0.5) * 2.4); g.stroke(); g.restore(); }
       }
       // the first two rows count out loud as each peak is traced, like the nurse
@@ -334,13 +334,13 @@ function drawLane(lane, y, t, show) {
   if (tg && tg.judge === 'miss' && t - tg.t < 1.6) { const a = clamp(1 - (t - tg.t - 1.0) / 0.6, 0, 1), xx = COL + clamp(tg.d / WIN_M, -1, 1) * 10, jit = hurt * 1.5; g.save(); g.lineCap = 'round'; g.lineWidth = 2.4; for (const [dx, c, al] of [[-jit, 'rgba(80,220,255,.7)', hurt], [jit, 'rgba(255,60,60,.7)', hurt], [0, '#ff4a7a', 1]]) { if (al <= 0) continue; g.globalAlpha = show * a * al; g.strokeStyle = c; g.beginPath(); g.moveTo(xx - 7 + dx, y - 15); g.lineTo(xx + 7 + dx, y - 1); g.moveTo(xx + 7 + dx, y - 15); g.lineTo(xx - 7 + dx, y - 1); g.stroke(); } g.restore(); }
   const hit = tg && tg.judge && tg.judge !== 'miss', since = hit ? t - tg.hitT : 9;
   // the heart
-  const beatK = clamp(1 - (now - F.beatAt) / 220, 0, 1), hitK = hit && since < 0.35 ? 1 - since / 0.35 : 0, arrK = clamp(1 - (now - F.arriveAt) / 300, 0, 1), pump = 1 + 0.18 * beatK + 0.2 * hitK + 0.4 * arrK;
+  const beatK = clamp(1 - (now - F.beatAt) / 220, 0, 1), hitK = hit && since < 0.35 ? 1 - since / 0.35 : 0, arrK = clamp(1 - (now - F.arriveAt) / 300, 0, 1), pump = 1 + 0.18 * beatK + 0.3 * hitK + 0.65 * arrK;
   // a good press lights the whole row for a moment, brightest at the column
-  { const rf = clamp(1 - (now - F.hitAt) / 280, 0, 1); if (rf > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const lg = g.createLinearGradient(X0, 0, HX, 0); lg.addColorStop(0, 'rgba(140,255,170,0)'); lg.addColorStop((COL - X0) / (HX - X0), `rgba(200,255,230,${0.3 * rf})`); lg.addColorStop(1, `rgba(255,140,140,${0.18 * rf})`); g.fillStyle = lg; g.fillRect(X0, y - 28, HX - X0, 38); g.restore(); } }
+  { const rf = clamp(1 - (now - F.hitAt) / 380, 0, 1); if (rf > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const lg = g.createLinearGradient(X0, 0, HX, 0); lg.addColorStop(0, 'rgba(140,255,170,0)'); lg.addColorStop((COL - X0) / (HX - X0), `rgba(200,255,230,${0.5 * rf})`); lg.addColorStop(1, `rgba(255,140,140,${0.32 * rf})`); g.fillStyle = lg; g.fillRect(X0, y - 34, HX - X0, 48); g.restore(); } }
   heartV(HX, y - 7, pump * 1.25, Math.max(beatK * 0.7, hitK, arrK), !!(tg && tg.judge === 'miss'), lane === 1 && !hit && beatK < 0.15 && !(tg && tg.judge === 'miss'));
   g.globalAlpha = show;
   // the judgement over the column: it pops in large and settles
-  for (const p of FX.pops) { if (p.lane !== lane) continue; const age = (now - p.at) / 650, a = 1 - age; if (a <= 0) continue; const sc = 1 + 0.5 * clamp(1 - age / 0.15, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(COL - 20, y - 26 - age * 4); g.scale(sc, sc); glowTxt(p.text, 0, -6, p.c, 12, 'center', '"Black Han Sans", sans-serif', p.text === '놓침' ? 'rgba(255,60,60,.8)' : 'rgba(180,255,200,.8)'); if (p.sub) txt(p.sub, 0, 7, p.c, 5, 'center', '400'); g.restore(); }
+  for (const p of FX.pops) { if (p.lane !== lane) continue; const age = (now - p.at) / 650, a = 1 - age; if (a <= 0) continue; const sc = 1 + 0.8 * clamp(1 - age / 0.15, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(COL - 22, y - 28 - age * 4); g.scale(sc, sc); glowTxt(p.text, 0, -7, p.c, 15, 'center', '"Black Han Sans", sans-serif', p.text === '놓침' ? 'rgba(255,60,60,.8)' : 'rgba(180,255,200,.8)'); if (p.sub) txt(p.sub, 0, 7, p.c, 5, 'center', '400'); g.restore(); }
   g.restore();
 }
 function drawRows(t) {
@@ -352,7 +352,7 @@ function drawRows(t) {
   // comes, a flash on a press
   const near = Math.max(...[0, 1].map(l => { const r = laneRow(l, t); return r ? clamp(1 - Math.abs(t - r.tg.t) / 0.5, 0, 1) : 0; })), fl = clamp(1 - (performance.now() - FX.flashAt) / 220, 0, 1);
   { const top = 120, a = 0.14 + 0.14 * near + 0.3 * fl, beam = g.createLinearGradient(0, top, 0, H); beam.addColorStop(0, 'rgba(120,225,235,0)'); beam.addColorStop(0.25, `rgba(120,225,235,${a})`); beam.addColorStop(1, `rgba(120,225,235,${a * 1.3})`);
-    g.fillStyle = beam; g.fillRect(COL - 9, top, 18, H - top);
+    g.fillStyle = beam; g.fillRect(COL - 9, top, 18, H - top); if (fl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fx = g.createRadialGradient(COL, (LANEY[0] + LANEY[1]) / 2, 0, COL, (LANEY[0] + LANEY[1]) / 2, 70); fx.addColorStop(0, `rgba(190,255,235,${0.35 * fl})`); fx.addColorStop(1, 'rgba(190,255,235,0)'); g.fillStyle = fx; g.fillRect(COL - 70, 100, 140, H - 100); g.restore(); }
     const edge = (x, dir) => { const e = g.createLinearGradient(x, 0, x + dir * 4, 0); e.addColorStop(0, `rgba(210,250,255,${0.35 + 0.35 * fl})`); e.addColorStop(1, 'rgba(210,250,255,0)'); g.fillStyle = e; g.fillRect(dir > 0 ? x : x - 4, top + 20, 4, H - top - 20); }; edge(COL - 9, 1); edge(COL + 9, -1);
     g.fillStyle = `rgba(220,252,255,${0.08 + 0.1 * near})`; for (let k = 0; k < 6; k++) { const yy = H - ((performance.now() / 40 + k * 17) % (H - top)); g.fillRect(COL - 8, yy, 16, 0.34); } }
   drawLane(0, y0, t, 1);
@@ -362,12 +362,12 @@ function drawRows(t) {
   // float up out of it
   for (let i = FX.runners.length - 1; i >= 0; i--) {
     const r = FX.runners[i], a = (now - r.at) / 240, yy = LANEY[r.lane];
-    if (a >= 1) { FX.lane[r.lane].arriveAt = now; for (let k = 0; k < (r.j === 'perfect' ? 5 : 3); k++) FLOATS.push({ x: HX + (Math.random() - 0.5) * 10, y: yy - 10, vx: (Math.random() - 0.5) * 14, vy: -18 - Math.random() * 16, at: now, life: 900 + Math.random() * 400, s: 0.25 + Math.random() * 0.15 }); FX.runners.splice(i, 1); continue; }
-    const x = lerp(COL, HX - 6, ease(a)); g.save(); g.globalCompositeOperation = 'lighter'; const lg = g.createLinearGradient(x - 40, 0, x, 0); lg.addColorStop(0, 'rgba(200,255,230,0)'); lg.addColorStop(1, 'rgba(230,255,240,.9)'); g.fillStyle = lg; g.fillRect(x - 40, yy - 0.6, 40, 1.2); const gr = g.createRadialGradient(x, yy, 0, x, yy, 9); gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(1, 'rgba(160,255,200,0)'); g.fillStyle = gr; g.fillRect(x - 9, yy - 9, 18, 18); g.restore();
+    if (a >= 1) { FX.lane[r.lane].arriveAt = now; for (let k = 0; k < (r.j === 'perfect' ? 9 : 5); k++) FLOATS.push({ x: HX + (Math.random() - 0.5) * 14, y: yy - 10, vx: (Math.random() - 0.5) * 26, vy: -26 - Math.random() * 26, at: now, life: 1100 + Math.random() * 500, s: 0.4 + Math.random() * 0.25 }); FX.runners.splice(i, 1); continue; }
+    const x = lerp(COL, HX - 6, ease(a)); g.save(); g.globalCompositeOperation = 'lighter'; const lg = g.createLinearGradient(x - 60, 0, x, 0); lg.addColorStop(0, 'rgba(200,255,230,0)'); lg.addColorStop(1, 'rgba(230,255,240,.95)'); g.fillStyle = lg; g.fillRect(x - 60, yy - 1.2, 60, 2.4); const gr = g.createRadialGradient(x, yy, 0, x, yy, 16); gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(1, 'rgba(160,255,200,0)'); g.fillStyle = gr; g.fillRect(x - 16, yy - 16, 32, 32); g.restore();
   }
   for (let i = FLOATS.length - 1; i >= 0; i--) { const f = FLOATS[i], a = (now - f.at) / f.life; if (a >= 1) { FLOATS.splice(i, 1); continue; } const tt = (now - f.at) / 1000; g.save(); g.globalAlpha = 1 - a * a; heartPath(f.x + f.vx * tt + Math.sin(tt * 8 + i) * 2, f.y + f.vy * tt, f.s); g.fillStyle = '#ff8a8a'; g.fill(); g.restore(); }
   // the rings and sparks from good presses
-  for (let i = RINGS.length - 1; i >= 0; i--) { const r = RINGS[i], a = (now - r.at) / (r.big ? 600 : 450); if (a < 0) continue; if (a >= 1) { RINGS.splice(i, 1); continue; } const k = r.big ? 1.8 : 1; g.save(); g.globalAlpha = (1 - a) * (r.big ? 0.55 : 0.8); g.strokeStyle = r.big ? '#bfffe0' : '#d8fbff'; g.lineWidth = 1.2 * (1 - a) + 0.3; g.beginPath(); g.ellipse(r.x, r.y - 6, 6 + 26 * k * ease(a), 4 + 14 * k * ease(a), 0, 0, Math.PI * 2); g.stroke(); g.restore(); }
+  for (let i = RINGS.length - 1; i >= 0; i--) { const r = RINGS[i], a = (now - r.at) / (r.big ? 600 : 450); if (a < 0) continue; if (a >= 1) { RINGS.splice(i, 1); continue; } const k = r.big ? 3.2 : 2; g.save(); g.globalAlpha = (1 - a) * (r.big ? 0.7 : 0.9); g.strokeStyle = r.big ? '#bfffe0' : '#d8fbff'; g.lineWidth = 2.4 * (1 - a) + 0.4; g.beginPath(); g.ellipse(r.x, r.y - 6, 6 + 26 * k * ease(a), 4 + 14 * k * ease(a), 0, 0, Math.PI * 2); g.stroke(); g.restore(); }
   g.save(); g.globalCompositeOperation = 'lighter';
   for (let i = SPARKS.length - 1; i >= 0; i--) { const p = SPARKS[i], a = (now - p.at) / p.life; if (a >= 1) { SPARKS.splice(i, 1); continue; } const tt = (now - p.at) / 1000; g.globalAlpha = (1 - a); g.fillStyle = p.c; if (p.plus) { const px = p.x + p.vx * tt * (1 - a * 0.5), py = p.y + p.vy * tt * (1 - a * 0.5) + 10 * tt * tt, z = p.s * (1 - a * 0.4); g.fillRect(px - z, py - z * 0.3, z * 2, z * 0.6); g.fillRect(px - z * 0.3, py - z, z * 0.6, z * 2); continue; } g.beginPath(); g.arc(p.x + p.vx * tt, p.y - 6 + p.vy * tt + 50 * tt * tt, p.s * (1 - a * 0.5), 0, Math.PI * 2); g.fill(); }
   g.restore(); g.globalAlpha = 1;
@@ -403,7 +403,7 @@ function frame() {
   requestAnimationFrame(frame);
   const t = playing ? songT() : -1;
   if (playing) { schedule(); tick(t); FX.pops = FX.pops.filter(p => performance.now() - p.at < 650); if (t > END_T) finish(); }
-  const kick = clamp(1 - (performance.now() - FX.kickAt) / 140, 0, 1), z = 1 + 0.012 * kick * kick; g.setTransform(SC * z, 0, 0, SC * z, W * SC * (1 - z) / 2, H * SC * (1 - z) / 2);
+  const kick = clamp(1 - (performance.now() - FX.kickAt) / 180, 0, 1), z = 1 + 0.03 * kick * kick; g.setTransform(SC * z, 0, 0, SC * z, W * SC * (1 - z) / 2, H * SC * (1 - z) / 2);
   drawMovie(t); drawRows(playing ? t : 0);
   const tl = beatT(SEG.length * 8 - 2);
   if (t > tl) { const a = clamp((t - tl) / 0.8, 0, 1), sc = 1 + 0.15 * (1 - a); g.save(); g.globalAlpha = a; g.translate(W / 2, 64); g.scale(sc, sc); glowTxt('심박 안정', 0, -10, '#f0fff4', 20, 'center', '"Black Han Sans", sans-serif', 'rgba(120,255,170,.9)'); g.restore(); g.globalAlpha = 1; }
