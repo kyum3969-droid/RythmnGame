@@ -93,55 +93,26 @@ const C = {
 const SCAN_X = 300, BELT_Y = 146;
 
 // ---------- the timeline ----------
+// One long take, no cuts: the same frame from the empty belt to the street. The chapters only mark where to jump to.
 const SHOTS = [
-  { id: 'belt', t0: 0, t1: 11, name: '빈 벨트', note: '벨트가 서고 등이 하나씩 꺼진다. 높은 창으로 햇살이 든다. 하은이 벨트를 두 번 두드리고, 빛 속에서 고개를 든다.' },
-  { id: 'walk', t0: 11, t1: 26, name: '공장 밖으로', note: '하은은 화면 제자리, 배경이 흐른다(창과 선반, 앞의 빈 라인, 기둥). 다리는 벨트와 담장 뒤로 가려진다. 셔터 밑을 지나 바깥 새벽으로.' }
+  { id: 'belt', t0: 0, t1: 10.2, name: '빈 벨트', note: '벨트가 서고 등이 하나씩 꺼진다. 높은 창으로 햇살이 든다. 하은이 벨트를 두 번 두드리고, 빛 쪽으로 고개를 든다.' },
+  { id: 'walk', t0: 10.2, t1: 26, name: '공장 밖으로', note: '컷 없이 이어서 걸어 나간다. 하은은 화면 제자리, 배경이 흐른다(창과 선반, 앞의 빈 라인, 기둥). 다리는 벨트와 담장 뒤로 가려진다. 셔터 밑을 지나 바깥 새벽으로.' }
 ];
 const END = 26;
-// shot 1 cues (seconds)
-const S1 = { cx: 222, top: 106, beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7] };
-// shot 2: she stays put in the frame and the world slides by. d = how far she has walked (px at 1x)
-const S2 = { cx: 170, top: 106, v: 30, door: 205, step: 0.55, lampOff: 21.0 };
-const doorT = SHOTS[1].t0 + S2.door / S2.v;   // when she passes under the shutter
-
-// ---------- the warehouse, as in the game (index.html's static background) ----------
-const bgFactory = document.createElement('canvas'); bgFactory.width = W; bgFactory.height = H;
-(() => {
-  const b = bgFactory.getContext('2d');
-  const r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
-  r(0, 0, W, H, '#231b17');
-  r(0, 0, W, 34, '#191311');
-  for (let x = 0; x < W; x += 48) r(x, 0, 3, 34, '#211915');
-  r(0, 34, W, 2, '#2e241f');
-  for (let x = 24; x < W; x += 64) r(x, 36, 1, 132, '#2a211c');
-  let seed = 1;
-  for (const [x0, w] of [[66, 128], [214, 150]]) {
-    r(x0, 44, 3, 124, '#41332a'); r(x0 + w - 3, 44, 3, 124, '#41332a');
-    for (const y of [64, 100, 136]) {
-      let x = x0 + 5;
-      while (x < x0 + w - 16) {
-        const bw = 9 + Math.floor(rnd(seed, 3) * 12), bh = 8 + Math.floor(rnd(seed, 4) * 16);
-        const c = ['#5b4330', '#4f3a2a', '#66503a'][Math.floor(rnd(seed, 5) * 3)];
-        r(x, y - bh, bw, bh, c); r(x, y - bh, bw, 1, '#76604a'); r(x + (bw >> 1), y - bh, 1, bh, '#6e5a42');
-        x += bw + 2 + Math.floor(rnd(seed, 6) * 5); seed++;
-      }
-      r(x0, y, w, 3, '#4a3a2f'); r(x0, y + 3, w, 1, '#1d1714');
-    }
-  }
-  r(186, 36, 1, 8, '#4a4038'); r(200, 36, 1, 8, '#4a4038');
-  r(180, 44, 27, 15, '#d9a520'); r(180, 58, 27, 1, '#8a6a12');
-  ['111', '001', '111', '001', '111'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') r(190 + x * 2, 46 + y * 2, 2, 2, '#1d1815'); }));
-  r(0, 168, W, 48, '#18120f'); r(0, 168, W, 1, '#2e241f');
-  for (let x = 0; x < W; x += 14) r(x, 200, 8, 3, '#c99a1e');
-  r(0, 158, 34, 4, '#6b4a2e'); r(0, 162, 34, 2, '#4a3220'); r(2, 164, 4, 4, '#4a3220'); r(28, 164, 4, 4, '#4a3220');
-  const sbx = (x, y) => { r(x, y, 15, 13, C.kraft); r(x, y, 15, 2, C.kraftTop); r(x + 13, y + 2, 2, 11, C.kraftDark); r(x + 6, y, 3, 13, C.tape); };
-  sbx(1, 145); sbx(17, 145); sbx(1, 132); sbx(17, 132); sbx(9, 119);
-})();
+// at the belt (seconds)
+const S1 = { beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], letGo: 9.6 };
+// she stands at x 222 the whole take; once she walks the world slides by. d = how far she has walked (px), easing into her pace
+const HX = 222, HTOP = 106;
+const WALK = { t0: 10.2, ramp: 0.8, v: 30, door: 210, step: 0.55, lampOff: 21.0 };
+const walkD = t => { const tt = t - WALK.t0; return tt <= 0 ? 0 : tt < WALK.ramp ? WALK.v * tt * tt / (2 * WALK.ramp) : WALK.v * (tt - WALK.ramp / 2); };
+const walkT = d => d <= WALK.v * WALK.ramp / 2 ? WALK.t0 + Math.sqrt(2 * WALK.ramp * d / WALK.v) : WALK.t0 + d / WALK.v + WALK.ramp / 2;   // the time she has walked d
+const doorT = walkT(WALK.door);   // when she passes under the shutter
+const STRIDE = WALK.v * WALK.step;  // px per step
 
 // ---------- 하은 (index.html drawHaeunAt, with a head that can tip down and lift) ----------
 // o.mirror: facing right. o.look: -1 head down over the belt, 0 level, 1 lifted into the light. Her eyes are never drawn: the cap's shadow always lies across them.
-// o.arms: 'belt' both hands on the belt edge (o.tap lifts the near one), 'walk' the near arm swings (o.swing -1..1) and the
-// other hand stays in her pocket. o.sway moves the hair.
+// o.arms: 'belt' both hands on the belt edge (o.tap lifts the near one), 'walk' both arms swing a little, opposite each
+// other (o.swing -1..1). o.sway moves the hair.
 let FACE_LINE = null;
 function haeun(cx, top, o = {}) {
   const hair = '#17121a', hairL = '#2e2630', shirt = '#1e1a1a', shirtD = '#121010', cap = '#d8463b', capD = '#a83328', brim = '#c43d33', sky = '#86c3e8', tee = '#e9f3f7', leg = '#3a3f45', shoe = '#1e1a1a';
@@ -175,9 +146,12 @@ function haeun(cx, top, o = {}) {
     thick(cx - 6, top + 22, cx - 11, top + 38 - ly, 4, shirt); R(cx - 13, top + 37 - ly, 4, 3, C.skin);
     thick(cx + 6, top + 22, cx + 9, top + 38, 4, shirt); R(cx + 8, top + 37, 4, 3, C.skin);
   } else if (o.arms === 'walk') {
-    const s = Math.round((o.swing || 0) * 4);
-    thick(cx - 6, top + 22, cx - 8 + s, top + 33, 4, shirt); R(cx - 10 + s, top + 32, 4, 3, C.skin);
-    thick(cx + 6, top + 22, cx + 8, top + 32, 4, shirt); R(cx + 6, top + 31, 4, 3, C.skin);
+    // both arms hang at her sides and swing a little, opposite each other: the near hand forward as the far one goes back,
+    // two pixels at most, the forward hand lifting one
+    // (f: how far the near hand is forward, toward where she faces; the far hand is as far back)
+    const f = Math.round((o.swing || 0) * 2), upN = f > 1 ? 1 : 0, upF = f < -1 ? 1 : 0;
+    thick(cx + 6, top + 22, cx + 8 + f, top + 32 - upF, 4, shirt); R(cx + 6 + f, top + 31 - upF, 4, 3, C.skin);
+    thick(cx - 6, top + 22, cx - 8 - f, top + 33 - upN, 4, shirt); R(cx - 10 - f, top + 32 - upN, 4, 3, C.skin);
   } else {
     thick(cx - 6, top + 22, cx - 8, top + 34, 4, shirt); R(cx - 10, top + 33, 4, 3, C.skin);
     thick(cx + 6, top + 22, cx + 8, top + 32, 4, shirt); R(cx + 6, top + 31, 4, 3, C.skin);
@@ -208,28 +182,6 @@ function putRim(x, top, dx, dy, color, a, clipY = H) {
 
 // ---------- shared pieces: belt, scanner, windows, light ----------
 const MARK = 29.25;   // the belt's paint every 16th at the game's 100 BPM
-function drawBelt(off) {
-  R(48, BELT_Y, W - 48, 4, C.belt); R(48, BELT_Y, W - 48, 1, '#4a403b');
-  const k0 = Math.ceil((SCAN_X + off - W) / MARK), k1 = Math.floor((SCAN_X + off - 49) / MARK);
-  for (let k = k0; k <= k1; k++) {
-    const x = Math.round(SCAN_X + off - k * MARK), q = ((k % 4) + 4) % 4;
-    if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); }
-    else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44'); else R(x, BELT_Y + 1, 1, 3, C.slat);
-  }
-  R(46, BELT_Y + 4, W - 46, 12, C.face);
-  const ro = ((off % 14) + 14) % 14;
-  for (let x = 50 + ro - 14; x < W; x += 14) if (x >= 48) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); }
-  R(46, BELT_Y + 15, W - 46, 1, '#0c0a09');
-  for (const x of [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422');
-  R(44, BELT_Y - 1, 5, 17, '#3d3431');
-}
-function drawScanner(on) {
-  R(SCAN_X - 11, 108, 4, 40, '#555a5f'); R(SCAN_X - 11, 105, 24, 5, C.metal); R(SCAN_X - 2, 110, 6, 3, '#2b2e31');
-  if (on) { g.globalAlpha = 0.22; R(SCAN_X - 2, 113, 5, 33, C.laser); g.globalAlpha = 1; }
-  R(SCAN_X + 8, 108, 4, 56, '#7b8288'); R(SCAN_X + 8, 108, 4, 2, '#9aa1a6');
-  R(SCAN_X, 113, 1, 33, on ? C.laser : '#3a2422');
-  R(SCAN_X + 2, 103, 5, 2, on ? '#5a2b27' : '#2b2422');
-}
 // a high window: frame, mullions, glass that goes from pre-dawn blue to sunlit gold
 function drawWindow(x, y, w, h, k) {
   R(x - 2, y - 2, w + 4, h + 4, '#3a2f28');
@@ -273,100 +225,79 @@ function ambient(color, holes = []) {
 }
 function glow(x, y, r, rgb, a) { if (a <= 0.005) return; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
 
-// ---------- shot 1: the empty belt ----------
-const TUBES = [60, 180, 300];
-const WINS1 = [[116, 5, 50, 22], [236, 5, 54, 22], [352, 5, 32, 22]];
+// ---------- the take ----------
+// The warehouse is laid out in layers that slide at their own speeds once she walks (lay: a layer's x for a spot q on it).
+// At the start (d = 0) they line up as the game's own line: belt from the loading end at x 48, the scanner at 300, the
+// tubes at 64/184/304 with the high windows between them, one window's light falling on her.
+const lay = (d, f) => q => q - d * f + HX;
+const TUBE_Q = [-158, -38, 82];   // the three tubes in view at the start (x 64, 184, 304); their switch-off times are S1.tubesOff
 const tubeOn = (k, t) => 1 - seg(t, S1.tubesOff[k], S1.tubesOff[k] + 0.22);
-function beltOff1(t) { const v0 = 150, T = S1.beltStop, p = Math.min(t, T); return v0 * (p - p * p / (2 * T)); }
-function shot1(t) {
-  const sun = 0.22 + 0.78 * ease(seg(t, 4.4, 8.6));
-  const lit = TUBES.map((_, k) => tubeOn(k, t)), dark = 1 - (lit[0] + lit[1] + lit[2]) / 3;
-  g.drawImage(bgFactory, 0, 0);
-  for (const w of WINS1) drawWindow(w[0], w[1], w[2], w[3], sun);
-  // the tubes: fixture, wires and the tube itself, lit or dead (a last flicker as each one goes)
-  TUBES.forEach((x, k) => {
-    const off = S1.tubesOff[k], fl = t > off - 0.18 && t < off && Math.sin(t * 90 + k) > 0.2;
-    R(x + 4, 0, 1, 13, '#3a332c'); R(x + 41, 0, 1, 13, '#3a332c'); R(x - 2, 13, 50, 2, '#3a332c');
-    R(x, 15, 46, 3, lit[k] > 0.5 && !fl ? '#fff3c8' : '#5d5446');
-  });
-  drawScanner(t < S1.laserOff);
-  // 하은 behind the belt, both hands on its edge, head down; two pats on the empty belt; she lifts her head into the light
-  const tap = Math.max(...S1.taps.map(a => { const d = t - a; return d < -0.35 ? 0 : d < 0 ? ease((d + 0.35) / 0.35) : d < 0.12 ? 1 - d / 0.12 : 0; }));
-  const lk = lerp(-1, 1, ease(seg(t, S1.look[0], S1.look[1])));
-  const top = S1.top - (lk > 0.5 ? 1 : 0);
-  haeunSprite({ mirror: true, look: lk, arms: 'belt', tap, sway: 0 });
-  putSprite(S1.cx, top);
-  drawBelt(beltOff1(t));
-  // light: the tubes' cones, then the dawn, then the sun shafts and the dust in them
-  g.save(); g.globalCompositeOperation = 'lighter';
-  TUBES.forEach((x, k) => { if (lit[k] <= 0) return; const gr = g.createLinearGradient(0, 18, 0, 170); gr.addColorStop(0, `rgba(255,236,170,${0.15 * lit[k]})`); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 88, 170); g.lineTo(x - 42, 170); g.closePath(); g.fill(); });
-  if (t < S1.laserOff) glow(SCAN_X, 130, 18, '255,74,61', 0.12);
-  g.restore();
-  ambient(mix('#ffffff', '#7685b0', 0.25 + 0.6 * dark), WINS1);
-  g.save(); g.globalCompositeOperation = 'lighter';
-  const shafts = WINS1.map(([x, y, w, h]) => ({ x: x + 1, y: y + h, w: w - 2 }));
-  for (const s of shafts) shaft(s.x, s.y, s.w, 216, 0.2 * sun);
-  // where the light lands on the floor
-  for (const s of shafts) { const y0 = 170, d0 = (y0 - s.y) * SLOPE; g.fillStyle = `rgba(255,200,130,${0.08 * sun})`; g.beginPath(); g.moveTo(s.x - d0, y0); g.lineTo(s.x + s.w - d0, y0); g.lineTo(s.x + s.w - d0 - 23, 216); g.lineTo(s.x - d0 - 23, 216); g.closePath(); g.fill(); }
-  for (const [x, y, w, h] of WINS1) glow(x + w / 2, y + h / 2, w * 0.9, '255,214,150', 0.18 * sun);
-  // her face in the light once she lifts it
-  glow(S1.cx + 3, top + 7, 14, '255,210,150', 0.22 * sun * ease(seg(lk, 0.2, 1)));
-  g.restore();
-  dust(t, shafts, sun, { x: 40, y: 30, w: 344, h: 170 });
-  putRim(S1.cx, top, 1, -1, '#ffd9a0', 0.12 + 0.38 * sun, BELT_Y);
-}
-
-// ---------- shot 2: out of the factory ----------
-// Same scale as the game. She stays put in the frame and the world slides past in layers; her legs stay hidden behind
-// what is in front of her: the line's belt inside, a low block wall outside. d = how far she has walked (px).
-const walkD = t => S2.v * (t - SHOTS[1].t0);
-const lay = (d, f, sx) => q => q - d * f + sx;
-function interior(d, t, sx) {
-  const wl = lay(d, 0.7, sx);
+const sunAt = t => 0.22 + 0.78 * ease(seg(t, 4.4, 8.6));
+function beltRun(t) { const v0 = 150, T = S1.beltStop, p = Math.min(t, T); return v0 * (p - p * p / (2 * T)); }
+function interior(d, t) {
+  const wl = lay(d, 0.7), sun = sunAt(t);
   R(0, 0, W, H, '#231b17');
-  // ceiling band with its trusses, the dead tubes, the high windows between them
+  // ceiling band with its trusses, the high windows, the tubes (the first three lit until they click off)
   R(0, 0, W, 34, '#191311');
-  for (let q = 0; q < 900; q += 48) { const x = Math.round(wl(q)); if (x > -4 && x < W) R(x, 0, 3, 34, '#211915'); }
+  for (let q = -240; q < 900; q += 48) { const x = Math.round(wl(q)); if (x > -4 && x < W) R(x, 0, 3, 34, '#211915'); }
   R(0, 34, W, 2, '#2e241f');
-  const wins = [];
-  for (let q = 0; q < 900; q += 120) {
-    const x = Math.round(wl(q));
-    if (x > -60 && x < W + 10) { drawWindow(x, 5, 50, 22, 1); wins.push([x, 5, 50, 22]); }
-    const tx = Math.round(wl(q + 64)); if (tx > -50 && tx < W) { R(tx + 4, 0, 1, 13, '#3a332c'); R(tx + 41, 0, 1, 13, '#3a332c'); R(tx - 2, 13, 50, 2, '#3a332c'); R(tx, 15, 46, 3, '#5d5446'); }
+  const wins = [], tubes = [];
+  for (let q = -342; q < 900; q += 120) {
+    const x = Math.round(wl(q)); if (x > -60 && x < W + 10) { drawWindow(x, 5, 50, 22, sun); wins.push([x, 5, 50, 22]); }
+    const tq = q + 64, tx = Math.round(wl(tq)), k = TUBE_Q.indexOf(tq), on = k >= 0 ? tubeOn(k, t) : 0;
+    if (tx > -50 && tx < W) {
+      const fl = k >= 0 && t > S1.tubesOff[k] - 0.18 && t < S1.tubesOff[k] && Math.sin(t * 90 + k) > 0.2;
+      R(tx + 4, 0, 1, 13, '#3a332c'); R(tx + 41, 0, 1, 13, '#3a332c'); R(tx - 2, 13, 50, 2, '#3a332c'); R(tx, 15, 46, 3, on > 0.5 && !fl ? '#fff3c8' : '#5d5446');
+      if (on > 0) tubes.push([tx, on]);
+    }
   }
   // the wall's seams and the racks of boxes
-  for (let q = 24; q < 900; q += 64) { const x = Math.round(wl(q)); if (x >= 0 && x < W) R(x, 36, 1, 132, '#2a211c'); }
-  for (let q = 10; q < 900; q += 180) {
+  for (let q = -198; q < 900; q += 64) { const x = Math.round(wl(q)); if (x >= 0 && x < W) R(x, 36, 1, 132, '#2a211c'); }
+  for (let q = -156; q < 900; q += 180) {
     const x0 = Math.round(wl(q)); if (x0 > W || x0 + 150 < 0) continue;
     R(x0, 44, 3, 124, '#41332a'); R(x0 + 147, 44, 3, 124, '#41332a');
     for (const y of [64, 100, 136]) {
-      let x = x0 + 5, sd = q * 7 + y;
+      let x = x0 + 5, sd = q * 7 + y + 1000;
       while (x < x0 + 134) { const bw = 9 + Math.floor(rnd(sd, 3) * 12), bh = 8 + Math.floor(rnd(sd, 4) * 16), c = ['#5b4330', '#4f3a2a', '#66503a'][Math.floor(rnd(sd, 5) * 3)];
         R(x, y - bh, bw, bh, c); R(x, y - bh, bw, 1, '#76604a'); R(x + (bw >> 1), y - bh, 1, bh, '#6e5a42'); x += bw + 2 + Math.floor(rnd(sd, 6) * 5); sd++; }
       R(x0, y, 150, 3, '#4a3a2f'); R(x0, y + 3, 150, 1, '#1d1714');
     }
   }
   // the 3라인 sign
-  const sg = Math.round(wl(176)); R(sg + 6, 36, 1, 8, '#4a4038'); R(sg + 20, 36, 1, 8, '#4a4038'); R(sg, 44, 27, 15, '#d9a520'); R(sg, 58, 27, 1, '#8a6a12');
+  const sg = Math.round(wl(-42)); R(sg + 6, 36, 1, 8, '#4a4038'); R(sg + 20, 36, 1, 8, '#4a4038'); R(sg, 44, 27, 15, '#d9a520'); R(sg, 58, 27, 1, '#8a6a12');
   ['111', '001', '111', '001', '111'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') R(sg + 10 + x * 2, 46 + y * 2, 2, 2, '#1d1815'); }));
-  // the floor and its painted walkway
+  // the floor and its painted walkway; the boxes stacked at the loading end
   R(0, 168, W, 48, '#18120f'); R(0, 168, W, 1, '#2e241f');
-  const fl = lay(d, 1.15, sx); for (let q = -14; q < 900; q += 14) { const x = Math.round(fl(q)); if (x > -8 && x < W) R(x, 200, 8, 3, '#c99a1e'); }
-  return wins;
+  const fl = lay(d, 1.15); for (let q = -238; q < 900; q += 14) { const x = Math.round(fl(q)); if (x > -8 && x < W) R(x, 200, 8, 3, '#c99a1e'); }
+  const st = lay(d, 1.0), sx0 = Math.round(st(-222));
+  if (sx0 > -40) {
+    R(sx0, 158, 34, 4, '#6b4a2e'); R(sx0, 162, 34, 2, '#4a3220'); R(sx0 + 2, 164, 4, 4, '#4a3220'); R(sx0 + 28, 164, 4, 4, '#4a3220');
+    const sbx = (x, y) => { R(x, y, 15, 13, C.kraft); R(x, y, 15, 2, C.kraftTop); R(x + 13, y + 2, 2, 11, C.kraftDark); R(x + 6, y, 3, 13, C.tape); };
+    sbx(sx0 + 1, 145); sbx(sx0 + 17, 145); sbx(sx0 + 1, 132); sbx(sx0 + 17, 132); sbx(sx0 + 9, 119);
+  }
+  return { wins, tubes };
 }
-// the line's belt in front of her, standing still, its scanner gates dark (a gate's back post goes behind her)
-const GATES = [150, 340];
-function lineBelt(d, sx, front) {
-  const bl = lay(d, 1.0, sx);
+// the line's belt in front of her: running down to a stop at the start, then still; its scanner gates (a gate's back post goes
+// behind her, the front post and the laser in front). The first gate's laser is on until the shift ends.
+const GATES = [78, 338], BELT_END = -174;
+function lineBelt(d, t, front) {
+  const bl = lay(d, 1.0), run = beltRun(t), laser = t < S1.laserOff;
   if (!front) { for (const q of GATES) { const x = Math.round(bl(q)); if (x > -20 && x < W + 20) { R(x - 11, 108, 4, 40, '#555a5f'); R(x - 11, 105, 24, 5, C.metal); R(x - 2, 110, 6, 3, '#2b2e31'); } } return; }
-  R(0, BELT_Y, W, 4, C.belt); R(0, BELT_Y, W, 1, '#4a403b');
-  for (let k = 0; k < 34; k++) { const x = Math.round(bl(k * MARK - 40)); if (x < -3 || x >= W) continue; const q = k % 4;
-    if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); } else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44'); else R(x, BELT_Y + 1, 1, 3, C.slat); }
-  R(0, BELT_Y + 4, W, 12, C.face);
-  for (let q = -14; q < 900; q += 14) { const x = Math.round(bl(q)); if (x > -8 && x < W) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); } }
-  R(0, BELT_Y + 15, W, 1, '#0c0a09');
-  for (let q = 0; q < 900; q += 80) { const x = Math.round(bl(q)); if (x > -4 && x < W) R(x, BELT_Y + 16, 4, 10, '#2b2422'); }
-  for (const q of GATES) { const x = Math.round(bl(q)); if (x > -20 && x < W + 20) { R(x + 8, 108, 4, 56, '#7b8288'); R(x + 8, 108, 4, 2, '#9aa1a6'); R(x, 113, 1, 33, '#3a2422'); R(x + 2, 103, 5, 2, '#2b2422'); } }
+  const x0 = Math.max(0, Math.round(bl(BELT_END)));
+  if (x0 < W) {
+    R(x0, BELT_Y, W - x0, 4, C.belt); R(x0, BELT_Y, W - x0, 1, '#4a403b');
+    const k0 = Math.floor((BELT_END - run) / MARK), k1 = Math.ceil((W - HX + d - run) / MARK);
+    for (let k = k0; k <= k1; k++) { const x = Math.round(bl(k * MARK + run)); if (x < x0 + 1 || x >= W) continue; const q = ((k % 4) + 4) % 4;
+      if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); } else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44'); else R(x, BELT_Y + 1, 1, 3, C.slat); }
+    R(x0, BELT_Y + 4, W - x0, 12, C.face);
+    for (let q = Math.floor((BELT_END - run % 14) / 14) * 14; q < W - HX + d + 14; q += 14) { const x = Math.round(bl(q + run % 14)); if (x >= x0 + 2 && x < W) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); } }
+    R(x0, BELT_Y + 15, W - x0, 1, '#0c0a09');
+    for (let q = BELT_END + 22; q < 1000; q += 80) { const x = Math.round(bl(q)); if (x > -4 && x < W) R(x, BELT_Y + 16, 4, 10, '#2b2422'); }
+    const ex = Math.round(bl(BELT_END - 4)); if (ex > -6) R(ex, BELT_Y - 1, 5, 17, '#3d3431');
+  }
+  GATES.forEach((q, i) => { const x = Math.round(bl(q)); if (x < -20 || x > W + 20) return; const on = laser && i === 0;
+    if (on) { g.globalAlpha = 0.22; R(x - 2, 113, 5, 33, C.laser); g.globalAlpha = 1; }
+    R(x + 8, 108, 4, 56, '#7b8288'); R(x + 8, 108, 4, 2, '#9aa1a6'); R(x, 113, 1, 33, on ? C.laser : '#3a2422'); R(x + 2, 103, 5, 2, on ? '#5a2b27' : '#2b2422'); });
 }
 // chain-link: one 6x6 diamond tile, repeated
 let MESH = null;
@@ -377,56 +308,69 @@ function meshPat() {
   return (MESH = wctx.createPattern(c, 'repeat'));
 }
 const SUN = { x: 318, y: 112 };
-function exterior(d, t, sx) {
+function exterior(d, t) {
   // the dawn sky, low sun ahead of her
   const gr = g.createLinearGradient(0, 0, 0, 150); gr.addColorStop(0, '#3e5a90'); gr.addColorStop(0.45, '#c98e94'); gr.addColorStop(0.78, '#ffd3a2'); gr.addColorStop(1, '#fff0c8');
   g.fillStyle = gr; g.fillRect(0, 0, W, H);
   g.save(); g.globalCompositeOperation = 'lighter'; glow(SUN.x, SUN.y, 90, '255,214,150', 0.45); glow(SUN.x, SUN.y, 26, '255,240,200', 0.7); g.restore();
   R(SUN.x - 5, SUN.y - 7, 10, 14, '#fff8e4'); R(SUN.x - 7, SUN.y - 5, 14, 10, '#fff8e4'); R(SUN.x - 6, SUN.y - 6, 12, 12, '#fff8e4');
   // long thin clouds
-  const cl = lay(d, 0.06, sx); for (const [q, y, w] of [[-120, 40, 50], [-20, 58, 70], [90, 34, 44], [170, 72, 60], [260, 50, 40]]) { const x = Math.round(cl(q)); R(x, y, w, 2, '#f3c3a4'); R(x + 6, y + 2, w - 12, 1, '#e8b39a'); }
+  const cl = lay(d, 0.06); for (const [q, y, w] of [[-170, 40, 50], [-70, 58, 70], [40, 34, 44], [120, 72, 60], [210, 50, 40]]) { const x = Math.round(cl(q)); R(x, y, w, 2, '#f3c3a4'); R(x + 6, y + 2, w - 12, 1, '#e8b39a'); }
   // birds crossing
   for (let i = 0; i < 3; i++) { const x = Math.round(((420 - (t - 17) * (10 + i * 3) + i * 50) % 520 + 520) % 520 - 60), y = Math.round(52 + i * 7 + Math.sin(t * 2 + i) * 2), up = Math.floor(t * 5 + i) % 2;
     if (up) { R(x - 1, y, 1, 1, '#4a3a48'); R(x + 1, y, 1, 1, '#4a3a48'); R(x, y + 1, 1, 1, '#4a3a48'); } else R(x - 1, y + 1, 3, 1, '#4a3a48'); }
   // far apartment blocks in the haze, a few windows still lit
-  const fa = lay(d, 0.22, sx);
-  for (let q = -200; q < 700; q += 46) { const h = 30 + Math.floor(rnd(q, 1) * 32), w = 26 + Math.floor(rnd(q, 2) * 12), x = Math.round(fa(q)), y = 150 - h;
+  const fa = lay(d, 0.22);
+  for (let q = -250; q < 700; q += 46) { const h = 30 + Math.floor(rnd(q, 1) * 32), w = 26 + Math.floor(rnd(q, 2) * 12), x = Math.round(fa(q)), y = 150 - h;
     if (x > W || x + w < 0) continue; R(x, y, w, h, '#8a7184'); R(x, y, w, 1, '#a48a96');
     for (let r = 0; r < h - 6; r += 4) for (let c = 2; c < w - 2; c += 4) if (rnd(q + r, c) < 0.07) R(x + c, y + 3 + r, 2, 2, '#ffd27a'); }
   // nearer roofs and trees
-  const nr = lay(d, 0.5, sx);
-  for (let q = -200; q < 900; q += 34) { const x = Math.round(nr(q)), h = 8 + Math.floor(rnd(q, 3) * 14); if (x > W || x + 36 < 0) continue;
+  const nr = lay(d, 0.5);
+  for (let q = -250; q < 900; q += 34) { const x = Math.round(nr(q)), h = 8 + Math.floor(rnd(q, 3) * 14); if (x > W || x + 36 < 0) continue;
     if (rnd(q, 4) < 0.45) { for (let k = 0; k < 4; k++) R(x + 4 + k * 3, 152 - h - k * 2, 24 - k * 6, h + k * 2, '#5a4656'); }
     else { R(x, 152 - h, 34, h, '#5a4656'); R(x - 2, 152 - h, 38, 2, '#4a3a48'); } }
   // the yard's fence behind her, posts and chain-link
-  const fc = lay(d, 0.85, sx);
+  const fc = lay(d, 0.85);
   g.save(); g.translate(-Math.round(d * 0.85) % 6, 0); g.fillStyle = meshPat(); g.globalAlpha = 0.22; g.fillRect(0, 106, W + 6, 44); g.restore();
   R(0, 104, W, 2, '#4a4448');
-  for (let q = -200; q < 900; q += 32) { const x = Math.round(fc(q)); if (x > -3 && x < W) { R(x, 104, 2, 46, '#3a3436'); R(x, 104, 1, 46, '#5a5458'); } }
+  for (let q = -250; q < 900; q += 32) { const x = Math.round(fc(q)); if (x > -3 && x < W) { R(x, 104, 2, 46, '#3a3436'); R(x, 104, 1, 46, '#5a5458'); } }
   // a street lamp still burning, then clicking off in the daylight
-  const lx = Math.round(fc(500)), on = t < S2.lampOff;
+  const lx = Math.round(fc(380)), on = t < WALK.lampOff;
   R(lx, 40, 2, 110, '#3a3436'); R(lx, 40, 9, 2, '#3a3436'); R(lx + 6, 42, 6, 2, on ? '#ffe2a0' : '#6a6466');
   if (on) { g.save(); g.globalCompositeOperation = 'lighter'; glow(lx + 9, 44, 18, '255,190,110', 0.35); g.restore(); }
 }
 // outside, in front of her: a low block wall along the pavement, then the road
-function lowWall(d, sx) {
-  const wl = lay(d, 1.0, sx), rd = lay(d, 1.15, sx);
+function lowWall(d) {
+  const wl = lay(d, 1.0), rd = lay(d, 1.15);
   R(0, 176, W, 40, '#3a3436'); R(0, 176, W, 2, '#6a605c');
-  for (let q = -40; q < 1000; q += 30) { const x = Math.round(rd(q)); if (x > -16 && x < W) R(x, 198, 14, 2, '#d8cfa0'); }
+  for (let q = -40; q < 1100; q += 30) { const x = Math.round(rd(q)); if (x > -16 && x < W) R(x, 198, 14, 2, '#d8cfa0'); }
   R(0, BELT_Y - 2, W, 3, '#a39890'); R(0, BELT_Y + 1, W, 29, '#7d726c'); R(0, BELT_Y + 1, W, 1, '#5a504c');
   R(0, BELT_Y + 15, W, 1, '#6a605c');
-  for (let q = -20; q < 1000; q += 16) { const x = Math.round(wl(q)); if (x > -2 && x < W) { R(x, BELT_Y + 2, 1, 13, '#6a605c'); R(x + 8, BELT_Y + 16, 1, 14, '#6a605c'); } }
-  for (let q = -20; q < 1000; q += 37) { const x = Math.round(wl(q)); if (x > -4 && x < W) R(x + 3, BELT_Y + 4 + Math.floor(rnd(q, 9) * 20), 2 + Math.floor(rnd(q, 8) * 3), 1, '#6e6560'); }
+  for (let q = -20; q < 1100; q += 16) { const x = Math.round(wl(q)); if (x > -2 && x < W) { R(x, BELT_Y + 2, 1, 13, '#6a605c'); R(x + 8, BELT_Y + 16, 1, 14, '#6a605c'); } }
+  for (let q = -20; q < 1100; q += 37) { const x = Math.round(wl(q)); if (x > -4 && x < W) R(x + 3, BELT_Y + 4 + Math.floor(rnd(q, 9) * 20), 2 + Math.floor(rnd(q, 8) * 3), 1, '#6e6560'); }
 }
-function shot2(t) {
-  const d = walkD(t), sx = S2.cx, bx = Math.round(S2.door - d + S2.cx);
-  const sp = ((t - SHOTS[1].t0) / S2.step) % 1, cyc = ((t - SHOTS[1].t0) / (S2.step * 2)) % 1;
-  const top = S2.top + (sp > 0.2 && sp < 0.7 ? -1 : 0);
-  const inside = (fn) => { if (bx <= 0) return; g.save(); g.beginPath(); g.rect(0, 0, bx, H); g.clip(); fn(); g.restore(); };
-  const outside_ = (fn) => { if (bx >= W) return; g.save(); g.beginPath(); g.rect(bx, 0, W - bx, H); g.clip(); fn(); g.restore(); };
-  let wins = [];
-  inside(() => { wins = interior(d, t, sx); lineBelt(d, sx, false); });
-  outside_(() => exterior(d, t, sx));
+// 하은 through the take: at the belt (hands on it, head down, two pats, the head lifts), letting go, then walking
+function haeunPose(t, d) {
+  if (t < S1.letGo) {
+    const tap = Math.max(...S1.taps.map(a => { const dt = t - a; return dt < -0.35 ? 0 : dt < 0 ? ease((dt + 0.35) / 0.35) : dt < 0.12 ? 1 - dt / 0.12 : 0; }));
+    const look = lerp(-1, 1, ease(seg(t, S1.look[0], S1.look[1])));
+    return { o: { mirror: true, look, arms: 'belt', tap, sway: 0 }, top: HTOP - (look > 0.5 ? 1 : 0) };
+  }
+  const look = lerp(1, 0.2, ease(seg(t, S1.letGo, WALK.t0 + 0.4)));
+  if (t < WALK.t0) return { o: { mirror: true, look, sway: 0 }, top: HTOP - (look > 0.5 ? 1 : 0) };
+  // walking: the phase runs on the distance, so the steps ease in with her pace; the body rises a pixel mid-step
+  const sp = (d / STRIDE) % 1, swing = Math.sin((d / (2 * STRIDE)) * Math.PI * 2) * Math.min(1, d / STRIDE);
+  return { o: { mirror: true, look, arms: 'walk', swing, sway: swing > 0.3 ? 1 : 0 }, top: HTOP + (sp > 0.25 && sp < 0.75 ? -1 : 0) };
+}
+function render(t) {
+  g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false;
+  g.clearRect(0, 0, W, H);
+  const d = walkD(t), bx = Math.round(WALK.door - d + HX), sun = sunAt(t);
+  const inside = fn => { if (bx <= 0) return; g.save(); g.beginPath(); g.rect(0, 0, bx, H); g.clip(); fn(); g.restore(); };
+  const outside = fn => { if (bx >= W) return; g.save(); g.beginPath(); g.rect(bx, 0, W - bx, H); g.clip(); fn(); g.restore(); };
+  let room = { wins: [], tubes: [] };
+  inside(() => { room = interior(d, t); lineBelt(d, t, false); });
+  outside(() => exterior(d, t));
   // the end wall: lintel over the door and the rolled-up shutter, the door's rails
   if (bx > -20 && bx < W + 20) {
     R(bx - 6, 0, 14, 98, '#2e2521'); R(bx - 6, 0, 2, 98, '#3d322c'); R(bx + 6, 0, 2, 98, '#1a1412');
@@ -434,45 +378,42 @@ function shot2(t) {
     R(bx - 9, 98, 1, 70, '#3a3d42'); R(bx + 10, 98, 1, 70, '#3a3d42');
   }
   // her
-  const swing = Math.sin(cyc * Math.PI * 2);
-  const outK = clamp((S2.cx - bx + 6) / 12, 0, 1), spill = clamp(1 - (bx - S2.cx) / 70, 0, 1);
-  haeunSprite({ mirror: true, look: 0.2, arms: 'walk', swing, sway: Math.round(-swing * 0.5 + 0.5) });
-  tintSprite(outK > 0.5 ? '#fff0e0' : mix('#8695bb', '#e8d8c8', spill * 0.8));
-  putSprite(S2.cx, top);
-  // what hides her legs: the belt inside, the low wall outside
-  inside(() => { lineBelt(d, sx, true); ambient('#8695bb', wins); });
-  outside_(() => lowWall(d, sx));
-  // light: shafts inside, the doorway spilling in, the sun's haze outside; then her rim
-  const shafts = wins.map(([x, y, w, h]) => ({ x: x + 1, y: y + h, w: w - 2 }));
+  const { o, top } = haeunPose(t, d);
+  const outK = clamp((HX - bx + 6) / 12, 0, 1), spill = clamp(1 - (bx - HX) / 70, 0, 1);
+  haeunSprite(o);
+  if (outK > 0.5) tintSprite('#fff0e0');
+  putSprite(HX, top);
+  // what hides her legs: the belt inside, the low wall outside; then the room's light: the tubes, the dawn over everything
+  // inside, the sun's shafts, the door's spill, the dust
+  const dark = 1 - TUBE_Q.reduce((a, _, k) => a + tubeOn(k, t), 0) / 3;
+  const shafts = room.wins.map(([x, y, w, h]) => ({ x: x + 1, y: y + h, w: w - 2 }));
   inside(() => {
+    lineBelt(d, t, true);
     g.globalCompositeOperation = 'lighter';
-    for (const s of shafts) shaft(s.x, s.y, s.w, 216, 0.17);
-    for (const [x, y, w, h] of wins) glow(x + w / 2, y + h / 2, w * 0.8, '255,214,150', 0.16);
+    for (const [x, on] of room.tubes) { const gr = g.createLinearGradient(0, 18, 0, 170); gr.addColorStop(0, `rgba(255,236,170,${0.15 * on})`); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 88, 170); g.lineTo(x - 42, 170); g.closePath(); g.fill(); }
+    if (t < S1.laserOff) glow(Math.round(lay(d, 1)(GATES[0])), 130, 18, '255,74,61', 0.12);
+    g.globalCompositeOperation = 'source-over';
+    ambient(mix('#ffffff', '#7685b0', 0.25 + 0.6 * dark), room.wins);
+    g.globalCompositeOperation = 'lighter';
+    for (const s of shafts) shaft(s.x, s.y, s.w, 216, 0.2 * sun);
+    for (const s of shafts) { const y0 = 170, d0 = (y0 - s.y) * SLOPE; g.fillStyle = `rgba(255,200,130,${0.08 * sun})`; g.beginPath(); g.moveTo(s.x - d0, y0); g.lineTo(s.x + s.w - d0, y0); g.lineTo(s.x + s.w - d0 - 23, 216); g.lineTo(s.x - d0 - 23, 216); g.closePath(); g.fill(); }
+    for (const [x, y, w, h] of room.wins) glow(x + w / 2, y + h / 2, w * 0.9, '255,214,150', 0.18 * sun);
     const gr = g.createLinearGradient(bx - 110, 0, bx, 0); gr.addColorStop(0, 'rgba(255,214,160,0)'); gr.addColorStop(1, 'rgba(255,214,160,.28)'); g.fillStyle = gr; g.fillRect(bx - 110, 0, 110, H);
     g.globalCompositeOperation = 'source-over';
-    dust(t, shafts, 0.9, { x: 0, y: 30, w: W, h: 170, ox: d * 0.8 });
+    dust(t, shafts, sun, { x: 0, y: 30, w: W, h: 170, ox: d * 0.8 });
   });
-  outside_(() => { g.globalCompositeOperation = 'lighter'; glow(SUN.x, SUN.y + 20, 160, '255,200,140', 0.12); });
-  let lightIn = 0; for (const s of shafts) lightIn = Math.max(lightIn, inShaft(S2.cx, top + 8, s.x, s.y, s.w));
-  putRim(S2.cx, top, 1, outK > 0.5 ? 0 : -1, outK > 0.5 ? '#ffe6b4' : '#ffd9a0', Math.max(0.12 + 0.45 * lightIn, 0.6 * spill, 0.7 * outK), BELT_Y - 2);
-  // pillars passing close to the lens (inside only)
-  inside(() => { for (const q of [70, 190]) { const x = Math.round(q - d * 1.45 + sx); if (x < -20 || x > W) continue; R(x, 0, 14, H, '#0f0c0b'); R(x + 13, 0, 1, H, '#1d1714'); for (let y = 120; y < 128; y += 4) { R(x, y, 14, 2, '#c99a1e'); R(x, y + 2, 14, 2, '#15110e'); } } });
+  outside(() => { lowWall(d); g.globalCompositeOperation = 'lighter'; glow(SUN.x, SUN.y + 20, 160, '255,200,140', 0.12); });
+  let lightIn = 0; for (const s of shafts) lightIn = Math.max(lightIn, inShaft(HX, top + 8, s.x, s.y, s.w));
+  putRim(HX, top, 1, outK > 0.5 ? 0 : -1, outK > 0.5 ? '#ffe6b4' : '#ffd9a0', Math.max((0.12 + 0.45 * lightIn) * sun, 0.6 * spill, 0.7 * outK), BELT_Y - 2);
+  // a pillar passing close to the lens (inside only)
+  inside(() => { for (const q of [200]) { const x = Math.round(q - d * 1.45 + HX); if (x < -20 || x > W) continue; R(x, 0, 14, H, '#0f0c0b'); R(x + 13, 0, 1, H, '#1d1714'); for (let y = 120; y < 128; y += 4) { R(x, y, 14, 2, '#c99a1e'); R(x, y + 2, 14, 2, '#15110e'); } } });
   // the exposure blows out as she walks under the shutter into the morning
-  const ex = clamp(1 - Math.abs(S2.cx - bx) / 22, 0, 1);
+  const ex = clamp(1 - Math.abs(HX - bx) / 22, 0, 1);
   if (ex > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,200,${0.3 * ex * ex})`; g.fillRect(0, 0, W, H); g.restore(); }
-}
-
-// ---------- render ----------
-function shotAt(t) { return t < SHOTS[1].t0 ? 0 : 1; }
-function render(t) {
-  g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false;
-  g.clearRect(0, 0, W, H);
-  if (shotAt(t) === 0) shot1(t); else shot2(t);
   // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
   out.drawImage(wb, 0, 0, W, H, 0, 0, cv.width, cv.height);
-  // fade in from black, a two-frame dip at the cut, fade out at the end
-  const fade = Math.max(1 - seg(t, 0.2, 1.8), seg(t, END - 1.5, END - 0.1), Math.abs(t - SHOTS[1].t0) < 0.04 ? 1 : 0);
+  const fade = Math.max(1 - seg(t, 0.2, 1.8), seg(t, END - 1.5, END - 0.1));
   if (fade > 0) { out.fillStyle = `rgba(0,0,0,${fade})`; out.fillRect(0, 0, cv.width, cv.height); }
 }
 
@@ -512,10 +453,10 @@ const SFX = {
 };
 EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: S1.laserOff, fn: 'laserOff' }, ...S1.tubesOff.map(t => ({ t, fn: 'tube' })),
   { t: 7.4, fn: 'pad', dur: 3.7, notes: [174.61, 220, 261.63, 329.63] },               // Fmaj7 as she lifts her head
-  { t: 11, fn: 'pad', dur: doorT - 11, notes: [130.81, 196, 246.94, 329.63] },          // Cmaj7 walking out
+  { t: WALK.t0, fn: 'pad', dur: doorT - WALK.t0, notes: [130.81, 196, 246.94, 329.63] },   // Cmaj7 walking out
   { t: doorT, fn: 'pad', dur: END - doorT - 1.2, notes: [98, 146.83, 220, 246.94, 329.63] },   // G6/9 in the morning
-  { t: doorT - 0.5, fn: 'whoosh' }, { t: 19.2, fn: 'bird' }, { t: 21.4, fn: 'bird' }, { t: 23.1, fn: 'bird' }, { t: S2.lampOff, fn: 'lamp' });
-for (let t = SHOTS[1].t0; t < END - 1.4; t += S2.step) EV.push({ t, fn: 'step', out: t > doorT });
+  { t: doorT - 0.5, fn: 'whoosh' }, { t: 19.2, fn: 'bird' }, { t: 21.4, fn: 'bird' }, { t: 23.1, fn: 'bird' }, { t: WALK.lampOff, fn: 'lamp' });
+for (let k = 1; ; k++) { const t = walkT(k * STRIDE); if (t > END - 1.4) break; EV.push({ t, fn: 'step', out: t > doorT }); }
 EV.sort((a, b) => a.t - b.t);
 function audioStart(t) {
   if (!ac) return; ac.resume(); newBus(); schedTo = t;
@@ -528,7 +469,7 @@ function audioTick(t) {
   for (const e of EV) if (e.t >= schedTo && e.t < until) SFX[e.fn](ac.currentTime + Math.max(0, e.t - t), e, 0);
   schedTo = until;
   // beds: room tone indoors, the tubes' buzz while they burn, wind outside
-  const outK = t > doorT ? 1 : 0, lit = t < SHOTS[1].t0 ? TUBES.reduce((s, _, k) => s + tubeOn(k, t), 0) : 0;
+  const outK = t > doorT ? 1 : 0, lit = TUBE_Q.reduce((s, _, k) => s + tubeOn(k, t), 0);
   amb.room.gain.setTargetAtTime(0.05 * (1 - outK), ac.currentTime, 0.2);
   amb.buzz.gain.setTargetAtTime(0.004 * lit, ac.currentTime, 0.02);
   amb.wind.gain.setTargetAtTime(outK * (0.025 + 0.012 * Math.sin(t * 0.8)), ac.currentTime, 0.4);
@@ -569,7 +510,7 @@ function frame(now) {
   render(T); audioTick(T);
   if (!dragging) seek.value = T;
   $('time').textContent = `${T.toFixed(1).padStart(4, '0')} / ${END.toFixed(1)}`;
-  const si = shotAt(T); [...shotsEl.children].forEach((c, i) => c.classList.toggle('on', i === si));
+  const si = T < SHOTS[1].t0 ? 0 : 1; [...shotsEl.children].forEach((c, i) => c.classList.toggle('on', i === si));
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
