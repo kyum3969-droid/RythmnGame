@@ -54,8 +54,8 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   <div class="bar">
     <button class="btn" id="play" type="button">재생</button>
     <button class="btn ghost" id="restart" type="button">처음부터</button>
-    <div class="scrub"><input id="seek" type="range" min="0" max="26" step="0.01" value="0" aria-label="재생 위치"></div>
-    <span class="time" id="time">00.0 / 26.0</span>
+    <div class="scrub"><input id="seek" type="range" min="0" max="31" step="0.01" value="0" aria-label="재생 위치"></div>
+    <span class="time" id="time">00.0 / 31.0</span>
     <button class="btn ghost" id="snd" type="button" aria-pressed="true">소리</button>
   </div>
   <div class="shots" id="shots"></div>
@@ -96,16 +96,24 @@ const SCAN_X = 300, BELT_Y = 146;
 // One long take, no cuts: the same frame from the empty belt to the street. The chapters only mark where to jump to.
 const SHOTS = [
   { id: 'belt', t0: 0, t1: 10.2, name: '빈 벨트', note: '벨트가 서고 등이 하나씩 꺼진다. 높은 창으로 햇살이 든다. 하은이 벨트를 두 번 두드리고, 빛 쪽으로 고개를 든다.' },
-  { id: 'walk', t0: 10.2, t1: 26, name: '공장 밖으로', note: '컷 없이 이어서 걸어 나간다. 하은은 화면 제자리, 배경이 흐른다(창과 선반, 앞의 빈 라인, 기둥). 다리는 벨트와 담장 뒤로 가려진다. 셔터 밑을 지나 바깥 새벽으로.' }
+  { id: 'walk', t0: 10.2, t1: 22.55, name: '공장 밖으로', note: '컷 없이 이어서 걸어 나간다. 하은은 화면 제자리, 배경이 흐른다(창과 선반, 앞의 빈 라인, 기둥). 다리는 벨트와 담장 뒤로 가려진다. 셔터 밑을 지나 바깥 새벽으로.' },
+  { id: 'train', t0: 22.55, t1: 31, name: '지하철', note: '하은이 걸음을 멈추면 배경이 그라데이션으로 샥 쓸려 첫차 안으로 바뀐다. 하은은 그 자리 그대로 손잡이를 잡고 선다. 창밖으로 터널 불빛이 지나간다.' }
 ];
-const END = 26;
+const END = 31;
 // at the belt (seconds)
 const S1 = { beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], letGo: 9.6 };
 // she stands at x 222 the whole take; once she walks the world slides by. d = how far she has walked (px), easing into her pace
 const HX = 222, HTOP = 106;
-const WALK = { t0: 10.2, ramp: 0.8, v: 30, door: 210, step: 0.55, lampOff: 21.0 };
-const walkD = t => { const tt = t - WALK.t0; return tt <= 0 ? 0 : tt < WALK.ramp ? WALK.v * tt * tt / (2 * WALK.ramp) : WALK.v * (tt - WALK.ramp / 2); };
-const walkT = d => d <= WALK.v * WALK.ramp / 2 ? WALK.t0 + Math.sqrt(2 * WALK.ramp * d / WALK.v) : WALK.t0 + d / WALK.v + WALK.ramp / 2;   // the time she has walked d
+// she eases into her pace over WALK.ramp and eases out of it again, standing still at WALK.stop
+const WALK = { t0: 10.2, ramp: 0.8, v: 30, door: 210, step: 0.55, lampOff: 21.0, stop: 22.9 };
+const WB_ = WALK.t0 + WALK.ramp, WC_ = WALK.stop - WALK.ramp, dB_ = WALK.v * WALK.ramp / 2, dC_ = dB_ + WALK.v * (WC_ - WB_);
+const walkD = t => { const v = WALK.v, r = WALK.ramp;
+  if (t <= WALK.t0) return 0; if (t < WB_) return v * (t - WALK.t0) ** 2 / (2 * r); if (t < WC_) return dB_ + v * (t - WB_);
+  const u = Math.min(t, WALK.stop) - WC_; return dC_ + v * u - v * u * u / (2 * r); };
+const walkT = d => { let a = WALK.t0, b = WALK.stop; for (let i = 0; i < 40; i++) { const m = (a + b) / 2; if (walkD(m) < d) a = m; else b = m; } return b; };   // the time she has walked d
+// then the background sweeps from the street to the first train (a soft gradient edge from the right), and she rides it
+const WIPE = { t0: 22.55, t1: 23.15 };
+const TRAIN = { strap: 23.75, clack0: 23.5, clackGap: 0.92 };
 const doorT = walkT(WALK.door);   // when she passes under the shutter
 const STRIDE = WALK.v * WALK.step;  // px per step
 
@@ -151,6 +159,10 @@ function haeun(cx, top, o = {}) {
     const fN = Math.round(o.fN || 0), fF = Math.round(o.fF || 0);
     arm(cx + 8, cx + 8 + fF, top + 31 - (fF <= -2 ? 1 : 0));
     arm(cx - 8, cx - 8 - fN, top + 31 - (fN >= 2 ? 1 : 0));
+  } else if (o.arms === 'strap') {
+    // the near hand goes up to a strap (o.strap 0..1 on the way up)
+    const k = ease(o.strap || 0);
+    arm(cx + 8, cx + 8, top + 31); arm(cx - 8, Math.round(lerp(cx - 8, cx - 10, k)), Math.round(lerp(top + 31, top - 2, k)));
   } else {
     arm(cx + 8, cx + 8, top + 31); arm(cx - 8, cx - 8, top + 31);
   }
@@ -356,17 +368,16 @@ function haeunPose(t, d) {
   }
   const look = lerp(1, 0.2, ease(seg(t, S1.letGo, WALK.t0 + 0.4)));
   if (t < WALK.t0) return { o: { mirror: true, look, sway: 0 }, top: HTOP - (look > 0.5 ? 1 : 0) };
+  if (t >= WALK.stop) return { o: { mirror: true, look, sway: 0 }, top: HTOP };
   // walking: the phase runs on the distance, so the steps ease in with her pace; the body rises a pixel mid-step
   // the arms swing from one step's end to the next; each arm gets its own random reach every step (0.7 to 2.3 px), so the
   // swing never repeats exactly. They start from hanging still as she sets off.
-  const k = Math.floor(d / STRIDE), sp = (d / STRIDE) % 1, e = ease(sp), start = Math.min(1, d / STRIDE);
+  const k = Math.floor(d / STRIDE), sp = (d / STRIDE) % 1, e = ease(sp), start = Math.min(1, d / STRIDE, (WALK.stop - t) / WALK.ramp);
   const reach = (i, a) => (i % 2 ? -1 : 1) * (0.7 + rnd(i + 1, a * 17 + 3) * 1.6);
   const fN = lerp(reach(k, 1), reach(k + 1, 1), e) * start, fF = lerp(reach(k, 2), reach(k + 1, 2), e) * start;
-  return { o: { mirror: true, look, arms: 'walk', fN, fF, sway: fN > 0.8 ? 1 : 0 }, top: HTOP + (sp > 0.25 && sp < 0.75 ? -1 : 0) };
+  return { o: { mirror: true, look, arms: 'walk', fN, fF, sway: fN > 0.8 ? 1 : 0 }, top: HTOP + (sp > 0.25 && sp < 0.75 && start > 0.3 ? -1 : 0) };
 }
-function render(t) {
-  g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false;
-  g.clearRect(0, 0, W, H);
+function street(t) {
   const d = walkD(t), bx = Math.round(WALK.door - d + HX), sun = sunAt(t);
   const inside = fn => { if (bx <= 0) return; g.save(); g.beginPath(); g.rect(0, 0, bx, H); g.clip(); fn(); g.restore(); };
   const outside = fn => { if (bx >= W) return; g.save(); g.beginPath(); g.rect(bx, 0, W - bx, H); g.clip(); fn(); g.restore(); };
@@ -412,6 +423,80 @@ function render(t) {
   // the exposure blows out as she walks under the shutter into the morning
   const ex = clamp(1 - Math.abs(HX - bx) / 22, 0, 1);
   if (ex > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,200,${0.3 * ex * ex})`; g.fillRect(0, 0, W, H); g.restore(); }
+}
+// ---------- the first train ----------
+// The car from inside, side on: ceiling lights, the ad strip, windows onto the dark tunnel with its lights streaking past, the
+// grab rail and its straps, the long blue bench, the floor. Early and empty. She stands where she stopped, a strap in her hand.
+const SUBW = document.createElement('canvas'); SUBW.width = W; SUBW.height = H; const subctx = SUBW.getContext('2d');
+const STRAPS = Array.from({ length: 17 }, (_, k) => 233 - 24 * 9 + 24 * k);   // one of them (x 233) is the strap she takes
+function clackAt(t) { let v = 0; for (let c = TRAIN.clack0; c < END; c += TRAIN.clackGap) for (const dt of [0, 0.18]) { const u = t - c - dt; if (u >= 0 && u < 0.09) v = 1; } return v; }
+function train(t) {
+  const jolt = clackAt(t);
+  g.save(); g.translate(0, jolt);
+  R(0, -2, W, H + 4, '#c9cfc8');
+  // ceiling and its light strip
+  R(0, -2, W, 20, '#e2e6df'); R(0, 17, W, 1, '#b5bbb5');
+  for (let x = 6; x < W; x += 64) { R(x, 7, 52, 5, '#fbfdf6'); R(x, 12, 52, 1, '#c9cec7'); }
+  // the ad strip over the windows
+  R(0, 18, W, 14, '#b9bfb9'); R(0, 31, W, 1, '#9aa09a');
+  const ADS = ['#e9d36a', '#7fb4d8', '#e58a7a', '#9ccf9a', '#f2efe6', '#c79ad9'];
+  for (let k = 0; k < 7; k++) { const x = 4 + k * 56; R(x, 20, 50, 10, ADS[k % ADS.length]); R(x + 3, 22, 18, 2, 'rgba(0,0,0,.35)'); R(x + 3, 25, 28, 1, 'rgba(0,0,0,.25)'); R(x + 38, 22, 8, 6, 'rgba(255,255,255,.45)'); }
+  // windows onto the tunnel: dark glass, cables, the tunnel lights streaking past to the left
+  for (let x0 = 92; x0 < W; x0 += 98) {
+    R(x0 - 2, 34, 80, 48, '#9aa29c'); R(x0, 36, 76, 44, '#0e1317');
+    g.save(); g.beginPath(); g.rect(x0, 36, 76, 44); g.clip();
+    R(x0, 60, 76, 1, '#1d252a'); R(x0, 66, 76, 1, '#182024');
+    for (let k = -2; k < 8; k++) { const lx = Math.round(((k * 150 - t * 620) % 900 + 900) % 900 - 120);
+      if (lx < x0 - 40 || lx > x0 + 80) continue; R(lx, 48, 34, 1, 'rgba(255,214,150,.25)'); R(lx + 24, 47, 10, 3, '#ffe6b0'); }
+    const rf = g.createLinearGradient(x0, 36, x0 + 76, 80); rf.addColorStop(0, 'rgba(200,220,230,.10)'); rf.addColorStop(1, 'rgba(200,220,230,0)'); g.fillStyle = rf; g.fillRect(x0, 36, 76, 44);
+    g.restore();
+    R(x0 + 37, 36, 2, 44, '#9aa29c');
+  }
+  // the door at the left end, its windows, the yellow edges
+  R(10, 32, 64, 124, '#b3bab5'); R(41, 32, 2, 124, '#8d948f'); R(16, 40, 20, 34, '#0e1317'); R(48, 40, 20, 34, '#0e1317'); R(10, 32, 2, 124, '#e2c34a'); R(72, 32, 2, 124, '#e2c34a');
+  // the long bench under the windows, the heater grille under it
+  R(80, 94, W - 80, 24, '#3a6d86'); R(80, 94, W - 80, 2, '#5a8fa8'); for (let x = 80 + 44; x < W; x += 44) R(x, 96, 1, 22, '#2f5b70');
+  R(80, 118, W - 80, 10, '#4a87a5'); R(80, 118, W - 80, 1, '#6aa6c2'); R(80, 128, W - 80, 2, '#2b4f61');
+  R(80, 130, W - 80, 26, '#7d8580'); for (let y = 134; y < 154; y += 3) R(84, y, W - 88, 1, '#6c736e');
+  R(78, 88, 3, 68, '#aab3b6');   // the glass end panel's frame
+  // the floor
+  R(0, 156, W, 60, '#8b8f89'); R(0, 156, W, 2, '#6e726d'); for (let k = 0; k < 120; k++) R(Math.floor(rnd(k, 31) * W), 160 + Math.floor(rnd(k, 32) * 54), 1, 1, '#9ea29c');
+  // the grab rail and the straps (they swing a little with the car; hers stays in her hand)
+  R(0, 84, W, 2, '#aab3b6'); R(0, 84, W, 1, '#d4dadc');
+  for (const sx of STRAPS) { const mine = sx === 233 && t >= TRAIN.strap + 0.3, sw = mine ? 0 : Math.round(Math.sin(t * 2.1 + sx * 0.05) * 1.2);
+    R(sx, 86, 1, 14, '#5d6568'); R(sx - 2 + sw, 100, 5, 1, '#e9e4d6'); R(sx - 2 + sw, 104, 5, 1, '#e9e4d6'); R(sx - 2 + sw, 100, 1, 5, '#e9e4d6'); R(sx + 2 + sw, 100, 1, 5, '#e9e4d6'); }
+  // poles
+  for (const px of [130, 340]) { R(px, 32, 2, 124, '#b9c2c6'); R(px, 32, 1, 124, '#e1e6e8'); }
+  // her
+  const k = seg(t, TRAIN.strap, TRAIN.strap + 0.35);
+  haeunSprite({ mirror: true, look: 0.2, arms: k > 0 ? 'strap' : undefined, strap: k, sway: 0 });
+  tintSprite('#f2f6f4');
+  putSprite(HX, HTOP);
+  // the car's cool light
+  g.globalCompositeOperation = 'lighter';
+  for (let x = 6; x < W; x += 64) glow(x + 26, 14, 50, '230,240,235', 0.12);
+  g.globalCompositeOperation = 'source-over';
+  g.restore();
+}
+function render(t) {
+  g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false;
+  g.clearRect(0, 0, W, H);
+  if (t < WIPE.t1) street(t);
+  if (t > WIPE.t0) {
+    if (t >= WIPE.t1) { g = wctx; train(t); }
+    else {
+      // the sweep: the train comes in from the right behind a soft gradient edge, with a bright band riding the edge
+      g = subctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, W, H); train(t);
+      const p = ease(seg(t, WIPE.t0, WIPE.t1)), e = lerp(W + 70, -70, p);
+      subctx.globalCompositeOperation = 'destination-in';
+      const m = subctx.createLinearGradient(e - 50, 0, e + 50, 0); m.addColorStop(0, 'rgba(0,0,0,0)'); m.addColorStop(1, 'rgba(0,0,0,1)');
+      subctx.fillStyle = m; subctx.fillRect(0, 0, W, H); subctx.globalCompositeOperation = 'source-over';
+      g = wctx; g.drawImage(SUBW, 0, 0);
+      g.save(); g.globalCompositeOperation = 'lighter';
+      const band = g.createLinearGradient(e - 40, 0, e + 40, 0); band.addColorStop(0, 'rgba(220,235,255,0)'); band.addColorStop(0.5, 'rgba(220,235,255,.45)'); band.addColorStop(1, 'rgba(220,235,255,0)');
+      g.fillStyle = band; g.fillRect(e - 40, 0, 80, H); g.restore();
+    }
+  }
   // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
   out.drawImage(wb, 0, 0, W, H, 0, 0, cv.width, cv.height);
@@ -428,7 +513,7 @@ function initAudio() {
   NB = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate); const d = NB.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
   const loop = (type, f, q) => { const s = ac.createBufferSource(); s.buffer = NB; s.loop = true; const fl = ac.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const gn = ac.createGain(); gn.gain.value = 0; s.connect(fl); fl.connect(gn); gn.connect(master); s.start(); return gn; };
   const buzzO = ac.createOscillator(); buzzO.type = 'sawtooth'; buzzO.frequency.value = 120; const bl = ac.createBiquadFilter(); bl.type = 'lowpass'; bl.frequency.value = 420; const buzz = ac.createGain(); buzz.gain.value = 0; buzzO.connect(bl); bl.connect(buzz); buzz.connect(master); buzzO.start();
-  amb = { room: loop('lowpass', 240, 0.7), wind: loop('bandpass', 520, 0.6), buzz };
+  amb = { room: loop('lowpass', 240, 0.7), wind: loop('bandpass', 520, 0.6), rumble: loop('lowpass', 140, 0.9), buzz };
 }
 function newBus() { if (bus) { const b = bus; b.gain.setTargetAtTime(0, ac.currentTime, 0.03); setTimeout(() => b.disconnect(), 500); } bus = ac.createGain(); bus.connect(master); }
 function thump(t, f, amp, dec) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f * 1.6, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.04); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.006); gn.gain.exponentialRampToValueAtTime(0.0001, t + dec); o.connect(gn); gn.connect(bus); o.start(t); o.stop(t + dec + 0.05); }
@@ -451,14 +536,21 @@ const SFX = {
     for (const [dt, k] of [[0, 1], [0.11, 0.3], [0.23, 0.1]]) { noise(t + dt, 0.035, 0.07 * k, 'bandpass', 2200, 1.2); thump(t + dt, 90, 0.09 * k, 0.07); } },
   whoosh(t) { const s = ac.createBufferSource(); s.buffer = NB; const fl = ac.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(300, t); fl.frequency.exponentialRampToValueAtTime(3000, t + 0.9); const gn = ac.createGain(); gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.06, t + 0.5); gn.gain.linearRampToValueAtTime(0.0001, t + 1.2); s.connect(fl); fl.connect(gn); gn.connect(bus); s.start(t); s.stop(t + 1.3); },
   bird(t) { for (let k = 0; k < 3; k++) tone(t + k * 0.09, 'sine', 2800 + k * 200, 3900, 0.014, 0.06); },
-  lamp(t) { noise(t, 0.02, 0.07, 'highpass', 2500); }
+  lamp(t) { noise(t, 0.02, 0.07, 'highpass', 2500); },
+  // the sweep into the train: a quick airy swish
+  swish(t) { const s = ac.createBufferSource(); s.buffer = NB; const fl = ac.createBiquadFilter(); fl.type = 'bandpass'; fl.Q.value = 0.8; fl.frequency.setValueAtTime(4000, t); fl.frequency.exponentialRampToValueAtTime(600, t + 0.6); const gn = ac.createGain(); gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.07, t + 0.12); gn.gain.linearRampToValueAtTime(0.0001, t + 0.7); s.connect(fl); fl.connect(gn); gn.connect(bus); s.start(t); s.stop(t + 0.8); },
+  // the wheels over a rail joint (덜컹)
+  clack(t) { thump(t, 62, 0.12, 0.09); noise(t, 0.05, 0.06, 'bandpass', 500, 1.2); }
 };
 EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: S1.laserOff, fn: 'laserOff' }, ...S1.tubesOff.map(t => ({ t, fn: 'tube' })),
   { t: 7.4, fn: 'pad', dur: 3.7, notes: [174.61, 220, 261.63, 329.63] },               // Fmaj7 as she lifts her head
   { t: WALK.t0, fn: 'pad', dur: doorT - WALK.t0, notes: [130.81, 196, 246.94, 329.63] },   // Cmaj7 walking out
-  { t: doorT, fn: 'pad', dur: END - doorT - 1.2, notes: [98, 146.83, 220, 246.94, 329.63] },   // G6/9 in the morning
+  { t: doorT, fn: 'pad', dur: WIPE.t0 - doorT, notes: [98, 146.83, 220, 246.94, 329.63] },   // G6/9 in the morning
+  { t: WIPE.t0, fn: 'pad', dur: END - WIPE.t0 - 1.2, notes: [110, 164.81, 196, 246.94, 261.63] },   // Am9 on the train
+  { t: WIPE.t0 - 0.1, fn: 'swish' },
   { t: doorT - 0.5, fn: 'whoosh' }, { t: 19.2, fn: 'bird' }, { t: 21.4, fn: 'bird' }, { t: 23.1, fn: 'bird' }, { t: WALK.lampOff, fn: 'lamp' });
-for (let k = 1; ; k++) { const t = walkT(k * STRIDE); if (t > END - 1.4) break; EV.push({ t, fn: 'step', out: t > doorT }); }
+for (let k = 1; ; k++) { const t = walkT(k * STRIDE); if (t > WALK.stop - 0.05) break; EV.push({ t, fn: 'step', out: t > doorT }); }
+for (let c = TRAIN.clack0; c < END - 0.6; c += TRAIN.clackGap) EV.push({ t: c, fn: 'clack' }, { t: c + 0.18, fn: 'clack' });
 EV.sort((a, b) => a.t - b.t);
 function audioStart(t) {
   if (!ac) return; ac.resume(); newBus(); schedTo = t;
@@ -474,7 +566,9 @@ function audioTick(t) {
   const outK = t > doorT ? 1 : 0, lit = TUBE_Q.reduce((s, _, k) => s + tubeOn(k, t), 0);
   amb.room.gain.setTargetAtTime(0.05 * (1 - outK), ac.currentTime, 0.2);
   amb.buzz.gain.setTargetAtTime(0.004 * lit, ac.currentTime, 0.02);
-  amb.wind.gain.setTargetAtTime(outK * (0.025 + 0.012 * Math.sin(t * 0.8)), ac.currentTime, 0.4);
+  const onTrain = t > WIPE.t0 ? 1 : 0;
+  amb.wind.gain.setTargetAtTime(outK * (1 - onTrain) * (0.025 + 0.012 * Math.sin(t * 0.8)), ac.currentTime, onTrain ? 0.08 : 0.4);
+  amb.rumble.gain.setTargetAtTime(onTrain * 0.09, ac.currentTime, 0.15);
 }
 
 // ---------- playback ----------
@@ -512,7 +606,7 @@ function frame(now) {
   render(T); audioTick(T);
   if (!dragging) seek.value = T;
   $('time').textContent = `${T.toFixed(1).padStart(4, '0')} / ${END.toFixed(1)}`;
-  const si = T < SHOTS[1].t0 ? 0 : 1; [...shotsEl.children].forEach((c, i) => c.classList.toggle('on', i === si));
+  const si = SHOTS.reduce((a, sh, i) => T >= sh.t0 ? i : a, 0); [...shotsEl.children].forEach((c, i) => c.classList.toggle('on', i === si));
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);

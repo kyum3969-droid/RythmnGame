@@ -1496,10 +1496,12 @@ const PARTNERS = {
     arm(pose) {
       const top = bodyTop(86, pose), shirt = '#1e1a1a', glove = C.skin;
       if (pose.phone) return;
-      if (pose.wave && !pose.carry) { thick(BOSS_X + 5, top + 23, BOSS_X + 9, top + 2, 4, shirt); R(BOSS_X + 7, top - 2, 5, 5, glove); return; }
-      thick(BOSS_X + 5, top + 23, pose.hand.x, pose.hand.y, 4, shirt); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, glove);
+      // her loading arm from the near shoulder (she faces the belt: the shoulder is at the right side of her body)
+      const sx = BOSS_X + 7, sy = top + 17;
+      if (pose.wave && !pose.carry) { thick(sx, sy, BOSS_X + 9, top + 2, 3, shirt); R(BOSS_X + 7, top - 2, 5, 5, glove); return; }
+      thick(sx, sy, pose.hand.x, pose.hand.y, 3, shirt); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, glove);
       // the watch on the wrist
-      R(lerp(BOSS_X + 5, pose.hand.x, 0.8) - 1, lerp(top + 23, pose.hand.y, 0.8) - 1, 3, 3, '#d8dde0');
+      R(lerp(sx, pose.hand.x, 0.8) - 1, lerp(sy, pose.hand.y, 0.8) - 1, 3, 3, '#d8dde0');
     }
   },
   park: {
@@ -1706,18 +1708,20 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
   // a thin dark line down the front of her face, from under the brim to the chin
   R(cx - 6, top + 6, 1, 9, '#1b1716');
   R(cx - 3, top + 10, 2, 1, '#b07a58'); R(cx - 3, top + 12, 2, 1, '#b2565a');
-  // front arm: the gun on the upper gate (kicks back toward her when a scan fires there), the watch check, a swing while walking,
-  // or nothing (the loading arm is drawn with the belt). The other hand stays in a pocket.
-  if (o.watch) { thick(cx - 6, top + 22, cx - 2, top + 30, 4, shirt); R(cx - 4, top + 28, 4, 4, glove); R(cx - 3, top + 26, 3, 3, '#d8dde0'); R(cx - 2, top + 27, 1, 1, C.ink); }
+  // arms, hung from the shoulders at the sides of her body (3 px sleeves). The near arm: the gun on the upper gate (kicks back
+  // toward her when a scan fires there), the watch check, a swing while walking, a tap on the belt, hanging, or nothing (the
+  // loading arm is drawn with the belt). The far hand hangs at her side, a little back while she walks.
+  const NX = cx - 8, FX = cx + 8, SY = top + 17;
+  if (o.watch) { thick(NX, SY, cx - 2, top + 28, 3, shirt); R(cx - 4, top + 28, 4, 4, glove); R(cx - 3, top + 26, 3, 3, '#d8dde0'); R(cx - 2, top + 27, 1, 1, C.ink); }
   else if (o.gun != null) {
     const gx = cx - 14 + kick * 3 - Math.round((o.knock || 0) * 7), gy = top + 24;
-    thick(cx - 6, top + 22, gx + 6, gy + 3, 4, shirt);
+    thick(NX, SY, gx + 6, gy + 3, 3, shirt);
     R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33'); R(gx - 10, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser); R(gx, gy + 2, 3, 3, glove);
   }
-  else if (o.step != null) { const st = o.step ? 4 : -2; thick(cx - 6, top + 22, cx - 9 + st, top + 33, 4, shirt); R(cx - 11 + st, top + 32, 4, 3, glove); }
-  else if (o.tap != null) { const hy = top + 30 + Math.round(o.tap * 6); thick(cx - 6, top + 22, cx - 15, hy, 4, shirt); R(cx - 17, hy - 1, 4, 3, glove); }
-  else if (o.rest) { thick(cx - 6, top + 22, cx - 8, top + 34, 4, shirt); R(cx - 10, top + 33, 4, 3, glove); }
-  thick(cx + 6, top + 22, cx + 8, top + 32, 4, shirt); R(cx + 6, top + 31, 4, 3, glove);
+  else if (o.step != null) { const f = o.step ? 2 : -1; thick(NX, SY, NX - f, top + 31, 3, shirt); R(NX - f - 1, top + 30, 3, 3, glove); }
+  else if (o.tap != null) { const hy = top + 30 + Math.round(o.tap * 6); thick(NX, SY, cx - 15, hy, 3, shirt); R(cx - 17, hy - 1, 4, 3, glove); }
+  else if (o.rest) { thick(NX, SY, NX, top + 31, 3, shirt); R(NX - 1, top + 30, 3, 3, glove); }
+  { const f = o.step != null ? (o.step ? 2 : -1) : 0; thick(FX, SY, FX + f, top + 31, 3, shirt); R(FX + f - 1, top + 30, 3, 3, glove); }
   g.restore();
 }
 // 하은 before she takes the upper belt: at her gate (knocking on it, checking her watch), crossing behind the upper belt to 반장,
