@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>이모의 도장 · 확장 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+/* 2-1 검수, call and response: 순자 이모 stamps a rhythm on her inspection sheet for one bar, then the boxes come down the
+   belt on that same rhythm and the player stamps them. The rhythm is heard first, then played. Same 384x216 pixel screen
+   as the game, drawn at three times for crisp text. */
+:root{
+  --ink:#efe6d2; --muted:#a6978a; --paper:#efe6d2; --paper-ink:#1d1815; --paper-muted:#6d6156; --stamp:#c8372d;
+  --display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%} body{box-sizing:border-box;margin:0}
+body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;padding:10px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden}
+.page{width:min(100%,calc((100dvh - 60px) * 16 / 9));max-width:100%}
+.stage{position:relative;width:100%;aspect-ratio:16/9;container-type:inline-size;overflow:hidden;border-radius:4px;background:#0d0a09;
+  box-shadow:0 0 0 1px #000,0 0 40px rgba(0,0,0,.6);touch-action:manipulation;user-select:none;-webkit-user-select:none;cursor:pointer}
+.stage canvas{display:block;width:100%;height:100%}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,8,7,.7);cursor:default}
+.label{width:min(80%,580px);background:var(--paper);color:var(--paper-ink);border-radius:3px;padding:2.4cqw 3cqw;box-shadow:0 6px 30px rgba(0,0,0,.5)}
+.label .kicker{display:flex;justify-content:space-between;font-family:var(--mono);font-size:clamp(10px,1.5cqw,14px);color:var(--paper-muted)}
+.label h2{font-family:var(--display);font-weight:400;font-size:clamp(20px,4cqw,38px);margin:.2em 0 .1em}
+.label p{margin:.3em 0 .8em;font-size:clamp(12px,1.75cqw,16px)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.btn{font:600 clamp(13px,1.8cqw,17px) var(--body);padding:.45em 1.1em;border-radius:3px;border:0;background:#1d1815;color:var(--paper);cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--paper-ink);box-shadow:inset 0 0 0 1.5px #1d1815}
+.btn:focus-visible,.sync button:focus-visible{outline:2px solid #2f6f8a;outline-offset:2px}
+.sync{font-family:var(--mono);font-size:clamp(11px,1.5cqw,14px);display:inline-flex;align-items:center;gap:4px;color:var(--paper-muted)}
+.sync button{width:30px;height:30px;border-radius:3px;border:1.5px solid #1d1815;background:transparent;color:#1d1815;font:600 15px var(--mono);cursor:pointer}
+.sync output{min-width:4.2em;text-align:center;color:var(--paper-ink)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:.15em 1.2em;margin:.5em 0 1em;font-size:clamp(12px,1.75cqw,16px)} dt{color:var(--paper-muted)} dd{margin:0;font-family:var(--mono)}
+.levels{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin:.4em 0 .6em}
+.lv{text-align:left;font:600 clamp(11px,1.5cqw,14px) var(--body);padding:.5em .7em;border-radius:3px;border:1.5px solid #1d1815;background:transparent;color:#1d1815;cursor:pointer;min-height:40px}
+.lv small{display:block;font-weight:400;color:#6d6156;font-size:.85em}
+.lv:hover,.lv:focus-visible{background:#1d1815;color:#efe6d2;outline:none}.lv:hover small,.lv:focus-visible small{color:#c9bfae}
+.help{font-size:13px;color:var(--muted);text-align:center;max-width:60em;margin:0}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="stage" id="stage">
+    <canvas id="cv" width="1152" height="648" aria-label="2-1 검수 확장 시안: 이모와 박씨가 리듬을 들려주고 상자가 같은 리듬으로 온다"></canvas>
+    <div class="overlay" id="title">
+      <div class="label">
+        <div class="kicker"><span>작업지시서 · 검수 도장 (확장 시안)</span><span>B동 3번 라인</span></div>
+        <h2>이모의 도장</h2>
+        <p>누가 먼저 리듬을 찍어 들려주면, 상자가 <b>그 리듬 그대로</b> 빨간 선에 닿습니다. 들은 대로 터치(또는 스페이스)해서 찍으세요. 단계마다 한 가지씩 어려워집니다.</p>
+        <div class="levels" id="levels"></div>
+        <div class="row"><span class="sync">싱크 <button id="sm" type="button" aria-label="보정값 낮추기">−</button><output id="sv">0 ms</output><button id="sp" type="button" aria-label="보정값 높이기">+</button></span></div>
+      </div>
+    </div>
+    <div class="overlay" id="result" hidden>
+      <div class="label">
+        <div class="kicker"><span>근무 확인서</span><span id="r-lv">검수 순자</span></div>
+        <h2 id="r-title">검수 통과</h2>
+        <dl>
+          <dt>따라 찍은 도장</dt><dd id="r-counts">딱 0 · 좋아 0 · 놓침 0</dd>
+          <dt>정확도</dt><dd id="r-acc">0%</dd>
+          <dt>최대 콤보</dt><dd id="r-combo">0</dd>
+        </dl>
+        <div class="row"><button class="btn" id="retry" type="button">다시 하기</button><button class="btn ghost" id="back" type="button">단계 고르기</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="help">확장 시안 · 1 기본(2-1) → 2 리듬(16분·당김) → 3 긴 리듬(두 마디) → 4 이어 찍기(쉬는 마디 없음) → 5 박씨도 던진다(지게차 쿵, 마지막엔 둘이 나눠 찍음)</p>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const W = 384, H = 216, SC = 3;
+const cv = $('cv'), g = cv.getContext('2d'); g.setTransform(SC, 0, 0, SC, 0, 0); g.imageSmoothingEnabled = false;
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
+function txt(s, x, y, c, size = 7, align = 'left', font = '600 {s}px "IBM Plex Sans KR", sans-serif') { g.font = font.replace('{s}', size); g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = c; g.fillText(s, x, y); g.textAlign = 'left'; }
+
+// ---------- the five steps ----------
+// Each step adds one thing to the same rule (someone stamps a rhythm, the boxes come on it, you stamp them):
+//   1 기본: one bar heard, one bar answered, eighths.              2 리듬: sixteenths and syncopation.
+//   3 긴 리듬: two bars heard, two bars answered.                  4 이어 찍기: no rest bar; she calls the next bar while you answer.
+//   5 박씨도 던진다: 박씨's forklift calls some bars with its 쿵, and at the end the two of them share a bar between them.
+// A phrase is { who, bars: [[beats in bar 1], [beats in bar 2]...] }; a beat may be [beat, who] to give it to the other caller.
+const P = (who, ...bars) => ({ who, bars });
+const LEVELS = [
+  { name: '1 · 기본', sub: '한 마디 듣고 한 마디', bpm: 92, phrases: [P('imo', [0, 1, 2, 3]), P('imo', [0, 1, 1.5, 2]), P('imo', [0, 1, 1.5, 2, 3]), P('imo', [0, 0.5, 1, 2]), P('imo', [0, 1.5, 2, 3]), P('imo', [0.5, 1.5, 2, 3]), P('imo', [0, 1, 1.5, 2])],
+    say: { 0: '내 도장 소리 듣고, 똑같이 찍어.', 1: '탁, 탁탁, 탁.' } },
+  { name: '2 · 리듬', sub: '16분 · 당김음', bpm: 92, phrases: [P('imo', [0, 1, 1.5, 2]), P('imo', [0, 0.75, 1.5, 2]), P('imo', [0, 0.75, 1.5, 2.5, 3]), P('imo', [0, 0.25, 0.5, 1, 2]), P('imo', [0, 1, 1.75, 2.5, 3]), P('imo', [0.5, 1.25, 2, 2.75, 3.5]), P('imo', [0, 0.25, 0.5, 1.5, 2, 2.25, 2.5])],
+    say: { 1: '이번엔 잘게 쪼갠다.', 4: '뒤에 붙는 거, 잘 들어.' } },
+  { name: '3 · 긴 리듬', sub: '두 마디 듣고 두 마디', bpm: 92, phrases: [P('imo', [0, 1, 2, 3], [0, 1, 1.5, 2]), P('imo', [0, 1, 1.5, 2], [0, 1, 1.5, 2, 3]), P('imo', [0, 0.5, 1, 2], [0, 1.5, 3]), P('imo', [0, 1.5, 2, 3], [0.5, 1.5, 2.5, 3]), P('imo', [0, 1, 1.5, 2, 3], [0, 0.5, 1, 1.5, 2])],
+    say: { 0: '이번엔 길게 간다. 끝까지 들어.' } },
+  { name: '4 · 이어 찍기', sub: '쉬는 마디 없음', bpm: 88, canon: true, phrases: [P('imo', [0, 1, 2, 3]), P('imo', [0, 1, 2, 3]), P('imo', [0, 1, 1.5, 2]), P('imo', [0, 1, 1.5, 2]), P('imo', [0, 2, 3]), P('imo', [0, 1, 1.5, 2, 3]), P('imo', [0, 1.5, 2, 3]), P('imo', [0, 1, 2, 3]), P('imo', [0, 0.5, 1, 2]), P('imo', [0, 1, 1.5, 2]), P('imo', [0, 1, 2, 3])],
+    say: { 0: '쉬지 말고 간다. 듣고, 찍고.' } },
+  { name: '5 · 박씨도 던진다', sub: '지게차 쿵 · 둘이 나눠', bpm: 92, phrases: [P('imo', [0, 1, 1.5, 2]), P('park', [0, 2, 3]), P('imo', [0, 1, 1.5, 2, 3]), P('park', [0, 1.5, 2, 3]), P('imo', [0, 1, [1.5, 'park'], 2, [3, 'park']]), P('imo', [[0, 'park'], 1, 1.5, 2, [2.5, 'park'], [3, 'park']]), P('imo', [0, [1, 'park'], 1.5, 2, [3, 'park']])],
+    say: { 0: '지게차 저 양반도 오늘은 박자 맞추네.', 4: '같이 간다!' }, park: true }
+];
+let LV = LEVELS[0], SPB = 60 / 92, BAR = 4 * SPB, LEAD = 0, END_T = 0;
+let STAMPS = [], TARGETS = [], SEGS = [];
+function build(lv) {
+  LV = lv; SPB = 60 / lv.bpm; BAR = 4 * SPB; LEAD = 0.4 + BAR; STAMPS = []; TARGETS = []; SEGS = [];
+  const hits = (ph, base, ri) => ph.bars.forEach((bar, j) => bar.forEach(it => { const b = Array.isArray(it) ? it[0] : it, who = Array.isArray(it) ? it[1] : ph.who, t = base + j * BAR + b * SPB; STAMPS.push({ t, who, round: ri }); TARGETS.push({ t: t + ph.bars.length * BAR, who, round: ri, judge: null, d: 0 }); }));
+  let cur = LEAD;
+  if (lv.canon) {
+    lv.phrases.forEach((ph, k) => hits(ph, cur + k * BAR, k));
+    const n = lv.phrases.length;
+    for (let k = 0; k <= n; k++) SEGS.push({ t0: cur + k * BAR, t1: cur + (k + 1) * BAR, kind: k === 0 ? 'call' : k === n ? 'resp' : 'both', who: (lv.phrases[k] || lv.phrases[n - 1]).who, round: Math.min(k, n - 1) });
+    cur += (n + 1) * BAR;
+  } else lv.phrases.forEach((ph, i) => { const L = ph.bars.length; hits(ph, cur, i); SEGS.push({ t0: cur, t1: cur + L * BAR, kind: 'call', who: ph.who, round: i }, { t0: cur + L * BAR, t1: cur + 2 * L * BAR, kind: 'resp', who: ph.who, round: i }); cur += 2 * L * BAR; });
+  END_T = cur + 1.6;
+}
+const segAt = t => SEGS.find(s => t >= s.t0 && t < s.t1) || null;
+
+// ---------- audio ----------
+let ac = null, out = null, mus = null, startAt = 0, playing = false, syncMs = 0, nextBeat = 0;
+function audio() { if (ac) return; ac = new (window.AudioContext || window.webkitAudioContext)(); out = ac.createGain(); out.gain.value = 0.9; const comp = ac.createDynamicsCompressor(); out.connect(comp); comp.connect(ac.destination); mus = ac.createGain(); mus.gain.value = 0.75; mus.connect(out); }
+let NOISE = null; const noiseBuf = () => { if (NOISE) return NOISE; NOISE = ac.createBuffer(1, ac.sampleRate * 0.5, ac.sampleRate); const d = NOISE.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; return NOISE; };
+const panTo = (dest, p) => { if (!p || !ac.createStereoPanner) return dest; const n = ac.createStereoPanner(); n.pan.value = p; n.connect(dest); return n; };
+function nz(t, type, f, amp, dec, dest = mus, q = 0.8) { const s = ac.createBufferSource(), fl = ac.createBiquadFilter(), gn = ac.createGain(); s.buffer = noiseBuf(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; gn.gain.setValueAtTime(amp, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + dec); s.connect(fl); fl.connect(gn); gn.connect(dest); s.start(t); s.stop(t + dec + 0.02); }
+function tone(t, type, f, amp, dec, dest = mus, f2 = 0) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dec * 0.6); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.006); gn.gain.exponentialRampToValueAtTime(0.0001, t + dec); o.connect(gn); gn.connect(dest); o.start(t); o.stop(t + dec + 0.03); }
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+const CHORDS = [[50, 53, 57, 60], [55, 58, 62, 65], [46, 50, 53, 57], [45, 49, 52, 55]];
+const kick = (t, a = 0.7) => tone(t, 'sine', 120, a, 0.28, mus, 48);
+const rim = (t, a = 0.18) => { nz(t, 'bandpass', 2200, a, 0.05); tone(t, 'triangle', 820, a * 0.4, 0.04); };
+const hat = (t, a = 0.05) => nz(t, 'highpass', 7500, a, 0.04);
+function rhodes(t, ch, dur, a = 0.05) { for (const m of ch) { const o = ac.createOscillator(), o2 = ac.createOscillator(), gn = ac.createGain(), g2 = ac.createGain(); o.type = 'sine'; o2.type = 'sine'; o.frequency.value = mtof(m + 12); o2.frequency.value = mtof(m + 12) * 2.01; g2.gain.value = 0.18; o2.connect(g2); g2.connect(gn); o.connect(gn); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(a, t + 0.01); gn.gain.exponentialRampToValueAtTime(a * 0.4, t + 0.4); gn.gain.exponentialRampToValueAtTime(0.0001, t + dur); gn.connect(mus); o.start(t); o2.start(t); o.stop(t + dur + 0.05); o2.stop(t + dur + 0.05); } }
+const bass = (t, m, dur, a = 0.16) => { tone(t, 'sine', mtof(m - 12), a, dur); tone(t, 'triangle', mtof(m), a * 0.25, dur * 0.5); };
+// the calls: 이모's wooden stamp (from the left), 박씨's forks dropping a pallet, a deep thud with a clank (from the right);
+// your stamp is 이모's sound, a little brighter, in the middle
+function call(t, who) {
+  if (who === 'park') { const d = panTo(out, 0.45); tone(t, 'sine', 90, 0.6, 0.22, d, 45); nz(t, 'lowpass', 300, 0.35, 0.14, d); tone(t + 0.01, 'square', 420, 0.05, 0.08, d); nz(t + 0.01, 'bandpass', 2600, 0.08, 0.05, d, 3); }
+  else { const d = panTo(out, -0.4); tone(t, 'sine', 160, 0.5, 0.12, d, 75); nz(t, 'bandpass', 1100, 0.32, 0.06, d, 1.4); nz(t + 0.004, 'lowpass', 600, 0.2, 0.08, d); }
+}
+function myStamp(t) { tone(t, 'sine', 190, 0.45, 0.12, out, 90); nz(t, 'bandpass', 1500, 0.3, 0.06, out, 1.4); nz(t + 0.004, 'lowpass', 600, 0.18, 0.08, out); }
+function scheduleMusic() {
+  const now = ac.currentTime, horizon = now + 0.3;
+  while (startAt + nextBeat * SPB < horizon && nextBeat * SPB < END_T) {
+    const b = nextBeat++, T = startAt + b * SPB, bar = Math.floor(b / 4), k = b % 4, ch = CHORDS[bar % 4], tb = b * SPB;
+    if (tb < LEAD - 0.01) { rim(T, 0.12); continue; }
+    const sg = segAt(tb + 0.01);
+    if (!sg) { if (k === 0 && tb < END_T - 1) { kick(T, 0.6); rhodes(T, CHORDS[0], SPB * 4, 0.06); bass(T, 50, SPB * 3); } continue; }
+    const full = sg.kind !== 'call';
+    if (k === 0) kick(T, full ? 0.7 : 0.5); if (full && k === 2) kick(T + SPB * 0.5, 0.45);
+    if (k === 1 || k === 3) rim(T, full ? 0.2 : 0.12);
+    hat(T, 0.05); hat(T + SPB * 0.62, full ? 0.035 : 0.02);
+    if (k === 0) { rhodes(T, ch, SPB * 1.6); bass(T, ch[0], SPB * 1.4); }
+    if (k === 1) rhodes(T + SPB * 0.5, ch, SPB * 1.2, 0.04);
+    if (k === 2) bass(T, ch[0] + (bar % 2 ? 7 : 0), SPB * 1.2, 0.13);
+  }
+  for (const s of STAMPS) if (!s.sent && startAt + s.t < horizon) { s.sent = 1; call(startAt + s.t, s.who); }
+}
+const songT = () => ac ? ac.currentTime - startAt : -99;
+
+// ---------- judging ----------
+const WIN_P = 0.05, WIN_G = 0.11, WIN_M = 0.18;
+const stats = { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 };
+const FX = { pops: [], missAt: -9, stampAt: -9, flash: -9, words: [] };
+function press(tIn) {
+  if (!playing) return;
+  const t = tIn - syncMs / 1000, now = performance.now();
+  FX.stampAt = now; myStamp(ac.currentTime);
+  let best = null, bd = 1e9; for (const tg of TARGETS) { if (tg.judge) continue; const d = Math.abs(t - tg.t); if (d < bd) { bd = d; best = tg; } }
+  if (!best || bd > WIN_M) return;
+  const d = t - best.t;
+  if (Math.abs(d) <= WIN_G) { best.judge = Math.abs(d) <= WIN_P ? 'perfect' : 'good'; best.d = d; stats[best.judge]++; stats.combo++; stats.best = Math.max(stats.best, stats.combo); FX.flash = now; FX.pops.push({ text: best.judge === 'perfect' ? '딱' : '좋아', sub: best.judge === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: now, c: best.judge === 'perfect' ? '#fff4d0' : '#e8d8a8' }); }
+  else missIt(best, d < 0 ? '빠름' : '늦음');
+}
+function missIt(tg, why) { tg.judge = 'miss'; stats.miss++; stats.combo = 0; FX.missAt = performance.now(); FX.pops.push({ text: '놓침', sub: why, at: performance.now(), c: '#ff7a6a' }); }
+function tick(t) {
+  for (const tg of TARGETS) if (!tg.judge && t > tg.t + WIN_M) missIt(tg, '');
+  // the sound-words over whoever just stamped
+  for (const s of STAMPS) if (!s.shown && t >= s.t) { s.shown = 1; FX.words.push({ who: s.who, at: performance.now() }); }
+}
+const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyK', 'KeyD']);
+addEventListener('keydown', e => { if (!KEYS.has(e.code) || e.repeat || !playing) return; e.preventDefault(); press(songT() + (e.timeStamp - performance.now()) / 1000); });
+$('stage').addEventListener('pointerdown', e => { if (!playing || e.target.closest('.overlay')) return; e.preventDefault(); press(songT() + (e.timeStamp - performance.now()) / 1000); });
+
+// ---------- the scene ----------
+const BELT_Y = 158, SCAN_X = 318, IMO_X = 64, PARK_X = 196;
+const V = () => (SCAN_X - 40) / BAR;
+function room() {
+  R(0, 0, W, H, '#1c1916');
+  R(0, 0, W, 112, '#2a2622'); for (let x = 0; x < W; x += 48) R(x, 0, 1, 112, '#23201c');
+  R(0, 14, W, 18, '#1a2230'); for (let x = 6; x < W; x += 24) R(x, 16, 18, 14, '#24314a'); R(0, 32, W, 2, '#3a3530');
+  for (const sx of [10, 226]) { R(sx, 44, 140, 3, '#5a4a38'); R(sx, 74, 140, 3, '#5a4a38'); for (let k = 0; k < 9; k++) { const w = 12 + (k * 7) % 6; R(sx + 4 + k * 15, 32 + (k % 3), w, 12 - (k % 3), ['#9c7a4e', '#8a6a42', '#b08a58'][k % 3]); R(sx + 4 + k * 15, 62 + (k % 2), w, 12 - (k % 2), ['#8a6a42', '#b08a58', '#9c7a4e'][k % 3]); } }
+  for (const lx of [96, 288]) { R(lx, 0, 1, 8, '#111'); R(lx - 9, 8, 19, 3, '#3a3a3a'); R(lx - 7, 11, 15, 1, '#ffe9a8'); const gr = g.createRadialGradient(lx, 12, 0, lx, 12, 90); gr.addColorStop(0, 'rgba(255,233,168,.12)'); gr.addColorStop(1, 'rgba(255,233,168,0)'); g.fillStyle = gr; g.fillRect(lx - 90, 0, 180, 140); }
+  R(0, 112, W, 104, '#24201c'); R(0, 112, W, 2, '#3a342e');
+}
+function belt(t) {
+  R(0, BELT_Y - 2, W, 4, '#4a4a50'); R(0, BELT_Y + 18, W, 4, '#3a3a40');
+  R(0, BELT_Y + 2, W, 16, '#2c2c32'); const off = ((t * V()) % 8 + 8) % 8; for (let x = -8 + off; x < W; x += 8) R(x, BELT_Y + 2, 1, 16, '#36363e');
+  for (let x = 6; x < W; x += 40) R(x, BELT_Y + 22, 4, 30, '#2a2a30');
+  R(SCAN_X - 1, BELT_Y - 26, 2, 46, '#ff4a3a'); R(SCAN_X - 6, BELT_Y - 30, 12, 5, '#3a3a40'); R(SCAN_X - 4, BELT_Y - 26, 8, 2, '#ff8a7a');
+}
+function box(x, tg) {
+  const y = BELT_Y - 12, heavy = tg.who === 'park';
+  R(x - 10, y, 20, 14, heavy ? '#8a7a5a' : '#b08a58'); R(x - 10, y, 20, 2, heavy ? '#a8966e' : '#c8a06a'); R(x - 10, y + 12, 20, 2, '#6a5a3e'); R(x - 1, y, 2, 14, heavy ? '#4a5a7a' : '#d8c8a0');
+  if (tg.judge === 'perfect' || tg.judge === 'good') { R(x - 6, y + 3, 12, 8, '#c8372d'); R(x - 5, y + 4, 10, 6, heavy ? '#8a7a5a' : '#b08a58'); txt('검', x, y + 3.4, '#c8372d', 6, 'center', '{s}px "Black Han Sans", sans-serif'); }
+  if (tg.judge === 'miss') R(x - 10, y + 6, 20, 2, 'rgba(255,90,80,.6)');
+}
+const downOf = (t, who) => { let down = 0; for (const s of STAMPS) { if (s.who !== who) continue; const d = t - s.t; if (d > -0.05 && d < 0.14) down = Math.max(down, d < 0 ? 1 + d / 0.05 : 1 - d / 0.14); } return down; };
+// 순자 이모 at her post: grey perm, glasses, a floral apron, the stamp coming down on each of her beats
+function imo(t, glow) {
+  const x = IMO_X, y = 96, down = downOf(t, 'imo'), lift = 1 - down, ax = x + 16, ay = y + 22 - 9 * lift;
+  if (glow > 0) { const gr = g.createRadialGradient(x, y + 18, 2, x, y + 18, 40); gr.addColorStop(0, `rgba(255,216,168,${0.18 * glow})`); gr.addColorStop(1, 'rgba(255,216,168,0)'); g.fillStyle = gr; g.fillRect(x - 40, y - 22, 80, 80); }
+  R(x - 24, y + 34, 64, 6, '#5a4430'); R(x - 24, y + 34, 64, 1, '#7a5e42'); R(x - 20, y + 40, 4, 22, '#3a2a1e'); R(x + 32, y + 40, 4, 22, '#3a2a1e');
+  R(x + 8, y + 30, 18, 5, '#2a2422'); R(x + 9, y + 30, 16, 1, '#c8372d');
+  R(x - 10, y + 14, 22, 22, '#9a6a8a'); R(x - 7, y + 16, 16, 20, '#e8dcc4'); for (const [px, py] of [[-4, 19], [3, 22], [-2, 28], [5, 30], [0, 24]]) R(x + px, y + py, 2, 2, '#d86a6a');
+  R(x - 14, y + 18, 5, 14, '#9a6a8a'); R(x - 14, y + 31, 5, 3, '#e8b898');
+  g.strokeStyle = '#9a6a8a'; g.lineWidth = 4; g.lineCap = 'round'; g.beginPath(); g.moveTo(x + 10, y + 18); g.lineTo(ax, ay); g.stroke(); g.lineCap = 'butt';
+  R(ax - 3, ay - 2, 6, 5, '#e8b898'); R(ax - 2, ay + 2, 4, 5, '#5a3a2a'); R(ax - 3, ay + 6, 6, 2, '#c8372d');
+  R(x - 6, y, 13, 14, '#e8b898'); R(x - 6, y + 11, 13, 3, '#d8a888');
+  R(x - 5, y + 5, 5, 4, '#2a2a2a'); R(x + 1, y + 5, 5, 4, '#2a2a2a'); R(x - 4, y + 6, 3, 2, '#c8d8e8'); R(x + 2, y + 6, 3, 2, '#c8d8e8'); R(x, y + 6, 1, 1, '#2a2a2a'); R(x - 1, y + 11, 4, 1, '#a86a5a');
+  for (const [cx, cy] of [[-8, -2], [-4, -4], [0, -5], [4, -4], [8, -2], [-9, 2], [9, 2], [-8, 6], [9, 6]]) { R(x + cx - 2, y + cy - 1, 5, 5, '#8a8288'); R(x + cx - 1, y + cy - 1, 2, 2, '#aaa2a8'); }
+}
+// 박씨 on his forklift behind the belt: the forks drop on each of his beats with a pallet on them
+function park(t, glow) {
+  const x = PARK_X, y = 92, down = downOf(t, 'park'), fy = y + 30 - 10 * (1 - down);
+  if (glow > 0) { const gr = g.createRadialGradient(x, y + 22, 2, x, y + 22, 46); gr.addColorStop(0, `rgba(255,216,120,${0.16 * glow})`); gr.addColorStop(1, 'rgba(255,216,120,0)'); g.fillStyle = gr; g.fillRect(x - 46, y - 24, 92, 92); }
+  // the mast and the forks with a pallet
+  R(x - 30, y - 4, 3, 54, '#3a3a40'); R(x - 24, y - 4, 3, 54, '#3a3a40'); R(x - 30, y - 4, 9, 2, '#5a5a62');
+  R(x - 44, fy + 8, 20, 2, '#8a8a92'); R(x - 46, fy, 24, 8, '#9c7a4e'); R(x - 46, fy, 24, 2, '#b8955e'); R(x - 46, fy + 4, 24, 1, '#7a5e3c');
+  // body, cab, wheel
+  R(x - 22, y + 18, 40, 26, '#e8b830'); R(x - 22, y + 18, 40, 3, '#ffd860'); R(x + 10, y + 22, 8, 22, '#c89420'); R(x - 20, y + 44, 12, 8, '#1e1e22'); R(x + 6, y + 44, 12, 8, '#1e1e22');
+  R(x - 16, y - 2, 2, 22, '#2a2a30'); R(x + 12, y - 2, 2, 22, '#2a2a30'); R(x - 16, y - 4, 30, 3, '#2a2a30');
+  // 박씨: cap, moustache, work jacket
+  R(x - 6, y + 4, 12, 13, '#d8a888'); R(x - 7, y + 1, 14, 5, '#2f4a6a'); R(x - 8, y + 5, 10, 2, '#2f4a6a'); R(x - 4, y + 8, 2, 2, '#2a2a2a'); R(x + 2, y + 8, 2, 2, '#2a2a2a'); R(x - 3, y + 12, 7, 2, '#3a2a22');
+  R(x - 8, y + 17, 16, 8, '#4a5a4a'); R(x - 10, y + 18, 4, 7, '#4a5a4a'); R(x - 11, y + 24, 4, 3, '#d8a888');
+}
+function draw(t) {
+  const now = performance.now(), sg = playing ? segAt(t) : null;
+  room();
+  const callIs = w => sg && sg.kind !== 'resp' && STAMPS.some(s => s.who === w && s.t >= sg.t0 && s.t < sg.t1);
+  if (LV.park) park(t, callIs('park') ? 1 : 0);
+  imo(t, callIs('imo') ? 1 : 0);
+  belt(t);
+  for (const tg of TARGETS) { const x = SCAN_X - (tg.t - t) * V(); if (x < -12 || x > W + 12) continue; box(x, tg); }
+  // you: the stamping hand at the red line
+  { const k = clamp(1 - (now - FX.stampAt) / 120, 0, 1), hx = SCAN_X + 18, hy = BELT_Y - 34 + 10 * k; R(hx - 2, hy - 30, 8, 30, '#2a3a5a'); R(hx - 4, hy, 12, 7, '#e8b898'); R(hx - 5, hy + 6, 14, 4, '#c8372d'); }
+  const f = clamp(1 - (now - FX.flash) / 260, 0, 1); if (f > 0) { g.save(); g.globalAlpha = f; g.strokeStyle = '#ffe8a8'; g.lineWidth = 1.2; g.beginPath(); g.ellipse(SCAN_X, BELT_Y - 4, 10 + 18 * (1 - f), 6 + 10 * (1 - f), 0, 0, Math.PI * 2); g.stroke(); g.restore(); }
+  const m = clamp(1 - (now - FX.missAt) / 300, 0, 1); if (m > 0) { g.fillStyle = `rgba(255,60,50,${0.12 * m})`; g.fillRect(0, 0, W, H); }
+  // the sound-words: 탁 over 이모, 쿵 over the forks
+  FX.words = FX.words.filter(w => now - w.at < 500);
+  for (const w of FX.words) { const a = 1 - (now - w.at) / 500, x = w.who === 'park' ? PARK_X - 34 : IMO_X + 18, y = (w.who === 'park' ? 84 : 92) - (1 - a) * 8; g.save(); g.globalAlpha = a; g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 3 * SC; txt(w.who === 'park' ? '쿵' : '탁', x, y, w.who === 'park' ? '#ffd860' : '#ffd8a8', 10, 'center', '{s}px "Black Han Sans", sans-serif'); g.restore(); }
+  // whose turn, and the beat dots
+  if (sg) {
+    const name = sg.who === 'park' ? '박씨' : '이모', both = LV.park && STAMPS.some(s => s.round === sg.round && s.who !== sg.who);
+    const lab = sg.kind === 'call' ? `${both ? '이모 · 박씨' : name} 차례 · 들어요` : sg.kind === 'resp' ? '따라 찍어요!' : '들으면서 따라 찍어요!';
+    const lc = sg.kind === 'call' ? '#ffd8a8' : sg.kind === 'resp' ? '#bff0ff' : '#d8f0c0';
+    g.save(); g.shadowColor = 'rgba(0,0,0,.85)'; g.shadowBlur = 3 * SC; txt(lab, W / 2, 46, lc, 11, 'center', '{s}px "Black Han Sans", sans-serif'); g.restore();
+    const barT = sg.t0 + Math.floor((t - sg.t0) / BAR) * BAR, bk = Math.floor((t - barT) / SPB), nb = Math.round((sg.t1 - sg.t0) / BAR), bi = Math.floor((t - sg.t0) / BAR);
+    for (let k = 0; k < 4; k++) R(W / 2 - 15 + k * 9, 64, 5, 3, k === bk ? lc : 'rgba(255,255,255,.18)');
+    if (nb > 1) txt(`${bi + 1} / ${nb} 마디`, W / 2, 70, 'rgba(255,255,255,.55)', 6, 'center');
+    const say = LV.say && LV.say[sg.round]; if (say && sg.kind === 'call' && t - sg.t0 < BAR * 0.9) { const x = 16, y = 70; g.font = '600 7px "IBM Plex Sans KR", sans-serif'; const w = g.measureText(say).width + 10; R(x, y, w, 13, '#fff8ec'); R(x + 40, y + 13, 5, 3, '#fff8ec'); txt(say, x + 5, y + 3, '#3a2a22', 7); }
+  }
+  FX.pops = FX.pops.filter(p => now - p.at < 650);
+  for (const p of FX.pops) { const a = 1 - (now - p.at) / 650; g.save(); g.globalAlpha = a; g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 3 * SC; txt(p.text, SCAN_X, BELT_Y - 58 - (1 - a) * 6, p.c, 13, 'center', '{s}px "Black Han Sans", sans-serif'); if (p.sub) txt(p.sub, SCAN_X, BELT_Y - 44, p.c, 6, 'center'); g.restore(); }
+  if (stats.combo > 1) txt(`콤보 ${stats.combo}`, W - 8, 6, '#efe6d2', 7, 'right', '500 {s}px "IBM Plex Mono", monospace');
+  txt(`B동 3번 라인 · ${LV.name}`, 8, 6, 'rgba(239,230,210,.7)', 6, 'left', '500 {s}px "IBM Plex Mono", monospace');
+  if (playing && t < LEAD && t > 0) { const k = Math.floor(t / SPB) + 1; if (k >= 1 && k <= 4) { g.save(); g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 3 * SC; txt(String(k), W / 2, 50, '#ffd8a8', 20, 'center', '{s}px "Black Han Sans", sans-serif'); g.restore(); } }
+}
+
+// ---------- flow ----------
+let lastLv = 0;
+function start(i) {
+  lastLv = i; audio(); if (ac.state === 'suspended') ac.resume();
+  build(LEVELS[i]); Object.assign(stats, { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 }); FX.pops = []; FX.words = [];
+  startAt = ac.currentTime + 0.3; nextBeat = 0; playing = true;
+  $('title').hidden = true; $('result').hidden = true;
+}
+function finish() {
+  playing = false;
+  const n = stats.perfect + stats.good + stats.miss, acc = n ? Math.round((stats.perfect + stats.good * 0.6) / n * 100) : 0;
+  $('r-counts').textContent = `딱 ${stats.perfect} · 좋아 ${stats.good} · 놓침 ${stats.miss}`; $('r-acc').textContent = acc + '%'; $('r-combo').textContent = stats.best;
+  $('r-title').textContent = stats.miss <= 4 ? '검수 통과' : '재검'; $('r-lv').textContent = LV.name;
+  $('result').hidden = false;
+}
+$('levels').innerHTML = LEVELS.map((l, i) => `<button class="lv" type="button" data-i="${i}">${l.name}<small>${l.sub} · ${l.bpm} BPM</small></button>`).join('');
+$('levels').addEventListener('click', e => { const b = e.target.closest('.lv'); if (b) start(+b.dataset.i); });
+$('retry').onclick = () => start(lastLv); $('back').onclick = () => { $('result').hidden = true; $('title').hidden = false; };
+const showSync = () => $('sv').textContent = (syncMs > 0 ? '+' : '') + syncMs + ' ms';
+$('sm').onclick = () => { syncMs -= 10; showSync(); }; $('sp').onclick = () => { syncMs += 10; showSync(); };
+build(LEVELS[0]);
+function frame() {
+  requestAnimationFrame(frame);
+  const t = playing ? songT() : -1;
+  if (playing) { scheduleMusic(); tick(t); if (t > END_T) finish(); }
+  draw(playing ? t : 0);
+}
+requestAnimationFrame(frame);
+window.__21 = { TARGETS: () => TARGETS, SEGS: () => SEGS, stats, press: t => press(t), songT, start, END_T: () => END_T };
+})();
+</script>
+</body>
+</html>
