@@ -56,8 +56,8 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   <div class="bar">
     <button class="btn" id="play" type="button">재생</button>
     <button class="btn ghost" id="restart" type="button">처음부터</button>
-    <div class="scrub"><input id="seek" type="range" min="0" max="118" step="0.01" value="0" aria-label="재생 위치"></div>
-    <span class="time" id="time">00.0 / 118.0</span>
+    <div class="scrub"><input id="seek" type="range" min="0" max="106" step="0.01" value="0" aria-label="재생 위치"></div>
+    <span class="time" id="time">00.0 / 106.0</span>
     <button class="btn ghost" id="hb" type="button" aria-pressed="true">심박 줄</button>
     <button class="btn ghost" id="snd" type="button" aria-pressed="true">소리</button>
   </div>
@@ -116,9 +116,9 @@ const SHOTS = [
   { id: 'alley', t0: 52.0, t1: 66.0, name: '골목길', note: '배경만 아침 골목으로 바뀌고 하은이 걷는다. 빨간 벽돌 담장과 화분, 다세대 주택, 전봇대와 전깃줄, 볼록거울, 담장 위 고양이, 작은 슈퍼.' },
   { id: 'hospital', t0: 66.0, t1: 70.2, name: '병원', note: '골목 끝에 병원이 나온다. 하은이 병원 앞에서 멈추고 건물을 올려다본다.' },
   { id: 'corridor', t0: 70.2, t1: 86.0, name: '병원 복도', note: '병원 앞이 암전되고, 깜깜한 복도에서 천장 등이 하나씩 켜진다. 하은이 걸어가 502호 문 앞에서 멈춘다.' },
-  { id: 'ward', t0: 86.0, t1: 118, name: '병실', note: '배경만 502호 병실로 바뀐다. 침상에 누운 어머니, 머리맡 심박 모니터, 창으로 들어오는 아침 해. 하은은 침상 옆에 섰다가 의자에 앉아 어머니 손을 잡고, 침상 쪽으로 고개를 숙였다가, 어머니 손가락이 움직이자 고개를 든다.' }
+  { id: 'ward', t0: 86.0, t1: 106, name: '병실', note: '배경만 502호 병실로 바뀐다. 침상에 누운 어머니, 머리맡 심박 모니터, 창으로 들어오는 아침 해. 하은은 침상 옆에 섰다가 의자에 앉아 어머니 손을 잡고, 침상 쪽으로 고개를 숙였다가, 어머니 손가락이 움직이자 고개를 든다.' }
 ];
-const END = 118;   // the cutscene's own length (not the song's)
+const END = 106;   // the cutscene's own length (not the song's)
 // at the belt (seconds)
 const S1 = { beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], letGo: 9.6 };
 // she stands at x 222 the whole take; once she walks the world slides by. d = how far she has walked (px), easing into her pace
@@ -149,7 +149,7 @@ const walk2D = t => { const v = WALK2.v, r = WALK2.ramp, b = WALK2.t0 + r, c = W
 const CORR = { t0: 70.2, t1: 71.3 };
 // the ward: background only again, then she sits, takes her mother's hand, bows her head toward the bed, feels the hand close a
 // little and lifts her head (fixed times, not tied to the song)
-const WARD = { t0: 86.0, t1: 89.0, sit: 93.5, hold: 96.0, rest: 100.0, squeeze: 106.5, lift: 108.0 };   // the hospital front fades to full black, then the corridor's lights come on one at a time
+const WARD = { t0: 86.0, t1: 89.0, sit: 91.5, hold: 93.0, rest: 95.5, squeeze: 99.0, lift: 100.5 };   // the hospital front fades to full black, then the corridor's lights come on one at a time
 const WALK3 = { t0: 73.4, ramp: 0.9, v: 30, stop: 84.2 };
 const walk3D = t => { const v = WALK3.v, r = WALK3.ramp, b = WALK3.t0 + r, c = WALK3.stop - r, dB = v * r / 2, dC = dB + v * (c - b);
   if (t <= WALK3.t0) return 0; if (t < b) return v * (t - WALK3.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
@@ -882,49 +882,49 @@ function alleyScene(t) {
 // with the rows, a visitor's chair, the window with its blinds where the morning comes in, slanting light and dust over the bed
 // (the same light as the first shot), a curtain. 하은 faces the bed from the right.
 const WDW = document.createElement('canvas'); WDW.width = W; WDW.height = H; const wdctx = WDW.getContext('2d');
-const MOM_HAND = { x: 197, y: 124 };
-const wardSun = t => 0.15 + 0.85 * ease(seg(t, WARD.t1, WARD.lift + 5));
+const MOM_HAND = { x: 226, y: 120 };   // on the blanket by her waist, just in front of where 하은 sits
+const wardSun = t => 0.15 + 0.85 * ease(seg(t, WARD.t1, WARD.lift + 3));
 function ward(t) {
   const sun = wardSun(t);
   R(0, 0, W, 150, '#d9dfdc'); R(0, 150, W, 66, '#c2ccc7'); R(0, 150, W, 2, '#a9b4ae'); R(0, 140, W, 10, '#c9d2ce');
   // the window and its blinds, the curtain
-  R(252, 16, 122, 92, '#e8ecea'); R(256, 20, 114, 84, mix('#7f97b8', '#fff0d0', sun));
-  for (let y = 22; y < 104; y += 5) R(256, y, 114, 2, mix('#c8ced0', '#f6f2e8', sun * 0.6));
-  R(256, 20, 114, 1, '#b9c0c0'); R(312, 20, 2, 84, '#e8ecea');
-  R(236, 12, 140, 2, '#9aa3a6'); for (let k = 0; k < 4; k++) R(238 + k * 4, 14, 4, 112, k % 2 ? '#bcd0d0' : '#cddcdc');
-  // the monitor over the bed head: her heartbeat, a blip on each beat of the song
-  R(176, 40, 34, 26, '#2b2f32'); R(178, 42, 30, 20, '#08140c'); R(190, 66, 4, 8, '#5a6064'); R(184, 74, 16, 2, '#5a6064');
+  R(300, 16, 78, 88, '#e8ecea'); R(304, 20, 70, 80, mix('#7f97b8', '#fff0d0', sun));
+  for (let y = 22; y < 100; y += 5) R(304, y, 70, 2, mix('#c8ced0', '#f6f2e8', sun * 0.6));
+  R(304, 20, 70, 1, '#b9c0c0'); R(338, 20, 2, 80, '#e8ecea');
+  R(290, 12, 92, 2, '#9aa3a6'); for (let k = 0; k < 3; k++) R(292 + k * 4, 14, 4, 108, k % 2 ? '#bcd0d0' : '#cddcdc');
+  // the monitor over the bed head: her heartbeat, a blip on each beat of the rows
+  R(254, 40, 34, 26, '#2b2f32'); R(256, 42, 30, 20, '#08140c'); R(268, 66, 4, 8, '#5a6064'); R(262, 74, 16, 2, '#5a6064');
   { const bt = tBeat(t), ph = bt - Math.floor(bt), sweep = Math.floor(ph * 30);
-    for (let x = 0; x < 30; x++) { const age = (sweep - x + 30) % 30; if (age > 22) continue; const d = Math.abs(x - 14), y = 53 - (age < 22 && d < 2 && x <= sweep ? (d === 0 ? 6 : 3) : 0); g.globalAlpha = 1 - age / 24; R(178 + x, y, 1, 1, '#7ef06a'); }
-    g.globalAlpha = 1; R(200, 44, 6, 3, '#7ef06a'); if (ph < 0.2) { g.save(); g.globalCompositeOperation = 'lighter'; glow(193, 52, 22, '126,240,106', 0.25 * (1 - ph / 0.2)); g.restore(); } }
-  // the IV pole and its bag, the line down to her arm
-  R(26, 28, 2, 124, '#9aa3a6'); R(20, 28, 14, 2, '#9aa3a6'); R(21, 31, 10, 18, '#eef6f8'); R(22, 38, 8, 10, '#d8eef4'); R(25, 49, 2, 3, '#c9d8dc'); R(22, 150, 10, 2, '#7a8286');
-  for (let k = 0; k <= 40; k++) { const p = k / 40, x = lerp(26, 168, p), y = lerp(52, 118, p) + Math.sin(p * Math.PI) * 18; R(x, y, 1, 1, '#c9dfe6'); }
-  // the bed: frame, mattress, pillow, the blanket over her
-  R(30, 100, 6, 34, '#c9d0d4'); R(204, 96, 7, 38, '#c9d0d4'); R(36, 128, 168, 5, '#b9c2c6'); R(42, 133, 3, 18, '#8d969a'); R(196, 133, 3, 18, '#8d969a'); R(40, 150, 8, 3, '#3a3e42'); R(194, 150, 8, 3, '#3a3e42');
-  R(36, 118, 168, 10, '#f0f2f0'); R(36, 127, 168, 1, '#d4d9d8');
-  R(176, 108, 28, 12, '#f8f8f4'); R(176, 118, 28, 2, '#e2e6e4');
+    for (let x = 0; x < 30; x++) { const age = (sweep - x + 30) % 30; if (age > 22) continue; const d = Math.abs(x - 14), y = 53 - (age < 22 && d < 2 && x <= sweep ? (d === 0 ? 6 : 3) : 0); g.globalAlpha = 1 - age / 24; R(256 + x, y, 1, 1, '#7ef06a'); }
+    g.globalAlpha = 1; R(278, 44, 6, 3, '#7ef06a'); if (ph < 0.2) { g.save(); g.globalCompositeOperation = 'lighter'; glow(271, 52, 22, '126,240,106', 0.25 * (1 - ph / 0.2)); g.restore(); } }
+  // the IV pole by the foot of the bed, its line over to her arm
+  R(150, 28, 2, 124, '#9aa3a6'); R(144, 28, 14, 2, '#9aa3a6'); R(145, 31, 10, 18, '#eef6f8'); R(146, 38, 8, 10, '#d8eef4'); R(149, 49, 2, 3, '#c9d8dc'); R(146, 150, 10, 2, '#7a8286');
+  for (let k = 0; k <= 40; k++) { const p = k / 40, x = lerp(150, 236, p), y = lerp(52, 118, p) + Math.sin(p * Math.PI) * 14; R(x, y, 1, 1, '#c9dfe6'); }
+  // the bed (shorter now): frame, mattress, pillow
+  R(162, 100, 6, 34, '#c9d0d4'); R(282, 96, 7, 38, '#c9d0d4'); R(168, 128, 114, 5, '#b9c2c6'); R(174, 133, 3, 18, '#8d969a'); R(274, 133, 3, 18, '#8d969a'); R(172, 150, 8, 3, '#3a3e42'); R(272, 150, 8, 3, '#3a3e42');
+  R(168, 118, 114, 10, '#f0f2f0'); R(168, 127, 114, 1, '#d4d9d8');
+  R(254, 108, 28, 12, '#f8f8f4'); R(254, 118, 28, 2, '#e2e6e4');
   // her mother: asleep, face up on the pillow, a nasal line
-  R(184, 105, 12, 11, '#d8a888'); R(183, 103, 15, 3, '#4a4446'); R(195, 104, 4, 11, '#4a4446'); R(183, 104, 2, 3, '#4a4446');
-  R(186, 109, 3, 1, '#7a5a4a'); R(183, 110, 2, 2, '#c99878'); R(187, 113, 3, 1, '#a87a6a');
-  R(184, 112, 16, 1, '#d8eef4'); R(199, 112, 1, 6, '#d8eef4');
-  // the blanket: a long mound from her shoulders to her feet, folded down at the chest
-  R(48, 112, 132, 16, '#a9c4dc'); R(52, 110, 120, 2, '#bcd4e8'); R(60, 108, 20, 4, '#a9c4dc'); R(150, 108, 26, 4, '#a9c4dc'); R(170, 110, 10, 18, '#e8ecf0');
-  for (const x of [80, 110, 136]) R(x, 113, 1, 14, '#93b0ca');
-  // her arm out on the near edge toward 하은, the hand that 하은 takes (it closes a little at 'same beat')
+  R(262, 105, 12, 11, '#d8a888'); R(261, 103, 15, 3, '#4a4446'); R(273, 104, 4, 11, '#4a4446'); R(261, 104, 2, 3, '#4a4446');
+  R(264, 109, 3, 1, '#7a5a4a'); R(261, 110, 2, 2, '#c99878'); R(265, 113, 3, 1, '#a87a6a');
+  R(262, 112, 16, 1, '#d8eef4'); R(277, 112, 1, 6, '#d8eef4');
+  // the blanket from her shoulders to her feet, folded down at the chest
+  R(176, 112, 82, 16, '#a9c4dc'); R(180, 110, 72, 2, '#bcd4e8'); R(184, 108, 16, 4, '#a9c4dc'); R(232, 108, 22, 4, '#a9c4dc'); R(248, 110, 10, 18, '#e8ecf0');
+  for (const x of [200, 222]) R(x, 113, 1, 14, '#93b0ca');
+  // her arm along her side on top of the blanket, the hand by her waist that 하은 takes (it closes a little)
   const sq = clamp((t - WARD.squeeze) / 0.4, 0, 1) * (1 - clamp((t - WARD.squeeze - 1.6) / 0.6, 0, 1));
-  R(172, 120, 22, 4, '#e8e4dc'); R(MOM_HAND.x - 3, MOM_HAND.y - 1, 5, 3, '#d8a888'); if (sq > 0.5) R(MOM_HAND.x + 1, MOM_HAND.y - 2, 2, 1, '#c99878');
-  // the visitor's chair
-  R(224, 144, 20, 3, '#6a7a86'); R(240, 118, 3, 28, '#6a7a86'); R(226, 147, 2, 12, '#55636c'); R(240, 147, 2, 12, '#55636c');
+  R(MOM_HAND.x + 2, MOM_HAND.y - 1, 24, 3, '#e8e4dc'); R(MOM_HAND.x - 2, MOM_HAND.y - 1, 5, 3, '#d8a888'); if (sq > 0.5) R(MOM_HAND.x - 3, MOM_HAND.y - 2, 2, 1, '#c99878');
+  // the visitor's chair, in front of the bed at her waist
+  R(206, 144, 24, 3, '#6a7a86'); R(206, 118, 3, 28, '#6a7a86'); R(208, 147, 2, 12, '#55636c'); R(226, 147, 2, 12, '#55636c');
 }
 function wardPose(t) {
-  if (t < WARD.sit) return { o: { mirror: false, look: -0.3, sway: 0 }, top: HTOP };
+  if (t < WARD.sit) return { o: { mirror: true, look: -0.3, sway: 0 }, top: HTOP };
   const top = HTOP + 2;   // sitting: the lap on the chair at y 144
-  if (t < WARD.hold) return { o: { mirror: false, look: -0.3, seated: true, sway: 0 }, top };
-  const reach = tp => ({ dx: MOM_HAND.x + 2 - HX, dy: MOM_HAND.y - tp });   // her hand on her mother's
-  if (t < WARD.rest) return { o: { mirror: false, look: -0.4, seated: true, arms: 'reach', reach: reach(top), sway: 0 }, top };
-  if (t < WARD.lift) { const k = ease(seg(t, WARD.rest, WARD.rest + 1.2)), tp = top + Math.round(4 * k); return { o: { mirror: false, look: lerp(-0.4, -1, k), seated: true, arms: 'reach', reach: reach(tp), sway: 0 }, top: tp }; }
-  const k = ease(seg(t, WARD.lift, WARD.lift + 1.4)), tp = top + Math.round(4 * (1 - k)); return { o: { mirror: false, look: lerp(-1, 0.1, k), seated: true, arms: 'reach', reach: reach(tp), sway: 0 }, top: tp };
+  if (t < WARD.hold) return { o: { mirror: true, look: -0.3, seated: true, sway: 0 }, top };
+  const reach = tp => ({ dx: HX - MOM_HAND.x - 1, dy: MOM_HAND.y - tp });   // her hand on her mother's (she faces right: measured mirrored)
+  if (t < WARD.rest) return { o: { mirror: true, look: -0.4, seated: true, arms: 'reach', reach: reach(top), sway: 0 }, top };
+  if (t < WARD.lift) { const k = ease(seg(t, WARD.rest, WARD.rest + 1.2)), tp = top + Math.round(4 * k); return { o: { mirror: true, look: lerp(-0.4, -1, k), seated: true, arms: 'reach', reach: reach(tp), sway: 0 }, top: tp }; }
+  const k = ease(seg(t, WARD.lift, WARD.lift + 1.4)), tp = top + Math.round(4 * (1 - k)); return { o: { mirror: true, look: lerp(-1, 0.1, k), seated: true, arms: 'reach', reach: reach(tp), sway: 0 }, top: tp };
 }
 function wardScene(t) {
   ward(t);
@@ -932,13 +932,13 @@ function wardScene(t) {
   haeunSprite(o); putSprite(HX, top);
   // the dim early room, the sun coming in through the blinds over the bed, dust in it
   const sun = wardSun(t);
-  ambient(mix('#7e8bab', '#f2ece4', sun), [[256, 20, 114, 84]]);
+  ambient(mix('#7e8bab', '#f2ece4', sun), [[304, 20, 70, 80]]);
   g.save(); g.globalCompositeOperation = 'lighter';
-  for (const [x, w] of [[260, 50], [316, 50]]) shaft(x, 22, w, 216, 0.16 * sun);
-  glow(312, 60, 70, '255,226,180', 0.25 * sun);
+  for (const [x, w] of [[306, 32], [342, 32]]) shaft(x, 22, w, 216, 0.16 * sun);
+  glow(340, 60, 60, '255,226,180', 0.25 * sun);
   g.restore();
-  dust(t, [{ x: 260, y: 22, w: 50 }, { x: 316, y: 22, w: 50 }], sun, { x: 120, y: 30, w: 260, h: 140 });
-  putRim(HX, top, -1, -1, '#ffe2b8', 0.5 * sun);
+  dust(t, [{ x: 306, y: 22, w: 32 }, { x: 342, y: 22, w: 32 }], sun, { x: 160, y: 30, w: 224, h: 130 });
+  putRim(HX, top, 1, -1, '#ffe2b8', 0.5 * sun);
 }
 
 // only the background changes between places: the next one comes in behind a wide soft gradient drifting from right to left,
@@ -1193,12 +1193,15 @@ const HB = (() => {
   }
   // a whole row's trace, left edge to the heart: flat line with a beat at each spot that beats (1 to 3 unless skipped, the 4th
   // only once the player has made it)
+  // (the row is narrower in the cutscene, so each beat is squeezed to fit its spot: overlapping beats double back on the line
+  // and the pixel fill paints in under it)
+  const BSQ = Math.min(1, (GAP - 2) / (2 * BEAT_W));
   function rowPts(row, amp) {
     const pts = [[X0, 0]];
     for (let k = 0; k <= HEART; k++) {
       const x = SPOT(k), j = row.tg.judge, on = k < HEART ? !row.skip.includes(k) : (j && j !== 'miss');
       if (!on) continue;
-      for (const [dx, dy] of beatPts(k === HEART ? amp * 1.2 : amp)) pts.push([x + dx, dy]);
+      for (const [dx, dy] of beatPts(k === HEART ? amp * 1.2 : amp)) pts.push([x + dx * BSQ, dy]);
     }
     pts.push([XE, 0]); return pts;
   }
@@ -1267,7 +1270,7 @@ const HB = (() => {
       if (x1 > lo + 1 && cool(x1) < 2.4) {
         // a made 4th beat is the same trace, drawn white around the box and cooling a little slower
         const tgr = row.tg, made = tgr.judge && tgr.judge !== 'miss', wsec = made ? t - tgr.hitT : 9;
-        const colAt = x => { let a = Math.max(0, cool(x)); const near4 = made && Math.abs(x - COL) <= BEAT_W; if (near4) a = Math.max(0, a - 0.5); const al = x > x1 + 0.5 ? 0 : clamp(1 - Math.pow(a / 2.2, 2), 0, 1); let c = a < 0.12 ? mixc('#f4fff0', '#9cf58a', a / 0.12) : mixc('#9cf58a', '#3e8c38', (a - 0.12) / 1.6); if (near4) c = mixc('#ffffff', c, clamp((wsec - 0.3) / 0.9, 0, 1)); return [c, al * show]; };
+        const colAt = x => { let a = Math.max(0, cool(x)); const near4 = made && Math.abs(x - COL) <= BEAT_W * BSQ; if (near4) a = Math.max(0, a - 0.5); const al = x > x1 + 0.5 ? 0 : clamp(1 - Math.pow(a / 2.2, 2), 0, 1); let c = a < 0.12 ? mixc('#f4fff0', '#9cf58a', a / 0.12) : mixc('#9cf58a', '#3e8c38', (a - 0.12) / 1.6); if (near4) c = mixc('#ffffff', c, clamp((wsec - 0.3) / 0.9, 0, 1)); return [c, al * show]; };
         const sp = pixSpans(rowPts(row, AMP).map(([x, dy]) => [x, y + dy]));
         pixDraw(sp, Math.ceil(lo), Math.floor(x1), colAt, () => '#0e2a10');
       }
@@ -1312,11 +1315,8 @@ const HB = (() => {
   // the scan point: a yellow box over the 4th beat's spot (the press counts while the peak is inside it), filled faintly, its
   // outline brighter as the beat comes and white on a press
   function scanBox(y0, y1) {
-    const k = Math.max(BOX.near, BOX.fl), col = BOX.fl > 0.3 ? '255,244,200' : '242,196,58', x0 = COL - BOX_HW, w = BOX_HW * 2 + 1;
-    g.save();
-    g.fillStyle = `rgba(${col},${0.1 + 0.14 * k})`; g.fillRect(x0, y0, w, y1 - y0);
-    g.fillStyle = `rgba(${col},${0.55 + 0.45 * k})`; g.fillRect(x0, y0, w, 1); g.fillRect(x0, y1 - 1, w, 1); g.fillRect(x0, y0, 1, y1 - y0); g.fillRect(x0 + w - 1, y0, 1, y1 - y0);
-    g.restore();
+    const k = Math.max(BOX.near, BOX.fl), col = BOX.fl > 0.3 ? '255,244,200' : '242,196,58';
+    g.save(); g.fillStyle = `rgba(${col},${0.14 + 0.16 * k + 0.2 * BOX.fl})`; g.fillRect(COL - BOX_HW, y0, BOX_HW * 2 + 1, y1 - y0); g.restore();
   }
   function drawRows(t) {
     if (!LOW.cv) { LOW.cv = document.createElement('canvas'); LOW.cv.width = W; LOW.cv.height = H; LOW.g = LOW.cv.getContext('2d'); }
@@ -1338,7 +1338,7 @@ const HB = (() => {
     // a black bar across the bottom of the screen for the row to sit on, so the sides beside the narrow row are black too
     g.fillStyle = '#000'; g.fillRect(0, Math.round(y0) - 25, W, H);
     for (const [yy, sh2] of [[y0, 1], [y1, e2]]) if (sh2 > 0) laneBand(yy, sh2);
-    { const top = Math.round(lerp(158, 134, e2)); BOX.near = near; BOX.fl = fl; BOX.rgb = fl > 0.3 ? '255,236,150' : '242,196,58'; BOX.a = 0.32 + 0.16 * near + 0.3 * fl; scanBox(Math.round(y0) - 21, Math.round(y0) + 7);
+    { const top = Math.round(lerp(158, 134, e2)); BOX.near = near; BOX.fl = fl; BOX.rgb = fl > 0.3 ? '255,236,150' : '242,196,58'; BOX.a = 0.32 + 0.16 * near + 0.3 * fl; scanBox(Math.round(y0) - 25, H);   // from the black bar's top edge to the bottom of the screen
       if (fl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fx = g.createRadialGradient(COL, y0 - 7, 0, COL, y0 - 7, 26); fx.addColorStop(0, `rgba(255,240,170,${0.4 * fl})`); fx.addColorStop(1, 'rgba(255,240,170,0)'); g.fillStyle = fx; g.fillRect(COL - 26, y0 - 33, 52, 52); g.restore(); } }
     drawLane(0, y0, t, 1);
     if (two > 0) drawLane(1, y1, t, e2);
