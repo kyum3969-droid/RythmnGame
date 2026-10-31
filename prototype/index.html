@@ -373,6 +373,31 @@ const SMEL_B = [[0, 'D5', 1.5], [1.5, 'F5', 0.5], [2, 'D5', 1], [3, 'C5', 1], [4
   [8, 'A4', 0.5], [8.5, 'C5', 0.5], [9, 'D5', 1.5], [10.5, 'F5', 0.5], [11, 'E5', 1], [12, 'Cs5', 1], [13, 'E5', 1], [14, 'A4', 2, 1],
   [16, 'F5', 1], [17, 'D5', 0.5], [17.5, 'F5', 0.5], [18, 'G5', 1.5], [19.5, 'F5', 0.5], [20, 'E5', 1], [21, 'G5', 1], [22, 'C5', 2, 1],
   [24, 'D5', 1], [25, 'A4', 0.5], [25.5, 'C5', 0.5], [26, 'D5', 1], [27, 'F5', 1], [28, 'E5', 0.5], [28.5, 'Cs5', 0.5], [29, 'D5', 3, 1]];
+// 2-2 중량: 박씨's cassette, 80s hard rock in E minor. A riff on power chords at a half-time 84, a sung verse over palm-muted
+// 8ths, an anthem chorus with the big snare, a bridge that kicks the tempo to 96, the solo at 104 over double-time hats, and the
+// last chorus a whole step up. Em | D | A | C territory, not 1-3's Em | C | G | D.
+const RN = { D4: 293.66, E4: 329.63, G4: 392, A4: 440, B4: 493.88, C5: 523.25, Cs5: 554.37, D5: 587.33, E5: 659.25, Fs5: 739.99, G5: 783.99, A5: 880, B5: 987.77 };
+const RROOT = { E: 82.41, G: 98, A: 110, B: 123.47, C: 130.81, D: 146.83 };
+const ROCK = {
+  // 0 Em, 1 A, 2 C, 3 D, 4 Am, 5 B; 6-11 the same a whole step up
+  chords: [[164.81, 246.94, 329.63, 392], [220, 277.18, 329.63, 440], [261.63, 329.63, 392, 523.25], [293.66, 369.99, 440, 587.33], [220, 261.63, 329.63, 440], [246.94, 311.13, 369.99, 493.88]],
+  roots: [82.41, 110, 130.81, 146.83, 110, 123.47],
+  verse: [0, 0, 1, 2], chorus: [1, 2, 3, 0], bridge: [4, 0, 4, 5]
+};
+ROCK.chords.push(...ROCK.chords.map(c => c.map(f => f * LIFT))); ROCK.roots.push(...ROCK.roots.map(f => f * LIFT));
+// the riff, two bars of power chords by root: [beat, root, length]
+const RRIFF = [[0, 'E', 1], [1.5, 'E', 0.5], [2, 'G', 1], [3, 'A', 0.5], [3.5, 'A', 0.5], [4, 'E', 1], [5.5, 'E', 0.5], [6, 'D', 1], [7, 'C', 0.5], [7.5, 'B', 0.5]];
+// the verse, sung, 8 bars over Em Em A C twice
+const RMEL_A = [[0.5, 'E4', 0.5], [1, 'G4', 0.5], [1.5, 'E4', 1], [3, 'D4', 1], [4, 'E4', 1], [5, 'G4', 0.5], [5.5, 'A4', 1.5], [8, 'A4', 0.5], [8.5, 'B4', 0.5], [9, 'Cs5', 1.5], [10.5, 'B4', 0.5], [11, 'A4', 1], [12, 'G4', 1], [13, 'E4', 0.5], [13.5, 'G4', 0.5], [14, 'E4', 2],
+  [16.5, 'E4', 0.5], [17, 'G4', 0.5], [17.5, 'B4', 1], [19, 'A4', 1], [20, 'G4', 1], [21, 'E4', 0.5], [21.5, 'D4', 1.5], [24, 'E4', 0.5], [24.5, 'A4', 0.5], [25, 'B4', 1.5], [26.5, 'A4', 0.5], [27, 'G4', 1], [28, 'E4', 3]];
+// the chorus hook, 8 bars over A C D Em twice
+const RMEL_B = [[0, 'B4', 1], [1, 'E5', 1], [2, 'D5', 0.5], [2.5, 'B4', 0.5], [3, 'A4', 1], [4, 'C5', 1.5], [5.5, 'B4', 0.5], [6, 'G4', 2], [8, 'D5', 1], [9, 'Fs5', 0.5], [9.5, 'D5', 0.5], [10, 'B4', 1], [11, 'A4', 1], [12, 'G4', 0.5], [12.5, 'A4', 0.5], [13, 'B4', 3],
+  [16, 'E5', 1], [17, 'G5', 1], [18, 'Fs5', 0.5], [18.5, 'E5', 0.5], [19, 'D5', 1], [20, 'E5', 1.5], [21.5, 'D5', 0.5], [22, 'C5', 2], [24, 'D5', 1], [25, 'B4', 1], [26, 'A4', 0.5], [26.5, 'B4', 0.5], [27, 'D5', 1], [28, 'E5', 3], [31, 'B4', 0.5], [31.5, 'D5', 0.5]];
+// the solo, 8 bars over the verse changes: [beat, note, length, bend]
+const RSOLO = [[0, 'E5', 0.5, 1], [0.5, 'G5', 0.5], [1, 'E5', 0.5], [1.5, 'D5', 0.5], [2, 'B4', 1], [3, 'D5', 0.5], [3.5, 'E5', 0.5], [4, 'G5', 1, 1], [5, 'E5', 0.5], [5.5, 'D5', 0.5], [6, 'B4', 0.5], [6.5, 'A4', 0.5], [7, 'G4', 1],
+  [8, 'A4', 0.5], [8.5, 'B4', 0.5], [9, 'Cs5', 1, 1], [10, 'E5', 0.5], [10.5, 'Cs5', 0.5], [11, 'A4', 1], [12, 'C5', 0.5], [12.5, 'E5', 0.5], [13, 'G5', 1.5, 1], [14.5, 'E5', 0.5], [15, 'D5', 1],
+  [16, 'B5', 2, 1], [18, 'A5', 0.5], [18.5, 'G5', 0.5], [19, 'E5', 1], [20, 'G5', 0.5], [20.5, 'A5', 0.5], [21, 'B5', 1, 1], [22, 'A5', 0.5], [22.5, 'G5', 0.5], [23, 'E5', 1],
+  [24, 'E5', 0.25], [24.25, 'Fs5', 0.25], [24.5, 'G5', 0.25], [24.75, 'A5', 0.25], [25, 'B5', 1, 1], [26, 'A5', 0.5], [26.5, 'G5', 0.5], [27, 'E5', 1], [28, 'G5', 0.5], [28.5, 'E5', 0.5], [29, 'D5', 0.5], [29.5, 'B4', 0.5], [30, 'E5', 2, 1]];
 // chorus hook, 8 bars: [beat offset inside the 8 bars, note, length in beats]
 const HOOK = [
   [0, 'E5', 1.5], [1.5, 'C5', 0.5], [2, 'B4', 1], [3, 'A4', 1],
@@ -642,6 +667,36 @@ const LEVELS = [
     outro: good => good ? [{ who:'순자 이모', text:'…손이 빠르네, 총각.' }] : [{ who:'순자 이모', text:'…내일 또 보자.' }]
   }
   ,{
+    id:'s2-2', stageNo:'2-2', who:'박씨', role:'박씨 · 84→96→104 BPM', tag:'하드 록 · 중량물 두 손 · 템포 상승', bpm:84, style:'rock22', fxTheme:'rock',
+    // 2-2 중량: peak season starts and 박씨 brings the pallets. Heavy boxes take both hands (two keys at once); the line speeds
+    // up twice as the backlog grows, and the song, 박씨's cassette, moves up with it. The music comes first; the chart below is a
+    // placeholder with heavies and a few crates.
+    tempo: [[0, 84], [96, 96], [176, 104]], clock:'01:30', title:'중량', partners:['park'], hints:true,
+    chords: ROCK.chords, roots: ROCK.roots,
+    chordAt: bar => bar < 8 ? 0 : bar < 16 ? ROCK.verse[(bar - 8) % 4] : bar < 24 ? ROCK.chorus[(bar - 16) % 4] : bar < 28 ? ROCK.bridge[(bar - 24) % 4] : bar < 36 ? ROCK.verse[(bar - 28) % 4] : bar < 44 ? ROCK.chorus[(bar - 36) % 4] : bar < 52 ? ROCK.verse[(bar - 44) % 4] : bar < 60 ? 6 + ROCK.chorus[(bar - 52) % 4] : 6,
+    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 }, endAt: 240,
+    special:['중량물', 'heavy', '두 손'],
+    sections: [[0, 'intro'], [4, 'riff'], [8, 'verse1'], [16, 'chorus1'], [24, 'bridge'], [28, 'verse2'], [36, 'chorus2'], [44, 'solo'], [52, 'chorus3'], [60, 'outro']],
+    bars: [
+      '........', '........', '........', '........',
+      'x.......', 'x...x...', 'x.......', 'x...H...',
+      'x...x...', 'x.......', 'x...x...', 'H.......', 'x...x...', 'x.x.x...', 'x...x...', 'H.......',
+      'x.x.x...', 'H...x...', 'x.x.x...', 'H...x.x.', 'x.x.x...', 'H...x...', 'x.x.x.x.', 'H.......',
+      'x.......', 'x...x...', 'x.x.x.x.', 'x.x.x.x.',
+      'x...x.x.', 'H...x...', 'x.x.x...', 'H...x.x.', 'x...x.x.', 'H...x...', 'x.x.x.x.', 'H.......',
+      'x.x.x.x.', 'H...x.x.', 'x.x.x.x.', 'H...x...', 'x.x.x.x.', 'H.x.x...', 'x.x.x.x.', 'H...H...',
+      'x.x.x.x.', 'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'x.x.x.x.', 'x...x.x.', 'h===..x.', 'x.x.x.x.',
+      'H.x.x.x.', 'H...x.x.', 'x.x.x.x.', 'H...H...', 'x.x.x.x.', 'H.x.x...', 'x.x.x.x.', 'H...H...',
+      '........', '........'
+    ],
+    say: [[16, '(임시) 무거운 건 두 손이다, 총각.', 3.5], [96, '물량 밀린다. 올려!', 3], [176, '한 단 더!', 2.5], [208, '…이 테이프, 아직 쓸 만하지?', 3.5]],
+    comfort: ['괜찮아. 다음 거.', '총각, 두 손!'],
+    intro: [
+      { who:'', text:'(임시) 새벽 1시 30분. 성수기 첫 밤. 지게차가 팔레트를 내려놓는다.' },
+      { who:'박씨', text:'(임시) 무거운 건 두 손으로 받아. 카세트는 내 거니까 건드리지 말고.' }],
+    outro: good => good ? [{ who:'박씨', text:'(임시) …테이프 늘어지기 전에 끝났네.' }] : [{ who:'박씨', text:'(임시) …내일은 허리 조심해.' }]
+  }
+  ,{
     id:'s2-stage', stageNo:'2-무대', who:'지우', role:'지우 · 본선 · 112 BPM', tag:'가스펠 스톰프 · 반장 기타 클립 · 정박', bpm:112, style:'final21', daw:true, place:'본선 무대',
     // the audition final: 지우 on stage with her laptop, you beside her on the launchpad. The belt is the LED runway across the
     // stage floor: clips glide from her laptop to the playhead and you fire them. Her set is 1-3 compressed, with a kick from the
@@ -704,7 +759,8 @@ const STAGE1 = [
   { level: LEVELS[1] },
   { level: LEVELS[2] },
   { level: LEVELS[3] },
-  { level: LEVELS[4], stage2: true }
+  { level: LEVELS[4], stage2: true },
+  { level: LEVELS[5] }
 ];
 
 // ---------- tempo + chart ----------
@@ -2611,7 +2667,8 @@ const THEME = {
   neon: { ring: ['#ff4fa3', '#4fe3ff'], bits: ['#ff4fa3', '#4fe3ff', '#cfe04a', '#ffffff'], spark: ['#ff4fa3', '#4fe3ff'], glow: '#4fe3ff' },
   blues: { ring: ['#f0b429', '#ffe9a8'], bits: ['#f0b429', '#ffe9a8', '#efe6d2'], spark: ['#f0b429', '#ff8a3d'], glow: '#f0b429' },
   chill: { ring: ['#9db4ff', '#e8e0ff'], bits: ['#9db4ff', '#e8e0ff', '#ffffff'], spark: ['#9db4ff', '#78dcff'], glow: '#9db4ff' },
-  gold: { ring: ['#ffd36a', '#ffffff'], bits: ['#ffd36a', '#fff6d8', '#ffffff'], spark: ['#ffd36a', '#ff8a3d'], glow: '#ffd36a' }
+  gold: { ring: ['#ffd36a', '#ffffff'], bits: ['#ffd36a', '#fff6d8', '#ffffff'], spark: ['#ffd36a', '#ff8a3d'], glow: '#ffd36a' },
+  rock: { ring: ['#ff8a3d', '#ffe9a8'], bits: ['#ff8a3d', '#ffe9a8', '#ffffff'], spark: ['#ff8a3d', '#ff4a3d'], glow: '#ff8a3d' }
 };
 // the climax hit answers by where the box falls. On the beat it is 반장: a driven power chord on the chord's root with a low thump,
 // the band ducking under it. Off the beat it is 지우: a bright piano chord stab (her instrument, below the synth lead) with a short
@@ -2677,6 +2734,11 @@ function hitSound(j, tones, beat, done) {
     if (!good) sfxPluck(t, f * 8, 0.025, 0.12);
     noise(t, 'bandpass', 1900, good ? 0.1 : 0.16, 0.035, 2.5, bus);
     if (done) tones.slice(0, 3).forEach(x => sfxPluck(t, x * 4, 0.05, 0.5));
+  } else if (th === 'rock') {
+    // a driven guitar note on the chord's root; a crate held to the end gets the whole chord
+    const r = tones[0] * 2;
+    (done ? tones.slice(0, 3).map(x => x * 2) : [good ? r : f * 2]).forEach(x => gtrDist(t, x, done ? 0.6 : good ? 0.2 : 0.28, done ? 0.035 : good ? 0.035 : 0.045, false, bus));
+    noise(t, 'highpass', 3000, 0.08, 0.02, 1, bus);
   } else if (th === 'blues') {
     const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 1900; fl.connect(bus);
     (done ? tones.slice(0, 3) : [f]).forEach(x => { osc('sine', x * 2, t, 0.004, good ? 0.06 : 0.08, 0.22, fl); osc('square', x * 2, t, 0.004, 0.02, 0.18, fl); osc('sine', x * 4, t, 0.004, 0.025, 0.14, fl); });
@@ -3306,6 +3368,56 @@ function buildEvents() {
       const rel = (b - (sec === 'a1' ? 8 : sec === 'a2' ? 40 : sec === 'b1' ? 72 : sec === 'a3' ? 120 : 152)) % 32;
       if (chorus) { for (const [ob, nm, len, fall] of SMEL_B) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { sax(T, SN[nm] * up, len * s * 0.92, p2 ? 0.055 : 0.05, !!fall); if (len >= 1.5) voice(T, SN[nm] * up / 2, len * s * 0.9, 0.012); if (p2 && len >= 1.5) brassStab(T, [SN[nm] * up, SN[nm] * up * 1.26], len * s * 0.6, 0.016); }); }
       else for (const [ob, nm, len] of SMEL_A) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { voice(T, SN[nm], len * s * 0.95, sec === 'a1' ? 0.026 : 0.03); ep(T, [SN[nm]], len * s * 0.8, p2 ? 0.018 : 0.012); if (p2) sax(T, SN[nm], len * s * 0.9, 0.028); });
+    } else if (style === 'rock22') {
+      // 2-2 중량: 80s hard rock off 박씨's cassette. Forklift beeps count it in; the riff on power chords with the bass in unison
+      // over half-time drums at 84; a sung verse over palm-muted 8ths and a clean arpeggio; the anthem chorus with the big snare,
+      // power chords on the changes and a synth pad; the bridge builds on toms and kicks the tempo to 96; the solo at 104 over
+      // double-time hats; the last chorus a whole step up; the forklift horn on the last chord.
+      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), ph = bar < 24 ? 1 : bar < 44 ? 2 : 3, lift = sec === 'chorus3', lf = lift ? LIFT : 1;
+      const pc = (T, f, d, v) => { gtrDist(T, f, d, v); gtrDist(T, f * 1.5, d, v * 0.8); gtrDist(T, f * 2, d, v * 0.5); };
+      const bigSnare = (T, v) => { snare(T, v); noise(T, 'lowpass', 2600, v * 0.7, 0.17, 0.7); };
+      const chorus = sec.startsWith('chorus'), verse = sec.startsWith('verse'), solo = sec === 'solo', riff = sec === 'riff', bridge = sec === 'bridge', r2 = roots[ci] * 2;
+      if (sec === 'intro') {
+        if (b < 8) { E(0, T => forklift(T, b < 4 ? 0.03 : 0.04)); if (b === 4) E(0, T => truckHorn(T)); E(s / 2, T => roller(T, 0.03)); }
+        else {
+          // the riff comes in on the bass and a palm-muted guitar, the drums building under it
+          const rb = (b - 8) % 8; for (const [ob, nm, len] of RRIFF) if (Math.floor(ob) === rb) E((ob - rb) * s, T => { bass(T, RROOT[nm], len * s * 0.9, 700); gtrDist(T, RROOT[nm] * 2, len * s * 0.5, 0.03); });
+          E(0, T => kick(T, 0.5 + (b - 8) * 0.05)); E(s / 2, T => hat(T, 0.03)); if (b === 14) for (let k = 0; k < 4; k++) E(k * s / 4, T => tom(T, 200 - k * 30, 0.35)); if (b === 15) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.12 + k * 0.05));
+        }
+        continue;
+      }
+      if (sec === 'outro') continue;
+      if (b === 16 || b === 64 || b === 144 || b === 208) E(0, T => crash(T));
+      if (b === 112 || b === 176) E(0, T => { crash(T); subDrop(T); });
+      // drums by phase: half-time, then straight rock, then double-time hats with fills
+      if (ph === 1) {
+        if (inBar === 0) E(0, T => kick(T, 0.9)); if (inBar === 2) { E(0, T => bigSnare(T, chorus ? 0.34 : 0.26)); E(s / 2, T => kick(T, 0.7)); } if (inBar === 1 && chorus) E(s / 2, T => kick(T, 0.55));
+        E(0, T => hat(T, 0.045)); E(s / 2, T => hat(T, 0.035)); if (chorus && inBar === 3) E(s / 2, T => openHat(T, 0.07));
+        if (bridge) { E(0, T => kick(T, 0.85)); E(0, T => tom(T, 150 - inBar * 10, 0.3)); if (bar === 27) for (let k = 0; k < 4; k++) E(k * s / 4, T => bigSnare(T, 0.14 + k * 0.05 + inBar * 0.04)); if (bar === 26 && inBar === 0) E(0, T => whoosh(T, s * 8)); }
+      } else if (ph === 2) {
+        if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.9)); if (inBar === 3) E(s / 2, T => kick(T, 0.6));
+        if (inBar === 1 || inBar === 3) E(0, T => bigSnare(T, chorus ? 0.34 : 0.28));
+        E(0, T => hat(T, 0.05)); E(s / 2, T => hat(T, 0.04)); if (chorus && inBar === 3) E(s / 2, T => openHat(T, 0.07));
+        if (inBar === 3 && bar % 4 === 3) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.1 + k * 0.05));
+      } else {
+        if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.95)); if (inBar === 1) E(s / 2, T => kick(T, 0.65));
+        if (inBar === 1 || inBar === 3) E(0, T => bigSnare(T, 0.36));
+        for (let k = 0; k < 4; k++) E(k * s / 4, T => hat(T, k % 2 ? 0.03 : 0.055)); if (inBar === 3) E(s / 2, T => openHat(T, 0.07));
+        if (inBar === 3 && bar % 4 === 3) for (let k = 0; k < 8; k++) E(k * s / 8, T => snare(T, 0.08 + k * 0.03));
+        if (bar % 4 === 3 && inBar === 2) for (let k = 0; k < 4; k++) E(k * s / 4, T => tom(T, 200 - k * 30, 0.3));
+      }
+      // bass: 8ths on the root (the riff's roots in the riff)
+      if (riff) { const rb = (b - 16) % 8; for (const [ob, nm, len] of RRIFF) if (Math.floor(ob) === rb) E((ob - rb) * s, T => { bass(T, RROOT[nm], len * s * 0.9, 700); pc(T, RROOT[nm] * 2, len * s * 0.9, 0.045); }); }
+      else { E(0, T => bass(T, roots[ci], s * 0.45, ph === 1 ? 500 : 700)); E(s / 2, T => bass(T, roots[ci], s * 0.4, ph === 1 ? 500 : 700)); if (ph === 3 && inBar === 3) E(3 * s / 4, T => bass(T, roots[ci] * 2, s * 0.2, 900)); }
+      // guitars: palm-muted 8ths and a clean arpeggio in the verses; power chords on 1, the 'and' of 2 and 4 in the chorus
+      if (verse || solo) { E(0, T => gtrDist(T, r2, s * 0.22, 0.028)); E(s / 2, T => gtrDist(T, r2, s * 0.22, 0.022)); if (!solo && (inBar === 0 || inBar === 2)) E(0, T => gtr(T, chords[ci].slice(0, 3), s * 0.8, 0.014)); }
+      if (chorus) { if (inBar === 0) E(0, T => pc(T, r2, s * 1.4, 0.05)); if (inBar === 1) E(s / 2, T => pc(T, r2, s * 0.5, 0.04)); if (inBar === 3) E(0, T => pc(T, r2, s * 0.9, 0.045)); if (inBar === 0) E(0, T => supersaw(T, chords[ci].map(f => f * 2), s * 4, 0.011, 2600)); }
+      if (solo && (inBar === 0 || inBar === 2)) E(0, T => pc(T, r2, s * 0.8, 0.035));
+      if (bridge) { if (inBar === 0) E(0, T => pc(T, r2, s * 2, 0.045)); if (bar === 27 && inBar === 2) E(0, T => pc(T, r2, s * 2, 0.05)); }
+      // the tune: the verse sung, the chorus hook sung with the guitar doubling it, the solo on the guitar
+      if (verse) for (const [ob, nm, len] of RMEL_A) if (Math.floor(ob) === (b - (sec === 'verse1' ? 32 : 112)) % 32) E((ob - Math.floor(ob)) * s, T => { voice(T, RN[nm], len * s * 0.95, 0.03); gtr(T, [RN[nm]], len * s * 0.6, 0.012); });
+      if (chorus) for (const [ob, nm, len] of RMEL_B) if (Math.floor(ob) === (b - (sec === 'chorus1' ? 64 : sec === 'chorus2' ? 144 : 208)) % 32) E((ob - Math.floor(ob)) * s, T => { voice(T, RN[nm] * lf, len * s * 0.95, 0.032); if (len >= 1) gtrDist(T, RN[nm] * lf, len * s * 0.9, 0.03); if (lift) voice(T + 0.02, RN[nm] * lf * 0.75, len * s * 0.9, 0.016); });
+      if (solo) for (const [ob, nm, len, bend] of RSOLO) if (Math.floor(ob) === (b - 176) % 32) E((ob - Math.floor(ob)) * s, T => gtrDist(T, RN[nm], len * s * 0.92, 0.065, !!bend));
     } else if (style === 'duo14') {
       // 반장's straight four (kick 1 and 3, snare 2 and 4, even hats, a root on every beat, organ, a guitar lick every fourth bar)
       // until his knee goes and the band thins to bass, organ and hats. 하은 counts the line back in and from bar 16 it is boom bap
@@ -3400,6 +3512,7 @@ function buildEvents() {
       return;
     }
     if (L.style === 'soul21') { kick(T, 0.8); crash(T, 0.7); rhodes(T, chords[5], SPB * 6, 0.045); sub808(T, roots[5], SPB * 4, 0.22); brassStab(T, chords[5].slice(0, 3).map(f => f * 2), SPB * 1.2, 0.03); sax(T, SN.D5 * SOUL.half, SPB * 3.5, 0.05, true); chords[5].slice(0, 3).forEach(f => voice(T, f * 2, SPB * 5, 0.01)); tak(T + SPB * 4, 0.3); tak(T + SPB * 5, 0.3); tak(T + SPB * 5.25, 0.26); tak(T + SPB * 6, 0.3); return; }
+    if (L.style === 'rock22') { kick(T, 0.9); crash(T); [1, 1.5, 2, 4].forEach((m, i) => gtrDist(T, roots[6] * 2 * m, SPB * 6, [0.07, 0.055, 0.04, 0.02][i], i === 3)); bass(T, roots[6], SPB * 4, 600); supersaw(T, chords[6].map(f => f * 2), SPB * 5, 0.012, 2600, true); truckHorn(T + SPB * 3); forklift(T + SPB * 5, 0.04); forklift(T + SPB * 5.5, 0.04); return; }
     if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[4], SPB * 4, 0.016, 2400); anthem(T, N_.D5, SPB * 3, 2); return; }
     if (L.style === 'duo14') { bbKick(T, 0.9); crash(T); organ(T, chords[0], SPB * 6, 0.035); sub808(T, roots[0], SPB * 4); gtrLead(T, N_.A4, SPB * 4, 0.05, true); forklift(T + SPB * 4.5, 0.02); return; }
     if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
@@ -3542,6 +3655,8 @@ function judgeNote(target, t) {
     if (target.late) FX.react[target.lane] = { type: 'relief', at: now };
     else if (j === 'perfect') FX.react[target.lane] = { type: 'nod', at: now };
     if (target.heavy) { lastHeavy = now; FX.shakeUntil = now + 90; thud(ctx.currentTime, 0.5); }
+    // 2-2: a heavy box taken with both hands is a power chord, guitar and bass together
+    if (target.heavy && fxTheme(target.beat) === 'rock') { const T = ctx.currentTime, r = tones[0]; [r, r * 1.5, r * 2].forEach((x, i) => gtrDist(T, x, 0.7, [0.06, 0.045, 0.03][i], false, bus)); bass(T, r / 2, 0.6, 500); }
     const dark = blackout(target.beat);
     const hype = inRange(target.beat, L.hype);
     if (!pairQuiet) popJudge(hype ? (isBam(target) ? 'bam' : 'hook') : j, milestone || (dark ? '소리로' : target.heavy ? '두 손' : j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''), target.lane);
