@@ -126,6 +126,7 @@ let ac = null, out = null, startAt = 0, evI = 0, playing = false, syncMs = 0;
 function audio() { if (ac) return; ac = new (window.AudioContext || window.webkitAudioContext)(); out = ac.createGain(); out.gain.value = 0.9; const comp = ac.createDynamicsCompressor(); out.connect(comp); comp.connect(ac.destination); }
 function thump(t, f, amp, dec) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f * 1.6, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.04); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.008); gn.gain.exponentialRampToValueAtTime(0.0001, t + dec); o.connect(gn); gn.connect(out); o.start(t); o.stop(t + dec + 0.05); }
 function heart(t, amp = 0.9, bright = false) { thump(t, 58, amp, 0.22); thump(t + 0.14, 50, amp * 0.6, 0.18); if (bright) { thump(t, 120, amp * 0.35, 0.08); } }
+function bell(t) { for (const [f, a, d] of [[1568, 0.05, 0.9], [2349, 0.025, 0.6], [3136, 0.012, 0.4]]) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.value = f; gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(a, t + 0.006); gn.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(gn); gn.connect(out); o.start(t); o.stop(t + d + 0.05); } }
 function heartH(t) { thump(t, 78, 0.5, 0.15); thump(t + 0.11, 68, 0.3, 0.12); }
 function beep(t, f = 1046, amp = 0.08, dur = 0.09) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'square'; o.frequency.value = f; const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400; gn.gain.setValueAtTime(amp, t); gn.gain.setValueAtTime(amp, t + dur * 0.8); gn.gain.linearRampToValueAtTime(0.0001, t + dur); o.connect(lp); lp.connect(gn); gn.connect(out); o.start(t); o.stop(t + dur + 0.02); }
 const CHORDS = [[57, 60, 64], [53, 57, 60], [48, 52, 55, 59], [55, 59, 62]];   // Am F Cmaj7 G
@@ -150,7 +151,7 @@ const songT = () => ac ? ac.currentTime - startAt : -99;
 // ---------- input and judging ----------
 const WIN_P = 0.05, WIN_G = 0.11, WIN_M = 0.18;
 const stats = { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 };
-const FX = { pops: [], lane: [{ beatAt: -9, hitAt: -9, missAt: -9 }, { beatAt: -9, hitAt: -9, missAt: -9 }], flashAt: -9 };
+const FX = { pops: [], lane: [{ beatAt: -9, hitAt: -9, missAt: -9, arriveAt: -9 }, { beatAt: -9, hitAt: -9, missAt: -9, arriveAt: -9 }], flashAt: -9, kickAt: -9, runners: [], milestone: null };
 function press(tIn) {
   if (!playing) return;
   const t = tIn - syncMs / 1000;
@@ -161,9 +162,10 @@ function press(tIn) {
   const same = TARGETS.filter(tg => !tg.demo && !tg.judge && Math.abs(tg.t - best.t) < 0.02);
   if (Math.abs(d) <= WIN_G) {
     const j = Math.abs(d) <= WIN_P ? 'perfect' : 'good';
-    for (const tg of same) { tg.judge = j; tg.d = d; tg.hitT = t; stats[j]++; stats.combo++; FX.lane[tg.lane].hitAt = now; burst(COL, LANEY[tg.lane]); FX.pops.push({ lane: tg.lane, text: j === 'perfect' ? '딱' : '좋아', sub: j === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: now, c: j === 'perfect' ? '#ffffff' : '#cfe8d6' }); }
-    stats.best = Math.max(stats.best, stats.combo); FX.flashAt = now;
-    heart(ac.currentTime, 0.9, true); if (j === 'perfect') beep(ac.currentTime + 0.02, 1046, 0.06);
+    for (const tg of same) { tg.judge = j; tg.d = d; tg.hitT = t; stats[j]++; stats.combo++; FX.lane[tg.lane].hitAt = now; burst(COL, LANEY[tg.lane], j); FX.runners.push({ lane: tg.lane, at: now, j }); FX.pops.push({ lane: tg.lane, text: j === 'perfect' ? '딱' : '좋아', sub: j === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: now, c: j === 'perfect' ? '#ffffff' : '#cfe8d6' }); }
+    stats.best = Math.max(stats.best, stats.combo); FX.flashAt = now; FX.kickAt = now;
+    if (stats.combo > 0 && stats.combo % 8 === 0) FX.milestone = { n: stats.combo, at: now };
+    heart(ac.currentTime, 0.9, true); if (j === 'perfect') { beep(ac.currentTime + 0.02, 1046, 0.06); bell(ac.currentTime + 0.03); }
   } else for (const tg of same) { tg.d = d; missIt(tg, d < 0 ? '빠름' : '늦음'); }
 }
 function missIt(tg, why) { tg.judge = 'miss'; stats.miss++; stats.combo = 0; FX.lane[tg.lane].missAt = performance.now(); if (ac) { beep(ac.currentTime, 196, 0.06, 0.3); beep(ac.currentTime + 0.05, 185, 0.05, 0.3); } FX.pops.push({ lane: tg.lane, text: '놓침', sub: why, at: performance.now(), c: '#ff6a5a' }); }
@@ -267,9 +269,12 @@ function heartV(cx, cy, s, glow, cracked, idle) {
   else { g.strokeStyle = '#140a0c'; g.lineWidth = 0.9; g.beginPath(); g.moveTo(cx - 0.5, cy - 5 * s); g.lineTo(cx + 2 * s, cy - 2 * s); g.lineTo(cx - 1.5 * s, cy + 0.5 * s); g.lineTo(cx + 1 * s, cy + 4 * s); g.stroke(); }
 }
 function laneRow(lane, t) { let r = null; for (const row of ROWS) if (row.lane === lane && row.t0 <= t + 0.001) r = row; return r && t < r.t8 + 0.6 ? r : null; }
-const SPARKS = [], RINGS = [], LANEY = [186, 202];
-function burst(x, y) {
-  for (let i = 0; i < 34; i++) { const a = Math.random() * Math.PI * 2, v = 20 + Math.random() * 70; SPARKS.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.8 - 20, at: performance.now(), life: 450 + Math.random() * 550, s: Math.random() < 0.25 ? 1.4 : 0.8, c: Math.random() < 0.35 ? '#ffffff' : '#7ef06a' }); }
+const SPARKS = [], RINGS = [], FLOATS = [], LANEY = [186, 202];
+function burst(x, y, j = 'perfect') {
+  const big = j === 'perfect';
+  for (let i = 0; i < 10 + (big ? 8 : 0); i++) { const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.2, v = 30 + Math.random() * 60; SPARKS.push({ x, y: y - 6, vx: Math.cos(a) * v, vy: Math.sin(a) * v, at: performance.now(), life: 600 + Math.random() * 500, s: 1.6 + Math.random() * 1.2, c: Math.random() < 0.5 ? '#bfffe0' : '#ffffff', plus: true }); }
+  if (big) RINGS.push({ x, y, at: performance.now() + 90, big: true });
+  for (let i = 0; i < (big ? 34 : 18); i++) { const a = Math.random() * Math.PI * 2, v = 20 + Math.random() * 70; SPARKS.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.8 - 20, at: performance.now(), life: 450 + Math.random() * 550, s: Math.random() < 0.25 ? 1.4 : 0.8, c: Math.random() < 0.35 ? '#ffffff' : '#7ef06a' }); }
   RINGS.push({ x, y, at: performance.now() });
 }
 function drawLane(lane, y, t, show) {
@@ -300,7 +305,7 @@ function drawLane(lane, y, t, show) {
     const lo = drawing ? X0 : Math.max(X0, penNow > 0 ? penNow + 8 : X0);
     if (x1 > lo + 1 && cool(x1) < 2.4) {
       const gr = g.createLinearGradient(X0, 0, HX - 12, 0), st = (x, c) => gr.addColorStop(clamp((x - X0) / (HX - 12 - X0), 0, 1), c);
-      for (let x = X0; x <= HX - 12; x += 8) { const a = cool(x), al = x > x1 ? 0 : clamp(1 - Math.pow(a / 2.2, 2), 0, 1); const c = a < 0.12 ? mixc('#f4fff0', '#9cf58a', a / 0.12) : mixc('#9cf58a', '#3e8c38', (a - 0.12) / 1.6); st(x, `rgba(${parseInt(c.slice(1, 3), 16)},${parseInt(c.slice(3, 5), 16)},${parseInt(c.slice(5, 7), 16)},${al})`); }
+      for (let x = X0; x <= HX - 12; x += 8) { const a = Math.max(0, cool(x)), al = x > x1 + 0.5 ? 0 : clamp(1 - Math.pow(a / 2.2, 2), 0, 1); const c = a < 0.12 ? mixc('#f4fff0', '#9cf58a', a / 0.12) : mixc('#9cf58a', '#3e8c38', (a - 0.12) / 1.6); st(x, `rgba(${parseInt(c.slice(1, 3), 16)},${parseInt(c.slice(3, 5), 16)},${parseInt(c.slice(5, 7), 16)},${al})`); }
       const pts = rowPts(row, 24), path = () => { g.beginPath(); pts.forEach(([x, dy], i) => i ? g.lineTo(x, y + dy) : g.moveTo(x, y + dy)); };
       g.save(); g.beginPath(); g.rect(lo, y - 40, x1 - lo, 60); g.clip(); g.globalAlpha = show;
       g.globalCompositeOperation = 'lighter'; g.strokeStyle = gr; g.lineJoin = 'round'; g.lineCap = 'round'; g.globalAlpha = show * 0.16; g.lineWidth = 4.5; path(); g.stroke(); g.globalAlpha = show * 0.32; g.lineWidth = 2; path(); g.stroke();
@@ -329,8 +334,10 @@ function drawLane(lane, y, t, show) {
   if (tg && tg.judge === 'miss' && t - tg.t < 1.6) { const a = clamp(1 - (t - tg.t - 1.0) / 0.6, 0, 1), xx = COL + clamp(tg.d / WIN_M, -1, 1) * 10, jit = hurt * 1.5; g.save(); g.lineCap = 'round'; g.lineWidth = 2.4; for (const [dx, c, al] of [[-jit, 'rgba(80,220,255,.7)', hurt], [jit, 'rgba(255,60,60,.7)', hurt], [0, '#ff4a7a', 1]]) { if (al <= 0) continue; g.globalAlpha = show * a * al; g.strokeStyle = c; g.beginPath(); g.moveTo(xx - 7 + dx, y - 15); g.lineTo(xx + 7 + dx, y - 1); g.moveTo(xx + 7 + dx, y - 15); g.lineTo(xx - 7 + dx, y - 1); g.stroke(); } g.restore(); }
   const hit = tg && tg.judge && tg.judge !== 'miss', since = hit ? t - tg.hitT : 9;
   // the heart
-  const beatK = clamp(1 - (now - F.beatAt) / 220, 0, 1), hitK = hit && since < 0.35 ? 1 - since / 0.35 : 0, pump = 1 + 0.18 * beatK + 0.28 * hitK;
-  heartV(HX, y - 7, pump * 1.25, Math.max(beatK * 0.7, hitK), !!(tg && tg.judge === 'miss'), lane === 1 && !hit && beatK < 0.15 && !(tg && tg.judge === 'miss'));
+  const beatK = clamp(1 - (now - F.beatAt) / 220, 0, 1), hitK = hit && since < 0.35 ? 1 - since / 0.35 : 0, arrK = clamp(1 - (now - F.arriveAt) / 300, 0, 1), pump = 1 + 0.18 * beatK + 0.2 * hitK + 0.4 * arrK;
+  // a good press lights the whole row for a moment, brightest at the column
+  { const rf = clamp(1 - (now - F.hitAt) / 280, 0, 1); if (rf > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const lg = g.createLinearGradient(X0, 0, HX, 0); lg.addColorStop(0, 'rgba(140,255,170,0)'); lg.addColorStop((COL - X0) / (HX - X0), `rgba(200,255,230,${0.3 * rf})`); lg.addColorStop(1, `rgba(255,140,140,${0.18 * rf})`); g.fillStyle = lg; g.fillRect(X0, y - 28, HX - X0, 38); g.restore(); } }
+  heartV(HX, y - 7, pump * 1.25, Math.max(beatK * 0.7, hitK, arrK), !!(tg && tg.judge === 'miss'), lane === 1 && !hit && beatK < 0.15 && !(tg && tg.judge === 'miss'));
   g.globalAlpha = show;
   // the judgement over the column: it pops in large and settles
   for (const p of FX.pops) { if (p.lane !== lane) continue; const age = (now - p.at) / 650, a = 1 - age; if (a <= 0) continue; const sc = 1 + 0.5 * clamp(1 - age / 0.15, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(COL - 20, y - 26 - age * 4); g.scale(sc, sc); glowTxt(p.text, 0, -6, p.c, 12, 'center', '"Black Han Sans", sans-serif', p.text === '놓침' ? 'rgba(255,60,60,.8)' : 'rgba(180,255,200,.8)'); if (p.sub) txt(p.sub, 0, 7, p.c, 5, 'center', '400'); g.restore(); }
@@ -350,12 +357,22 @@ function drawRows(t) {
     g.fillStyle = `rgba(220,252,255,${0.08 + 0.1 * near})`; for (let k = 0; k < 6; k++) { const yy = H - ((performance.now() / 40 + k * 17) % (H - top)); g.fillRect(COL - 8, yy, 16, 0.34); } }
   drawLane(0, y0, t, 1);
   if (two > 0) drawLane(1, y1, t, e2);
-  // the rings and sparks from good presses
   const now = performance.now();
-  for (let i = RINGS.length - 1; i >= 0; i--) { const r = RINGS[i], a = (now - r.at) / 450; if (a >= 1) { RINGS.splice(i, 1); continue; } g.save(); g.globalAlpha = (1 - a) * 0.8; g.strokeStyle = '#d8fbff'; g.lineWidth = 1.2 * (1 - a) + 0.3; g.beginPath(); g.ellipse(r.x, r.y - 6, 6 + 26 * ease(a), 4 + 14 * ease(a), 0, 0, Math.PI * 2); g.stroke(); g.restore(); }
+  // the beat a good press makes runs on along the row into the heart; when it gets there the heart beats again and little hearts
+  // float up out of it
+  for (let i = FX.runners.length - 1; i >= 0; i--) {
+    const r = FX.runners[i], a = (now - r.at) / 240, yy = LANEY[r.lane];
+    if (a >= 1) { FX.lane[r.lane].arriveAt = now; for (let k = 0; k < (r.j === 'perfect' ? 5 : 3); k++) FLOATS.push({ x: HX + (Math.random() - 0.5) * 10, y: yy - 10, vx: (Math.random() - 0.5) * 14, vy: -18 - Math.random() * 16, at: now, life: 900 + Math.random() * 400, s: 0.25 + Math.random() * 0.15 }); FX.runners.splice(i, 1); continue; }
+    const x = lerp(COL, HX - 6, ease(a)); g.save(); g.globalCompositeOperation = 'lighter'; const lg = g.createLinearGradient(x - 40, 0, x, 0); lg.addColorStop(0, 'rgba(200,255,230,0)'); lg.addColorStop(1, 'rgba(230,255,240,.9)'); g.fillStyle = lg; g.fillRect(x - 40, yy - 0.6, 40, 1.2); const gr = g.createRadialGradient(x, yy, 0, x, yy, 9); gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(1, 'rgba(160,255,200,0)'); g.fillStyle = gr; g.fillRect(x - 9, yy - 9, 18, 18); g.restore();
+  }
+  for (let i = FLOATS.length - 1; i >= 0; i--) { const f = FLOATS[i], a = (now - f.at) / f.life; if (a >= 1) { FLOATS.splice(i, 1); continue; } const tt = (now - f.at) / 1000; g.save(); g.globalAlpha = 1 - a * a; heartPath(f.x + f.vx * tt + Math.sin(tt * 8 + i) * 2, f.y + f.vy * tt, f.s); g.fillStyle = '#ff8a8a'; g.fill(); g.restore(); }
+  // the rings and sparks from good presses
+  for (let i = RINGS.length - 1; i >= 0; i--) { const r = RINGS[i], a = (now - r.at) / (r.big ? 600 : 450); if (a < 0) continue; if (a >= 1) { RINGS.splice(i, 1); continue; } const k = r.big ? 1.8 : 1; g.save(); g.globalAlpha = (1 - a) * (r.big ? 0.55 : 0.8); g.strokeStyle = r.big ? '#bfffe0' : '#d8fbff'; g.lineWidth = 1.2 * (1 - a) + 0.3; g.beginPath(); g.ellipse(r.x, r.y - 6, 6 + 26 * k * ease(a), 4 + 14 * k * ease(a), 0, 0, Math.PI * 2); g.stroke(); g.restore(); }
   g.save(); g.globalCompositeOperation = 'lighter';
-  for (let i = SPARKS.length - 1; i >= 0; i--) { const p = SPARKS[i], a = (now - p.at) / p.life; if (a >= 1) { SPARKS.splice(i, 1); continue; } const tt = (now - p.at) / 1000; g.globalAlpha = (1 - a); g.fillStyle = p.c; g.beginPath(); g.arc(p.x + p.vx * tt, p.y - 6 + p.vy * tt + 50 * tt * tt, p.s * (1 - a * 0.5), 0, Math.PI * 2); g.fill(); }
+  for (let i = SPARKS.length - 1; i >= 0; i--) { const p = SPARKS[i], a = (now - p.at) / p.life; if (a >= 1) { SPARKS.splice(i, 1); continue; } const tt = (now - p.at) / 1000; g.globalAlpha = (1 - a); g.fillStyle = p.c; if (p.plus) { const px = p.x + p.vx * tt * (1 - a * 0.5), py = p.y + p.vy * tt * (1 - a * 0.5) + 10 * tt * tt, z = p.s * (1 - a * 0.4); g.fillRect(px - z, py - z * 0.3, z * 2, z * 0.6); g.fillRect(px - z * 0.3, py - z, z * 0.6, z * 2); continue; } g.beginPath(); g.arc(p.x + p.vx * tt, p.y - 6 + p.vy * tt + 50 * tt * tt, p.s * (1 - a * 0.5), 0, Math.PI * 2); g.fill(); }
   g.restore(); g.globalAlpha = 1;
+  // every 8 in a row: the count jumps out over the column
+  if (FX.milestone) { const a = (now - FX.milestone.at) / 1000; if (a < 1) { const sc = 1 + 0.6 * clamp(1 - a / 0.12, 0, 1); g.save(); g.globalAlpha = clamp(1 - (a - 0.6) / 0.4, 0, 1); g.translate(COL, Math.min(LANEY[0], LANEY[1]) - 48 - a * 6); g.scale(sc, sc); glowTxt(`연속 ${FX.milestone.n}!`, 0, -8, '#ffffff', 15, 'center', '"Black Han Sans", sans-serif', 'rgba(120,255,180,.95)'); g.restore(); } }
   // the row's cue, top right of the rows
   const cueRow = ROWS.filter(r => r.cue && t >= r.t0 - 0.2 && t < r.t0 + (r.t8 - r.t0) * 0.8).pop();
   if (cueRow) { const a = clamp(Math.min((t - cueRow.t0 + 0.2) * 3, ((cueRow.t8 - cueRow.t0) * 0.8 - (t - cueRow.t0)) * 2), 0, 1); g.globalAlpha = a; g.save(); g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 4 * SC; txt(cueRow.cue, 378, 108, '#ffffff', 8, 'right'); g.restore(); g.globalAlpha = 1; }
@@ -386,13 +403,14 @@ function frame() {
   requestAnimationFrame(frame);
   const t = playing ? songT() : -1;
   if (playing) { schedule(); tick(t); FX.pops = FX.pops.filter(p => performance.now() - p.at < 650); if (t > END_T) finish(); }
+  const kick = clamp(1 - (performance.now() - FX.kickAt) / 140, 0, 1), z = 1 + 0.012 * kick * kick; g.setTransform(SC * z, 0, 0, SC * z, W * SC * (1 - z) / 2, H * SC * (1 - z) / 2);
   drawMovie(t); drawRows(playing ? t : 0);
   const tl = beatT(SEG.length * 8 - 2);
-  if (t > tl) { g.globalAlpha = clamp((t - tl) / 0.8, 0, 1); txt('— 심박 안정 —', W / 2, 60, '#e8fff0', 9, 'center'); g.globalAlpha = 1; }
+  if (t > tl) { const a = clamp((t - tl) / 0.8, 0, 1), sc = 1 + 0.15 * (1 - a); g.save(); g.globalAlpha = a; g.translate(W / 2, 64); g.scale(sc, sc); glowTxt('심박 안정', 0, -10, '#f0fff4', 20, 'center', '"Black Han Sans", sans-serif', 'rgba(120,255,170,.9)'); g.restore(); g.globalAlpha = 1; }
 }
 requestAnimationFrame(frame);
 // for testing: window.__16 exposes the chart, a press at a song time and a jump
-window.__16 = { ROWS, TARGETS: () => TARGETS, stats, END_T: () => END_T, beatT, press: t => press(t), songT, start, jump: t => { startAt = ac.currentTime - t; evI = EV.findIndex(e => e.t >= t); for (const e of EV) e.seen = e.t < t ? 1 : 0; } };
+window.__16 = { ROWS, TARGETS: () => TARGETS, stats, END_T: () => END_T, beatT, press: t => press(t), songT, start, jump: t => { startAt = ac.currentTime - t; evI = EV.findIndex(e => e.t >= t); if (evI < 0) evI = EV.length; for (const e of EV) e.seen = e.t < t ? 1 : 0; } };
 })();
 </script>
 </body>
