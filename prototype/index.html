@@ -721,7 +721,7 @@ const LEVELS = [
     lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, bossSeat: { x: 22, stand: [[84, 89], [143.7, 145.3]] }, vibe: [[72, 104]],
     // the thrown box's ride: belt speed for `slow` beats after it is set down, then speeding up steadily, then from the seam (x)
     // a dash of `dash` beats (슉) onto the scanner
-    surge: { x: 240, slow: 0.25, dash: 0.2, fix: 144.5 },
+    surge: { x: 232, slow: 0.25, dash: 0.25, fix: 144.5 },
     heads: { h: [82, 44], j: [58, 80], b: [22, 98] }, phone: [[120, 121.5], [136, 137.5]], phoneLane: 0,
     clock:'03:20', title:'꿈', offTilt: true,
     chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4,
@@ -825,6 +825,7 @@ function loadLevel(level) {
       const S = level.surge; n.a0 = timeAt(n.beat + 0.5); n.place = n.a0 - TRAVEL * SPB; n.t1 = timeAt(n.beat - S.dash);
       n.tS = n.place + S.slow * SPB; n.xS = PLACE_X + S.slow * SPB * SPEED;
       const T = n.t1 - n.tS; n.acc = 2 * (S.x - n.xS - SPEED * T) / (T * T);   // the steady speed-up that reaches the seam on time
+      const ride = n.t1 - n.place; n.jP = ride / Math.max(1, Math.round(ride / (SPB / 4)));   // the belt catches (덜컥) on every sixteenth
     }
     if (n.len) { n.w = Math.round((n.end - n.arr) * SPEED) + 16; n.h = 12; }
     else if (n.heavy) { n.w = 26 + Math.floor(rnd(i, 1) * 5); n.h = 17 + Math.floor(rnd(i, 2) * 4); }
@@ -1648,15 +1649,25 @@ function drawHaeunScene(beat, kick, nowMs, active) {
 // blinks, the belt goes 덜덜), rides at belt speed for a moment, picks up speed steadily, and at the seam the belt lurches (슉):
 // a short dash onto the scanner, half a beat early, on the off-beat. Then belt speed again. 반장 bangs the machine at
 // L.surge.fix and it stops.
+// the box hops as the belt catches it (-2 then -1), and sits still while it sticks
+function surgeHop(n, t) { const { f } = jerkPhase(n, t); return f < 0.14 ? -2 : f < 0.28 ? -1 : 0; }
+function surgeBase(n, t) {
+  if (t < n.tS) return SCAN_X + (t - n.a0) * SPEED;
+  const d = t - n.tS; return n.xS + SPEED * d + 0.5 * n.acc * d * d;
+}
+// 덜컥덜컥: on the way to the seam the belt catches the box on every sixteenth and jerks it forward, then it sticks (creeps)
+// till the next; it keeps to the speed-up on average and is exactly at the seam when the dash starts
+function jerkPhase(n, t) { const u = (t - n.place) / n.jP, k = Math.floor(u); return { k, f: u - k }; }
 function surgedX(n, t) {
   const X = L.surge.x;
-  if (t < n.tS) return SCAN_X + (t - n.a0) * SPEED;
-  if (t < n.t1) { const d = t - n.tS; return n.xS + SPEED * d + 0.5 * n.acc * d * d; }
+  if (t < n.place) return SCAN_X + (t - n.a0) * SPEED;
+  if (t < n.t1) { const { k, f } = jerkPhase(n, t), q = f < 0.4 ? 0.85 * f / 0.4 : 0.85 + 0.15 * (f - 0.4) / 0.6; return surgeBase(n, n.place + (k + q) * n.jP); }
   if (t < n.arr) return X + (t - n.t1) / (n.arr - n.t1) * (SCAN_X - X);
   return SCAN_X + (t - n.arr) * SPEED;
 }
 const surgeSfx = () => { if (!ctx) return; const t = ctx.currentTime; noise(t, 'bandpass', 2600, 0.07, 0.09, 1.2, bus); noise(t + 0.02, 'highpass', 5200, 0.03, 0.06, 0.7, bus); osc('square', 70, t, 0.003, 0.025, 0.06, bus); };
-const rattleSfx = dur => { if (!ctx) return; const t = ctx.currentTime; for (let k = 0; t + k * 0.055 < t + dur - 0.03; k++) noise(t + k * 0.055, 'bandpass', 900 + (k % 2) * 500, 0.014, 0.04, 2, bus); };
+// a 덜컥 each time the box jerks forward, scheduled from when it is set down
+const rattleSfx = (n, now) => { if (!ctx) return; const t0 = ctx.currentTime; for (let k = 0; n.place + k * n.jP < n.t1 - 0.02; k++) { const at = n.place + k * n.jP - now; if (at >= 0) { noise(t0 + at, 'bandpass', 1100 + (k % 2) * 450, 0.024, 0.035, 2.5, bus); osc('square', 95, t0 + at, 0.002, 0.012, 0.03, bus); } } };
 // how hard the seam's lamp is going: 1 while a box it will throw is on the belt, a white flash as it throws, 0 once fixed
 function surgeLamp(t) {
   let warn = 0, thrown = 0;
@@ -2095,7 +2106,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
       if (t < n.place) break;
       let cx = n.surge && n.t1 != null ? surgedX(n, t) : SCAN_X + (t - n.arr) * SPEED;
       if (n.surge && active && n.t1 != null) {
-        if (!n.rattleFx && t >= n.place) { n.rattleFx = true; rattleSfx(n.t1 - t); }
+        if (!n.rattleFx && t >= n.place) { n.rattleFx = true; rattleSfx(n, t); }
         if (!n.surgeFx && t >= n.t1) { n.surgeFx = true; surgeSfx(); const X = L.surge.x; spawn(far ? farX(X) : X, (far ? farY(BELT_Y) : BELT_Y) - 1, 6, ['#ffd27a', '#fff4d8', '#ff9a3a'], -30, 70, -70, -20, 260, 260, [1, 1]); }
       }
       if (n.state === 'hit' && n.hitAt != null && !n.len) cx -= SPEED * hitLag(t - n.hitAt, n.judge === 'perfect' ? HITSTOP : HITSTOP * 0.6);
@@ -2126,12 +2137,12 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
       const sq = ha < 0.16 ? Math.sin(ha / 0.16 * Math.PI) * (n.judge === 'perfect' ? 1 : 0.6) * (ha < 0.08 ? 1 : -0.5) : 0;
       const ja = n.missKind === 'bad' ? t - n.hitAt : 9;
       const jolt = ja < 0.35 ? Math.round(Math.sin(ja * 70) * 2.5 * Math.exp(-ja * 8)) : 0;
-      boxQ.push([n, cx + jolt, sq, n.surge && n.t1 != null && t < n.t1 ? (Math.floor(nowMs / 45) % 2 ? -1 : 0) : 0]);
+      boxQ.push([n, cx + jolt, sq, n.surge && n.t1 != null && t < n.t1 ? surgeHop(n, t) : 0]);
     }
     for (const [n, x, sq, rat] of boxQ) {
       // an off-beat box was set down crooked: it leans, and its tape is red
       if (n.surge && t >= n.t1 && t < n.arr) for (let k = 0; k < 3; k++) R(Math.round(x - n.w / 2 - 6 - k * 5), BELT_Y - 4 - k * 4, 4 + k, 1, 'rgba(255,255,255,.55)');   // thrown: speed lines
-      if (rat) { drawBox(n, x, BELT_Y + rat, n.state, t, sq); continue; }   // rattling on the bad belt
+      if (rat) { g.save(); g.translate(x, BELT_Y + rat); g.rotate(rat * 0.04); drawBox(n, 0, 0, n.state, t, sq); g.restore(); continue; }   // the bad belt catches it: a hop and a rock
       if (n.off && L.offTilt && !n.top && !(n.surge && t < n.t1)) { g.save(); g.translate(x, BELT_Y); g.rotate((n.i % 2 ? 1 : -1) * 0.12); drawBox(n, 0, 0, n.state, t, sq); g.restore(); }
       else drawBox(n, x, n.top ? BELT_Y - 12 : BELT_Y, n.state, t, sq);
     }
