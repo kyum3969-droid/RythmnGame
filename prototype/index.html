@@ -421,6 +421,23 @@ const DMEL_B = [[0, 'G4', 0.5], [0.5, 'Bb4', 0.5], [1, 'D5', 1.5], [2.5, 'C5', 0
   [24, 'D5', 1], [25, 'Bb4', 0.5], [25.5, 'D5', 0.5], [26, 'G5', 1.5], [27.5, 'F5', 0.5], [28, 'D5', 0.5], [28.5, 'Bb4', 0.5], [29, 'G4', 3]];
 // horn answers in the hook's gaps, for the last chorus
 const DHORN = [[6.5, 'F4', 0.25], [6.75, 'A4', 0.25], [7, 'C5', 1], [14, 'D5', 0.5], [14.5, 'F5', 0.5], [15, 'G5', 1], [22.5, 'F5', 0.5], [23, 'C5', 1], [29.5, 'G4', 0.5], [30, 'Bb4', 0.5], [30.5, 'D5', 1.5]];
+// 2-3 두 벨트: reggaeton in F minor at 96. The dembow (kick on 1 and 3, the snare on the 'a' of 1 and the 'and' of 2),
+// an 808, piano on the off 8ths, brass in the chorus, a sung verse and a synth hook over Fm | Db | Ab | Eb.
+const DN = { C4: 261.63, Db4: 277.18, Eb4: 311.13, F4: 349.23, G4: 392, Ab4: 415.3, Bb4: 466.16, C5: 523.25, Db5: 554.37, Eb5: 622.25, F5: 698.46, G5: 783.99, Ab5: 830.61 };
+const DEM = {
+  // 0 Fm, 1 Db, 2 Ab, 3 Eb
+  chords: [[174.61, 207.65, 261.63, 349.23], [207.65, 277.18, 349.23, 415.3], [207.65, 261.63, 311.13, 415.3], [233.08, 311.13, 392, 466.16]],
+  roots: [87.31, 69.3, 103.83, 77.78], verse: [0, 1, 2, 3], pre: [2, 3, 2, 3], chorus: [1, 2, 0, 3]
+};
+const DMB_A = [[0.5, 'F4', 0.5], [1, 'Ab4', 0.5], [1.5, 'F4', 1], [2.75, 'Eb4', 0.25], [3, 'F4', 1], [4.5, 'Ab4', 0.5], [5, 'Bb4', 0.5], [5.5, 'Ab4', 1], [6.75, 'F4', 0.25], [7, 'Eb4', 1],
+  [8.5, 'C5', 0.5], [9, 'Ab4', 0.5], [9.5, 'C5', 1], [10.75, 'Bb4', 0.25], [11, 'Ab4', 1], [12.5, 'G4', 0.5], [13, 'Bb4', 0.5], [13.5, 'G4', 1], [14.75, 'F4', 0.25], [15, 'Eb4', 1]];
+const DMB_B = [[0, 'Ab4', 0.5], [0.5, 'C5', 0.5], [1, 'Db5', 1], [2, 'C5', 0.5], [2.5, 'Ab4', 0.5], [3, 'F4', 1], [4, 'Eb5', 0.75], [4.75, 'C5', 0.25], [5, 'Ab4', 1.5], [6.5, 'Bb4', 0.5], [7, 'C5', 1],
+  [8, 'F5', 1], [9, 'Eb5', 0.5], [9.5, 'C5', 0.5], [10, 'Ab4', 1], [11, 'C5', 1], [12, 'Bb4', 0.5], [12.5, 'G4', 0.5], [13, 'Bb4', 1.5], [14.5, 'Ab4', 0.5], [15, 'G4', 1],
+  [16, 'Ab4', 0.5], [16.5, 'C5', 0.5], [17, 'Eb5', 1], [18, 'Db5', 0.5], [18.5, 'C5', 0.5], [19, 'Ab4', 1], [20, 'C5', 1], [21, 'Eb5', 0.5], [21.5, 'Ab5', 1.5], [23, 'Eb5', 1],
+  [24, 'F5', 1.5], [25.5, 'Eb5', 0.5], [26, 'C5', 1], [27, 'Ab4', 1], [28, 'Bb4', 1], [29, 'G4', 0.5], [29.5, 'Bb4', 0.5], [30, 'F4', 2]];
+// 2-6 피날레: the one night the songs may meet. 박씨's rock riff and hook a minor third up, in 이모's G minor, over her disco floor
+const UP3 = Math.pow(2, 3 / 12);
+const FIN = { chords: [...DISCO.chords, ...ROCK.chords.slice(0, 6).map(c => c.map(f => f * UP3))], roots: [...DISCO.roots, ...ROCK.roots.slice(0, 6).map(f => f * UP3)] };
 // chorus hook, 8 bars: [beat offset inside the 8 bars, note, length in beats]
 const HOOK = [
   [0, 'E5', 1.5], [1.5, 'C5', 0.5], [2, 'B4', 1], [3, 'A4', 1],
@@ -682,19 +699,25 @@ const LEVELS = [
       'x...P...', 'x.P.x...', 'x...x.P.', 'h===..P.', 'P...P...', 'x.x.x...', 'x...P.P.', 'x.x.x...',
       'x...P...', 'x.x...P.', 'x...P.P.', 'h===..P.', 'P...x.P.', 'x.P.x...', 'x...P.P.', 'x.x.x.x.',
       '........', '........'
-    ],    say: [[4, '탁, 탁탁, 탁. 알았지?', 3.5, 0, 's'], [38, '느린 건 내가 민다?', 3, 0, 's'], [104, '(전화) 어, 우리 강아지. 할머니 일하지.', 4, 0, 's'], [112, '…응, 응. 끊어. 이모 간다.', 3.5, 0, 's'], [122, '자, 이제 제대로 민다!', 3, 0, 's']],
+    ],    say: [[4, '탁, 탁탁, 탁.', 3, 0, 's'], [34, '지게차 저 양반, 팔레트 삐뚤게 놓네.', 3.5, 0, 's'], [40, '느린 건 내가 민다?', 3, 0, 's'], [104, '(전화) 어, 우리 강아지. 할머니 일하지.', 4, 0, 's'], [112, '…응, 응. 끊어. 할머니 일해.', 3.5, 0, 's'], [122, '자, 이제 제대로 민다!', 3, 0, 's'], [168, '총각, 손 잘 보네.', 3, 0, 's']],
     comfort: ['괜찮아, 다음 거.', '총각! 손 봐, 손!'],
     intro: [
-      { who:'', text:'(임시) 회식 다음 날 새벽 2시 40분. 라인에 검수가 붙었다.' },
-      { who:'순자 이모', text:'검수 순자야. 오늘부터 내가 보고 넘긴다. 탁, 탁탁, 탁!' }],
-    outro: good => good ? [{ who:'순자 이모', text:'…손이 빠르네, 총각.' }] : [{ who:'순자 이모', text:'…내일 또 보자.' }]
+      { who:'', text:'회식 다음 날 새벽 2시 40분. 오배송 클레임 때문에 소장이 라인에 검수를 붙였다.' },
+      { who:'순자 이모', text:'검수 순자. 오늘부터 내가 보고 넘긴다.' },
+      { who:'순자 이모', text:'탁, 탁탁, 탁. 내 손만 보면 돼. 느린 건 민다.' },
+      { who:'반장', text:'(작게) …말 많은 양반 왔네.' }],
+    outro: good => good ? [
+      { who:'순자 이모', text:'…손 좀 보네, 총각.' },
+      { who:'반장', text:'…내일 또 봅시다.' },
+      { who:'', text:'이모는 전화기를 앞치마 주머니에 넣고 먼저 나갔다. 주차장에서 지게차가 팔레트를 내리고 있었다.' }] : [
+      { who:'순자 이모', text:'…내일은 내 손만 봐.' }]
   }
   ,{
     id:'s2-2', stageNo:'2-2', who:'순자 이모', role:'반장 · 순자 이모 · 112 BPM', tag:'디스코 펑크 · 밀기와 붙잡기', bpm:112, style:'disco22', fxTheme:'neon', inspector: true,
     // 2-2 재검: 순자 이모's second night. 소장 wants a second look at anything odd, so to her push she adds the grab ('R'): she
     // takes a box off the belt as it passes, looks it over for half a beat (two stamps, a question mark), and sends it on half a
     // beat late with her red mark on it. Her hand now says early or late. 반장 loads.
-    tempo: [[0, 112]], clock:'02:20', title:'재검', partners:['boss'], hints:true,
+    tempo: [[0, 112]], clock:'02:20', title:'재검', partners:['boss'], hints:true, cameo: { from: 94, to: 112 },
     chords: DISCO.chords, roots: DISCO.roots,
     chordAt: bar => bar < 2 ? 0 : bar < 10 ? DISCO.verse[(bar - 2) % 4] : bar < 18 ? DISCO.chorus[(bar - 10) % 4] : bar < 26 ? DISCO.verse[(bar - 18) % 4] : bar < 34 ? DISCO.chorus[(bar - 26) % 4] : bar < 40 ? DISCO.bridge[(bar - 34) % 4] : bar < 56 ? DISCO.chorus[(bar - 40) % 4] : 0,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 224,
@@ -719,15 +742,72 @@ const LEVELS = [
       'P...R...', 'x.x.x.x.', 'x...P.P.', 'R...x...', 'x.P.x...', 'x...R...', 'P...x.P.', 'x.x.x.x.',
       '........', '........'
     ],
-    say: [[4, '(임시) 소장이 재검 돌리래. 이상한 건 내가 잡는다.', 4, 0, 's'], [40, '(임시) 잡으면 늦게 간다. 알지?', 3, 0, 's'], [72, '(임시) 빠른 거, 늦은 거. 손 봐.', 3, 0, 's'], [136, '(임시) …숨 좀 돌리자.', 3, 0, 's'], [160, '(임시) 자, 간다!', 2.5, 0, 's']],
+    say: [[4, '소장이 재검 돌리래.', 3, 0, 's'], [40, '잡으면 늦게 간다. 알지?', 3, 0, 's'], [72, '빠른 거, 늦은 거. 손 봐.', 3, 0, 's'], [100, '(지게차가 멈춘다) …뭘 봐.', 3, 0, 's'], [136, '…숨 좀 돌리자.', 3, 0, 's'], [140, '(전화기를 보며) 우리 강아지 열은 내렸나…', 4, 0, 's'], [160, '자, 간다!', 2.5, 0, 's']],
     comfort: ['괜찮아, 다음 거.', '총각! 내 손 봐, 손!'],
     intro: [
-      { who:'', text:'(임시) 새벽 2시 20분. 둘째 밤. 소장이 재검을 돌리라고 했다.' },
-      { who:'순자 이모', text:'(임시) 이상한 건 내가 잡아 본다. 잡힌 건 늦게 가. 민 건 빨리 가고.' }],
-    outro: good => good ? [{ who:'순자 이모', text:'(임시) …내 손 잘 보네, 총각.' }] : [{ who:'순자 이모', text:'(임시) …내일은 손만 봐.' }]
+      { who:'', text:'둘째 밤, 새벽 2시 20분. 소장: "이상한 건 전부 재검."' },
+      { who:'순자 이모', text:'잡으면 늦게 가. 민 건 빨리 가고. 손만 봐.' },
+      { who:'반장', text:'소장 말은 반만 들어요.' },
+      { who:'순자 이모', text:'반만 듣고 반은 잡지.' }],
+    outro: good => good ? [
+      { who:'순자 이모', text:'…내 손 잘 보네.' },
+      { who:'', text:'지게차가 팔레트를 내려놓고 갔다. 이번엔 반듯했다. 이모는 못 본 척했다.' }] : [
+      { who:'순자 이모', text:'…내일은 손만 봐.' }]
   }
   ,{
-    id:'s2-4', stageNo:'2-4', who:'박씨', role:'박씨 · 84→96→104 BPM', tag:'하드 록 · 중량물 두 손 · 템포 상승', bpm:84, style:'rock22', fxTheme:'rock',
+    id:'s2-3', stageNo:'2-3', who:'반장 + 하은', role:'반장 · 하은 · 순자 이모 · 96 BPM · 벨트 둘', tag:'레게톤 · 버튼 둘 · 하은의 전화', bpm:96, style:'dembow23', fxTheme:'neon', inspector: true,
+    // 2-3 두 벨트: 2라인 is swamped, so 하은 comes over and loads the upper belt while 반장 loads the lower one. Two buttons again
+    // (left hand the upper gate, right hand the lower). 순자 이모 stands between the belts and pushes or grabs on either. Halfway
+    // through, the hospital calls 하은: her belt stops while she talks, and her hands are late for a while after.
+    lanes: 2, partners: ['haeun', 'boss'], tempo: [[0, 96]], clock:'02:10', title:'두 벨트', hints:true,
+    chords: DEM.chords, roots: DEM.roots,
+    chordAt: bar => bar < 2 ? 0 : bar < 10 ? DEM.verse[(bar - 2) % 4] : bar < 14 ? DEM.pre[(bar - 10) % 4] : bar < 22 ? DEM.chorus[(bar - 14) % 4] : bar < 30 ? DEM.verse[(bar - 22) % 4] : bar < 34 ? DEM.pre[(bar - 30) % 4] : bar < 42 ? DEM.chorus[(bar - 34) % 4] : bar < 46 ? DEM.verse[(bar - 42) % 4] : bar < 54 ? DEM.chorus[(bar - 46) % 4] : 0,
+    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 216,
+    phone: [[88, 104]], phoneLane: 0, lateHint: '하은 손이 늦어요. 손을 봐요',
+    special:['밀리거나 붙잡힌 상자', 'off', '받아냄'],
+    sections: [[0, 'intro'], [2, 'v1'], [10, 'pre1'], [14, 'ch1'], [22, 'v2'], [30, 'pre2'], [34, 'ch2'], [42, 'bridge'], [46, 'ch3'], [54, 'outro']],
+    // lower belt (반장, right hand) and upper belt (하은, left hand). 'P' pushed, 'R' grabbed, 'L' late (하은 after the call)
+    bars: [
+      '........', '........',
+      'x...x...', 'x.x.x...', 'x...P...', 'x.x.x...', 'x...x.x.', 'R...x...', 'x.x.x...', 'x...P...',
+      'x...x...', 'x.x.x...', 'x...R...', 'x.x.x.x.',
+      'x.x.x...', 'P...x.x.', 'x...R...', 'x.x.x...', 'x.x.x.x.', 'R...P...', 'x.x.x...', 'x...x.P.',
+      'x...x...', 'x.x.x...', 'x...P...', 'x...x.x.', 'x.x.x...', 'R...x...', 'x...P.x.', 'x.x.x...',
+      'x...x...', 'x.x.x...', 'x...R...', 'x.x.x.x.',
+      'x.x.x...', 'P...x.x.', 'x...R...', 'x.x.x...', 'x.x.x.x.', 'R...P...', 'x.x.x...', 'x...x.P.',
+      'x.......', 'x...x...', 'x.......', 'x.x.x.x.',
+      'x.x.x.x.', 'P...x.x.', 'x...R.x.', 'x.x.x...', 'x.x.x.x.', 'R...P...', 'x.x.x.x.', 'P...x.R.',
+      '........', '........'
+    ],
+    bars2: [
+      '........', '........',
+      '....x...', 'x.......', '....x...', 'x.......', '....x...', 'x.......', '....R...', 'x.......',
+      'x...x...', 'x.......', 'x...x...', 'x.......',
+      'x...x...', 'x.P.....', 'x...x...', '....R...', 'x...x...', 'P.......', 'x...x...', '....x...',
+      '........', '........', '........', '........', 'L.......', '....L...', 'L...x...', '....x...',
+      'x...x...', 'x.......', 'x...x...', 'x.......',
+      'x...x...', 'x.P.....', 'x...x...', '....R...', 'x...x...', 'P.......', 'x...x...', '....x...',
+      '........', '....x...', '........', 'x...x...',
+      'x...x...', 'x.P.x...', 'x...x...', 'R...x...', 'x.x.x...', 'P...x...', 'x...x...', 'x.R.....',
+      '........', '........'
+    ],
+    say: [[8, '왼손 위, 오른손 아래.', 3, 1], [40, '(지게차 소리) …어, 저 양반 오늘은 반듯하네.', 3.5, 0, 's'], [60, '둘 다 본다. 손 봐.', 2.5, 0, 's'],
+          [86, '(전화) …네. 네, 알아요. 지금은…', 4, 0, 'h'], [96, '…끊을게요.', 2.5, 0, 'h'], [104, '…미안. 다시 해.', 3, 0, 'h'], [112, '…엄마가 좀 아파.', 3.5, 0, 'h'],
+          [168, '위에 늦는다! 신입, 손 봐.', 3, 1], [200, '…됐다. 수고.', 2.5, 0, 'h']],
+    comfort: ['괜찮아. 다음 거 봐.', '신입! 위도 봐!'],
+    intro: [
+      { who:'', text:'셋째 밤, 새벽 2시 10분. 2라인이 터져서 하은이 넘어왔다. 벨트가 둘.' },
+      { who:'반장', text:'위는 하은이 싣는다. 왼손 위, 오른손 아래.' },
+      { who:'하은', text:'…빨리 끝내자.' },
+      { who:'순자 이모', text:'둘 다 내가 본다. 손 봐.' }],
+    outro: (good, sp) => good ? [
+      { who:'하은', text:'…고마워. 위에.' },
+      { who:'반장', text:'…잘 받았다.' },
+      { who:'', text:'이모는 하은을 한 번 보고 아무 말도 하지 않았다. 지게차가 둘째 벨트 자리에 팔레트를 딱 맞춰 놓고 갔다.' }] : [
+      { who:'하은', text:'…내일은 내가 더 빨리 실을게.' }]
+  }
+  ,{
+    id:'s2-4', stageNo:'2-4', who:'박씨', role:'박씨 · 순자 이모 · 84→96→104 BPM', tag:'하드 록 · 중량물 두 손 · 템포 상승', bpm:84, style:'rock22', fxTheme:'rock', inspector: true,
     // 2-2 중량: peak season starts and 박씨 brings the pallets. Heavy boxes take both hands (two keys at once); the line speeds
     // up twice as the backlog grows, and the song, 박씨's cassette, moves up with it. The music comes first; the chart below is a
     // placeholder with heavies and a few crates.
@@ -749,12 +829,104 @@ const LEVELS = [
       'H.x.x.x.', 'H...x.x.', 'x.x.x.x.', 'H...H...', 'x.x.x.x.', 'H.x.x...', 'x.x.x.x.', 'H...H...',
       '........', '........'
     ],
-    say: [[16, '(임시) 무거운 건 두 손이다, 총각.', 3.5], [96, '물량 밀린다. 올려!', 3], [176, '한 단 더!', 2.5], [208, '…이 테이프, 아직 쓸 만하지?', 3.5]],
+    say: [[16, '두 손이다, 총각.', 3], [40, '(받치며) 무겁네. 뭘 이렇게 실었어.', 3.5, 0, 's'], [64, '내 거니까 건드리지 마요.', 3], [96, '물량 밀린다. 올려!', 3], [120, '…이 노래, 뭐야.', 3, 0, 's'], [176, '한 단 더!', 2.5], [184, '(흥얼) 탁, 탁탁, 탁…', 4, 0, 's'], [208, '…따라 부르지 마요.', 3], [212, '(웃음) 느린 박자네.', 3, 0, 's']],
     comfort: ['괜찮아. 다음 거.', '총각, 두 손!'],
     intro: [
-      { who:'', text:'(임시) 새벽 1시 30분. 성수기 첫 밤. 지게차가 팔레트를 내려놓는다.' },
-      { who:'박씨', text:'(임시) 무거운 건 두 손으로 받아. 카세트는 내 거니까 건드리지 말고.' }],
-    outro: good => good ? [{ who:'박씨', text:'(임시) …테이프 늘어지기 전에 끝났네.' }] : [{ who:'박씨', text:'(임시) …내일은 허리 조심해.' }]
+      { who:'', text:'넷째 밤, 새벽 0시 50분. 성수기 피크. 팔레트가 산처럼 쌓였다. 반장은 무릎 때문에 사무실.' },
+      { who:'박씨', text:'무거운 건 두 손. 카세트는 내 거니까 건드리지 말고.' },
+      { who:'순자 이모', text:'…무거운 건 내가 받쳐 줄게.' },
+      { who:'박씨', text:'…고맙습니다.' }],
+    outro: good => good ? [
+      { who:'박씨', text:'…테이프 늘어지기 전에 끝났네.' },
+      { who:'순자 이모', text:'지게차 태워 줘. 주차장까지.' },
+      { who:'박씨', text:'…네.' },
+      { who:'', text:'새벽. 지게차가 주차장까지 천천히 갔다. 손주 줄 장난감 하나가 이모 손에 들려 있었다.' },
+      { who:'박씨', text:'…내일도 나와요?' },
+      { who:'순자 이모', text:'…일이니까.' }] : [
+      { who:'박씨', text:'…내일은 허리 조심해.' }]
+  }
+  ,{
+    id:'s2-5', stageNo:'2-5', who:'반장', role:'반장 · 순자 이모 · 112 BPM · 라디오', tag:'본선 생중계 · 정전 16박 · 헤드라이트', bpm:112, style:'final21', fxTheme:'chill', inspector: true, radio: true, lofi: 2600,
+    // 2-5 본선 날: 지우 is at the final, and her set plays on the line's radio (her song through a small speaker). 소장 has told
+    // 박씨 the forklift goes to a contractor after the season; 이모 is cold and only grabs tonight; his pallets come in crooked
+    // ('L'). Halfway through the blues the power goes: the radio runs on batteries, the boxes show only in the scanner's glow and
+    // in the forklift's headlights, and you play by the thud of each box being set down two beats ahead.
+    tempo: [[0, 112]], clock:'03:10', title:'본선 날', partners:['boss'], hints:true,
+    chords: GOS.chords, roots: GOS.roots,
+    chordAt: bar => bar < 2 ? 0 : bar < 28 ? (bar - 2) % 4 : bar < 40 ? 4 + BLUES.prog[(bar - 28) % 12] : bar < 52 ? (bar - 40) % 4 : bar < 60 ? 7 + (bar - 52) % 4 : 7,
+    win: { p: 0.065, g: 0.125, m: 0.19, release: 0.18, off: 1.3 }, endAt: 240,
+    crazy: [[128, 144]], headlight: true, lateHint: '팔레트가 삐뚤어요. 반장님 손이 늦어요',
+    special:['소리로 받은 상자', 'range', '받아냄', [128, 144]],
+    sections: [[0, 'intro'], [2, 'verse'], [10, 'build'], [18, 'drop'], [26, 'break'], [28, 'blues'], [40, 'drop2'], [48, 'vamp'], [52, 'lift'], [60, 'outro']],
+    bars: [
+      '........', '........',
+      'x.......', 'x...x...', 'x.......', 'x...L...', 'x.......', 'x...x...', 'x...R...', 'x.......',
+      'x...x...', 'x.x.x...', 'x...L...', 'x.x.x...', 'x...R...', 'x...x...', 'x.x.x...', 'x.......',
+      'x.x.x...', 'x...R...', 'x.x.x.x.', 'h===....', 'x.x.x...', 'L...x...', 'x.x.x.x.', 'h=====..',
+      '........', '........',
+      'x...x...', 'x...R...', 'x.x.x...', 'L...x...', 'x...x...', 'x.......', 'x...x...', 'x.......', 'x...R...', 'x.x.x...', 'L...x...', 'h=====..',
+      'x.x.x...', 'x...R...', 'x.x.x.x.', 'h===..x.', 'x.x.x...', 'R...x...', 'x.x.x.x.', 'x.......',
+      'x...x...', 'x...x...', 'x.x.x...', 'x.x.x.x.',
+      'x.x.x.x.', 'x...R...', 'x.x.x...', 'h=o=....', 'x.x.x.x.', 'L...x...', 'x.x.x.x.', 'x.x.x.x.',
+      '........', '........'
+    ],
+    say: [[4, '(라디오) 다음, 17번.', 3], [8, '(라디오) …시작할게요.', 2.5], [20, '(팔레트가 삐뚤다) …저 양반, 오늘은 왜.', 3.5, 0, 's'], [72, '(라디오 너머 박수)', 2.5],
+          [104, '(라디오) 반장님… 들리세요?', 3.5], [112, '(작게) …들린다.', 2.5], [124, '정전이다! 라디오는 배터리야.', 3], [129, '(헤드라이트가 켜진다) …저 양반.', 3.5, 0, 's'], [146, '…불 들어온다.', 2.5],
+          [160, '(라디오) 같이 가요!!', 3], [194, '(지게차가 나간다) …', 2.5, 0, 's'], [208, '(라디오) 끝까지!!', 3]],
+    comfort: ['괜찮아. 소리 들어.', '내 손 봐.'],
+    intro: [
+      { who:'', text:'다섯째 밤, 새벽 3시 10분. 지우는 본선. 라인 라디오를 켰다.' },
+      { who:'소장', text:'성수기 끝나면 지게차는 외주로 돌립니다. 박 기사는 이번 주까지.' },
+      { who:'순자 이모', text:'…가면 가는 거지.' },
+      { who:'반장', text:'…라디오 소리나 키워.' }],
+    outro: good => good ? [
+      { who:'', text:'라디오 너머로 박수. 전화가 울렸다.' },
+      { who:'지우', text:'(전화) 반장님!!! 붙었어요!!! 기타 누구 거냐고 물어봤어요!!!' },
+      { who:'반장', text:'…마음대로 해.' },
+      { who:'', text:'이모는 비어 있는 지게차 자리를 보지 않았다. 하은의 전화기도 울렸다. 하은은 받지 않고 나갔다.' }] : [
+      { who:'반장', text:'…라디오 꺼.' },
+      { who:'순자 이모', text:'…내일 또 보자.' }]
+  }
+  ,{
+    id:'s2-6', stageNo:'2-6', who:'순자 이모 + 박씨', role:'소장 → 박씨 · 순자 이모 · 108 BPM', tag:'피날레 · 두 곡이 만난다', bpm:108, style:'finale26', fxTheme:'gold', inspector: true,
+    // 2-6 피날레: the last night before the holiday. The forklift's spot is empty and 소장 loads the pallets himself, late and
+    // crooked; 이모 pushes his late boxes straight ('Q': late, then pushed, so it lands on its beat). A horn: 박씨 is back on a
+    // contractor's night shift. From there it is heavies with her hands under them and both their songs at once.
+    tempo: [[0, 108]], clock:'01:20', title:'마지막 밤', partners:['chief'], hints:true,
+    cast: { first: 'chief', ids: ['chief', 'park'], seq: [[72, 'park', 'exit']], offUntil: { park: 72 } },
+    chords: FIN.chords, roots: FIN.roots,
+    chordAt: bar => bar < 2 ? 0 : bar < 10 ? DISCO.verse[(bar - 2) % 4] : bar < 18 ? DISCO.chorus[(bar - 10) % 4] : bar < 20 ? 0 : bar < 28 ? 6 : bar < 36 ? 6 + ROCK.chorus[(bar - 28) % 4] : bar < 40 ? 6 + ROCK.chorus[(bar - 36) % 4] : bar < 48 ? DISCO.chorus[(bar - 40) % 4] : 0,
+    win: { p: 0.065, g: 0.125, m: 0.19, release: 0.18, off: 1.3 }, endAt: 192,
+    lateHint: '소장님 손이 늦어요. 이모가 밀면 제자리로',
+    special:['늦게 실린 상자', 'late', '바로잡음'],
+    sections: [[0, 'intro'], [2, 'a1'], [10, 'a2'], [18, 'horn'], [20, 'd1'], [28, 'd2'], [36, 'fin'], [44, 'coda'], [48, 'outro']],
+    // 'L' late (소장), 'Q' late and pushed straight, 'H' heavy (박씨), 'P' pushed, 'R' grabbed
+    bars: [
+      '........', '........',
+      'L...x...', 'x...L...', 'Q...x...', 'x.L.x...', 'L...Q...', 'x...x...', 'Q...L...', 'x.x.x...',
+      'x.x.x...', 'L...x.Q.', 'x...R...', 'Q.x.x...', 'x.x.L...', 'P...x...', 'x...Q...', 'L.x.x...',
+      'x.......', '........',
+      'x...x...', 'H.......', 'x.x.x...', 'H...x...', 'x...x.x.', 'H...P...', 'x.x.x...', 'H...R...',
+      'x.x.x.x.', 'H...x.x.', 'x...P...', 'H.R.x...', 'x.x.x.x.', 'H...x...', 'P...x.P.', 'H...H...',
+      'x.x.x.x.', 'H...P...', 'x.R.x...', 'H...x.x.', 'x.x.x.x.', 'H.x.P...', 'x...R...', 'H...H...',
+      'x.x.x.x.', 'H...P...', 'x.x.x.x.', 'H...H...',
+      '........', '........'
+    ],
+    say: [[8, '(삐뚤게 싣는다) 자, 자. 돌아갑니다.', 3.5], [24, '…늦잖아. 내가 민다.', 3, 0, 's'], [44, '소장님, 손이 늦어요.', 3, 0, 's'], [66, '(경적) …?', 2, 0, 's'],
+          [76, '외주 야간. 제가 들어왔습니다.', 4], [84, '…뭘 봐.', 2.5, 0, 's'], [96, '무거운 건 두 손.', 2.5], [120, '(받치며) …느리네, 여전히.', 3, 0, 's'],
+          [144, '(카세트를 꺼낸다) …이거.', 3], [152, '(테이프에 "순자 씨") …', 3, 0, 's'], [160, '…내 박자 느려도, 같이 맞춰 줄래요.', 4.5], [168, '탁, 탁탁, 탁. 그 박자면 돼.', 4, 0, 's']],
+    comfort: ['괜찮아, 다음 거.', '총각! 손 봐, 손!'],
+    intro: [
+      { who:'', text:'명절 전 마지막 밤, 새벽 1시 20분. 지게차 자리가 비었다. 소장이 직접 팔레트를 내린다.' },
+      { who:'소장', text:'지게차 없어도 돌아갑니다. 제가 싣죠.' },
+      { who:'순자 이모', text:'…삐뚤잖아.' },
+      { who:'소장', text:'검수나 하세요.' }],
+    outro: good => good ? [
+      { who:'', text:'마지막 상자가 게이트를 지났다. 둘은 아무 말이 없었다.' },
+      { who:'반장', text:'(사무실에서 나오며) …새벽이다. 집에들 가.' },
+      { who:'', text:'지게차가 이모를 태우고 주차장으로 갔다. 카세트는 이모 앞치마 주머니에 있었다. B면은 비어 있었다.' }] : [
+      { who:'박씨', text:'…다시 해도 돼요?' },
+      { who:'순자 이모', text:'…내일.' }]
   }
   ,{
     id:'s2-stage', stageNo:'2-무대', who:'지우', role:'지우 · 본선 · 112 BPM', tag:'가스펠 스톰프 · 반장 기타 클립 · 정박', bpm:112, style:'final21', daw:true, place:'본선 무대',
@@ -821,7 +993,10 @@ const STAGE1 = [
   { level: LEVELS[3] },
   { level: LEVELS[4], stage2: true },
   { level: LEVELS[5] },
-  { level: LEVELS[6] }
+  { level: LEVELS[6] },
+  { level: LEVELS[7] },
+  { level: LEVELS[8] },
+  { level: LEVELS[9] }
 ];
 
 // ---------- tempo + chart ----------
@@ -849,7 +1024,7 @@ function loadLevel(level) {
       const ch = bar[c]; if (ch === '.' || ch === '=') continue;
       let len = 0;
       if (ch === 'h') { let k = c + 1, cnt = 1; while (bar[k] === '=' || bar[k] === 'o') { cnt++; k++; } len = cnt / div; }
-      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : ch === 'P' ? -0.5 : ch === 'R' ? 0.5 : 0), beat0: bi * 4 + c / div, push: ch === 'P', grab: ch === 'R', len, late: ch === 'L', heavy: ch === 'H', gtr: ch === 'G', shuffle: div === 3 && c % 3 === 2, off: ch === 'P' || ch === 'R' || (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane });
+      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : ch === 'P' ? -0.5 : ch === 'R' ? 0.5 : 0), beat0: bi * 4 + c / div + (ch === 'Q' ? 0.5 : 0), push: ch === 'P' || ch === 'Q', grab: ch === 'R', len, late: ch === 'L' || ch === 'Q', heavy: ch === 'H', gtr: ch === 'G', shuffle: div === 3 && c % 3 === 2, off: ch === 'P' || ch === 'R' || (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane });
     }
   }));
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
@@ -1499,11 +1674,12 @@ function seqGone(beat, id) { return L.cast.seq.some(([b0, to, mode]) => mode ===
 function drawCast2(t, nowMs, active, placerPose) {
   const beat = castBeatAt(t, active), ph = beat - Math.floor(beat), placer = seqPlacer(beat), sw = seqSwap(beat), walkBob = ph < 0.5 ? 1 : 0;
   const xs = {};
-  for (const id of ['boss', 'jiwoo']) xs[id] = sw ? (id === sw.to ? lerp(OBS_X, BOSS_X, ease(sw.rel / 6)) : lerp(BOSS_X, sw.exit ? W + 30 : OBS_X, ease((sw.rel - 2) / 6))) : id === placer ? BOSS_X : seqGone(beat, id) ? W + 30 : OBS_X;
+  const ids = L.cast.ids || ['boss', 'jiwoo'], off = L.cast.offUntil || {};
+  for (const id of ids) xs[id] = sw ? (id === sw.to ? lerp(off[id] != null ? W + 30 : OBS_X, BOSS_X, ease(sw.rel / 6)) : lerp(BOSS_X, sw.exit ? W + 30 : OBS_X, ease((sw.rel - 2) / 6))) : id === placer ? BOSS_X : seqGone(beat, id) || (off[id] != null && beat < off[id]) ? W + 30 : OBS_X;
   const leaving = L.cast.leave != null && beat >= L.cast.leave;
   if (leaving) xs[placer] = lerp(BOSS_X, W + 30, ease((beat - L.cast.leave) / 6));
   CAST.dx = xs[placer] - BOSS_X; CAST.hideArm = !!sw || leaving;
-  for (const id of ['boss', 'jiwoo']) {
+  for (const id of ids) {
     if (xs[id] >= W + 20) continue;
     const atLine = !sw && !leaving && id === placer, mirror = sw ? id === sw.to : id !== placer && !leaving, tired = id === 'boss' && !atLine && beat >= 88 && beat < 144;
     const pose = atLine ? placerPose : { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: tired, dip: 0, bob: !active ? 0 : (sw || leaving) ? walkBob : (id === 'jiwoo' && ph < 0.25 ? 1 : 0),
@@ -1907,18 +2083,23 @@ function noteX(n, t) {
 const shoop = t => { const fl = ctx.createBiquadFilter(); fl.type = 'bandpass'; fl.Q.value = 1.2; fl.frequency.setValueAtTime(2200, t); fl.frequency.exponentialRampToValueAtTime(500, t + 0.14); fl.connect(bus); noise(t, 'highpass', 300, 0.3, 0.14, 0.7, fl); roller(t + 0.03, 0.05); };
 function drawInspector(t, active, nowMs) {
   const beat = active ? beatAt(t) : (state === 'outro' || state === 'result') ? END_BEAT : 0, ph = beat - Math.floor(beat);
-  const onPhone = active && inRange(beat, L.phone);
+  const onPhone = active && inRange(beat, L.phone) && (L.phoneLane == null || L.phoneLane === 2);
+  // with two belts she stands between them (like 반장 in 1-4) and reaches up to the far one or down to the near one
+  const two = L.lanes === 2, ox = two ? 8 : 0, oy = two ? -14 : 0, by = lane => two ? (lane === 0 ? -22 : 14) : 0;
+  g.save(); g.translate(ox, oy);
   // the post: a lectern with the scan sheet and a lamp, the stamp pad
   R(INSPECT_X - 2, 112, 30, 3, '#5b4a3a'); R(INSPECT_X + 1, 115, 24, 2, '#3f3328'); R(INSPECT_X + 10, 117, 6, 29, '#3f3328'); R(INSPECT_X + 4, 113, 12, 2, '#efe6d2'); R(INSPECT_X + 18, 112, 7, 3, '#8a2f2a');
   R(INSPECT_X + 25, 94, 2, 18, '#6a7075'); R(INSPECT_X + 20, 92, 12, 3, '#3a3d45'); R(INSPECT_X + 22, 95, 8, 1, '#ffe9a8');
-  // her hand: idle on the sheet; the stamp drops on a passing box; the shove winds up and goes
-  let hand = { x: BOSS_X + 14, y: 116 }, act = null;   // resting on the sheet
+  // her hand: resting on the sheet; the stamp drops on a passing box; the shove winds up and goes; the grab holds the box;
+  // both hands go under a heavy one
+  let hand = { x: BOSS_X + 14, y: 116 }, act = null, dy = 0;
   if (active) for (const n of notes) {
     if (n.state === 'pending' || n.state === 'hit' || n.state === 'miss' || n.state === 'holding') {
-      const tp = passAt(n), rel = t - tp;
-      if (n.grab) { if (rel >= -0.15 * SPB && t < n.tRel + 0.12 * SPB) { act = t < n.tRel ? 'grab' : 'let'; hand = t < n.tRel ? { x: BOSS_X + 12, y: 119 } : { x: BOSS_X + 16, y: 114 }; break; } }
-      else if (n.push) { if (rel >= -0.5 * SPB && rel < 0.35 * SPB) { act = rel < 0 ? 'wind' : 'shove'; hand = rel < 0 ? { x: BOSS_X - 4 - 6 * (-rel / (0.5 * SPB)), y: 104 - 8 * (-rel / (0.5 * SPB)) } : { x: BOSS_X + 24 - 10 * (rel / (0.35 * SPB)), y: 116 }; break; } }
-      else if (!onPhone && !n.top && rel >= -0.2 * SPB && rel < 0.25 * SPB) { act = 'stamp'; hand = rel < 0 ? { x: BOSS_X + 12, y: 104 } : { x: BOSS_X + 12, y: 118 }; break; }
+      const tp = passAt(n), rel = t - tp, ly = by(n.lane);
+      if (n.grab) { if (rel >= -0.15 * SPB && t < n.tRel + 0.12 * SPB) { act = t < n.tRel ? 'grab' : 'let'; dy = ly; hand = t < n.tRel ? { x: BOSS_X + 12, y: 119 + ly } : { x: BOSS_X + 16, y: 114 + ly }; break; } }
+      else if (n.push) { if (rel >= -0.5 * SPB && rel < 0.35 * SPB) { act = rel < 0 ? 'wind' : 'shove'; dy = ly; hand = rel < 0 ? { x: BOSS_X - 4 - 6 * (-rel / (0.5 * SPB)), y: 104 - 8 * (-rel / (0.5 * SPB)) + ly * 0.5 } : { x: BOSS_X + 24 - 10 * (rel / (0.35 * SPB)), y: 116 + ly }; break; } }
+      else if (n.heavy && !onPhone && rel >= -0.3 * SPB && rel < 0.45 * SPB) { act = 'lift'; dy = ly; hand = { x: BOSS_X + 11, y: 123 + ly }; break; }
+      else if (!onPhone && !n.top && rel >= -0.2 * SPB && rel < 0.25 * SPB) { act = 'stamp'; dy = ly; hand = rel < 0 ? { x: BOSS_X + 12, y: 104 + ly } : { x: BOSS_X + 12, y: 118 + ly }; break; }
     }
   }
   const pose = { hand, carry: null, wince: false, dip: 0, bob: active && !onPhone && ph < 0.2 ? 1 : 0, nod: 0, doze: false, phone: onPhone, vibe: false, unplug: false, lane: 2 };
@@ -1926,10 +2107,19 @@ function drawInspector(t, active, nowMs) {
   drawActor('sunja', INSPECT_X, false, pose, nowMs, active, top => {
     if (onPhone) return;
     PARTNERS.sunja.arm(pose);
-    if (act === 'stamp' && hand.y > 110) { R(hand.x - 3, hand.y + 2, 6, 2, '#8a2f2a'); }
+    if (act === 'lift') { thick(BOSS_X - 6, top + 22, hand.x - 9, hand.y + 1, 4, '#d87a9a'); R(hand.x - 11, hand.y - 1, 4, 4, C.skin); }
+    if (act === 'stamp' && hand.y - dy > 110) R(hand.x - 3, hand.y + 2, 6, 2, '#8a2f2a');
     if (act === 'wind') { R(hand.x + 2, hand.y - 6, 1, 1, '#ffe9a8'); R(hand.x + 5, hand.y - 4, 1, 1, '#ffe9a8'); }
     if (act === 'grab') { R(BOSS_X + 9, top - 10, 3, 1, '#efe6d2'); R(BOSS_X + 12, top - 9, 1, 2, '#efe6d2'); R(BOSS_X + 11, top - 7, 1, 1, '#efe6d2'); R(BOSS_X + 10, top - 5, 1, 1, '#efe6d2'); R(BOSS_X + 10, top - 3, 1, 1, '#efe6d2'); }
   });
+  g.restore();
+  // 박씨 walks by behind the belt (L.cameo = { from, to } in beats): in from the right, a stop by her post, and on out to the left
+  if (L.cameo && active && beat >= L.cameo.from && beat < L.cameo.to) {
+    const p = (beat - L.cameo.from) / (L.cameo.to - L.cameo.from), stopX = INSPECT_X + 48;
+    const x = p < 0.35 ? lerp(W + 24, stopX, ease(p / 0.35)) : p < 0.7 ? stopX : lerp(stopX, -30, ease((p - 0.7) / 0.3)), walking = p < 0.35 || p >= 0.7;
+    const pose2 = { hand: { x: BOSS_X + 9, y: 138 }, carry: null, wince: false, dip: 0, bob: walking && Math.floor(nowMs / 190) % 2 === 0 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
+    drawActor('park', x, true, pose2, nowMs, active, top => { R(BOSS_X - 9, top + 25, 18, 5, '#6e4a33'); R(BOSS_X + 4, top + 2, 2, 2, '#f4f1ea'); for (let k = 0; k < 6; k++) R(BOSS_X + 5, top + 4 + k, 1, 1, '#f4f1ea'); });
+  }
 }
 // ---------- 2-1 stage (the audition hall) ----------
 const LAPTOP = { x: 54, y: 112, kx: 64, ky: 121 }, PAD = { x: 314, y: 126 };
@@ -2540,7 +2730,13 @@ function drawScene(t, bt, active, nowMs) {
       pr.addColorStop(0, 'rgba(0,0,0,.35)'); pr.addColorStop(1, 'rgba(0,0,0,0)');
       d.fillStyle = pr; d.fillRect(BOSS_X - 40, 78 + dy, 80, 80);
     }
+    if (L.headlight) {
+      // the forklift's headlights from the left edge, along the belt as far as the inspector's post
+      const hg = d.createLinearGradient(0, 0, INSPECT_X + 70, 0); hg.addColorStop(0, 'rgba(0,0,0,.95)'); hg.addColorStop(0.7, 'rgba(0,0,0,.6)'); hg.addColorStop(1, 'rgba(0,0,0,0)');
+      d.fillStyle = hg; d.beginPath(); d.moveTo(0, BELT_Y - 34); d.lineTo(INSPECT_X + 70, BELT_Y - 48); d.lineTo(INSPECT_X + 70, BELT_Y + 14); d.lineTo(0, BELT_Y + 4); d.closePath(); d.fill();
+    }
     g.drawImage(darkBuf, 0, 0);
+    if (L.headlight) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = dark; R(0, BELT_Y - 30, 7, 5, '#fff6d0'); R(0, BELT_Y - 12, 7, 5, '#fff6d0'); const bg2 = g.createLinearGradient(0, 0, INSPECT_X + 70, 0); bg2.addColorStop(0, 'rgba(255,240,200,.22)'); bg2.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = bg2; g.beginPath(); g.moveTo(0, BELT_Y - 34); g.lineTo(INSPECT_X + 70, BELT_Y - 48); g.lineTo(INSPECT_X + 70, BELT_Y + 14); g.lineTo(0, BELT_Y + 4); g.closePath(); g.fill(); g.restore(); }
     const pulse = 0.05 + 0.05 * Math.sin(nowMs / 160);
     g.fillStyle = `rgba(220,30,20,${pulse * dark})`; g.fillRect(0, 0, W, H);
     R(170, 2, 44, 3, `rgba(255,60,40,${(0.5 + 0.5 * Math.sin(nowMs / 160)) * dark})`);
@@ -3317,6 +3513,7 @@ function buildEvents() {
       // verse; the choir hook for the chorus; a tape stop and 반장's pickup; a 12-bar gospel blues with his guitar on top of the
       // stomp; the chorus again with his answers; a four-bar vamp; and the hook a whole step up with claps on every beat.
       const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), lift = sec === 'lift', lf = lift ? LIFT : 1;
+      if (L.radio) { if (b === 0) E(0, T => musHP.frequency.setValueAtTime(380, T)); if (inBar === 0) E(0, T => noise(T, 'highpass', 4500, 0.012, s * 4, 0.5)); }
       const stomp = (T, v) => { kick(T, v); noise(T, 'lowpass', 220, v * 0.5, 0.09, 0.7); };
       const tamb = (T, v) => { noise(T, 'highpass', 6500, v, 0.05, 0.7); noise(T + 0.012, 'highpass', 8000, v * 0.6, 0.04, 0.7); };
       const choir = (T, f, d, v) => { voice(T, f, d, v); voice(T + 0.01, f / 2, d, v * 0.5); piano(T, [f], d * 0.6, v * 0.8); };
@@ -3485,6 +3682,76 @@ function buildEvents() {
       if (verse) for (const [ob, nm, len] of DMEL_A) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { voice(T, FN[nm], len * s * 0.9, 0.03); ep(T, [FN[nm]], len * s * 0.7, 0.012); });
       if (chorus) for (const [ob, nm, len] of DMEL_B) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { voice(T, FN[nm], len * s * 0.92, 0.034); voice(T + 0.015, FN[nm] / 2, len * s * 0.9, 0.012); if (sec === 'ch4') supersaw(T, [FN[nm] * 2], len * s * 0.9, 0.006, 2600); });
       if (sec === 'ch4') for (const [ob, nm, len] of DHORN) if (Math.floor(ob) === rel) E((ob - rel) * s, T => brassStab(T, [FN[nm], FN[nm] * 1.5], len * s * 0.9, 0.026));
+    } else if (style === 'dembow23') {
+      // 2-3 두 벨트: reggaeton. The dembow under everything (kick on 1 and 3, the rim and clap on the 'a' of 1 and the 'and' of 2),
+      // 8th hats and 16th shaker, an 808 under the kicks, piano on the off 8ths, a pad, brass in the chorus, the verse sung
+      // and the hook on a synth lead with the voice under it; the band thins while 하은 is on the phone.
+      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), chorus = sec.startsWith('ch'), pre = sec.startsWith('pre'), verse = sec.startsWith('v'), bridge = sec === 'bridge';
+      const thin = phone || bridge;
+      if (sec === 'intro') { E(0, T => roller(T, 0.03)); if (b >= 4) { for (let k = 0; k < 4; k++) E(k * s / 4, T => shaker(T, 0.02)); if (b === 4) E(0, T => piano(T, chords[0].map(f => f * 2), s * 3, 0.04)); if (b === 7) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.1 + k * 0.05)); } continue; }
+      if (sec === 'outro') continue;
+      if (b === 8 || b === 56 || b === 136 || b === 184) E(0, T => crash(T));
+      if (inBar === 0 || inBar === 2) E(0, T => kick(T, thin ? 0.5 : 0.9));
+      if (!thin) { if (inBar === 0 || inBar === 2) E(3 * s / 4, T => { rim(T, 0.35); clap(T, 0.12); }); if (inBar === 1 || inBar === 3) E(s / 2, T => { rim(T, 0.35); clap(T, chorus ? 0.2 : 0.12); snare(T, chorus ? 0.14 : 0.08); }); }
+      E(0, T => hat(T, 0.035)); E(s / 2, T => hat(T, 0.045)); if (chorus || pre) for (let k = 0; k < 4; k++) E(k * s / 4 + s / 8, T => shaker(T, 0.018));
+      if (inBar === 0 || inBar === 2) E(0, T => sub808(T, roots[ci], s * 1.4, thin ? 0.14 : 0.22)); if (!thin && inBar === 3) E(s / 2, T => bass(T, roots[ci] * 1.5, s * 0.3, 700));
+      E(s / 2, T => piano(T, chords[ci].slice(0, 3).map(f => f * 2), s * 0.35, thin ? 0.03 : chorus ? 0.04 : 0.034));
+      if (inBar === 0) E(0, T => pad(T, chords[ci].map(f => f * 2), s * 4, 'sawtooth', chorus ? 0.014 : 0.008));
+      if (chorus && !thin && (inBar === 0 || inBar === 2) && bar % 2 === 1) E(inBar === 0 ? 0 : s / 4, T => brassStab(T, chords[ci].slice(0, 3).map(f => f * 2), s * 0.3, 0.024));
+      if (pre) { if ((bar - (bar < 20 ? 10 : 30)) === 3) { for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.08 + k * 0.04 + inBar * 0.03)); } if ((bar - (bar < 20 ? 10 : 30)) === 2 && inBar === 0) E(0, T => riser(T, s * 8, 0.045)); }
+      if (inBar === 3 && bar % 8 === 5 && !thin) for (let k = 0; k < 4; k++) E(k * s / 4, T => rim(T, 0.2 + k * 0.05));
+      // 이모's snaps from the first chorus
+      if ((chorus || verse) && bar >= 14 && L.inspector) { if (inBar === 0 || inBar === 2) E(0, T => tak(T, 0.14)); if (inBar === 1) { E(0, T => tak(T, 0.14)); E(s / 4, T => tak(T, 0.12)); } }
+      const start = sec === 'v1' ? 8 : sec === 'pre1' ? 40 : sec === 'ch1' ? 56 : sec === 'v2' ? 88 : sec === 'pre2' ? 120 : sec === 'ch2' ? 136 : sec === 'bridge' ? 168 : 184;
+      if (verse) { const rel = (b - start) % 16; for (const [ob, nm, len] of DMB_A) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { voice(T, DN[nm], len * s * 0.9, thin ? 0.02 : 0.03); ep(T, [DN[nm]], len * s * 0.7, 0.012); }); }
+      if (chorus) { const rel = (b - start) % 32; for (const [ob, nm, len] of DMB_B) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { synthLead(T, DN[nm], len * s * 0.9, 0.03); voice(T, DN[nm], len * s * 0.9, 0.022); }); }
+      if (bridge && inBar === 0) E(0, T => chords[ci].slice(0, 3).forEach(f => voice(T, f * 2, s * 3.6, 0.01)));
+    } else if (style === 'finale26') {
+      // 2-6 피날레: 소장's half is 이모's disco, thin and slow; the horn; then 박씨's riff and hook come in a minor third up, in her
+      // key, over her floor; the last stretch is his hook, then hers, then both at once with the horns.
+      const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), st = f => k => f * Math.pow(2, k / 12), root2 = roots[ci] * 2;
+      const pc = (T, f, d, v) => { gtrDist(T, f, d, v); gtrDist(T, f * 1.5, d, v * 0.8); gtrDist(T, f * 2, d, v * 0.5); };
+      const bigSnare = (T, v) => { snare(T, v); noise(T, 'lowpass', 2600, v * 0.7, 0.17, 0.7); };
+      const chief = sec === 'a1' || sec === 'a2', horn = sec === 'horn', d1 = sec === 'd1', d2 = sec === 'd2', fin = sec === 'fin', coda = sec === 'coda';
+      if (sec === 'intro') { E(0, T => roller(T, 0.03)); if (b >= 4) { E(0, T => hat(T, 0.035)); E(s / 2, T => openHat(T, 0.04)); } if (b === 6) E(0, T => piano(T, chords[0].map(f => f * 2), s * 2, 0.035)); continue; }
+      if (sec === 'outro') continue;
+      if (b === 72) E(0, T => { truckHorn(T); forklift(T + s, 0.04); forklift(T + s * 1.5, 0.04); });
+      if (b === 80 || b === 112 || b === 144 || b === 160 || b === 176) E(0, T => crash(T));
+      if (b === 80) E(0, T => subDrop(T));
+      if (chief) {
+        // her disco, thin: the floor, the open hat, the slap and a faint clavinet; the clap and strings for the chorus half
+        E(0, T => kick(T, 0.7)); E(s / 2, T => openHat(T, 0.04)); E(s / 4, T => hat(T, 0.015)); E(3 * s / 4, T => hat(T, 0.02));
+        if (sec === 'a2' && (inBar === 1 || inBar === 3)) E(0, T => { clap(T, 0.16); snare(T, 0.14); });
+        for (const [ob, k, len] of DISCO.slap) if (Math.floor(ob) === inBar) E((ob - inBar) * s, T => slap(T, st(roots[ci])(k), len * s * 0.8));
+        for (const [ob, k, len] of DISCO.clav) if (Math.floor(ob) === inBar) E((ob - inBar) * s, T => clav(T, st(root2)(k), len * s * 0.8, 0.014));
+        if (sec === 'a2' && inBar === 0) E(0, T => supersaw(T, chords[ci].map(f => f * 2), s * 4, 0.008, 2200));
+        const rel = (b - (sec === 'a1' ? 8 : 40)) % 32;
+        if (sec === 'a1') for (const [ob, nm, len] of DMEL_A) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { voice(T, FN[nm], len * s * 0.9, 0.028); ep(T, [FN[nm]], len * s * 0.7, 0.01); });
+        else for (const [ob, nm, len] of DMEL_B) if (Math.floor(ob) === rel) E((ob - rel) * s, T => voice(T, FN[nm], len * s * 0.92, 0.03));
+        if (inBar === 0 || inBar === 2) E(0, T => tak(T, 0.14)); if (inBar === 1) { E(0, T => tak(T, 0.14)); E(s / 4, T => tak(T, 0.12)); }
+        continue;
+      }
+      if (horn) { E(0, T => kick(T, 0.6)); E(s / 2, T => hat(T, 0.03)); if (bar === 19 && inBar >= 2) for (let k = 0; k < 4; k++) E(k * s / 4, T => bigSnare(T, 0.14 + k * 0.05 + (inBar - 2) * 0.1)); continue; }
+      // the floor under his riff: four on the floor, the open hat, the big snare and clap on 2 and 4, his snaps for hers
+      E(0, T => kick(T, 0.9)); E(s / 2, T => openHat(T, 0.06)); E(s / 4, T => hat(T, 0.02)); E(3 * s / 4, T => hat(T, 0.03));
+      if (inBar === 1 || inBar === 3) E(0, T => { bigSnare(T, coda ? 0.36 : 0.3); clap(T, 0.22); });
+      if (coda) E(0, T => clap(T, 0.18)); if (coda && bar === 47 && inBar >= 2) for (let k = 0; k < 4; k++) E(k * s / 4, T => snare(T, 0.1 + k * 0.05 + (inBar - 2) * 0.1));
+      if (inBar === 0 || inBar === 2) E(0, T => tak(T, 0.16)); if (inBar === 1) { E(0, T => tak(T, 0.16)); E(s / 4, T => tak(T, 0.13)); }
+      if (d1) {
+        // his riff in her key, the slap bass on its roots
+        const rb = (b - 80) % 8; for (const [ob, nm, len] of RRIFF) if (Math.floor(ob) === rb) E((ob - rb) * s, T => { pc(T, RROOT[nm] * 2 * UP3, len * s * 0.9, 0.045); slap(T, RROOT[nm] * UP3, len * s * 0.9); });
+        for (const [ob, k, len] of DISCO.clav) if (Math.floor(ob) === inBar) E((ob - inBar) * s, T => clav(T, st(root2)(k), len * s * 0.8, 0.012));
+      } else {
+        // the changes: power chords on 1, the 'and' of 2 and 4, the slap on 8ths, strings
+        if (inBar === 0) E(0, T => pc(T, root2, s * 1.4, 0.045)); if (inBar === 1) E(s / 2, T => pc(T, root2, s * 0.5, 0.036)); if (inBar === 3) E(0, T => pc(T, root2, s * 0.9, 0.04));
+        for (const [ob, k, len] of DISCO.slap) if (Math.floor(ob) === inBar) E((ob - inBar) * s, T => slap(T, st(roots[ci])(k), len * s * 0.8));
+        if (inBar === 0) E(0, T => supersaw(T, chords[ci].map(f => f * 2), s * 4, 0.01, 2400));
+        const hisRel = d2 ? (b - 112) % 32 : fin && bar < 40 ? (b - 144) % 32 : coda ? (b - 176) + 16 : -1;
+        const herRel = fin && bar >= 40 ? (b - 160) % 32 : coda ? (b - 176) + 16 : -1;
+        if (hisRel >= 0) for (const [ob, nm, len] of RMEL_B) if (Math.floor(ob) === hisRel) E((ob - hisRel) * s, T => { voice(T, RN[nm] * UP3, len * s * 0.95, 0.03); if (len >= 1) gtrDist(T, RN[nm] * UP3, len * s * 0.9, 0.03); });
+        if (herRel >= 0) for (const [ob, nm, len] of DMEL_B) if (Math.floor(ob) === herRel) E((ob - herRel) * s, T => { voice(T + 0.02, FN[nm], len * s * 0.92, 0.03); if (coda) brassStab(T, [FN[nm], FN[nm] * 1.5], len * s * 0.7, 0.018); });
+        if (herRel >= 0 && !coda) for (const [ob, nm, len] of DHORN) if (Math.floor(ob) === herRel) E((ob - herRel) * s, T => brassStab(T, [FN[nm], FN[nm] * 1.5], len * s * 0.9, 0.024));
+      }
     } else if (style === 'rock22') {
       // 2-2 중량: 80s hard rock off 박씨's cassette. Forklift beeps count it in; the riff on power chords with the bass in unison
       // over half-time drums at 84; a sung verse over palm-muted 8ths and a clean arpeggio; the anthem chorus with the big snare,
@@ -3522,6 +3789,8 @@ function buildEvents() {
         for (let k = 0; k < 4; k++) E(k * s / 4, T => hat(T, k % 2 ? 0.03 : 0.055)); if (inBar === 3) E(s / 2, T => openHat(T, 0.07));
         if (inBar === 3 && bar % 4 === 3) for (let k = 0; k < 8; k++) E(k * s / 8, T => snare(T, 0.08 + k * 0.03));
         if (bar % 4 === 3 && inBar === 2) for (let k = 0; k < 4; k++) E(k * s / 4, T => tom(T, 200 - k * 30, 0.3));
+        // 이모 humming along: her snaps on the riff's rhythm
+        if (L.inspector) { if (inBar === 0 || inBar === 2) E(0, T => tak(T, 0.18)); if (inBar === 1) { E(0, T => tak(T, 0.18)); E(s / 4, T => tak(T, 0.15)); } }
       }
       // bass: 8ths on the root (the riff's roots in the riff)
       if (riff) { const rb = (b - 16) % 8; for (const [ob, nm, len] of RRIFF) if (Math.floor(ob) === rb) E((ob - rb) * s, T => { bass(T, RROOT[nm], len * s * 0.9, 700); pc(T, RROOT[nm] * 2, len * s * 0.9, 0.045); }); }
@@ -3629,6 +3898,8 @@ function buildEvents() {
       return;
     }
     if (L.style === 'soul21') { kick(T, 0.8); crash(T, 0.7); rhodes(T, chords[5], SPB * 6, 0.045); sub808(T, roots[5], SPB * 4, 0.22); brassStab(T, chords[5].slice(0, 3).map(f => f * 2), SPB * 1.2, 0.03); sax(T, SN.D5 * SOUL.half, SPB * 3.5, 0.05, true); chords[5].slice(0, 3).forEach(f => voice(T, f * 2, SPB * 5, 0.01)); tak(T + SPB * 4, 0.3); tak(T + SPB * 5, 0.3); tak(T + SPB * 5.25, 0.26); tak(T + SPB * 6, 0.3); return; }
+    if (L.style === 'dembow23') { kick(T, 0.9); crash(T); sub808(T, roots[0], SPB * 4, 0.24); piano(T, chords[0].map(f => f * 2), SPB * 4, 0.05); brassStab(T, chords[0].slice(0, 3).map(f => f * 2), SPB * 1.5, 0.03); synthLead(T, DN.F5, SPB * 3, 0.03); voice(T, DN.F4, SPB * 4, 0.025); rim(T + SPB * 0.75, 0.3); rim(T + SPB * 1.5, 0.3); return; }
+    if (L.style === 'finale26') { kick(T, 0.9); crash(T); [1, 1.5, 2].forEach((m, i) => gtrDist(T, roots[6] * 2 * m, SPB * 6, [0.07, 0.055, 0.04][i], i === 2)); slap(T, roots[6], SPB * 3); supersaw(T, chords[6].map(f => f * 2), SPB * 5, 0.012, 2400, true); brassStab(T, chords[6].slice(0, 3).map(f => f * 2), SPB * 1.5, 0.03); voice(T, FN.G4, SPB * 5, 0.03); voice(T + 0.02, FN.D5, SPB * 5, 0.02); tak(T + SPB * 4, 0.2); tak(T + SPB * 5, 0.2); tak(T + SPB * 5.25, 0.17); tak(T + SPB * 6, 0.2); truckHorn(T + SPB * 6.5); return; }
     if (L.style === 'disco22') { kick(T, 0.9); crash(T); clap(T, 0.25); supersaw(T, chords[0].map(f => f * 2), SPB * 5, 0.014, 2600, true); brassStab(T, chords[0].slice(0, 3).map(f => f * 2), SPB * 1.5, 0.03); slap(T, roots[0], SPB * 3); voice(T, FN.G4, SPB * 4, 0.03); voice(T + 0.02, FN.D5, SPB * 4, 0.02); tak(T + SPB * 3, 0.2); tak(T + SPB * 4, 0.2); tak(T + SPB * 4.25, 0.17); tak(T + SPB * 5, 0.2); return; }
     if (L.style === 'rock22') { kick(T, 0.9); crash(T); [1, 1.5, 2, 4].forEach((m, i) => gtrDist(T, roots[6] * 2 * m, SPB * 6, [0.07, 0.055, 0.04, 0.02][i], i === 3)); bass(T, roots[6], SPB * 4, 600); supersaw(T, chords[6].map(f => f * 2), SPB * 5, 0.012, 2600, true); truckHorn(T + SPB * 3); forklift(T + SPB * 5, 0.04); forklift(T + SPB * 5.5, 0.04); return; }
     if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[4], SPB * 4, 0.016, 2400); anthem(T, N_.D5, SPB * 3, 2); return; }
@@ -3923,7 +4194,7 @@ function updateHud(t) {
     const lane = line ? (line[3] || 0) : 0, spk = line && line[4];
     bubble.style.bottom = L.lanes === 2 ? (lane === 0 ? '78%' : '58%') : '61%';
     let bx = null;
-    if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X; else if (spk === 'h') { if (duoMode(beat) === 'one') { bx = HAEUN_X - 70; bubble.style.bottom = '84%'; } else { bx = 0; bubble.style.bottom = '78%'; } }
+    if (L.cast && L.cast.seq && spk) bx = spk === 's' ? INSPECT_X - 24 : 0; else if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X; else if (spk === 'h') { if (duoMode(beat) === 'one') { bx = HAEUN_X - 70; bubble.style.bottom = '84%'; } else { bx = 0; bubble.style.bottom = '78%'; } }
     if (spk === 's') { bx = INSPECT_X - 24; bubble.style.bottom = '66%'; }
     if (L.daw) { if (spk === 'b') { bx = 0; bubble.style.bottom = '32%'; } else if (spk === 'h') { bx = 34; bubble.style.bottom = '32%'; } else if (spk === 'd') { bx = 200; bubble.style.bottom = '19%'; } }
     bubble.style.left = bx == null || bx < 60 ? '3cqw' : (bx / W * 100 - 5).toFixed(1) + '%';
@@ -3962,8 +4233,8 @@ function updateHud(t) {
     const f1 = notes.find(n => n.lane === 1);
     if (notes[0].state === 'pending' && t > notes[0].place) h = L.autoLane === 0 ? '위 벨트는 하은이 찍어요. 나는 아래만' : L.coScanner ? '주황 벨트 = 왼손, 하은이 찍어요' : '주황 벨트 = 왼손';
     if (f1 && f1.state === 'pending' && t > f1.place) h = L.oneButton ? '아래 상자: 빨간 선에 닿을 때 터치' : L.autoLane === 0 ? '연두 벨트 = 내 손' : L.coScanner ? '연두 벨트 = 오른손, 내가 찍어요' : '연두 벨트 = 오른손';
-    if (blackout(beat)) h = '정전! 소리로';
   }
+  if (blackout(beat)) h = '정전! 소리로. 상자가 놓이는 툭 소리 두 박 뒤';
   if (L.hints === false) h = '';
   if (h !== lastHint) { hint.textContent = h; hint.hidden = !h; lastHint = h; }
 }
