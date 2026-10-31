@@ -54,8 +54,8 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   <div class="bar">
     <button class="btn" id="play" type="button">재생</button>
     <button class="btn ghost" id="restart" type="button">처음부터</button>
-    <div class="scrub"><input id="seek" type="range" min="0" max="31" step="0.01" value="0" aria-label="재생 위치"></div>
-    <span class="time" id="time">00.0 / 31.0</span>
+    <div class="scrub"><input id="seek" type="range" min="0" max="46" step="0.01" value="0" aria-label="재생 위치"></div>
+    <span class="time" id="time">00.0 / 46.0</span>
     <button class="btn ghost" id="snd" type="button" aria-pressed="true">소리</button>
   </div>
   <div class="shots" id="shots"></div>
@@ -96,10 +96,11 @@ const SCAN_X = 300, BELT_Y = 146;
 // One long take, no cuts: the same frame from the empty belt to the street. The chapters only mark where to jump to.
 const SHOTS = [
   { id: 'belt', t0: 0, t1: 10.2, name: '빈 벨트', note: '벨트가 서고 등이 하나씩 꺼진다. 높은 창으로 햇살이 든다. 하은이 벨트를 두 번 두드리고, 빛 쪽으로 고개를 든다.' },
-  { id: 'walk', t0: 10.2, t1: 24.5, name: '공장 밖으로', note: '컷 없이 이어서 걸어 나간다. 하은은 화면 제자리, 배경이 흐른다(창과 선반, 앞의 빈 라인, 기둥). 다리는 벨트와 담장 뒤로 가려진다. 셔터 밑을 지나 바깥 새벽으로.' },
-  { id: 'station', t0: 24.5, t1: 33.5, name: '지하철역', note: '새벽 거리(울타리, 셔터 내린 가게, 24시 편의점)를 한참 걷다가 걸음이 느려지는 동안 배경만 부드러운 그라데이션으로 지하철역 승강장으로 바뀐다. 하은은 그대로 스크린도어 앞에 서서 시계를 보고, 유리 너머로 첫차가 들어온다.' }
+  { id: 'walk', t0: 10.2, t1: 24.3, name: '공장 밖으로', note: '컷 없이 이어서 걸어 나간다. 하은은 화면 제자리, 배경이 흐른다(창과 선반, 앞의 빈 라인, 기둥). 다리는 벨트와 담장 뒤로 가려진다. 셔터 밑을 지나 바깥 새벽으로.' },
+  { id: 'station', t0: 24.3, t1: 35.0, name: '지하철역', note: '새벽 거리(울타리, 셔터 내린 가게, 24시 편의점)를 한참 걷다가 걸음이 느려지는 동안 배경만 천천히 지하철역 승강장으로 바뀐다. 하은은 스크린도어 앞에 서서 시계를 보고, 유리 너머로 첫차가 들어와 문이 열린다.' },
+  { id: 'train', t0: 35.0, t1: 46, name: '열차 안', note: '문이 열리면 배경만 천천히 열차 안으로 바뀐다. 출근길 사람들로 붐비는 객실(자는 사람, 휴대폰 보는 사람, 가방 멘 학생, 정장 입은 직장인). 하은은 손잡이를 잡고, 열차가 출발한다.' }
 ];
-const END = 33.5;
+const END = 46;
 // at the belt (seconds)
 const S1 = { beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], letGo: 9.6 };
 // she stands at x 222 the whole take; once she walks the world slides by. d = how far she has walked (px), easing into her pace
@@ -113,8 +114,11 @@ const walkD = t => { const v = WALK.v, r = WALK.ramp;
 const walkT = d => { let a = WALK.t0, b = WALK.stop; for (let i = 0; i < 40; i++) { const m = (a + b) / 2; if (walkD(m) < d) a = m; else b = m; } return b; };   // the time she has walked d
 // as she slows down on the street, only the background changes: the station platform comes in behind her through a wide soft
 // gradient while she stays as she is. She waits at the screen doors, checks her watch, and the first train pulls in behind the glass
-const WIPE = { t0: 24.5, t1: 26.1 };
-const ST = { chime: 26.6, watch: [27.0, 28.4], light: 28.6, arrive: [29.4, 32.0] };
+const WIPE = { t0: 24.3, t1: 27.8 };
+const ST = { chime: 28.4, watch: [28.8, 30.2], light: 30.4, arrive: [31.2, 33.8], open: 34.3 };
+// boarding: the doors open, the background turns slowly into the crowded car around her, the doors close, the train pulls out
+const BOARD = { t0: 35.0, t1: 38.2 };
+const RIDE = { strap: 38.6, close: 38.3, depart: 39.0, clack0: 39.9, gap: 0.9 };
 const D_STOP = walkD(WALK.stop);
 const doorT = walkT(WALK.door);   // when she passes under the shutter
 const STRIDE = WALK.v * WALK.step;  // px per step
@@ -161,6 +165,10 @@ function haeun(cx, top, o = {}) {
     const fN = Math.round(o.fN || 0), fF = Math.round(o.fF || 0);
     arm(cx + 8, cx + 8 + fF, top + 31 - (fF <= -2 ? 1 : 0));
     arm(cx - 8, cx - 8 - fN, top + 31 - (fN >= 2 ? 1 : 0));
+  } else if (o.arms === 'strap') {
+    // the near hand goes up to a strap (o.strap 0..1 on the way up)
+    const k = ease(o.strap || 0);
+    arm(cx + 8, cx + 8, top + 31); arm(cx - 8, Math.round(lerp(cx - 8, cx - 10, k)), Math.round(lerp(top + 31, top - 2, k)));
   } else if (o.arms === 'watch') {
     // the near wrist brought up in front of her to read the watch (o.watch 0..1 on the way up)
     const k = ease(o.watch || 0), hx = Math.round(lerp(cx - 8, cx - 4, k)), hy = Math.round(lerp(top + 31, top + 25, k));
@@ -320,7 +328,9 @@ function meshPat() {
   return (MESH = wctx.createPattern(c, 'repeat'));
 }
 const SUN = { x: 318, y: 112 };
-const FENCE_END = 230;   // the yard's fence stops here and the shops begin
+const FENCE_END = 230;
+// a window is lit or dark for good; about half the lit ones go dark once somewhere along the walk as morning comes (never back on)
+const winLit = (id, p, t) => rnd(id, 61) < p && (rnd(id, 62) < 0.5 || t < 16 + rnd(id, 63) * 12);   // the yard's fence stops here and the shops begin
 function exterior(d, t) {
   // the dawn sky, low sun ahead of her
   const gr = g.createLinearGradient(0, 0, 0, 150); gr.addColorStop(0, '#3e5a90'); gr.addColorStop(0.45, '#c98e94'); gr.addColorStop(0.78, '#ffd3a2'); gr.addColorStop(1, '#fff0c8');
@@ -336,7 +346,7 @@ function exterior(d, t) {
   const fa = lay(d, 0.22);
   for (let q = -250; q < 700; q += 46) { const h = 30 + Math.floor(rnd(q, 1) * 32), w = 26 + Math.floor(rnd(q, 2) * 12), x = Math.round(fa(q)), y = 150 - h;
     if (x > W || x + w < 0) continue; R(x, y, w, h, '#8a7184'); R(x, y, w, 1, '#a48a96');
-    for (let r = 0; r < h - 6; r += 4) for (let c = 2; c < w - 2; c += 4) if (rnd(q + r, c) < 0.07) R(x + c, y + 3 + r, 2, 2, '#ffd27a'); }
+    for (let r = 0; r < h - 6; r += 4) for (let c = 2; c < w - 2; c += 4) if (winLit(q * 31 + r * 7 + c, 0.07, t)) R(x + c, y + 3 + r, 2, 2, '#ffd27a'); }
   // nearer roofs and trees
   const nr = lay(d, 0.5);
   for (let q = -250; q < 900; q += 34) { const x = Math.round(nr(q)), h = 8 + Math.floor(rnd(q, 3) * 14); if (x > W || x + 36 < 0) continue;
@@ -355,7 +365,7 @@ function exterior(d, t) {
     const q = FENCE_END + 6 + i * 70, x = Math.round(fc(q)); if (x > W || x + 70 < 0) continue;
     const h = 64 + Math.floor(rnd(i, 51) * 22), top = 150 - h, store = i === 2;
     R(x, top, 68, h, ['#6e5e6a', '#66586a', '#735f62'][i % 3]); R(x, top, 68, 2, '#8a7884');
-    for (let wy = top + 6; wy < 92; wy += 12) for (let wx = x + 6; wx < x + 62; wx += 14) R(wx, wy, 8, 6, rnd(wx + wy, i) < 0.15 ? '#ffd27a' : '#4c4250');
+    for (let row = 0; top + 6 + row * 12 < 92; row++) for (let col = 0; col < 4; col++) R(x + 6 + col * 14, top + 6 + row * 12, 8, 6, winLit(i * 97 + row * 13 + col + 5000, 0.18, t) ? '#ffd27a' : '#4c4250');
     R(x + 2, 96, 64, 10, store ? '#2f8a5a' : ['#8a5a4a', '#4a6a8a', '#7a7a4a', '#5a4a6a'][i % 4]); R(x + 2, 105, 64, 1, '#2a2228');
     if (store) {
       R(x + 6, 99, 30, 2, '#f4f1ea'); R(x + 2, 103, 64, 1, '#f0a03a');
@@ -480,6 +490,13 @@ function station(t) {
     for (let x = tx + 10; x < W; x += 40) { R(x, 62, 24, 26, '#f3f0da'); R(x, 62, 24, 2, '#d8d3b8'); }
     for (let x = tx + 6; x < W; x += 80) { R(x, 56, 1, 90, '#9aa1a4'); R(x + 33, 56, 1, 90, '#9aa1a4'); }
     R(tx, 50, 4, 98, '#9aa1a4'); R(tx + 1, 128, 3, 6, '#fff4d0');   // the nose and its headlight
+    // the car's doors (the train stops with one right behind her, x 224); when they open, the lit, crowded car shows
+    const op = Math.round(ease(seg(t, ST.open, ST.open + 0.6)) * 11);
+    for (let c = tx + 50; c < W + 20; c += 160) {
+      if (op > 0) { R(c - op, 54, 2 * op, 94, '#e7eae2'); for (let k = -1; k <= 1; k++) { const px = c + k * 7; R(px - 3, 70 + Math.abs(k) * 3, 6, 6, '#3a3330'); R(px - 4, 76 + Math.abs(k) * 3, 8, 70, ['#2b3550', '#6b5a4a', '#3a3d42'][k + 1]); } }
+      R(c - 12 - op, 54, 12, 94, '#b5bcbf'); R(c + op, 54, 12, 94, '#b5bcbf');
+      R(c - 10 - op, 62, 8, 26, '#f3f0da'); R(c + 2 + op, 62, 8, 26, '#f3f0da'); R(c - 1 - op, 54, 1, 94, '#8d9497'); R(c + op, 54, 1, 94, '#8d9497');
+    }
   }
   // the headlight's glow growing in the tunnel before the train shows, then riding in with it
   const hl = seg(t, ST.light, ST.arrive[0] + 0.4) * (1 - seg(t, ST.arrive[1] - 0.4, ST.arrive[1] + 0.6));
@@ -496,9 +513,11 @@ function station(t) {
   g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(170,200,210,.08)'; g.fillRect(0, 46, W, 104);
   for (let x = -232; x < W; x += 64) { g.fillStyle = 'rgba(255,255,255,.05)'; g.beginPath(); g.moveTo(x, 46); g.lineTo(x + 14, 46); g.lineTo(x + 44, 150); g.lineTo(x + 30, 150); g.closePath(); g.fill(); }
   g.restore();
+  const sop = Math.round(ease(seg(t, ST.open, ST.open + 0.6)) * 14);
   for (let x = -192; x < W + 64; x += 64) {
     R(x - 2, 40, 5, 116, '#aab3b6'); R(x - 2, 40, 1, 116, '#d3d9db');
-    R(x + 31, 46, 2, 104, '#7f888b');
+    if (x === 192 && sop > 0) { R(x + 31 - sop, 46, 2, 104, '#aab3b6'); R(x + 33 + sop - 2, 46, 2, 104, '#aab3b6'); }   // the pair behind her slides open
+    else R(x + 31, 46, 2, 104, '#7f888b');
     R(x + 12, 96, 8, 3, '#e8c440'); R(x + 44, 96, 8, 3, '#e8c440'); R(x + 14, 44, 4, 2, '#f4f1ea');
   }
   R(-200, 150, W + 400, 6, '#7d8588'); R(-200, 150, W + 400, 1, '#a9b0b2');
@@ -523,27 +542,143 @@ function stationPose(t) {
   const w = seg(t, ST.watch[0], ST.watch[0] + 0.35) * (1 - seg(t, ST.watch[1] - 0.35, ST.watch[1]));
   return { o: { mirror: true, look: w > 0.5 ? -0.4 : 0.2, arms: w > 0 ? 'watch' : undefined, watch: w, sway: 0 }, top: HTOP };
 }
+// ---------- the car ----------
+// Inside the train, side on: ceiling lights, the ad strip, windows onto the tunnel, the grab rail, the long blue bench, the end
+// door, poles, the floor. Rush hour: the bench is full and people stand all along the aisle. Each is a small person built like
+// the cast (12x14 face, 14-wide body): their own hair, clothes, bag, and what they are doing.
+const TRW = document.createElement('canvas'); TRW.width = W; TRW.height = H; const trctx = TRW.getContext('2d');
+const SK = ['#d9a27a', '#e3b48f', '#c99470', '#b8825e'];
+// p: hair (short / long / bob / bun / grey / cap), hc hair colour, sk skin, top / sh (shirt under a jacket) / tie, bot, h (shorter
+// by h px), m (faces right), act: strap / phone / book / bag / hang, glasses, mask, buds, sleep, pack (backpack colour), seated
+const SEATED = [
+  { x: 102, hair: 'short', hc: '#1a1618', sk: SK[0], top: '#2b3550', sh: '#e8e8e2', tie: '#8a2f3a', bot: '#23262b', act: 'hang', sleep: true },
+  { x: 146, hair: 'long', hc: '#2a1e1a', sk: SK[1], top: '#b8a27a', bot: '#3a3d42', act: 'phone', m: true },
+  { x: 190, hair: 'grey', hc: '#9a9894', sk: SK[2], top: '#5a5a4e', bot: '#4a463e', act: 'book', glasses: true },
+  { x: 278, hair: 'short', hc: '#1a1618', sk: SK[1], top: '#1f2a44', sh: '#f0f0ec', bot: '#1f2a44', act: 'hang', sleep: true, buds: true },
+  { x: 322, hair: 'bob', hc: '#3a2a22', sk: SK[0], top: '#c97a6a', bot: '#2b2b30', act: 'phone', mask: true },
+  { x: 366, hair: 'short', hc: '#2a2220', sk: SK[3], top: '#3a3d42', sh: '#d8dde6', bot: '#2a2c30', act: 'phone', glasses: true, m: true }
+];
+const STANDING = [
+  { x: 30, hair: 'long', hc: '#1a1618', sk: SK[1], top: '#e8e2d6', bot: '#2b2b30', act: 'bag', bag: '#7a4a3a', m: true, h: 3 },
+  { x: 58, hair: 'short', hc: '#1a1618', sk: SK[2], top: '#2b3550', sh: '#e8e8e2', tie: '#2f4f7a', bot: '#2b3550', act: 'strap' },
+  { x: 152, hair: 'cap', hc: '#2a3a5a', sk: SK[0], top: '#2f4f58', bot: '#3a3f45', act: 'strap', pack: '#5a6a3a', h: 1 },
+  { x: 184, hair: 'bun', hc: '#2a1e1a', sk: SK[1], top: '#b8a27a', bot: '#2b2b30', act: 'phone', m: true, h: 4 },
+  { x: 262, hair: 'short', hc: '#1a1618', sk: SK[3], top: '#3a3d42', sh: '#e8e8e2', tie: '#6a2a2a', bot: '#3a3d42', act: 'strap', glasses: true, m: true },
+  { x: 296, hair: 'bob', hc: '#4a3226', sk: SK[0], top: '#7a8a9a', bot: '#2b2b30', act: 'strap', buds: true, h: 3 },
+  { x: 334, hair: 'short', hc: '#2a2220', sk: SK[2], top: '#6b2f3f', bot: '#3a3f45', act: 'phone', pack: '#2b2e33' },
+  { x: 368, hair: 'short', hc: '#1a1618', sk: SK[1], top: '#4a4a52', sh: '#f0f0ec', bot: '#2a2c30', act: 'strap', mask: true, m: true, h: 1 }
+];
+function person(cx, top, p) {
+  const ink = '#1b1716', shoe = '#1e1a1a', sleeve = p.top;
+  g.save(); if (p.m) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
+  if (p.pack) { R(cx + 5, top + 17, 6, 17, p.pack); R(cx + 5, top + 17, 6, 1, 'rgba(255,255,255,.15)'); }
+  if (p.hair === 'long') R(cx + 1, top + 1, 7, 22, p.hc);
+  // legs: standing, or seated (the lap on the cushion, shins down to the floor)
+  if (p.seated) { R(cx - 7, top + 36, 14, 6, p.bot); R(cx - 5, top + 42, 4, 11, p.bot); R(cx + 1, top + 42, 4, 11, p.bot); R(cx - 6, top + 52, 6, 3, shoe); R(cx + 1, top + 52, 6, 3, shoe); }
+  else { R(cx - 5, top + 38, 5, 16, p.bot); R(cx + 1, top + 38, 5, 15, p.bot); R(cx - 6, top + 53, 6, 3, shoe); R(cx + 1, top + 52, 6, 3, shoe); }
+  R(cx - 7, top + 16, 14, p.seated ? 21 : 23, p.top);
+  if (p.sh) { R(cx - 2, top + 16, 4, 7, p.sh); if (p.tie) R(cx - 1, top + 17, 2, 7, p.tie); }
+  // the head (asleep, it drops forward)
+  const hy = p.sleep ? 2 : 0, hx = p.sleep ? -1 : 0, fx = cx + hx, ft = top + hy;
+  R(fx - 6, ft + 1, 12, 14, p.sk);
+  const hc = p.hc;
+  if (p.hair === 'cap') { R(fx + 2, ft + 2, 4, 7, '#1a1618'); R(fx - 7, ft - 1, 14, 5, hc); R(fx - 12, ft + 3, 6, 2, hc); }
+  else {
+    R(fx - 7, ft - 1, 14, 5, hc); R(fx + 2, ft + 1, 5, p.hair === 'bob' ? 12 : p.hair === 'long' ? 14 : 8, hc);
+    if (p.hair === 'bob' || p.hair === 'long') R(fx - 7, ft + 3, 2, p.hair === 'long' ? 12 : 8, hc);
+    if (p.hair === 'bun') R(fx + 3, ft - 4, 5, 5, hc);
+    if (p.hair === 'grey') R(fx - 7, ft - 1, 14, 2, '#b8b6b0');
+  }
+  if (p.sleep) R(fx - 5, ft + 8, 3, 1, ink); else R(fx - 4, ft + 7, 2, 2, ink);
+  if (p.glasses) { R(fx - 6, ft + 6, 7, 1, '#2a2a2a'); R(fx - 6, ft + 6, 1, 3, '#2a2a2a'); R(fx - 1, ft + 6, 1, 3, '#2a2a2a'); }
+  if (p.mask) { R(fx - 6, ft + 9, 9, 5, '#eef0f2'); R(fx + 3, ft + 9, 3, 1, '#d8dce0'); } else R(fx - 3, ft + 11, 2, 1, '#9a5a50');
+  if (p.buds) R(fx + 3, ft + 8, 2, 2, '#f4f4f0');
+  // arms (3 px sleeves from the shoulders, like 하은)
+  const arm = (sx, hx2, hy2) => { thick(sx, top + 17, hx2, hy2, 3, sleeve); R(hx2 - 1, hy2 - 1, 3, 3, p.sk); };
+  arm(cx + 8, cx + 8, top + (p.seated ? 30 : 31));
+  if (p.act === 'strap') arm(cx - 8, cx - 10, top - 2);
+  else if (p.act === 'phone') { arm(cx - 8, cx - 4, top + 26); R(cx - 6, top + 22, 3, 5, '#1b1d1e'); R(cx - 6, top + 22, 3, 1, '#9fd0ff'); }
+  else if (p.act === 'book') { arm(cx - 8, cx - 3, top + 28); R(cx - 9, top + 24, 9, 6, '#a8443a'); R(cx - 8, top + 25, 7, 4, '#f2eee2'); }
+  else if (p.act === 'bag') { arm(cx - 8, cx - 8, top + 31); thick(cx - 6, top + 17, cx + 5, top + 31, 1, '#3a2a22'); R(cx + 3, top + 29, 9, 8, p.bag); }
+  else arm(cx - 8, cx - 8, top + (p.seated ? 30 : 31));
+  g.restore();
+}
+// the hand at a strap: where the ring hangs
+const strapHand = (cx, top, m) => ({ x: m ? 2 * cx - (cx - 10) - 1 : cx - 10, y: top - 2 });
+function ring(x, y, sw) { R(x, 86, 1, y - 89, '#5d6568'); R(x - 2 + sw, y - 4, 5, 1, '#e9e4d6'); R(x - 2 + sw, y, 5, 1, '#e9e4d6'); R(x - 2 + sw, y - 4, 1, 5, '#e9e4d6'); R(x + 2 + sw, y - 4, 1, 5, '#e9e4d6'); }
+function rideLights(t) { const u = t - RIDE.depart; return u <= 0 ? 0 : u < 3 ? 620 * u * u / 6 : 620 * (u - 1.5); }   // how far the tunnel has slid by (pulling out, then at speed)
+function clackAt(t) { let v = 0; for (let c = RIDE.clack0; c < END; c += RIDE.gap) for (const dt of [0, 0.18]) { const u = t - c - dt; if (u >= 0 && u < 0.09) v = 1; } return v; }
+function car(t) {
+  const jolt = clackAt(t), u = t - RIDE.depart, lurch = u > 0 && u < 0.3 ? 1 : u >= 0.3 && u < 0.7 ? -1 : 0;   // pulling out, everyone standing rocks back, then forward
+  g.save(); g.translate(0, jolt);
+  R(0, -2, W, H + 4, '#c9cfc8');
+  R(0, -2, W, 20, '#e2e6df'); R(0, 17, W, 1, '#b5bbb5');
+  for (let x = 6; x < W; x += 64) { R(x, 7, 52, 5, '#fbfdf6'); R(x, 12, 52, 1, '#c9cec7'); }
+  R(0, 18, W, 14, '#b9bfb9'); R(0, 31, W, 1, '#9aa09a');
+  const ADS = ['#e9d36a', '#7fb4d8', '#e58a7a', '#9ccf9a', '#f2efe6', '#c79ad9'];
+  for (let k = 0; k < 7; k++) { const x = 4 + k * 56; R(x, 20, 50, 10, ADS[k % ADS.length]); R(x + 3, 22, 18, 2, 'rgba(0,0,0,.35)'); R(x + 3, 25, 28, 1, 'rgba(0,0,0,.25)'); R(x + 38, 22, 8, 6, 'rgba(255,255,255,.45)'); }
+  const slide = rideLights(t);
+  for (let x0 = 92; x0 < W; x0 += 98) {
+    R(x0 - 2, 34, 80, 48, '#9aa29c'); R(x0, 36, 76, 44, '#0e1317');
+    g.save(); g.beginPath(); g.rect(x0, 36, 76, 44); g.clip();
+    R(x0, 60, 76, 1, '#1d252a'); R(x0, 66, 76, 1, '#182024');
+    for (let k = -2; k < 8; k++) { const lx = Math.round(((k * 150 + slide) % 900 + 900) % 900 - 120);
+      if (lx < x0 - 40 || lx > x0 + 80) continue; if (u > 0.5) R(lx - 34, 48, 34, 1, 'rgba(255,214,150,.25)'); R(lx, 47, 10, 3, '#ffe6b0'); }
+    const rf = g.createLinearGradient(x0, 36, x0 + 76, 80); rf.addColorStop(0, 'rgba(200,220,230,.10)'); rf.addColorStop(1, 'rgba(200,220,230,0)'); g.fillStyle = rf; g.fillRect(x0, 36, 76, 44);
+    g.restore(); R(x0 + 37, 36, 2, 44, '#9aa29c');
+  }
+  R(10, 32, 64, 124, '#b3bab5'); R(41, 32, 2, 124, '#8d948f'); R(16, 40, 20, 34, '#0e1317'); R(48, 40, 20, 34, '#0e1317'); R(10, 32, 2, 124, '#e2c34a'); R(72, 32, 2, 124, '#e2c34a');
+  // the long bench at the cast's own size: the seat at knee height, the back up to their shoulders
+  R(80, 118, W - 80, 26, '#3a6d86'); R(80, 118, W - 80, 2, '#5a8fa8'); for (let x = 124; x < W; x += 44) R(x, 120, 1, 24, '#2f5b70');
+  R(80, 144, W - 80, 6, '#4a87a5'); R(80, 144, W - 80, 1, '#6aa6c2'); R(80, 150, W - 80, 2, '#2b4f61');
+  R(80, 152, W - 80, 4, '#7d8580');
+  R(78, 100, 3, 56, '#aab3b6');
+  R(0, 156, W, 60, '#8b8f89'); R(0, 156, W, 2, '#6e726d'); for (let k = 0; k < 120; k++) R(Math.floor(rnd(k, 31) * W), 160 + Math.floor(rnd(k, 32) * 54), 1, 1, '#9ea29c');
+  // the bench, full
+  for (const p of SEATED) person(p.x, 108, { ...p, seated: true });   // sitting: the lap on the seat at y 144
+  R(0, 84, W, 2, '#aab3b6'); R(0, 84, W, 1, '#d4dadc');
+  // free straps swing with the car; held ones hang straight from the hand
+  const held = STANDING.filter(p => p.act === 'strap').map(p => strapHand(p.x, HTOP + (p.h || 0), p.m).x).concat(233);
+  for (let sx = 17; sx < W; sx += 24) if (!held.some(h => Math.abs(h - sx) < 8)) ring(sx, 104, Math.round(Math.sin(t * 2.1 + sx * 0.05) * (u > 0 ? 1.4 : 0.4)));
+  for (const px of [130, 340]) { R(px, 32, 2, 124, '#b9c2c6'); R(px, 32, 1, 124, '#e1e6e8'); }
+  // the people standing in the aisle (rocking as the train pulls out), and her among them, a strap in her hand
+  g.save(); g.translate(-lurch, 0);
+  for (const p of STANDING) { const top = HTOP + (p.h || 0); if (p.act === 'strap') { const hd = strapHand(p.x, top, p.m); ring(hd.x, hd.y + 2, 0); } person(p.x, top, p); }
+  const k = seg(t, RIDE.strap, RIDE.strap + 0.35);
+  ring(233, 104, k >= 1 ? 0 : Math.round(Math.sin(t * 2.1 + 233 * 0.05) * (u > 0 ? 1.4 : 0.4)));   // her strap, still once she holds it
+  haeunSprite({ mirror: true, look: 0.2, arms: k > 0 ? 'strap' : undefined, strap: k, sway: 0 });
+  tintSprite('#f2f6f4'); putSprite(HX, HTOP);
+  g.restore();
+  g.globalCompositeOperation = 'lighter';
+  for (let x = 6; x < W; x += 64) glow(x + 26, 14, 50, '230,240,235', 0.12);
+  g.globalCompositeOperation = 'source-over';
+  g.restore();
+}
+// only the background changes between places: the next one comes in behind a wide soft gradient drifting from right to left,
+// and she is drawn again on top so she stays exactly as she is (clipY: how far down she is redrawn)
+function crossTo(t, t0, t1, ctx, canvas, drawNext, pose, tintA, tintB, clipY) {
+  g = ctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, W, H); drawNext(t);
+  const p = ease(seg(t, t0, t1)), e = lerp(W + 180, -180, p);
+  ctx.globalCompositeOperation = 'destination-in';
+  const m = ctx.createLinearGradient(e - 170, 0, e + 170, 0); m.addColorStop(0, 'rgba(0,0,0,0)'); m.addColorStop(1, 'rgba(0,0,0,1)');
+  ctx.fillStyle = m; ctx.fillRect(0, 0, W, H); ctx.globalCompositeOperation = 'source-over';
+  g = wctx; g.drawImage(canvas, 0, 0);
+  const { o, top } = pose;
+  haeunSprite(o); tintSprite(mix(tintA, tintB, p));
+  g.save(); g.beginPath(); g.rect(0, 0, W, clipY); g.clip(); putSprite(HX, top); g.restore();
+  return p;
+}
 function render(t) {
   g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false;
   g.clearRect(0, 0, W, H);
   if (t < WIPE.t1) street(t);
-  if (t > WIPE.t0) {
-    if (t >= WIPE.t1) { g = wctx; station(t); }
-    else {
-      // only the background changes: the station comes in behind a wide soft gradient drifting from right to left, and she is
-      // drawn again on top (down to her waist), so she stays exactly as she is while the street turns into the platform
-      g = subctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, W, H); station(t);
-      const p = ease(seg(t, WIPE.t0, WIPE.t1)), e = lerp(W + 180, -180, p);
-      subctx.globalCompositeOperation = 'destination-in';
-      const m = subctx.createLinearGradient(e - 170, 0, e + 170, 0); m.addColorStop(0, 'rgba(0,0,0,0)'); m.addColorStop(1, 'rgba(0,0,0,1)');
-      subctx.fillStyle = m; subctx.fillRect(0, 0, W, H); subctx.globalCompositeOperation = 'source-over';
-      g = wctx; g.drawImage(SCRW, 0, 0);
-      const { o, top } = stationPose(t);
-      haeunSprite(o); tintSprite(mix('#fff0e0', '#eef0ec', p));
-      g.save(); g.beginPath(); g.rect(0, 0, W, BELT_Y - 2); g.clip(); putSprite(HX, top); g.restore();
-      putRim(HX, top, 1, 0, '#ffe6b4', 0.7 * (1 - p), BELT_Y - 2);
-    }
+  if (t > WIPE.t0 && t < WIPE.t1) {
+    const p = crossTo(t, WIPE.t0, WIPE.t1, subctx, SCRW, station, stationPose(t), '#fff0e0', '#eef0ec', BELT_Y - 2);
+    putRim(HX, stationPose(t).top, 1, 0, '#ffe6b4', 0.7 * (1 - p), BELT_Y - 2);
   }
+  if (t >= WIPE.t1 && t < BOARD.t1) { g = wctx; station(t); }
+  if (t > BOARD.t0 && t < BOARD.t1) crossTo(t, BOARD.t0, BOARD.t1, trctx, TRW, car, stationPose(t), '#eef0ec', '#f2f6f4', H);
+  if (t >= BOARD.t1) { g = wctx; car(t); }
   // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
   out.drawImage(wb, 0, 0, W, H, 0, 0, cv.width, cv.height);
@@ -592,6 +727,15 @@ const SFX = {
   approach(t, e, into) { const left = e.dur - into, s = ac.createBufferSource(); s.buffer = NB; s.loop = true; const fl = ac.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(120, t); fl.frequency.linearRampToValueAtTime(700, t + left * 0.7); const gn = ac.createGain();
     gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.12, t + left * 0.75); gn.gain.linearRampToValueAtTime(0.0001, t + left + 0.8); s.connect(fl); fl.connect(gn); gn.connect(bus); s.start(t); s.stop(t + left + 0.9);
     for (let c = Math.max(0, ST.arrive[0] - e.t - into) ; c < left - 0.3; c += 0.25 + c * 0.04) { thump(t + c, 62, 0.08, 0.08); noise(t + c, 0.04, 0.04, 'bandpass', 500, 1.2); } },
+  // the doors: a two-note chime and the air
+  doors(t) { tone(t, 'sine', 880, 880, 0.03, 0.35); tone(t + 0.28, 'sine', 698.46, 698.46, 0.03, 0.5); noise(t + 0.15, 0.5, 0.05, 'highpass', 1800); },
+  // pulling out: the motors' whine rising
+  pullout(t) { const o = ac.createOscillator(), lp = ac.createBiquadFilter(), gn = ac.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(180, t); o.frequency.exponentialRampToValueAtTime(620, t + 4); lp.type = 'lowpass'; lp.frequency.value = 900;
+    gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.02, t + 1); gn.gain.linearRampToValueAtTime(0.012, t + 4); gn.gain.linearRampToValueAtTime(0.0001, t + 5.5); o.connect(lp); lp.connect(gn); gn.connect(bus); o.start(t); o.stop(t + 5.6); },
+  // a full car's low murmur
+  murmur(t, e, into) { const left = e.dur - into, sN = ac.createBufferSource(); sN.buffer = NB; sN.loop = true; const fl = ac.createBiquadFilter(); fl.type = 'bandpass'; fl.frequency.value = 420; fl.Q.value = 1.4; const gn = ac.createGain();
+    gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.018, t + 1.5); gn.gain.setValueAtTime(0.018, t + left); gn.gain.linearRampToValueAtTime(0.0001, t + left + 1); sN.connect(fl); fl.connect(gn); gn.connect(bus); sN.start(t); sN.stop(t + left + 1.1); },
+  clack(t) { thump(t, 62, 0.12, 0.09); noise(t, 0.05, 0.06, 'bandpass', 500, 1.2); },
   // the brakes' squeal as it stops
   brake(t) { const o = ac.createOscillator(), gn = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(2900, t); o.frequency.linearRampToValueAtTime(2500, t + 1.2); lfo.frequency.value = 9; lg.gain.value = 30; lfo.connect(lg); lg.connect(o.frequency);
     const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2700; bp.Q.value = 6; gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.012, t + 0.3); gn.gain.linearRampToValueAtTime(0.0001, t + 1.3); o.connect(bp); bp.connect(gn); gn.connect(bus); o.start(t); lfo.start(t); o.stop(t + 1.4); lfo.stop(t + 1.4); }
@@ -600,10 +744,13 @@ EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: 
   { t: 7.4, fn: 'pad', dur: 3.7, notes: [174.61, 220, 261.63, 329.63] },               // Fmaj7 as she lifts her head
   { t: WALK.t0, fn: 'pad', dur: doorT - WALK.t0, notes: [130.81, 196, 246.94, 329.63] },   // Cmaj7 walking out
   { t: doorT, fn: 'pad', dur: WIPE.t0 - doorT, notes: [98, 146.83, 220, 246.94, 329.63] },   // G6/9 in the morning
-  { t: WIPE.t0, fn: 'pad', dur: END - WIPE.t0 - 1.2, notes: [110, 164.81, 196, 246.94, 261.63] },   // Am9 on the platform
+  { t: WIPE.t0, fn: 'pad', dur: BOARD.t0 - WIPE.t0, notes: [110, 164.81, 196, 246.94, 261.63] },   // Am9 on the platform
+  { t: BOARD.t0, fn: 'pad', dur: END - BOARD.t0 - 1.2, notes: [87.31, 174.61, 220, 261.63, 329.63, 392] },   // Fmaj9 on the train
+  { t: ST.open, fn: 'doors' }, { t: RIDE.close, fn: 'doors' }, { t: RIDE.depart, fn: 'pullout' }, { t: BOARD.t0 + 0.4, fn: 'murmur', dur: END - BOARD.t0 - 0.4 },
   { t: ST.chime, fn: 'chime' }, { t: ST.light, fn: 'approach', dur: ST.arrive[1] - ST.light }, { t: ST.arrive[1] - 1.3, fn: 'brake' },
   { t: doorT - 0.5, fn: 'whoosh' }, { t: 19.2, fn: 'bird' }, { t: 21.4, fn: 'bird' }, { t: 23.1, fn: 'bird' }, { t: WALK.lampOff, fn: 'lamp' });
 for (let k = 1; ; k++) { const t = walkT(k * STRIDE); if (t > WALK.stop - 0.05) break; EV.push({ t, fn: 'step', out: t > doorT }); }
+for (let c = RIDE.clack0; c < END - 0.6; c += RIDE.gap) EV.push({ t: c, fn: 'clack' }, { t: c + 0.18, fn: 'clack' });
 EV.sort((a, b) => a.t - b.t);
 function audioStart(t) {
   if (!ac) return; ac.resume(); newBus(); schedTo = t;
@@ -621,7 +768,7 @@ function audioTick(t) {
   amb.buzz.gain.setTargetAtTime(0.004 * lit, ac.currentTime, 0.02);
   const onTrain = t > WIPE.t0 ? 1 : 0;
   amb.wind.gain.setTargetAtTime(outK * (1 - onTrain) * (0.025 + 0.012 * Math.sin(t * 0.8)), ac.currentTime, onTrain ? 0.08 : 0.4);
-  amb.rumble.gain.setTargetAtTime(onTrain * 0.035, ac.currentTime, 0.15);   // the station's low hum
+  amb.rumble.gain.setTargetAtTime(t > RIDE.depart ? 0.035 + 0.06 * seg(t, RIDE.depart, RIDE.depart + 3) : onTrain * 0.035, ac.currentTime, 0.15);   // the station's low hum, then the train running
 }
 
 // ---------- playback ----------
