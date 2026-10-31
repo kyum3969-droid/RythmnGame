@@ -126,8 +126,8 @@ const RIDE = { strap: 38.6, close: 38.3, depart: 39.0, clack0: 39.9, gap: 0.9, s
 // off at the next station: the car turns into its platform, the doors close behind her, the train leaves
 const DEST = { t0: 46.4, t1: 49.4, close: 49.9, leave: 50.5 };
 // then the morning alley, walking again (legs behind a low brick wall), to the hospital at its end
-const ALLEY = { t0: 52.0, t1: 55.0 };
-const WALK2 = { t0: 55.3, ramp: 0.9, v: 30, stop: 67.6 };
+const ALLEY = { t0: 52.0, t1: 55.4 };
+const WALK2 = { t0: 51.6, ramp: 0.9, v: 30, stop: 67.6 };   // she sets off on the platform; the alley comes in around her as she walks
 const walk2D = t => { const v = WALK2.v, r = WALK2.ramp, b = WALK2.t0 + r, c = WALK2.stop - r, dB = v * r / 2, dC = dB + v * (c - b);
   if (t <= WALK2.t0) return 0; if (t < b) return v * (t - WALK2.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
   const u = Math.min(t, WALK2.stop) - c; return dC + v * u - v * u * u / (2 * r); };
@@ -146,7 +146,9 @@ function haeun(cx, top, o = {}) {
   const look = o.look || 0, sw = o.sway || 0;
   const hx = look < -0.5 ? -1 : 0, hy = look < -0.25 ? Math.round(-look * 2) : look > 0.5 ? -1 : 0, tilt = look < -0.5 ? 1 : look > 0.5 ? -1 : 0;
   g.save(); if (o.mirror) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
-  R(cx - 5, top + 38, 5, 16, leg); R(cx + 2, top + 38, 5, 15, leg); R(cx - 6, top + 53, 6, 3, shoe); R(cx + 2, top + 52, 6, 3, shoe);
+  // legs: standing, or the game's two-frame stride while she walks (only seen where nothing in front hides them)
+  const st = o.stride == null ? 0 : o.stride ? 3 : -3;
+  R(cx - 5 + st, top + 38, 5, 16, leg); R(cx + 2 - st, top + 38, 5, 15, leg); R(cx - 6 + st, top + 53, 6, 3, shoe); R(cx + 2 - st, top + 52, 6, 3, shoe);
   // only the back hair: long and straight, falling down her back past the shoulders (nothing in front of the face)
   R(cx + 6 + sw, top + 14, 4, 18, hair); R(cx + 8 + sw, top + 16, 1, 12, hairL);
   // sky-blue tee with the white stripe over black sleeves, black bottoms
@@ -421,7 +423,7 @@ function walking(d, start, look) {
   const k = Math.floor(d / STRIDE), sp = (d / STRIDE) % 1, e = ease(sp);
   const reach = (i, a) => (i % 2 ? -1 : 1) * (0.7 + rnd(i + 1, a * 17 + 3) * 1.6);
   const fN = lerp(reach(k, 1), reach(k + 1, 1), e) * start, fF = lerp(reach(k, 2), reach(k + 1, 2), e) * start;
-  return { o: { mirror: true, look, arms: 'walk', fN, fF, sway: fN > 0.8 ? 1 : 0 }, top: HTOP + (sp > 0.25 && sp < 0.75 && start > 0.3 ? -1 : 0) };
+  return { o: { mirror: true, look, arms: 'walk', fN, fF, sway: fN > 0.8 ? 1 : 0, stride: start > 0.2 ? k % 2 : null }, top: HTOP + (sp > 0.25 && sp < 0.75 && start > 0.3 ? -1 : 0) };
 }
 function street(t) {
   const d = walkD(t), bx = Math.round(WALK.door - d + HX), sun = sunAt(t);
@@ -494,7 +496,7 @@ const LINE = '#3a9a4e';   // the line's colour (the train's stripe, the badge)
 function trainX(t) { const p = seg(t, ST.arrive[0], ST.arrive[1]); return Math.round(lerp(W + 8, 14, 1 - (1 - p) * (1 - p))); }   // the train's nose, braking to a stop
 function station(t, dest) {
   // the platform slides in step with her last few steps, then holds still
-  const so = dest ? 0 : Math.round(Math.max(0, D_STOP - walkD(t)));
+  const so = dest ? -Math.round(walk2D(t)) : Math.round(Math.max(0, D_STOP - walkD(t)));
   g.save(); g.translate(so, 0);
   // the tunnel behind the glass, its lamps, and the train when it comes
   R(-200, 40, W + 400, 116, '#14191c'); R(-200, 72, W + 400, 1, '#1f272b'); R(-200, 76, W + 400, 1, '#1b2226'); R(-200, 136, W + 400, 20, '#101416');
@@ -546,7 +548,7 @@ function station(t, dest) {
   R(88, 0, 20, 158, '#d6d1c3'); R(88, 0, 2, 158, '#ebe7dc'); R(106, 0, 2, 158, '#b3ae9f'); for (let y = 6; y < 156; y += 8) R(90, y, 16, 1, '#c4bfb0');
   g.restore();
   // her: her last steps, then waiting, the watch checked once (at the station she gets off at, just standing)
-  const { o, top } = dest ? IDLE : stationPose(t);
+  const { o, top } = dest ? alleyPose(t) : stationPose(t);
   haeunSprite(o); tintSprite('#eef0ec'); putSprite(HX, top);
   // the station's flat cool light, and the train's headlight on her when it comes in
   g.save(); g.globalCompositeOperation = 'lighter';
@@ -682,7 +684,7 @@ function car(t) {
 // mirror, a cat on the wall. A low red-brick wall with potted plants runs in front of her (her legs stay behind it). At the end
 // of the alley, the hospital: a tall pale block with a red cross and its sign, a lit lobby behind glass doors, an ambulance.
 const ALW = document.createElement('canvas'); ALW.width = W; ALW.height = H; const alctx = ALW.getContext('2d');
-const HOSP_Q = 300;   // where the hospital starts (on the 0.9 layer); its door ends up just ahead of her when she stops
+const HOSP_Q = 400;   // where the hospital starts (on the 0.9 layer); its door ends up just ahead of her when she stops
 function alley(t) {
   const d = walk2D(t), L = f => q => Math.round(q - d * f + HX);
   // sky
@@ -692,7 +694,7 @@ function alley(t) {
   const ft = L(0.15); for (let q = -200; q < 600; q += 52) { const x = ft(q), h = 50 + Math.floor(rnd(q, 71) * 40); if (x > W || x + 40 < 0) continue; R(x, 150 - h, 40, h, '#b9bccb'); for (let r = 6; r < h - 4; r += 6) R(x + 4, 150 - h + r, 32, 1, '#a9adbd'); }
   // villas along the alley, and the corner shop
   const vl = L(0.9);
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 12; i++) {
     const q = -260 + i * 80; if (q + 76 > HOSP_Q) break; const x = vl(q); if (x > W || x + 80 < 0) continue;
     const floors = 2 + Math.floor(rnd(i, 72) * 2), h = floors * 30 + 6, top = 150 - h, brick = ['#9a5a4a', '#8a6a5a', '#a86a50', '#b8a48a'][i % 4];
     R(x, top, 76, h, brick); for (let y = top + 3; y < 150; y += 3) R(x, y, 76, 1, 'rgba(0,0,0,.06)');
@@ -754,7 +756,8 @@ function alleyScene(t) {
 }
 // only the background changes between places: the next one comes in behind a wide soft gradient drifting from right to left,
 // and she is drawn again on top so she stays exactly as she is (clipY: how far down she is redrawn)
-function crossTo(t, t0, t1, ctx, canvas, drawNext, pose, tintA, tintB, clipY) {
+const FRW = document.createElement('canvas'); FRW.width = W; FRW.height = H; const frctx = FRW.getContext('2d');
+function crossTo(t, t0, t1, ctx, canvas, drawNext, pose, tintA, tintB, clipY, drawFront) {
   g = ctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, W, H); drawNext(t);
   const p = ease(seg(t, t0, t1)), e = lerp(W + 180, -180, p);
   ctx.globalCompositeOperation = 'destination-in';
@@ -764,6 +767,12 @@ function crossTo(t, t0, t1, ctx, canvas, drawNext, pose, tintA, tintB, clipY) {
   const { o, top } = pose;
   haeunSprite(o); tintSprite(mix(tintA, tintB, p));
   g.save(); g.beginPath(); g.rect(0, 0, W, clipY); g.clip(); putSprite(HX, top); g.restore();
+  // (the next place's foreground, e.g. the alley wall's pots and the cat, goes back over her the same way, so it does not vanish)
+  if (drawFront) {
+    g = frctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, W, H); drawFront(t);
+    frctx.globalCompositeOperation = 'destination-in'; frctx.fillStyle = m; frctx.fillRect(0, 0, W, H); frctx.globalCompositeOperation = 'source-over';
+    g = wctx; g.drawImage(FRW, 0, 0);
+  }
   return p;
 }
 function render(t) {
@@ -779,7 +788,7 @@ function render(t) {
   if (t >= BOARD.t1 && t < DEST.t1) { g = wctx; car(t); }
   if (t > DEST.t0 && t < DEST.t1) crossTo(t, DEST.t0, DEST.t1, subctx, SCRW, u => station(u, true), IDLE, '#f2f6f4', '#eef0ec', H);
   if (t >= DEST.t1 && t < ALLEY.t1) { g = wctx; station(t, true); }
-  if (t > ALLEY.t0 && t < ALLEY.t1) crossTo(t, ALLEY.t0, ALLEY.t1, alctx, ALW, alleyScene, IDLE, '#eef0ec', '#fff6ec', BELT_Y - 3);
+  if (t > ALLEY.t0 && t < ALLEY.t1) crossTo(t, ALLEY.t0, ALLEY.t1, alctx, ALW, alleyScene, alleyPose(t), '#eef0ec', '#fff6ec', BELT_Y - 3, alleyWall);
   if (t >= ALLEY.t1) { g = wctx; alleyScene(t); }
   // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
@@ -856,13 +865,13 @@ EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: 
   { t: ALLEY.t0, fn: 'pad', dur: WALK2.stop - ALLEY.t0, notes: [130.81, 196, 246.94, 293.66, 329.63] },   // Cmaj9 down the alley
   { t: WALK2.stop, fn: 'pad', dur: END - WALK2.stop - 1.2, notes: [110, 164.81, 220, 246.94, 261.63] },   // A minor (add9) at the hospital
   { t: RIDE.stop - 1.4, fn: 'brake' }, { t: RIDE.open, fn: 'doors' }, { t: DEST.close, fn: 'doors' }, { t: DEST.leave, fn: 'leaving' },
-  { t: 56.5, fn: 'bird' }, { t: 59.8, fn: 'bird' }, { t: 63.1, fn: 'bird' }, { t: 61.0, fn: 'meow' },
+  { t: 56.5, fn: 'bird' }, { t: 59.8, fn: 'bird' }, { t: 63.1, fn: 'bird' }, { t: 56.2, fn: 'meow' },
   { t: ST.open, fn: 'doors' }, { t: RIDE.close, fn: 'doors' }, { t: RIDE.depart, fn: 'pullout' }, { t: BOARD.t0 + 0.4, fn: 'murmur', dur: DEST.t0 + 1 - BOARD.t0 },
   { t: ST.chime, fn: 'chime' }, { t: ST.light, fn: 'approach', dur: ST.arrive[1] - ST.light }, { t: ST.arrive[1] - 1.3, fn: 'brake' },
   { t: doorT - 0.5, fn: 'whoosh' }, { t: 19.2, fn: 'bird' }, { t: 21.4, fn: 'bird' }, { t: 23.1, fn: 'bird' }, { t: WALK.lampOff, fn: 'lamp' });
 for (let k = 1; ; k++) { const t = walkT(k * STRIDE); if (t > WALK.stop - 0.05) break; EV.push({ t, fn: 'step', out: t > doorT }); }
 for (let c = RIDE.clack0; c < RIDE.slow + 1; c += RIDE.gap) EV.push({ t: c, fn: 'clack' }, { t: c + 0.18, fn: 'clack' });
-for (let k = 1; ; k++) { const t = walk2T(k * STRIDE); if (t > WALK2.stop - 0.05) break; EV.push({ t, fn: 'step', out: true }); }
+for (let k = 1; ; k++) { const t = walk2T(k * STRIDE); if (t > WALK2.stop - 0.05) break; EV.push({ t, fn: 'step', out: t > ALLEY.t0 + 1.7 }); }   // on the platform the steps ring, in the alley they don't
 EV.sort((a, b) => a.t - b.t);
 function audioStart(t) {
   if (!ac) return; ac.resume(); newBus(); schedTo = t;
