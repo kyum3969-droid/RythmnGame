@@ -74,6 +74,10 @@ const W = 384, H = 216, SC = 3;
 // the picture sits 20 px higher than the game's own screen (its top 20 px cut off), so the black bar along the bottom for the
 // heartbeat row and the lyrics is taller (from y 141); her feet still end at the bar's edge as before
 const CROP = 20, BAR_TOP = 141;
+// at the door the bars close in, even top and bottom like a cinema frame (68 px each); the picture slides down 24 px with them so
+// the strip between shows y 44 to 124 of it (heads to waists)
+const LETTERBOX = { top: 68, bottom: 148, shift: 24, dur: 2.2 };
+const letterK = t => ease(seg(t, EXIT.walk, EXIT.walk + LETTERBOX.dur));
 const cv = $('cv'), out = cv.getContext('2d');
 // every shot is drawn at the game's 1x into this buffer; the camera crops it and blows it up without smoothing
 const wb = document.createElement('canvas'); wb.width = W; wb.height = H; const wctx = wb.getContext('2d');
@@ -122,10 +126,10 @@ const SHOTS = [
   { id: 'lobby', t0: 73.0, t1: 94.6, name: '로비', note: '배경만 이른 아침의 병원 로비로 바뀐다. 졸고 있는 경비, 빈 대기 의자, 자판기 불빛. 하은이 가로질러 엘리베이터 버튼을 누른다.' },
   { id: 'lift', t0: 94.6, t1: 106.8, name: '엘리베이터', note: '엘리베이터 안. 층 표시가 1에서 5로 올라가고, 딩 하고 문이 열리면 깜깜한 복도.' },
   { id: 'corridor', t0: 106.8, t1: 125.4, name: '병원 복도', note: '암전 뒤 복도. 브리지 가사에 맞춰 불이 하나씩 켜지고(One light comes on / Another light), 하은이 한 걸음씩 걸어 502호 앞에 선다.' },
-  { id: 'ward', t0: 125.4, t1: 162.4, name: '병실', note: '마지막 코러스와 함께 병실. 의자에 앉고, I\'ll lay my hand에 어머니 손을 잡고, All the way home에 고개를 숙이고, 첫 Four…에 어머니 손가락이 움직이자 고개를 든다. 노래가 끝나고 노크, 천천히 뒤돌아봄, 문 밖에서 "누나!"' },
-  { id: 'door', t0: 162.4, t1: 176.6, name: '문 너머', note: '하은이 일어나 병실 문으로 걸어가고, 카메라가 따라가며 벽과 문이 들어온다. 문 건너편 복도에 꽃다발을 든 지우. 하은이 문손잡이에 손을 뻗고, 암전.' }
+  { id: 'ward', t0: 125.4, t1: 166.6, name: '병실', note: '마지막 코러스와 함께 병실. 의자에 앉고, I\'ll lay my hand에 어머니 손을 잡고, All the way home에 고개를 숙이고, 첫 Four…에 어머니 손가락이 움직이자 고개를 든다. 노래가 끝나고 노크, 천천히 뒤돌아봄, 문 밖에서 "누나!" "누나?" "누나!!"' },
+  { id: 'door', t0: 166.6, t1: 180.8, name: '문 너머', note: '하은이 일어나 병실 문으로 걸어가고, 위아래 검은 띠가 시네마처럼 크게 들어온다. 카메라가 따라가며 벽과 문이 들어오고, 문 건너편 복도에 꽃다발을 든 지우. 하은이 문손잡이에 손을 뻗고, 암전.' }
 ];
-const CUT_END = 176.6;   // the drawn cutscene's length: the song (Four Steps Home, 2:37.5), then the knock and the door; it fades to black here
+const CUT_END = 180.8;   // the drawn cutscene's length: the song (Four Steps Home, 2:37.5), then the knock and the door; it fades to black here
 const ROWS_END = 158.6;   // the heartbeat row (and its black bar) fades out once the song is over, leaving the whole picture
 const SONG = { src: 'media/four-steps-home.mp3', len: 157.52 };
 const END = CUT_END + 0.4;
@@ -171,10 +175,10 @@ const CORR = { t0: 106.8, t1: 108.6 };
 // after the song: a knock, she turns round, a voice through the door ('누나!'), she gets up and walks to the door; the camera
 // goes with her, the ward slides away and the wall with the door comes in, cut through side on, and on its far side in the
 // corridor 지우 with flowers. She reaches for the handle; black.
-const EXIT = { stand: 162.4, walk: 163.2, v: 28, reach: 173.8, look: 173.4 };
+const EXIT = { stand: 166.6, walk: 167.4, v: 28, reach: 178.0, look: 177.6 };
 const WALL = { x0: -58, x1: -48 };   // the ward's door wall (in the ward's own x), just off its left edge
 const EXIT_D = HX - 18 - WALL.x1;   // how far she walks (and the camera pans): the wall's ward side ends 18 px ahead of her
-const WARD = { t0: 125.4, t1: 127.4, sit: 128.4, hold: 131.7, rest: 140.8, squeeze: 149.2, lift: 150.2, knock: 158.4, turn: 159.0, voice: 161.2 };   // with the final chorus: the hand at 'I'll lay my hand', head down at 'All the way home', the hand moves at the first 'Four…'   // the hospital front fades to full black, then the corridor's lights come on one at a time
+const WARD = { t0: 125.4, t1: 127.4, sit: 128.4, hold: 131.7, rest: 140.8, squeeze: 149.2, lift: 150.2, knock: 158.4, turn: 159.0, voice: 161.2, voice2: 163.5, voice3: 165.8 };   // with the final chorus: the hand at 'I'll lay my hand', head down at 'All the way home', the hand moves at the first 'Four…'   // the hospital front fades to full black, then the corridor's lights come on one at a time
 const WALK3 = { t0: 113.3, ramp: 0.9, v: 18, stop: 125.0 };   // 'One more step': slow steps down the corridor
 const walk3D = t => { const v = WALK3.v, r = WALK3.ramp, b = WALK3.t0 + r, c = WALK3.stop - r, dB = v * r / 2, dC = dB + v * (c - b);
   if (t <= WALK3.t0) return 0; if (t < b) return v * (t - WALK3.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
@@ -1194,9 +1198,7 @@ function render(t) {
   // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
   out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = "#000"; out.fillRect(0, 0, cv.width, cv.height);
-  // (when she gets up for the door the camera pushes in, over 0.9 s, to twice the size: a waist shot on her, the door and 지우)
-  const zk = t >= EXIT.stand ? ease(seg(t, EXIT.stand, EXIT.stand + 0.9)) : 0, z = lerp(1, 2, zk), vx = lerp(0, 96, zk), vy = lerp(CROP, 80, zk), vw = W / z, vh = H / z, sh = Math.min(vh, H - vy);
-  out.drawImage(wb, vx, vy, vw, sh, 0, 0, cv.width, cv.height * sh / vh);
+  out.drawImage(wb, 0, CROP, W, H - CROP, 0, Math.round(LETTERBOX.shift * letterK(t)) * SC, cv.width, cv.height * (H - CROP) / H);
   const fade = Math.max(1 - seg(t, 0.2, 1.8), seg(t, CUT_END - 1.5, CUT_END - 0.1));
   if (fade > 0) { out.fillStyle = `rgba(0,0,0,${fade})`; out.fillRect(0, 0, cv.width, cv.height); }
 }
@@ -1297,7 +1299,7 @@ for (let k = 1; ; k++) { const t = walk2T(k * STRIDE); if (t > WALK2.stop - 0.05
 for (let i = EV.length - 1; i >= 0; i--) if (EV[i].fn === 'pad') EV.splice(i, 1);   // the song is the music now
 EV.push({ t: LOBBY.press, fn: 'button' }, { t: LOBBY.open, fn: 'liftDoor' }, { t: ELEV.t1, fn: 'liftHum', dur: ELEV.ding - ELEV.t1 }, { t: ELEV.ding, fn: 'ding' }, { t: ELEV.open, fn: 'liftDoor' });
 for (let k = 1; ; k++) { const t = W4.T(k * STRIDE); if (t > WALK4.stop - 0.05) break; EV.push({ t, fn: 'step', out: false }); }
-EV.push({ t: WARD.voice, fn: 'blip' }, { t: WARD.voice + 0.1, fn: 'blip' }, { t: EXIT.stand, fn: 'chair' }, { t: EXIT.stand + 0.2, fn: 'rustle' }, { t: EXIT.reach + 0.3, fn: 'handle' });
+EV.push(...[WARD.voice, WARD.voice2, WARD.voice3].flatMap(v => [{ t: v, fn: 'blip' }, { t: v + 0.1, fn: 'blip' }]), { t: EXIT.stand, fn: 'chair' }, { t: EXIT.stand + 0.2, fn: 'rustle' }, { t: EXIT.reach + 0.3, fn: 'handle' });
 for (let k = 1; ; k++) { const t = WX.T(k * STRIDE); if (t > WX.stop - 0.05) break; EV.push({ t, fn: 'step', out: false }); }
 EV.sort((a, b) => a.t - b.t);
 function audioStart(t) {
@@ -1369,11 +1371,11 @@ const LYRIC_LOOK = [
   { x: 14, y: 70, al: 'l', w: 185, p: LOOK.warm, ink: true },
   { x: 14, y: 30, al: 'l', w: 185, p: LOOK.four, s: 1.1, ink: true },
   { x: 14, y: 46, al: 'l', w: 190, p: LOOK.gold, s: 1.5, ink: true, st: 0.35 },   // all the way home
-  { x: 70, y: 50, al: 'c', w: 200, p: LOOK.gold, s: 1.9, ink: true }, // Four…
-  { x: 130, y: 34, al: 'c', w: 200, p: LOOK.gold, s: 1.9, ink: true },
+  null, null,   // the closing 'Four… Four…' is left to the song, no words on screen
 ];
 let subLang = 'en';
-const LINES = [{ t0: WARD.voice, t1: WARD.voice + 2.8, who: '???', en: 'Haeun!', ko: '누나!' }];   // through the ward door (지우, not seen yet; in English he calls her by name)
+const LINES = [{ t0: WARD.voice, t1: WARD.voice2 - 0.2, who: '???', en: 'Haeun!', ko: '누나!' }, { t0: WARD.voice2, t1: WARD.voice3 - 0.2, who: '???', en: 'Haeun?', ko: '누나?' },
+  { t0: WARD.voice3, t1: WARD.voice3 + 2.4, who: '???', en: 'Haeun!!', ko: '누나!!' }];   // through the ward door (지우, not seen yet; in English he calls her by name)
 function drawSubs(t) {
   if (t >= CUT_END) return;
   // a line of dialogue, in the game's own dialogue box (index.html .dialog: the dark panel along the bottom, the speaker on an
@@ -1758,8 +1760,11 @@ function frame(now) {
   const rows = hbOn && T < ROWS_END;   // the row is gone once the song is over
   if (rows) HB.update(T);
   render(T); audioTick(T); songSync(T);
-  // the black bar along the bottom stays after the row has gone (it is the dialogue's place too)
-  if (hbOn && T < CUT_END) { out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = '#000'; out.fillRect(0, BAR_TOP * SC, cv.width, cv.height); }
+  // the black bar along the bottom stays after the row has gone (it is the dialogue's place too); as she walks to the door the
+  // bars close in top and bottom, cinema-wide (the bottom one up to her waist, so her steps read from the shoulders)
+  { const lb = letterK(T); if ((hbOn || lb > 0) && T < CUT_END) {
+    out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = '#000'; out.fillRect(0, Math.round(lerp(hbOn ? BAR_TOP : H - CROP, LETTERBOX.bottom, lb)) * SC, cv.width, cv.height);
+    if (lb > 0) out.fillRect(0, 0, cv.width, Math.round(LETTERBOX.top * lb) * SC); } }
   // the row (and its black bar) fades out after the song, and the picture is whole for the door
   if (rows) { const HG = HBCV.getContext('2d'); HG.setTransform(1, 0, 0, 1, 0, 0); HG.clearRect(0, 0, HBCV.width, HBCV.height); HB.draw(T);
     out.save(); out.setTransform(1, 0, 0, 1, 0, 0); out.globalAlpha = 1 - seg(T, ROWS_END - 1.2, ROWS_END - 0.05); out.drawImage(HBCV, 0, 0); out.restore(); }
