@@ -72,7 +72,7 @@ Keep your rhythm, kid, keep it loud in your ears
 Some of us can't stop long enough to hear
 
 [Back and forth]
-JIWOO: Noona, why so cold, did the night shift steal your heart?
+JIWOO: Haeun, why so cold, did the night shift steal your heart?
 JIWOO: Every time I start, you just tear it apart
 HAEUN: Every time you start, I'm the one who has to finish
 HAEUN: You play, I pay. That's the difference.
@@ -122,7 +122,7 @@ BOTH: Tick-tock on the line, and nobody's gonna stop
 | I'm counting the minutes to the next set of doors | 난 다음 문까지 남은 분을 세 |
 | Keep your rhythm, kid, keep it loud in your ears | 네 리듬 지켜, 꼬마야, 귀에 크게 틀어 놔 |
 | Some of us can't stop long enough to hear | 누군 들을 만큼 멈출 수도 없거든 |
-| Noona, why so cold, did the night shift steal your heart? | 누나, 왜 그렇게 차가워요, 야간이 마음까지 가져갔어요? |
+| Haeun, why so cold, did the night shift steal your heart? | 하은 누나, 왜 그렇게 차가워요, 야간이 마음까지 가져갔어요? |
 | Every time I start, you just tear it apart | 내가 시작만 하면 누난 다 망쳐 |
 | Every time you start, I'm the one who has to finish | 네가 시작하면, 끝내는 건 늘 나야 |
 | You play, I pay. That's the difference. | 넌 놀고, 난 갚아. 그게 차이야. |
