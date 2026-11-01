@@ -1067,7 +1067,11 @@ const LEVELS = [
     // tipping towards him, him pushed back a step every four bars as his light goes; in her last fast verse every box is hers
     // the final on two belts (from 304): she storms both of them at him (the upper belt takes the upper lane's boxes, the lower
     // the lower's); he stands at their far end trying to lift a box to throw back and is knocked back a step every four bars
-    stage: { from: 216, two: 304, fast: 304, push: [304, 460], hers: [[304, 461]], tilt: [[304, 0], [392, 0.02], [428, 0.045], [459.9, 0.08], [460, 0]] },   // a tick for his belt, a tock for hers: no pitch, so they sit with his beat and the song
+    stage: { from: 216, two: 304, fast: 304, push: [304, 460], hers: [[304, 461]], tilt: [[304, 0], [392, 0.02], [428, 0.045], [459.9, 0.08], [460, 0]],
+      // round two, her verse and the hook: the words that land, on the LED wall as she says them ([beat, text, beats held];
+      // timed off the recording, 75.5 BPM from beat 216)
+      lines: [[249.6, 'HALF ASLEEP', 3.2], [253.4, 'COUNTING SHEEP', 3], [256.7, 'SO LAZY', 3.4], [262.2, 'YOU CALL IT A VIBE', 3.6], [266.2, 'WHOLE WORLD OUT', 3.4],
+        [272.5, 'WAITING ON THE DROP', 3.3], [277.7, 'SINCE BEFORE YOU GOT HERE', 2.3], [280, 'IS THAT IT?', 3.5], [284.4, 'IS THAT IT?', 3.5], [288.8, 'IS THAT IT?', 1.4], [290.2, 'YOU CALL THAT HOT?', 2.6], [293, 'IS THAT IT?', 3]] },   // a tick for his belt, a tock for hers: no pitch, so they sit with his beat and the song
     slam: [[160, 999]],   // from her first verse she slams her boxes down rather than carrying them
     // phase 2's turns, by bar: hers, his, or both at once
     // the battle is recorded songs with her rapping alone, three rounds, each song cut after its first hook. Round one (phase
@@ -3042,8 +3046,22 @@ function drawStage15(t, nowMs, sv) {
   }
   g.restore();
   const round = sec === 'climax' || b >= (S.two != null ? S.two - 8 : 1e9) ? 'FINAL ROUND' : 'ROUND 2';
+  // her punchline as she lands it: slammed onto the LED wall in her red (the hook's "IS THAT IT?" in white), held, then gone
+  const pl = S.lines && S.lines.find(([b0, , d]) => b >= b0 && b < b0 + d);
+  if (pl) {
+    const [b0, txt, d] = pl, q = b - b0, hook = /IS THAT IT|CALL THAT HOT/.test(txt), slam = 1 + 0.5 * Math.max(0, 1 - q / 0.18), a = Math.min(1, (b0 + d - b) / 0.5);
+    g.save(); g.fillStyle = 'rgba(5,4,7,.82)'; g.fillRect(lw0, ly0, lw1 - lw0, ly1 - ly0);
+    g.font = '900 22px sans-serif'; const tw = g.measureText(txt).width, fit = Math.min(1, (lw1 - lw0 - 16) / tw);
+    g.translate(cx, (ly0 + ly1) / 2 + 1); g.scale(slam * fit, slam * fit); g.textAlign = 'center'; g.textBaseline = 'middle'; g.globalAlpha = a;
+    g.fillStyle = hook ? 'rgba(255,60,40,.9)' : 'rgba(120,10,6,.9)'; g.fillText(txt, 2, 2);
+    g.fillStyle = hook ? (Math.floor(q * 4) % 2 ? '#ffffff' : '#ffd0c4') : '#ff5a3c'; g.fillText(txt, 0, 0);
+    // the wall's dots over the letters
+    g.restore(); g.save(); g.globalAlpha = 0.35 * a; g.fillStyle = '#050407'; for (let y = ly0; y < ly1; y += 4) g.fillRect(lw0, y + 3, lw1 - lw0, 1); for (let x = lw0; x < lw1; x += 4) g.fillRect(x + 3, ly0, 1, ly1 - ly0); g.restore();
+    if (q < 0.12) FX.shakeUntil = Math.max(FX.shakeUntil, nowMs + 90);
+  } else {
   g.save(); g.font = '900 13px sans-serif'; g.textAlign = 'center'; g.fillStyle = 'rgba(0,0,0,.6)'; g.fillText(round, cx + 1, ly0 + 19); g.fillStyle = `rgba(255,240,220,${0.75 + 0.25 * beatK})`; g.fillText(round, cx, ly0 + 18);
   g.font = '700 8px sans-serif'; g.fillStyle = 'rgba(255,120,100,.9)'; g.fillText('하은', cx - 34, ly0 + 31); g.fillStyle = 'rgba(255,255,255,.7)'; g.fillText('VS', cx, ly0 + 31); g.fillStyle = `rgba(120,210,255,${0.9 * (fin ? J.light : 1)})`; g.fillText('지우', cx + 34, ly0 + 31); g.restore();
+  }
   const spk = (x0) => { R(x0, 64, 26, FY - 64, '#121014'); R(x0, 64, 26, 1, '#2a252c'); for (const [yy, r] of [[80, 7], [104, 9], [130, 9]]) { if (yy + r > FY) continue; const k = 1 + Math.round(beatK * 1.5); g.fillStyle = '#060507'; g.beginPath(); g.arc(x0 + 13, yy, r + 1, 0, Math.PI * 2); g.fill(); g.fillStyle = '#1e1a20'; g.beginPath(); g.arc(x0 + 13, yy, r - 2 + k, 0, Math.PI * 2); g.fill(); g.fillStyle = '#060507'; g.beginPath(); g.arc(x0 + 13, yy, 2, 0, Math.PI * 2); g.fill(); } };
   spk(2); spk(W - 28);
   R(-60, FY, W + 120, 120, '#0d0a0c'); R(-60, FY, W + 120, 1, '#231c20');
