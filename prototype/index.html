@@ -5716,7 +5716,8 @@ function startHum() {
 }
 function stopHum() { if (hum) { try { hum.stop(); } catch (e) {} hum = null; } }
 function startHold(beat) {
-  stopHold(); if (L.bareBand) return;   // no held tone under a recorded song holdOsc = ctx.createOscillator(); const gn = ctx.createGain(), lf = ctx.createOscillator(), lg = ctx.createGain();
+  stopHold(); if (L.bareBand) return;   // no held tone under a recorded song
+  holdOsc = ctx.createOscillator(); const gn = ctx.createGain(), lf = ctx.createOscillator(), lg = ctx.createGain();
   const tones = CHORDS[chordIdx(beat || 0)], th = fxTheme(beat || 0);
   holdOsc.type = th === 'neon' ? 'sawtooth' : th === 'chill' ? 'triangle' : 'sine'; holdOsc.frequency.value = tones[0] * 4;
   lf.frequency.value = 6; lg.gain.value = 8; lf.connect(lg); lg.connect(holdOsc.detune); lf.start(); holdOsc._lf = lf;
