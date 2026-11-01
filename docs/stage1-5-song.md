@@ -281,3 +281,51 @@ BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
 [Ending]
 (one huge hit, then silence)
 ```
+
+### 절정 곡 장르 변경: 시네마틱 오케스트라 트랩 (추천)
+
+랩락(디스토션 기타)은 앞의 두 곡(붐뱁)과 결이 어긋나서 뺀다. 힙합은 그대로 두고, 힘은 기타 대신 **오케스트라(현악 오스티나토, 브라스, 합창, 타이코) + 찢어지는 808**에서 낸다. 시계 모티프는 피치카토 현과 시계 째깍으로, 브리지 없이도 1-6 심장 박동으로 이어지는 킥.
+
+```
+An epic, cinematic orchestral trap / hip-hop track with ONE solo female rapper: the final round of a rap battle on a night shift, like the last boss fight in a film. Powerful and huge, not fast. English rap vocals, one female voice only, no male vocals, no singing. No electric guitars, no rock. 0:41 long, 105 BPM, 4/4, A minor. Clean lyrics.
+
+The sound:
+- Hip-hop drums, half-time and heavy: a deep booming kick, a huge snare and clap with a big reverb on beat 3, crisp trap hi-hats with short rolls.
+- A massive distorted 808 sub that slides and shakes the floor.
+- An orchestra on top: fast, driving staccato strings repeating the riff, the bass line walking down by half steps (A, G#, F#, E); big low brass stabs on the downbeats; a dark choir; taiko drums hitting with the kick.
+- A ticking clock sound and plucked pizzicato strings keeping time, like a clock running out.
+- Mixed loud, wide and dramatic.
+
+The rapper: a young woman of 23, cold, controlled and forceful, every word landing on the beat. Her voice is doubled and stacked, like a crowd made of her own voice. The last line is shouted.
+
+Structure (one bar = 2.29 seconds):
+0:00–0:09 Intro (4 bars), NO vocals, building up from almost nothing:
+  bar 1: only a slow heartbeat kick and a ticking clock, dark and tense.
+  bar 2: pizzicato strings and a low choir hum come in; the clock ticks twice as fast.
+  bar 3: the staccato strings start the riff, taiko drums, a rising swell.
+  bar 4: a snare roll and the whole orchestra rising to the top; on the last half beat everything cuts to silence for a breath.
+0:09–0:18 (4 bars): everything slams in at once on the downbeat with her voice: drums, 808, strings, brass, choir. The chant "Tick-tock on the line", one line per bar.
+0:18–0:37 (8 bars): her verse "You play, I pay", one line per bar, bigger and louder to the end.
+0:37–0:41 Ending: one huge orchestral hit with the 808 on the downbeat of the last bar, then silence. No fade out.
+
+Lyrics (all by the one female rapper):
+
+[Intro – no vocals, building]
+
+[Final]
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+"Haeun, why so cold, did the night shift steal your heart?"
+That's what you said, so let me take it from the start
+Every time you start, I'm the one who has to finish
+You play, I pay. That's the difference.
+You don't know what I need, you don't know what I've seen
+Stay up on your stage, I'll stay down at the machine
+Call me stiff, call me slow, say I live by the clock
+BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
+
+[Ending]
+(one huge hit, then silence)
+```
