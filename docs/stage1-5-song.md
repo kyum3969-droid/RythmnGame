@@ -4,7 +4,7 @@
 
 **비트 레퍼런스**(사용자가 준 곡, 수치로 분석): 85 BPM, 2마디(약 5.6초) 루프 반복, 베이스가 A → G# → F# → E로 반음씩 내려가고 위에 C#·D#·G# 같은 긴장음, 길게 울리는 무거운 저음과 킥, 2·4박 스네어, 촘촘한 하이햇의 붐뱁. 가사 들어가기 전에 드럼이 잠깐 빠졌다 들어옴. 프롬프트에는 곡·가수 이름을 넣지 않는다(거절 사유가 될 수 있음).
 
-**거절 대응**: 처음 버전("tense hip-hop diss battle", "menacing", 실명 같은 이름)은 제미나이가 민감한 주제로 막았다. 그래서 **동료끼리 경쟁하는 콜앤리스폰스 랩 듀엣**으로 쓰고 공격적인 표현은 줄였다. 이름은 실명(JIWOO, HAEUN)으로 써도 됨. "Haeun, why so cold, did the night shift steal your heart?"는 살림. 그래도 막히면: 가사를 빼고 비트만 먼저 받거나, 그 줄의 이름을 "Hey"로.
+**거절 대응**: 처음 버전("tense hip-hop diss battle", "menacing", 실명 같은 이름)은 제미나이가 민감한 주제로 막았다. 그래서 **동료끼리 경쟁하는 콜앤리스폰스 랩 듀엣**으로 쓰고 공격적인 표현은 줄였다. 이름은 실명으로 쓰되, 제미나이가 남녀 파트를 헷갈려서 모든 표기에 성별을 붙인다(`JIWOO (MALE)`, `HAEUN (FEMALE)`). "Haeun, why so cold, did the night shift steal your heart?"는 살림. 그래도 막히면: 가사를 빼고 비트만 먼저 받거나, 그 줄의 이름을 "Hey"로.
 
 노래를 받으면 할 일:
 - 실제 박과 차례가 바뀌는 지점을 찾아 2페이즈 차트와 `battle` 표를 노래에 맞춘다.
@@ -37,30 +37,30 @@ The beat (the same loop under the whole song):
 - Hard-hitting dusty drums: a heavy kick with a long, deep low end, a loud cracking snare on 2 and 4, busy crisp sixteenth-note hi-hats.
 - Driving and hard-hitting, pushing forward, but still heavy with lots of room for the vocals.
 
-Voices:
-- JIWOO (young man, 20): cocky, playful, bouncy, quick flow with fun ad-libs ("yah!", "uh-huh"). Free-spirited, loves improvising.
-- HAEUN (young woman, 23): low, calm, cool, precise, lands every word right on the beat, confident and steady, gets more fired up toward the end.
+Voices (two different rappers: one male, one female; every line below is labelled with who raps it):
+- JIWOO (MALE), a young man of 20, male rap voice: cocky, playful, bouncy, quick flow with fun ad-libs ("yah!", "uh-huh"). Free-spirited, loves improvising.
+- HAEUN (FEMALE), a young woman of 23, female rap voice: low, calm, cool, precise, lands every word right on the beat, confident and steady, gets more fired up toward the end.
 
 The turns:
-- On JIWOO's turns, a funky layer joins the loop: slap bass and short chord stabs on the off-beats. Every switch to JIWOO starts with a chopped vocal stab.
-- On HAEUN's turns, the funky layer drops out and only the raw dark loop is left. Every switch to HAEUN starts with a record scratch.
+- On JIWOO (MALE)'s turns, a funky layer joins the loop: slap bass and short chord stabs on the off-beats. Every switch to JIWOO (MALE) starts with a chopped vocal stab.
+- On HAEUN (FEMALE)'s turns, the funky layer drops out and only the raw dark loop is left. Every switch to HAEUN (FEMALE) starts with a record scratch.
 - The switches land exactly on the bar line.
 
 Structure with timestamps (one bar = 2.5 seconds):
-0:00–0:10 Intro (4 bars): the dark loop comes in with the drums; on the last bar the drums cut out and JIWOO says: "Keep up if you can."
-0:10–0:30 Verse 1, JIWOO (8 bars): the drums slam back in, his funky layer on top.
-0:30–0:51 Verse 2, HAEUN (8 bars): record scratch, the raw loop only. Calm and precise.
-0:51–1:11 Back and forth (8 bars): two bars each, JIWOO, HAEUN, JIWOO, HAEUN; the layer switches every two bars.
-1:11–1:21 Breakdown (4 bars): the drums drop to just the bass line and claps, half-time feel; one bar each, JIWOO, HAEUN, JIWOO, HAEUN, short lines with space.
+0:00–0:10 Intro (4 bars): the dark loop comes in with the drums; on the last bar the drums cut out and JIWOO (MALE) says: "Keep up if you can."
+0:10–0:30 Verse 1, JIWOO (MALE), 8 bars: the drums slam back in, his funky layer on top.
+0:30–0:51 Verse 2, HAEUN (FEMALE), 8 bars: record scratch, the raw loop only. Calm and precise.
+0:51–1:11 Back and forth (8 bars): two bars each, JIWOO (MALE), HAEUN (FEMALE), JIWOO (MALE), HAEUN (FEMALE); the layer switches every two bars.
+1:11–1:21 Breakdown (4 bars): the drums drop to just the bass line and claps, half-time feel; one bar each, JIWOO (MALE), HAEUN (FEMALE), JIWOO (MALE), HAEUN (FEMALE), short lines with space.
 1:21–1:41 Final round (8 bars): everything back in, louder, double-time hi-hats, a crash on every bar, quick back-and-forth line by line; the last two bars they rap together in unison.
 1:41–1:44 Ending: one big hit on the downbeat of the last bar, then silence. No fade out.
 
 Lyrics:
 
-[Intro – JIWOO, spoken]
+[Intro – JIWOO (MALE), spoken]
 Keep up if you can.
 
-[Verse 1 – JIWOO]
+[Verse 1 – JIWOO (MALE)]
 Tick-tock, tick-tock, is that all you got?
 Eyes on your watch like the world's gonna stop
 I throw it with style, let it fly, let it drop
@@ -70,7 +70,7 @@ Never cracked a smile, never stole a look
 I got my own rhythm, I got my own lane
 You're stuck on the beat while I'm out here making rain
 
-[Verse 2 – HAEUN]
+[Verse 2 – HAEUN (FEMALE)]
 You throw it, it falls, and it lands next to me
 Every box you drop is a box I carry
 You call it a flow, I call it a mess
@@ -81,30 +81,30 @@ Keep your rhythm, kid, keep it loud in your ears
 Some of us can't stop long enough to hear
 
 [Back and forth]
-JIWOO: Haeun, why so cold, did the night shift steal your heart?
-JIWOO: Every time I start, you're a step behind
-HAEUN: Every time you start, I'm the one who has to finish
-HAEUN: You play, I pay. That's the difference.
-JIWOO: Then drop the watch for once, let the beat take the lead
-JIWOO: You don't know what you want, I know what I need
-HAEUN: You don't know what I need, you don't know what I've seen
-HAEUN: Stay up on your stage. I'll stay down at the machine.
+JIWOO (MALE): Haeun, why so cold, did the night shift steal your heart?
+JIWOO (MALE): Every time I start, you're a step behind
+HAEUN (FEMALE): Every time you start, I'm the one who has to finish
+HAEUN (FEMALE): You play, I pay. That's the difference.
+JIWOO (MALE): Then drop the watch for once, let the beat take the lead
+JIWOO (MALE): You don't know what you want, I know what I need
+HAEUN (FEMALE): You don't know what I need, you don't know what I've seen
+HAEUN (FEMALE): Stay up on your stage. I'll stay down at the machine.
 
 [Breakdown]
-JIWOO: Then say it. What's it for?
-HAEUN: Rent. And more.
-JIWOO: That's it? That's your life?
-HAEUN: That's the beat. Keep time.
+JIWOO (MALE): Then say it. What's it for?
+HAEUN (FEMALE): Rent. And more.
+JIWOO (MALE): That's it? That's your life?
+HAEUN (FEMALE): That's the beat. Keep time.
 
 [Final round]
-JIWOO: I throw it! / HAEUN: I catch it!
-JIWOO: You're stiff! / HAEUN: You're careless!
-JIWOO: My beat! / HAEUN: My belt!
-JIWOO: My way! / HAEUN: Every day!
-JIWOO: Can't keep up? / HAEUN: Watch me.
-JIWOO: One more box! / HAEUN: One more drop!
-BOTH: Tick-tock on the line, and nobody's gonna stop
-BOTH: Tick-tock on the line, and nobody's gonna stop
+JIWOO (MALE): I throw it! / HAEUN (FEMALE): I catch it!
+JIWOO (MALE): You're stiff! / HAEUN (FEMALE): You're careless!
+JIWOO (MALE): My beat! / HAEUN (FEMALE): My belt!
+JIWOO (MALE): My way! / HAEUN (FEMALE): Every day!
+JIWOO (MALE): Can't keep up? / HAEUN (FEMALE): Watch me.
+JIWOO (MALE): One more box! / HAEUN (FEMALE): One more drop!
+BOTH (MALE + FEMALE, together): Tick-tock on the line, and nobody's gonna stop
+BOTH (MALE + FEMALE, together): Tick-tock on the line, and nobody's gonna stop
 
 [Ending]
 (one big hit, then silence)
