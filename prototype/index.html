@@ -1280,6 +1280,8 @@ function spbAt(t) { let s = tempoSeg[0]; for (const x of tempoSeg) if (t >= x.t)
 
 function loadLevel(level) {
   const w = level.win || {}; WIN_P = w.p || 0.05; WIN_G = w.g || 0.10; WIN_M = w.m || 0.16; WIN_REL = w.release || 0.12; WIN_OFF = w.off || 1;
+  // who loads each belt, as the level wrote it (1-5 swaps in 하은 for the lower belt mid-shift; a new run starts from the original)
+  if (level.partners) { level.partners0 = level.partners0 || level.partners.slice(); level.partners = level.partners0.slice(); }
   L = level; TRAVEL = level.travel || 2; setTempo(level); SPB = 60 / level.bpm; SPEED = (SCAN_X - PLACE_X) / (TRAVEL * SPB); CHORDS = level.chords;
   notes = [];
   [level.bars, level.bars2 || []].forEach((bars, lane) => bars.forEach((bar, bi) => {
@@ -5231,10 +5233,13 @@ function startHold(beat) {
 }
 function stopHold() { if (holdOsc) { fadeStop(holdOsc, holdOsc._gn, holdOsc._lf); holdOsc = null; } stopHypeHold(); }
 
-const GUIDE = { on: false, t: 0, n: null, side: '' };   // see guideTick
+const GUIDE = { on: false, t: 0, n: null, side: '', resuming: false };   // see guideTick
 function songAt(perfMs) {
-  if (!ctx) return -99;
   if (GUIDE.on) return GUIDE.t;   // the tutorial's guide holds the shift still at the gate
+  return songRaw(perfMs);
+}
+function songRaw(perfMs) {
+  if (!ctx) return -99;
   if (ctx.getOutputTimestamp) {
     const ts = ctx.getOutputTimestamp();
     if (ts.contextTime > 0 && ts.performanceTime > 0) return ts.contextTime + (perfMs - ts.performanceTime) / 1000 - T0;
@@ -5661,7 +5666,7 @@ function buildCards() {
     g = saved;
   });
 }
-function openBoard() { ensureAudio(); sceneReset(); state = 'select'; $('title').hidden = true; $('result').hidden = true; dialogEl.hidden = true; buildCards(); $('select').hidden = false; }
+function openBoard() { guideOff(); ensureAudio(); sceneReset(); state = 'select'; $('title').hidden = true; $('result').hidden = true; dialogEl.hidden = true; buildCards(); $('select').hidden = false; }
 
 function beginShift(level) {
   TUT.on = false; TUT.line = null; CAM.to = null; SLOW.on = false;
@@ -5675,7 +5680,10 @@ function beginShift(level) {
 const TUT = { count: null, on: false, phase: '', i: 0, lines: null, li: 0, line: null, done: null, at: 0, stand: false, run: [], miss0: 0, endT: 0, lvl: null };
 function startPractice(level) {
   loadLevel({ ...level, practiceOf: level, bars: Array(400).fill('........'), bars2: [], say: [], sections: [[0, 'tutor']],
-    beltSwing: { lane: 1, until: Infinity }, fixAt: Infinity, bossSeat: { x: level.bossSeat.x, stand: [] }, vibe: null, phone: null });
+    beltSwing: { lane: 1, until: Infinity }, fixAt: Infinity, bossSeat: { x: level.bossSeat.x, stand: [] }, vibe: null, phone: null,
+    // the shift's own staging is keyed to its beats, and a long tutorial runs past them: none of it here (her walk over, the
+    // shove and her taking the middle, his doze and earbuds, the cutscenes)
+    visit: null, soloFrom: null, doze: null, unplug: null, cutscene: null, camPlay: null, toss: null, tempo: [[0, level.bpm]] });
   Object.assign(TUT, { on: true, phase: 'wait', i: 0, line: null, stand: false, lvl: level, count: null });
   startPlay();
 }
@@ -5684,7 +5692,7 @@ function skipPractice() {
   if (!TUT.on || state !== 'play') return;
   guideOff(); TUT.on = false; TUT.line = null; TUT.count = null; CAM.to = null; SLOW.on = false; stopHum(); stopHold(); loadLevel(TUT.lvl); startPlay();
 }
-function guideOff() { if (!GUIDE.on) return; GUIDE.on = false; $('guide').hidden = true; if (ctx && ctx.state === 'suspended') ctx.resume(); }
+function guideOff() { if (!GUIDE.on) return; GUIDE.on = false; GUIDE.resuming = false; $('guide').hidden = true; if (ctx) ctx.resume(); }
 $('tutskip').addEventListener('click', e => { e.stopPropagation(); skipPractice(); $('tutskip').blur(); });
 // ---------- developer mode ----------
 // The DEV button (corner, during a shift) opens a panel: jump to a part of the shift (the level's devMarks, else the starts of
@@ -5808,17 +5816,25 @@ function guideTick(t) {
   const d = TUT.lvl.practice.drills[TUT.i]; if (!d || !d.guide || GUIDE.on) return;
   const n = TUT.run.find(m => m.state === 'pending' && !m.guided && t >= m.arr - 0.004); if (!n) return;
   n.guided = true; Object.assign(GUIDE, { on: true, t: n.arr, n, side: n.lane === 1 ? 'R' : 'L' });
-  if (ctx && ctx.state === 'running') ctx.suspend();
+  if (ctx) ctx.suspend();
   const gy = n.lane === 0 ? farY(BELT_Y) - 12 : BELT_Y - 18;
   CAM.to = { x: SCAN_X - 20, y: gy, k: 2.2 };
   const el = $('guide'); el.textContent = GUIDE.side === 'R' ? '오른쪽을 누르세요 ▶' : '◀ 왼쪽을 누르세요'; el.className = 'guide ' + GUIDE.side; el.hidden = false;
 }
 function guidePress(ts, key, lane) {
+  if (GUIDE.resuming) return;
   const el = $('guide');
   if (lane !== GUIDE.side) { el.classList.remove('no'); void el.offsetWidth; el.classList.add('no'); return; }
   CAM.to = null; onHit(ts, key, lane);   // judged on the held clock: right on the beat (a run's last hit then goes slow-mo)
-  GUIDE.on = false; el.hidden = true;
-  if (ctx && ctx.state === 'suspended') ctx.resume();
+  el.hidden = true; guideResume();
+}
+// let the shift run on from exactly where it was held: the audio may have run a few ms past the gate before it stopped (and a
+// press can come before the suspend has even taken), so resume unconditionally and move the clock back onto the held time
+function guideResume() {
+  GUIDE.resuming = true;
+  const done = () => { if (!GUIDE.on) return; T0 += songRaw(performance.now()) - GUIDE.t; GUIDE.on = false; GUIDE.resuming = false; };
+  if (!ctx) { done(); return; }
+  ctx.resume().then(done, done);
 }
 function tutTick(t) {
   if (TUT.phase === 'run') guideTick(t);
@@ -5830,7 +5846,7 @@ function tutTick(t) {
   }
 }
 function startPlay() {
-  ensureAudio(); resetRun(); sceneReset();
+  guideOff(); ensureAudio(); resetRun(); sceneReset();
   $('title').hidden = true; $('result').hidden = true; $('select').hidden = true;
   events = buildEvents(); evI = 0; T0 = ctx.currentTime + 0.8;
   lastClock = ''; lastCombo = -1; lastSay = ''; lastHint = ''; bubble.hidden = true; bubble.textContent = '';
