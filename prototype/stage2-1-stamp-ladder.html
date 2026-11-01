@@ -26,7 +26,9 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .stage{position:relative;width:100%;aspect-ratio:16/9;container-type:inline-size;overflow:hidden;border-radius:4px;background:#0d0a09;
   box-shadow:0 0 0 1px #000,0 0 40px rgba(0,0,0,.6);touch-action:manipulation;user-select:none;-webkit-user-select:none;cursor:pointer}
 .stage canvas{display:block;width:100%;height:100%}
-.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,8,7,.7);cursor:default}
+.overlay{position:absolute;inset:0;display:flex;background:rgba(10,8,7,.7);cursor:default;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:2cqw 0;box-sizing:border-box}
+/* the card centres itself while it fits and scrolls (from its top) when it does not */
+.overlay>.label{margin:auto}
 .label{width:min(80%,580px);background:var(--paper);color:var(--paper-ink);border-radius:3px;padding:2.4cqw 3cqw;box-shadow:0 6px 30px rgba(0,0,0,.5)}
 .label .kicker{display:flex;justify-content:space-between;font-family:var(--mono);font-size:clamp(10px,1.5cqw,14px);color:var(--paper-muted)}
 .label h2{font-family:var(--display);font-weight:400;font-size:clamp(20px,4cqw,38px);margin:.2em 0 .1em}
@@ -73,7 +75,7 @@ dl{display:grid;grid-template-columns:auto 1fr;gap:.15em 1.2em;margin:.5em 0 1em
     </div>
   </div>
 </div>
-<p class="help">확장 시안 · 1 기본(2-1) → 2 리듬(16분·당김) → 3 긴 리듬(두 마디) → 4 이어 찍기(쉬는 마디 없음) → 5 박씨도 던진다(지게차 쿵, 마지막엔 둘이 나눠 찍음) → 6 엑스레이(벨트 가운데 터널이 오르내림, 내려오면 소리만 듣고 찍음)</p>
+<p class="help">확장 시안 · 1 기본(2-1) → 2 리듬(16분·당김) → 3 긴 리듬(두 마디) → 4 이어 찍기(쉬는 마디 없음) → 5 박씨도 던진다(지게차 쿵, 마지막엔 둘이 나눠 찍음) → 6 엑스레이(벨트 가운데가 가려져 소리만 듣고 찍음)</p>
 <script>
 (() => {
 'use strict';
@@ -102,13 +104,13 @@ const LEVELS = [
     say: { 0: '쉬지 말고 간다. 듣고, 찍고.' } },
   { name: '5 · 박씨도 던진다', sub: '지게차 쿵 · 둘이 나눠', bpm: 92, phrases: [P('imo', [0, 1, 1.5, 2]), P('park', [0, 2, 3]), P('imo', [0, 1, 1.5, 2, 3]), P('park', [0, 1.5, 2, 3]), P('imo', [0, 1, [1.5, 'park'], 2, [3, 'park']]), P('imo', [[0, 'park'], 1, 1.5, 2, [2.5, 'park'], [3, 'park']]), P('imo', [0, [1, 'park'], 1.5, 2, [3, 'park']])],
     say: { 0: '지게차 저 양반도 오늘은 박자 맞추네.', 4: '같이 간다!' }, park: true },
-  // 6 엑스레이: an X-ray tunnel hangs over the middle of the belt and goes up and down between rounds. Down, it covers the belt:
-  // the boxes go in right after her stamp and come out only at the red line, so you play what you heard. Up, you see them
-  { name: '6 · 엑스레이', sub: '터널이 오르내린다 · 내려오면 소리만', bpm: 92, xray: [0, 0, 1, 0, 1, 1, 0, 1], phrases: [P('imo', [0, 1, 2, 3]), P('imo', [0, 1, 1.5, 2]), P('imo', [0, 1, 1.5, 2, 3]), P('imo', [0, 0.5, 1, 2]), P('imo', [0, 1.5, 2, 3]), P('imo', [0, 0.75, 1.5, 2]), P('imo', [0.5, 1.5, 2, 3]), P('imo', [0, 1, 1.75, 2.5, 3])],
-    say: { 0: '저거 내려오면 안 보여. 귀로 찍어.', 2: '내려온다!', 5: '눈 감아도 돼.' } }
+  // 6 엑스레이: an X-ray tunnel covers the middle of the belt; the boxes go in right after her stamp and come out only at the
+  // red line, so you play what you heard
+  { name: '6 · 엑스레이', sub: '상자가 안 보인다 · 소리만', bpm: 92, xray: true, phrases: [P('imo', [0, 1, 2, 3]), P('imo', [0, 1, 1.5, 2]), P('imo', [0, 1, 1.5, 2, 3]), P('imo', [0, 0.5, 1, 2]), P('imo', [0, 1.5, 2, 3]), P('imo', [0, 0.75, 1.5, 2]), P('imo', [0.5, 1.5, 2, 3]), P('imo', [0, 1, 1.75, 2.5, 3])],
+    say: { 0: '엑스레이 들어가면 안 보여. 귀로 찍어.', 5: '눈 감아도 돼.' } }
 ];
 let LV = LEVELS[0], SPB = 60 / 92, BAR = 4 * SPB, LEAD = 0, END_T = 0;
-let STAMPS = [], TARGETS = [], SEGS = [], XR = [];
+let STAMPS = [], TARGETS = [], SEGS = [];
 function build(lv) {
   LV = lv; SPB = 60 / lv.bpm; BAR = 4 * SPB; LEAD = 0.4 + BAR; STAMPS = []; TARGETS = []; SEGS = [];
   const hits = (ph, base, ri) => ph.bars.forEach((bar, j) => bar.forEach(it => { const b = Array.isArray(it) ? it[0] : it, who = Array.isArray(it) ? it[1] : ph.who, t = base + j * BAR + b * SPB; STAMPS.push({ t, who, round: ri }); TARGETS.push({ t: t + ph.bars.length * BAR, who, round: ri, judge: null, d: 0 }); }));
@@ -120,11 +122,7 @@ function build(lv) {
     cur += (n + 1) * BAR;
   } else lv.phrases.forEach((ph, i) => { const L = ph.bars.length; hits(ph, cur, i); SEGS.push({ t0: cur, t1: cur + L * BAR, kind: 'call', who: ph.who, round: i }, { t0: cur + L * BAR, t1: cur + 2 * L * BAR, kind: 'resp', who: ph.who, round: i }); cur += 2 * L * BAR; });
   END_T = cur + 1.6;
-  // the X-ray: for each round, up (0) or down (1), moving over the half beat before her bar; only the changes are kept
-  XR = []; if (lv.xray) { let was = 0; for (const sg of SEGS) if (sg.kind === 'call') { const d = lv.xray[sg.round] || 0; if (d !== was) XR.push({ t: sg.t0 - 0.5 * SPB, d }); was = d; } }
 }
-// 0 = raised clear of the boxes, 1 = down over the belt
-function xrDown(t) { let v = 0; for (const e of XR) { if (t < e.t) break; const p = Math.min(1, (t - e.t) / (0.5 * SPB)); v = v + (e.d - v) * (p * p * (3 - 2 * p)); } return v; }
 const segAt = t => SEGS.find(s => t >= s.t0 && t < s.t1) || null;
 
 // ---------- audio ----------
@@ -194,10 +192,7 @@ function tick(t) {
   for (const tg of TARGETS) if (!tg.judge && t > tg.t + WIN_M) missIt(tg, '');
   // the sound-words over whoever just stamped
   for (const s of STAMPS) if (!s.shown && t >= s.t) { s.shown = 1; FX.words.push({ who: s.who, at: performance.now() }); }
-  for (const e of XR) if (!e.sent && t >= e.t) { e.sent = 1; hiss(ac.currentTime, e.d); }
 }
-// the tunnel's hydraulics: a falling (down) or rising (up) air hiss and a clunk when it lands
-function hiss(t, down) { const s = ac.createBufferSource(), fl = ac.createBiquadFilter(), gn = ac.createGain(), d = 0.5 * SPB; s.buffer = noiseBuf(); s.loop = true; fl.type = 'bandpass'; fl.Q.value = 1.5; fl.frequency.setValueAtTime(down ? 2600 : 900, t); fl.frequency.exponentialRampToValueAtTime(down ? 700 : 2400, t + d); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(0.16, t + 0.04); gn.gain.exponentialRampToValueAtTime(0.0001, t + d); s.connect(fl); fl.connect(gn); gn.connect(out); s.start(t); s.stop(t + d + 0.05); tone(t + d, 'sine', down ? 110 : 160, 0.35, 0.12, out, 60); nz(t + d, 'lowpass', 500, 0.2, 0.08, out); }
 const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyK', 'KeyD']);
 addEventListener('keydown', e => { if (!KEYS.has(e.code) || e.repeat || !playing) return; e.preventDefault(); press(songT() + (e.timeStamp - performance.now()) / 1000); });
 $('stage').addEventListener('pointerdown', e => { if (!playing || e.target.closest('.overlay')) return; e.preventDefault(); press(songT() + (e.timeStamp - performance.now()) / 1000); });
@@ -240,23 +235,24 @@ function imo(t, glow) {
   R(x - 5, y + 5, 5, 4, '#2a2a2a'); R(x + 1, y + 5, 5, 4, '#2a2a2a'); R(x - 4, y + 6, 3, 2, '#c8d8e8'); R(x + 2, y + 6, 3, 2, '#c8d8e8'); R(x, y + 6, 1, 1, '#2a2a2a'); R(x - 1, y + 11, 4, 1, '#a86a5a');
   for (const [cx, cy] of [[-8, -2], [-4, -4], [0, -5], [4, -4], [8, -2], [-9, 2], [9, 2], [-8, 6], [9, 6]]) { R(x + cx - 2, y + cy - 1, 5, 5, '#8a8288'); R(x + cx - 1, y + cy - 1, 2, 2, '#aaa2a8'); }
 }
-// the X-ray tunnel over the middle of the belt: grey housing, lead curtains at both ends, a warning lamp, hung on two hydraulic
-// rods. Down, nothing shows through it, so the boxes are only heard between her stamp and your line; up, it clears the boxes
-const XR0 = 104, XR1 = SCAN_X - 16, XR_LIFT = 40;
+// the X-ray tunnel over the middle of the belt: grey housing, lead curtains at both ends, a monitor and a warning lamp on top.
+// Nothing shows through it, so the boxes are only heard between her stamp and your line
+const XR0 = 104, XR1 = SCAN_X - 16;
 function xray(t) {
-  const dn = xrDown(t), y = BELT_Y - 30 - Math.round((1 - dn) * XR_LIFT), w = XR1 - XR0;
-  // the rods from the ceiling beam
-  for (const rx of [XR0 + 24, XR1 - 28]) { R(rx - 3, 34, 8, 4, '#2a2e33'); R(rx, 38, 2, y - 38, '#8a9098'); R(rx - 1, 38, 4, Math.max(0, y - 38 - 18), '#5a6068'); }
+  const y = BELT_Y - 30, w = XR1 - XR0;
   R(XR0, y, w, 50, '#4e545c'); R(XR0, y, w, 3, '#6c737c'); R(XR0, y + 46, w, 4, '#3a3f45');
   R(XR0 + 4, y + 6, w - 8, 26, '#40464d'); for (let x = XR0 + 10; x < XR1 - 8; x += 22) R(x, y + 8, 1, 22, '#4a5058');
   // the curtains: dark strips at each mouth
   for (const cx of [XR0, XR1 - 6]) { R(cx, y + 3, 6, 47, '#1c1f23'); for (let k = 0; k < 3; k++) R(cx + 1 + k * 2, y + 4, 1, 44, k % 2 ? '#2a2e33' : '#33383e'); }
   // the label and the yellow and black band
   for (let x = XR0 + 6; x < XR1 - 6; x += 8) { R(x, y + 36, 4, 5, '#e2b23a'); R(x + 4, y + 36, 4, 5, '#1c1f23'); }
-  R(XR0 + w / 2 - 22, y + 13, 44, 12, '#1c1f23'); txt('X-RAY', XR0 + w / 2, y + 15.5, dn > 0.5 ? '#ff6a4a' : '#e2b23a', 8, 'center', '{s}px "Black Han Sans", sans-serif');
-  // the warning lamp: red and blinking on the beat while it is down, dark yellow while it is up
-  const on = playing && dn > 0.5 && ((t / SPB) % 1) < 0.3; R(XR1 - 22, y - 7, 8, 7, '#2a2e33'); R(XR1 - 21, y - 6, 6, 5, on ? '#ff5a3a' : dn > 0.5 ? '#6a2418' : '#6a5420');
-  if (on) { const gr = g.createRadialGradient(XR1 - 18, y - 4, 0, XR1 - 18, y - 4, 16); gr.addColorStop(0, 'rgba(255,90,58,.35)'); gr.addColorStop(1, 'rgba(255,90,58,0)'); g.fillStyle = gr; g.fillRect(XR1 - 34, y - 20, 32, 32); }
+  R(XR0 + w / 2 - 22, y + 13, 44, 12, '#1c1f23'); txt('X-RAY', XR0 + w / 2, y + 15.5, '#e2b23a', 8, 'center', '{s}px "Black Han Sans", sans-serif');
+  // monitor on top: a green screen with a slow scan line, no boxes on it
+  const mx = XR0 + w / 2 - 20, my = y - 24; R(mx + 18, my + 18, 4, 6, '#2a2e33'); R(mx, my, 40, 19, '#2a2e33'); R(mx + 2, my + 2, 36, 15, '#0f2a1c');
+  const sl = Math.floor((t * 20) % 15); R(mx + 2, my + 2 + sl, 36, 1, '#2f7a4c'); for (let k = 0; k < 15; k += 3) R(mx + 2, my + 2 + k, 36, 1, 'rgba(0,0,0,.25)');
+  // the warning lamp blinks on the beat
+  const on = playing && ((t / SPB) % 1) < 0.25; R(XR1 - 20, y - 7, 8, 7, '#2a2e33'); R(XR1 - 19, y - 6, 6, 5, on ? '#ffcf4a' : '#6a5420');
+  if (on) { const gr = g.createRadialGradient(XR1 - 16, y - 4, 0, XR1 - 16, y - 4, 14); gr.addColorStop(0, 'rgba(255,207,74,.35)'); gr.addColorStop(1, 'rgba(255,207,74,0)'); g.fillStyle = gr; g.fillRect(XR1 - 30, y - 18, 28, 28); }
 }
 // 박씨 on his forklift behind the belt: the forks drop on each of his beats with a pallet on them
 function park(t, glow) {
