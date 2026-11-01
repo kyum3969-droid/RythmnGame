@@ -1,6 +1,6 @@
 # 1-5 노래: 하은의 랩 두 곡 — 제미나이(Lyria) 프롬프트
 
-**세 라운드**: 2페이즈(1라운드)는 아래의 "You Play, I Pay"(94), 3페이즈(2라운드)는 느린 곡 "The Lazy Shift"(`prototype/audio/1-5-the-lazy-shift.mp3`, 91.98초, 실측 75.5 BPM, 28마디, 첫 다운비트 0.068초, 끝에 테이프 정지), 4페이즈(3라운드, 절정)는 새 곡(110 BPM, 프롬프트는 이 문서 끝). The Lazy Shift 마지막 줄 "You want it faster? … Play me another."가 절정으로 넘어가는 다리.
+**세 라운드**: 2페이즈(1라운드)는 아래의 "You Play, I Pay"(94), 3페이즈(2라운드)는 느린 곡 "The Lazy Shift"(`prototype/audio/1-5-the-lazy-shift.mp3`, 91.98초, 실측 75.5 BPM, 28마디, 첫 다운비트 0.068초, 끝에 테이프 정지), 4페이즈(3라운드, 절정)는 새 곡(100 BPM 하프타임, 무겁고 파워풀하게, 프롬프트는 이 문서 끝). The Lazy Shift 마지막 줄 "You want it faster? … Play me another."가 절정으로 넘어가는 다리.
 
 
 1-5 2페이즈(32–72마디)에 깔 곡. 다툼 끝에 하은이 지우를 밀쳐내자, 자기 벨트로 돌아온 지우가 "좋아요. 그럼 박으로 해요. 누나 박이 그렇게 잘났으면, 따라와 봐요!" 하고 자기 비트를 튼다. **지우는 비트로 도발하고(가사 없음, 으스스한 멜로디 리프 + 상자 던지기), 하은이 그 비트를 뺏어 랩으로 받아친다.** 랩은 하은 혼자. **95 BPM**, 4/4, A 단조(어두운 반음 하강 루프), **2:34**(61마디). 게임은 정적이 끝나는 128박부터 95. 1-6 노래처럼 글로벌 출시용 영어 가사(한국어는 자막).
@@ -193,71 +193,75 @@ A slow, lazy, swaggering hip-hop track with ONE solo female rapper. A young woma
 
 ## 3라운드(절정) 곡 프롬프트
 
-절정. The Lazy Shift 끝("Play me another")에 지우가 가장 빠르고 센 비트를 튼다. 110 BPM, 45마디, 1:38. 같은 A 단조, 같은 반음 하강 베이스를 두 배 빠르게. 브리지(조용한 4마디)는 심박처럼 뛰는 킥과 시계처럼 반복되는 높은 피아노 한 음 위에서 하은이 가장 솔직한 말을 한다 → 1-6 병실 심전도로 이어짐("Somebody's waiting"). 마지막은 1라운드의 Tick-tock 훅이 돌아오고 "Faster" 훅과 겹치며 끝.
+절정. The Lazy Shift 끝("Play me another")에 지우가 가장 무겁고 센 비트를 튼다. **빠르기보다 무게**: 100 BPM에 하프타임 드럼(체감은 느리고 짓누름), 디스토션 기타 파워코드, 큰 홀 드럼, 찢어지는 808, 하은 목소리를 겹겹이 쌓은 떼창. 45마디, 1:48. 같은 A 단조, 같은 반음 하강 베이스(A–G#–F#–E)를 기타 리프로. 브리지(조용한 4마디)는 심박 킥과 시계처럼 반복되는 피아노 한 음 위에서 하은이 가장 솔직한 말을 한다 → 1-6 병실 심전도로 이어짐("Somebody's waiting"). 마지막은 1라운드 Tick-tock 훅이 돌아오고 "Hit it harder" 훅과 겹치며 끝.
+
+훅을 "Faster"에서 "Hit it harder"로 바꾼 이유: 가사에 '빠르게'가 반복되면 곡이 속도로만 끌려간다. 이전 프롬프트(110 BPM, "fast, explosive, relentless")는 빠르기만 하고 힘이 안 실렸다.
 
 ```
-A fast, explosive, relentless hip-hop track with ONE solo female rapper: the climax of a rap battle on a night shift. Her careless coworker plays his fastest, hardest beat to break her, and she rides it harder than ever. English rap vocals, one female voice only, no male vocals, no singing. 1:38 long, 110 BPM, 4/4, A minor. Clean lyrics.
+A HEAVY, POWERFUL, anthemic rap-rock / trap-metal track with ONE solo female rapper: the final round of a rap battle on a night shift. It must feel huge and crushing, not fast. Think stadium-sized: every drum hit is a cannon, the guitars are a wall. English rap vocals, one female voice only, no male vocals, no singing. 1:48 long, 100 BPM, 4/4, A minor. Clean lyrics.
 
-The beat (the same loop under the whole song):
-- A hard, driving, dark beat: punchy boom bap drums with trap-style rolling hi-hats, a loud cracking snare on 2 and 4, a heavy distorted 808.
-- The bass walks down by half steps (A, G#, F#, E), now twice as fast and pounding.
-- Big and cinematic: orchestral hits on the downbeats, a tense siren-like synth stab.
+The sound:
+- Half-time drums: a massive kick and a giant snare with a big hall reverb on beat 3, slow and heavy, like stomping. Trap hi-hats only as a light shimmer on top.
+- Thick distorted electric guitars playing low power chords, chugging and palm-muted: the riff walks down by half steps, A, G#, F#, E, one chord per beat, hammered.
+- A loud, overdriven 808 sub that shakes the floor, doubling the guitar riff.
+- Low brass and choir swells on the downbeats, epic and dark. Big impacts and booms at section starts.
+- Mixed loud, wide and aggressive. Lots of space between hits, so each one lands like a punch.
 
-The rapper: a young woman of 23. Low and cool at first, then faster, sharper and louder with every section; double-time flow in the verses; she breaks only in the quiet bridge, then explodes at the end.
+The rapper: a young woman of 23. Low, cold and controlled at first, every word hitting with the snare; she gets louder and more forceful every section, not faster. In the hooks and the final her voice is doubled and tripled, stacked into a chant like a crowd made of her own voice. She breaks only in the quiet bridge, then comes back with everything.
 
 Two kinds of sections:
-- BEAT sections (no rap): the siren-like synth riff and chopped vocal stabs on top, frantic and cocky, like someone trying to break her. Every BEAT section starts with a chopped vocal stab.
-- RAP and HOOK sections: the riff drops out and the hard loop is left under her voice. Every RAP section starts with a record scratch.
+- BEAT sections (no rap): the guitar riff and the brass at full weight, menacing, like someone trying to crush her. Every BEAT section starts with a huge impact.
+- RAP and HOOK sections: the brass drops out, the drums, guitars and 808 stay under her voice. Every RAP section starts with a record scratch.
 - Every switch lands exactly on the bar line.
 
-Structure with timestamps (one bar = 2.2 seconds):
-0:00–0:09 Intro, BEAT (4 bars): the beat bursts in at full power, the siren riff and stabs. On the last bar the drums cut out. No rap.
-0:09–0:26 Verse 1, RAP (8 bars): record scratch, the drums slam back in. Fast, double-time, sharp.
-0:26–0:35 Hook (4 bars): a chant, punchy, on the beat.
-0:35–0:44 BEAT (4 bars): the riff again, even more frantic. No rap.
-0:44–1:01 Verse 2, RAP (8 bars): record scratch; faster and harder.
-1:01–1:10 Hook (4 bars): the chant again, louder, doubled.
-1:10–1:19 Bridge (4 bars): everything drops away except a soft kick pulsing like a heartbeat and one high piano note repeating like a clock. She raps quietly, almost spoken, honest.
-1:19–1:36 Final (8 bars): everything back at once, the biggest the song gets, a crash on every bar. The first four lines are the old chant "Tick-tock on the line", the last four are the hook, stacked and shouted.
-1:36–1:38 Ending: one huge hit on the downbeat of the last bar, then silence. No fade out.
+Structure with timestamps (one bar = 2.4 seconds):
+0:00–0:10 Intro, BEAT (4 bars): two bars of war drums and a rising swell, then the whole band slams in on bar 3. On the last beat everything cuts to silence for a breath. No rap.
+0:10–0:29 Verse 1, RAP (8 bars): record scratch, the drums and guitars crash back in. Heavy, punchy, every line lands on the beat.
+0:29–0:38 Hook (4 bars): a stacked chant, shouted, on the beat.
+0:38–0:48 BEAT (4 bars): the riff and brass again, heavier, a choir on top. No rap.
+0:48–1:07 Verse 2, RAP (8 bars): record scratch; louder, angrier, more weight.
+1:07–1:17 Hook (4 bars): the chant again, louder, more layers.
+1:17–1:26 Bridge (4 bars): everything drops away except a soft kick pulsing like a heartbeat and one high piano note repeating like a clock. She raps quietly, almost spoken, honest.
+1:26–1:46 Final (8 bars): everything back at once, the biggest and heaviest the song gets, a crash and a choir hit on every bar. The first four lines are the old chant "Tick-tock on the line", the last four are the hook, stacked and screamed.
+1:46–1:48 Ending: one huge hit on the downbeat of the last bar, then silence. No fade out.
 
 Lyrics (all by the one female rapper):
 
 [Intro – BEAT, no vocals]
 
-[Verse 1 – female rap, double-time]
-You wanted it faster, so here we go
-Every box in the air and I'm running the show
-You throw it, I catch it before it can land
-Your beat's in my pocket, your clock's in my hand
-Turn it up louder, it's still in my lane
-Speed it up, slow it down, it's all the same
-You play with the rhythm, I play it for real
-You talk about a feeling, I'm the one who has to deal
+[Verse 1 – female rap, heavy, on the beat]
+You wanted it harder? Then here it comes
+Every box hits the belt like a kick drum
+You throw it, I catch it, I don't even flinch
+I've been holding this line, I won't give an inch
+Turn it up louder, it's still my lane
+Every hit that you send just feeds the flame
+You play with the rhythm, I carry the weight
+You can shake the whole floor, I'm still standing straight
 
-[Hook – chant]
-Faster, faster, I don't fall behind
-Faster, faster, every box is mine
-Faster, faster, keep it on the line
-Faster, faster, I'm still keeping time
+[Hook – stacked chant, shouted]
+Hit it harder, I don't break
+Hit it harder, every box I take
+Hit it harder, shake the floor
+Hit it harder, is that all? Give me more
 
 [BEAT, no vocals]
 
-[Verse 2 – female rap, faster]
+[Verse 2 – female rap, louder]
 Night after night and the belt never sleeps
-I'm counting the boxes, you're counting the beats
+I'm carrying boxes, you're carrying beats
 You drop it, I lift it, you laugh, I don't
 You tell me "let it go", I tell you "I won't"
 Two shifts, one clock, and it's ticking for me
-You've got your tomorrow, I've got what I need to be
-So go on, make it harder, make it fast as you can
-I was keeping this line before you ever began
+You've got your tomorrow, I've got where I need to be
+So bring the whole weight, bring the worst that you've got
+I was holding this line, and I'm holding it now
 
-[Hook – chant, louder]
-Faster, faster, I don't fall behind
-Faster, faster, every box is mine
-Faster, faster, keep it on the line
-Faster, faster, I'm still keeping time
+[Hook – stacked chant, louder]
+Hit it harder, I don't break
+Hit it harder, every box I take
+Hit it harder, shake the floor
+Hit it harder, is that all? Give me more
 
 [Bridge – quiet, almost spoken]
 Every night I count the minutes
@@ -265,16 +269,22 @@ Somebody's waiting at the end of it
 You don't have to know, and that's alright
 Just keep the time tonight
 
-[Final – everything]
+[Final – everything, screamed]
 Tick-tock on the line, and nobody's gonna stop
 Tick-tock on the line, and nobody's gonna stop
 Tick-tock on the line, and nobody's gonna stop
 Tick-tock on the line, and nobody's gonna stop
-Faster, faster, I don't fall behind
-Faster, faster, every box is mine
-Faster, faster, keep it on the line
-FASTER, FASTER, I'M STILL KEEPING TIME
+Hit it harder, I don't break
+Hit it harder, every box I take
+Hit it harder, shake the floor
+HIT IT HARDER, IS THAT ALL? GIVE ME MORE
 
 [Ending]
 (one huge hit, then silence)
+```
+
+그래도 힘이 약하게 나오면 위 프롬프트 첫 단락만 아래로 바꿔서 다시 뽑는다(장르 단어를 더 세게):
+
+```
+A brutally heavy, earth-shaking trap metal / nu-metal rap anthem with ONE solo female rapper. Crushing down-tuned guitars, slow pounding half-time drums, distorted 808 sub, epic dark choir and brass. Huge, menacing, triumphant, like a boss fight in a stadium. Power over speed. English rap vocals, one female voice only, no male vocals, no singing. 1:48 long, 100 BPM, 4/4, A minor. Clean lyrics.
 ```
