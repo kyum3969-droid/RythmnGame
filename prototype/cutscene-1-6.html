@@ -98,8 +98,8 @@ const C = {
 const SCAN_X = 300, BELT_Y = 146;
 
 // ---------- the song (the heartbeat rows' chart, the same as stage1-6.html) ----------
-// The rows run on this chart while the cutscene plays under them. The cutscene keeps its own length and timing: the song is
-// going to be made again, so nothing in the pictures waits on it (only the ward's monitor blips along with the rows).
+// The rows run on this chart while the cutscene plays under them, until the song ends. The pictures are timed to the song
+// (Four Steps Home, below); the chart is not yet set on the song's own beats (the ward's monitor blips along with the rows).
 const SEG = [62, 62, 62, 62, 62, 68, 68, 56, 72, 60, 60, 66, 58, 64, 64, 64, 64, 60, 60, 60];
 const LEAD = 2.4;
 const SEGT = []; { let t = LEAD; for (const b of SEG) { SEGT.push(t); t += 8 * 60 / b; } SEGT.push(t); }
@@ -119,14 +119,13 @@ const SHOTS = [
   { id: 'lobby', t0: 73.0, t1: 94.6, name: '로비', note: '배경만 이른 아침의 병원 로비로 바뀐다. 졸고 있는 경비, 빈 대기 의자, 자판기 불빛. 하은이 가로질러 엘리베이터 버튼을 누른다.' },
   { id: 'lift', t0: 94.6, t1: 106.8, name: '엘리베이터', note: '엘리베이터 안. 층 표시가 1에서 5로 올라가고, 딩 하고 문이 열리면 깜깜한 복도.' },
   { id: 'corridor', t0: 106.8, t1: 125.4, name: '병원 복도', note: '암전 뒤 복도. 브리지 가사에 맞춰 불이 하나씩 켜지고(One light comes on / Another light), 하은이 한 걸음씩 걸어 502호 앞에 선다.' },
-  { id: 'ward', t0: 125.4, t1: 158.0, name: '병실', note: '마지막 코러스와 함께 병실. 의자에 앉고, I\'ll lay my hand에 어머니 손을 잡고, All the way home에 고개를 숙이고, 첫 Four…에 어머니 손가락이 움직이자 고개를 든다. 노크, 천천히 뒤돌아봄.' },
-  { id: 'clip', t0: 158.6, t1: 174.8, name: '꽃다발', note: '암전 뒤 영상: 신입이 꽃다발을 들고 병실 문을 두드리고, 하은이 문을 열고 받는다. 심박 줄은 없음.' }
+  { id: 'ward', t0: 125.4, t1: 162.4, name: '병실', note: '마지막 코러스와 함께 병실. 의자에 앉고, I\'ll lay my hand에 어머니 손을 잡고, All the way home에 고개를 숙이고, 첫 Four…에 어머니 손가락이 움직이자 고개를 든다. 노래가 끝나고 노크, 천천히 뒤돌아봄, 문 밖에서 "누나!"' },
+  { id: 'door', t0: 162.4, t1: 176.6, name: '문 너머', note: '하은이 일어나 병실 문으로 걸어가고, 카메라가 따라가며 벽과 문이 들어온다. 문 건너편 복도에 꽃다발을 든 지우. 하은이 문손잡이에 손을 뻗고, 암전.' }
 ];
-const CUT_END = 158.0;   // the drawn cutscene's length: the song (Four Steps Home, 2:37.5) and a breath; it fades to black here
+const CUT_END = 176.6;   // the drawn cutscene's length: the song (Four Steps Home, 2:37.5), then the knock and the door; it fades to black here
+const ROWS_END = 158.6;   // the heartbeat row (and its black bar) fades out once the song is over, leaving the whole picture
 const SONG = { src: 'media/four-steps-home.mp3', len: 157.52 };
-// then, after a beat of black, the ward-visit clip (prototype/media; slowed by section with media/retime.sh), with the rows gone
-const CLIP = { t0: CUT_END + 0.6, dur: 16.0, src: 'media/1-6-ward-visit-paced' };   // .mp4 (H.264), or .webm (VP9) where H.264 won't play
-const END = CLIP.t0 + CLIP.dur + 0.2;
+const END = CUT_END + 0.4;
 // at the belt (seconds)
 const S1 = { beltStop: 2.6, taps: [3.4, 3.8], laserOff: 3.9, tubesOff: [5.7, 5.1, 4.5], look: [7.3, 8.7], letGo: 9.6 };
 // she stands at x 222 the whole take; once she walks the world slides by. d = how far she has walked (px), easing into her pace
@@ -166,7 +165,13 @@ const ELEV = { t0: 94.6, t1: 97.0, floors: [98.6, 100.6, 102.6, 104.6], ding: 10
 const CORR = { t0: 106.8, t1: 108.6 };
 // the ward: background only again, then she sits, takes her mother's hand, bows her head toward the bed, feels the hand close a
 // little and lifts her head (fixed times, not tied to the song)
-const WARD = { t0: 125.4, t1: 127.4, sit: 128.4, hold: 131.7, rest: 140.8, squeeze: 149.2, lift: 150.2, knock: 154.0, turn: 154.6 };   // with the final chorus: the hand at 'I'll lay my hand', head down at 'All the way home', the hand moves at the first 'Four…'   // the hospital front fades to full black, then the corridor's lights come on one at a time
+// after the song: a knock, she turns round, a voice through the door ('누나!'), she gets up and walks to the door; the camera
+// goes with her, the ward slides away and the wall with the door comes in, cut through side on, and on its far side in the
+// corridor 지우 with flowers. She reaches for the handle; black.
+const EXIT = { stand: 162.4, walk: 163.2, v: 28, reach: 173.8, look: 173.4 };
+const WALL = { x0: -58, x1: -48 };   // the ward's door wall (in the ward's own x), just off its left edge
+const EXIT_D = HX - 18 - WALL.x1;   // how far she walks (and the camera pans): the wall's ward side ends 18 px ahead of her
+const WARD = { t0: 125.4, t1: 127.4, sit: 128.4, hold: 131.7, rest: 140.8, squeeze: 149.2, lift: 150.2, knock: 158.4, turn: 159.0, voice: 161.2 };   // with the final chorus: the hand at 'I'll lay my hand', head down at 'All the way home', the hand moves at the first 'Four…'   // the hospital front fades to full black, then the corridor's lights come on one at a time
 const WALK3 = { t0: 113.3, ramp: 0.9, v: 18, stop: 125.0 };   // 'One more step': slow steps down the corridor
 const walk3D = t => { const v = WALK3.v, r = WALK3.ramp, b = WALK3.t0 + r, c = WALK3.stop - r, dB = v * r / 2, dC = dB + v * (c - b);
   if (t <= WALK3.t0) return 0; if (t < b) return v * (t - WALK3.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
@@ -912,6 +917,77 @@ function liftScene(t) {
   const look = lerp(0.3, 0.6, ease(seg(t, ELEV.ding - 0.3, ELEV.ding + 0.4)));
   haeunSprite({ mirror: true, look, sway: 0 }); tintSprite('#fff8ec'); putSprite(HX, HTOP);
 }
+// ---------- the door: after the song ----------
+// She gets up and walks left to the ward's door; the camera stays on her, so the ward slides away and the wall with the door
+// comes in, cut through side on (the dollhouse view), and past it the corridor, lit now, where 지우 stands with flowers. The
+// door between them. She reaches for the handle; black.
+const WX = { ...makeWalk(EXIT.walk, 0.9, EXIT.v, EXIT.walk + 0.9 + EXIT_D / EXIT.v), stop: EXIT.walk + 0.9 + EXIT_D / EXIT.v };
+const DOOR = { y0: 95, y1: 163, handle: 132 };   // the doorway in the cut wall (from her feet's line up), the handles' height
+function doorPose(t) {
+  if (t < EXIT.walk) {   // getting up from the chair, still turned to the door
+    const u = t - EXIT.stand; return { o: { mirror: false, look: 0.4, seated: u < 0.3, sway: 0 }, top: HTOP + (u < 0.3 ? 2 : u < 0.5 ? 1 : 0) };
+  }
+  if (t < WX.stop) { const d = WX.D(t), w = walking(d, Math.min(1, d / STRIDE, (WX.stop - t) / 0.9), lerp(0.4, 0.2, seg(t, EXIT.walk, EXIT.walk + 1))); w.o.mirror = false; return w; }
+  const look = lerp(0.2, 0.35, ease(seg(t, EXIT.look, EXIT.look + 0.5)));
+  const k = ease(seg(t, EXIT.reach, EXIT.reach + 0.6));   // her near hand up to the handle (facing left: not mirrored)
+  if (k > 0) return { o: { mirror: false, look, arms: 'reach', reach: { dx: Math.round(lerp(-8, WALL.x1 + EXIT_D + 3 - HX, k)), dy: Math.round(lerp(31, DOOR.handle - HTOP, k)) }, sway: 0 }, top: HTOP };
+  return { o: { mirror: false, look, sway: 0 }, top: HTOP };
+}
+// 지우, off work: the maroon hoodie with the hood up (as at the belt), jeans, white trainers, an earbud in, flowers held in front
+function jiwoo(cx, top, t) {
+  const hood = '#6b2f3f', hoodD = '#4a2030', skin = '#d9a27a', jean = '#3c4a66', shoe = '#e8e4dc', ink = '#1b1716';
+  const down = t < EXIT.look + 0.2 ? 1 : 0, fid = Math.floor(t * 1.3) % 7 === 0 ? 1 : 0;   // eyes on the flowers until she comes to the door; now and then he settles them
+  R(cx - 5, top + 38, 5, 16, jean); R(cx + 1, top + 38, 5, 16, jean); R(cx - 6, top + 53, 6, 3, shoe); R(cx + 1, top + 53, 7, 3, shoe);
+  thick(cx - 5, top + 19, cx + 5, top + 31, 3, hoodD);   // the far arm, round to the flowers
+  R(cx - 7, top + 16, 14, 24, hood); R(cx - 7, top + 37, 14, 3, hoodD); R(cx + 2, top + 18, 1, 7, '#e8e4dc');
+  R(cx - 9, top - 2, 18, 20, hood); R(cx - 9, top - 2, 18, 2, hoodD); R(cx - 9, top + 16, 4, 2, hoodD);
+  R(cx - 4, top + 3, 10, 12, skin); R(cx - 4, top + 3, 10, 2 + down, '#1e1a1a');
+  R(cx + 2, top + 8 + down, 2, down ? 1 : 2, ink); R(cx + 2, top + 12 + down, 2, 1, '#9a5a50');
+  for (let k = 0; k < 7; k++) R(cx + 5 - (k % 2), top + 13 + k, 1, 1, '#f4f1ea');   // an earbud's wire out from under the hood
+  // the flowers: a paper cone, stems down, the heads up by his chest
+  const bx = cx + 13, by = top + 14 - fid;
+  for (let r = 0; r < 18; r++) { const w = Math.round(12 - r * 0.55); R(bx - Math.floor(w / 2), by + 4 + r, w, 1, r % 5 === 0 ? '#cbbd9e' : '#e8dcc4'); }
+  R(bx - 3, by + 13, 6, 2, '#d8463b');
+  for (const [dx, dy, c] of [[-5, 0, '#4a8a3a'], [4, 1, '#4a8a3a'], [-4, -2, '#f2a6c8'], [0, -4, '#e86a6a'], [3, -2, '#ffd27a'], [-1, 0, '#f8f4ec'], [2, 1, '#f2a6c8'], [-3, 2, '#ffd27a']]) R(bx + dx, by + dy, 3, 3, c);
+  thick(cx + 4, top + 19, bx - 2, by + 15, 3, hood); R(bx - 3, by + 14, 3, 3, skin);   // the near arm, his hand on the cone
+}
+function doorScene(t) {
+  const P = Math.round(WX.D(t)), wx0 = WALL.x0 + P, wx1 = WALL.x1 + P;
+  // the corridor side, lit now: wall, handrail, a ceiling panel over 지우, the floor
+  g.save(); g.beginPath(); g.rect(0, 0, Math.max(0, wx0), H); g.clip();
+  R(0, 0, W, 150, '#d6dfdb'); R(0, 0, W, 30, '#dfe4e2'); R(0, 29, W, 1, '#b9c2be');
+  R(0, 116, W, 34, '#b9c8c2'); R(0, 114, W, 3, '#c9a77a'); R(0, 117, W, 1, '#9a7a52');
+  for (let q = -400; q < WALL.x0; q += 48) { const x = q + P; if (x > -4 && x < wx0) R(x, 118, 2, 3, '#9a7a52'); }
+  R(0, 150, W, 66, '#c6d0cb'); R(0, 150, W, 2, '#9aa6a0'); for (let q = -416; q < WALL.x0; q += 32) { const x = q + P; if (x > -2 && x < wx0) R(x, 152, 1, 64, '#b9c4bf'); } R(0, 180, W, 1, '#b9c4bf');
+  { const x = P - 260; R(x, 34, 22, 9, '#2f9a5a'); R(x + 3, 36, 4, 5, '#f4f8fa'); R(x + 9, 37, 10, 3, '#f4f8fa'); }   // the exit sign, far down
+  { const x = P - 168; R(x, 92, 6, 12, '#e8eef0'); R(x + 2, 104, 2, 3, '#6a9ad8'); }   // a hand sanitiser
+  const lx = WALL.x0 - 52 + P; R(lx - 1, 23, 32, 6, '#9aa3a0'); R(lx, 24, 30, 4, '#fffffa');
+  g.globalCompositeOperation = 'lighter'; glow(lx + 15, 60, 90, '255,250,240', 0.12); glow(lx + 15, 28, 14, '240,248,255', 0.25); g.globalCompositeOperation = 'source-over';
+  jiwoo(WALL.x0 - 36 + P, HTOP, t);
+  g.restore();
+  // the ward side: carried on past its left edge to the wall, her, then the morning over it
+  g.save(); g.beginPath(); g.rect(wx1, 0, W - wx1, H); g.clip();
+  g.translate(P, 0);
+  R(WALL.x1, 0, -WALL.x1, 150, '#d9dfdc'); R(WALL.x1, 150, -WALL.x1, 66, '#c2ccc7'); R(WALL.x1, 150, -WALL.x1, 2, '#a9b4ae'); R(WALL.x1, 140, -WALL.x1, 10, '#c9d2ce');
+  ward(t);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  const { o, top } = doorPose(t); haeunSprite(o); putSprite(HX, top);
+  const sun = wardSun(t);
+  ambient(mix('#7e8bab', '#f2ece4', sun), [[304 + P, 20, 70, 80]]);
+  g.globalCompositeOperation = 'lighter'; for (const [x, w] of [[306, 32], [342, 32]]) shaft(x + P, 22, w, 216, 0.16 * sun); glow(340 + P, 60, 60, '255,226,180', 0.25 * sun); g.globalCompositeOperation = 'source-over';
+  dust(t, [{ x: 306 + P, y: 22, w: 32 }, { x: 342 + P, y: 22, w: 32 }], sun, { x: 160 + P, y: 30, w: 224, h: 130 });
+  g.restore();
+  putRim(HX, top, 1, -1, '#ffe2b8', 0.4 * sun);
+  // the wall, cut through: its section from ceiling to the bottom of the picture, the doorway with the closed door in it
+  if (wx1 > 0) {
+    R(wx0, 0, 10, H, '#7d8783'); R(wx0, 0, 1, H, '#5f6864'); R(wx1 - 1, 0, 1, H, '#5f6864');
+    for (let y = -10; y < H; y += 6) for (let k = 0; k < 10; k++) { const yy = y + k; if (yy >= 0 && yy < H) R(wx0 + k, yy, 1, 1, '#727c78'); }   // the section's hatching
+    R(wx0, DOOR.y0, 10, DOOR.y1 - DOOR.y0, '#c4ccc8'); R(wx0, DOOR.y0 - 2, 10, 2, '#a8b4b0');   // the frame seen in the opening
+    R(wx0 + 3, DOOR.y0, 4, DOOR.y1 - DOOR.y0, '#c9b48e'); R(wx0 + 3, DOOR.y0, 1, DOOR.y1 - DOOR.y0, '#ddc9a2'); R(wx0 + 6, DOOR.y0, 1, DOOR.y1 - DOOR.y0, '#a8936e');   // the door leaf, shut
+    R(wx0 - 3, DOOR.handle, 6, 2, '#8a8f8c'); R(wx1 - 3, DOOR.handle, 6, 2, '#8a8f8c'); R(wx0 - 3, DOOR.handle + 2, 1, 1, '#6a6f6c'); R(wx1 + 2, DOOR.handle + 2, 1, 1, '#6a6f6c');   // the lever handles, both sides
+    R(wx0, DOOR.y1, 10, 2, '#5f6864');
+  }
+}
 // ---------- the hospital corridor ----------
 // Side on: the ceiling with its light panels, pale walls, a wooden handrail over the wainscot, ward doors with their number
 // plates, a wheelchair and a bench, the glossy floor. Dark at first; each panel switches on (a flicker, a tick) when she comes
@@ -1048,7 +1124,7 @@ function wardPose(t) {
     // and her head goes on round to the door behind her (from 1.7 s)
     const u = t - WARD.turn, k = ease(seg(u, 0, 0.5)), r = reach(top);
     const arms = u < 0.5 ? { arms: 'reach', reach: { dx: Math.round(lerp(r.dx, -6, k)), dy: Math.round(lerp(r.dy, 33, k)) } } : {};
-    return { o: { mirror: u < 1.1, look: lerp(-0.1, 0.2, seg(u, 0.5, 1.7)), headFront: u >= 0.5 && u < 1.7, seated: true, sway: 0, ...arms }, top: top - (u >= 1.0 && u < 1.25 ? 1 : 0) };
+    return { o: { mirror: u < 1.1, look: lerp(-0.1, 0.2, seg(u, 0.5, 1.7)) + 0.2 * ease(seg(t, WARD.voice + 0.2, WARD.voice + 0.7)), headFront: u >= 0.5 && u < 1.7, seated: true, sway: 0, ...arms }, top: top - (u >= 1.0 && u < 1.25 ? 1 : 0) };
   }
   const k = ease(seg(t, WARD.lift, WARD.lift + 1.4)), tp = top + Math.round(4 * (1 - k)); return { o: { mirror: true, look: lerp(-1, 0.1, k), seated: true, arms: 'reach', reach: reach(tp), sway: 0 }, top: tp };
 }
@@ -1109,8 +1185,9 @@ function render(t) {
   if (t > CORR.t0 && t < CORR.t1) { g.fillStyle = `rgba(0,0,0,${ease(seg(t, CORR.t0, CORR.t1 - 0.1))})`; g.fillRect(0, 0, W, H); }   // the doors open on the dark: fading to full black
   if (t >= CORR.t1 && t < WARD.t1) { g = wctx; corridorScene(t); }
   if (t > WARD.t0 && t < WARD.t1) crossTo(t, WARD.t0, WARD.t1, wdctx, WDW, wardScene, wardPose(t), '#eef4f2', '#f2ece4', 0);   // (she turns to the bed here, so both whole scenes cross; redrawn on top she'd jump out of the corridor's light)
-  if (t >= WARD.t1) { g = wctx; wardScene(t); }
-  if (t >= CUT_END) { out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = '#000'; out.fillRect(0, 0, cv.width, cv.height); if (t >= CLIP.t0 && clipOK) { out.imageSmoothingEnabled = true; out.drawImage(clip, 0, 0, cv.width, cv.height); out.imageSmoothingEnabled = false; } return; }
+  if (t >= WARD.t1 && t < EXIT.stand) { g = wctx; wardScene(t); }
+  if (t >= EXIT.stand) { g = wctx; doorScene(t); }
+  if (t >= CUT_END) { out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = '#000'; out.fillRect(0, 0, cv.width, cv.height); return; }
   // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
   out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = "#000"; out.fillRect(0, 0, cv.width, cv.height);
@@ -1182,7 +1259,9 @@ const SFX = {
   ding(t) { tone(t, 'sine', 1318.5, 1318.5, 0.04, 1.2); tone(t, 'sine', 2637, 2637, 0.008, 0.6); },
   // knuckles on the ward door, three times
   rustle(t) { noise(t, 0.35, 0.025, 'bandpass', 2400, 0.7); noise(t + 0.6, 0.3, 0.02, 'bandpass', 1800, 0.7); },
-  knock(t) { for (const dt of [0, 0.26, 0.52]) { thump(t + dt, 170, 0.16, 0.08); noise(t + dt, 0.04, 0.09, 'bandpass', 900, 1.5); noise(t + dt + 0.09, 0.05, 0.02, 'bandpass', 700, 1); } },
+  knock(t) { for (const dt of [0, 0.3, 0.6]) { thump(t + dt, 150, 0.5, 0.11); thump(t + dt, 95, 0.3, 0.16); noise(t + dt, 0.05, 0.3, 'bandpass', 900, 1.4); noise(t + dt + 0.01, 0.18, 0.05, 'bandpass', 420, 2.5); } },   // knuckles on the ward door, loud and close
+  handle(t) { noise(t, 0.03, 0.08, 'bandpass', 3200, 3); tone(t, 'square', 2100, 1900, 0.01, 0.05); },
+  chair(t) { noise(t, 0.25, 0.04, 'bandpass', 520, 1.2); noise(t + 0.05, 0.2, 0.025, 'bandpass', 1400, 2); },
   meow(t) { tone(t, 'triangle', 700, 520, 0.02, 0.35); tone(t + 0.05, 'sine', 1400, 1000, 0.006, 0.3); },
   // the brakes' squeal as it stops
   brake(t) { const o = ac.createOscillator(), gn = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(2900, t); o.frequency.linearRampToValueAtTime(2500, t + 1.2); lfo.frequency.value = 9; lg.gain.value = 30; lfo.connect(lg); lg.connect(o.frequency);
@@ -1212,6 +1291,8 @@ for (let k = 1; ; k++) { const t = walk2T(k * STRIDE); if (t > WALK2.stop - 0.05
 for (let i = EV.length - 1; i >= 0; i--) if (EV[i].fn === 'pad') EV.splice(i, 1);   // the song is the music now
 EV.push({ t: LOBBY.press, fn: 'button' }, { t: LOBBY.open, fn: 'liftDoor' }, { t: ELEV.t1, fn: 'liftHum', dur: ELEV.ding - ELEV.t1 }, { t: ELEV.ding, fn: 'ding' }, { t: ELEV.open, fn: 'liftDoor' });
 for (let k = 1; ; k++) { const t = W4.T(k * STRIDE); if (t > WALK4.stop - 0.05) break; EV.push({ t, fn: 'step', out: false }); }
+EV.push({ t: EXIT.stand, fn: 'chair' }, { t: EXIT.stand + 0.2, fn: 'rustle' }, { t: EXIT.reach + 0.3, fn: 'handle' });
+for (let k = 1; ; k++) { const t = WX.T(k * STRIDE); if (t > WX.stop - 0.05) break; EV.push({ t, fn: 'step', out: false }); }
 EV.sort((a, b) => a.t - b.t);
 function audioStart(t) {
   if (!ac) return; ac.resume(); newBus(); schedTo = t;
@@ -1245,8 +1326,19 @@ function songSync(t) {
 }
 const SUBS = [{"t0": 8.9, "t1": 13.8, "en": "The belt has stopped, the lights are out", "ko": "벨트는 멈추고, 불은 꺼졌어"}, {"t0": 13.8, "t1": 17.4, "en": "There's nothing left to hold", "ko": "붙잡을 건 아무것도 남지 않았어"}, {"t0": 17.5, "t1": 21.1, "en": "Just a watch around my wrist", "ko": "손목 위 시계 하나만"}, {"t0": 21.16, "t1": 24.9, "en": "Still telling me I'm late", "ko": "아직도 늦었다고 재촉해"}, {"t0": 24.94, "t1": 29.5, "en": "Before the first train comes", "ko": "첫차가 오기 전에"}, {"t0": 29.78, "t1": 34.6, "en": "Just hold on a little more", "ko": "조금만 더 버티면 돼"}, {"t0": 35.28, "t1": 37.72, "en": "I never had a dream", "ko": "나는 꿈이 없었어"}, {"t0": 37.72, "t1": 39.86, "en": "So I just count to four", "ko": "그래서 넷까지만 세"}, {"t0": 39.86, "t1": 41.64, "en": "One, two, three, and four", "ko": "하나, 둘, 셋, 그리고 넷"}, {"t0": 41.64, "t1": 43.72, "en": "I'll be waiting on the four", "ko": "넷에서 기다릴게"}, {"t0": 43.72, "t1": 45.94, "en": "Lost in a crowd of strangers", "ko": "낯선 사람들 틈에서"}, {"t0": 45.94, "t1": 48.04, "en": "I'm standing all alone", "ko": "나는 혼자 서 있어"}, {"t0": 48.04, "t1": 50.52, "en": "But the four is mine to keep", "ko": "그래도 넷은 내가 지킬게"}, {"t0": 50.52, "t1": 52.36, "en": "I won't let it go", "ko": "놓치지 않을게"}, {"t0": 52.36, "t1": 55.6, "en": "At the end of the alley", "ko": "골목 끝에서"}, {"t0": 55.74, "t1": 60.08, "en": "The windows go dark one by one", "ko": "창문들이 하나둘 꺼져"}, {"t0": 60.08, "t1": 62.74, "en": "The morning's coming in", "ko": "아침은 오는데"}, {"t0": 62.74, "t1": 68.4, "en": "But I'm still in the night", "ko": "나는 아직 밤이야"}, {"t0": 109.42, "t1": 112.8, "en": "One light comes on", "ko": "불이 하나 켜지면"}, {"t0": 113.3, "t1": 117.0, "en": "One more step", "ko": "한 걸음 더"}, {"t0": 118.34, "t1": 120.7, "en": "Another light", "ko": "또 하나의 불"}, {"t0": 121.06, "t1": 125.2, "en": "Another step", "ko": "또 한 걸음"}, {"t0": 126.56, "t1": 129.2, "en": "Mom, I'll count for you", "ko": "엄마, 내가 셀게"}, {"t0": 129.2, "t1": 130.7, "en": "One, two, three, and four", "ko": "하나, 둘, 셋, 그리고 넷"}, {"t0": 130.7, "t1": 132.84, "en": "Don't stop, I'll lay my hand", "ko": "멈추지 마, 내가 손을 얹을게"}, {"t0": 132.84, "t1": 135.06, "en": "Right on your every beat", "ko": "엄마의 박 하나하나 위에"}, {"t0": 135.06, "t1": 137.2, "en": "I don't need a dream", "ko": "꿈은 없어도 돼"}, {"t0": 137.32, "t1": 139.34, "en": "This beat is all I need", "ko": "이 박 하나면 충분해"}, {"t0": 139.34, "t1": 141.3, "en": "Your four, I'll carry it", "ko": "엄마의 넷은 내가 이어 갈게"}, {"t0": 141.3, "t1": 146.6, "en": "All the way home", "ko": "집에 닿을 때까지"}, {"t0": 149.22, "t1": 151.8, "en": "Four...", "ko": "넷…"}, {"t0": 153.26, "t1": 155.8, "en": "Four...", "ko": "넷…"}];
 let subLang = 'en';
+const LINES = [{ t0: WARD.voice, t1: WARD.voice + 2.2, who: '???', en: 'Noona!', ko: '누나!' }];   // through the ward door (지우, not seen yet)
 function drawSubs(t) {
-  if (subLang === 'off' || t >= CUT_END) return;
+  if (t >= CUT_END) return;
+  // a line of dialogue (shown even with the lyrics off: in Korean when the Korean subtitles are on, otherwise English)
+  const ln = LINES.find(c => t >= c.t0 && t < c.t1);
+  if (ln) { const a = clamp(Math.min((t - ln.t0) / 0.15, (ln.t1 - t) / 0.3), 0, 1), lang = subLang === 'ko' ? 'ko' : 'en';
+    out.save(); out.setTransform(1, 0, 0, 1, 0, 0); out.globalAlpha = a; out.textAlign = 'center'; out.textBaseline = 'middle';
+    const big = Math.round(cv.width / 34), small = Math.round(cv.width / 60), y = cv.height * 0.9;
+    out.font = `600 ${small}px "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; out.lineWidth = 4; out.strokeStyle = 'rgba(0,0,0,.85)';
+    out.strokeText(ln.who, cv.width / 2, y - big * 1.05); out.fillStyle = '#c9bfae'; out.fillText(ln.who, cv.width / 2, y - big * 1.05);
+    out.font = `600 ${big}px "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; out.lineWidth = 5;
+    out.strokeText(ln[lang], cv.width / 2, y); out.fillStyle = '#fff6e4'; out.fillText(ln[lang], cv.width / 2, y); out.restore(); }
+  if (subLang === 'off') return;
   const c = SUBS.find(c => t >= c.t0 - 0.05 && t < c.t1); if (!c) return;
   const a = clamp(Math.min((t - c.t0 + 0.05) / 0.2, (c.t1 - t) / 0.25), 0, 1), text = c[subLang];
   out.save(); out.setTransform(1, 0, 0, 1, 0, 0); out.globalAlpha = a;
@@ -1255,24 +1347,14 @@ function drawSubs(t) {
   out.restore();
 }
 
-// ---------- the clip after the cutscene ----------
-const clip = document.createElement('video'); clip.src = CLIP.src + (clip.canPlayType('video/mp4; codecs="avc1.640028"') ? '.mp4' : '.webm'); clip.preload = 'auto'; clip.playsInline = true; let clipOK = false;
-clip.addEventListener('loadeddata', () => { clipOK = true; });
-// keep the clip on the page's clock: playing while the page plays inside its span, nudged back if it drifts
-function clipSync(t) {
-  const want = t - CLIP.t0, inside = playing && want >= 0 && want < CLIP.dur;
-  clip.muted = !soundOn;
-  if (!inside) { if (!clip.paused) clip.pause(); if (!playing && want >= 0 && want < CLIP.dur && Math.abs(clip.currentTime - want) > 0.05) clip.currentTime = want; return; }
-  if (clip.paused) { clip.currentTime = want; clip.play().catch(() => {}); }
-  else if (Math.abs(clip.currentTime - want) > 0.25) clip.currentTime = want;
-}
-
+// the row is drawn on its own layer the size of the screen, laid over the picture (so it can fade out after the song)
+const HBCV = document.createElement('canvas'); HBCV.width = cv.width; HBCV.height = cv.height;
 // ---------- the heartbeat rows (from stage1-6.html, laid over the cutscene) ----------
 // 1-6's rhythm game, Rhythm Doctor style: her mother's heartbeat runs along a row at the bottom, three beats by themselves and the
 // 4th yours to press; later 하은's own heart joins as a second row. The code is stage1-6.html's, kept as it is, with its own
 // drawing context and audio; the cutscene is its movie, played on the song's clock.
 const HB = (() => {
-  const SC = 3, G0 = cv.getContext('2d'); let g = G0;
+  const SC = 3, G0 = HBCV.getContext('2d'); let g = G0;
   const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
   const ROW = 4;   // beats from a row's start to its arrival: three heartbeats come in by themselves, the 4th is the player's
   const ROWS = [];
@@ -1560,15 +1642,15 @@ let hbOn = true;
 function setPlaying(p) {
   if (p && T >= END - 0.01) T = 0;
   playing = p; playBtn.textContent = p ? '일시정지' : '재생'; $('big').hidden = p || started;
-  if (p) { started = true; $('big').hidden = true; initAudio(); audioStart(T); if (hbOn && T < CUT_END) { if (T < 0.05) HB.reset(); HB.begin(T); } } else { audioStop(); HB.halt(); }
+  if (p) { started = true; $('big').hidden = true; initAudio(); audioStart(T); if (hbOn && T < ROWS_END) { if (T < 0.05) HB.reset(); HB.begin(T); } } else { audioStop(); HB.halt(); }
 }
-function jump(t) { T = clamp(t, 0, END); if (playing) { audioStart(T); if (hbOn && T < CUT_END) HB.begin(T); else HB.halt(); } }
+function jump(t) { T = clamp(t, 0, END); if (playing) { audioStart(T); if (hbOn && T < ROWS_END) HB.begin(T); else HB.halt(); } }
 playBtn.onclick = () => { if (!started) T = 0; setPlaying(!playing); };   // the first play starts from the top
 const pressNow = e => HB.press(HB.clock() + (e.timeStamp - performance.now()) / 1000);
 // the picture: while playing with the rows on, a touch is a press on the beat; otherwise it plays or pauses
-$('stage').addEventListener('pointerdown', e => { if (playing && hbOn && T < CUT_END && HB.clock() != null) { e.preventDefault(); pressNow(e); return; } if (!started) T = 0; setPlaying(!playing); });
+$('stage').addEventListener('pointerdown', e => { if (playing && hbOn && T < ROWS_END && HB.clock() != null) { e.preventDefault(); pressNow(e); return; } if (!started) T = 0; setPlaying(!playing); });
 $('restart').onclick = () => { HB.reset(); jump(0); if (!playing) setPlaying(true); };
-$('hb').onclick = () => { hbOn = !hbOn; $('hb').setAttribute('aria-pressed', hbOn); if (!hbOn) HB.halt(); else if (playing) HB.begin(T); };
+$('hb').onclick = () => { hbOn = !hbOn; $('hb').setAttribute('aria-pressed', hbOn); if (!hbOn) HB.halt(); else if (playing && T < ROWS_END) HB.begin(T); };
 let dragging = false;
 seek.addEventListener('pointerdown', () => { dragging = true; });
 addEventListener('pointerup', () => { dragging = false; });
@@ -1578,7 +1660,7 @@ $('sub').onclick = () => { subLang = { en: 'ko', ko: 'off', off: 'en' }[subLang]
 const PRESS_KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyK', 'KeyD']);
 addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' && e.code !== 'Space') return;
-  if (PRESS_KEYS.has(e.code) && playing && hbOn && T < CUT_END && HB.clock() != null) { e.preventDefault(); if (!e.repeat) pressNow(e); return; }
+  if (PRESS_KEYS.has(e.code) && playing && hbOn && T < ROWS_END && HB.clock() != null) { e.preventDefault(); if (!e.repeat) pressNow(e); return; }
   if (e.code === 'Space' || e.code === 'KeyP') { e.preventDefault(); if (!started) T = 0; setPlaying(!playing); }
   else if (e.code === 'ArrowLeft') jump(T - 1); else if (e.code === 'ArrowRight') jump(T + 1);
 });
@@ -1595,12 +1677,13 @@ function showResult() {
 }
 function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
-  if (playing) { const hc = hbOn ? HB.clock() : null; T = hc != null ? hc : T + dt; if (T >= CUT_END && hc != null) { HB.halt(); showResult(); } if (T >= END) { T = END; setPlaying(false); } }
-  const rows = hbOn && T < CUT_END;   // the rows are gone once the cutscene ends
+  if (playing) { const hc = hbOn ? HB.clock() : null; T = hc != null ? hc : T + dt; if (T >= ROWS_END && hc != null) { HB.halt(); showResult(); } if (T >= END) { T = END; setPlaying(false); } }
+  const rows = hbOn && T < ROWS_END;   // the row is gone once the song is over
   if (rows) HB.update(T);
-  render(T); if (rows) HB.draw(T); audioTick(T); clipSync(T); songSync(T);
-  // the rows go dark with the cutscene's fade, so they leave with it
-  { const f = rows ? seg(T, CUT_END - 1.5, CUT_END - 0.1) : 0; if (f > 0) { out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = `rgba(0,0,0,${f})`; out.fillRect(0, 0, cv.width, cv.height); } }
+  render(T); audioTick(T); songSync(T);
+  // the row (and its black bar) fades out after the song, and the picture is whole for the door
+  if (rows) { const HG = HBCV.getContext('2d'); HG.setTransform(1, 0, 0, 1, 0, 0); HG.clearRect(0, 0, HBCV.width, HBCV.height); HB.draw(T);
+    out.save(); out.setTransform(1, 0, 0, 1, 0, 0); out.globalAlpha = 1 - seg(T, ROWS_END - 1.2, ROWS_END - 0.05); out.drawImage(HBCV, 0, 0); out.restore(); }
   drawSubs(T);
   if (!dragging) seek.value = T;
   $('time').textContent = `${T.toFixed(1).padStart(4, '0')} / ${END.toFixed(1)}`;
