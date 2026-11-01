@@ -1,4 +1,7 @@
-# 1-5 노래: 하은의 랩 — 제미나이(Lyria) 프롬프트
+# 1-5 노래: 하은의 랩 두 곡 — 제미나이(Lyria) 프롬프트
+
+**두 라운드**: 2페이즈(1라운드)는 느린 곡 "The Lazy Shift"(`prototype/audio/1-5-the-lazy-shift.mp3`, 받은 곡 91.98초, 실측 75.5 BPM, 28마디, 첫 다운비트 0.068초, 끝에 테이프 정지), 3페이즈(2라운드)는 아래의 "You Play, I Pay". 1라운드 프롬프트는 이 문서 끝.
+
 
 1-5 2페이즈(32–72마디)에 깔 곡. 다툼 끝에 하은이 지우를 밀쳐내자, 자기 벨트로 돌아온 지우가 "좋아요. 그럼 박으로 해요. 누나 박이 그렇게 잘났으면, 따라와 봐요!" 하고 자기 비트를 튼다. **지우는 비트로 도발하고(가사 없음, 으스스한 멜로디 리프 + 상자 던지기), 하은이 그 비트를 뺏어 랩으로 받아친다.** 랩은 하은 혼자. **95 BPM**, 4/4, A 단조(어두운 반음 하강 루프), **2:34**(61마디). 게임은 정적이 끝나는 128박부터 95. 1-6 노래처럼 글로벌 출시용 영어 가사(한국어는 자막).
 
@@ -174,3 +177,16 @@ TICK-TOCK ON THE LINE, AND NOBODY'S GONNA STOP
 | Tick-tock on the line, and nobody's gonna stop | 라인 위에 째깍째깍, 아무도 안 멈춰 |
 
 "Stay up on your stage / down at the machine"은 지우가 위 벨트(무대), 하은이 아래 벨트(기계)라는 자리를 그대로 쓴 것. "Somebody's waiting."(기다리는 사람이 있어)이 1-6 병원 사정(어머니)의 유일한 실마리. 돈 얘기는 하지 않는다. "What's it for?"는 원래 지우가 묻던 말을 하은이 스스로 묻고 답하는 식.
+
+## 1라운드 곡 "The Lazy Shift" 프롬프트 (받아서 씀)
+
+```
+A slow, lazy, swaggering hip-hop track with ONE solo female rapper. A young woman on the night shift answers a careless coworker who keeps playing his sleepy beat at her: she takes it over and raps on it, cool and unimpressed. English rap vocals, one female voice only, no male vocals, no singing. 1:29 long, 78 BPM, 4/4, A minor. Clean lyrics.
+(beat: dark, dusty, laid-back boom bap; sub bass walking A, G#, F#, E; hazy Rhodes, tape wobble, vinyl. BEAT sections with a lazy whistle-like riff and vocal stabs, RAP sections with the raw loop. Structure: intro BEAT 4, BEAT 4, verse 1 8, hook 4, BEAT 4, verse 2 4, ending 1 bar slowing down like a tape stopping.)
+
+[Verse 1] This your beat? It's half asleep / Just like you on the shift, counting sheep / You throw it so lazy, it lands on my side / I pick up the pieces, you call it a vibe / Earbuds in and the whole world out / Nodding along like you know what it's about / You're waiting on the drop, you're waiting on the cheer / I've been on the beat since before you got here
+[Hook] Is that it? Is that all you got? (x2) / Is that it? You call that hot? / Is that it? Is that all you got?
+[Verse 2] Turn it up, turn it down, I don't really mind / I'll ride any beat that you leave behind / You want it faster? Go on, raise the bar / Play me another. I'll catch every bar.
+```
+
+받은 곡의 실제 구조(곡 마디): 0–3 조용한 인트로(저음 없음), 4–7 지우 비트, 8–15 1절, 16–19 훅(2·3박 강세), 20–23 지우 비트, 24–27 2절, 28 정적. 템포는 75.5에서 ±0.03초 안으로 맞음.

@@ -1056,36 +1056,41 @@ const LEVELS = [
     // a stand-in beat): in his beat sections he throws boxes at her belt on purpose, in her verses and her "Tick-tock" hooks
     // her own slam down on the beat; then both at once, the last hook eight times over, building to the last hit.
     show: true,   // 1-5's light show (drawShow15) and their auras
-    lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 376]], unplugMuffle: false,
+    lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 496]], unplugMuffle: false,
     // the row: she crosses to the stairs at the upper belt's left end and climbs to his deck, stands with him, pulls his earbud
     // out at the record scratch, shoves him back along his deck (he stares, then walks back to his belt) and goes back down
     visit: { go: [95.5, 99.5], back: [126, 128], yank: 104, shove: 122.3, ret: [128.5, 130.5] },
     stairs: { x: 86, dx: -2, dy: 7, steps: 4 },   // at the upper belt's left end, from his deck down to the floor
     metalShift: 3, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
     hitKit: 'ticktock',   // a tick for his belt, a tock for hers: no pitch, so they sit with his beat and the song
-    slam: [[160, 376]],   // from her first verse she slams her boxes down rather than carrying them
+    slam: [[160, 496]],   // from her first verse she slams her boxes down rather than carrying them
     // phase 2's turns, by bar: hers, his, or both at once
-    // phase 2 is the recorded song (her rapping alone, 94 BPM, 61 bars, its first downbeat 0.055 s in), started on beat 128.
-    // Its sections as measured: intro without drums 32-35 and his beat 36-39, her verse 40-47, hook 48-51, his beat 52-55
-    // (the bass drops out on 52), her verse 56-63 (the bass out again 60-63), hook 64-67, his beat 68-75 (eight bars), the
-    // breakdown 76-79 (quiet, her short lines), the build 80-83, the last hook 84-90 (loudest 87-90), the last hit 91
-    song: { src: 'audio/1-5-you-play-i-pay.mp3', at: 128, lead: 0.055, gain: 0.9 },
-    battle: { h: [[40, 52], [56, 68], [77, 78], [79, 80]], j: [[32, 40], [52, 56], [68, 76], [76, 77], [78, 79]] }, battleHard: 84,
+    // the battle is two recorded songs with her rapping alone. Phase 2, round one: his slow beat 'The Lazy Shift' (75.5 BPM,
+    // 28 bars, first downbeat 0.068 s in, it winds down like a stopping tape at the end), started on beat 128: a quiet intro
+    // 32-35, his beat 36-39, her verse 40-47, the hook ("Is that it?") 48-51, his beat 52-55, her verse 56-59. The switch
+    // 60-61: silence, the camera on him - 이 비트도 한번 받아봐요! Phase 3, round two: 'You Play, I Pay' (94 BPM, 61 bars,
+    // 0.055 s) from beat 248: intro and his beat 62-69, her verse 70-77, hook 78-81, his beat 82-85, her verse 86-93, hook
+    // 94-97, his eight-bar beat 98-105, the breakdown 106-109, the build 110-113, the last hook 114-120, the last hit 121
+    songs: [{ src: 'audio/1-5-the-lazy-shift.mp3', at: 128, lead: 0.068, gain: 0.9, sec: 'lazy' },
+            { src: 'audio/1-5-you-play-i-pay.mp3', at: 248, lead: 0.055, gain: 0.9, sec: 'diss' }],
+    battle: { h: [[40, 52], [56, 60], [70, 82], [86, 98], [107, 108], [109, 110]],
+              j: [[32, 40], [52, 56], [60, 62], [62, 70], [82, 86], [98, 106], [106, 107], [108, 109]] }, battleHard: 114,
     // the camera (no box lands while it is in close or easing out): his doze as a cutscene (him nodding off, her watching,
     // the two of them as she wakes him), his track opening, and the row: the two of them, then him knocked back and staring
     camPlay: [[40.5, 46, { x: 104, y: 84, k: 2.2 }], [46, 57, { x: 56, y: 108, k: 2 }], [57, 62.5, { x: 76, y: 96, k: 1.5 }],
-      [72, 78, { x: 104, y: 84, k: 1.8 }], [96, 122.3, { x: 90, y: 92, k: 1.5 }], [122.3, 128, { x: 108, y: 88, k: 1.6 }]],
-    cutscene: [[40.5, 62.5], [96, 128]],   // letterboxed
-    devMarks: [[0, '처음'], [8, '3점슛'], [36, '졸음 컷씬'], [68, '지우 음악·떨어뜨림'], [92, '다툼·밀치기'], [128, '노래 시작'], [160, '하은 1절'], [192, '훅 1'], [208, '지우 비트'], [224, '하은 2절'], [256, '훅 2'], [272, '지우 비트 (8마디)'], [304, '브레이크다운'], [320, '빌드업'], [336, '마지막 훅'], [364, '마지막 한 방']],
+      [72, 78, { x: 104, y: 84, k: 1.8 }], [96, 122.3, { x: 90, y: 92, k: 1.5 }], [122.3, 128, { x: 108, y: 88, k: 1.6 }],
+      [240, 248, { x: 104, y: 80, k: 2.4 }]],
+    cutscene: [[40.5, 62.5], [96, 128], [240, 248]],   // letterboxed
+    devMarks: [[0, '처음'], [8, '3점슛'], [36, '졸음 컷씬'], [68, '지우 음악·떨어뜨림'], [92, '다툼·밀치기'], [128, '1라운드 (느린 비트)'], [160, '하은 1절'], [192, '훅 Is that it?'], [224, '하은 2절'], [240, '곡 전환·지우 클로즈업'], [248, '2라운드 (You Play, I Pay)'], [280, '하은 1절'], [312, 'Tick-tock 훅'], [392, '지우 비트 (8마디)'], [424, '브레이크다운'], [456, '마지막 훅'], [484, '마지막 한 방']],
     farBeltLeft: 36,   // the upper belt runs on to the left, past his legs, up to the stairs
     heads: { j: [104, 58], h: [52, 90], v: [86, 58], k: [130, 58] },
     clock:'03:20', title:'꿈', offTilt: true,
     chords: S15.lofi.ch, roots: S15.lofi.rt, chordAt: bar => bar % 4,
-    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 376,
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 496,
     hints: false, special:['떨어진 상자', 'drop', '받아냄'],
-    sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [32, 'diss'], [91, 'finale'], [92, 'end'], [93, 'outro']],
-    // one tempo, the song's: his beat in phase 1 is the same beat
-    tempo: [[0, 94]],
+    sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [32, 'lazy'], [60, 'switch'], [62, 'diss'], [121, 'finale'], [122, 'end'], [123, 'outro']],
+    // 94 (his beat in phase 1 is the second song's beat), the first song's 75.5 for round one, 94 again from the switch
+    tempo: [[0, 94], [128, 75.5], [240, 94]],
     // upper belt: 하은, on the beat (8 cells; h= a long crate, held). Phase 1: her taps and long crates on their own, and alone
     // through his doze. Phase 2 (bars 29-50, her alone in the middle on both belts) follows the metal's guitar: a tap on each
     // bar's first chug, a long crate where a chord rings (riff A: G on the third beat, a beat long; riff B: D on the third
@@ -1101,6 +1106,11 @@ const LEVELS = [
       '........', '........', '........', '........', '........', '........', '......x.', '........',
       '........', '........', '......x.', '........', '....x...', '........', '........', '........',
       '........', '........', '........', '........', '........', '........',
+      '........', '........', 'x.......', 'x...x...',
+      'x...x...', 'x.x.....', 'x...x...', 'x.x.x...', '..u...u.', '......u.', '........', '........',
+      '..u...u.', '......u.', '........', '........', '..u.....', '..u.....', '..u.....', '..u...u.',
+      'x...x...', 'x.x.....', 'x...x...', 'x.x.x...', '..u...u.', '........', '..u...u.', '........',
+      '........', '........',
       '........', '........', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.....', 'x...x...', 'x.x.x...',
       '..u...u.', '......u.', '........', '........', '..u...u.', '......u.', '........', '........',
       '..u.....', '..u.....', '..u.....', '..u...u.', 'x.......', 'x.x.....', 'x...x...', 'x.x.x.x.',
@@ -1119,6 +1129,11 @@ const LEVELS = [
       '........', '........', '........', '........', '........', '........', '..x.x...', 'x.x...d.',
       '........', '........', 'x.d.x...', 'x.d.x.d.', 'h===..x.', 'x.d.x.d.', '........', '........',
       '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........',
+      '..d...d.', '....d.d.', '..d...d.', '......d.', 'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.',
+      'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.', '....x...', '....x...', '....x...', 'x...x...',
+      '..d...d.', '....d.d.', '..d.d.d.', '......d.', 'x...x...', 'h===..x.', 'x...x...', 'h===....',
+      '........', '........',
       '........', '........', '........', '........', '..d...d.', '....d.d.', '..d...d.', '......d.',
       'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.', 'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.',
       '......x.', '......x.', '......x.', 'x...x...', '..d.....', '....d.d.', '..d...d.', '........',
@@ -1146,9 +1161,12 @@ const LEVELS = [
           [124.5, '…어?', 1.5, 0, 'k'], [126.5, '…와. 진짜 밀었어요?', 2.5, 0, 'k'],
           // back at his belt he answers with a beat: the battle
           [129, '좋아요. 그럼 박으로 해요.', 2.5, 0, 'j'], [132, '누나 박이 그렇게 잘났으면, 따라와 봐요!', 3, 0, 'j'],
-          // the battle: he hands her his beat to play with, she shrugs it off and raps
-          [159, '…이 정도?', 2, 1, 'h'], [207, '이 비트도 한번 가지고 놀아봐요.', 3, 0, 'j'], [223, '…이 정도?', 2, 1, 'h'],
-          [271, '이것도 한번 가지고 놀아봐요!', 3, 0, 'j']],
+          // round one: she shrugs his beat off; he hands her another
+          [159, '…이 정도?', 2, 1, 'h'], [207, '이 비트도 한번 가지고 놀아봐요.', 3, 0, 'j'], [223, '…그게 다야?', 2, 1, 'h'],
+          // the switch: the tape has run down; the camera on him
+          [241, '…하. 그래요?', 2, 0, 'j'], [244, '이 비트도 한번 받아봐요!', 3.5, 0, 'j'],
+          // round two
+          [279, '…또?', 1.5, 1, 'h'], [327, '이것도 한번 가지고 놀아봐요!', 3, 0, 'j'], [343, '…이 정도?', 2, 1, 'h'], [391, '이것도요!', 2, 0, 'j']],
     comfort: [],   // nobody steadies you here
     intro: [
       { who:'', text:'며칠 뒤. 명절 물량은 그대로다.' },
@@ -2190,6 +2208,7 @@ const SHOW15 = { lastB: -1e9 };
 // 1-5: the metal and what follows it are written from bar 29; a level that lengthens the silence before it (metalShift, in
 // bars) moves them later, so their beats are counted back to where they were written
 // 1-5's diss battle: whose turn a bar is ('h' her, 'j' his, 'both' when it is not one of theirs)
+const sectionStart = name => { const x = (L.sections || []).find(z => z[1] === name); return x ? x[0] : -1; };
 const battleAt = bar => { const B = L.battle; if (!B) return 'both'; if (B.h.some(([a, z]) => bar >= a && bar < z)) return 'h'; if (B.j.some(([a, z]) => bar >= a && bar < z)) return 'j'; return 'both'; };
 const sh15 = sec => sec === 'metal' || sec === 'together' || sec === 'finale' || sec === 'end' || sec === 'outro' ? (L.metalShift || 0) * 4 : 0;
 function drawShow15(t, nowMs) {
@@ -2236,14 +2255,18 @@ function drawShow15(t, nowMs) {
     ember(late ? ['#ff5a2a', '#5ad7ff', '#ffffff'] : ['#ff5a2a', '#5ad7ff']);
     return;
   }
-  if (sec === 'diss') {
+  // the switch between the two songs: the tape has run down, the room goes dark round him
+  if (sec === 'switch') { dim(0.5 + 0.15 * Math.min(1, (bA - sectionStart('switch') * 4) / 2)); return; }
+  if (sec === 'diss' || sec === 'lazy') {
     // the battle: the room takes the colour of whoever has the turn (hers red, his cyan; both, it flips on every beat), a
-    // flash on each snare, the floor thumping on every beat (harder when they go at once, hardest in the last six bars)
-    const who = battleAt(bar), last = bar >= (L.battleHard || 48), red = who === 'h' || (who === 'both' && fb % 2 === 0);
-    tint(red ? '255,110,90' : '120,200,255', 0.38 + (last ? 0.1 : 0)); add(red ? '255,60,40' : '60,190,255', 0.03 + 0.08 * hit);
-    if (inBar === 1 || inBar === 3) add('255,255,255', (last ? 0.18 : 0.12) * Math.max(0, 1 - ph * 6));
-    FX.rumble = (last ? 2.6 : who === 'both' ? 2 : 1.4) * Math.max(0, 1 - ph * 4);
-    if (crossed && inBar === 0) punch(last ? 1.05 : 1.03, 140, 2);
+    // flash on each snare, the floor thumping on every beat (harder when they go at once, hardest at the end). The first
+    // round (his lazy beat) is softer; the second song comes in on a white flash and a punch
+    const lazy = sec === 'lazy', who = battleAt(bar), last = bar >= (L.battleHard || 48), red = who === 'h' || (who === 'both' && fb % 2 === 0);
+    tint(red ? '255,110,90' : '120,200,255', (lazy ? 0.28 : 0.38) + (last ? 0.1 : 0)); add(red ? '255,60,40' : '60,190,255', 0.03 + (lazy ? 0.05 : 0.08) * hit);
+    if (inBar === 1 || inBar === 3) add('255,255,255', (last ? 0.18 : lazy ? 0.07 : 0.12) * Math.max(0, 1 - ph * 6));
+    FX.rumble = (last ? 2.6 : who === 'both' ? 2 : lazy ? 0.9 : 1.4) * Math.max(0, 1 - ph * 4);
+    if (!lazy && bar === sectionStart('diss')) { add('255,255,255', 0.8 * Math.max(0, 1 - (b - bar * 4) / 2)); if (crossed && inBar === 0) punch(1.1, 420, 4); }
+    else if (crossed && inBar === 0) punch(last ? 1.05 : 1.03, 140, 2);
     ember(red ? ['#ff5a2a', '#ffb03a'] : ['#5ad7ff', '#bfe9ff']);
     return;
   }
@@ -2254,7 +2277,7 @@ function drawShow15(t, nowMs) {
 function drawRage15(t, nowMs, who) {
   const bA = beatAt(t), sec = sectionAt(Math.floor(bA / 4)), b = bA - sh15(sec), bar = Math.floor(b / 4), e = Math.max(0, 1 - (b % 1) * 3);
   let k = 0;
-  if (sec === 'diss') { const turn = battleAt(bar); k = turn === who ? 0.85 : turn === 'both' ? 0.7 : 0.2; }
+  if (sec === 'diss' || sec === 'lazy') { const turn = battleAt(bar); k = (turn === who ? 0.85 : turn === 'both' ? 0.7 : 0.2) * (sec === 'lazy' ? 0.7 : 1); }
   else if (who === 'h') k = sec === 'metal' ? (bar < 31 ? 0.25 : bar === 35 || bar === 36 ? 0.95 : 0.7) : sec === 'together' ? 0.6 : sec === 'finale' ? 0.9 : 0;
   else k = sec === 'together' && bar >= 42 ? 0.6 : sec === 'finale' ? 0.9 : 0;
   if (k <= 0) return;
@@ -5094,8 +5117,9 @@ function buildEvents() {
         // hook over it). Into each of her turns a record scratch, into each of his a vocal chop. From bar 46 both at once (the
         // breakdown on long chords, then everything), the hats doubling for the last six bars, a crash on every bar
         const who = battleAt(bar), H = who !== 'j', J = who !== 'h', hard = bar >= (L.battleHard || 48);
-        if (bar === 32 && inBar === 0) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady()) startSong(T); });
-        if (songReady()) continue;   // the recorded song carries it
+        const si = L.songs ? L.songs.findIndex(sp => sp.sec === 'diss') : -1;
+        if (bar === sectionStart('diss') && inBar === 0) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(si)) startSong(T, 0, si); });
+        if (songReady(si)) continue;   // the recorded song carries it
         if (H) {
           if (inBar === 0) { E(0, T => bbKick(T, 1)); E(AND, T => bbKick(T, 0.55)); }
           if (inBar === 2) { E(0, T => bbKick(T, 0.9)); if (bar % 2) E(AND, T => bbKick(T, 0.5)); }
@@ -5110,7 +5134,15 @@ function buildEvents() {
         if (inBar === 0 && (who === 'both' || battleAt(bar - 1) !== who)) E(0, T => crash(T));
         continue;
       }
-      if (sec === 'finale' && songReady()) continue;   // the song has its own last hit
+      if (sec === 'finale' && L.songs && songReady(L.songs.length - 1)) continue;   // the song has its own last hit
+      if (sec === 'lazy') {
+        // 1-5 phase 2: his slow beat (the recorded 'The Lazy Shift'); without it, his beat off his phone stands in
+        const si = L.songs.findIndex(sp => sp.sec === 'lazy');
+        if (bar === sectionStart('lazy') && inBar === 0) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(si)) startSong(T, 0, si); });
+        if (!songReady(si)) hipBeat15(E, bar, inBar, s, 1, 'demo');
+        continue;
+      }
+      if (sec === 'switch') { E(0, T => roller(T, 0.03)); continue; }   // the tape has stopped: rollers, his line
       if (sec === 'finale') {
         // the last hit: everything at once on the first beat, then let it ring out
         if (inBar === 0) E(0, T => { mGtr(T, 82.41 * Math.pow(2, 2 / 12), s * 3.6, false, 0.12); mBass(T, 41.2 * Math.pow(2, 2 / 12), s * 3.4, 0.24); mKick(T, 1.2); mSnare(T, 1.2); mCrash(T, 0.6); mCrash(T + 0.01, 0.4); synthLead(T, 987.77 * Math.pow(2, 2 / 12), s * 3, 0.05); });
@@ -5773,10 +5805,10 @@ function buildCards() {
 }
 function openBoard() { guideOff(); stopSong(); ensureAudio(); sceneReset(); state = 'select'; $('title').hidden = true; $('result').hidden = true; dialogEl.hidden = true; buildCards(); $('select').hidden = false; }
 
-// a level can play a recorded song for a stretch of the shift (L.song = { src, at, lead }): decoded once, started so that its
-// first downbeat (lead seconds into the file) lands on beat `at`; while it is loaded the synthesized stand-in for that
-// stretch stays quiet. Fetched next to the page (an artifact publishes it with the page); if it cannot be fetched or decoded
-// (a file:// page, say) the stand-in plays.
+// a level can play recorded songs for stretches of the shift (L.songs: [{ src, at, lead, gain }]): each decoded once, started
+// so that its first downbeat (lead seconds into the file) lands on beat `at`; while it is loaded the synthesized stand-in for
+// that stretch stays quiet. Fetched next to the page (an artifact publishes them with the page); if one cannot be fetched or
+// decoded (a file:// page, say) the stand-in plays.
 const SONG = { bufs: {}, src: null };
 function loadSong(sp) {
   if (!sp || !ctx || SONG.bufs[sp.src] !== undefined) return;
@@ -5785,18 +5817,19 @@ function loadSong(sp) {
   fetch(sp.src).then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(a => ctx.decodeAudioData(a))
     .then(buf => { SONG.bufs[sp.src] = buf; }).catch(() => { SONG.bufs[sp.src] = false; });
 }
-const songReady = () => !!(L.song && SONG.bufs[L.song.src]);
+const loadSongs = level => (level.songs || []).forEach(loadSong);
+const songReady = (i = 0) => !!(L.songs && L.songs[i] && SONG.bufs[L.songs[i].src]);
 function stopSong() { if (SONG.src) { try { SONG.src.stop(); } catch (e) {} SONG.src = null; } }
-// start it at audio time T, `into` seconds past its first downbeat
-function startSong(T, into = 0) {
-  stopSong(); const buf = L.song && SONG.bufs[L.song.src]; if (!buf || !ctx) return;
-  const off = L.song.lead + into; if (off >= buf.duration) return;
-  const s = ctx.createBufferSource(), gn = ctx.createGain(); s.buffer = buf; gn.gain.value = L.song.gain || 0.9;
+// start song i at audio time T, `into` seconds past its first downbeat
+function startSong(T, into = 0, i = 0) {
+  stopSong(); const sp = L.songs && L.songs[i], buf = sp && SONG.bufs[sp.src]; if (!buf || !ctx) return;
+  const off = sp.lead + into; if (off >= buf.duration) return;
+  const s = ctx.createBufferSource(), gn = ctx.createGain(); s.buffer = buf; gn.gain.value = sp.gain || 0.9;
   s.connect(gn); gn.connect(mus); s.start(Math.max(T, ctx.currentTime), off); SONG.src = s;
 }
 function beginShift(level) {
   TUT.on = false; TUT.line = null; CAM.to = null; SLOW.on = false;
-  ensureAudio(); loadLevel(level); loadSong(level.song); resetRun(); handLabels();
+  ensureAudio(); loadLevel(level); loadSongs(level); resetRun(); handLabels();
   $('title').hidden = true; $('result').hidden = true; $('select').hidden = true; state = 'intro';
   sceneReset((level.intro[0] && level.intro[0].scene) || 'line');
   runDialog(level.intro, level.practice ? () => startPractice(level) : startPlay);
@@ -5845,7 +5878,7 @@ function devSeek(beat) {
   musHP.frequency.cancelScheduledValues(now); musHP.frequency.setValueAtTime(20, now);
   mus.gain.cancelScheduledValues(now); mus.gain.setValueAtTime(1, now);
   if (L.visit) { FX.yankFx = L.visit.yank != null && beat > L.visit.yank; FX.shoveFx = L.visit.shove != null && beat > L.visit.shove; }
-  stopSong(); if (L.song && songReady() && beat > L.song.at) startSong(T0 + tB, tB - timeAt(L.song.at));
+  stopSong(); if (L.songs) { let i = -1; L.songs.forEach((sp, k) => { if (beat > sp.at) i = k; }); if (i >= 0 && songReady(i)) startSong(T0 + tB, tB - timeAt(L.songs[i].at), i); }
   DEV.open = false; devSync();
 }
 function devEnd(good) {
@@ -5972,7 +6005,7 @@ function tutTick(t) {
   }
 }
 function startPlay() {
-  guideOff(); stopSong(); ensureAudio(); loadSong(L.song); resetRun(); sceneReset();
+  guideOff(); stopSong(); ensureAudio(); loadSongs(L); resetRun(); sceneReset();
   $('title').hidden = true; $('result').hidden = true; $('select').hidden = true;
   events = buildEvents(); evI = 0; T0 = ctx.currentTime + 0.8;
   lastClock = ''; lastCombo = -1; lastSay = ''; lastHint = ''; bubble.hidden = true; bubble.textContent = '';
