@@ -1125,8 +1125,8 @@ const LEVELS = [
       '........', '........', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.....', '........', '........',
       '..u...u.', '......u.', '........', '........', '..u...u.', '......u.', '........', '........',
       '..u.....', '..u.....', '..u.....', '..u...u.', '........', '........', '........', '........',
-      'x.......', 'x...x...', 'x...x...', 'x.x.....', 'x...x...', 'x.x.x...', '..u...u.', '......u.',
-      '........', '........', '..u...u.', '......u.', '........', '........', '..u.....', '..u.....',
+      'x.......', 'x...x...', 'x...x...', 'x.x.....', 'x...x...', 'x.x.x...', '....u...', '......u.',
+      '....u...', '....u...', '....u...', '....u...', '........', '........', '..u.....', '..u.....',
       '..u.....', '..u...u.', '........', '........', '........', '........', '........', '........',
       'x...x...', '........', 'x...x...', '........', 'x...x...', '........', '........', '......u.',
       '........', '....u...', '......u.', 'u.......', '......u.', '....u...', '....u...', '........',
@@ -1145,8 +1145,8 @@ const LEVELS = [
       '........', '........', '........', '........', '..d...d.', '....d.d.', '........', '........',
       'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.', 'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.',
       '......x.', '......x.', '......x.', 'x...x...', '........', '........', '........', '........',
-      '........', '........', '..d...d.', '....d.d.', '..d...d.', '......d.', 'x...x...', 'x.x.x...',
-      'h===..x.', 'x.x.x.x.', 'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.', '....x...', '....x...',
+      '........', '........', '..d...d.', '....d.d.', '..d...d.', '......d.', '..x...x.', '..x.....',
+      '..x...x.', '..x...x.', 'x.....x.', '..x...x.', '..x.d.x.', 'x.x.x.x.', '....x...', '....x...',
       '....x...', 'x...x...', '........', '........', '........', '........', '........', '........',
       '..x.....', 'x...x...', '..x.....', 'x...x...', '..x.....', 'x...x...', 'x...x...', 'x...x...',
       'x...x...', 'x...x...', 'x...x...', '....x...', 'x...x...', 'x...x...', 'x...x...', 'x...d...',
@@ -3087,8 +3087,9 @@ function drawStage15(t, nowMs, sv) {
   cone(jx, jl * (0.85 + 0.25 * beatK * (turn === 'j' ? 1 : 0)), '150,215,255', 8, 34);
   cone(cx, 0.5, '255,250,235', 5, 26);
   const glow = (x, y, col, k) => { if (k <= 0.02) return; g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 3, x, y, 38 + 8 * beatK); gr.addColorStop(0, `rgba(${col},${(0.4 + 0.3 * beatK) * k})`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.fillRect(x - 50, y - 50, 100, 100); g.restore(); };
-  // (her feet are 56 px under her figure's top, his 85: he is drawn at JK of his size so they match; both stand on the floor)
-  const JK = 0.82, hDy = FY + 1 - 142, jDy = FY + 1 - 169, jA = y => 169 + (y - FY - 1) / JK;   // jA: a height on screen in his drawing's own
+  // (her feet are 56 px under her figure's top; his figure has no legs - on the line a belt always hides them - so the stage
+  // gives him short ones, his feet 74 px under his top; both stand on the floor)
+  const hDy = FY + 1 - 142, jDy = FY + 1 - 158, jA = y => y - jDy;   // jA: a height on screen in his drawing's own
   glow(hx, 116 + hDy, '255,90,40', fin ? 1 : turn === 'h' ? 0.85 : 0.3);
   glow(jx, FY - 36, '80,210,255', (fin ? 0.25 : turn === 'j' ? 0.85 : 0.3) * J.light);
   // the belts tip towards him in her round (about the scanner); they stand at the ends, so they ride them up and down
@@ -3116,10 +3117,10 @@ function drawStage15(t, nowMs, sv) {
   // their shadows on the floor, then them (him drawn smaller, his feet planted)
   for (const [x, w] of [[hx, 11], [jx + Math.round(4 * jFlinch), 11]]) { g.fillStyle = 'rgba(0,0,0,.45)'; g.beginPath(); g.ellipse(x, FY + 1 + lift(x), w, 2.5, 0, 0, Math.PI * 2); g.fill(); }
   g.save(); g.translate(0, hDy + lift(hx)); drawActor('haeun', hx, false, hp, nowMs, true, () => PARTNERS.haeun.arm(hp)); g.restore();
-  g.save(); g.translate(jx + Math.round(4 * jFlinch), FY + 1 + lift(jx)); g.scale(JK, JK); g.translate(-jx, -169); drawActor('jiwoo', jx, true, jp, nowMs, true, () => { PARTNERS.jiwoo.arm(jp); if (jCarry) drawBox(STG.box, jCarry.x, jCarry.y + 5, '', t); });
+  g.save(); g.translate(Math.round(4 * jFlinch), jDy + lift(jx)); drawActor('jiwoo', jx, true, jp, nowMs, true, top => { const ft = 84 + 64; R(BOSS_X - 6, ft, 5, 7, '#2f3440'); R(BOSS_X + 1, ft, 5, 7, '#2f3440'); R(BOSS_X - 7, ft + 7, 7, 3, '#e9e4da'); R(BOSS_X + 1, ft + 7, 7, 3, '#e9e4da'); PARTNERS.jiwoo.arm(jp); if (jCarry) drawBox(STG.box, jCarry.x, jCarry.y + 5, '', t); });
   g.restore();
   if (jDrop != null) { const q = jDrop, x = jx - 8 + Math.round(18 * q), y = FY - 70 + Math.round(64 * q * q); g.save(); g.translate(x, y); g.rotate(q * 4); drawBox(STG.box, 0, 6, '', t); g.restore(); }
-  STG.heads = { h: [hx + 2, 88 + hDy + lift(hx)], j: [jx - 2, Math.round(FY + 1 - 81 * JK) + lift(jx)] };
+  STG.heads = { h: [hx + 2, 88 + hDy + lift(hx)], j: [jx - 2, 86 + jDy + lift(jx)] };
   // the belts and everything on them, about the scanner
   g.save(); g.translate(cx, midY); g.rotate(tilt); g.translate(-cx, -midY);
   const xL = hx + 12, xR = STG.jx - 12, run = (t * 60) % 8;   // (pushed back, he ends up off the end of the belts)
