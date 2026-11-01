@@ -6,7 +6,7 @@
 <title>1-6 컷씬 · 새벽</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Gowun+Batang&display=swap">
 <style>
 /* 1-6 cutscene, drawn live in the game's own pixels: the same 384x216 screen, the same 하은, belt and warehouse as index.html,
    at the game's own scale the whole way through (no zoom, no crop). */
@@ -1334,43 +1334,44 @@ function songSync(t) {
 }
 const SUBS = [{"t0": 8.9, "t1": 13.8, "en": "The belt has stopped, the lights are out", "ko": "벨트는 멈추고, 불은 꺼졌어"}, {"t0": 13.8, "t1": 17.4, "en": "There's nothing left to hold", "ko": "붙잡을 건 아무것도 남지 않았어"}, {"t0": 17.5, "t1": 21.1, "en": "Just a watch around my wrist", "ko": "손목 위 시계 하나만"}, {"t0": 21.16, "t1": 24.9, "en": "Still telling me I'm late", "ko": "아직도 늦었다고 재촉해"}, {"t0": 24.94, "t1": 29.5, "en": "Before the first train comes", "ko": "첫차가 오기 전에"}, {"t0": 29.78, "t1": 34.6, "en": "Just hold on a little more", "ko": "조금만 더 버티면 돼"}, {"t0": 35.28, "t1": 37.72, "en": "I never had a dream", "ko": "나는 꿈이 없었어"}, {"t0": 37.72, "t1": 39.86, "en": "So I just count to four", "ko": "그래서 넷까지만 세"}, {"t0": 39.86, "t1": 41.64, "en": "One, two, three, and four", "ko": "하나, 둘, 셋, 그리고 넷"}, {"t0": 41.64, "t1": 43.72, "en": "I'll be waiting on the four", "ko": "넷에서 기다릴게"}, {"t0": 43.72, "t1": 45.94, "en": "Lost in a crowd of strangers", "ko": "낯선 사람들 틈에서"}, {"t0": 45.94, "t1": 48.04, "en": "I'm standing all alone", "ko": "나는 혼자 서 있어"}, {"t0": 48.04, "t1": 50.52, "en": "But the four is mine to keep", "ko": "그래도 넷은 내가 지킬게"}, {"t0": 50.52, "t1": 52.36, "en": "I won't let it go", "ko": "놓치지 않을게"}, {"t0": 52.36, "t1": 55.6, "en": "At the end of the alley", "ko": "골목 끝에서"}, {"t0": 55.74, "t1": 60.08, "en": "The windows go dark one by one", "ko": "창문들이 하나둘 꺼져"}, {"t0": 60.08, "t1": 62.74, "en": "The morning's coming in", "ko": "아침은 오는데"}, {"t0": 62.74, "t1": 68.4, "en": "But I'm still in the night", "ko": "나는 아직 밤이야"}, {"t0": 109.42, "t1": 112.8, "en": "One light comes on", "ko": "불이 하나 켜지면"}, {"t0": 113.3, "t1": 117.0, "en": "One more step", "ko": "한 걸음 더"}, {"t0": 118.34, "t1": 120.7, "en": "Another light", "ko": "또 하나의 불"}, {"t0": 121.06, "t1": 125.2, "en": "Another step", "ko": "또 한 걸음"}, {"t0": 126.56, "t1": 129.2, "en": "Mom, I'll count for you", "ko": "엄마, 내가 셀게"}, {"t0": 129.2, "t1": 130.7, "en": "One, two, three, and four", "ko": "하나, 둘, 셋, 그리고 넷"}, {"t0": 130.7, "t1": 132.84, "en": "Don't stop, I'll lay my hand", "ko": "멈추지 마, 내가 손을 얹을게"}, {"t0": 132.84, "t1": 135.06, "en": "Right on your every beat", "ko": "엄마의 박 하나하나 위에"}, {"t0": 135.06, "t1": 137.2, "en": "I don't need a dream", "ko": "꿈은 없어도 돼"}, {"t0": 137.32, "t1": 139.34, "en": "This beat is all I need", "ko": "이 박 하나면 충분해"}, {"t0": 139.34, "t1": 141.3, "en": "Your four, I'll carry it", "ko": "엄마의 넷은 내가 이어 갈게"}, {"t0": 141.3, "t1": 146.6, "en": "All the way home", "ko": "집에 닿을 때까지"}, {"t0": 149.22, "t1": 151.8, "en": "Four...", "ko": "넷…"}, {"t0": 153.26, "t1": 155.8, "en": "Four...", "ko": "넷…"}];
 // how each lyric line looks: where it rises (x, y on the picture as seen, after the crop; al: l/r/c from x; w: wrap width),
-// its colour and glow (taken from the scene's light), its size, ink: a soft dark edge on bright backgrounds, st: word stagger.
+// its colour and glow (taken from the scene's light), its size, ink: a soft dark shadow on bright backgrounds, st: a word a
+// count (the counting lines), fx: flicker / dark / alone.
 // Lines about the four come in the yellow of the scan box.
 const LOOK = { amber: ['#ffe6b0', '255,176,80'], pink: ['#fff0f3', '255,128,168'], peach: ['#ffe8d6', '255,150,100'], led: ['#ffc66e', '255,160,50'],
   mint: ['#eafff2', '80,200,120'], cool: ['#ffffff', '140,190,255'], four: ['#ffe066', '242,196,58'], grey: ['#e6edf4', '150,170,200'],
   sky: ['#ffffff', '70,110,170'], gold: ['#fff0c4', '255,190,110'], night: ['#26346e', '210,222,255'], lamp: ['#fffaf0', '255,245,220'],
   dim: ['#cfd8e0', '120,140,170'], warm: ['#fff3dc', '255,190,130'] };
 const LYRIC_LOOK = [
-  { x: 14, y: 34, al: 'l', w: 170, p: LOOK.amber, fx: 'off' },                 // the factory, in the dark under the sunlit windows
+  { x: 14, y: 34, al: 'l', w: 170, p: LOOK.amber },                 // the factory, in the dark under the sunlit windows
   { x: 370, y: 34, al: 'r', w: 150, p: LOOK.amber },
-  { x: 370, y: 26, al: 'r', w: 200, p: LOOK.pink, fx: 'type' },                  // the dawn street: up in the pink sky
-  { x: 14, y: 26, al: 'l', w: 160, p: LOOK.peach, fx: 'type' },
+  { x: 370, y: 26, al: 'r', w: 200, p: LOOK.pink },                  // the dawn street: up in the pink sky
+  { x: 14, y: 26, al: 'l', w: 160, p: LOOK.peach },
   { x: 14, y: 46, al: 'l', w: 170, p: LOOK.led },                    // the platform: amber like the board, over the dark glass
-  { x: 14, y: 70, al: 'l', w: 170, p: LOOK.mint, fx: 'grip' },                   // the train coming, the line's green
+  { x: 14, y: 70, al: 'l', w: 170, p: LOOK.mint },                   // the train coming, the line's green
   { x: 14, y: 28, al: 'l', w: 180, p: LOOK.cool, s: 1.05, ink: true },   // the train (bright): over the dark tunnel windows, a dark edge
-  { x: 370, y: 28, al: 'r', w: 160, p: LOOK.cool, s: 1.05, ink: true, fx: 'beat' },
-  { x: 192, y: 30, al: 'c', w: 360, p: LOOK.four, s: 1.3, st: 0.32, ink: true, fx: 'count' }, // one, two, three, and four: a word a count
-  { x: 14, y: 28, al: 'l', w: 180, p: LOOK.four, s: 1.05, ink: true, fx: 'beat' },
-  { x: 370, y: 28, al: 'r', w: 160, p: LOOK.cool, ink: true, fx: 'crowd' },
+  { x: 370, y: 28, al: 'r', w: 160, p: LOOK.cool, s: 1.05, ink: true },
+  { x: 192, y: 30, al: 'c', w: 360, p: LOOK.four, s: 1.3, st: 0.32, ink: true }, // one, two, three, and four: a word a count
+  { x: 14, y: 28, al: 'l', w: 180, p: LOOK.four, s: 1.05, ink: true },
+  { x: 370, y: 28, al: 'r', w: 160, p: LOOK.cool, ink: true },
   { x: 14, y: 56, al: 'l', w: 170, p: LOOK.grey, ink: true, fx: 'alone' },        // the crowd gone, alone on the platform
-  { x: 370, y: 40, al: 'r', w: 150, p: LOOK.four, s: 1.05, ink: true, fx: 'beat' },
-  { x: 14, y: 70, al: 'l', w: 170, p: LOOK.four, s: 1.1, ink: true, fx: 'grip' },
+  { x: 370, y: 40, al: 'r', w: 150, p: LOOK.four, s: 1.05, ink: true },
+  { x: 14, y: 70, al: 'l', w: 170, p: LOOK.four, s: 1.1, ink: true },
   { x: 14, y: 20, al: 'l', w: 180, p: LOOK.sky, ink: true },         // the alley: in the morning sky
   { x: 370, y: 20, al: 'r', w: 150, p: LOOK.sky, ink: true, fx: 'dark' },
-  { x: 14, y: 22, al: 'l', w: 180, p: LOOK.gold, s: 1.05, ink: true, fx: 'bloom' },
-  { x: 14, y: 46, al: 'l', w: 180, p: LOOK.night, s: 1.1, fx: 'night' },         // the hospital front: dark night blue against the morning sky
+  { x: 14, y: 22, al: 'l', w: 180, p: LOOK.gold, s: 1.05, ink: true },
+  { x: 14, y: 46, al: 'l', w: 180, p: LOOK.night, s: 1.1 },         // the hospital front: dark night blue against the morning sky
   { x: 196, y: 40, al: 'r', w: 170, p: LOOK.lamp, s: 1.1, fx: 'flicker' },          // the dark corridor: glowing by the first light
-  { x: 14, y: 106, al: 'l', w: 170, p: LOOK.dim, fx: 'step' },                   // a step: low, by her feet
+  { x: 14, y: 106, al: 'l', w: 170, p: LOOK.dim },                   // a step: low, by her feet
   { x: 250, y: 40, al: 'l', w: 130, p: LOOK.lamp, s: 1.1, fx: 'flicker' },          // the next light
-  { x: 250, y: 106, al: 'l', w: 130, p: LOOK.dim, fx: 'step' },
+  { x: 250, y: 106, al: 'l', w: 130, p: LOOK.dim },
   { x: 14, y: 22, al: 'l', w: 180, p: LOOK.warm, ink: true },        // the ward: on the bare wall, in the morning sun
-  { x: 14, y: 46, al: 'l', w: 180, p: LOOK.four, s: 1.15, ink: true, st: 0.26, fx: 'count' },
-  { x: 14, y: 70, al: 'l', w: 185, p: LOOK.warm, ink: true, fx: 'beat' },
-  { x: 14, y: 22, al: 'l', w: 180, p: LOOK.warm, ink: true, fx: 'beat' },
+  { x: 14, y: 46, al: 'l', w: 180, p: LOOK.four, s: 1.15, ink: true, st: 0.26 },
+  { x: 14, y: 70, al: 'l', w: 185, p: LOOK.warm, ink: true },
+  { x: 14, y: 22, al: 'l', w: 180, p: LOOK.warm, ink: true },
   { x: 14, y: 46, al: 'l', w: 180, p: LOOK.warm, ink: true },
-  { x: 14, y: 70, al: 'l', w: 185, p: LOOK.warm, ink: true, fx: 'beat' },
-  { x: 14, y: 30, al: 'l', w: 185, p: LOOK.four, s: 1.1, ink: true, fx: 'beat' },
-  { x: 14, y: 46, al: 'l', w: 190, p: LOOK.gold, s: 1.5, ink: true, st: 0.35, fx: 'bloom' },   // all the way home
+  { x: 14, y: 70, al: 'l', w: 185, p: LOOK.warm, ink: true },
+  { x: 14, y: 30, al: 'l', w: 185, p: LOOK.four, s: 1.1, ink: true },
+  { x: 14, y: 46, al: 'l', w: 190, p: LOOK.gold, s: 1.5, ink: true, st: 0.35 },   // all the way home
   null, null,   // the closing 'Four… Four…' is left to the song, no words on screen
 ];
 let subLang = 'en';
@@ -1396,81 +1397,53 @@ function drawSubs(t) {
   if (subLang === 'off') return;
   drawLyrics(t);
 }
-// The lyrics' typography. Every line comes in letter by letter (each rising out of a soft blur into place, snapped to the game's
-// pixel grid so the motion steps like the sprites), its glow swells a little on each heartbeat, and it leaves letter by letter
-// breaking into pixel dust that floats away. On top of that each line has an effect for what it says (LYRIC_LOOK fx):
-//   off: the lights are out, it flickers off like the tubes; type: the watch, typed with a ticking cursor; flicker: comes on like a
-//   ceiling panel; count: a word a count, each popping in white, the four with a ring like the scan box's; beat: pulses on the
-//   heartbeat; crowd: letters jostled, finding their places; alone: the words drift apart; dark: lit, then going dark word by
-//   word; bloom: slow, in a wide warm glow with motes rising; night: slow out of the dark; step: words land like steps;
-//   grip: lands with a shake and holds.
+// The lyrics' typography: plain and quiet. A book serif (Cormorant Garamond for English, Gowun Batang for Korean), a little
+// open tracking, proper apostrophes and ellipses. Each line fades in letter by letter as it rises a few pixels, rests, and
+// fades out letter by letter as it drifts on up; a soft glow in the scene's light (and a soft dark shadow on bright scenes)
+// is all the ornament. Only three lines do more, gently: the lights come on with one small flicker, the windows go dark word
+// by word, and 'all alone' opens a little space between its words.
 const LYR_CACHE = new Map();
-const lyrFont = size => `600 ${size}px "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`;
+const LYR_FACE = { en: '600 {S}px "Cormorant Garamond", "Gowun Batang", Georgia, serif', ko: '400 {S}px "Gowun Batang", "Cormorant Garamond", serif' };
+const lyrLang = () => subLang === 'ko' ? 'ko' : 'en';
+const lyrFont = size => LYR_FACE[lyrLang()].replace('{S}', size);
+const lyrSize = st => Math.round(cv.width / (lyrLang() === 'ko' ? 27 : 25) * (st.s || 1));
+const pretty = s => s.replace(/(\w)'(\w)/g, '$1’$2').replace(/'/g, '’').replace(/\.\.\./g, '…');
+try { Promise.all(['600 40px "Cormorant Garamond"', '400 40px "Gowun Batang"'].map(f => document.fonts.load(f))).then(() => LYR_CACHE.clear()); } catch (e) {}
 function lyricLayout(i, st, text, size) {
-  const key = `${i}|${text}|${size}|${cv.width}`; if (LYR_CACHE.has(key)) return LYR_CACHE.get(key);
-  const sc = cv.width / W, lh = size * 1.2; out.font = lyrFont(size);
-  const sp = out.measureText(' ').width, lines = [[]]; let lw = 0;
-  for (const w of text.split(' ')) { const ww = out.measureText(w).width; if (lines[lines.length - 1].length && lw + sp + ww > st.w * sc) { lines.push([]); lw = 0; } lw += (lines[lines.length - 1].length ? sp : 0) + ww; lines[lines.length - 1].push(w); }
-  const glyphs = [], words = []; let wi = 0, ci = 0;
+  const key = `${i}|${text}|${size}|${cv.width}|${lyrLang()}`; if (LYR_CACHE.has(key)) return LYR_CACHE.get(key);
+  const sc = cv.width / W, lh = size * 1.25, tr = size * 0.035; out.font = lyrFont(size);
+  const wW = w => [...w].reduce((a, ch) => a + out.measureText(ch).width + tr, -tr);
+  const sp = out.measureText(' ').width + tr * 2, lines = [[]]; let lw = 0;
+  for (const w of text.split(' ')) { const ww = wW(w); if (lines[lines.length - 1].length && lw + sp + ww > st.w * sc) { lines.push([]); lw = 0; } lw += (lines[lines.length - 1].length ? sp : 0) + ww; lines[lines.length - 1].push(w); }
+  const glyphs = []; let wi = 0, ci = 0;
   lines.forEach((ln, li) => {
-    const width = ln.reduce((a, w, k) => a + out.measureText(w).width + (k ? sp : 0), 0);
+    const width = ln.reduce((a, w, k) => a + wW(w) + (k ? sp : 0), 0);
     let x = st.al === 'r' ? st.x * sc - width : st.al === 'c' ? st.x * sc - width / 2 : st.x * sc;
     const y = st.y * sc + (li - (st.al === 'c' ? (lines.length - 1) / 2 : 0)) * lh;
-    for (const w of ln) { const x0 = x; for (const ch of [...w]) { const cw = out.measureText(ch).width; glyphs.push({ ch, x, y, w: wi, i: ci++, cw }); x += cw; } words.push({ x0, x1: x, y }); x += sp; wi++; }
+    for (const w of ln) { for (const ch of [...w]) { const cw = out.measureText(ch).width; glyphs.push({ ch, x, y, w: wi, i: ci++, cw }); x += cw + tr; } x += sp - tr; wi++; }
   });
-  const L = { glyphs, words, nW: wi, nC: ci }; LYR_CACHE.set(key, L); return L;
+  const L = { glyphs, nW: wi, nC: ci }; LYR_CACHE.set(key, L); return L;
 }
-const FLICK = [1, 0, 1, 0, 0, 1, 0.6, 1];   // like a tube catching (and the reverse going out)
 function drawLyrics(t) {
-  const sc = cv.width / W, px = SC, snap = v => Math.round(v / px) * px;
-  const ph = ((tBeat(t) % 1) + 1) % 1, pulse = Math.exp(-ph * 6);   // 1 on each heartbeat, fading through the beat
-  out.save(); out.setTransform(1, 0, 0, 1, 0, 0); out.textAlign = 'left'; out.textBaseline = 'middle'; out.lineJoin = 'round';
+  const sc = cv.width / W;
+  out.save(); out.setTransform(1, 0, 0, 1, 0, 0); out.textAlign = 'left'; out.textBaseline = 'middle';
   SUBS.forEach((c, i) => {
-    const st = LYRIC_LOOK[i]; if (!st || t < c.t0 - 0.05 || t > c.t1 + 1.2) return;
-    const fx = st.fx || 'rise', [col0, gl] = st.p, size = Math.round(cv.width / 29 * (st.s || 1)), text = c[subLang], dur = c.t1 - c.t0;
-    const L = lyricLayout(i, st, text, size); out.font = lyrFont(size);
-    const slow = fx === 'night' || fx === 'bloom', inT = slow ? 0.9 : 0.45;
-    const stag = fx === 'type' ? Math.min(0.07, dur * 0.5 / L.nC) : Math.min(slow ? 0.07 : 0.04, dur * 0.4 / L.nC);
-    const drift = -3 * sc * seg(t, c.t0, c.t1 + 0.6);
-    const startOf = g => st.st ? c.t0 + g.w * st.st : c.t0 + g.i * stag;
+    const st = LYRIC_LOOK[i]; if (!st || t < c.t0 - 0.05 || t > c.t1 + 1.0) return;
+    const [col0, gl] = st.p, size = lyrSize(st), dur = c.t1 - c.t0, L = lyricLayout(i, st, pretty(c[subLang]), size); out.font = lyrFont(size);
+    const stag = Math.min(0.035, dur * 0.3 / L.nC), drift = -2 * sc * seg(t, c.t0, c.t1 + 0.8);
     for (const g of L.glyphs) {
-      const ta = startOf(g); if (t < ta) continue;
-      const k = fx === 'type' || fx === 'count' ? 1 : ease(seg(t, ta, ta + inT));
-      const te = c.t1 - 0.1 + g.i * (slow ? 0.035 : 0.018), ke = seg(t, te, te + (slow ? 0.9 : 0.55));
-      let x = g.x, y = g.y + drift + (1 - k) * (slow ? 5 : 8) * sc - ke * 6 * sc, a = k * (1 - ke), s = 1, col = col0, blur = size * (0.5 + 0.25 * pulse) * (1 + 1.6 * (1 - k)), ga = 0.9;
-      if (fx === 'off' && t > te) { a = k * FLICK[FLICK.length - 1 - Math.min(FLICK.length - 1, Math.floor((t - te) / 0.07))] * (1 - seg(t, te + 0.5, te + 0.56)); y = g.y + drift; }
-      if (fx === 'flicker') { const u = t - ta; if (u < 0.48) a *= FLICK[Math.floor(u / 0.06)]; blur *= 1.4; }
-      if (fx === 'count') { const u = seg(t, ta, ta + 0.28); s = 1 + 0.55 * (1 - ease(u)); col = mix('#ffffff', col0, ease(seg(t, ta, ta + 0.4))); blur *= 1 + (1 - u); }
-      if (fx === 'beat') { s = 1 + 0.06 * pulse; blur *= 1 + 0.7 * pulse; }
-      if (fx === 'crowd') { const q = 1 - ease(seg(t, ta, ta + 1.4)); x += (rnd(g.i, 41) - 0.5) * 36 * sc * q; y += (rnd(g.i, 42) - 0.5) * 20 * sc * q; }
-      if (fx === 'alone') x += (g.w - (L.nW - 1) / 2) * 5 * sc * ease(seg(t, c.t0 + 0.9, c.t1 + 0.5)) + (g.w === L.nW - 1 ? 6 * sc * seg(t, c.t0 + 1.2, c.t1 + 0.5) : 0);
-      if (fx === 'dark') { const kd = ease(seg(t, c.t0 + 1.7 + g.w * 0.38, c.t0 + 2.1 + g.w * 0.38)); col = mix(col0, '#3a4258', kd); ga = 0.9 * (1 - kd); }
-      if (fx === 'step') { const u = seg(t, ta, ta + 0.32); y = g.y + drift - (1 - u) * (1 - u) * 14 * sc + (u > 0.75 && u < 1 ? 1 * sc : 0); a = (u > 0 ? 1 : 0) * (1 - ke); }
-      if (fx === 'grip') { const u = t - ta - 0.35; if (u > 0 && u < 0.35) x += Math.sin(u * 90) * 1.5 * sc * (1 - u / 0.35); }
-      if (fx === 'bloom') blur *= 1.8;
+      const ta = st.st ? c.t0 + g.w * st.st + g.i * 0.012 : c.t0 + g.i * stag; if (t < ta) continue;
+      const k = ease(seg(t, ta, ta + 0.8)), te = c.t1 - 0.2 + g.i * 0.012, ke = ease(seg(t, te, te + 0.7));
+      let a = k * (1 - ke), x = g.x, y = g.y + drift + (1 - k) * 3 * sc - ke * 3 * sc, col = col0, ga = 0.55;
+      if (st.fx === 'flicker' && t - ta < 0.3) a *= [1, 0.2, 0.9, 0.35, 1][Math.floor((t - ta) / 0.06)];
+      if (st.fx === 'dark') { const kd = ease(seg(t, c.t0 + 1.7 + g.w * 0.4, c.t0 + 2.3 + g.w * 0.4)); col = mix(col0, '#46506a', kd); ga *= 1 - kd; }
+      if (st.fx === 'alone') x += (g.w - (L.nW - 1) / 2) * 2.5 * sc * ease(seg(t, c.t0 + 0.8, c.t1 + 0.5));
       if (a <= 0.01) continue;
-      x = snap(x); y = snap(y);
-      out.save(); out.translate(x + g.cw / 2, y); if (s !== 1) out.scale(s, s); out.globalAlpha = a;
-      if (st.ink) { out.shadowBlur = 0; out.lineWidth = Math.max(3, size / 6); out.strokeStyle = 'rgba(24,16,12,.75)'; out.strokeText(g.ch, -g.cw / 2, 0); }
-      if (ga > 0.05) { out.shadowColor = `rgba(${gl},${ga})`; out.shadowBlur = blur; } out.fillStyle = col; out.fillText(g.ch, -g.cw / 2, 0);
-      out.shadowBlur = 0; out.fillText(g.ch, -g.cw / 2, 0);
-      out.restore();
-      // leaving: the letter breaks into a few pixels that float up and fade
-      if (ke > 0 && ke < 1 && fx !== 'off') for (let q = 0; q < 4; q++) {
-        const dx = rnd(g.i * 7 + i, 50 + q) * g.cw, dy = (rnd(g.i * 7 + i, 60 + q) - 0.5) * size * 0.6 - ke * (6 + rnd(g.i, 70 + q) * 16) * sc + Math.sin(ke * 6 + q) * 2 * sc;
-        out.globalAlpha = (1 - ke) * 0.85; out.fillStyle = q % 2 ? col : `rgb(${gl})`; out.fillRect(snap(g.x + dx), snap(g.y + drift + dy), px, px);
-      }
+      out.globalAlpha = a; out.fillStyle = col;
+      if (st.ink) { out.shadowColor = 'rgba(18,12,8,.7)'; out.shadowBlur = size * 0.22; out.shadowOffsetY = sc * 0.5; out.fillText(g.ch, x, y); out.shadowOffsetY = 0; }
+      if (ga > 0.05) { out.shadowColor = `rgba(${gl},${ga})`; out.shadowBlur = size * 0.4; out.fillText(g.ch, x, y); }
+      out.shadowBlur = 0; out.fillText(g.ch, x, y);
     }
-    // the count's four: a ring bursting from the last word, the scan box's yellow
-    if (fx === 'count') { const wd = L.words[L.nW - 1], ta = c.t0 + (L.nW - 1) * (st.st || 0.3), u = seg(t, ta, ta + 0.7);
-      if (u > 0 && u < 1) { out.globalAlpha = (1 - u) * 0.9; out.strokeStyle = '#ffe066'; out.lineWidth = px; out.beginPath(); out.arc((wd.x0 + wd.x1) / 2, wd.y + drift, size * (0.5 + 1.6 * ease(u)), 0, Math.PI * 2); out.stroke(); } }
-    // a type line's cursor, ticking
-    if (fx === 'type' && t < c.t1) { const n = L.glyphs.filter(g => t >= startOf(g)).length, last = L.glyphs[Math.max(0, n - 1)];
-      if (Math.floor(t * 2.5) % 2 === 0 || n < L.nC) { out.globalAlpha = 0.9; out.fillStyle = col0; out.fillRect(snap(last.x + last.cw + 2 * sc), snap(last.y + drift - size * 0.35), px * 2, snap(size * 0.7)); } }
-    // bloom: warm motes rising around the line
-    if (fx === 'bloom' && t < c.t1 + 0.8) { const g0 = L.glyphs[0], g1 = L.glyphs[L.nC - 1], x0 = g0.x, x1 = g1.x + g1.cw, fade = seg(t, c.t0, c.t0 + 0.8) * (1 - seg(t, c.t1, c.t1 + 0.8));
-      for (let q = 0; q < 14; q++) { const life = 2.2 + rnd(q, 81), u = ((t - c.t0) / life + rnd(q, 82)) % 1, mx = x0 + rnd(q, 83) * (x1 - x0) + Math.sin(t * 1.3 + q) * 3 * sc, my = g0.y + size * 0.6 - u * size * 2.2;
-        out.globalAlpha = fade * Math.sin(Math.PI * u) * 0.8; out.fillStyle = q % 3 ? '#fff0c4' : '#ffd27a'; out.fillRect(snap(mx), snap(my), px, px); } }
   });
   out.restore();
 }
