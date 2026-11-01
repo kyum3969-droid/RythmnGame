@@ -1052,8 +1052,9 @@ const LEVELS = [
     // Phase 1 (lo-fi, then his future funk): his "3-pointer" that lands on her belt, his contest, her days off ("…일."); he
     // dozes (a cutscene); his track in his earbuds and his boxes raining onto her belt; two warnings; she climbs the stairs to
     // his deck and pulls his earbud out (a record scratch, the band cut); the row in the silence; she shoves him back along
-    // his deck. Phase 2: he answers with a beat - a diss battle (a song with both of them rapping, made in Gemini; for now a
-    // stand-in beat): his turns throw boxes at her belt on purpose, hers slam her own on the beat, then both at once.
+    // his deck. Phase 2: he answers with a beat and she takes it over - a song with her rapping alone (made in Gemini; for now
+    // a stand-in beat): in his beat sections he throws boxes at her belt on purpose, in her verses her own slam down on the
+    // beat, then both at once.
     show: true,   // 1-5's light show (drawShow15) and their auras
     lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 300]], unplugMuffle: false,
     // the row: she crosses to the stairs at the upper belt's left end and climbs to his deck, stands with him, pulls his earbud
@@ -1062,14 +1063,15 @@ const LEVELS = [
     stairs: { x: 86, dx: -2, dy: 7, steps: 4 },   // at the upper belt's left end, from his deck down to the floor
     metalShift: 3, farLoaderDy: 14, farLoaderDx: 22, dropLead: 1,
     // phase 2's turns, by bar: hers, his, or both at once
-    // (the song's plan: his intro 32-35, his verse 36-43, hers 44-51, two bars each 52-59, a bar each 60-63, both 64-71)
-    battle: { h: [[44, 52], [54, 56], [58, 60], [61, 62], [63, 64]], j: [[32, 44], [52, 54], [56, 58], [60, 61], [62, 63]] },
+    // (the song's plan, her rapping alone: his beat 32-39, her verse 40-47, his beat 48-51, her verse 52-59, a bar each 60-63,
+    // both 64-71)
+    battle: { h: [[40, 48], [52, 60], [61, 62], [63, 64]], j: [[32, 40], [48, 52], [60, 61], [62, 63]] },
     // the camera (no box lands while it is in close or easing out): his doze as a cutscene (him nodding off, her watching,
     // the two of them as she wakes him), his track opening, and the row: the two of them, then him knocked back and staring
     camPlay: [[40.5, 46, { x: 104, y: 84, k: 2.2 }], [46, 57, { x: 56, y: 108, k: 2 }], [57, 62.5, { x: 76, y: 96, k: 1.5 }],
       [72, 78, { x: 104, y: 84, k: 1.8 }], [96, 122.3, { x: 90, y: 92, k: 1.5 }], [122.3, 128, { x: 108, y: 88, k: 1.6 }]],
     cutscene: [[40.5, 62.5], [96, 128]],   // letterboxed
-    devMarks: [[0, '처음'], [8, '3점슛'], [36, '졸음 컷씬'], [68, '지우 음악·떨어뜨림'], [92, '다툼·밀치기'], [128, '배틀 도발'], [144, '지우 벌스'], [176, '하은 벌스'], [208, '주고받기'], [240, '브레이크다운'], [256, '끝판'], [288, '마지막 한 방']],
+    devMarks: [[0, '처음'], [8, '3점슛'], [36, '졸음 컷씬'], [68, '지우 음악·떨어뜨림'], [92, '다툼·밀치기'], [128, '배틀 도발'], [144, '지우 비트'], [160, '하은 1절'], [192, '지우 비트 2'], [208, '하은 2절'], [240, '브레이크다운'], [256, '끝판'], [288, '마지막 한 방']],
     farBeltLeft: 36,   // the upper belt runs on to the left, past his legs, up to the stairs
     heads: { j: [104, 58], h: [52, 82], v: [86, 58], k: [130, 58] },
     clock:'03:20', title:'꿈', offTilt: true,
@@ -1095,9 +1097,10 @@ const LEVELS = [
       '........', '........', '......x.', '........', '....x...', '........', '........', '........',
       '........', '........', '........', '........', '........', '........',
       '........', '........', 'x...x...', 'x.x.x...',
-      'x...x...', 'x.x.....', 'x...x...', 'x.x.....', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.',
+      'x...x...', 'x.x.....', 'x...x...', 'x.x.x...',
       '........', '........', '........', '........', '........', '........', '........', '........',
-      'x...x...', 'x.x.....', '........', '........', 'x...x...', 'x.x.x...', '........', '........',
+      'x...x...', 'x.x.....', 'x...x...', 'x.x.x.x.',
+      '........', '........', '........', '........', '........', '........', '........', '........',
       'h=======', '........', 'h=======', '........',
       'x...x...', 'x...x...', 'x.x.x.x.', 'x...x...', 'x...x...', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.',
       'x.......', '........', '........'
@@ -1112,9 +1115,10 @@ const LEVELS = [
       '........', '........', 'x.d.x...', 'x.d.x.d.', 'h===..x.', 'x.d.x.d.', '........', '........',
       '........', '........', '........', '........', '........', '........',
       '........', '........', '........', '........',
-      '..d...d.', '....d.d.', '..d...d.', '....d.d.', '..d...d.', '......d.', '..d.d.d.', '........',
+      '..d...d.', '....d.d.', '..d...d.', '......d.',
       'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.', 'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.',
-      '..d...d.', '....d.d.', 'x.x.x.x.', 'h===..x.', '..d.d.d.', '......d.', 'x.x.x.x.', 'x.x.x.x.',
+      '..d...d.', '....d.d.', '..d.d.d.', '........',
+      'x.x.x.x.', 'h===..x.', 'x...x...', 'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'x.x.x.x.', 'h===....',
       '........', 'h=======', '........', 'h===....',
       '..x...x.', '..d...d.', 'x...x...', '..d...d.', '..x...x.', '..d...d.', 'x.x.x.x.', 'x.x.x.x.',
       'x.......', '........', '........'
