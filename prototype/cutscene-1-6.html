@@ -1134,9 +1134,28 @@ const LIGHT_CUE = { 0: 109.42, 64: 118.34, 128: 121.06 };
 const lightOn = q => q in LIGHT_CUE ? LIGHT_CUE[q] : 121.06 + (q / 64 - 2) * 0.9;
 function lightI(q, t) { if (WHO === 'jiwoo') return 1; const u = t - lightOn(q); if (u < 0) return 0; if (u < 0.36) return [1, 0, 1, 0, 0, 1][Math.floor(u / 0.06)] * 0.85; return 1; }
 // (his walk) the hospital morning: a visitor dozing on the bench, a patient shuffling with his drip, a nurse at her cart, and
-// a doctor (a nod to Rhythm Doctor) at a laptop on a cart with headphones on, tapping a key in time: on every heartbeat of the
+// Ian from Rhythm Doctor (a cameo) at a laptop on a cart, tapping a key in time: on every heartbeat of the
 // row, and on the 4th (the one the player presses) the screen's trace flares
 let PAGE_T = 0;
+// Ian, from Rhythm Doctor (a cameo, with thanks to 7th Beat Games): black messy hair with its fringe, light-framed glasses,
+// tan skin, the white coat open over a dark grey shirt, a touch of orange at the collar. He faces the laptop (left) and taps.
+function ian(x, top, tap) {
+  const hair = '#141418', hairL = '#2a2a32', skin = '#c48e66', skinD = '#a8744e', coat = '#f2f4f6', coatD = '#c8ced6', shirt = '#4e4e54', pants = '#2a2e3a';
+  R(x - 5, top + 38, 5, 16, pants); R(x + 1, top + 38, 5, 15, pants); R(x - 6, top + 53, 6, 3, '#1b1a1e'); R(x + 1, top + 52, 6, 3, '#1b1a1e');
+  thick(x + 8, top + 18, x + 8, top + 31, 3, coatD); R(x + 7, top + 30, 3, 3, skin);   // the far arm
+  R(x - 8, top + 16, 16, 25, coat); R(x + 6, top + 16, 2, 25, coatD); R(x - 8, top + 39, 16, 2, coatD);
+  R(x - 3, top + 16, 6, 14, shirt); R(x - 3, top + 16, 6, 2, '#3a3a40'); R(x - 1, top + 16, 3, 2, '#e07a2a');   // the grey shirt in the coat's opening, the orange at the collar
+  R(x - 8, top + 22, 1, 17, coatD); R(x + 3, top + 18, 1, 21, coatD);   // the coat's front edges
+  R(x - 6, top + 3, 12, 12, skin); R(x + 4, top + 6, 2, 8, skinD);
+  // the hair: a messy black mop, tufts sticking up, the fringe falling over his forehead toward the front
+  R(x - 8, top - 2, 16, 7, hair); R(x - 7, top - 4, 3, 2, hair); R(x - 2, top - 5, 3, 3, hair); R(x + 3, top - 4, 3, 2, hair); R(x + 6, top - 1, 3, 4, hair);
+  R(x + 3, top + 4, 5, 9, hair); R(x - 9, top + 2, 6, 5, hair); R(x - 9, top + 7, 2, 2, hair); R(x - 4, top + 4, 3, 2, hair);
+  R(x - 6, top - 2, 3, 1, hairL); R(x + 1, top - 3, 2, 1, hairL);
+  // the glasses: pale frames, grey lenses catching the light
+  R(x - 8, top + 7, 6, 4, '#d8dde6'); R(x - 1, top + 7, 6, 4, '#d8dde6'); R(x - 7, top + 8, 4, 2, '#9aa4b0'); R(x, top + 8, 4, 2, '#9aa4b0'); R(x - 2, top + 8, 1, 1, '#d8dde6'); R(x - 7, top + 8, 1, 1, '#eef2f8');
+  R(x - 5, top + 13, 3, 1, '#7a4436');   // the mouth
+  thick(x - 7, top + 18, x - 18, top + 25 - tap * 2, 3, coat); R(x - 20, top + 24 - tap * 2, 3, 3, skin);   // the near arm out to the keys, tapping
+}
 function hallPeople(t, L) {
   const tv = t;
   { const x = L(-40) + 20; person(x, 96, { hair: 'grey', hc: '#9a9894', sk: SK[2], top: '#7a6a5a', bot: '#4a463e', act: 'hang', seated: true, sleep: true }); }
@@ -1151,10 +1170,7 @@ function hallPeople(t, L) {
     R(x - 31, top + 14, 18, 12, '#2b2f32'); R(x - 30, top + 15, 16, 10, '#08140c');   // the laptop, its screen
     for (let i = 0; i < 16; i++) { const k = (i + Math.floor(PAGE_T * 12)) % 16, y = top + 20 - (k === 10 ? (fourth ? 4 : 3) : k === 9 || k === 11 ? 1 : 0); R(x - 30 + i, y, 1, 1, fourth ? '#c8ffb8' : '#7ef06a'); }
     R(x - 32, top + 26, 20, 1, '#4a4e52');
-    person(x, top, { hair: 'short', hc: '#2a2220', sk: SK[0], top: '#f4f4f0', sh: '#9ad0e0', bot: '#3a4a6a', act: 'hang', glasses: true });
-    R(x - 7, top - 1, 14, 2, '#1b1d1e'); R(x - 8, top + 4, 3, 5, '#1b1d1e'); R(x + 5, top + 4, 3, 5, '#1b1d1e');   // headphones
-    thick(x - 6, top + 22, x - 4, top + 34, 2, '#3a3d42'); R(x - 5, top + 33, 3, 2, '#9aa3a6');   // the stethoscope
-    R(x + 2, top + 22, 5, 3, '#2f6f9a'); R(x - 8, top + 17, 3, 9, '#f4f4f0'); thick(x - 8, top + 18, x - 18, top + 25 - tap * 2, 3, '#f4f4f0'); R(x - 20, top + 24 - tap * 2, 3, 3, SK[0]);   // badge; the near arm out to the keys, tapping
+    ian(x, top, tap);
     if (fourth) { g.save(); g.globalCompositeOperation = 'lighter'; glow(x - 22, top + 20, 14, '126,240,106', 0.35); g.restore(); } }
 }
 function corridor(t) {
