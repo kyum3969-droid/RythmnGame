@@ -56,9 +56,10 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   <div class="bar">
     <button class="btn" id="play" type="button">재생</button>
     <button class="btn ghost" id="restart" type="button">처음부터</button>
-    <div class="scrub"><input id="seek" type="range" min="0" max="125" step="0.01" value="0" aria-label="재생 위치"></div>
-    <span class="time" id="time">00.0 / 124.8</span>
+    <div class="scrub"><input id="seek" type="range" min="0" max="175" step="0.01" value="0" aria-label="재생 위치"></div>
+    <span class="time" id="time">00.0 / 174.8</span>
     <button class="btn ghost" id="hb" type="button" aria-pressed="true">심박 줄</button>
+    <button class="btn ghost" id="sub" type="button">자막 EN</button>
     <button class="btn ghost" id="snd" type="button" aria-pressed="true">소리</button>
   </div>
   <div class="shots" id="shots"></div>
@@ -114,12 +115,15 @@ const SHOTS = [
   { id: 'train', t0: 35.0, t1: 46.4, name: '열차 안', note: '문이 열리면 배경만 천천히 열차 안으로 바뀐다. 출근길 사람들로 붐비는 객실. 하은은 손잡이를 잡고, 열차가 달리다 다음 역에 선다.' },
   { id: 'off', t0: 46.4, t1: 52.0, name: '내리는 역', note: '문이 열리면 배경만 내리는 역 승강장으로 바뀐다. 하은 뒤로 문이 닫히고 열차가 떠난다.' },
   { id: 'alley', t0: 52.0, t1: 66.0, name: '골목길', note: '배경만 아침 골목으로 바뀌고 하은이 걷는다. 빨간 벽돌 담장과 화분, 다세대 주택, 전봇대와 전깃줄, 볼록거울, 담장 위 고양이, 작은 슈퍼.' },
-  { id: 'hospital', t0: 66.0, t1: 70.2, name: '병원', note: '골목 끝에 병원이 나온다. 하은이 병원 앞에서 멈추고 건물을 올려다본다.' },
-  { id: 'corridor', t0: 70.2, t1: 86.0, name: '병원 복도', note: '병원 앞이 암전되고, 깜깜한 복도에서 천장 등이 하나씩 켜진다. 하은이 걸어가 502호 문 앞에서 멈춘다.' },
-  { id: 'ward', t0: 86.0, t1: 108, name: '병실', note: '배경만 502호 병실로 바뀐다. 침상에 누운 어머니, 머리맡 심박 모니터, 창으로 들어오는 아침 해. 하은은 침상 옆에 섰다가 의자에 앉아 어머니 손을 잡고, 침상 쪽으로 고개를 숙였다가, 어머니 손가락이 움직이자 고개를 든다.' },
-  { id: 'clip', t0: 108.6, t1: 124.8, name: '꽃다발', note: '암전 뒤 영상: 신입이 꽃다발을 들고 병실 문을 두드리고, 하은이 문을 열고 받는다(구간별로 느리게 다듬은 영상). 심박 줄은 없음.' }
+  { id: 'hospital', t0: 66.0, t1: 73.0, name: '병원', note: '골목 끝에 병원이 나온다. 하은이 병원 앞에서 멈추고 건물을 올려다본다(노래 간주가 부풀어 오름).' },
+  { id: 'lobby', t0: 73.0, t1: 94.6, name: '로비', note: '배경만 이른 아침의 병원 로비로 바뀐다. 졸고 있는 경비, 빈 대기 의자, 자판기 불빛. 하은이 가로질러 엘리베이터 버튼을 누른다.' },
+  { id: 'lift', t0: 94.6, t1: 106.8, name: '엘리베이터', note: '엘리베이터 안. 층 표시가 1에서 5로 올라가고, 딩 하고 문이 열리면 깜깜한 복도.' },
+  { id: 'corridor', t0: 106.8, t1: 125.4, name: '병원 복도', note: '암전 뒤 복도. 브리지 가사에 맞춰 불이 하나씩 켜지고(One light comes on / Another light), 하은이 한 걸음씩 걸어 502호 앞에 선다.' },
+  { id: 'ward', t0: 125.4, t1: 158.0, name: '병실', note: '마지막 코러스와 함께 병실. 의자에 앉고, I\'ll lay my hand에 어머니 손을 잡고, All the way home에 고개를 숙이고, 첫 Four…에 어머니 손가락이 움직이자 고개를 든다. 노크, 천천히 뒤돌아봄.' },
+  { id: 'clip', t0: 158.6, t1: 174.8, name: '꽃다발', note: '암전 뒤 영상: 신입이 꽃다발을 들고 병실 문을 두드리고, 하은이 문을 열고 받는다. 심박 줄은 없음.' }
 ];
-const CUT_END = 108;   // the drawn cutscene's own length (not the song's); it fades to black here
+const CUT_END = 158.0;   // the drawn cutscene's length: the song (Four Steps Home, 2:37.5) and a breath; it fades to black here
+const SONG = { src: 'media/four-steps-home.mp3', len: 157.52 };
 // then, after a beat of black, the ward-visit clip (prototype/media; slowed by section with media/retime.sh), with the rows gone
 const CLIP = { t0: CUT_END + 0.6, dur: 16.0, src: 'media/1-6-ward-visit-paced' };   // .mp4 (H.264), or .webm (VP9) where H.264 won't play
 const END = CLIP.t0 + CLIP.dur + 0.2;
@@ -150,11 +154,20 @@ const walk2D = t => { const v = WALK2.v, r = WALK2.ramp, b = WALK2.t0 + r, c = W
   if (t <= WALK2.t0) return 0; if (t < b) return v * (t - WALK2.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
   const u = Math.min(t, WALK2.stop) - c; return dC + v * u - v * u * u / (2 * r); };
 // then the hospital's corridor, dark this early: the lights come on one panel at a time ahead of her as she walks, to 502
-const CORR = { t0: 70.2, t1: 71.3 };
+// the hospital, from the song's long instrumental (70 to 106 s): the lobby, then the lift up to 5
+const LOBBY = { t0: 73.0, t1: 76.0, press: 92.2, open: 93.5 };
+const makeWalk = (W0, r, v, W1) => { const b = W0 + r, c = W1 - r, dB = v * r / 2, dC = dB + v * (c - b);
+  const D = t => { if (t <= W0) return 0; if (t < b) return v * (t - W0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b); const u = Math.min(t, W1) - c; return dC + v * u - v * u * u / (2 * r); };
+  const T_ = d => { let a = W0, z = W1; for (let i = 0; i < 40; i++) { const m = (a + z) / 2; if (D(m) < d) a = m; else z = m; } return z; };
+  return { D, T: T_ }; };
+const WALK4 = { t0: 76.4, ramp: 0.9, v: 30, stop: 91.4 }, W4 = makeWalk(WALK4.t0, WALK4.ramp, WALK4.v, WALK4.stop);
+const ELEV = { t0: 94.6, t1: 97.0, floors: [98.6, 100.6, 102.6, 104.6], ding: 105.6, open: 106.2 };
+// the doors open on darkness; the corridor's first light comes on with 'One light comes on' (109.4)
+const CORR = { t0: 106.8, t1: 108.6 };
 // the ward: background only again, then she sits, takes her mother's hand, bows her head toward the bed, feels the hand close a
 // little and lifts her head (fixed times, not tied to the song)
-const WARD = { t0: 86.0, t1: 89.0, sit: 91.5, hold: 93.0, rest: 95.5, squeeze: 99.0, lift: 100.5, knock: 103.0, turn: 103.9 };   // the hospital front fades to full black, then the corridor's lights come on one at a time
-const WALK3 = { t0: 73.4, ramp: 0.9, v: 30, stop: 84.2 };
+const WARD = { t0: 125.4, t1: 127.4, sit: 128.4, hold: 131.7, rest: 140.8, squeeze: 149.2, lift: 150.2, knock: 154.0, turn: 154.6 };   // with the final chorus: the hand at 'I'll lay my hand', head down at 'All the way home', the hand moves at the first 'Four…'   // the hospital front fades to full black, then the corridor's lights come on one at a time
+const WALK3 = { t0: 113.3, ramp: 0.9, v: 18, stop: 125.0 };   // 'One more step': slow steps down the corridor
 const walk3D = t => { const v = WALK3.v, r = WALK3.ramp, b = WALK3.t0 + r, c = WALK3.stop - r, dB = v * r / 2, dC = dB + v * (c - b);
   if (t <= WALK3.t0) return 0; if (t < b) return v * (t - WALK3.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
   const u = Math.min(t, WALK3.stop) - c; return dC + v * u - v * u * u / (2 * r); };
@@ -810,6 +823,95 @@ function alleyPose(t) {
   if (t >= WALK2.stop) { const look = lerp(0.2, 1, ease(seg(t, WALK2.stop + 0.7, WALK2.stop + 1.8))); return { o: { mirror: true, look, sway: 0 }, top: HTOP - (look > 0.5 ? 1 : 0) }; }
   const d = walk2D(t); return walking(d, Math.min(1, d / STRIDE, (WALK2.stop - t) / WALK2.ramp), 0.2);
 }
+// ---------- the hospital lobby and the lift ----------
+// The song's long instrumental: inside the hospital before seven. The lobby side on (tall windows with the morning in them, a
+// guard asleep at reception, the empty waiting chairs, a vending machine's glow, the clock); she crosses it and presses for the
+// lift. Then the lift's inside: the floor number climbs 1 to 5, a ding, and the doors open on the dark corridor.
+const LBW = document.createElement('canvas'); LBW.width = W; LBW.height = H; const lbctx = LBW.getContext('2d');
+const ELW = document.createElement('canvas'); ELW.width = W; ELW.height = H; const elctx = ELW.getContext('2d');
+const LIFT_Q = Math.round(W4.D(WALK4.stop)) + 40;   // the near lift's doors (on the 1.0 layer): just ahead of her when she stops
+function lobby(t) {
+  const d = W4.D(t), L = f => q => Math.round(q - d * f + HX), l1 = L(1.0), lw = L(0.85), lf = L(1.15);
+  R(0, 0, W, 150, '#dfe3df'); R(0, 0, W, 22, '#eef0ec'); R(0, 21, W, 1, '#c4cbc6');
+  R(0, 120, W, 30, '#cfd6d2'); R(0, 119, W, 2, '#b9c3be');
+  // the tall windows, the early sky in them
+  for (let q = -260; q <= 40; q += 70) { const x = lw(q); if (x > W || x + 54 < 0) continue;
+    R(x - 2, 28, 54, 90, '#c4ccc8'); const sk = g.createLinearGradient(0, 30, 0, 116); sk.addColorStop(0, '#9fbbd8'); sk.addColorStop(1, '#f2e2c8'); g.fillStyle = sk; g.fillRect(x, 30, 50, 86);
+    R(x + 24, 30, 2, 86, '#c4ccc8'); R(x, 72, 50, 2, '#c4ccc8'); R(x + 4, 100, 18, 16, '#b9bccb'); R(x + 30, 92, 16, 24, '#aab0c0'); }
+  // ceiling lights
+  for (let q = -300; q < 900; q += 90) { const x = lw(q); if (x > -30 && x < W) { R(x, 20, 26, 3, '#f8fbf8'); R(x - 1, 19, 28, 1, '#b9c2be'); } }
+  // the wall clock (ten past six)
+  { const x = lw(-60); if (x > -12 && x < W) { R(x - 6, 34, 13, 13, '#f8f8f4'); R(x - 6, 34, 13, 1, '#5a6064'); R(x - 6, 46, 13, 1, '#5a6064'); R(x - 6, 34, 1, 13, '#5a6064'); R(x + 6, 34, 1, 13, '#5a6064'); R(x, 37, 1, 4, '#2a2a2a'); R(x, 41, 1, 3, '#2a2a2a'); R(x + 1, 41, 3, 1, '#2a2a2a'); } }
+  // reception: the sign, the guard asleep behind the counter, a monitor and a lamp
+  { const x = l1(110); if (x > -110 && x < W + 10) {
+    R(x + 18, 40, 60, 12, '#2f6f9a'); R(x + 18, 40, 60, 1, '#4a8ab4'); pixText('RECEPTION', x + 48 - Math.floor(pixTextW('RECEPTION') / 2), 44, '#f4f8fa');
+    person(x + 34, 98, { hair: 'grey', hc: '#8a8884', sk: SK[2], top: '#2b3550', sh: '#d8dde6', bot: '#2b3550', act: 'hang', sleep: true });
+    R(x + 58, 104, 16, 12, '#2b2f32'); R(x + 59, 105, 14, 9, '#5a8aa8'); R(x + 64, 116, 4, 4, '#5a6064');
+    R(x + 80, 108, 2, 12, '#5a6064'); R(x + 76, 104, 10, 5, '#e8c070');
+    R(x, 120, 96, 32, '#b89a72'); R(x, 120, 96, 3, '#d8bc92'); R(x, 149, 96, 3, '#8a7050'); for (let k = 1; k < 4; k++) R(x + k * 24, 124, 1, 25, '#a88a62'); } }
+  // the waiting chairs, empty
+  for (let q = 196; q <= 276; q += 20) { const x = l1(q); if (x < -20 || x > W) continue; R(x, 128, 16, 4, '#4a7a9a'); R(x + 13, 112, 3, 17, '#4a7a9a'); R(x + 2, 132, 2, 18, '#5a6064'); R(x + 12, 132, 2, 18, '#5a6064'); }
+  // the vending machine, its glow; a plant
+  { const x = l1(316); if (x > -40 && x < W + 30) { R(x, 82, 30, 70, '#c23a34'); R(x + 3, 86, 18, 42, '#f2f4ee'); for (let r = 0; r < 4; r++) for (let c = 0; c < 3; c++) R(x + 5 + c * 6, 89 + r * 10, 4, 7, ['#3a8ad8', '#e8c040', '#5aa85a', '#e86a6a'][(r + c) % 4]); R(x + 23, 92, 4, 10, '#2a2a2a'); R(x + 4, 134, 20, 6, '#2a2a2a');
+    g.save(); g.globalCompositeOperation = 'lighter'; glow(x + 12, 106, 34, '255,240,220', 0.2); g.restore(); } }
+  { const x = l1(296); if (x > -20 && x < W) { R(x, 136, 12, 14, '#c9744a'); R(x - 4, 116, 20, 20, '#4a8a3a'); R(x, 108, 10, 10, '#5a9a4a'); R(x + 2, 134, 8, 2, '#3a7a3a'); } }
+  // the lifts: frames, doors (the near one opens), the floor indicators, the call button
+  for (const [k, q] of [[0, LIFT_Q], [1, LIFT_Q + 64]]) { const x = l1(q); if (x > W + 10 || x + 40 < 0) continue;
+    const op = k ? 0 : Math.round(ease(seg(t, LOBBY.open, LOBBY.open + 0.8)) * 15);
+    R(x - 4, 54, 38, 98, '#a8b0b4'); R(x - 4, 54, 38, 2, '#c9d0d4');
+    R(x, 58, 30, 94, '#f2ead6'); R(x, 58, 30, 3, '#fff8e8'); R(x, 144, 30, 8, '#8a8478');   // the lit inside
+    R(x, 58, 15 - op, 94, '#c4cbcf'); R(x + 15 + op, 58, 15 - op, 94, '#c4cbcf'); if (op < 15) { R(x + 14 - op, 58, 1, 94, '#9aa3a8'); R(x + 15 + op, 58, 1, 94, '#dfe4e6'); }
+    R(x + 6, 44, 18, 8, '#1b1d1e'); pixText(k ? '3' : (t < LOBBY.open - 0.3 ? '7' : '1'), x + 13, 46, '#ff5a4a');
+    if (!k) { const lit = t >= LOBBY.press && t < LOBBY.open + 0.4; R(x - 32, 120, 6, 10, '#9aa3a8'); R(x - 31, 121, 4, 3, lit ? '#ffd27a' : '#e8ecee'); R(x - 31, 126, 4, 3, '#e8ecee');
+      if (lit) { g.save(); g.globalCompositeOperation = 'lighter'; glow(x - 29, 122, 8, '255,210,122', 0.5); g.restore(); }
+      if (op > 0) { g.save(); g.globalCompositeOperation = 'lighter'; glow(x + 15, 100, 40, '255,240,200', 0.25 * op / 15); g.restore(); } }
+  }
+  // the floor: polished tiles
+  R(0, 150, W, 66, '#cfd5d1'); R(0, 150, W, 2, '#a9b4ae');
+  for (let q = -60; q < 1000; q += 36) { const x = lf(q); if (x > -2 && x < W) R(x, 152, 1, 64, '#bec6c1'); } R(0, 178, W, 1, '#bec6c1'); R(0, 200, W, 1, '#bec6c1');
+}
+function lobbyPose(t) {
+  if (t < WALK4.t0) { const look = lerp(1, 0.2, ease(seg(t, LOBBY.t0, LOBBY.t0 + 1))); return { o: { mirror: true, look, sway: 0 }, top: HTOP - (look > 0.5 ? 1 : 0) }; }
+  if (t < WALK4.stop) { const d = W4.D(t); return walking(d, Math.min(1, d / STRIDE, (WALK4.stop - t) / WALK4.ramp), 0.2); }
+  // she presses for the lift: the near hand out to the button (she faces right: measured mirrored), then back down
+  const k = ease(seg(t, LOBBY.press - 0.45, LOBBY.press)) * (1 - ease(seg(t, LOBBY.press + 0.5, LOBBY.press + 0.9)));
+  const bx = HX + 40 - 30 + 1;   // the button's middle on screen once she has stopped
+  if (k > 0) return { o: { mirror: true, look: 0.3, arms: 'reach', reach: { dx: Math.round(lerp(-6, HX - bx - 1, k)), dy: Math.round(lerp(33, 122 - HTOP, k)) }, sway: 0 }, top: HTOP };
+  return { o: { mirror: true, look: lerp(0.2, 0.4, ease(seg(t, LOBBY.open - 0.6, LOBBY.open))), sway: 0 }, top: HTOP };
+}
+function lobbyScene(t) {
+  lobby(t);
+  const { o, top } = lobbyPose(t);
+  haeunSprite(o); tintSprite('#f6f6f2'); putSprite(HX, top);
+  // the morning in through the windows, soft over the floor
+  g.save(); g.globalCompositeOperation = 'lighter'; const lw = q => Math.round(q - W4.D(t) * 0.85 + HX);
+  for (let q = -260; q <= 40; q += 70) { const x = lw(q); if (x > -120 && x < W + 60) shaft(x + 4, 30, 42, 216, 0.06); }
+  g.restore();
+}
+// inside the lift: brushed steel, a handrail, the doors on the right, the floor number over them
+function liftFloor(t) { return 1 + ELEV.floors.filter(f => t >= f).length; }
+function lift(t) {
+  R(0, 0, W, 152, '#b9c0c4'); for (let x = 3; x < W; x += 7) R(x, 22, 1, 130, '#aeb5b9'); for (let x = 60; x < W; x += 76) R(x, 22, 2, 130, '#9fa7ab');
+  R(0, 0, W, 22, '#d8dcd8'); R(0, 21, W, 1, '#8f989c'); R(140, 18, 160, 3, '#fffdf4');
+  R(0, 114, 280, 3, '#d6dadc'); R(0, 117, 280, 1, '#7f888c'); for (const x of [30, 250]) R(x, 117, 2, 6, '#8f989c');
+  R(0, 152, W, 64, '#5e5a54'); R(0, 152, W, 2, '#3e3a36'); for (let x = 0; x < W; x += 24) R(x, 154, 1, 62, '#56524c');
+  // the doors, opening onto the dark at the end
+  const op = Math.round(ease(seg(t, ELEV.open, ELEV.open + 0.8)) * 34);
+  R(282, 26, 84, 126, '#8f989c'); R(286, 30, 76, 122, '#050506');
+  R(286, 30, 38 - op, 122, '#c9d0d4'); R(324 + op, 30, 38 - op, 122, '#c9d0d4'); if (op < 38) { R(323 - op, 30, 1, 122, '#9aa3a8'); R(324 + op, 30, 1, 122, '#e2e6e8'); }
+  // the floor number and its arrow; it flashes at the ding
+  const fl = liftFloor(t), flash = t >= ELEV.ding && t < ELEV.ding + 0.6 && Math.floor((t - ELEV.ding) * 6) % 2 === 0;
+  R(312, 14, 24, 10, '#1b1d1e'); pixText(String(fl), 321, 16, flash ? '#ffb0a0' : '#ff5a4a');
+  if (t < ELEV.ding && t >= ELEV.floors[0] - 1.6) { R(316, 17, 1, 1, '#ff5a4a'); R(315, 18, 3, 1, '#ff5a4a'); R(314, 19, 5, 1, '#ff5a4a'); }
+  // the button panel
+  R(262, 62, 10, 36, '#9aa3a8'); for (let r = 0; r < 6; r++) R(265, 65 + r * 5, 4, 3, r === 1 ? '#ffd27a' : '#e8ecee');
+  g.save(); g.globalCompositeOperation = 'lighter'; glow(220, 20, 90, '255,250,236', 0.18); glow(267, 71, 6, '255,210,122', 0.4); if (flash) glow(324, 19, 16, '255,90,74', 0.4); g.restore();
+}
+function liftScene(t) {
+  lift(t);
+  const look = lerp(0.3, 0.6, ease(seg(t, ELEV.ding - 0.3, ELEV.ding + 0.4)));
+  haeunSprite({ mirror: true, look, sway: 0 }); tintSprite('#fff8ec'); putSprite(HX, HTOP);
+}
 // ---------- the hospital corridor ----------
 // Side on: the ceiling with its light panels, pale walls, a wooden handrail over the wainscot, ward doors with their number
 // plates, a wheelchair and a bench, the glossy floor. Dark at first; each panel switches on (a flicker, a tick) when she comes
@@ -817,7 +919,9 @@ function alleyPose(t) {
 const LIGHT_Q = Array.from({ length: 12 }, (_, k) => k * 64);   // the panels (on the 1.0 layer, from where she comes in)
 const DOOR502 = Math.round(walk3D(WALK3.stop)) + 34;   // the door she stops at (just ahead of her); the ones she passes are 503, 504...
 // when each panel comes on: the one over her and the next as the corridor comes in, then each as she gets within 70 px
-const lightOn = q => Math.min(CORR.t1 + 0.8 + (q / 64) * 0.85, q - 70 > 0 ? walk3T(q - 70) : Infinity);
+// the first three panels on the bridge's words ('One light comes on', 'Another light', 'Another step'), then on down the corridor
+const LIGHT_CUE = { 0: 109.42, 64: 118.34, 128: 121.06 };
+const lightOn = q => q in LIGHT_CUE ? LIGHT_CUE[q] : 121.06 + (q / 64 - 2) * 0.9;
 function lightI(q, t) { const u = t - lightOn(q); if (u < 0) return 0; if (u < 0.36) return [1, 0, 1, 0, 0, 1][Math.floor(u / 0.06)] * 0.85; return 1; }
 function corridor(t) {
   const d = walk3D(t), L = q => Math.round(q - d + HX);
@@ -997,8 +1101,12 @@ function render(t) {
   if (t > DEST.t0 && t < DEST.t1) crossTo(t, DEST.t0, DEST.t1, subctx, SCRW, u => station(u, true), IDLE, '#f2f6f4', '#eef0ec', H);
   if (t >= DEST.t1 && t < ALLEY.t1) { g = wctx; station(t, true); }
   if (t > ALLEY.t0 && t < ALLEY.t1) crossTo(t, ALLEY.t0, ALLEY.t1, alctx, ALW, alleyScene, alleyPose(t), '#eef0ec', '#fff6ec', BELT_Y - 3, alleyWall);
-  if (t >= ALLEY.t1 && t < CORR.t1) { g = wctx; alleyScene(t); }
-  if (t > CORR.t0 && t < CORR.t1) { g.fillStyle = `rgba(0,0,0,${ease(seg(t, CORR.t0, CORR.t1 - 0.1))})`; g.fillRect(0, 0, W, H); }   // fading to full black
+  if (t >= ALLEY.t1 && t < LOBBY.t1) { g = wctx; alleyScene(t); }
+  if (t > LOBBY.t0 && t < LOBBY.t1) crossTo(t, LOBBY.t0, LOBBY.t1, lbctx, LBW, lobbyScene, lobbyPose(t), '#fff6ec', '#f6f6f2', BELT_Y - 3);
+  if (t >= LOBBY.t1 && t < ELEV.t1) { g = wctx; lobbyScene(t); }
+  if (t > ELEV.t0 && t < ELEV.t1) crossTo(t, ELEV.t0, ELEV.t1, elctx, ELW, liftScene, { o: { mirror: true, look: 0.3, sway: 0 }, top: HTOP }, '#f6f6f2', '#fff8ec', H);
+  if (t >= ELEV.t1 && t < CORR.t1) { g = wctx; liftScene(t); }
+  if (t > CORR.t0 && t < CORR.t1) { g.fillStyle = `rgba(0,0,0,${ease(seg(t, CORR.t0, CORR.t1 - 0.1))})`; g.fillRect(0, 0, W, H); }   // the doors open on the dark: fading to full black
   if (t >= CORR.t1 && t < WARD.t1) { g = wctx; corridorScene(t); }
   if (t > WARD.t0 && t < WARD.t1) crossTo(t, WARD.t0, WARD.t1, wdctx, WDW, wardScene, wardPose(t), '#eef4f2', '#f2ece4', 0);   // (she turns to the bed here, so both whole scenes cross; redrawn on top she'd jump out of the corridor's light)
   if (t >= WARD.t1) { g = wctx; wardScene(t); }
@@ -1016,7 +1124,7 @@ let ac = null, master = null, bus = null, amb = null, NB = null, schedTo = 0, so
 const EV = [];
 function initAudio() {
   if (ac) return; ac = new (window.AudioContext || window.webkitAudioContext)();
-  master = ac.createGain(); master.gain.value = soundOn ? 0.85 : 0; const comp = ac.createDynamicsCompressor(); master.connect(comp); comp.connect(ac.destination);
+  master = ac.createGain(); master.gain.value = soundOn ? 0.6 : 0; const comp = ac.createDynamicsCompressor(); master.connect(comp); comp.connect(ac.destination);
   NB = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate); const d = NB.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
   const loop = (type, f, q) => { const s = ac.createBufferSource(); s.buffer = NB; s.loop = true; const fl = ac.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const gn = ac.createGain(); gn.gain.value = 0; s.connect(fl); fl.connect(gn); gn.connect(master); s.start(); return gn; };
   const buzzO = ac.createOscillator(); buzzO.type = 'sawtooth'; buzzO.frequency.value = 120; const bl = ac.createBiquadFilter(); bl.type = 'lowpass'; bl.frequency.value = 420; const buzz = ac.createGain(); buzz.gain.value = 0; buzzO.connect(bl); bl.connect(buzz); buzz.connect(master); buzzO.start();
@@ -1068,6 +1176,10 @@ const SFX = {
   panel(t) { noise(t, 0.02, 0.12, 'highpass', 3000); noise(t + 0.12, 0.02, 0.07, 'highpass', 3000); tone(t + 0.24, 'sine', 2400, 2300, 0.006, 0.4); thump(t + 0.24, 110, 0.04, 0.06); },
   // a heartbeat, faint, from behind the door (the next stage's beat)
   heartbeat(t, e, into) { const left = e.dur - into; for (let c = 0; c < left - 0.2; c += 60 / 62) { const a = 0.05 + 0.08 * Math.min(1, c / 2); thump(t + c, 58, a, 0.22); thump(t + c + 0.14, 50, a * 0.6, 0.18); } },
+  button(t) { tone(t, 'square', 1320, 1320, 0.012, 0.06); },
+  liftDoor(t) { const s = ac.createBufferSource(); s.buffer = NB; const fl = ac.createBiquadFilter(); fl.type = 'bandpass'; fl.frequency.value = 600; fl.Q.value = 0.8; const gn = ac.createGain(); gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.035, t + 0.2); gn.gain.linearRampToValueAtTime(0.0001, t + 0.9); s.connect(fl); fl.connect(gn); gn.connect(bus); s.start(t); s.stop(t + 1); thump(t + 0.85, 70, 0.04, 0.08); },
+  liftHum(t, e, into) { const left = e.dur - into, o = ac.createOscillator(), gn = ac.createGain(), lp = ac.createBiquadFilter(); o.type = 'sawtooth'; o.frequency.value = 55; lp.type = 'lowpass'; lp.frequency.value = 180; gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.02, t + 0.8); gn.gain.setValueAtTime(0.02, t + Math.max(0.8, left - 0.6)); gn.gain.linearRampToValueAtTime(0.0001, t + left); o.connect(lp); lp.connect(gn); gn.connect(bus); o.start(t); o.stop(t + left + 0.1); },
+  ding(t) { tone(t, 'sine', 1318.5, 1318.5, 0.04, 1.2); tone(t, 'sine', 2637, 2637, 0.008, 0.6); },
   // knuckles on the ward door, three times
   rustle(t) { noise(t, 0.35, 0.025, 'bandpass', 2400, 0.7); noise(t + 0.6, 0.3, 0.02, 'bandpass', 1800, 0.7); },
   knock(t) { for (const dt of [0, 0.26, 0.52]) { thump(t + dt, 170, 0.16, 0.08); noise(t + dt, 0.04, 0.09, 'bandpass', 900, 1.5); noise(t + dt + 0.09, 0.05, 0.02, 'bandpass', 700, 1); } },
@@ -1097,6 +1209,9 @@ for (let c = RIDE.clack0; c < RIDE.slow + 1; c += RIDE.gap) EV.push({ t: c, fn: 
 for (let k = 1; ; k++) { const t = walk3T(k * STRIDE); if (t > WALK3.stop - 0.05) break; EV.push({ t, fn: 'step', out: false }); }
 for (const q of LIGHT_Q) { const t = lightOn(q); if (t < CUT_END - 0.5) EV.push({ t, fn: 'panel' }); }
 for (let k = 1; ; k++) { const t = walk2T(k * STRIDE); if (t > WALK2.stop - 0.05) break; EV.push({ t, fn: 'step', out: t > ALLEY.t0 + 1.7 }); }   // on the platform the steps ring, in the alley they don't
+for (let i = EV.length - 1; i >= 0; i--) if (EV[i].fn === 'pad') EV.splice(i, 1);   // the song is the music now
+EV.push({ t: LOBBY.press, fn: 'button' }, { t: LOBBY.open, fn: 'liftDoor' }, { t: ELEV.t1, fn: 'liftHum', dur: ELEV.ding - ELEV.t1 }, { t: ELEV.ding, fn: 'ding' }, { t: ELEV.open, fn: 'liftDoor' });
+for (let k = 1; ; k++) { const t = W4.T(k * STRIDE); if (t > WALK4.stop - 0.05) break; EV.push({ t, fn: 'step', out: false }); }
 EV.sort((a, b) => a.t - b.t);
 function audioStart(t) {
   if (!ac) return; ac.resume(); newBus(); schedTo = t;
@@ -1110,12 +1225,34 @@ function audioTick(t) {
   schedTo = until;
   // beds: room tone indoors, the tubes' buzz while they burn, wind outside
   const outK = t > doorT ? 1 : 0, lit = TUBE_Q.reduce((s, _, k) => s + tubeOn(k, t), 0);
-  amb.room.gain.setTargetAtTime(0.05 * (1 - outK), ac.currentTime, 0.2);
+  amb.room.gain.setTargetAtTime(0.05 * (1 - outK) + (t > LOBBY.t0 && t < CUT_END ? 0.022 : 0), ac.currentTime, 0.2);
   amb.buzz.gain.setTargetAtTime(0.004 * lit, ac.currentTime, 0.02);
   const onTrain = t > WIPE.t0 ? 1 : 0;
-  const street2 = t > ALLEY.t0 && t < CORR.t0 + 1.5 ? 1 : 0, running = t > RIDE.depart && t < RIDE.stop ? seg(t, RIDE.depart, RIDE.depart + 3) * (1 - seg(t, RIDE.slow, RIDE.stop)) : 0;
+  const street2 = t > ALLEY.t0 && t < LOBBY.t0 + 1.5 ? 1 : 0, running = t > RIDE.depart && t < RIDE.stop ? seg(t, RIDE.depart, RIDE.depart + 3) * (1 - seg(t, RIDE.slow, RIDE.stop)) : 0;
   amb.wind.gain.setTargetAtTime(Math.max(outK * (1 - onTrain), street2) * (0.025 + 0.012 * Math.sin(t * 0.8)), ac.currentTime, onTrain ? 0.08 : 0.4);
   amb.rumble.gain.setTargetAtTime(street2 ? 0 : onTrain * (0.035 + 0.06 * running), ac.currentTime, 0.15);   // the station's low hum, the train running
+}
+
+// ---------- the song under the cutscene, and its lyrics as subtitles ----------
+// Four Steps Home (media/four-steps-home.mp3) plays from the start on the page's clock; its lyric lines (media/subs, timed from
+// the recording) show under the heartbeat row in the black bar: English, Korean, or off.
+const song = new Audio(SONG.src); song.preload = 'auto';
+function songSync(t) {
+  const inside = playing && t >= 0 && t < SONG.len; song.muted = !soundOn; song.volume = 0.9;
+  if (!inside) { if (!song.paused) song.pause(); return; }
+  if (song.paused) { song.currentTime = t; song.play().catch(() => {}); }
+  else if (Math.abs(song.currentTime - t) > 0.15) song.currentTime = t;
+}
+const SUBS = [{"t0": 8.9, "t1": 13.8, "en": "The belt has stopped, the lights are out", "ko": "벨트는 멈추고, 불은 꺼졌어"}, {"t0": 13.8, "t1": 17.4, "en": "There's nothing left to hold", "ko": "붙잡을 건 아무것도 남지 않았어"}, {"t0": 17.5, "t1": 21.1, "en": "Just a watch around my wrist", "ko": "손목 위 시계 하나만"}, {"t0": 21.16, "t1": 24.9, "en": "Still telling me I'm late", "ko": "아직도 늦었다고 재촉해"}, {"t0": 24.94, "t1": 29.5, "en": "Before the first train comes", "ko": "첫차가 오기 전에"}, {"t0": 29.78, "t1": 34.6, "en": "Just hold on a little more", "ko": "조금만 더 버티면 돼"}, {"t0": 35.28, "t1": 37.72, "en": "I never had a dream", "ko": "나는 꿈이 없었어"}, {"t0": 37.72, "t1": 39.86, "en": "So I just count to four", "ko": "그래서 넷까지만 세"}, {"t0": 39.86, "t1": 41.64, "en": "One, two, three, and four", "ko": "하나, 둘, 셋, 그리고 넷"}, {"t0": 41.64, "t1": 43.72, "en": "I'll be waiting on the four", "ko": "넷에서 기다릴게"}, {"t0": 43.72, "t1": 45.94, "en": "Lost in a crowd of strangers", "ko": "낯선 사람들 틈에서"}, {"t0": 45.94, "t1": 48.04, "en": "I'm standing all alone", "ko": "나는 혼자 서 있어"}, {"t0": 48.04, "t1": 50.52, "en": "But the four is mine to keep", "ko": "그래도 넷은 내가 지킬게"}, {"t0": 50.52, "t1": 52.36, "en": "I won't let it go", "ko": "놓치지 않을게"}, {"t0": 52.36, "t1": 55.6, "en": "At the end of the alley", "ko": "골목 끝에서"}, {"t0": 55.74, "t1": 60.08, "en": "The windows go dark one by one", "ko": "창문들이 하나둘 꺼져"}, {"t0": 60.08, "t1": 62.74, "en": "The morning's coming in", "ko": "아침은 오는데"}, {"t0": 62.74, "t1": 68.4, "en": "But I'm still in the night", "ko": "나는 아직 밤이야"}, {"t0": 109.42, "t1": 112.8, "en": "One light comes on", "ko": "불이 하나 켜지면"}, {"t0": 113.3, "t1": 117.0, "en": "One more step", "ko": "한 걸음 더"}, {"t0": 118.34, "t1": 120.7, "en": "Another light", "ko": "또 하나의 불"}, {"t0": 121.06, "t1": 125.2, "en": "Another step", "ko": "또 한 걸음"}, {"t0": 126.56, "t1": 129.2, "en": "Mom, I'll count for you", "ko": "엄마, 내가 셀게"}, {"t0": 129.2, "t1": 130.7, "en": "One, two, three, and four", "ko": "하나, 둘, 셋, 그리고 넷"}, {"t0": 130.7, "t1": 132.84, "en": "Don't stop, I'll lay my hand", "ko": "멈추지 마, 내가 손을 얹을게"}, {"t0": 132.84, "t1": 135.06, "en": "Right on your every beat", "ko": "엄마의 박 하나하나 위에"}, {"t0": 135.06, "t1": 137.2, "en": "I don't need a dream", "ko": "꿈은 없어도 돼"}, {"t0": 137.32, "t1": 139.34, "en": "This beat is all I need", "ko": "이 박 하나면 충분해"}, {"t0": 139.34, "t1": 141.3, "en": "Your four, I'll carry it", "ko": "엄마의 넷은 내가 이어 갈게"}, {"t0": 141.3, "t1": 146.6, "en": "All the way home", "ko": "집에 닿을 때까지"}, {"t0": 149.22, "t1": 151.8, "en": "Four...", "ko": "넷…"}, {"t0": 153.26, "t1": 155.8, "en": "Four...", "ko": "넷…"}];
+let subLang = 'en';
+function drawSubs(t) {
+  if (subLang === 'off' || t >= CUT_END) return;
+  const c = SUBS.find(c => t >= c.t0 - 0.05 && t < c.t1); if (!c) return;
+  const a = clamp(Math.min((t - c.t0 + 0.05) / 0.2, (c.t1 - t) / 0.25), 0, 1), text = c[subLang];
+  out.save(); out.setTransform(1, 0, 0, 1, 0, 0); out.globalAlpha = a;
+  out.font = `500 ${Math.round(cv.width / 52)}px "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; out.textAlign = 'center'; out.textBaseline = 'middle';
+  out.lineWidth = 4; out.strokeStyle = 'rgba(0,0,0,.85)'; out.strokeText(text, cv.width / 2, cv.height * 0.955); out.fillStyle = '#f4efe4'; out.fillText(text, cv.width / 2, cv.height * 0.955);
+  out.restore();
 }
 
 // ---------- the clip after the cutscene ----------
@@ -1404,8 +1541,6 @@ const HB = (() => {
     const kick = clamp(1 - (performance.now() - FX.kickAt) / 180, 0, 1), z = 1 + 0.03 * kick * kick;
     g = G0; G0.setTransform(SC * z, 0, 0, SC * z, W * SC * (1 - z) / 2, H * SC * (1 - z) / 2);
     drawRows(t);
-    const tl = beatT(SEG.length * 8 - 2);
-    if (t > tl) { const a = clamp((t - tl) / 0.8, 0, 1), sc = 1 + 0.15 * (1 - a); g.save(); g.globalAlpha = a; g.translate(W / 2, 64); g.scale(sc, sc); glowTxt('심박 안정', 0, -10, '#f0fff4', 20, 'center', '"Black Han Sans", sans-serif', 'rgba(120,255,170,.9)'); g.restore(); g.globalAlpha = 1; }
     G0.setTransform(1, 0, 0, 1, 0, 0);
   }
   return {
@@ -1438,7 +1573,8 @@ let dragging = false;
 seek.addEventListener('pointerdown', () => { dragging = true; });
 addEventListener('pointerup', () => { dragging = false; });
 seek.oninput = () => { started = true; $('big').hidden = true; jump(+seek.value); };
-$('snd').onclick = () => { soundOn = !soundOn; $('snd').setAttribute('aria-pressed', soundOn); if (master) master.gain.setTargetAtTime(soundOn ? 0.85 : 0, ac.currentTime, 0.05); HB.mute(!soundOn); };
+$('snd').onclick = () => { soundOn = !soundOn; $('snd').setAttribute('aria-pressed', soundOn); if (master) master.gain.setTargetAtTime(soundOn ? 0.6 : 0, ac.currentTime, 0.05); HB.mute(!soundOn); };
+$('sub').onclick = () => { subLang = { en: 'ko', ko: 'off', off: 'en' }[subLang]; $('sub').textContent = { en: '자막 EN', ko: '자막 한국어', off: '자막 끔' }[subLang]; };
 const PRESS_KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyK', 'KeyD']);
 addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' && e.code !== 'Space') return;
@@ -1462,9 +1598,10 @@ function frame(now) {
   if (playing) { const hc = hbOn ? HB.clock() : null; T = hc != null ? hc : T + dt; if (T >= CUT_END && hc != null) { HB.halt(); showResult(); } if (T >= END) { T = END; setPlaying(false); } }
   const rows = hbOn && T < CUT_END;   // the rows are gone once the cutscene ends
   if (rows) HB.update(T);
-  render(T); if (rows) HB.draw(T); audioTick(T); clipSync(T);
+  render(T); if (rows) HB.draw(T); audioTick(T); clipSync(T); songSync(T);
   // the rows go dark with the cutscene's fade, so they leave with it
   { const f = rows ? seg(T, CUT_END - 1.5, CUT_END - 0.1) : 0; if (f > 0) { out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = `rgba(0,0,0,${f})`; out.fillRect(0, 0, cv.width, cv.height); } }
+  drawSubs(T);
   if (!dragging) seek.value = T;
   $('time').textContent = `${T.toFixed(1).padStart(4, '0')} / ${END.toFixed(1)}`;
   const si = SHOTS.reduce((a, sh, i) => T >= sh.t0 ? i : a, 0); [...shotsEl.children].forEach((c, i) => c.classList.toggle('on', i === si));
