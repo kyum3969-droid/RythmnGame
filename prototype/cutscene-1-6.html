@@ -71,6 +71,9 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 'use strict';
 const $ = id => document.getElementById(id);
 const W = 384, H = 216, SC = 3;
+// the picture sits 20 px higher than the game's own screen (its top 20 px cut off), so the black bar along the bottom for the
+// heartbeat row and the lyrics is taller (from y 141); her feet still end at the bar's edge as before
+const CROP = 20, BAR_TOP = 141;
 const cv = $('cv'), out = cv.getContext('2d');
 // every shot is drawn at the game's 1x into this buffer; the camera crops it and blows it up without smoothing
 const wb = document.createElement('canvas'); wb.width = W; wb.height = H; const wctx = wb.getContext('2d');
@@ -902,15 +905,15 @@ function lift(t) {
   R(0, 152, W, 64, '#5e5a54'); R(0, 152, W, 2, '#3e3a36'); for (let x = 0; x < W; x += 24) R(x, 154, 1, 62, '#56524c');
   // the doors, opening onto the dark at the end
   const op = Math.round(ease(seg(t, ELEV.open, ELEV.open + 0.8)) * 34);
-  R(282, 26, 84, 126, '#8f989c'); R(286, 30, 76, 122, '#050506');
-  R(286, 30, 38 - op, 122, '#c9d0d4'); R(324 + op, 30, 38 - op, 122, '#c9d0d4'); if (op < 38) { R(323 - op, 30, 1, 122, '#9aa3a8'); R(324 + op, 30, 1, 122, '#e2e6e8'); }
+  R(282, 40, 84, 112, '#8f989c'); R(286, 44, 76, 108, '#050506');
+  R(286, 44, 38 - op, 108, '#c9d0d4'); R(324 + op, 44, 38 - op, 108, '#c9d0d4'); if (op < 38) { R(323 - op, 44, 1, 108, '#9aa3a8'); R(324 + op, 44, 1, 108, '#e2e6e8'); }
   // the floor number and its arrow; it flashes at the ding
   const fl = liftFloor(t), flash = t >= ELEV.ding && t < ELEV.ding + 0.6 && Math.floor((t - ELEV.ding) * 6) % 2 === 0;
-  R(312, 14, 24, 10, '#1b1d1e'); pixText(String(fl), 321, 16, flash ? '#ffb0a0' : '#ff5a4a');
-  if (t < ELEV.ding && t >= ELEV.floors[0] - 1.6) { R(316, 17, 1, 1, '#ff5a4a'); R(315, 18, 3, 1, '#ff5a4a'); R(314, 19, 5, 1, '#ff5a4a'); }
+  R(312, 28, 24, 10, '#1b1d1e'); pixText(String(fl), 321, 30, flash ? '#ffb0a0' : '#ff5a4a');
+  if (t < ELEV.ding && t >= ELEV.floors[0] - 1.6) { R(316, 31, 1, 1, '#ff5a4a'); R(315, 32, 3, 1, '#ff5a4a'); R(314, 33, 5, 1, '#ff5a4a'); }
   // the button panel
   R(262, 62, 10, 36, '#9aa3a8'); for (let r = 0; r < 6; r++) R(265, 65 + r * 5, 4, 3, r === 1 ? '#ffd27a' : '#e8ecee');
-  g.save(); g.globalCompositeOperation = 'lighter'; glow(220, 20, 90, '255,250,236', 0.18); glow(267, 71, 6, '255,210,122', 0.4); if (flash) glow(324, 19, 16, '255,90,74', 0.4); g.restore();
+  g.save(); g.globalCompositeOperation = 'lighter'; glow(220, 20, 90, '255,250,236', 0.18); glow(267, 71, 6, '255,210,122', 0.4); if (flash) glow(324, 33, 16, '255,90,74', 0.4); g.restore();
 }
 function liftScene(t) {
   lift(t);
@@ -1191,7 +1194,9 @@ function render(t) {
   // the whole cutscene stays at the game's own scale: the 384x216 screen, blown up whole, never cropped or zoomed
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
   out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = "#000"; out.fillRect(0, 0, cv.width, cv.height);
-  out.drawImage(wb, 0, 0, W, H, 0, 0, cv.width, cv.height);
+  // (when she gets up for the door the camera pushes in, over 0.9 s, to twice the size: a waist shot on her, the door and 지우)
+  const zk = t >= EXIT.stand ? ease(seg(t, EXIT.stand, EXIT.stand + 0.9)) : 0, z = lerp(1, 2, zk), vx = lerp(0, 96, zk), vy = lerp(CROP, 80, zk), vw = W / z, vh = H / z, sh = Math.min(vh, H - vy);
+  out.drawImage(wb, vx, vy, vw, sh, 0, 0, cv.width, cv.height * sh / vh);
   const fade = Math.max(1 - seg(t, 0.2, 1.8), seg(t, CUT_END - 1.5, CUT_END - 0.1));
   if (fade > 0) { out.fillStyle = `rgba(0,0,0,${fade})`; out.fillRect(0, 0, cv.width, cv.height); }
 }
@@ -1349,8 +1354,9 @@ function drawSubs(t) {
   const c = SUBS.find(c => t >= c.t0 - 0.05 && t < c.t1); if (!c) return;
   const a = clamp(Math.min((t - c.t0 + 0.05) / 0.2, (c.t1 - t) / 0.25), 0, 1), text = c[subLang];
   out.save(); out.setTransform(1, 0, 0, 1, 0, 0); out.globalAlpha = a;
-  out.font = `500 ${Math.round(cv.width / 52)}px "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; out.textAlign = 'center'; out.textBaseline = 'middle';
-  out.lineWidth = 4; out.strokeStyle = 'rgba(0,0,0,.85)'; out.strokeText(text, cv.width / 2, cv.height * 0.955); out.fillStyle = '#f4efe4'; out.fillText(text, cv.width / 2, cv.height * 0.955);
+  out.font = `600 ${Math.round(cv.width / 38)}px "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; out.textAlign = 'center'; out.textBaseline = 'middle';
+  const ly = cv.height * 203 / H;   // under the row, in the bar
+  out.lineWidth = 4; out.strokeStyle = 'rgba(0,0,0,.85)'; out.strokeText(text, cv.width / 2, ly); out.fillStyle = '#fff6e4'; out.fillText(text, cv.width / 2, ly);
   out.restore();
 }
 
@@ -1451,7 +1457,7 @@ const HB = (() => {
   function glowTxt(s, x, y, c, size, align, font, glow) { g.save(); g.shadowColor = glow; g.shadowBlur = 6 * SC; txt(s, x, y, c, size, align, '400', font); g.restore(); txt(s, x, y, c, size, align, '400', font); }
   // one heartbeat on the line at x (the R peak), sharp like a monitor's: a small P, the flat PR, a little Q, a needle-thin R, a deep
   // S, the ST segment and a low T; amp is the R peak's height
-  const BEAT_W = 32, AMP = 17;   // the R peak's height in game pixels
+  const BEAT_W = 32, AMP = 26;   // the R peak's height in game pixels (taller in the cutscene's deeper bar)
   function beatPts(amp) {
     return [[-32, 0], [-27, -amp * 0.06], [-24, -amp * 0.11], [-21, -amp * 0.06], [-18, 0], [-5, 0], [-2.6, amp * 0.14], [0, -amp], [2.4, amp * 0.46], [4, 0], [10, -amp * 0.03],
       [13, -amp * 0.09], [16, -amp * 0.17], [19, -amp * 0.2], [22, -amp * 0.15], [25, -amp * 0.06], [28, 0], [32, 0]];
@@ -1505,7 +1511,7 @@ const HB = (() => {
     else { g.strokeStyle = '#140a0c'; g.lineWidth = 0.9; g.beginPath(); g.moveTo(cx - 0.5, cy - 5 * s); g.lineTo(cx + 2 * s, cy - 2 * s); g.lineTo(cx - 1.5 * s, cy + 0.5 * s); g.lineTo(cx + 1 * s, cy + 4 * s); g.stroke(); }
   }
   function laneRow(lane, t) { let r = null; for (const row of ROWS) if (row.lane === lane && row.t0 <= t + 0.001) r = row; return r && t < r.t8 + 0.6 ? r : null; }
-  const SPARKS = [], RINGS = [], FLOATS = [], LANEY = [186, 202];
+  const SPARKS = [], RINGS = [], FLOATS = [], LANEY = [177, 202];
   function burst(x, y, j = 'perfect') {
     const big = j === 'perfect';
     for (let i = 0; i < 18 + (big ? 14 : 0); i++) { const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.6, v = 50 + Math.random() * 100; SPARKS.push({ x, y: y - 6, vx: Math.cos(a) * v, vy: Math.sin(a) * v, at: performance.now(), life: 700 + Math.random() * 600, s: 2.4 + Math.random() * 1.8, c: Math.random() < 0.5 ? '#bfffe0' : '#ffffff', plus: true }); }
@@ -1546,7 +1552,7 @@ const HB = (() => {
           if (waiting && kf > HEART - 1.6) {
             
             const sp = beatT(row.b0 + HEART) - beatT(row.b0 + HEART - 1), p = clamp(1 + dt / sp, 0, 1);
-            if (p > 0 && p < 1) { g.save(); g.globalAlpha = show * (0.4 + 0.6 * p); g.strokeStyle = '#fff2b8'; g.lineWidth = 1; g.beginPath(); g.arc(x, y - 9, 4 + 20 * (1 - p), 0, Math.PI * 2); g.stroke(); g.restore(); }
+            if (p > 0 && p < 1) { g.save(); g.globalAlpha = show * (0.4 + 0.6 * p); g.strokeStyle = '#fff2b8'; g.lineWidth = 1; g.beginPath(); g.arc(x, y - 13, 5 + 24 * (1 - p), 0, Math.PI * 2); g.stroke(); g.restore(); }
           }
           else if (tgk.judge === 'miss' && t - tgk.t < 1.2) { const f = clamp(1 - (t - tgk.t - 0.4) / 0.8, 0, 1); g.save(); g.globalAlpha = show * f; g.strokeStyle = '#ff5a5a'; g.lineWidth = 0.9; g.beginPath(); for (let i = -BEAT_W; i <= BEAT_W; i += 2) g.lineTo(x + i, y + (rnd(i, Math.floor(now / 50)) - 0.5) * 2.4); g.stroke(); g.restore(); }
         }
@@ -1563,14 +1569,14 @@ const HB = (() => {
     { const rf = clamp(1 - (now - F.hitAt) / 380, 0, 1); if (rf > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const lg = g.createLinearGradient(X0, 0, HXR, 0); lg.addColorStop(0, 'rgba(140,255,170,0)'); lg.addColorStop((COL - X0) / (HXR - X0), `rgba(200,255,230,${0.5 * rf})`); lg.addColorStop(1, 'rgba(200,255,230,0)'); g.fillStyle = lg; g.fillRect(X0, y - 34, HXR - X0, 48); g.restore(); } }
     g.globalAlpha = show;
     // the judgement over the column: it pops in large and settles
-    for (const p of FX.pops) { if (p.lane !== lane) continue; const age = (now - p.at) / 650, a = 1 - age; if (a <= 0) continue; const sc = 1 + 0.8 * clamp(1 - age / 0.15, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(COL - 22, y - 28 - age * 4); g.scale(sc, sc); glowTxt(p.text, 0, -7, p.c, 15, 'center', '"Black Han Sans", sans-serif', p.text === '놓침' ? 'rgba(255,60,60,.8)' : 'rgba(180,255,200,.8)'); if (p.sub) txt(p.sub, 0, 7, p.c, 5, 'center', '400'); g.restore(); }
+    for (const p of FX.pops) { if (p.lane !== lane) continue; const age = (now - p.at) / 650, a = 1 - age; if (a <= 0) continue; const sc = 1 + 0.8 * clamp(1 - age / 0.15, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(COL - 22, y - 38 - age * 4); g.scale(sc, sc); glowTxt(p.text, 0, -7, p.c, 15, 'center', '"Black Han Sans", sans-serif', p.text === '놓침' ? 'rgba(255,60,60,.8)' : 'rgba(180,255,200,.8)'); if (p.sub) txt(p.sub, 0, 7, p.c, 5, 'center', '400'); g.restore(); }
     g.restore();
   }
   const LOW = { on: false, text: [], cv: null, g: null }, BOX = { rgb: '242,196,58', a: 0.3, near: 0, fl: 0 };
   // the yellow scan box, or the part of it between y0 and y1 (redrawn over each row's band so it stays solid)
   function laneBand(y, show) {
     // a slim dark band just around the trace (from the left edge to the end of the 4th peak), its ends fading
-    const BT = Math.round(y) - 21, BH = 28, x0 = X0 - 6, x1 = XE + 6, band = g.createLinearGradient(x0, 0, x1, 0); band.addColorStop(0, 'rgba(4,10,8,0)'); band.addColorStop(0.05, 'rgba(4,10,8,.4)'); band.addColorStop(0.95, 'rgba(4,10,8,.4)'); band.addColorStop(1, 'rgba(4,10,8,0)');
+    const BT = Math.round(y) - 32, BH = 44, x0 = X0 - 6, x1 = XE + 6, band = g.createLinearGradient(x0, 0, x1, 0); band.addColorStop(0, 'rgba(4,10,8,0)'); band.addColorStop(0.05, 'rgba(4,10,8,.4)'); band.addColorStop(0.95, 'rgba(4,10,8,.4)'); band.addColorStop(1, 'rgba(4,10,8,0)');
     g.save(); g.globalAlpha = show; g.fillStyle = band; g.fillRect(x0, BT, x1 - x0, BH);
     g.fillStyle = 'rgba(80,160,110,.08)'; for (let x = X0; x < XE; x += 6) g.fillRect(x, BT + 2, 1, BH - 4); for (let yy = BT + 3; yy < BT + BH - 2; yy += 6) g.fillRect(X0, yy, XE - X0, 1);
     g.restore();
@@ -1596,14 +1602,14 @@ const HB = (() => {
   function drawRowsAt(t) {
     // a soft shade over the lower part of the scene so the rows read
     const two = 0, e2 = 0;   // one row only
-    const y0 = lerp(186, 162, e2), y1 = lerp(246, 204, e2); LANEY[0] = y0; LANEY[1] = y1;
+    const y0 = lerp(177, 162, e2), y1 = lerp(246, 204, e2); LANEY[0] = y0; LANEY[1] = y1;
     // the 4th beat's column, across every row: a wide solid yellow box with a dark rim and a lit edge; it brightens as the beat
     // comes and flashes white on a press
     const near = Math.max(...[0, 1].map(l => { const r = laneRow(l, t); return r ? clamp(1 - Math.abs(t - r.tg.t) / 0.5, 0, 1) : 0; })), fl = clamp(1 - (performance.now() - FX.flashAt) / 220, 0, 1);
     // a black bar across the bottom of the screen for the row to sit on, so the sides beside the narrow row are black too
-    g.fillStyle = '#000'; g.fillRect(0, Math.round(y0) - 25, W, H);
+    g.fillStyle = '#000'; g.fillRect(0, BAR_TOP, W, H);
     for (const [yy, sh2] of [[y0, 1], [y1, e2]]) if (sh2 > 0) laneBand(yy, sh2);
-    { const top = Math.round(lerp(158, 134, e2)); BOX.near = near; BOX.fl = fl; BOX.rgb = fl > 0.3 ? '255,236,150' : '242,196,58'; BOX.a = 0.32 + 0.16 * near + 0.3 * fl; scanBox(Math.round(y0) - 25, H);   // from the black bar's top edge to the bottom of the screen
+    { const top = Math.round(lerp(158, 134, e2)); BOX.near = near; BOX.fl = fl; BOX.rgb = fl > 0.3 ? '255,236,150' : '242,196,58'; BOX.a = 0.32 + 0.16 * near + 0.3 * fl; scanBox(BAR_TOP, H);   // from the black bar's top edge to the bottom of the screen
       if (fl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fx = g.createRadialGradient(COL, y0 - 7, 0, COL, y0 - 7, 26); fx.addColorStop(0, `rgba(255,240,170,${0.4 * fl})`); fx.addColorStop(1, 'rgba(255,240,170,0)'); g.fillStyle = fx; g.fillRect(COL - 26, y0 - 33, 52, 52); g.restore(); } }
     drawLane(0, y0, t, 1);
     if (two > 0) drawLane(1, y1, t, e2);
@@ -1689,7 +1695,7 @@ function frame(now) {
   if (rows) HB.update(T);
   render(T); audioTick(T); songSync(T);
   // the black bar along the bottom stays after the row has gone (it is the dialogue's place too)
-  if (hbOn && T < CUT_END) { out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = '#000'; out.fillRect(0, 161 * SC, cv.width, cv.height); }
+  if (hbOn && T < CUT_END) { out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = '#000'; out.fillRect(0, BAR_TOP * SC, cv.width, cv.height); }
   // the row (and its black bar) fades out after the song, and the picture is whole for the door
   if (rows) { const HG = HBCV.getContext('2d'); HG.setTransform(1, 0, 0, 1, 0, 0); HG.clearRect(0, 0, HBCV.width, HBCV.height); HB.draw(T);
     out.save(); out.setTransform(1, 0, 0, 1, 0, 0); out.globalAlpha = 1 - seg(T, ROWS_END - 1.2, ROWS_END - 0.05); out.drawImage(HBCV, 0, 0); out.restore(); }
