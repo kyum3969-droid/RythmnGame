@@ -193,12 +193,12 @@ A slow, lazy, swaggering hip-hop track with ONE solo female rapper. A young woma
 
 ## 3라운드(절정) 곡 프롬프트
 
-절정. The Lazy Shift 끝("Play me another")에 지우가 가장 무겁고 센 비트를 튼다. **빠르기보다 무게**: 100 BPM에 하프타임 드럼(체감은 느리고 짓누름), 디스토션 기타 파워코드, 큰 홀 드럼, 찢어지는 808, 하은 목소리를 겹겹이 쌓은 떼창. 45마디, 1:48. 같은 A 단조, 같은 반음 하강 베이스(A–G#–F#–E)를 기타 리프로. 브리지(조용한 4마디)는 심박 킥과 시계처럼 반복되는 피아노 한 음 위에서 하은이 가장 솔직한 말을 한다 → 1-6 병실 심전도로 이어짐("Somebody's waiting"). 마지막은 1라운드 Tick-tock 훅이 돌아오고 "Hit it harder" 훅과 겹치며 끝.
+절정. The Lazy Shift 끝("Play me another")에 지우가 가장 무겁고 센 비트를 튼다. **빠르기보다 무게**: 100 BPM에 하프타임 드럼(체감은 느리고 짓누름), 디스토션 기타 파워코드, 큰 홀 드럼, 찢어지는 808, 하은 목소리를 겹겹이 쌓은 떼창. 49마디, 1:58. 같은 A 단조, 같은 반음 하강 베이스(A–G#–F#–E)를 기타 리프로. 브리지(조용한 4마디)는 심박 킥과 시계처럼 반복되는 피아노 한 음 위에서 하은이 가장 솔직한 말을 한다 → 1-6 병실 심전도로 이어짐("Somebody's waiting"). 마지막(Final)은 단순하게 1라운드의 두 조각만: Tick-tock 훅 4줄, 그리고 "You play, I pay" 벌스(1라운드 2절) 8줄을 이 무거운 비트 위에서 다시.
 
 훅을 "Faster"에서 "Hit it harder"로 바꾼 이유: 가사에 '빠르게'가 반복되면 곡이 속도로만 끌려간다. 이전 프롬프트(110 BPM, "fast, explosive, relentless")는 빠르기만 하고 힘이 안 실렸다.
 
 ```
-A HEAVY, POWERFUL, anthemic rap-rock / trap-metal track with ONE solo female rapper: the final round of a rap battle on a night shift. It must feel huge and crushing, not fast. Think stadium-sized: every drum hit is a cannon, the guitars are a wall. English rap vocals, one female voice only, no male vocals, no singing. 1:48 long, 100 BPM, 4/4, A minor. Clean lyrics.
+A HEAVY, POWERFUL, anthemic rap-rock / trap-metal track with ONE solo female rapper: the final round of a rap battle on a night shift. It must feel huge and crushing, not fast. Think stadium-sized: every drum hit is a cannon, the guitars are a wall. English rap vocals, one female voice only, no male vocals, no singing. 1:58 long, 100 BPM, 4/4, A minor. Clean lyrics.
 
 The sound:
 - Half-time drums: a massive kick and a giant snare with a big hall reverb on beat 3, slow and heavy, like stomping. Trap hi-hats only as a light shimmer on top.
@@ -222,8 +222,8 @@ Structure with timestamps (one bar = 2.4 seconds):
 0:48–1:07 Verse 2, RAP (8 bars): record scratch; louder, angrier, more weight.
 1:07–1:17 Hook (4 bars): the chant again, louder, more layers.
 1:17–1:26 Bridge (4 bars): everything drops away except a soft kick pulsing like a heartbeat and one high piano note repeating like a clock. She raps quietly, almost spoken, honest.
-1:26–1:46 Final (8 bars): everything back at once, the biggest and heaviest the song gets, a crash and a choir hit on every bar. The first four lines are the old chant "Tick-tock on the line", the last four are the hook, stacked and screamed.
-1:46–1:48 Ending: one huge hit on the downbeat of the last bar, then silence. No fade out.
+1:26–1:55 Final (12 bars): everything back at once, the biggest and heaviest the song gets, a crash and a choir hit on every bar. Only two things: first the old chant "Tick-tock on the line" four times, stacked and shouted (4 bars), then her old verse "You play, I pay" (8 bars), harder than ever. The last line is screamed.
+1:55–1:58 Ending: one huge hit on the downbeat of the last bar, then silence. No fade out.
 
 Lyrics (all by the one female rapper):
 
@@ -269,15 +269,19 @@ Somebody's waiting at the end of it
 You don't have to know, and that's alright
 Just keep the time tonight
 
-[Final – everything, screamed]
+[Final – everything]
 Tick-tock on the line, and nobody's gonna stop
 Tick-tock on the line, and nobody's gonna stop
 Tick-tock on the line, and nobody's gonna stop
 Tick-tock on the line, and nobody's gonna stop
-Hit it harder, I don't break
-Hit it harder, every box I take
-Hit it harder, shake the floor
-HIT IT HARDER, IS THAT ALL? GIVE ME MORE
+"Haeun, why so cold, did the night shift steal your heart?"
+That's what you said, so let me take it from the start
+Every time you start, I'm the one who has to finish
+You play, I pay. That's the difference.
+You don't know what I need, you don't know what I've seen
+Stay up on your stage, I'll stay down at the machine
+Call me stiff, call me slow, say I live by the clock
+BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
 
 [Ending]
 (one huge hit, then silence)
@@ -286,5 +290,5 @@ HIT IT HARDER, IS THAT ALL? GIVE ME MORE
 그래도 힘이 약하게 나오면 위 프롬프트 첫 단락만 아래로 바꿔서 다시 뽑는다(장르 단어를 더 세게):
 
 ```
-A brutally heavy, earth-shaking trap metal / nu-metal rap anthem with ONE solo female rapper. Crushing down-tuned guitars, slow pounding half-time drums, distorted 808 sub, epic dark choir and brass. Huge, menacing, triumphant, like a boss fight in a stadium. Power over speed. English rap vocals, one female voice only, no male vocals, no singing. 1:48 long, 100 BPM, 4/4, A minor. Clean lyrics.
+A brutally heavy, earth-shaking trap metal / nu-metal rap anthem with ONE solo female rapper. Crushing down-tuned guitars, slow pounding half-time drums, distorted 808 sub, epic dark choir and brass. Huge, menacing, triumphant, like a boss fight in a stadium. Power over speed. English rap vocals, one female voice only, no male vocals, no singing. 1:58 long, 100 BPM, 4/4, A minor. Clean lyrics.
 ```
