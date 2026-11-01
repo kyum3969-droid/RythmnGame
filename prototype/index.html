@@ -1045,40 +1045,37 @@ const LEVELS = [
   }
   ,{
     id:'s1-5', stageNo:'1-5', who:'지우 + 하은', role:'지우 · 하은 · 104 BPM · 벨트 둘', tag:'둘의 다툼 · 메탈', bpm:104, style:'duo15', fxTheme:'blues',
-    // 지우 is back (반장 is not in this one). 하은 loads the upper belt and 지우 the lower, and you scan
-    // both with one button as in 1-4, every light on the whole way. Every box on the beat (no off-beats for now: the staging of
-    // their fight is being rethought). No tutorial: the shift starts
-    // after the intro, in two phases, the music changing genre as the row grows. (The broken-motor rule that swung his belt
-    // and its tutorial are gone; the off-beat as a rule of its own is for stage 2's inspection.)
-    // Phase 1 (lo-fi): their bars trade over a sleepy lo-fi shuffle; 지우 dozes for a long stretch (the music sags like a slow
-    // tape) while 하은 works on alone; his future-funk track opens up when his earbuds go in and the camera is on him; he loads
-    // ragged and won't take them out; 하은 walks over and pulls his earbud out - a record scratch, the band cut;
-    // he snaps (누나, 대체 왜 그래요? 저도 제 리듬이 있다구요.), she: 니 맘대로 할 거면… 꺼져, 그냥. She shoves him aside and takes the middle.
-    // Phase 2 (악바리, heavy metal): she loads both belts on her own, long crates and taps trading between them, the tempo
-    // creeping up; a key change for the last stretch and a last hit on both belts; then only the motor.
-    show: true,   // 1-5's light show (drawShow15) and her rage aura
-    lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, allLit: true, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 232]],
-    // 하은 goes over to him (she leaves her belt, walks down to beside him), stands there through the row, pulls his earbud out
-    // at the record scratch, and walks back to start her metal; the camera closes in on him when his track opens and on the two
-    // of them for the row
-    // ...then shoves him aside (he stumbles back to the left and stays there, his earbud hanging) and takes the middle, between
-    // the belts, from where she loads both on her own (soloFrom: one loader, 하은)
-    visit: { go: [95.5, 99.5], back: [126, 128], x: 72, top: 92, yank: 104, shove: 122.3, to: 'center' },
-    stairs: { x: 86, dx: -2, dy: 7, steps: 4 },   // at the upper belt's left end, from her deck down to the floor
-    soloFrom: 128, metalShift: 3, farLoaderDy: 14, farLoaderDx: 10, oneSpot: { x: 80, top: 96 },
+    // 지우 is back (반장 is not in this one). 지우 loads the upper belt and 하은 the lower, and you scan both with one button as
+    // in 1-4, every light on the whole way, every box on the beat. Their fight is played on the belts: 지우 loads any old way and
+    // his boxes rock and fall off the upper belt onto hers ('d' on the lower belt: scanned at her gate), first by accident, more
+    // and more as he slacks. No tutorial: the shift starts after the intro, in two phases.
+    // Phase 1 (lo-fi, then his future funk): their bars, his boasting, a box of his falling onto her belt; he dozes (a cutscene);
+    // his track opens in his earbuds and his boxes rain onto her belt; she warns him twice, climbs the stairs to his deck, pulls
+    // his earbud out (a record scratch, the band cut), they row in the silence and she shoves him back along his deck.
+    // Phase 2 (a diss battle): her boom bap gone hard against his funk, bar for bar - her turns on her belt, his on his, and now
+    // he drops his boxes onto hers on purpose; then the two of them at once, and a last hit on both belts.
+    show: true,   // 1-5's light show (drawShow15) and their auras
+    lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 232]], unplugMuffle: false,
+    // the row: she crosses to the stairs at the upper belt's left end and climbs to his deck, stands with him, pulls his earbud
+    // out at the record scratch, shoves him back along his deck (he stares, then walks back to his belt) and goes back down
+    visit: { go: [95.5, 99.5], back: [126, 128], yank: 104, shove: 122.3, ret: [128.5, 130.5] },
+    stairs: { x: 86, dx: -2, dy: 7, steps: 4 },   // at the upper belt's left end, from his deck down to the floor
+    metalShift: 3, farLoaderDy: 14, farLoaderDx: 22, dropLead: 1,
+    // phase 2's turns, by bar: hers, his, or both at once
+    battle: { h: [[32, 36], [38, 40], [42, 43], [44, 45]], j: [[36, 38], [40, 42], [43, 44], [45, 46]] },
     // the camera (no box lands while it is in close or easing out): his doze as a cutscene (him nodding off, her watching,
     // the two of them as she wakes him), his track opening, and the row: the two of them, then him knocked back and staring
-    camPlay: [[40.5, 46, { x: 54, y: 102, k: 2.2 }], [46, 57, { x: 92, y: 84, k: 2 }], [57, 62.5, { x: 72, y: 98, k: 1.5 }],
-      [72, 78, { x: 58, y: 112, k: 1.6 }], [96, 122.3, { x: 70, y: 114, k: 1.4 }], [122.3, 128, { x: 46, y: 108, k: 1.6 }]],
+    camPlay: [[40.5, 46, { x: 104, y: 84, k: 2.2 }], [46, 57, { x: 56, y: 108, k: 2 }], [57, 62.5, { x: 76, y: 96, k: 1.5 }],
+      [72, 78, { x: 104, y: 84, k: 1.8 }], [96, 122.3, { x: 90, y: 92, k: 1.5 }], [122.3, 128, { x: 108, y: 88, k: 1.6 }]],
     cutscene: [[40.5, 62.5], [96, 128]],   // letterboxed
-    devMarks: [[0, '처음'], [16, '대회 얘기'], [36, '졸음 컷씬'], [68, '지우 음악'], [92, '이어폰·다툼·밀치기'], [128, '2페이즈 메탈'], [164, '정점 1'], [196, '정점 2 (전조)'], [212, '마지막 한 방']],
-    farBeltLeft: 36,   // the upper belt runs on to the left, past her legs, up to the stairs
-    heads: { h: [92, 60], j: [50, 92], v: [72, 86], k: [24, 90] },
+    devMarks: [[0, '처음'], [16, '대회 얘기'], [36, '졸음 컷씬'], [68, '지우 음악·떨어뜨림'], [92, '이어폰·다툼·밀치기'], [128, '2페이즈 디스 배틀'], [168, '둘이 동시에'], [184, '끝판'], [212, '마지막 한 방']],
+    farBeltLeft: 36,   // the upper belt runs on to the left, past his legs, up to the stairs
+    heads: { j: [104, 58], h: [52, 82], v: [86, 58], k: [130, 58] },
     clock:'03:20', title:'꿈', offTilt: true,
     chords: S15.lofi.ch, roots: S15.lofi.rt, chordAt: bar => bar % 4,
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 232,
-    hints: false, special:['긴 화물', 'len', '끝까지'],
-    sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [32, 'metal'], [54, 'finale'], [55, 'end'], [56, 'outro']],
+    hints: false, special:['떨어진 상자', 'drop', '받아냄'],
+    sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [32, 'diss'], [54, 'finale'], [55, 'end'], [56, 'outro']],
     // phase 2 runs away with her, a step at a time, up to 112 for the last four bars
     tempo: [[0, 104], [136, 106], [144, 108], [160, 110], [200, 112]],
     // upper belt: 하은, on the beat (8 cells; h= a long crate, held). Phase 1: her taps and long crates on their own, and alone
@@ -1088,36 +1085,37 @@ const LEVELS = [
     // her straight belt on the gallop's triplet grid (12 cells a bar, like the music: the beat and two thirds in, then the
     // whole triplet), and now and then a single box drops onto his belt on a swung 'and' (two thirds in, the gallop's own
     // slot) where hers has a gap, never together with one of hers; the last bar all hers. Then the last hit on both belts
+    // upper belt: 지우 (8 cells, every box on the beat). Phase 1: his bars, sparse after his doze and in his music. Phase 2: his
+    // turns, and both of them at once at the end
     bars: [
-      '........', '........',
-      '........', '........', 'h===..x.', 'x.x.x...', '........', '........', 'x...x...', 'h===....',
-      '........', '........', '........', '........', '........', '........', '..x.x...', 'x.x.....',
-      '........', '........', 'x...x...', 'x...x...', 'h===..x.', 'x...x...', '........', '........',
-      '........', '........', '........', '........', '........', '........',
-      '........', '..x...x.', 'x.....x.', 'x...h=..', 'x.....x.', 'x...h=..',
-      'h===....', 'h===....', 'x.....x.', 'x...h=..', 'x.x.x.x.', 'x.x.x.x.',
-      'x.x.x.x.', 'x.x.x.x.', 'h===....', 'h===....', 'x.....x.', 'x...h=..',
-      'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.......',
-      '........', '........', '........'
-    ],
-    // lower belt: 8 cells, or 12 (the shuffle's grid) where his 'and's are, two thirds into the beat. Phase 1: 지우's bars, his doze (bars 10-15 empty) and his rush on waking,
-    // ragged with his earbuds in. Phase 2: 하은's, on the beat, answering her upper belt
-    bars2: [
       '........', '........',
       'x...x...', 'x.x.x...', '........', '........', 'x.x.x.x.', 'x...x.x.', '..x...x.', '....x.x.',
       '........', '........', '........', '........', '........', '........', '......x.', '........',
       '........', '........', '......x.', '........', '....x...', '........', '........', '........',
       '........', '........', '........', '........', '........', '........',
-      '........', '........', '....h=..', '......x.', '....h=..', '......x.',
-      '....h===', '....h===', '..x.h=..', '..x...x.', '........', '........',
-      '........', '........', '....h===', '....h===', '..x.h=..', '..x...x.',
-      '........', '........', '........', '........', 'x.......',
+      '........', '........', '........', '........', 'x...x...', 'x.x.....', '........', '........',
+      'x...x...', 'x.x.x...', '........', 'x...x...', '........', 'x...x...', '....h===', '....h===',
+      '....x...', 'x.x.x...', 'x...x...', 'x.x.x...', 'x.x.x.x.', 'x.x.x.x.', 'x.......',
+      '........', '........', '........'
+    ],
+    // lower belt: 하은 (8 cells, on the beat; h= a long crate, held) and the boxes he drops onto it ('d': they come along the
+    // upper belt, rock, fall off a beat before her gate and are scanned there). Phase 1: her bars, two of his falling by
+    // accident, then a rain of them while he is in his music. Phase 2: her turns, his turns dropping onto her on purpose, both
+    bars2: [
+      '........', '........',
+      '........', '......d.', 'h===..x.', 'x.x.x...', '........', '..d.....', 'x...x...', 'h===....',
+      '........', '........', '........', '........', '........', '........', '..x.x...', 'x.x...d.',
+      '........', '........', 'x.d.x...', 'x.d.x.d.', 'h===..x.', 'x.d.x.d.', '........', '........',
+      '........', '........', '........', '........', '........', '........',
+      '........', 'x...x...', 'x.x.x.x.', 'x...h=..', '..d...d.', '....d.d.', 'x.x.x.x.', 'h===..x.',
+      '..d...d.', '......d.', 'x.x.x.x.', '..d...d.', 'x.x.x.x.', '..d...d.', 'h===....', 'h===....',
+      '..d...d.', '......d.', '..d...d.', '......d.', 'x...x...', 'x...x...', 'x.......',
       '........', '........', '........'
     ],
     // [beat, text, beats shown, lane, speaker]: 'h' 하은 (upper loading end), 'j' 지우 (lower), 'v' 하은 beside him, 'k' 지우 shoved aside
-    say: [[9, '누나, 이 비트 들어봐요!', 3, 1, 'j'], [12.5, '…일이나 해.', 2, 0, 'h'],
+    say: [[9, '누나, 이 비트 들어봐요!', 3, 0, 'j'], [12.5, '…일이나 해.', 2, 1, 'h'], [15.6, '앗, 죄송!', 1.5, 0, 'j'],
           // his plans out loud, and her answer is her watch (what she has room for is shown, never said)
-          [24, '형, 저 이 곡으로 대회 나갈 거예요!', 3.5, 1, 'j'], [28.5, '(시계를 본다)', 2, 0, 'h'],
+          [22, '형, 저 이 곡으로 대회 나갈 거예요!', 3.5, 0, 'j'], [26, '(시계를 본다)', 2, 1, 'h'],
           [41, '(꾸벅…)', 2.5, 1, 'j'], [47, '…지우?', 2, 0, 'h'], [53, '하… 진짜.', 2.5, 0, 'h'], [58.5, '(드르렁…)', 2, 1, 'j'],
           [61, '…야. 지우.', 1.5, 0, 'h'], [62.5, '넵! 안 잤어요!', 2.5, 1, 'j'], [66, '침이나 닦아.', 2, 0, 'h'],
           [73, '(흥얼흥얼) 여기서 드롭…!', 3.5, 1, 'j'], [81, '이어폰 빼.', 2, 0, 'h'], [83, '한 곡만요, 딱 한 곡만!', 3, 1, 'j'],
@@ -1130,7 +1128,7 @@ const LEVELS = [
     intro: [
       { who:'', text:'며칠 뒤. 명절 물량은 그대로다.' },
       { who:'지우', text:'형! 저 왔어요! …아, 누나가 하은 누나죠? 지우예요! 잘 부탁해요!' },
-      { who:'하은', text:'(시계를 본다) …응. 위는 내가.' }],
+      { who:'하은', text:'(시계를 본다) …응. 아래는 내가.' }],
     // the outro sets up 1-6 (her last night, her mother in hospital) without saying any of it: she is gone the moment the shift
     // ends, and on the notice board 지우 finds next week's rota with her name in every row, day and night; he puts his earbuds away
     outro: (good) => good ? [
@@ -1253,7 +1251,7 @@ function loadLevel(level) {
       const ch = bar[c]; if (ch === '.' || ch === '=') continue;
       let len = 0;
       if (ch === 'h') { let k = c + 1, cnt = 1; while (bar[k] === '=' || bar[k] === 'o') { cnt++; k++; } len = cnt / div; }
-      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : ch === 'P' ? -0.5 : ch === 'R' ? 0.5 : 0), beat0: bi * 4 + c / div + (ch === 'Q' ? 0.5 : 0), push: ch === 'P' || ch === 'Q', grab: ch === 'R', len, late: ch === 'L' || ch === 'Q', heavy: ch === 'H', gtr: ch === 'G', jam: ch === 'j', shuffle: div === 3 && c % 3 === 2, off: ch === 'P' || ch === 'R' || (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane });
+      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : ch === 'P' ? -0.5 : ch === 'R' ? 0.5 : 0), beat0: bi * 4 + c / div + (ch === 'Q' ? 0.5 : 0), push: ch === 'P' || ch === 'Q', grab: ch === 'R', len, late: ch === 'L' || ch === 'Q', heavy: ch === 'H', gtr: ch === 'G', jam: ch === 'j', drop: ch === 'd', shuffle: div === 3 && c % 3 === 2, off: ch === 'P' || ch === 'R' || (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane });
     }
   }));
   // a swung belt: a box written on the 'and' lands two thirds into the beat
@@ -1281,6 +1279,9 @@ function prepNote(n, i, level) {
   if (n.push) { n.arr0 = timeAt(n.beat0); n.place = n.arr0 - TRAVEL * SPB; n.tPush = n.arr0 - (SCAN_X - INSPECT_X) / SPEED; n.k = (SCAN_X - INSPECT_X) / ((n.arr - n.tPush) * SPEED); }
   // a grabbed box rides to her post, waits there in her hand for the half beat, and goes on at the belt's speed
   if (n.grab) { n.arr0 = timeAt(n.beat0); n.place = n.arr0 - TRAVEL * SPB; n.tPass = n.arr0 - (SCAN_X - INSPECT_X) / SPEED; n.tRel = n.tPass + (n.arr - n.arr0); }
+  // a dropped box ('d' on the lower belt, 1-5): loaded onto the upper belt by its loader, it rides there, wobbles and falls off
+  // onto the lower belt dropLead beats before it reaches the gate (the fall takes a quarter of a beat), and is scanned below
+  if (n.drop) { n.tFall = timeAt(n.beat - (level.dropLead || 1)); n.fallDur = 0.25 * SPB; }
   if (n.jam && level.jam) { const m = n.jg.length, R = n.jg[0].beat - level.jam.dash; n.leave = timeAt(n.beat - level.jam.dash); n.jR = timeAt(R); n.place = timeAt(Math.floor(R - 1) - (m - 1 - n.jk)); }
   if (n.len) { n.w = Math.round((n.end - n.arr) * SPEED) + 16; n.h = 12; }
   else if (n.heavy) { n.w = 26 + Math.floor(rnd(i, 1) * 5); n.h = 17 + Math.floor(rnd(i, 2) * 4); }
@@ -1738,13 +1739,13 @@ function basePose(t, bt, active, lane = 0) {
   if (pose.doze) pose.bob = 0;
   let cur = null;
   for (const n of notes) {
-    if (n.lane !== lane || n.toss) continue;
+    if (loadLane(n) !== lane || n.toss) continue;
     if (n.late && t > n.place - SPB && t < n.place + 0.4 * SPB) { pose.wince = !pose.doze && !pose.vibe; pose.dip = pose.vibe ? 0 : 2; }
     if (n.place - n.carry <= t) cur = n;
   }
   if (L.lanes === 2) {
-    const nxt = notes.find(n => n.lane === lane && !n.toss && n.state === 'pending' && n.place > t);
-    if (nxt && nxt.place - t < SPB * 1.5 && !notes.some(n => n.lane === lane && n.place < nxt.place && n.place > nxt.place - 4 * SPB)) pose.wave = true;
+    const nxt = notes.find(n => loadLane(n) === lane && !n.toss && n.state === 'pending' && n.place > t);
+    if (nxt && nxt.place - t < SPB * 1.5 && !notes.some(n => loadLane(n) === lane && n.place < nxt.place && n.place > nxt.place - 4 * SPB)) pose.wave = true;
   }
   if (!cur) return pose;
   if (L.daw) {
@@ -1769,13 +1770,14 @@ function basePose(t, bt, active, lane = 0) {
 // belt from her hip, and alone between the belts from beside her on either side
 function carryFrom(n) {
   if (L.lanes === 2 && DUO.mode !== 'two' && L.oneSpot) return n.lane === 0 ? { x: 47, y: 155, arc: 8 } : { x: 70, y: 122, arc: 6 };
-  if (L.lanes === 2 && DUO.mode === 'two' && n.lane === 0 && L.farLoaderDy) return { x: 54, y: 132, arc: 8 };
+  if (L.lanes === 2 && DUO.mode === 'two' && loadLane(n) === 0 && L.farLoaderDy) return { x: 54, y: 132, arc: 8 };
   return { x: L.lanes === 2 ? 28 : 16, y: 112, arc: 14 };
 }
 function carryPos(n, p) {
   const q = Math.max(0, Math.min(1, p)), f = carryFrom(n);
   return { x: lerp(f.x, PLACE_X, q), y: lerp(f.y, BELT_Y - n.h / 2, ease(q)) - Math.sin(Math.PI * q) * f.arc };
 }
+const loadLane = n => n.drop ? 0 : n.lane;   // a dropped box is loaded by the upper belt's loader
 const bodyTop = (base, pose) => base + pose.dip + pose.bob + pose.nod;
 
 function eighthNote(x, y, c) { R(x, y + 3, 2, 2, c); R(x + 1, y - 2, 1, 5, c); R(x + 2, y - 2, 2, 1, c); R(x + 3, y - 1, 1, 1, c); }
@@ -2156,6 +2158,8 @@ const beltClockT = (t, lane = 0) => timeAt(beltBeat(beatAt(t), lane));
 const SHOW15 = { lastB: -1e9 };
 // 1-5: the metal and what follows it are written from bar 29; a level that lengthens the silence before it (metalShift, in
 // bars) moves them later, so their beats are counted back to where they were written
+// 1-5's diss battle: whose turn a bar is ('h' her, 'j' his, 'both' when it is not one of theirs)
+const battleAt = bar => { const B = L.battle; if (!B) return 'both'; if (B.h.some(([a, z]) => bar >= a && bar < z)) return 'h'; if (B.j.some(([a, z]) => bar >= a && bar < z)) return 'j'; return 'both'; };
 const sh15 = sec => sec === 'metal' || sec === 'together' || sec === 'finale' || sec === 'end' || sec === 'outro' ? (L.metalShift || 0) * 4 : 0;
 function drawShow15(t, nowMs) {
   const bA = beatAt(t), sec = sectionAt(Math.floor(bA / 4)), b = bA - sh15(sec), fb = Math.floor(b), bar = Math.floor(b / 4), ph = b - fb, inBar = ((fb % 4) + 4) % 4;
@@ -2201,6 +2205,17 @@ function drawShow15(t, nowMs) {
     ember(late ? ['#ff5a2a', '#5ad7ff', '#ffffff'] : ['#ff5a2a', '#5ad7ff']);
     return;
   }
+  if (sec === 'diss') {
+    // the battle: the room takes the colour of whoever has the turn (hers red, his cyan; both, it flips on every beat), a
+    // flash on each snare, the floor thumping on every beat (harder when they go at once, hardest in the last six bars)
+    const who = battleAt(bar), last = bar >= 48, red = who === 'h' || (who === 'both' && fb % 2 === 0);
+    tint(red ? '255,110,90' : '120,200,255', 0.38 + (last ? 0.1 : 0)); add(red ? '255,60,40' : '60,190,255', 0.03 + 0.08 * hit);
+    if (inBar === 1 || inBar === 3) add('255,255,255', (last ? 0.18 : 0.12) * Math.max(0, 1 - ph * 6));
+    FX.rumble = (last ? 2.6 : who === 'both' ? 2 : 1.4) * Math.max(0, 1 - ph * 4);
+    if (crossed && inBar === 0) punch(last ? 1.05 : 1.03, 140, 2);
+    ember(red ? ['#ff5a2a', '#ffb03a'] : ['#5ad7ff', '#bfe9ff']);
+    return;
+  }
   if (sec === 'finale') { add('255,255,255', 0.95 * Math.exp(-(b - 204) * 1.4)); if (crossed && inBar === 0) punch(1.14, 600, 5); return; }
   if (sec === 'end' || sec === 'outro') dim(0.35);
 }
@@ -2208,10 +2223,12 @@ function drawShow15(t, nowMs) {
 function drawRage15(t, nowMs, who) {
   const bA = beatAt(t), sec = sectionAt(Math.floor(bA / 4)), b = bA - sh15(sec), bar = Math.floor(b / 4), e = Math.max(0, 1 - (b % 1) * 3);
   let k = 0;
-  if (who === 'h') k = sec === 'metal' ? (bar < 31 ? 0.25 : bar === 35 || bar === 36 ? 0.95 : 0.7) : sec === 'together' ? 0.6 : sec === 'finale' ? 0.9 : 0;
+  if (sec === 'diss') { const turn = battleAt(bar); k = turn === who ? 0.85 : turn === 'both' ? 0.7 : 0.2; }
+  else if (who === 'h') k = sec === 'metal' ? (bar < 31 ? 0.25 : bar === 35 || bar === 36 ? 0.95 : 0.7) : sec === 'together' ? 0.6 : sec === 'finale' ? 0.9 : 0;
   else k = sec === 'together' && bar >= 42 ? 0.6 : sec === 'finale' ? 0.9 : 0;
   if (k <= 0) return;
-  const solo = DUO.mode === 'one', hx = who === 'h' ? (solo ? soloSpot().x : haeunHome().x) : BOSS_X + LANE_DX[1], cy = who === 'h' ? (solo ? soloSpot().top + 24 : haeunHome().top + 24) : 118, col = who === 'h' ? '255,90,40' : '80,210,255';
+  // round whoever it is, at their belt (or 하은 in the middle when she loads both)
+  const solo = DUO.mode === 'one' && who === 'h', o = placerOff(Math.max(0, L.partners.indexOf(who === 'h' ? 'haeun' : 'jiwoo'))), hx = solo ? soloSpot().x : BOSS_X + o.dx, cy = solo ? soloSpot().top + 24 : 86 + o.dy + 24, col = who === 'h' ? '255,90,40' : '80,210,255';
   g.save(); g.globalCompositeOperation = 'lighter';
   const gr = g.createRadialGradient(hx, cy, 3, hx, cy, 36 + 8 * e); gr.addColorStop(0, `rgba(${col},${(0.45 + 0.3 * e) * k})`); gr.addColorStop(1, `rgba(${col},0)`);
   g.fillStyle = gr; g.beginPath(); g.ellipse(hx, cy, 24 + 6 * e, 40 + 6 * e, 0, 0, Math.PI * 2); g.fill();
@@ -2222,40 +2239,46 @@ function drawRage15(t, nowMs, who) {
 // over the half beat before each lands there (a whoosh as it leaves her)
 function visitAt(b) {
   const V = L.visit; if (!V || b < V.go[0] || b >= V.back[1]) return null;
-  const home = haeunHome(), dest = { x: V.x, top: V.top }, end = V.to === 'center' ? soloSpot() : home;
+  const S = L.stairs, deck = haeunHome().top, home = { x: BOSS_X + LANE_DX[1], top: 86 }, bot = { x: S.x + S.dx * S.steps, top: deck + S.dy * S.steps }, top = { x: S.x, top: deck };
+  // a step at a time up (or down) the stairs: p runs 0 (bottom) to 1 (top)
+  const onStairs = p => { const q = p * S.steps, k = Math.min(S.steps - 1, Math.floor(q)), f = q - k; return { x: bot.x - S.dx * (k + f), top: bot.top - S.dy * (k + ease(Math.min(1, f * 1.6))) }; };
   if (b < V.go[1]) {
-    const q = (b - V.go[0]) / (V.go[1] - V.go[0]), S = L.stairs;
-    if (!S) { const p = ease(q); return { x: lerp(home.x, dest.x, p), top: lerp(home.top, dest.top, p), walk: true, back: false }; }
-    // by the stairs: along her deck behind the belt to the top step, down the steps one at a time, onto the floor to him
-    if (q < 0.2) return { x: lerp(home.x, S.x, q / 0.2), top: home.top, walk: true, back: false, deck: true };
-    if (q < 0.8) { const p = (q - 0.2) / 0.6 * S.steps, k = Math.min(S.steps - 1, Math.floor(p)), f = p - k; return { x: S.x + S.dx * (k + f), top: home.top + S.dy * (k + ease(Math.min(1, f * 1.6))), walk: true, back: false }; }
-    const p = ease((q - 0.8) / 0.2); return { x: lerp(S.x + S.dx * S.steps, dest.x, p), top: lerp(home.top + S.dy * S.steps, dest.top, p), walk: true, back: false };
+    // across from her belt to the foot of the stairs, then up them to his deck
+    const q = (b - V.go[0]) / (V.go[1] - V.go[0]);
+    if (q < 0.35) { const p = ease(q / 0.35); return { x: lerp(home.x, bot.x, p), top: lerp(home.top, bot.top, p), walk: true, right: true }; }
+    return { ...onStairs((q - 0.35) / 0.65), walk: true, right: true };
   }
   const hit = at => at != null && b >= at - 0.5 && b < at + 0.6 ? Math.max(0, 1 - Math.abs(b - at) * 2) : null;
-  if (b < V.back[0]) return { x: dest.x, top: dest.top, walk: false, yank: hit(V.yank) ?? hit(V.shove) };
-  const p = ease((b - V.back[0]) / (V.back[1] - V.back[0])); return { x: lerp(dest.x, end.x, p), top: lerp(dest.top, end.top, p), walk: true, back: end.x > dest.x };
+  if (b < V.back[0]) return { x: top.x, top: top.top, walk: false, right: true, yank: hit(V.yank) ?? hit(V.shove) };
+  // and back down to her belt
+  const q = (b - V.back[0]) / (V.back[1] - V.back[0]);
+  if (q < 0.65) return { ...onStairs(1 - q / 0.65), walk: true, right: false };
+  const p = ease((q - 0.65) / 0.35); return { x: lerp(bot.x, home.x, p), top: lerp(bot.top, home.top, p), walk: true, right: false };
 }
-// 지우 once she has shoved him: he stumbles back to behind 반장's crate and stands there, his earbud hanging
-// he is thrown back hard (out fast, leaning back, a hop, two stumbling steps), the room jolts with a thud and dust, white
-// streaks where he was; then he stands there behind 반장 staring, eyes wide and mouth open, a '?' over him, and when he finds
-// his voice (와… 진짜 밀었어요?) his hands come up and a bead of sweat runs down
+// 지우 once she has shoved him (1-5): thrown back along his deck behind the upper belt (out fast, leaning back, a hop, two
+// stumbling steps; the room jolts with a thud, dust off the belt, white streaks where he stood, his earbud flying), then he
+// stands there staring, eyes wide and mouth open, a '?' over him, and when he finds his voice (와… 진짜 밀었어요?) his hands
+// come up and a bead of sweat runs down; then he walks back to his belt (V.ret)
+const shovedAt = b => { const V = L.visit; return !!V && V.shove != null && b >= V.shove && b < (V.ret ? V.ret[1] : Infinity); };
 function drawShoved(b, nowMs) {
-  const V = L.visit; if (!V || V.shove == null || b < V.shove) return false;
-  const d = b - V.shove, q = Math.min(1, d / 0.7), p = 1 - Math.pow(1 - q, 3), x0 = BOSS_X + LANE_DX[1], x1 = 24, x = lerp(x0, x1, p);
-  const hop = Math.round(Math.sin(q * Math.PI) * -4) + (d > 0.7 && d < 1.1 ? Math.round(Math.sin((d - 0.7) / 0.4 * Math.PI) * -1) : 0);
-  const lean = d < 1.2 ? -0.28 * Math.sin(Math.min(1, d / 1.2) * Math.PI) : 0;
+  const V = L.visit; if (!shovedAt(b)) return false;
+  const o = placerOff(0), x0 = BOSS_X + o.dx, x1 = x0 + 26, d = b - V.shove, q = Math.min(1, d / 0.7), p = 1 - Math.pow(1 - q, 3);
+  const back = V.ret && b >= V.ret[0] ? ease((b - V.ret[0]) / (V.ret[1] - V.ret[0])) : 0, x = lerp(lerp(x0, x1, p), x0, back);
+  const hop = Math.round(Math.sin(q * Math.PI) * -4) + (d > 0.7 && d < 1.1 ? Math.round(Math.sin((d - 0.7) / 0.4 * Math.PI) * -1) : 0) + (back > 0 && back < 1 && Math.floor(nowMs / 150) % 2 ? 1 : 0);
+  const lean = d < 1.2 ? 0.28 * Math.sin(Math.min(1, d / 1.2) * Math.PI) : 0;
   if (d < 0.6 && !FX.shoveFx) {
     FX.shoveFx = true; FX.shakeUntil = nowMs + 380; FX.shakeAmp = 4; FX.flinch = nowMs;
     if (ctx) { const T = ctx.currentTime; thud(T, 1.4); noise(T, 'bandpass', 1600, 0.3, 0.14, 1.2, bus); [0.28, 0.45].forEach((k, j) => thud(T + k * SPB * 2, 0.35 - j * 0.1)); }
-    if (!reduce) { spawn(x0, BELT_Y + 2, 14, ['#8a7a68', '#6d6052', '#b8a890'], -90, 10, -60, -15, 260, 600); spawn(x0 + 4, 96, 1, ['#f4f1ea'], 30, 50, -90, -70, 420, 700, [2, 2]); }
+    if (!reduce) { spawn(x0, farY(BELT_Y) - 2, 14, ['#8a7a68', '#6d6052', '#b8a890'], -10, 90, -60, -15, 260, 600); spawn(x0 - 4, 70, 1, ['#f4f1ea'], -50, -30, -90, -70, 420, 700, [2, 2]); }
   }
   // the streaks he leaves
-  if (d < 0.5) { const a = 1 - d / 0.5; g.fillStyle = `rgba(255,255,255,${0.7 * a})`; for (let k = 0; k < 5; k++) g.fillRect(Math.round(x + 10), 92 + k * 9 + (k % 2) * 3, Math.round((x0 - x) + 14 - k * 3), 1); }
-  const stare = d >= 0.9, talk = inRange(b, [[V.shove + 4.2, V.shove + 7]]);
-  const pose = { hand: talk ? { x: BOSS_X + 11, y: 114 } : { x: BOSS_X + 4, y: 128 }, carry: null, wince: !stare, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: true, lane: 1, beat: b };
-  const fx = Math.round(x - BOSS_X), feet = 148;
-  g.save(); g.translate(fx, hop); g.translate(BOSS_X, feet); g.rotate(lean); g.translate(-BOSS_X, -feet);
-  PARTNERS.jiwoo.draw(pose, nowMs, true); PARTNERS.jiwoo.arm(pose);
+  if (d < 0.5) { const a = 1 - d / 0.5; g.fillStyle = `rgba(255,255,255,${0.7 * a})`; for (let k = 0; k < 5; k++) { const len = Math.round((x - x0) + 14 - k * 3); g.fillRect(Math.round(x - 10 - len), 70 + k * 8 + (k % 2) * 3, Math.max(0, len), 1); } }
+  const stare = d >= 0.9 && back === 0, talk = inRange(b, [[V.shove + 4.2, V.shove + 7]]);
+  const pose = { hand: talk ? { x: BOSS_X + 11, y: 114 } : { x: BOSS_X + 4, y: 128 }, carry: null, wince: d < 0.9, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: true, lane: 0, beat: b };
+  const feet = 148;
+  g.save(); clipBehindUpper(); g.translate(Math.round(x - BOSS_X), o.dy + hop); g.translate(BOSS_X, feet); g.rotate(lean); g.translate(-BOSS_X, -feet);
+  if (back > 0 && back < 1) { g.translate(BOSS_X, 0); g.scale(-1, 1); g.translate(-BOSS_X, 0); }   // facing the way he walks back
+  PARTNERS.jiwoo.draw(pose, nowMs, true);
   if (stare) {
     // the face gone blank: brows up, wide eyes, mouth open
     const cx = BOSS_X, top = bodyTop(84, pose), ink = C.ink;
@@ -2267,6 +2290,8 @@ function drawShoved(b, nowMs) {
     if (talk) { const k = ((b - V.shove - 4.2) / 2.8); R(cx - 9, top + 3 + Math.round(k * 6), 2, 3, C.sweat); }
   }
   g.restore();
+  // his arms above the belt (screen space, like his loading arm): hanging, or up when he speaks
+  g.save(); g.translate(Math.round(x - BOSS_X), o.dy + hop); PARTNERS.jiwoo.arm(pose); g.restore();
   return true;
 }
 // 하은 on her visit, drawn in front of the lower belt
@@ -2274,10 +2299,7 @@ function drawVisit(b, nowMs) {
   const v = visitAt(b); if (!v) return;
   // she lunges into the shove
   const lunge = L.visit.shove != null && b >= L.visit.shove - 0.3 && b < L.visit.shove + 0.6 ? Math.round(Math.sin((b - L.visit.shove + 0.3) / 0.9 * Math.PI) * 4) : 0;
-  // on her deck the upper belt still hides her legs (up to its left end)
-  g.save(); if (v.deck) { g.beginPath(); g.rect(0, 0, W, farY(BELT_Y) + 2); g.rect(0, 0, Math.round(farX(L.farBeltLeft != null ? L.farBeltLeft : 48)), H); g.clip(); }
-  drawHaeunAt(Math.round(v.x) - lunge, Math.round(v.top), nowMs, v.walk ? { step: Math.floor(nowMs / 150) % 2, mirror: v.back } : v.yank != null ? { tap: v.yank } : { rest: true });
-  g.restore();
+  drawHaeunAt(Math.round(v.x) + (v.right ? lunge : -lunge), Math.round(v.top), nowMs, v.walk ? { step: Math.floor(nowMs / 150) % 2, mirror: v.right } : v.yank != null ? { tap: v.yank, mirror: v.right } : { rest: true, mirror: v.right });
   if (L.visit.yank != null && b >= L.visit.yank && b < L.visit.yank + 0.4 && ctx && !FX.yankFx) { FX.yankFx = true; noise(ctx.currentTime, 'bandpass', 3000, 0.2, 0.05, 2, bus); }
 }
 function drawTosses(t) {
@@ -2756,7 +2778,9 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
     g.save(); g.beginPath(); g.rect(49, -dy, W, H); g.clip();
     const boxQ = [];
     for (const n of notes) {
-      if (n.lane !== lane) continue;
+      const vl = n.drop ? (t < n.tFall ? 0 : t < n.tFall + n.fallDur ? -1 : n.lane) : n.lane;
+      if (vl === -1 && lane === 1) { laneFx.dropping = laneFx.dropping || []; laneFx.dropping.push(n); continue; }
+      if (vl !== lane) continue;
       if (t < n.place) break;
       let cx = n.jam && L.jam ? jamX(n, t) : n.bb != null ? SCAN_X + (beltBeat(beatAt(t), lane) - n.bb) * SPEED * SPB : noteX(n, t);
       if (n.jam && L.jam && active && !n.jamFx && t >= n.leave) { n.jamFx = true; jamSfx(n.jk === 0); }
@@ -2798,6 +2822,8 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
       }
       // an off-beat box was set down crooked: it leans, and its tape is red
       if (n.jam && t >= n.leave && t < n.arr) for (let k = 0; k < 3; k++) R(Math.round(x - n.w / 2 - 6 - k * 5), BELT_Y - 4 - k * 4, 4 + k, 1, 'rgba(255,255,255,.55)');   // thrown: speed lines
+      // a box he set down any old way: it rocks harder and harder and goes over the edge
+      if (n.drop && t < n.tFall) { const w = Math.max(0, 1 - (n.tFall - t) / (0.75 * SPB)); g.save(); g.translate(x, BELT_Y); g.rotate(Math.sin(t * 38) * 0.08 * w + 0.35 * w * w * w); drawBox(n, 0, 0, n.state, t, sq); g.restore(); continue; }
       if (n.off && L.offTilt && !n.top) { g.save(); g.translate(x, BELT_Y); g.rotate((n.i % 2 ? 1 : -1) * 0.12); drawBox(n, 0, 0, n.state, t, sq); g.restore(); }
       else drawBox(n, x, n.top ? BELT_Y - 12 : BELT_Y, n.state, t, sq);
     }
@@ -2813,10 +2839,19 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   const armFirst = !far && L.oneSpot && DUO.mode !== 'two';
   if (armFirst) drawPartnerArmOf(pid, pose, lane);
   if (pose.carry) drawBox(pose.carry.n, pose.carry.x, pose.carry.y + pose.carry.n.h / 2, '', t);
-  if (!far && !armFirst && !(active && L.visit && L.visit.shove != null && beatAt(t) >= L.visit.shove && DUO.mode === 'two')) drawPartnerArmOf(pid, pose, lane);
+  if (!far && !armFirst && !(active && L.visit && visitAt(beatAt(t)))) drawPartnerArmOf(pid, pose, lane);
   g.restore();
   // the arm to the far belt is drawn in screen space so it stays on the body; only the hand goes through the perspective
-  if (far && DUO.mode === 'two' && !(active && L.visit && visitAt(castBeatAt(t, active)))) { const who = pid, o = placerOff(0), h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
+  if (far && DUO.mode === 'two' && !(active && shovedAt(castBeatAt(t, active)))) { const who = pid, o = placerOff(0), h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
+}
+// a dropped box in the air: off the upper belt's edge (its far, smaller picture) down onto the lower belt, turning over; a thud,
+// a puff of dust and a jolt when it lands
+function drawDropFall(n, t, nowMs) {
+  const p = Math.min(1, (t - n.tFall) / n.fallDur), x = SCAN_X + (t - n.arr) * SPEED;
+  const x0 = farX(x), y0 = farY(BELT_Y), k = lerp(FAR.k, 1, p), y = lerp(y0, BELT_Y, p * p) - Math.sin(Math.PI * p) * 6;
+  g.save(); g.translate(lerp(x0, x, p), y); g.rotate(0.35 + p * 0.9); g.scale(k, k); drawBox(n, 0, 0, '', t); g.restore();
+  if (p > 0.85 && !n.dropFx) { n.dropFx = true; if (ctx) thud(ctx.currentTime, 0.5); FX.shakeUntil = Math.max(FX.shakeUntil, nowMs + 90);
+    if (!reduce) spawn(x, BELT_Y - 2, 7, ['#8a7a68', '#6d6052', '#b8a890'], -50, 50, -50, -15, 260, 450); }
 }
 // 1-5: metal stairs from her deck behind the upper belt down to the floor at its left end: a landing at the deck's height,
 // four steps (tread and riser), a stringer under them and a hand rail on posts
@@ -3614,7 +3649,7 @@ function drawScene(t, bt, active, nowMs) {
   if (L.lanes === 2) {
     const mb = castBeatAt(t, active); DUO.mode = duoMode(mb); if (L.soloFrom != null) L.partners[1] = active && mb >= L.soloFrom ? 'haeun' : 'jiwoo'; DUO.p = L.handover ? Math.max(0, Math.min(1, (mb - L.handover[0]) / (L.handover[1] - L.handover[0]))) : 1;
     if (DUO.mode !== 'two' && L.coScanner) drawHaeunScene(mb, upperKick, nowMs, active);
-    if (DUO.mode === 'two') { const fa = active ? feverAura(mb) : 0; if (fa) drawHaeunAura(mb, fa, nowMs, false); if (L.show && active) { drawRage15(t, nowMs, 'h'); drawRage15(t, nowMs, 'j'); } if (!(active && visitAt(mb))) { g.save(); clipBehindUpper(); { const o = placerOff(0); g.translate(o.dx, o.dy); } drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); } if (fa) drawHaeunAura(mb, fa, nowMs, true); }
+    if (DUO.mode === 'two') { const fa = active ? feverAura(mb) : 0; if (fa) drawHaeunAura(mb, fa, nowMs, false); if (L.show && active) { drawRage15(t, nowMs, 'h'); drawRage15(t, nowMs, 'j'); } if (active && shovedAt(mb)) drawShoved(mb, nowMs); else { g.save(); clipBehindUpper(); { const o = placerOff(0); g.translate(o.dx, o.dy); } drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); } if (fa) drawHaeunAura(mb, fa, nowMs, true); }
     else if (!L.oneSpot) {
       // one loader between the belts: his body follows whichever belt is busy
       const o = placerOff(1), bp = { ...poses[1], wince: poses[0].wince || poses[1].wince, dip: Math.max(poses[0].dip, poses[1].dip), nod: Math.max(poses[0].nod, poses[1].nod) };
@@ -3626,7 +3661,6 @@ function drawScene(t, bt, active, nowMs) {
     if (L.stairs) drawStairs();
     drawLane(0, poses[0], t, beltT, active, nowMs, laneFx);
     if (DUO.mode !== 'two' && L.oneSpot) drawSoloLoader(poses, nowMs, active);
-    if (active && L.visit) drawShoved(mb, nowMs);
     if (L.bossSeat) drawBossSeat(mb, nowMs, active);
     // the driver stands between the belts, in front of the upper one (it is empty while he is there)
     if (active) drawDriver(mb, nowMs);
@@ -3634,7 +3668,7 @@ function drawScene(t, bt, active, nowMs) {
   const lo = L.lanes === 2 ? 1 : 0;
   if (L.cast) { L.partners[0] = castPlacer(castBeatAt(t, active)); drawCast(t, nowMs, active, poses[lo]); }
   else if (SCENE.walk && !active) drawWalkingBoss(nowMs);
-  else if (!(L.lanes === 2 && DUO.mode !== 'two') && !(active && L.visit && L.visit.shove != null && castBeatAt(t, active) >= L.visit.shove)) { const o = L.lanes === 2 ? placerOff(1) : { dx: 0, dy: 0 }; g.save(); g.translate(laneSlide(lo, t, active) + o.dx, o.dy); drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); g.restore(); drawObserver(t, nowMs, active); }
+  else if (!(L.lanes === 2 && DUO.mode !== 'two') && !(active && visitAt(castBeatAt(t, active)))) { const o = L.lanes === 2 ? placerOff(1) : { dx: 0, dy: 0 }; g.save(); g.translate(laneSlide(lo, t, active) + o.dx, o.dy); drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); g.restore(); drawObserver(t, nowMs, active); }
   if (L.daw) drawLaptop(t, active, nowMs);
   if (L.inspector) drawInspector(t, active, nowMs);
   if (L.bossSeat && L.lanes !== 2) drawBossSeat(castBeatAt(t, active), nowMs, active);
@@ -3646,6 +3680,7 @@ function drawScene(t, bt, active, nowMs) {
   if (L.dock) drawDockFront(dockBeat, t, nowMs, active); else if (L.lanes === 2) drawPairBolt(nowMs);
   drawGauge(nowMs);
   if (!L.daw) { drawBin(laneFx.binned, nowMs); drawPallet(laneFx.delivered); }
+  if (laneFx.dropping) for (const n of laneFx.dropping) drawDropFall(n, t, nowMs);
   for (const [n, f, dy] of laneFx.falling) { g.save(); g.translate(f.x, f.y + dy - n.h / 2); g.rotate(f.rot); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); }
   // (the dotted tether between a same-beat pair was tried and taken out: the stacked gates say it on their own)
   drawPlayerArm(kick, nowMs, nowMs - lastHeavy < 260, upperKick);
@@ -3919,7 +3954,7 @@ const click = t => noise(t, 'bandpass', 1800, 0.12, 0.02, 3, bus);
 const tear = t => noise(t, 'highpass', 2500, 0.22, 0.12, 0.7, bus);
 const blip = (f) => { if (ctx && ctx.state === 'running') osc('square', f, ctx.currentTime, 0.002, 0.025, 0.025, bus); };
 const feverCut = beat => { const fr = L.fever && L.fever.find(([a, z]) => beat >= a && beat < z); return fr ? 700 * Math.pow(18000 / 700, Math.pow((beat - fr[0]) / (fr[1] - fr[0]), 1.3)) : 0; };
-const musBase = () => { const b = beatAt(songAt(performance.now())); return state === 'play' && inRange(b, L.unplug) ? 3200 : state === 'play' && feverCut(b) ? feverCut(b) : (L.lofi || 20000); };
+const musBase = () => { const b = beatAt(songAt(performance.now())); return state === 'play' && inRange(b, L.unplug) && L.unplugMuffle !== false ? 3200 : state === 'play' && feverCut(b) ? feverCut(b) : (L.lofi || 20000); };
 function muffle() {
   const t = ctx.currentTime; FX.muffleAt = performance.now();
   musF.frequency.cancelScheduledValues(t); musF.frequency.setValueAtTime(450, t); musF.frequency.exponentialRampToValueAtTime(musBase(), t + 0.55);
@@ -4968,6 +5003,27 @@ function buildEvents() {
         funkBeat15(E, bar, inBar, s, AND);
         continue;
       }
+      if (sec === 'diss') {
+        // phase 2, a diss battle bar for bar. Her turns: her boom bap from 1-4 gone hard (a heavy kick, a cracking snare and clap
+        // on 2 and 4, the 808 on the root, a dark rhodes stab, vinyl). His turns: his future funk answering (see funkBeat15, his
+        // hook over it). Into each of her turns a record scratch, into each of his a vocal chop. From bar 46 both at once (the
+        // breakdown on long chords, then everything), the hats doubling for the last six bars, a crash on every bar
+        const who = battleAt(bar), H = who !== 'j', J = who !== 'h', hard = bar >= 48;
+        if (bar === 32 && inBar === 0) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); });
+        if (H) {
+          if (inBar === 0) { E(0, T => bbKick(T, 1)); E(AND, T => bbKick(T, 0.55)); }
+          if (inBar === 2) { E(0, T => bbKick(T, 0.9)); if (bar % 2) E(AND, T => bbKick(T, 0.5)); }
+          if (inBar === 1 || inBar === 3) E(0, T => { bbSnare(T, 0.45); clap(T, 0.22); });
+          if (hard) for (let k = 0; k < 4; k++) E(k * s / 4, T => hat(T, k % 2 ? 0.035 : 0.06)); else { E(0, T => hat(T, 0.06)); E(AND, T => hat(T, 0.04)); }
+          if (inBar === 0 || inBar === 2) E(0, T => sub808(T, rt, s * (inBar === 0 ? 1.5 : 1.1), 0.3));
+          if (inBar === 1 || inBar === 3) E(AND, T => rhodes(T, ch.slice(0, 3), s * 0.35, 0.04));
+          if (inBar === 0) E(0, T => vinyl(T, s * 4));
+        }
+        if (J) funkBeat15(E, bar, inBar, s, AND, 0);
+        if (inBar === 3 && bar < 46 && battleAt(bar + 1) !== who) E(AND, T => battleAt(bar + 1) === 'j' ? vox(T, ch[2] * 2, s * 0.3, 0.2) : scratch(T));
+        if (inBar === 0 && (who === 'both' || battleAt(bar - 1) !== who)) E(0, T => crash(T));
+        continue;
+      }
       if (sec === 'finale') {
         // the last hit: everything at once on the first beat, then let it ring out
         if (inBar === 0) E(0, T => { mGtr(T, 82.41 * Math.pow(2, 2 / 12), s * 3.6, false, 0.12); mBass(T, 41.2 * Math.pow(2, 2 / 12), s * 3.4, 0.24); mKick(T, 1.2); mSnare(T, 1.2); mCrash(T, 0.6); mCrash(T + 0.01, 0.4); synthLead(T, 987.77 * Math.pow(2, 2 / 12), s * 3, 0.05); });
@@ -5223,7 +5279,7 @@ let progress = {};
 try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}; } catch (e) {}
 
 function resetRun() {
-  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.jamFx = false; n.tossFx = false; }); BANG.done = false; FX.yankFx = false;
+  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.jamFx = false; n.tossFx = false; n.dropFx = false; }); BANG.done = false; FX.yankFx = false;
   FX.particles = []; FX.marks = []; FX.yankFx = false; FX.shoveFx = false; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.splashes = []; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9; FX.goodBoth = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
   rings = []; heavyPend = null;
