@@ -1044,152 +1044,154 @@ const LEVELS = [
       { who:'지우', text:'(작게) …괜찮아요, 형. 다음에 또 하면 돼요.' }]
   }
   ,{
-    id:'s1-5', stageNo:'1-5', who:'지우 + 하은', role:'지우 · 하은 · 94 BPM · 벨트 둘', tag:'둘의 다툼 · 메탈', bpm:94, style:'duo15', fxTheme:'blues',
+    id:'s1-5', stageNo:'1-5', who:'지우 + 하은', role:'지우 · 하은 · 94 BPM · 벨트 둘', tag:'둘의 다툼 · 랩 배틀', bpm:94, style:'duo15', fxTheme:'blues',
     // 지우 is back (반장 is not in this one). 지우 loads the upper belt and 하은 the lower, and you scan both with one button as
     // in 1-4, every light on the whole way, every box on the beat. Their fight is played on the belts: 지우 throws his boxes up
     // any old way and some miss, tumbling down onto 하은's belt ('d' on the lower belt: scanned at her gate) - by accident at
     // first, then a rain of them while he is in his music, then on purpose. No tutorial: the shift starts after the intro.
-    // Phase 1 (lo-fi, then his future funk): his "3-pointer" that lands on her belt, his contest, her days off ("…일."); he
-    // dozes (a cutscene); his track in his earbuds and his boxes raining onto her belt; two warnings; she climbs the stairs to
-    // his deck and pulls his earbud out (a record scratch, the band cut); the row in the silence; she shoves him back along
-    // his deck. Phase 2: he answers with a beat and she takes it over - a song with her rapping alone (made in Gemini; for now
-    // a stand-in beat): in his beat sections he throws boxes at her belt on purpose, in her verses and her "Tick-tock" hooks
-    // her own slam down on the beat; then both at once, the last hook eight times over, building to the last hit.
+    // Phase 1 (his hip-hop beat off his phone, then in his earbuds): his "3-pointer" that lands on her belt, his contest, her
+    // days off ("…일."); he dozes (a cutscene); his track in his earbuds (he catches her foot keeping his beat: the one hint
+    // of what she does in the battle) and his boxes raining onto her belt; two warnings; she climbs the stairs to his deck
+    // and pulls his earbud out (a record scratch, the band cut); the row in the silence; she shoves him back along his deck.
+    // Phases 2-4: three recorded songs, her rapping alone (see `songs` below) - he answers with a beat and she takes it over.
     show: true,   // 1-5's light show (drawShow15) and their auras
-    lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 999]], unplugMuffle: false,
+    lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, vibe: [[72, 104]], doze: [[40, 56.5]], unplug: [[104, 999]], unplugMuffle: false,
     // the row: she crosses to the stairs at the upper belt's left end and climbs to his deck, stands with him, pulls his earbud
     // out at the record scratch, shoves him back along his deck (he stares, then walks back to his belt) and goes back down
     visit: { go: [95.5, 99.5], back: [126, 128], yank: 104, shove: 122.3, ret: [128.5, 130.5] },
     stairs: { x: 86, dx: -2, dy: 7, steps: 4 },   // at the upper belt's left end, from his deck down to the floor
     metalShift: 3, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
-    hitKit: 'ticktock', bareBand: true, crowdClap: [[70, 74], [98, 104]],   // the crowd clapping along (bars)
-    // from phase 3 the stage (drawStage15): the turn into it on beat 216; in her round (from 304) her boxes thrown hard, the belt
-    // tipping towards him, him pushed back a step every four bars as his light goes; in her last fast verse every box is hers
-    // the final on two belts (from 304): she storms both of them at him (the upper belt takes the upper lane's boxes, the lower
-    // the lower's); he stands at their far end trying to lift a box to throw back and is knocked back a step every four bars
-    stage: { from: 216, two: 304, fast: 304, push: [304, 460], hers: [[304, 461]], tilt: [[304, 0], [392, 0.02], [428, 0.045], [459.9, 0.08], [460, 0]],
-      // round two, her verse and the hook: the words that land, on the LED wall as she says them ([beat, text, beats held];
-      // timed off the recording, 75.5 BPM from beat 216)
+    hitKit: 'ticktock', bareBand: true, crowdClap: [[66, 70], [94, 100]],   // the crowd clapping along (bars)
+    // from phase 3 the stage (drawStage15): the turn into it over beats 212.5-215.5, while he says "이 비트도 한번 받아봐요!",
+    // so his slow beat drops (216) on a stage already lit; in her round (from 288) her boxes thrown hard, the belt tipping
+    // towards him, him pushed back a step every four bars as his light goes; in her last fast verse every box is hers.
+    // The final on two belts (from 288): she storms both of them at him (the upper belt takes the upper lane's boxes, the lower
+    // the lower's); he stands at their far end trying to lift a box to throw back and is knocked back a step every four bars.
+    // After he stops it (444) the stage stays through the outro's first lines, the two of them out of breath on it
+    stage: { from: 214, two: 288, fast: 288, push: [288, 444], hers: [[288, 445]], tilt: [[288, 0], [376, 0.02], [412, 0.045], [443.9, 0.08], [444, 0]],
+      // round two, her verse and the hook: the words that land, on the LED wall as she says them ([beat, text, beats held,
+      // the Korean under it]; timed off the recording, 75.5 BPM from beat 216, the song started at its bar 4)
       // the crowd's big moments in the final: her first line slamming in, "Haeun, why so cold", "watch it drop", the beat back at
       // full tilt, the chant with the drums out, her fast verse
-      cheers: [320, 344, 381.5, 392, 416, 428],
-      lines: [[249.6, 'HALF ASLEEP', 3.2], [253.4, 'COUNTING SHEEP', 3], [256.7, 'SO LAZY', 3.4], [262.2, 'YOU CALL IT A VIBE', 3.6], [266.2, 'WHOLE WORLD OUT', 3.4],
-        [272.5, 'WAITING ON THE DROP', 3.3], [277.7, 'SINCE BEFORE YOU GOT HERE', 2.3], [280, 'IS THAT IT?', 3.5], [284.4, 'IS THAT IT?', 3.5], [288.8, 'IS THAT IT?', 1.4], [290.2, 'YOU CALL THAT HOT?', 2.6], [293, 'IS THAT IT?', 3]] },   // a tick for his belt, a tock for hers: no pitch, so they sit with his beat and the song
+      cheers: [304, 328, 365.5, 376, 400, 412],
+      lines: [[233.6, 'HALF ASLEEP', 3.2, '반쯤 잠든'], [237.4, 'COUNTING SHEEP', 3, '양이나 세고'], [240.7, 'SO LAZY', 3.4, '그렇게 대충'], [246.2, 'YOU CALL IT A VIBE', 3.6, '그걸 바이브라고?'], [250.2, 'WHOLE WORLD OUT', 3.4, '세상은 꺼 놓고'],
+        [256.5, 'WAITING ON THE DROP', 3.3, '드롭만 기다려'], [261.7, 'SINCE BEFORE YOU GOT HERE', 2.3, '네가 오기 전부터'], [264, 'IS THAT IT?', 3.5, '그게 다야?'], [268.4, 'IS THAT IT?', 3.5, '그게 다야?'], [272.8, 'IS THAT IT?', 1.4, '그게 다야?'], [274.2, 'YOU CALL THAT HOT?', 2.6, '그게 센 거야?'], [277, 'IS THAT IT?', 3, '그게 다야?']] },   // a tick for his belt, a tock for hers: no pitch, so they sit with his beat and the song
     slam: [[160, 999]],   // from her first verse she slams her boxes down rather than carrying them
     // phase 2's turns, by bar: hers, his, or both at once
     // the battle is recorded songs with her rapping alone, three rounds, each song cut after its first hook. Round one (phase
     // 2): 'You Play, I Pay' (94 BPM, first downbeat 0.055 s in) from beat 128: intro and his beat 32-39, her verse 40-47, the
     // "Tick-tock" hook 48-51. The switch 52-53: the song cut with a record scratch, the camera on him - 이 비트도 한번 받아봐요!
-    // Round two (phase 3): his slow 'The Lazy Shift' (75.5 BPM, 0.068 s) from beat 216: a quiet intro 54-57, his beat 58-61,
-    // her verse 62-69, the hook ("Is that it?") 70-73. The second switch 74-75, on him again. Round three (phase 4, the climax):
-    // The second switch: he reaches for another beat and she cuts him off - 야, 이게 비트야. 그냥 입 다물고 봐. The climax is
-    // hers: a drill track (146 BPM, half-time: the snare on the third beat; 0.483 s in) from beat 304, 40 bars: an intro 76-79,
-    // the "Tick-tock" chant 80-85 (a line every two bars), her verse 86-95 ("watch it drop" at 95), a break 96-97, the beat at
-    // full tilt 98-103, the chant again with the drums out 104-106, her verse double time 107-114. Where the recording stops dead
-    // (115) he is the one who stops it: a record scratch, the camera in on him, 아! 이제 그… 그만해요, 누나!
-    // Before her first verse in round one (bars 38-39) the camera goes in on her: 뭐? 해보자고?
+    // Round two (phase 3): his slow 'The Lazy Shift' (75.5 BPM) from beat 216, started at its bar 4 so its quiet intro is
+    // skipped and his beat drops the moment the stage is lit: his beat 54-57, her verse 58-65, the hook ("Is that it?") 66-69.
+    // The second switch 70-71: he reaches for another beat and she cuts him off - 야, 이게 비트야. 그냥 입 다물고 봐. The climax
+    // (phase 4) is hers: a drill track (146 BPM, half-time: the snare on the third beat; 0.483 s in) from beat 288, 40 bars: an
+    // intro 72-75, the "Tick-tock" chant 76-81 (a line every two bars), her verse 82-91 ("watch it drop" at 91), a break 92-93,
+    // the beat at full tilt 94-99, the chant again with the drums out 100-102, her verse double time 103-110. Where the
+    // recording stops dead (111) he is the one who stops it: a record scratch, the camera in on him, 아! 이제 그… 그만해요, 누나!
+    // - then on her, spent, getting her breath back. Before her first verse in round one (bars 38-39) the camera goes in on
+    // her: 뭐? 해보자고?
     songs: [{ src: 'audio/1-5-you-play-i-pay.mp3', at: 128, lead: 0.055, gain: 0.75, sec: 'diss' },
-            { src: 'audio/1-5-the-lazy-shift.mp3', at: 216, lead: 0.068, gain: 0.75, sec: 'lazy' },
-            { src: 'audio/1-5-this-is-a-beat.mp3', at: 304, lead: 0.483, gain: 1.3, sec: 'climax' }],
-    battle: { h: [[40, 52], [62, 74]], j: [[32, 40], [52, 54], [54, 62], [74, 76]] }, battleHard: [107, 115], breakdown: [96, 98], lastHit: 115,
+            { src: 'audio/1-5-the-lazy-shift.mp3', at: 216, lead: 0.068 + 16 * 60 / 75.5, gain: 0.75, sec: 'lazy' },
+            { src: 'audio/1-5-this-is-a-beat.mp3', at: 288, lead: 0.483, gain: 1.3, sec: 'climax' }],
+    battle: { h: [[40, 52], [58, 70]], j: [[32, 40], [52, 54], [54, 58], [70, 72]] }, battleHard: [103, 111], breakdown: [92, 94], lastHit: 111,
     // the camera (no box lands while it is in close or easing out): his doze as a cutscene (him nodding off, her watching,
     // the two of them as she wakes him), his track opening, and the row: the two of them, then him knocked back and staring
-    camPlay: [[40.5, 46, { x: 104, y: 84, k: 2.2 }], [46, 57, { x: 56, y: 108, k: 2 }], [57, 62.5, { x: 76, y: 96, k: 1.5 }],
+    camPlay: [[40.5, 45, { x: 104, y: 84, k: 2.2 }], [45, 52, { x: 56, y: 108, k: 2 }], [52, 56.5, { x: 76, y: 96, k: 1.5 }],
       [72, 78, { x: 104, y: 84, k: 1.8 }], [96, 122.3, { x: 90, y: 92, k: 1.5 }], [152, 158.5, { x: 56, y: 104, k: 2.4 }], [122.3, 128, { x: 108, y: 88, k: 1.6 }],
-      [208, 216, { x: 104, y: 80, k: 2.4 }], [296, 298.3, { x: 340, y: 86, k: 2.4 }], [298.3, 304, { x: 44, y: 100, k: 2.6 }], [460, 476, { x: 366, y: 96, k: 2.6 }]],
-    cutscene: [[40.5, 62.5], [96, 128], [152, 158.5], [208, 216], [296, 304], [460, 476]],   // letterboxed
-    devMarks: [[0, '처음'], [8, '3점슛'], [36, '졸음 컷씬'], [68, '지우 음악·떨어뜨림'], [92, '다툼·밀치기'], [128, '1라운드 You Play, I Pay'], [160, '하은 1절'], [192, 'Tick-tock 훅'], [204, '곡 전환 1·지우 클로즈업'], [216, '2라운드 The Lazy Shift'], [248, '하은 1절'], [280, '훅 Is that it?'], [292, '곡 전환 2·하은 클로즈업'], [304, '3라운드 하은의 비트'], [344, '하은 벌스'], [384, '끊김·풀 비트'], [416, 'Tick-tock'], [428, '마지막 빠른 벌스'], [456, '지우: 그만해요']],
+      [208, 212.5, { x: 104, y: 80, k: 2.4 }], [280, 282.3, { x: 340, y: 86, k: 2.4 }], [282.3, 288, { x: 44, y: 100, k: 2.6 }], [444, 452, { x: 366, y: 96, k: 2.6 }], [452, 460, { x: 44, y: 100, k: 2.6 }]],
+    cutscene: [[40.5, 56.5], [96, 128], [152, 158.5], [208, 216], [280, 288], [444, 460]],   // letterboxed
+    devMarks: [[0, '처음'], [8, '3점슛'], [36, '졸음 컷씬'], [68, '지우 음악·떨어뜨림'], [92, '다툼·밀치기'], [128, '1라운드 You Play, I Pay'], [160, '하은 1절'], [192, 'Tick-tock 훅'], [204, '곡 전환 1·지우 클로즈업'], [216, '2라운드 The Lazy Shift'], [232, '하은 1절'], [264, '훅 Is that it?'], [276, '곡 전환 2·하은 클로즈업'], [288, '3라운드 하은의 비트'], [328, '하은 벌스'], [368, '끊김·풀 비트'], [400, 'Tick-tock'], [412, '마지막 빠른 벌스'], [440, '지우: 그만해요']],
     farBeltLeft: 36,   // the upper belt runs on to the left, past his legs, up to the stairs
     heads: { j: [104, 58], h: [52, 90], v: [86, 58], k: [130, 58] },
     clock:'03:20', title:'꿈', offTilt: true,
     chords: S15.lofi.ch, roots: S15.lofi.rt, chordAt: bar => bar % 4,
-    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 476,
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 460,
     hints: false, special:['떨어진 상자', 'drop', '받아냄'],
-    sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [32, 'diss'], [52, 'switch'], [54, 'lazy'], [74, 'switch'], [76, 'climax'], [117, 'end'], [118, 'outro']],
+    sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [32, 'diss'], [52, 'switch'], [54, 'lazy'], [70, 'switch'], [72, 'climax'], [113, 'end'], [114, 'outro']],
     // 94 (his beat in phase 1 is round one's beat) through round one, the slow song's 75.5 for round two, 146 for the climax (her drill)
-    tempo: [[0, 94], [216, 75.5], [304, 146]],
-    // upper belt: 하은, on the beat (8 cells; h= a long crate, held). Phase 1: her taps and long crates on their own, and alone
-    // through his doze. Phase 2 (bars 29-50, her alone in the middle on both belts) follows the metal's guitar: a tap on each
-    // bar's first chug, a long crate where a chord rings (riff A: G on the third beat, a beat long; riff B: D on the third
-    // beat; the breakdowns: the two big chords, two beats each), taps on the short accents. The peaks (39-42, 47-50) whirl on
-    // her straight belt on the gallop's triplet grid (12 cells a bar, like the music: the beat and two thirds in, then the
-    // whole triplet), and now and then a single box drops onto his belt on a swung 'and' (two thirds in, the gallop's own
-    // slot) where hers has a gap, never together with one of hers; the last bar all hers. Then the last hit on both belts
-    // upper belt: 지우 (8 cells, every box on the beat). Phase 1: his bars, sparse after his doze and in his music. Phase 2 by the
-    // song: his intro and verse, his turns in the trading, a held crate in each of his breakdown bars, both at the end
+    tempo: [[0, 94], [216, 75.5], [288, 146]],
+    // upper belt: 지우 (8 cells, every box on the beat; u = a box she throws up onto his belt). Phase 1: his bars, sparse after
+    // his doze and in his music. The battle by the songs: his beat sections, her throws up in her verses and hooks, the final
+    // on both belts (from bar 72 the upper belt is hers too)
     bars: [
       '........', '........', 'x...x...', 'x.x.x...', '........', '........', 'x.x.x.x.', 'x...x.x.',
-      '..x...x.', '....x.x.', '........', '........', '........', '........', '........', '........',
+      '..x...x.', '....x.x.', '........', '........', '........', '........', '......x.', 'x...x...',
       '......x.', '........', '........', '........', '......x.', '........', '....x...', '........',
       '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.....', '........', '........',
       '..u...u.', '......u.', '........', '........', '..u...u.', '......u.', '........', '........',
-      '..u.....', '..u.....', '..u.....', '..u...u.', '........', '........', '........', '........',
-      'x.......', 'x...x...', 'x...x...', 'x.x.....', 'x...x...', 'x.x.x...', '....u...', '......u.',
-      '....u...', '....u...', '....u...', '....u...', '........', '........', '..u.....', '..u.....',
-      '..u.....', '..u...u.', '........', '........', '........', '........', '........', '........',
-      'x...x...', '........', 'x...x...', '........', 'x...x...', '........', '........', '......u.',
-      '........', '....u...', '......u.', 'u.......', '......u.', '....u...', '....u...', '........',
-      '........', '........', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x.x.x.x.', 'x.x.x.x.',
-      'x.......', '........', 'x.......', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'u.......',
-      'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', '........', '........', '........', '........'
+      '..u.....', '..u.....', '..u.....', '..u...u.', '........', '........', '....x...', 'x.x.....',
+      'x...x...', 'x.x.x...', '....u...', '......u.', '....u...', '....u...', '....u...', '....u...',
+      '........', '........', '..u.....', '..u.....', '..u.....', '..u...u.', '........', '........',
+      '........', '........', '........', '........', 'x...x...', '........', 'x...x...', '........',
+      'x...x...', '........', '........', '......u.', '........', '....u...', '......u.', 'u.......',
+      '......u.', '....u...', '....u...', '........', '........', '........', 'x...x...', 'x...x...',
+      'x...x...', 'x...x...', 'x.x.x.x.', 'x.x.x.x.', 'x.......', '........', 'x.......', 'x...x...',
+      'x...x...', 'x...x...', 'x...x...', 'u.......', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', '........',
+      '........', '........', '........'
     ],
     // lower belt: 하은 (8 cells, on the beat; h= a long crate, held) and his boxes that miss and fall onto it ('d', written
     // where they are scanned: he throws them two beats before). Phase 1: two by accident, then a rain while he is in his music.
     // Phase 2: his verse throwing at her belt on purpose, her verse and her turns on her own, both at the end
     bars2: [
       '........', '........', '........', '......d.', 'h===..x.', 'x.x.x...', '........', '..d.....',
-      'x...x...', 'h===....', '........', '........', '........', '........', '........', '........',
+      'x...x...', 'h===....', '........', '........', '........', '........', '........', 'x.x.x...',
       '..x.x...', 'x.x...d.', '........', '........', 'x.d.x...', 'x.d.x.d.', 'h===..x.', 'x.d.x.d.',
       '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........', '........', '........', '..d...d.', '....d.d.', '........', '........',
       'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.', 'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.',
-      '......x.', '......x.', '......x.', 'x...x...', '........', '........', '........', '........',
-      '........', '........', '..d...d.', '....d.d.', '..d...d.', '......d.', '..x...x.', '..x.....',
-      '..x...x.', '..x...x.', 'x.....x.', '..x...x.', '..x.d.x.', 'x.x.x.x.', '....x...', '....x...',
-      '....x...', 'x...x...', '........', '........', '........', '........', '........', '........',
-      '..x.....', 'x...x...', '..x.....', 'x...x...', '..x.....', 'x...x...', 'x...x...', 'x...x...',
-      'x...x...', 'x...x...', 'x...x...', '....x...', 'x...x...', 'x...x...', 'x...x...', 'x...d...',
-      'x.......', '........', '..x...x.', '..x...x.', '..x...x.', '..x...x.', 'x.x.x.x.', 'x.x.x.x.',
-      '..x.....', 'x.......', '..x.....', '..x...x.', '..x...x.', '..x...x.', '..x...x.', '....x...',
-      '..x...x.', 'x.x.x.x.', 'x.x.x.x.', '........', '........', '........', '........'
+      '......x.', '......x.', '......x.', 'x...x...', '........', '........', '......d.', '....d.d.',
+      '..d...d.', '......d.', '..x...x.', '..x.....', '..x...x.', '..x...x.', 'x.....x.', '..x...x.',
+      '..x.d.x.', 'x.x.x.x.', '....x...', '....x...', '....x...', 'x...x...', '........', '........',
+      '........', '........', '........', '........', '..x.....', 'x...x...', '..x.....', 'x...x...',
+      '..x.....', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', '....x...',
+      'x...x...', 'x...x...', 'x...x...', 'x...d...', 'x.......', '........', '..x...x.', '..x...x.',
+      '..x...x.', '..x...x.', 'x.x.x.x.', 'x.x.x.x.', '..x.....', 'x.......', '..x.....', '..x...x.',
+      '..x...x.', '..x...x.', '..x...x.', '....x...', '..x...x.', 'x.x.x.x.', 'x.x.x.x.', '........',
+      '........', '........', '........'
     ],
     // [beat, text, beats shown, lane, speaker]: 'h' 하은 (upper loading end), 'j' 지우 (lower), 'v' 하은 beside him, 'k' 지우 shoved aside
+    // (no stage directions in the bubbles: what she does with the clock, the earbud and the shove is animated)
     say: [[6, '누나, 이 비트 들어봐요!', 3, 0, 'j'], [9.5, '…일이나 해.', 2, 1, 'h'],
           // his "3-pointer" misses and lands on her belt: the rule, shown
           [12, '형, 이거 봐요. 3점—', 2, 0, 'j'], [14.5, '앗… 죄송! 손이 미끄러졌어요.', 2.5, 0, 'j'], [17.5, '…', 1.5, 1, 'h'],
           // his plans out loud; hers is one word (what she has room for is shown, never said)
-          [21, '형, 저 이 곡으로 대회 나갈 거예요!', 3.5, 0, 'j'], [25, '누나는 쉬는 날 뭐 해요?', 2.5, 0, 'j'], [28, '…일.', 1.5, 1, 'h'], [30, '(시계를 본다)', 2, 1, 'h'],
-          [41, '(꾸벅…)', 2.5, 0, 'j'], [47, '…지우?', 2, 1, 'h'], [53, '하… 진짜.', 2.5, 1, 'h'], [58.5, '(드르렁…)', 2, 0, 'j'],
-          [61, '…야. 지우.', 1.5, 1, 'h'], [62.5, '넵! 안 잤어요!', 2.5, 0, 'j'], [66, '침이나 닦아.', 2, 1, 'h'],
-          [73, '(흥얼흥얼) 여기서 드롭…!', 3.5, 0, 'j'], [81, '이어폰 빼.', 2, 1, 'h'], [83, '한 곡만요, 딱 한 곡만!', 3, 0, 'j'],
+          [21, '형, 저 이 곡으로 대회 나갈 거예요!', 3.5, 0, 'j'], [25, '누나는 쉬는 날 뭐 해요?', 2.5, 0, 'j'], [28, '…일.', 1.5, 1, 'h'],
+          // his doze (four bars)
+          [41, '(꾸벅…)', 2.5, 0, 'j'], [45, '…지우?', 2, 1, 'h'], [48.5, '하… 진짜.', 2.5, 1, 'h'], [52, '(드르렁…)', 2, 0, 'j'],
+          [54, '…야. 지우.', 1.5, 1, 'h'], [55.5, '넵! 안 잤어요!', 2.5, 0, 'j'], [58.5, '침이나 닦아.', 2, 1, 'h'],
+          // in his earbuds; he catches her foot on his beat (the one hint, before the battle, that she has it in her)
+          [73, '(흥얼흥얼) 여기서 드롭…!', 3.5, 0, 'j'], [77, '어? 누나, 지금 제 비트에 발 맞췄죠?', 2.5, 0, 'j'], [79.5, '…아니야.', 1.5, 1, 'h'],
+          [81, '이어폰 빼.', 2, 1, 'h'], [83, '한 곡만요, 딱 한 곡만!', 3, 0, 'j'],
           [88.5, '야. 네 거 다 내 쪽으로 떨어지잖아.', 3, 1, 'h'], [92, '…제대로 안 해?', 2.5, 1, 'h'],
-          // the row on his deck ('v' her beside him)
-          [100, '야.', 1.5, 0, 'v'], [104, '(이어폰 줄을 확 잡아뺀다)', 2, 0, 'v'],
+          // the row on his deck ('v' her beside him); she pulls his earbud out at 104 without a word
+          [100, '야.', 1.5, 0, 'v'],
           [106, '…아, 진짜. 누나, 왜 그래요?', 2.5, 0, 'j'], [108.5, '네가 던진 거, 누가 받는 줄 알아?', 3, 0, 'v'],
           [111.5, '몇 개 떨어진 거 갖고… 저도 제 리듬이 있다구요.', 3.5, 0, 'j'], [115, '…네 리듬 때문에 내 박이 다 꼬여.', 2.5, 0, 'v'],
-          [117.5, '누나는 맨날 박, 시계, 박, 시계… 숨 막혀요.', 3, 0, 'j'], [120.5, '…꺼져, 그냥.', 1.5, 0, 'v'], [122, '(지우를 확 밀쳐낸다) 비켜.', 2, 0, 'v'],
+          [117.5, '누나는 맨날 박, 시계, 박, 시계… 숨 막혀요.', 3, 0, 'j'], [122, '비켜.', 2, 0, 'v'],
           [124.5, '…어?', 1.5, 0, 'k'], [126.5, '…와. 진짜 밀었어요?', 2.5, 0, 'k'],
-          // back at his belt he answers with a beat: the battle
-          [129, '좋아요. 그럼 박으로 해요.', 2.5, 0, 'j'], [132, '누나 박이 그렇게 잘났으면, 따라와 봐요!', 3, 0, 'j'],
+          // back at his belt (130.5) his beat is already running; he lets it play a bar before he answers with it
+          [131, '…좋아요. 그럼 박으로 해요.', 2.5, 0, 'j'], [134, '누나 박이 그렇게 잘났으면, 따라와 봐요!', 3, 0, 'j'],
           // round one: before her first verse the camera goes in on her as his drums drop out
           [152.5, '뭐? 해보자고?', 4, 1, 'h'],
-          // she shrugs his song off at the end of her hook; he cuts it, the camera on him
+          // she shrugs his song off at the end of her hook; he cuts it, the camera on him, and the room turns into the stage
+          // while he says it
           [204.5, '…이 정도?', 2.5, 1, 'h'],
           [209, '…하. 그래요?', 2, 0, 'j'], [212, '이 비트도 한번 받아봐요!', 3.5, 0, 'j'],
           // round two, his slow beat
-          [247, '…또?', 1.5, 1, 'h'], [293, '…그게 다야?', 2, 1, 'h'],
+          [231, '…또?', 1.5, 1, 'h'], [277, '…그게 다야?', 2, 1, 'h'],
           // the second switch: he reaches for another beat and she cuts him off - the last round is hers
-          [296.3, '이번엔 제일 센 걸로—', 2, 0, 'j'], [298.5, '야, 이게 비트야.', 2.5, 1, 'h'], [301, '그냥 입 다물고 봐.', 3, 1, 'h'],
-          // the end of her final: he can't take any more and stops it
-          [460.8, '아! 이제 그… 그만해요, 누나!', 12, 0, 'j']],
+          [280.3, '이번엔 제일 센 걸로—', 2, 0, 'j'], [282.5, '야, 이게 비트야.', 2.5, 1, 'h'], [285, '그냥 입 다물고 봐.', 3, 1, 'h'],
+          // the end of her final: he can't take any more and stops it; then her, spent, getting her breath back
+          [444.8, '아! 이제 그… 그만해요, 누나!', 7, 0, 'j'], [452.5, '…하아… 하아…', 6, 1, 'h']],
     comfort: [],   // nobody steadies you here
     intro: [
       { who:'', text:'며칠 뒤. 명절 물량은 그대로다.' },
       { who:'지우', text:'형! 저 왔어요! …아, 누나가 하은 누나죠? 지우예요! 저 위에서 할게요, 위가 뷰가 좋거든요!' },
       { who:'하은', text:'(시계를 본다) …떨어뜨리지만 마.' }],
-    // the outro sets up 1-6 (her last night, her mother in hospital) without saying any of it: she is gone the moment the shift
-    // ends, and on the notice board 지우 finds next week's rota with her name in every row, day and night; he puts his earbuds away
+    // the outro sets up 1-6 (her last night, her mother in hospital) without saying any of it: its first lines stay on the dark
+    // stage with the two of them out of breath; she is gone the moment the shift ends, and in the break room 지우 finds next
+    // week's rota with her name in every row, day and night; 반장 looks in and tells him to say sorry tomorrow; he puts his earbuds away
     outro: (good) => good ? [
       { who:'', text:'비트가 끊겼다. 둘 다 숨을 몰아쉬었다. 아무도 먼저 말하지 않았다.' },
       { who:'하은', text:'(시계를 본다) …먼저 갈게.' },
@@ -1198,6 +1200,10 @@ const LEVELS = [
       { who:'지우', text:'사과해야 할까요? …근데 누나도 저 밀었잖아요.', scene:'office', jpose:'think' },
       { who:'', text:'게시판에 다음 주 근무표가 붙어 있다. 하은 누나 이름만 칸마다 있다. 주간에도, 야간에도.', scene:'office', jpose:'think' },
       { who:'지우', text:'…이거 다 누나예요? 낮에도?', scene:'office', jpose:'fluster' },
+      // 반장 looks in from the line (he was not on the shift): one line, and it is the line 1-6 opens on
+      { who:'', text:'문이 열렸다. 반장님이 게시판을 한 번 보고, 지우를 봤다.', scene:'office', office: { j: 184, b: 240 }, enter: 'boss', jpose:'fluster' },
+      { who:'반장', text:'…지우. 내일 사과해라.', scene:'office', jpose:'down' },
+      { who:'지우', text:'…네.', scene:'office', jpose:'down' },
       { who:'', text:'지우는 이어폰을 한참 만지작거리다가 주머니에 넣었다.', scene:'office', jpose:'down' },
       { who:'지우', text:'…형, 저 내일 일찍 올게요.', scene:'office', jpose:'down' }] : [
       { who:'지우', text:'…형, 오늘은 그냥 가요.' }]
@@ -2241,7 +2247,8 @@ function drawShow15(t, nowMs) {
   const beam = (x, col, a) => { if (a <= 0.004) return; g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(x, 0, x, H); gr.addColorStop(0, `rgba(${col},${a})`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.beginPath(); g.moveTo(x - 6, 0); g.lineTo(x + 6, 0); g.lineTo(x + 46, H); g.lineTo(x - 46, H); g.closePath(); g.fill(); g.restore(); };
   const hit = Math.max(0, 1 - ph * 4);
   const punch = (k, shake, amp) => { CAM.k = Math.max(CAM.k, k); CAM.x = W / 2; CAM.y = H / 2; FX.shakeUntil = nowMs + shake; FX.shakeAmp = amp; };
-  if (sec === 'funk') { beam(fb % 2 ? 110 : 270, fb % 2 ? '255,120,200' : '90,220,255', 0.12 + 0.18 * hit); beam(fb % 2 ? 270 : 110, '255,230,160', 0.05); return; }
+  // his beat in his earbuds: a cold blue-white beam on the beat (the beat's bell riff), the warehouse amber under it
+  if (sec === 'funk') { beam(fb % 2 ? 110 : 270, '140,190,255', 0.08 + 0.14 * hit); beam(fb % 2 ? 270 : 110, '255,190,120', 0.04); return; }
   if (sec === 'clash') { dim(0.25 + (Math.random() < 0.3 ? 0.3 : 0)); return; }
   if (sec === 'silence') { dim(0.45); return; }
   const ember = cols => { if (!reduce && Math.random() < 0.5) spawn(Math.random() * W, H - 4, 1, cols, -12, 12, -70, -35, -20, 1400, [1, 1]); };
@@ -2350,7 +2357,8 @@ function drawRage15(t, nowMs, who) {
 // over the half beat before each lands there (a whoosh as it leaves her)
 function visitAt(b) {
   const V = L.visit; if (!V || b < V.go[0] || b >= V.back[1]) return null;
-  const S = L.stairs, deck = haeunHome().top, home = { x: BOSS_X + LANE_DX[1], top: 86 + (L.nearLoaderDy || 0) }, bot = { x: S.x + S.dx * S.steps, top: deck + S.dy * S.steps }, top = { x: S.x, top: deck };
+  // (she stands a few pixels short of the landing, so the two of them don't overlap while they row)
+  const S = L.stairs, deck = haeunHome().top, home = { x: BOSS_X + LANE_DX[1], top: 86 + (L.nearLoaderDy || 0) }, bot = { x: S.x + S.dx * S.steps, top: deck + S.dy * S.steps }, top = { x: S.x - 6, top: deck };
   // a step at a time up (or down) the stairs: p runs 0 (bottom) to 1 (top)
   const onStairs = p => { const q = p * S.steps, k = Math.min(S.steps - 1, Math.floor(q)), f = q - k; return { x: bot.x - S.dx * (k + f), top: bot.top - S.dy * (k + ease(Math.min(1, f * 1.6))) }; };
   if (b < V.go[1]) {
@@ -3034,7 +3042,8 @@ function stageJiwoo(b) {
 }
 function drawStage15(t, nowMs, sv) {
   STG.on = true;
-  const b = beatAt(t), S = L.stage, bar = Math.floor(b / 4), sec = sectionAt(bar), cx = STG.cx;
+  // after the shift (STG.post) the stage is drawn at the last beat: nothing moves on the belts, the two of them stay put
+  const post = !!STG.post, b = post ? END_BEAT : beatAt(t), S = L.stage, bar = Math.floor(b / 4), sec = sectionAt(bar), cx = STG.cx;
   // one belt across the middle in round two; in the final, two: his (the upper one, from his end to hers) and hers (the
   // lower, from her end to his), the two of them trading boxes across the scanner
   const two = S.two != null && b >= S.two, yOf = n => two ? (n.lane === 0 || n.up ? 108 : 136) : 122, midY = 122;
@@ -3046,7 +3055,7 @@ function drawStage15(t, nowMs, sv) {
   if (!reduce && shakeA > 0.3) g.translate(Math.round((Math.random() * 2 - 1) * shakeA), Math.round((Math.random() * 2 - 1) * shakeA));
   const pa = (nowMs - (FX.punchAt || -1e9)) / 150;
   if (!reduce && pa >= 0 && pa < 1) { const z = 1 + 0.03 * (FX.punch || 1) * (1 - pa) * (1 - pa); g.translate(cx, midY - 10); g.scale(z, z); g.translate(-cx, -midY + 10); }
-  const turn = sec === 'lazy' ? battleAt(bar) : sec === 'climax' ? 'h' : 'both', J = stageJiwoo(b), beatK = Math.max(0, 1 - (b % 1) * 3), fin = sec === 'climax';
+  const turn = sec === 'lazy' ? battleAt(bar) : sec === 'climax' ? 'h' : 'both', J = stageJiwoo(b), beatK = post ? 0 : Math.max(0, 1 - (b % 1) * 3), fin = sec === 'climax' || (S.two != null && b >= S.two);
   const hot = turn === 'h' ? '255,70,50' : turn === 'j' ? '70,200,255' : (Math.floor(b) % 2 ? '70,200,255' : '255,70,50');
   // the room as a battle floor: the factory's back wall dark, an LED wall over the line in the colour of whoever has the turn
   // (bars jumping to the beat, the round's name across it), speaker stacks at both ends
@@ -3064,14 +3073,17 @@ function drawStage15(t, nowMs, sv) {
   // her punchline as she lands it: slammed onto the LED wall in her red (the hook's "IS THAT IT?" in white), held, then gone
   const pl = S.lines && S.lines.find(([b0, , d]) => b >= b0 && b < b0 + d);
   if (pl) {
-    const [b0, txt, d] = pl, q = b - b0, hook = /IS THAT IT|CALL THAT HOT/.test(txt), slam = 1 + 0.5 * Math.max(0, 1 - q / 0.18), a = Math.min(1, (b0 + d - b) / 0.5);
+    const [b0, txt, d, ko] = pl, q = b - b0, hook = /IS THAT IT|CALL THAT HOT/.test(txt), slam = 1 + 0.5 * Math.max(0, 1 - q / 0.18), a = Math.min(1, (b0 + d - b) / 0.5);
     g.save(); g.fillStyle = 'rgba(5,4,7,.82)'; g.fillRect(lw0, ly0, lw1 - lw0, ly1 - ly0);
     g.font = '900 22px sans-serif'; const tw = g.measureText(txt).width, fit = Math.min(1, (lw1 - lw0 - 16) / tw);
-    g.translate(cx, (ly0 + ly1) / 2 + 1); g.scale(slam * fit, slam * fit); g.textAlign = 'center'; g.textBaseline = 'middle'; g.globalAlpha = a;
+    g.translate(cx, (ly0 + ly1) / 2 - (ko ? 5 : 0) + 1); g.scale(slam * fit, slam * fit); g.textAlign = 'center'; g.textBaseline = 'middle'; g.globalAlpha = a;
     g.fillStyle = hook ? 'rgba(255,60,40,.9)' : 'rgba(120,10,6,.9)'; g.fillText(txt, 2, 2);
     g.fillStyle = hook ? (Math.floor(q * 4) % 2 ? '#ffffff' : '#ffd0c4') : '#ff5a3c'; g.fillText(txt, 0, 0);
+    g.restore();
+    // what it means, small, under it (the raps are in English; the wall carries the Korean so the burn lands here too)
+    if (ko) { g.save(); g.globalAlpha = a * Math.min(1, q / 0.25); g.font = '700 9px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = 'rgba(0,0,0,.8)'; g.fillText(ko, cx + 1, ly1 - 12); g.fillStyle = hook ? '#ffe0d8' : '#ffb0a0'; g.fillText(ko, cx, ly1 - 13); g.restore(); }
     // the wall's dots over the letters
-    g.restore(); g.save(); g.globalAlpha = 0.35 * a; g.fillStyle = '#050407'; for (let y = ly0; y < ly1; y += 4) g.fillRect(lw0, y + 3, lw1 - lw0, 1); for (let x = lw0; x < lw1; x += 4) g.fillRect(x + 3, ly0, 1, ly1 - ly0); g.restore();
+    g.save(); g.globalAlpha = 0.35 * a; g.fillStyle = '#050407'; for (let y = ly0; y < ly1; y += 4) g.fillRect(lw0, y + 3, lw1 - lw0, 1); for (let x = lw0; x < lw1; x += 4) g.fillRect(x + 3, ly0, 1, ly1 - ly0); g.restore();
     if (q < 0.12) FX.shakeUntil = Math.max(FX.shakeUntil, nowMs + 90);
   } else {
   g.save(); g.font = '900 13px sans-serif'; g.textAlign = 'center'; g.fillStyle = 'rgba(0,0,0,.6)'; g.fillText(round, cx + 1, ly0 + 19); g.fillStyle = `rgba(255,240,220,${0.75 + 0.25 * beatK})`; g.fillText(round, cx, ly0 + 18);
@@ -3096,7 +3108,7 @@ function drawStage15(t, nowMs, sv) {
   // the belts tip towards him in her round (about the scanner); they stand at the ends, so they ride them up and down
   const tilt = pw(S.tilt, b), lift = x => Math.round((x - cx) * Math.tan(tilt));
   let upLast = false;
-  const throwK = side => { let k = 0; for (const n of notes) { if (n.beat < b - 4) continue; if (n.beat > b + 8) break; if (stageSide(n) !== side) continue; const v = stageSpeed(side, n.beat), go = n.arr - (STG.cx - 56) / v; const q = (t - go) / 0.16; if (q >= -0.6 && q < 1) { const kk = q < 0 ? 0.3 : Math.sin(q * Math.PI); if (kk >= k) { k = kk; if (side < 0) upLast = yOf(n) < 122; } } } return k; };
+  const throwK = side => { let k = 0; if (post) return 0; for (const n of notes) { if (n.beat < b - 4) continue; if (n.beat > b + 8) break; if (stageSide(n) !== side) continue; const v = stageSpeed(side, n.beat), go = n.arr - (STG.cx - 56) / v; const q = (t - go) / 0.16; if (q >= -0.6 && q < 1) { const kk = q < 0 ? 0.3 : Math.sin(q * Math.PI); if (kk >= k) { k = kk; if (side < 0) upLast = yOf(n) < 122; } } } return k; };
   const pose = (k, dip, hy) => ({ hand: { x: BOSS_X + 15 + Math.round(8 * k), y: hy - Math.round(3 * k) }, carry: null, wince: false, dip, bob: beatK > 0.6 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 1, beat: b, vibe: false, unplug: true, reach: 34 });
   const hk = throwK(-1), hp = pose(hk, 0, (two ? (upLast ? 108 : 136) : 122) - hDy - 4), jp = pose(two ? 0 : throwK(1), Math.round(2 * J.stumble), Math.round(jA((two ? 124 : 122) - 4)));
   // in the final he tries to fight back: each four bars he gets a box up off the floor and over his head to throw it back,
@@ -3115,6 +3127,8 @@ function drawStage15(t, nowMs, sv) {
   if (sw != null) { const p = Math.min(1, sw), up = ease(Math.min(1, Math.max(0, (p - 0.3) / 0.7))); jp.dip = Math.round(4 * Math.sin(Math.min(1, p / 0.6) * Math.PI)); jp.hand = { x: BOSS_X + 12, y: Math.round(jA(FY - 8 - 34 * up)) + (sw > 1.2 ? Math.round(Math.sin(nowMs / 60) * 0.6) : 0) }; jp.reach = 50; }
   const swBox = sw != null ? jp.hand : null;
   if (over) { jp.wince = true; jp.hand = { x: BOSS_X + 13, y: Math.round(jA(FY - 52)) + (Math.floor(nowMs / 160) % 2) }; jp.reach = 50; }
+  // and her, once it is over: spent, her hand down on the belt, her shoulders heaving as she gets her breath back
+  if (over) { const br = Math.sin(nowMs / 320); hp.dip = 2 + Math.round(1.5 * br); hp.bob = 0; hp.hand = { x: BOSS_X + 14, y: (two ? 136 : 122) - hDy - 2 + Math.round(br) }; hp.wince = true; }
   if (two && J.k != null && !over) {
     const f = J.f;
     if (f >= 3 && f < 16) { const lift = Math.min(1, (f - 3) / 10); jp.hand = { x: BOSS_X + 10 - Math.round(4 * lift), y: Math.round(jA(FY - 6 - 56 * ease(lift))) + (lift >= 1 ? Math.round(Math.sin(nowMs / 40)) : 0) }; jp.reach = 50; jCarry = jp.hand; }
@@ -3129,7 +3143,7 @@ function drawStage15(t, nowMs, sv) {
   STG.heads = { h: [hx + 2, 88 + hDy + lift(hx)], j: [jx - 2, 86 + jDy + lift(jx)] };
   // the belts and everything on them, about the scanner
   g.save(); g.translate(cx, midY); g.rotate(tilt); g.translate(-cx, -midY);
-  const xL = hx + 12, xR = STG.jx - 12, run = (t * 60) % 8;   // (pushed back, he ends up off the end of the belts)
+  const xL = hx + 12, xR = STG.jx - 12, run = post ? 0 : (t * 60) % 8;   // (pushed back, he ends up off the end of the belts; after the shift the belts stand)
   const belt = (y, dir) => {
     R(xL, y, xR - xL, 3, '#4a5058'); R(xL, y + 3, xR - xL, 9, '#23272c'); R(xL, y + 12, xR - xL, 2, '#15181b');
     // the end drums
@@ -3147,7 +3161,7 @@ function drawStage15(t, nowMs, sv) {
   g.globalAlpha = 1;
   // the boxes: each side drawn in its own frame, the scanner at SCAN_X and its belt at BELT_Y, so the factory's box and crate
   // code works as it is
-  for (const side of [-1, 1]) {
+  for (const side of post ? [] : [-1, 1]) {
     g.save();
     if (side < 0) g.translate(cx - SCAN_X, 0); else { g.translate(cx + SCAN_X, 0); g.scale(-1, 1); }
     for (const n of notes) {
@@ -3977,8 +3991,10 @@ function drawPairLinks(t) {
   g.restore();
 }
 function drawScene(t, bt, active, nowMs) {
-  const sv = active && L.stage ? stageView(beatAt(t)) : null;
-  if (sv && sv.stage) { drawStage15(t, nowMs, sv); return; }
+  // the stage stays up after the shift (the outro's lines on it, the two of them out of breath) until the dialogue cuts away
+  const post = !active && (state === 'outro' || state === 'result') && SCENE.kind === 'line';
+  const sv = L.stage && (active || post) ? stageView(active ? beatAt(t) : END_BEAT) : null;
+  if (sv && sv.stage) { STG.post = post; drawStage15(t, nowMs, sv); return; }
   STG.on = false;
   g.save();
   if (sv) { g.translate(W / 2, H / 2); g.rotate(sv.rot); g.scale(sv.zoom, sv.zoom); g.translate(-W / 2, -H / 2); }
@@ -5420,7 +5436,7 @@ function buildEvents() {
       }
       if (sec === 'finale' && L.songs && L.songs.some((sp, k) => songReady(k))) continue;   // the song has its own last hit
       if (sec === 'lazy') {
-        // 1-5 phase 2: his slow beat (the recorded 'The Lazy Shift'); without it, his beat off his phone stands in
+        // 1-5 phase 3: his slow beat (the recorded 'The Lazy Shift', from its bar 4); without it, his beat off his phone stands in
         const si = L.songs.findIndex(sp => sp.sec === 'lazy');
         if (bar === sectionStart('lazy') && inBar === 0) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(si)) startSong(T, 0, si); });
         if (!songReady(si)) hipBeat15(E, bar, inBar, s, 1, 'demo');
@@ -5442,7 +5458,7 @@ function buildEvents() {
         continue;
       }
       if (sec === 'climax') {
-        // 1-5 phase 4: the climax (the recorded 'Your Beat, My Belt'); without it his beat at full tilt stands in
+        // 1-5 phase 4: the climax (the recorded drill track 'This Is a Beat'); without it his beat at full tilt stands in
         const si = L.songs.findIndex(sp => sp.sec === 'climax');
         if (bar === sectionStart('climax') && inBar === 0) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(si)) startSong(T, 0, si); });
         if (!songReady(si) && bar < (L.lastHit || 999) && !(L.breakdown && bar >= L.breakdown[0] && bar < L.breakdown[1] && bar % 2)) hipBeat15(E, bar, inBar, s, 1, 'ears');
@@ -5735,7 +5751,8 @@ function popJudge(kind, sub = '', lane = 0) {
   const map = { perfect: ['딱!', 'perfect'], good: ['좋아', 'good'], miss: ['놓침', 'miss'], done: ['스캔 완료', 'perfect'], broken: ['깨짐', 'miss'], bam: ['빰!', 'bam'], hook: ['딱!', 'hook'], both: ['양쪽!', 'both'] };
   const [txt, cls] = map[kind];
   judgeEl.className = 'judge ' + cls;
-  judgeEl.style.top = kind === 'both' ? '19%' : L.lanes === 2 && lane === 0 ? '12%' : '29%';
+  // on 1-5's stage the LED wall takes the top of the screen, so the call goes under the belts instead
+  judgeEl.style.top = STG.on ? '67%' : kind === 'both' ? '19%' : L.lanes === 2 && lane === 0 ? '12%' : '29%';
   judgeEl.innerHTML = '';
   judgeEl.append(txt);
   if (sub) { const s = document.createElement('small'); s.textContent = sub; judgeEl.append(s); }
@@ -6180,7 +6197,7 @@ $('tutskip').addEventListener('click', e => { e.stopPropagation(); skipPractice(
 // its music sections), or end it now with the good or the bad ending. Boxes before the jump count as perfect, so the jump
 // does not fail the run; a forced ending is not saved to progress.
 const DEV = { open: false };
-const SEC_KO = { intro: '인트로', outro: '아웃트로', end: '끝', finale: '마지막 한 방', lofi: '로파이', funk: '지우 음악', clash: '이어폰', silence: '정적', metal: '메탈' };
+const SEC_KO = { intro: '인트로', outro: '아웃트로', end: '끝', finale: '마지막 한 방', lofi: '지우 폰 비트', funk: '지우 이어폰', clash: '이어폰', silence: '정적', metal: '메탈' };
 function devMarks() {
   if (L.devMarks) return L.devMarks;
   return (L.sections || []).map(([bar, name]) => [bar * 4, (SEC_KO[name] || name) + ' · ' + bar + '마디']).filter(([b], i, a) => i === 0 || b !== a[i - 1][0]);
