@@ -104,14 +104,16 @@ const C = {
 };
 const SCAN_X = 300, BELT_Y = 146;
 
-// ---------- the song (the heartbeat rows' chart, the same as stage1-6.html) ----------
-// The rows run on this chart while the cutscene plays under them, until the song ends. The pictures are timed to the song
-// (Four Steps Home, below); the chart is not yet set on the song's own beats (the ward's monitor blips along with the rows).
-const SEG = [62, 62, 62, 62, 62, 68, 68, 56, 72, 60, 60, 66, 58, 64, 64, 64, 64, 60, 60, 60];
-const LEAD = 2.4;
-const SEGT = []; { let t = LEAD; for (const b of SEG) { SEGT.push(t); t += 8 * 60 / b; } SEGT.push(t); }
-const beatT = b => { const s = clamp(Math.floor(b / 8), 0, SEG.length - 1); return SEGT[s] + (b - s * 8) * 60 / SEG[s]; };
-const tBeat = t => { if (t < LEAD) return (t - LEAD) * SEG[0] / 60; let s = 0; while (s < SEG.length - 1 && t >= SEGT[s + 1]) s++; return s * 8 + (t - SEGT[s]) * SEG[s] / 60; };
+// ---------- the song's beats (the heartbeat rows' chart) ----------
+// The rows run on the song's own pulse: its quarter beats (about 61.6 BPM), tracked from the recording (librosa's beat tracker
+// on the onset strength, held to a steady tempo, smoothed over nine beats), from the first row's first beat. The bar is set so
+// each row's 4th beat, the one the player presses, falls on the bar's heaviest beat: where the bass lands and where the sung
+// 'four's fall ('One, two, three, and four' at 40.9 s and 130.5 s). 19 sections of 8 beats, two rows each.
+const BEATS = [2.972, 3.947, 4.923, 5.898, 6.873, 7.848, 8.824, 9.799, 10.773, 11.745, 12.718, 13.689, 14.661, 15.632, 16.602, 17.57, 18.532, 19.493, 20.454, 21.414, 22.372, 23.33, 24.287, 25.243, 26.201, 27.165, 28.131, 29.1, 30.072, 31.05, 32.032, 33.014, 33.995, 34.98, 35.966, 36.956, 37.947, 38.933, 39.916, 40.894, 41.869, 42.845, 43.816, 44.785, 45.751, 46.712, 47.674, 48.637, 49.602, 50.572, 51.548, 52.53, 53.513, 54.499, 55.492, 56.485, 57.48, 58.472, 59.459, 60.439, 61.417, 62.393, 63.369, 64.34, 65.311, 66.283, 67.257, 68.233, 69.212, 70.19, 71.165, 72.139, 73.111, 74.081, 75.048, 76.014, 76.982, 77.952, 78.925, 79.902, 80.882, 81.863, 82.846, 83.83, 84.813, 85.795, 86.773, 87.746, 88.716, 89.683, 90.647, 91.61, 92.573, 93.535, 94.495, 95.455, 96.417, 97.379, 98.342, 99.307, 100.272, 101.239, 102.209, 103.18, 104.151, 105.118, 106.086, 107.054, 108.023, 108.993, 109.965, 110.937, 111.912, 112.893, 113.878, 114.867, 115.857, 116.848, 117.835, 118.82, 119.805, 120.789, 121.772, 122.752, 123.728, 124.7, 125.673, 126.646, 127.617, 128.588, 129.56, 130.53, 131.5, 132.472, 133.448, 134.427, 135.416, 136.409, 137.4, 138.388, 139.376, 140.365, 141.353, 142.338, 143.32, 144.294, 145.265, 146.239, 147.215, 148.19, 149.165, 150.14, 151.115];
+const LEAD = BEATS[0], NBEAT = BEATS.length - 1, BP0 = BEATS[1] - BEATS[0], BPN = BEATS[NBEAT] - BEATS[NBEAT - 1];
+const SEG = Array.from({ length: NBEAT / 8 }, (_, s) => 8 * 60 / (BEATS[s * 8 + 8] - BEATS[s * 8]));   // each section's tempo (for reference)
+const beatT = b => { if (b <= 0) return LEAD + b * BP0; if (b >= NBEAT) return BEATS[NBEAT] + (b - NBEAT) * BPN; const i = Math.floor(b); return BEATS[i] + (b - i) * (BEATS[i + 1] - BEATS[i]); };
+const tBeat = t => { if (t <= LEAD) return (t - LEAD) / BP0; if (t >= BEATS[NBEAT]) return NBEAT + (t - BEATS[NBEAT]) / BPN; let a = 0, z = NBEAT; while (z - a > 1) { const m = (a + z) >> 1; if (BEATS[m] <= t) a = m; else z = m; } return a + (t - BEATS[a]) / (BEATS[a + 1] - BEATS[a]); };
 
 // ---------- the timeline ----------
 // One long take, no cuts: the same frame from the empty belt to the street. The chapters only mark where to jump to.
@@ -126,10 +128,10 @@ const SHOTS = [
   { id: 'lobby', t0: 73.0, t1: 94.6, name: '로비', note: '배경만 이른 아침의 병원 로비로 바뀐다. 졸고 있는 경비, 빈 대기 의자, 자판기 불빛. 하은이 가로질러 엘리베이터 버튼을 누른다.' },
   { id: 'lift', t0: 94.6, t1: 106.8, name: '엘리베이터', note: '엘리베이터 안. 층 표시가 1에서 5로 올라가고, 딩 하고 문이 열리면 깜깜한 복도.' },
   { id: 'corridor', t0: 106.8, t1: 125.4, name: '병원 복도', note: '암전 뒤 복도. 브리지 가사에 맞춰 불이 하나씩 켜지고(One light comes on / Another light), 하은이 한 걸음씩 걸어 502호 앞에 선다.' },
-  { id: 'ward', t0: 125.4, t1: 164.4, name: '병실', note: '마지막 코러스와 함께 병실. 의자에 앉고, I\'ll lay my hand에 어머니 손을 잡고, All the way home에 고개를 숙이고, 첫 Four…에 어머니 손가락이 움직이자 고개를 든다. 노래가 끝나고 노크, 천천히 뒤돌아봄, 문 밖에서 "누나!" "누나?" "누나!!"' },
-  { id: 'door', t0: 164.4, t1: 178.6, name: '문 너머', note: '하은이 일어나 병실 문으로 걸어가고, 위아래 검은 띠가 시네마처럼 크게 들어온다. 카메라가 따라가며 벽과 문이 들어오고, 문 건너편 복도에 꽃다발을 든 지우. 하은이 문손잡이에 손을 뻗고, 암전.' }
+  { id: 'ward', t0: 125.4, t1: 165.8, name: '병실', note: '마지막 코러스와 함께 병실. 의자에 앉고, I\'ll lay my hand에 어머니 손을 잡고, All the way home에 고개를 숙이고, 첫 Four…에 어머니 손가락이 움직이자 고개를 든다. 노래가 끝나고 노크, 천천히 뒤돌아봄, 문 밖에서 "누나!" "누나?" "누나!!"' },
+  { id: 'door', t0: 165.8, t1: 180.0, name: '문 너머', note: '하은이 일어나 병실 문으로 걸어가고, 위아래 검은 띠가 시네마처럼 크게 들어온다. 카메라가 따라가며 벽과 문이 들어오고, 문 건너편 복도에 꽃다발을 든 지우. 하은이 문손잡이에 손을 뻗고, 암전.' }
 ];
-const CUT_END = 178.6;   // the drawn cutscene's length: the song (Four Steps Home, 2:37.5), then the knock and the door; it fades to black here
+const CUT_END = 180.0;   // the drawn cutscene's length: the song (Four Steps Home, 2:37.5), then the knock and the door; it fades to black here
 const ROWS_END = 158.6;   // the heartbeat row (and its black bar) fades out once the song is over, leaving the whole picture
 const SONG = { src: 'media/four-steps-home.mp3', len: 157.52 };
 const END = CUT_END + 0.4;
@@ -175,10 +177,10 @@ const CORR = { t0: 106.8, t1: 108.6 };
 // after the song: a knock, she turns round, a voice through the door ('누나!'), she gets up and walks to the door; the camera
 // goes with her, the ward slides away and the wall with the door comes in, cut through side on, and on its far side in the
 // corridor 지우 with flowers. She reaches for the handle; black.
-const EXIT = { stand: 164.4, walk: 165.2, v: 28, reach: 175.8, look: 175.4 };
+const EXIT = { stand: 165.8, walk: 166.6, v: 28, reach: 177.2, look: 176.8 };
 const WALL = { x0: -58, x1: -48 };   // the ward's door wall (in the ward's own x), just off its left edge
 const EXIT_D = HX - 18 - WALL.x1;   // how far she walks (and the camera pans): the wall's ward side ends 18 px ahead of her
-const WARD = { t0: 125.4, t1: 127.4, sit: 128.4, hold: 131.7, rest: 140.8, squeeze: 149.2, lift: 150.2, knock: 158.4, turn: 159.0, voice: 161.2, voice2: 162.4, voice3: 163.6 };   // the calls (each waits on screen for a click)   // with the final chorus: the hand at 'I'll lay my hand', head down at 'All the way home', the hand moves at the first 'Four…'   // the hospital front fades to full black, then the corridor's lights come on one at a time
+const WARD = { t0: 125.4, t1: 127.4, sit: 128.4, hold: 131.7, rest: 140.8, squeeze: 149.2, lift: 150.2, knock: 158.4, turn: 159.0, voice: 161.2, knock2: 162.0, voice2: 163.1, knock3: 163.9, voice3: 165.0 };   // the calls (each waits on screen for a click)   // with the final chorus: the hand at 'I'll lay my hand', head down at 'All the way home', the hand moves at the first 'Four…'   // the hospital front fades to full black, then the corridor's lights come on one at a time
 const WALK3 = { t0: 113.3, ramp: 0.9, v: 18, stop: 125.0 };   // 'One more step': slow steps down the corridor
 const walk3D = t => { const v = WALK3.v, r = WALK3.ramp, b = WALK3.t0 + r, c = WALK3.stop - r, dB = v * r / 2, dC = dB + v * (c - b);
   if (t <= WALK3.t0) return 0; if (t < b) return v * (t - WALK3.t0) ** 2 / (2 * r); if (t < c) return dB + v * (t - b);
@@ -1284,7 +1286,7 @@ EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: 
   { t: DEST.t0, fn: 'pad', dur: ALLEY.t0 - DEST.t0, notes: [110, 164.81, 196, 246.94, 261.63] },   // Am9 getting off
   { t: ALLEY.t0, fn: 'pad', dur: WALK2.stop - ALLEY.t0, notes: [130.81, 196, 246.94, 293.66, 329.63] },   // Cmaj9 down the alley
   { t: WALK2.stop, fn: 'pad', dur: CORR.t0 + 1 - WALK2.stop, notes: [110, 164.81, 220, 246.94, 261.63] },   // A minor (add9) at the hospital
-  { t: WARD.knock, fn: 'knock' }, { t: WARD.turn + 0.4, fn: 'rustle' },
+  { t: WARD.knock, fn: 'knock' }, { t: WARD.knock2, fn: 'knock' }, { t: WARD.knock3, fn: 'knock' }, { t: WARD.turn + 0.4, fn: 'rustle' },
   { t: CORR.t0 + 1, fn: 'pad', dur: WARD.t0 - CORR.t0 - 1, notes: [146.83, 174.61, 220, 261.63, 329.63] },   // Dm9 down the corridor
   { t: RIDE.stop - 1.4, fn: 'brake' }, { t: RIDE.open, fn: 'doors' }, { t: DEST.close, fn: 'doors' }, { t: DEST.leave, fn: 'leaving' },
   { t: 56.5, fn: 'bird' }, { t: 59.8, fn: 'bird' }, { t: 63.1, fn: 'bird' }, { t: 56.2, fn: 'meow' },
@@ -1335,7 +1337,7 @@ function songSync(t) {
 const SUBS = [{"t0": 8.9, "t1": 13.8, "en": "The belt has stopped, the lights are out", "ko": "벨트는 멈추고, 불은 꺼졌어"}, {"t0": 13.8, "t1": 17.4, "en": "There's nothing left to hold", "ko": "붙잡을 건 아무것도 남지 않았어"}, {"t0": 17.5, "t1": 21.1, "en": "Just a watch around my wrist", "ko": "손목 위 시계 하나만"}, {"t0": 21.16, "t1": 24.9, "en": "Still telling me I'm late", "ko": "아직도 늦었다고 재촉해"}, {"t0": 24.94, "t1": 29.5, "en": "Before the first train comes", "ko": "첫차가 오기 전에"}, {"t0": 29.78, "t1": 34.6, "en": "Just hold on a little more", "ko": "조금만 더 버티면 돼"}, {"t0": 35.28, "t1": 37.72, "en": "I never had a dream", "ko": "나는 꿈이 없었어"}, {"t0": 37.72, "t1": 39.86, "en": "So I just count to four", "ko": "그래서 넷까지만 세"}, {"t0": 39.86, "t1": 41.64, "en": "One, two, three, and four", "ko": "하나, 둘, 셋, 그리고 넷"}, {"t0": 41.64, "t1": 43.72, "en": "I'll be waiting on the four", "ko": "넷에서 기다릴게"}, {"t0": 43.72, "t1": 45.94, "en": "Lost in a crowd of strangers", "ko": "낯선 사람들 틈에서"}, {"t0": 45.94, "t1": 48.04, "en": "I'm standing all alone", "ko": "나는 혼자 서 있어"}, {"t0": 48.04, "t1": 50.52, "en": "But the four is mine to keep", "ko": "그래도 넷은 내가 지킬게"}, {"t0": 50.52, "t1": 52.36, "en": "I won't let it go", "ko": "놓치지 않을게"}, {"t0": 52.36, "t1": 55.6, "en": "At the end of the alley", "ko": "골목 끝에서"}, {"t0": 55.74, "t1": 60.08, "en": "The windows go dark one by one", "ko": "창문들이 하나둘 꺼져"}, {"t0": 60.08, "t1": 62.74, "en": "The morning's coming in", "ko": "아침은 오는데"}, {"t0": 62.74, "t1": 68.4, "en": "But I'm still in the night", "ko": "나는 아직 밤이야"}, {"t0": 109.42, "t1": 112.8, "en": "One light comes on", "ko": "불이 하나 켜지면"}, {"t0": 113.3, "t1": 117.0, "en": "One more step", "ko": "한 걸음 더"}, {"t0": 118.34, "t1": 120.7, "en": "Another light", "ko": "또 하나의 불"}, {"t0": 121.06, "t1": 125.2, "en": "Another step", "ko": "또 한 걸음"}, {"t0": 126.56, "t1": 129.2, "en": "Mom, I'll count for you", "ko": "엄마, 내가 셀게"}, {"t0": 129.2, "t1": 130.7, "en": "One, two, three, and four", "ko": "하나, 둘, 셋, 그리고 넷"}, {"t0": 130.7, "t1": 132.84, "en": "Don't stop, I'll lay my hand", "ko": "멈추지 마, 내가 손을 얹을게"}, {"t0": 132.84, "t1": 135.06, "en": "Right on your every beat", "ko": "엄마의 박 하나하나 위에"}, {"t0": 135.06, "t1": 137.2, "en": "I don't need a dream", "ko": "꿈은 없어도 돼"}, {"t0": 137.32, "t1": 139.34, "en": "This beat is all I need", "ko": "이 박 하나면 충분해"}, {"t0": 139.34, "t1": 141.3, "en": "Your four, I'll carry it", "ko": "엄마의 넷은 내가 이어 갈게"}, {"t0": 141.3, "t1": 146.6, "en": "All the way home", "ko": "집에 닿을 때까지"}, {"t0": 149.22, "t1": 151.8, "en": "Four...", "ko": "넷…"}, {"t0": 153.26, "t1": 155.8, "en": "Four...", "ko": "넷…"}];
 // how each lyric line looks: where it rises (x, y on the picture as seen, after the crop; al: l/r/c from x; w: wrap width),
 // its colour and glow (taken from the scene's light), its size, ink: a soft dark shadow on bright backgrounds, st: a word a
-// count (the counting lines), fx: flicker / dark / alone.
+// count (the counting lines), fx: flicker / alone.
 // Lines about the four come in the yellow of the scan box.
 const LOOK = { amber: ['#ffe6b0', '255,176,80'], pink: ['#fff0f3', '255,128,168'], peach: ['#ffe8d6', '255,150,100'], led: ['#ffc66e', '255,160,50'],
   mint: ['#eafff2', '80,200,120'], cool: ['#ffffff', '140,190,255'], four: ['#ffe066', '242,196,58'], grey: ['#e6edf4', '150,170,200'],
@@ -1357,7 +1359,7 @@ const LYRIC_LOOK = [
   { x: 370, y: 40, al: 'r', w: 150, p: LOOK.four, s: 1.05, ink: true },
   { x: 14, y: 70, al: 'l', w: 170, p: LOOK.four, s: 1.1, ink: true },
   { x: 14, y: 20, al: 'l', w: 180, p: LOOK.sky, ink: true },         // the alley: in the morning sky
-  { x: 370, y: 20, al: 'r', w: 150, p: LOOK.sky, ink: true, fx: 'dark' },
+  { x: 370, y: 20, al: 'r', w: 150, p: LOOK.sky, ink: true },
   { x: 14, y: 22, al: 'l', w: 180, p: LOOK.gold, s: 1.05, ink: true },
   { x: 14, y: 46, al: 'l', w: 180, p: LOOK.night, s: 1.1 },         // the hospital front: dark night blue against the morning sky
   { x: 196, y: 40, al: 'r', w: 170, p: LOOK.lamp, s: 1.1, fx: 'flicker' },          // the dark corridor: glowing by the first light
@@ -1376,7 +1378,7 @@ const LYRIC_LOOK = [
 ];
 let subLang = 'en';
 // the lines through the door, in the game's dialogue box: each is typed out, then the cutscene waits on it (a blinking ▼) until a
-// click, a tap or Space/Enter, as dialogue does in the game; the next call comes 1.2 s after
+// click, a tap or Space/Enter, as dialogue does in the game; after it, a knock again, then the next call
 const LINES = [{ t0: WARD.voice, who: '???', en: 'Haeun!', ko: '누나!' }, { t0: WARD.voice2, who: '???', en: 'Haeun?', ko: '누나?' }, { t0: WARD.voice3, who: '???', en: 'Haeun!!', ko: '누나!!' }];
 for (const l of LINES) { l.hold = l.t0 + 0.45; l.done = false; }
 let waiting = null;   // the line the clock is held on
@@ -1407,8 +1409,8 @@ function drawSubs(t) {
 // The lyrics' typography: plain and quiet. A book serif (Cormorant Garamond for English, Gowun Batang for Korean), a little
 // open tracking, proper apostrophes and ellipses. Each line fades in letter by letter as it rises a few pixels, rests, and
 // fades out letter by letter as it drifts on up; a soft glow in the scene's light (and a soft dark shadow on bright scenes)
-// is all the ornament. Only three lines do more, gently: the lights come on with one small flicker, the windows go dark word
-// by word, and 'all alone' opens a little space between its words.
+// is all the ornament. Only two lines do more, gently: the lights come on with one small flicker, and 'all alone' opens a
+// little space between its words. No line changes colour.
 const LYR_CACHE = new Map();
 const LYR_FACE = { en: '700 {S}px "Cormorant Garamond", "Gowun Batang", Georgia, serif', ko: '700 {S}px "Gowun Batang", "Cormorant Garamond", serif' };
 const lyrLang = () => subLang === 'ko' ? 'ko' : 'en';
@@ -1447,7 +1449,6 @@ function drawLyrics(t) {
       const k = ease(seg(t, ta, ta + 0.8)), te = c.t1 - 0.2 + g.i * 0.012, ke = ease(seg(t, te, te + 0.7));
       let a = k * (1 - ke), x = g.x, y = g.y + drift + (1 - k) * 3 * sc - ke * 3 * sc, col = col0, ga = 0.55;
       if (st.fx === 'flicker' && t - ta < 0.3) a *= [1, 0.2, 0.9, 0.35, 1][Math.floor((t - ta) / 0.06)];
-      if (st.fx === 'dark') { const kd = ease(seg(t, c.t0 + 1.7 + g.w * 0.4, c.t0 + 2.3 + g.w * 0.4)); col = mix(col0, '#8a93ab', kd); ga *= 1 - kd; }
       if (st.fx === 'alone') x += (g.w - (L.nW - 1) / 2) * 2.5 * sc * ease(seg(t, c.t0 + 0.8, c.t1 + 0.5));
       if (a <= 0.01) continue;
       out.globalAlpha = a; out.fillStyle = col;
@@ -1459,6 +1460,8 @@ function drawLyrics(t) {
   out.restore();
 }
 
+// a hit on the row (set by the rows below): the picture breathes a little warm light
+const SCREEN_HIT = { at: -1e9, perfect: false };
 // the row is drawn on its own layer the size of the screen, laid over the picture (so it can fade out after the song)
 const HBCV = document.createElement('canvas'); HBCV.width = cv.width; HBCV.height = cv.height;
 // ---------- the heartbeat rows (from stage1-6.html, laid over the cutscene) ----------
@@ -1533,6 +1536,7 @@ const HB = (() => {
     const bw = boxWin(best);
     if (Math.abs(d) <= bw) {
       const j = Math.abs(d) <= Math.max(0.08, bw * 0.4) ? 'perfect' : 'good';
+      SCREEN_HIT.at = performance.now(); SCREEN_HIT.perfect = j === 'perfect';
       for (const tg of same) { tg.judge = j; tg.d = d; tg.hitT = t; stats[j]++; stats.combo++; FX.lane[tg.lane].hitAt = now; burst(COL, LANEY[tg.lane], j); FX.pops.push({ lane: tg.lane, text: j === 'perfect' ? '딱' : '좋아', sub: j === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: now, c: j === 'perfect' ? '#ffffff' : '#cfe8d6' }); }
       stats.best = Math.max(stats.best, stats.combo); FX.flashAt = now; FX.kickAt = now;
       if (ac.currentTime - startAt >= WARD.t0) monBeep(ac.currentTime, 1175, 0.07); else { heart(ac.currentTime, 0.9, true); monBeep(ac.currentTime, 1175, 0.015); }
@@ -1795,6 +1799,10 @@ function frame(now) {
   const rows = hbOn && T < ROWS_END;   // the row is gone once the song is over
   if (rows) HB.update(T);
   render(T); audioTick(T); songSync(T);
+  // a hit: a soft warm light swells over the whole picture from its middle and fades (0.5 s; a little more on a perfect)
+  { const u = (performance.now() - SCREEN_HIT.at) / 520; if (u >= 0 && u < 1 && T < ROWS_END) { const a = (SCREEN_HIT.perfect ? 0.2 : 0.13) * (1 - u) * (1 - u), cx = cv.width / 2, cy = cv.height * 0.33, r = cv.width * 0.75;
+    out.save(); out.setTransform(1, 0, 0, 1, 0, 0); out.globalCompositeOperation = 'lighter'; const gr = out.createRadialGradient(cx, cy, 0, cx, cy, r); gr.addColorStop(0, `rgba(255,236,200,${a})`); gr.addColorStop(0.6, `rgba(255,226,180,${a * 0.55})`); gr.addColorStop(1, 'rgba(255,220,170,0)');
+    out.fillStyle = gr; out.fillRect(0, 0, cv.width, BAR_TOP * SC); out.restore(); } }
   // the black bar along the bottom stays after the row has gone (it is the dialogue's place too); as she walks to the door the
   // bars close in top and bottom, cinema-wide (the bottom one up to her waist, so her steps read from the shoulders)
   { const lb = letterK(T); if ((hbOn || lb > 0) && T < CUT_END) {
