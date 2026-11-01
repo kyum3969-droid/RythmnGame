@@ -3108,6 +3108,11 @@ function drawStage15(t, nowMs, sv) {
   if (P && P.q < 0.3 && !STG.fired.has(P.b0) && ctx) { STG.fired.add(P.b0); crowdRoar(ctx.currentTime, 0.8, 0.05); }
   let jCarry = null, jDrop = null;
   const over = L.lastHit && b >= L.lastHit * 4;
+  // the second switch: as he says he'll go with his heaviest, he bends for a box and gets it up to his chest - and freezes
+  // there with it while she cuts him off
+  const sw = S.two != null && b >= S.two - 8 && b < S.two ? (b - (S.two - 8)) / 2 : null;
+  if (sw != null) { const p = Math.min(1, sw), up = ease(Math.min(1, Math.max(0, (p - 0.3) / 0.7))); jp.dip = Math.round(4 * Math.sin(Math.min(1, p / 0.6) * Math.PI)); jp.hand = { x: BOSS_X + 12, y: Math.round(jA(FY - 8 - 34 * up)) + (sw > 1.2 ? Math.round(Math.sin(nowMs / 60) * 0.6) : 0) }; jp.reach = 50; }
+  const swBox = sw != null ? jp.hand : null;
   if (over) { jp.wince = true; jp.hand = { x: BOSS_X + 13, y: Math.round(jA(FY - 52)) + (Math.floor(nowMs / 160) % 2) }; jp.reach = 50; }
   if (two && J.k != null && !over) {
     const f = J.f;
@@ -3117,7 +3122,7 @@ function drawStage15(t, nowMs, sv) {
   // their shadows on the floor, then them (him drawn smaller, his feet planted)
   for (const [x, w] of [[hx, 11], [jx + Math.round(4 * jFlinch), 11]]) { g.fillStyle = 'rgba(0,0,0,.45)'; g.beginPath(); g.ellipse(x, FY + 1 + lift(x), w, 2.5, 0, 0, Math.PI * 2); g.fill(); }
   g.save(); g.translate(0, hDy + lift(hx)); drawActor('haeun', hx, false, hp, nowMs, true, () => PARTNERS.haeun.arm(hp)); g.restore();
-  g.save(); g.translate(Math.round(4 * jFlinch), jDy + lift(jx)); drawActor('jiwoo', jx, true, jp, nowMs, true, top => { const ft = 84 + 64; R(BOSS_X - 6, ft, 5, 7, '#2f3440'); R(BOSS_X + 1, ft, 5, 7, '#2f3440'); R(BOSS_X - 7, ft + 7, 7, 3, '#e9e4da'); R(BOSS_X + 1, ft + 7, 7, 3, '#e9e4da'); PARTNERS.jiwoo.arm(jp); if (jCarry) drawBox(STG.box, jCarry.x, jCarry.y + 5, '', t); });
+  g.save(); g.translate(Math.round(4 * jFlinch), jDy + lift(jx)); drawActor('jiwoo', jx, true, jp, nowMs, true, top => { const ft = 84 + 64; R(BOSS_X - 6, ft, 5, 7, '#2f3440'); R(BOSS_X + 1, ft, 5, 7, '#2f3440'); R(BOSS_X - 7, ft + 7, 7, 3, '#e9e4da'); R(BOSS_X + 1, ft + 7, 7, 3, '#e9e4da'); PARTNERS.jiwoo.arm(jp); if (jCarry || swBox) { const hb = jCarry || swBox; drawBox(STG.box, hb.x, hb.y + 5, '', t); } });
   g.restore();
   if (jDrop != null) { const q = jDrop, x = jx - 8 + Math.round(18 * q), y = FY - 70 + Math.round(64 * q * q); g.save(); g.translate(x, y); g.rotate(q * 4); drawBox(STG.box, 0, 6, '', t); g.restore(); }
   STG.heads = { h: [hx + 2, 88 + hDy + lift(hx)], j: [jx - 2, 86 + jDy + lift(jx)] };
