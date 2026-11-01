@@ -139,14 +139,14 @@ const SHOTS = [
   { id: 'ward', t0: 125.4, t1: 165.8, name: '병실', note: '마지막 코러스와 함께 병실. 의자에 앉고, I\'ll lay my hand에 어머니 손을 잡고, All the way home에 고개를 숙이고, 첫 Four…에 어머니 손가락이 움직이자 고개를 든다. 노래가 끝나고 노크, 천천히 뒤돌아봄, 문 밖에서 "누나!" "누나?" "누나!!"' },
   { id: 'door', t0: 165.8, t1: 178.2, name: '문 너머', note: '하은이 일어나 병실 문으로 걸어가고, 위아래 검은 띠가 시네마처럼 크게 들어온다. 카메라가 따라가며 벽과 문이 들어오고, 문 건너편 복도에 꽃다발을 든 지우. 하은이 문손잡이에 손을 뻗고, 암전.' },
   { id: 'rewind', t0: 178.2, t1: 183.0, name: '되감기', note: '지우의 노래(Three Steps Behind)가 시작되며 컷씬이 빠르게 거꾸로 감긴다: 문, 병실, 복도, 로비, 골목, 열차, 공장 앞.' },
-  { id: 'jiwoo', t0: 183.0, t1: 227.9, name: '지우의 길', note: '같은 길을 지우가 걷는다: 거리, 역, 열차(이어폰 속 하은의 비트), 내리는 역 꽃집에서 꽃다발, 하은이 켜 둔 불이 그대로인 복도, 502호 앞에서 노크 셋, 넷째는 플레이어.' },
+  { id: 'jiwoo', t0: 183.0, t1: 227.9, name: '지우의 길', note: '반장 "…지우. 따라가든가." 같은 길을 지우가 걷는다: 거리, 역, 열차(이어폰 속 하은의 비트), 내리는 역 꽃집에서 천천히 꽃다발을 삼(할머니가 건네줌, 고개 숙여 인사), 하은이 켜 둔 불이 그대로인 복도, 502호 앞에서 노크 셋, 넷째는 플레이어.' },
   { id: 'open', t0: 227.9, t1: 240.8, name: '문이 열린다', note: '다시 문을 가운데 둔 단면, 위아래 띠가 닫히고, Let me count with you에 문이 열린다. 암전.' }
 ];
 const CUT_END = 178.2 + 62.6;   // 하은's part, then 지우's reprise (REP) to its last hum   // the drawn cutscene's length: the song (Four Steps Home, 2:37.5), then the knock and the door; it fades to black here
 const ROWS_END = 158.6;
 // 지우's heart in the reprise: from a little before his first row to just after his last
-const inRows = t => t < ROWS_END || (t >= REP.t0 + QREP[0] - 2.5 && t < REP.t0 + QREP[QREP.length - 1] + 0.6);
-const rowsAlpha = t => t < ROWS_END ? 1 - seg(t, ROWS_END - 1.2, ROWS_END - 0.05) : seg(t, REP.t0 + QREP[0] - 2.5, REP.t0 + QREP[0] - 1.5) * (1 - seg(t, REP.t0 + QREP[QREP.length - 1] - 0.6, REP.t0 + QREP[QREP.length - 1] + 0.55));   // the heartbeat row (and its black bar) fades out once the song is over, leaving the whole picture
+const inRows = t => t < ROWS_END || (t >= REP.t0 + 7.3 && t < REP.t0 + QREP[QREP.length - 1] + 0.6);
+const rowsAlpha = t => t < ROWS_END ? 1 - seg(t, ROWS_END - 1.2, ROWS_END - 0.05) : seg(t, REP.t0 + 7.3, REP.t0 + 7.8) * (1 - seg(t, REP.t0 + QREP[QREP.length - 1] - 0.6, REP.t0 + QREP[QREP.length - 1] + 0.55));   // the heartbeat row (and its black bar) fades out once the song is over, leaving the whole picture
 const SONG = { src: 'media/four-steps-home.mp3', len: 157.52 };
 const END = CUT_END + 0.4;
 // at the belt (seconds)
@@ -313,7 +313,8 @@ function jiwooFig(cx, top, o = {}) {
 }
 // draw her on her sheet; returns a function that puts her (and later her rim light) into the shot
 // who walks the scenes: 하은, or (in the reprise) 지우 in her place, in her poses (JPOSE can change a pose for him)
-let WHO = 'haeun', JPOSE = null, JFLOWERS = false;
+let WHO = 'haeun', JPOSE = null, JFLOWERS = false, STALL_S = -1;
+const STALL_HAND = { x: HX + 15, y: HTOP + 27 };   // where the money and the flowers change hands, over the stall's front corner
 function haeunSprite(o) {
   sctx.clearRect(0, 0, SPR_W, SPR_H); const keep = g; g = sctx;
   if (WHO === 'jiwoo') { FACE_LINE = null; jiwooFig(SPR_CX, SPR_TOP, JPOSE ? JPOSE(o) : o); } else haeun(SPR_CX, SPR_TOP, o);
@@ -682,12 +683,24 @@ function station(t, dest) {
   R(-200, 158, W + 400, 7, '#e0b93a'); for (let x = -200; x < W; x += 3) { R(x, 159, 1, 1, '#c79f25'); R(x + 1, 162, 1, 1, '#c79f25'); }
   // a tiled pillar
   R(88, 0, 20, 158, '#d6d1c3'); R(88, 0, 2, 158, '#ebe7dc'); R(106, 0, 2, 158, '#b3ae9f'); for (let y = 6; y < 156; y += 8) R(90, y, 16, 1, '#c4bfb0');
-  // (in 지우's walk) a flower stall open early by the exit, where he buys the flowers
-  if (dest && WHO === 'jiwoo') { const x = HX + 18;
-    R(x, 104, 40, 4, '#2f8a5a'); for (let k = 0; k < 5; k++) R(x + k * 8, 108, 8, 4, k % 2 ? '#f4f1ea' : '#2f8a5a');
-    R(x + 2, 112, 2, 18, '#6a5a4a'); R(x + 36, 112, 2, 18, '#6a5a4a'); R(x + 6, 96, 28, 7, '#f4f1ea'); pixText('FLOWERS', x + 20 - Math.floor(pixTextW('FLOWERS') / 2), 97, '#2f8a5a');
-    R(x, 130, 40, 26, '#8a6a4a'); R(x, 130, 40, 2, '#a8865e');
-    for (let k = 0; k < 4; k++) { const bx = x + 3 + k * 9; R(bx, 124, 7, 7, '#5a6a72'); for (const [dx, dy, c] of [[1, -3, '#4a8a3a'], [0, -5, ['#e86a6a', '#f2a6c8', '#ffd27a', '#f8f4ec'][k]], [3, -6, ['#f2a6c8', '#e86a6a', '#f8f4ec', '#ffd27a'][k]], [5, -4, '#4a8a3a']]) R(bx + dx, 124 + dy, 2, 3, c); } }
+  // (in 지우's walk) a flower stall open early by the exit, an older woman in an apron behind it; she takes his money and
+  // hands him the flowers over the counter (in song time STALL_S, see BUY)
+  if (dest && WHO === 'jiwoo') { const x = HX + 18, ss = STALL_S;
+    R(x + 6, 76, 28, 7, '#f4f1ea'); R(x + 6, 76, 28, 1, '#2f8a5a'); pixText('FLOWERS', x + 20 - Math.floor(pixTextW('FLOWERS') / 2), 77, '#2f8a5a');
+    R(x, 84, 44, 4, '#2f8a5a'); for (let k = 0; k < 6; k++) R(x + k * 8 - 2, 88, 8, 4, k % 2 ? '#f4f1ea' : '#2f8a5a');
+    R(x + 1, 92, 2, 40, '#6a5a4a'); R(x + 40, 92, 2, 40, '#6a5a4a');
+    // the seller: grey bun, cardigan and apron; she looks up at him, then reaches over with the flowers
+    const sx = x + 26; person(sx, 100, { hair: 'bun', hc: '#8a8480', sk: SK[1], top: '#9a7a6a', sh: '#e8e2d6', bot: '#5a5048', act: 'hang' });
+    R(sx - 7, 118, 14, 12, '#5a7a5a'); R(sx - 7, 118, 14, 1, '#6e8e6e');   // the apron
+    R(x, 130, 44, 26, '#8a6a4a'); R(x, 130, 44, 2, '#a8865e'); R(x + 2, 140, 40, 1, '#76583a');
+    for (let k = 0; k < 4; k++) { const bx = x + 4 + k * 10; R(bx, 124, 7, 7, '#5a6a72'); for (const [dx, dy, c] of [[1, -3, '#4a8a3a'], [0, -5, ['#e86a6a', '#f2a6c8', '#ffd27a', '#f8f4ec'][k]], [3, -6, ['#f2a6c8', '#e86a6a', '#f8f4ec', '#ffd27a'][k]], [5, -4, '#4a8a3a'], [2, -8, ['#ffd27a', '#f8f4ec', '#e86a6a', '#f2a6c8'][k]]]) R(bx + dx, 124 + dy, 2, 3, c); }
+    // her arm over the counter, in front of the buckets
+    if (ss >= BUY.pay && ss < BUY.take + 0.3) { const k = ease(seg(ss, BUY.pay + 0.3, BUY.hand)) * (1 - ease(seg(ss, BUY.take, BUY.take + 0.3))), hx = Math.round(lerp(sx - 8, STALL_HAND.x + 3, k)), hy = Math.round(lerp(131, STALL_HAND.y + 1, k));
+      thick(sx - 8, 117, hx, hy, 3, '#9a7a6a'); R(hx - 1, hy - 1, 3, 3, SK[1]);
+      if (ss >= BUY.hand - 0.2 && ss < BUY.take) { const bx = hx - 3, by = hy - 13;   // the flowers in her hand, coming over
+        for (let r = 0; r < 12; r++) { const w = Math.round(9 - r * 0.6); R(bx - Math.floor(w / 2), by + 5 + r, w, 1, r % 4 === 0 ? '#cbbd9e' : '#e8dcc4'); }
+        for (const [dx, dy, c] of [[-3, 2, '#4a8a3a'], [2, 1, '#e86a6a'], [-1, 0, '#f2a6c8'], [1, 3, '#ffd27a'], [-2, 3, '#f8f4ec']]) R(bx + dx, by + dy, 3, 3, c); } }
+  }
   g.restore();
   // her: her last steps, then waiting, the watch checked once (at the station she gets off at, just standing)
   const { o, top } = dest ? alleyPose(t) : stationPose(t);
@@ -1233,26 +1246,31 @@ function crossTo(t, t0, t1, ctx, canvas, drawNext, pose, tintA, tintB, clipY, dr
 //   the flower stall (he buys them at her 47.8 to 48.6);  chorus (31.6 to 46): her corridor with every light still on;
 //   'One, two, three, and four' (46 to 49.7): at 502 he knocks on one, two, three (the player has four);
 //   then (from 49.7) the door again, cut through, and on 'Let me count with you' it opens.
-const VT = [[4.8, 17.0], [23.9, 38.5], [33.2, 50.9], [31.6, 112.6], [46.0, 125.0]];
-const RS = { walk: 4.8, bToC: [31.6, 33.2], knock: 46.0, door: 49.7, open: 54.6, buy: [47.8, 48.6] };
+const RS = { walk: 4.8, ride: 21.5, stall: 26.0, bToC: [32.0, 33.6], knock: 46.0, door: 49.7, open: 54.6 };
+// the stall, in song time: he turns to it, looks over the buckets, holds out the money, the seller hands him the flowers,
+// he looks down at them and gives her a little bow
+const BUY = { look: 26.4, browse: 27.0, pay: 28.2, hand: 29.0, take: 29.7, bow: 30.7 };
 const KNOCKS = [QREP[40], QREP[41], QREP[42]];   // song time: one, two, three
-const vtA = s => lerp(17.0, 38.5, (s - 4.8) / (23.9 - 4.8)), vtB = s => lerp(38.5, 50.9, (s - 23.9) / (33.2 - 23.9)), vtC = s => s >= 46 ? 125.0 : lerp(112.6, 125.0, (s - 31.6) / (46.0 - 31.6));
+const STALL_T = 49.45;   // her timeline held here while he buys (the platform she got off at, the train still in)
+const vtA = s => lerp(17.0, 38.5, (s - RS.walk) / (RS.ride - RS.walk)), vtB = s => s >= RS.stall ? STALL_T : lerp(38.5, STALL_T, (s - RS.ride) / (RS.stall - RS.ride)), vtC = s => s >= 46 ? 125.0 : lerp(112.6, 125.0, (s - RS.bToC[0]) / (46.0 - RS.bToC[0]));
 const rewT = s => lerp(177.8, 17.0, ease(seg(s, 0.15, REP.rew - 0.25)));   // where the rewind is in her cutscene
 // in her timeline, the time that drives the room's sound beds (null: no beds)
-function bedTime(t) { const s = t - REP.t0; if (s < 0) return t; if (s < REP.rew) return null; if (s < 23.9) return vtA(s); if (s < 31.6) return vtB(s); if (s < 49.7) return vtC(s); return EXIT.reach + 0.6; }
+function bedTime(t) { const s = t - REP.t0; if (s < 0) return t; if (s < REP.rew) return null; if (s < RS.ride) return vtA(s); if (s < RS.bToC[0]) return vtB(s); if (s < 49.7) return vtC(s); return EXIT.reach + 0.6; }
 let DOOR_OPEN = 0;
 function repWorld(t) {
   const s = t - REP.t0;
   if (s < REP.rew) { drawWorld(rewT(s)); rewindFX(s); return; }
   WHO = 'jiwoo'; JFLOWERS = false; JPOSE = null;
   try {
-    if (s < 23.9) drawWorld(vtA(s));
+    if (s < RS.ride) drawWorld(vtA(s));
     else if (s < RS.bToC[1]) {
-      const v = vtB(s); JFLOWERS = v > 48.3;
-      // buying: his hand out to the stall and back with the flowers
-      const k = seg(v, RS.buy[0], RS.buy[0] + 0.25) * (1 - seg(v, RS.buy[1] - 0.2, RS.buy[1]));
-      if (k > 0) JPOSE = o => ({ ...o, arms: 'reach', reach: { dx: Math.round(lerp(-6, HX - (HX + 22) - 1, k)), dy: Math.round(lerp(31, 22, k)) } });
-      drawWorld(v);
+      STALL_S = s; JFLOWERS = s >= BUY.take;
+      if (s >= RS.stall) {   // at the stall: standing, his look and hands through the buying
+        const look = s < BUY.look ? 0.2 : s < BUY.browse ? lerp(0.2, -0.4, ease(seg(s, BUY.look, BUY.browse))) : s < BUY.pay ? -0.4 : s < BUY.take ? 0.1 : s < BUY.bow ? -0.5 : s < BUY.bow + 0.5 ? -0.9 : lerp(-0.5, 0.2, ease(seg(s, BUY.bow + 0.5, BUY.bow + 1.2)));
+        const k = ease(seg(s, BUY.pay, BUY.pay + 0.5)) * (1 - ease(seg(s, BUY.take, BUY.take + 0.4)));   // his hand out: the money, then taking them
+        JPOSE = o => ({ mirror: true, look, sway: 0, ...(k > 0 ? { arms: 'reach', reach: { dx: Math.round(lerp(-6, HX - STALL_HAND.x - 1, k)), dy: Math.round(lerp(31, STALL_HAND.y - HTOP, k)) } } : {}) });
+      }
+      drawWorld(vtB(s));
       if (s > RS.bToC[0]) { JFLOWERS = true; JPOSE = null; crossTo(t, REP.t0 + RS.bToC[0], REP.t0 + RS.bToC[1], wdctx, WDW, () => corridorScene(vtC(s)), { o: {}, top: HTOP }, '#ffffff', '#ffffff', 0); }
     } else if (s < RS.door) {
       JFLOWERS = true;
@@ -1263,7 +1281,7 @@ function repWorld(t) {
       drawWorld(vtC(s));
       if (s > RS.door - 1.4) { const keep = WHO; WHO = 'haeun'; JPOSE = null; crossTo(t, REP.t0 + RS.door - 1.4, REP.t0 + RS.door, frctx, FRW, () => doorEnd(s), { o: {}, top: HTOP }, '#ffffff', '#ffffff', 0); WHO = keep; }
     } else { WHO = 'haeun'; doorEnd(s); }
-  } finally { WHO = 'haeun'; JPOSE = null; JFLOWERS = false; }
+  } finally { WHO = 'haeun'; JPOSE = null; JFLOWERS = false; STALL_S = -1; }
 }
 // the door at the end: as 하은's part left it (her hand on the handle, 지우 with the flowers beyond the wall), then it opens
 function doorEnd(s) { DOOR_OPEN = ease(seg(s, RS.open, RS.open + 1.6)); try { doorScene(EXIT.reach + 0.6); } finally { DOOR_OPEN = 0; } }
@@ -1389,6 +1407,7 @@ const SFX = {
   rustle(t) { noise(t, 0.35, 0.025, 'bandpass', 2400, 0.7); noise(t + 0.6, 0.3, 0.02, 'bandpass', 1800, 0.7); },
   knock(t) { for (const dt of [0, 0.3, 0.6]) { thump(t + dt, 150, 0.5, 0.11); thump(t + dt, 95, 0.3, 0.16); noise(t + dt, 0.05, 0.3, 'bandpass', 900, 1.4); noise(t + dt + 0.01, 0.18, 0.05, 'bandpass', 420, 2.5); } },   // knuckles on the ward door, loud and close
   blip(t) { tone(t, 'square', 392, 392, 0.025, 0.025); },
+  blipLow(t) { tone(t, 'square', 220, 220, 0.03, 0.025); },   // 반장's, as in the game
   rewind(t) { const s = ac.createBufferSource(); s.buffer = NB; s.loop = true; const fl = ac.createBiquadFilter(); fl.type = 'bandpass'; fl.Q.value = 5; fl.frequency.setValueAtTime(300, t); fl.frequency.exponentialRampToValueAtTime(2600, t + 1.2); fl.frequency.setValueAtTime(2600, t + 3.8); fl.frequency.exponentialRampToValueAtTime(400, t + 4.6);
     const gn = ac.createGain(); gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.06, t + 0.4); gn.gain.setValueAtTime(0.06, t + 4.2); gn.gain.linearRampToValueAtTime(0.0001, t + 4.7); s.connect(fl); fl.connect(gn); gn.connect(bus); s.start(t); s.stop(t + 4.8); thump(t + 4.65, 90, 0.15, 0.08); },
   knock1(t) { thump(t, 150, 0.45, 0.11); thump(t, 95, 0.25, 0.16); noise(t, 0.05, 0.25, 'bandpass', 900, 1.4); },
@@ -1424,7 +1443,7 @@ for (let k = 1; ; k++) { const t = walk2T(k * STRIDE); if (t > WALK2.stop - 0.05
 for (let i = EV.length - 1; i >= 0; i--) if (EV[i].fn === 'pad') EV.splice(i, 1);   // the song is the music now
 EV.push({ t: LOBBY.press, fn: 'button' }, { t: LOBBY.open, fn: 'liftDoor' }, { t: ELEV.t1, fn: 'liftHum', dur: ELEV.ding - ELEV.t1 }, { t: ELEV.ding, fn: 'ding' }, { t: ELEV.open, fn: 'liftDoor' });
 for (let k = 1; ; k++) { const t = W4.T(k * STRIDE); if (t > WALK4.stop - 0.05) break; EV.push({ t, fn: 'step', out: false }); }
-EV.push({ t: REP.t0, fn: 'rewind' }, ...KNOCKS.map(q => ({ t: REP.t0 + q, fn: 'knock1' })), { t: REP.t0 + RS.open, fn: 'dooropen' }, ...[WARD.voice, WARD.voice2, WARD.voice3].flatMap(v => [{ t: v, fn: 'blip' }, { t: v + 0.08, fn: 'blip' }]), { t: EXIT.stand, fn: 'chair' }, { t: EXIT.stand + 0.2, fn: 'rustle' }, { t: EXIT.reach + 0.3, fn: 'handle' });
+EV.push({ t: REP.t0 + 4.9, fn: 'blipLow' }, { t: REP.t0 + 5.0, fn: 'blipLow' }, { t: REP.t0 + 5.1, fn: 'blipLow' }, { t: REP.t0, fn: 'rewind' }, ...KNOCKS.map(q => ({ t: REP.t0 + q, fn: 'knock1' })), { t: REP.t0 + RS.open, fn: 'dooropen' }, ...[WARD.voice, WARD.voice2, WARD.voice3].flatMap(v => [{ t: v, fn: 'blip' }, { t: v + 0.08, fn: 'blip' }]), { t: EXIT.stand, fn: 'chair' }, { t: EXIT.stand + 0.2, fn: 'rustle' }, { t: EXIT.reach + 0.3, fn: 'handle' });
 for (let k = 1; ; k++) { const t = WX.T(k * STRIDE); if (t > WX.stop - 0.05) break; EV.push({ t, fn: 'step', out: false }); }
 EV.sort((a, b) => a.t - b.t);
 function audioStart(t) {
@@ -1566,9 +1585,11 @@ let subLang = 'en';
 // the lines through the door, in the game's dialogue box: each is typed out, then the cutscene waits on it (a blinking ▼) until a
 // click, a tap or Space/Enter, as dialogue does in the game; after it, a knock again, then the next call
 const LINES = [{ t0: WARD.voice, who: '???', en: 'Haeun!', ko: '누나!' }, { t0: WARD.voice2, who: '???', en: 'Haeun?', ko: '누나?' }, { t0: WARD.voice3, who: '???', en: 'Haeun!!', ko: '누나!!' }];
+// and as the rewind lands at the factory, 반장's voice: a nudge, not an order (timed: the song is playing, so it doesn't wait for a click)
+LINES.push({ t0: REP.t0 + 4.9, t1: REP.t0 + 7.3, timed: true, who: { ko: '반장', en: 'Foreman' }, en: '…Jiwoo. Follow her, if you want.', ko: '…지우. 따라가든가.' });
 for (const l of LINES) { l.hold = l.t0 + 0.45; l.done = false; }
 let waiting = null;   // the line the clock is held on
-const lineAt = t => LINES.find(l => t >= l.t0 && (l.done ? t < l.hold : t <= l.hold + 1e-6));   // on screen from its start until dismissed
+const lineAt = t => LINES.find(l => t >= l.t0 && (l.timed ? t < l.t1 : l.done ? t < l.hold : t <= l.hold + 1e-6));   // on screen from its start until dismissed
 function dismissLine() { if (!waiting) return false; waiting.done = true; waiting = null; return true; }
 function resetLines(t) { for (const l of LINES) l.done = t > l.hold; waiting = null; }   // through the ward door (지우, not seen yet; in English he calls her by name)
 function drawSubs(t) {
@@ -1577,13 +1598,13 @@ function drawSubs(t) {
   // orange tag, the line typed out a letter at a time). Shown even with the lyrics off: Korean with the Korean subtitles, else English.
   const ln = lineAt(t);
   if (ln) {
-    const full = ln[subLang === 'ko' ? 'ko' : 'en'], n = Math.min(full.length, Math.floor((t - ln.t0) / 0.032) + 1), a = clamp((t - ln.t0) / 0.12, 0, 1);
+    const lang = subLang === 'ko' ? 'ko' : 'en', full = ln[lang], who = typeof ln.who === 'string' ? ln.who : ln.who[lang], n = Math.min(full.length, Math.floor((t - ln.t0) / 0.032) + 1), a = clamp(Math.min((t - ln.t0) / 0.12, ln.timed ? (ln.t1 - t) / 0.3 : 1), 0, 1);
     const u = cv.width / 100, bx = 4 * u, bw = cv.width - 8 * u, bh = 16 * u, by = cv.height - 3 * u - bh, ws = 2.5 * u, px = bx + 3 * u, py = by + 2 * u, th = ws * 1.4;
     out.save(); out.setTransform(1, 0, 0, 1, 0, 0); out.globalAlpha = a;
     out.beginPath(); out.roundRect(bx, by, bw, bh, 6); out.fillStyle = 'rgba(17,13,11,.95)'; out.fill(); out.lineWidth = 1.5; out.strokeStyle = '#3a2f28'; out.stroke();
-    out.font = `${Math.round(ws)}px "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; const tw = out.measureText(ln.who).width;
+    out.font = `${Math.round(ws)}px "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; const tw = out.measureText(who).width;
     out.beginPath(); out.roundRect(px, py, tw + 1.1 * ws, th, 3); out.fillStyle = '#f07a2a'; out.fill();
-    out.fillStyle = '#1b120c'; out.textAlign = 'left'; out.textBaseline = 'middle'; out.fillText(ln.who, px + 0.55 * ws, py + th / 2 + 1);
+    out.fillStyle = '#1b120c'; out.textAlign = 'left'; out.textBaseline = 'middle'; out.fillText(who, px + 0.55 * ws, py + th / 2 + 1);
     out.font = `500 ${Math.round(3.3 * u)}px "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; out.fillStyle = '#efe6d2'; out.textBaseline = 'top';
     out.fillText(full.slice(0, n), px, py + th + 0.5 * ws);
     if (waiting === ln && Math.floor(performance.now() / 500) % 2 === 0) { out.font = `${Math.round(1.8 * u)}px "IBM Plex Mono", monospace`; out.fillStyle = '#a6978a'; out.textAlign = 'right'; out.textBaseline = 'bottom'; out.fillText('▼', bx + bw - 2.2 * u, by + bh - 1.4 * u); }
@@ -1990,7 +2011,7 @@ function showResult() {
 function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
   if (playing) { const hc = hbOn ? HB.clock() : null, T0 = T; T = hc != null ? hc : T + dt;
-    if (!waiting) { const l = LINES.find(l => !l.done && T0 <= l.hold && T >= l.hold); if (l) { waiting = l; T = l.hold; } } else T = waiting.hold; if (hc != null && !inRows(T)) { HB.halt(); showResult(); } if (hc == null && hbOn && inRows(T) && T > ROWS_END) HB.begin(T); if (T >= END) { T = END; setPlaying(false); } }
+    if (!waiting) { const l = LINES.find(l => !l.timed && !l.done && T0 <= l.hold && T >= l.hold); if (l) { waiting = l; T = l.hold; } } else T = waiting.hold; if (hc != null && !inRows(T)) { HB.halt(); showResult(); } if (hc == null && hbOn && inRows(T) && T > ROWS_END) HB.begin(T); if (T >= END) { T = END; setPlaying(false); } }
   const rows = hbOn && inRows(T);   // her row through her song, his through the reprise
   if (rows) HB.update(T);
   render(T); audioTick(T); songSync(T);
