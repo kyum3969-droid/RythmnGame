@@ -24,6 +24,80 @@
 
 **박**: 드럼이 없어 박이 약하지만 4분음표 약 61.6 BPM(8분 123 BPM)으로 거의 일정. 박 추적으로 뽑은 박 시각을 심박 줄 차트에 그대로 씀(`cutscene-1-6.html`의 `BEATS`). 누르는 넷째 박은 베이스가 가장 세게 들어오는 박이고, 노래의 'four'가 그 박에 떨어짐.
 
+## 다시 뽑기: 더 어둡고 슬프게 (프롬프트 v2)
+
+컷씬이 지금 노래의 구조에 맞춰져 있어서(간주 = 로비와 엘리베이터, 브리지 단어마다 복도 불, 마지막 코러스 = 병실), **구간 시간과 가사는 지금 노래 그대로** 두고 분위기와 소리만 어둡게. 새 노래가 오면 박 추출(`BEATS`)과 자막 시간만 다시 맞추면 됨.
+
+```
+A very dark, grieving ballad with English vocals. 2:37 long, 62 BPM, 4/4, A minor. Never turns to major.
+
+Mood: a 23-year-old woman walking alone through a cold blue dawn after her last night shift, to her mother's hospital bed. Exhausted, numb, quietly grieving; she is not hoping, she is holding on. Cold, empty, heavy. Like the hour before sunrise in a hospital corridor.
+
+Vocals: young female, low and breathy, tired, close-mic, almost speaking in the verses, no vibrato, no belting at any point. Fragile; her voice cracks on a few words and she sounds close to tears in the final chorus but never cries out. Natural breaths and small pauses left in.
+
+Instruments: a felt upright piano in the low-middle register, slightly detuned and soft, with lots of space. A solo cello, low and dark, played softly. A low, cold sustained drone underneath (like a distant organ or low string harmonics). Very sparse, distant room reverb, a little tape hiss. No drums, no beat, no bass synth, no bright strings, no warm major chords. Harmony stays in minor with dark turns (iv, bVI, V); the last chord is left unresolved.
+
+Structure with timestamps:
+0:00–0:09 Intro: low felt piano, a few slow notes in A minor, a cold drone fading in. One high soft note repeating like a distant heart monitor.
+0:09–0:25 Verse 1: vocal enters very softly, almost spoken. Piano and drone only.
+0:25–0:35 Pre-chorus: a low cello enters underneath, holding long dark notes.
+0:35–0:52 Chorus 1: slightly fuller low piano chords, cello moving, still restrained and dark. Alone in a crowd.
+0:52–1:08 Verse 2: stripped back to piano and voice, even sparser and colder than verse 1.
+1:08–1:10 Near silence: one held low piano chord fading.
+1:10–1:48 Instrumental interlude, no vocals: a slow dark swell. Low cello, the drone growing, piano chords in the low register building heavier and heavier, like walking into a hospital at dawn, peaking around 1:30, then sinking back to almost nothing by 1:46. Near silence at 1:48.
+1:49–2:06 Bridge: near silence. Single low piano notes, one at a time, evenly spaced, like cold lights turning on one by one in a dark corridor. The vocal is a whisper: "One light comes on" at 1:49, "One more step" at 1:53, "Another light" at 1:58, "Another step" at 2:01.
+2:06–2:27 Final chorus: cello and low piano together with the drone, the heaviest part of the song, but still restrained and dark, not triumphant. Her voice trembles and almost breaks on the last lines.
+2:27–2:37 Outro: everything drops away. A whispered "four" at 2:29, and again at 2:33, then one low unresolved piano chord fading into silence at 2:37.
+
+Lyrics:
+
+[Verse 1]
+The belt has stopped, the lights are out
+There's nothing left to hold
+Just a watch around my wrist
+Still telling me I'm late
+
+[Pre-chorus]
+Before the first train comes
+Just hold on a little more
+
+[Chorus]
+I never had a dream
+So I just count to four
+One, two, three, and four
+I'll be waiting on the four
+Lost in a crowd of strangers
+I'm standing all alone
+But the four is mine to keep
+I won't let it go
+
+[Verse 2]
+At the end of the alley
+The windows go dark one by one
+The morning's coming in
+But I'm still in the night
+
+[Bridge] (whispered)
+One light comes on
+One more step
+Another light
+Another step
+
+[Final Chorus]
+Mom, I'll count for you
+One, two, three, and four
+Don't stop, I'll lay my hand
+Right on your every beat
+I don't need a dream
+This beat is all I need
+Your four, I'll carry it
+All the way home
+
+[Outro] (whispered)
+Four...
+Four...
+```
+
 ## 장면 맞춤 (처음 계획)
 
 | 노래 | 컷씬 |
