@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>1-6 하은의 새벽 · 심박</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;600&display=swap">
+<style>
+/* 1-6's screen: the cutscene movie fills the top, the mother's heartbeat runs along a monitor strip at the bottom. One button:
+   press on the 4th beat of each row (a homage to Rhythm Doctor). Same 384x216 pixel canvas and the same look as the game. */
+:root{
+  --night:#15110e; --panel:#1f1915; --line:#3a2f28; --ink:#efe6d2; --muted:#a6978a;
+  --paper:#efe6d2; --paper-ink:#1d1815; --paper-muted:#6d6156; --ok:#8fd694; --stamp:#c8372d;
+  --display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%} body{box-sizing:border-box;margin:0}
+body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;padding:10px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden}
+.page{width:min(100%,calc((100dvh - 20px) * 16 / 9));max-width:100%}
+.stage{position:relative;width:100%;aspect-ratio:16/9;container-type:inline-size;overflow:hidden;border-radius:4px;background:#0d0a09;
+  box-shadow:0 0 0 1px #000,0 0 40px rgba(0,0,0,.6);touch-action:manipulation;user-select:none;-webkit-user-select:none;cursor:pointer}
+.stage canvas{display:block;width:100%;height:100%}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(6,9,8,.72);cursor:default}
+.label{width:min(78%,560px);background:var(--paper);color:var(--paper-ink);border-radius:3px;padding:2.4cqw 3cqw;box-shadow:0 6px 30px rgba(0,0,0,.5)}
+.label .kicker{display:flex;justify-content:space-between;font-family:var(--mono);font-size:clamp(10px,1.5cqw,14px);color:var(--paper-muted)}
+.label h2{font-family:var(--display);font-weight:400;font-size:clamp(20px,4cqw,38px);margin:.2em 0 .1em;letter-spacing:.01em}
+.label p{margin:.3em 0 .8em;font-size:clamp(12px,1.75cqw,16px)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.btn{font:600 clamp(13px,1.8cqw,17px) var(--body);padding:.45em 1.1em;border-radius:3px;border:0;background:#1d1815;color:var(--paper);cursor:pointer;min-height:40px}
+.btn.ghost{background:transparent;color:var(--paper-ink);box-shadow:inset 0 0 0 1.5px #1d1815}
+.btn:focus-visible,.sync button:focus-visible{outline:2px solid #2f6f8a;outline-offset:2px}
+.sync{font-family:var(--mono);font-size:clamp(11px,1.5cqw,14px);display:inline-flex;align-items:center;gap:4px;color:var(--paper-muted)}
+.sync button{width:30px;height:30px;border-radius:3px;border:1.5px solid #1d1815;background:transparent;color:#1d1815;font:600 15px var(--mono);cursor:pointer}
+.sync output{min-width:4.2em;text-align:center;color:var(--paper-ink)}
+.file{font-size:clamp(11px,1.5cqw,14px);color:var(--paper-muted)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:.15em 1.2em;margin:.5em 0 1em;font-size:clamp(12px,1.75cqw,16px)} dt{color:var(--paper-muted)} dd{margin:0;font-family:var(--mono)}
+.help{font-size:13px;color:var(--muted);text-align:center;max-width:60em}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="stage" id="stage">
+    <canvas id="cv" width="1152" height="648" aria-label="1-6 화면: 위는 컷씬 영상, 아래는 어머니의 심박 모니터"></canvas>
+    <video id="mov" playsinline muted preload="auto" hidden></video>
+
+    <div class="overlay" id="title">
+      <div class="label">
+        <div class="kicker"><span>스테이지 1-6 · 하은의 새벽</span><span>502호 · 05:40</span></div>
+        <h2>어머니의 박자</h2>
+        <p>아래 줄에서 어머니의 심박이 칸을 하나씩 건너갑니다. 세 번 뛰고, <b>네 번째 박에 화면을 터치</b>(또는 스페이스)해서 하은이 박을 이어 주세요. 첫 줄은 보여 주기만 합니다. 중간부터는 하은의 심장도 한 줄 더 뜁니다.</p>
+        <div class="row">
+          <button class="btn" id="start" type="button">시작</button>
+          <label class="btn ghost" for="file">컷씬 영상 불러오기</label>
+          <input id="file" type="file" accept="video/*" hidden>
+          <span class="sync">싱크 <button id="sm" type="button" aria-label="보정값 낮추기">−</button><output id="sv">0 ms</output><button id="sp" type="button" aria-label="보정값 높이기">+</button></span>
+        </div>
+        <p class="file" id="fname">영상이 없으면 위쪽에 임시 병실 화면이 나옵니다.</p>
+      </div>
+    </div>
+
+    <div class="overlay" id="result" hidden>
+      <div class="label">
+        <div class="kicker"><span>간호 기록</span><span>502호</span></div>
+        <h2 id="r-title">심박 안정</h2>
+        <dl>
+          <dt>이어 준 박</dt><dd id="r-counts">딱 0 · 좋아 0 · 놓침 0</dd>
+          <dt>정확도</dt><dd id="r-acc">0%</dd>
+          <dt>최대 연속</dt><dd id="r-combo">0</dd>
+        </dl>
+        <div class="row"><button class="btn" id="retry" type="button">다시 하기</button><button class="btn ghost" id="back" type="button">처음으로</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+<p class="help">시안 페이지 · 리듬닥터 오마주. 컷씬 영상이 화면 전체에 깔리고, 환자 줄은 그 아래쪽 위에 얹힙니다. 영상은 소리 없이 노래 시간에 맞춰 재생됩니다.</p>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const W = 384, H = 216, MOV_H = 216;
+const SC = 3;   // the canvas is three times the game's 384x216; everything is laid out in game pixels and drawn at SC
+const cv = $('cv'), G0 = cv.getContext('2d'); let g = G0; g.setTransform(SC, 0, 0, SC, 0, 0); g.imageSmoothingEnabled = false;
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
+
+// ---------- the chart (after Rhythm Doctor's rows, four beats long) ----------
+// The song runs in 8-beat segments, each at its own tempo. A row is four beats on one patient's line, one bar: the heart beats
+// on 1 to 3 and on the 4th the player presses. Her mother's rows run back to back, and the doctor's "오늘 좀 흔들려요" plays out
+// as rows that speed up, slow down, or skip a beat (the 4th still falls where the count says). From the middle 하은's own
+// heart joins as a second row: two beats behind at first (her 4th falls between her mother's), then on the same beats, so one
+// press keeps both.
+const SEG = [62, 62, 62, 62, 62, 68, 68, 56, 72, 60, 60, 66, 58, 64, 64, 64, 64, 60, 60, 60];
+const LEAD = 2.4;   // a count-in before the first row (two soft clicks)
+const SEGT = []; { let t = LEAD; for (const b of SEG) { SEGT.push(t); t += 8 * 60 / b; } SEGT.push(t); }
+const beatT = b => { const s = clamp(Math.floor(b / 8), 0, SEG.length - 1); return SEGT[s] + (b - s * 8) * 60 / SEG[s]; };
+const tBeat = t => { if (t < LEAD) return (t - LEAD) * SEG[0] / 60; let s = 0; while (s < SEG.length - 1 && t >= SEGT[s + 1]) s++; return s * 8 + (t - SEGT[s]) * SEG[s] / 60; };
+const ROW = 4;   // beats from a row's start to its arrival: three heartbeats come in by themselves, the 4th is the player's
+const ROWS = [];
+SEG.forEach((_, s) => { for (const h of [0, 4]) { const b0 = s * 8 + h, first = h === 0; ROWS.push({ lane: 0, b0, demo: b0 === 0, skip: (first ? { 9: [1], 10: [0, 2], 11: [2] } : { 9: [2], 10: [1], 12: [1] })[s] || [], cue: first ? { 0: '보세요: 네 번째 박은 하은이 이어 줍니다', 1: '네 번째 박에!', 5: '빨라진다', 7: '느려진다', 9: '한 박이 빠져도, 세던 대로', 17: '괜찮아' }[s] : undefined }); } });
+for (const b0 of [106, 110, 114, 118, 122, 128, 132, 136, 140, 144, 148, 152, 156]) ROWS.push({ lane: 1, b0, skip: [], cue: { 106: '하은의 심장도 뛴다', 128: '같은 박으로' }[b0] });
+const TWO_AT = beatT(106) - 1.4;
+let EV = [], TARGETS = [], END_T = 0;
+function compile() {
+  EV = []; TARGETS = [];
+  ROWS.forEach((r, ri) => {
+    r.t0 = beatT(r.b0); r.t8 = beatT(r.b0 + ROW);
+    if (r.lane === 0) EV.push({ t: r.t0, type: 'chord', row: r.b0 / ROW, dur: r.t8 - r.t0 });
+    for (let k = 0; k < ROW - 1; k++) if (!r.skip.includes(k)) EV.push({ t: beatT(r.b0 + k), type: 'pulse', lane: r.lane });
+    const tg = { t: beatT(r.b0 + ROW - 1), row: ri, lane: r.lane, demo: !!r.demo, judge: null, d: 0 }; TARGETS.push(tg); r.tg = tg;
+    if (r.demo) EV.push({ t: tg.t, type: 'demo', lane: 0 });
+  });
+  EV.push({ t: LEAD - 1.2, type: 'click' }, { t: LEAD - 0.6, type: 'click' });
+  END_T = beatT(SEG.length * 8) + 1.2; EV.sort((a, b) => a.t - b.t);
+}
+compile();
+
+// ---------- audio: the heartbeat (lub-dub), a soft pad under each row, the monitor's beep ----------
+let ac = null, out = null, startAt = 0, evI = 0, playing = false, syncMs = 0;
+function audio() { if (ac) return; ac = new (window.AudioContext || window.webkitAudioContext)(); out = ac.createGain(); out.gain.value = 0.9; const comp = ac.createDynamicsCompressor(); out.connect(comp); comp.connect(ac.destination); }
+function thump(t, f, amp, dec) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f * 1.6, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.04); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.008); gn.gain.exponentialRampToValueAtTime(0.0001, t + dec); o.connect(gn); gn.connect(out); o.start(t); o.stop(t + dec + 0.05); }
+function heart(t, amp = 0.9, bright = false) { thump(t, 58, amp, 0.22); thump(t + 0.14, 50, amp * 0.6, 0.18); if (bright) { thump(t, 120, amp * 0.35, 0.08); } }
+function monBeep(t, f, amp) { const o = ac.createOscillator(), gn = ac.createGain(), lp = ac.createBiquadFilter(); o.type = 'sine'; o.frequency.value = f; lp.type = 'lowpass'; lp.frequency.value = 3000; gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.004); gn.gain.setValueAtTime(amp, t + 0.07); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.13); o.connect(lp); lp.connect(gn); gn.connect(out); o.start(t); o.stop(t + 0.16); }
+function bell(t) { for (const [f, a, d] of [[1568, 0.05, 0.9], [2349, 0.025, 0.6], [3136, 0.012, 0.4]]) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.value = f; gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(a, t + 0.006); gn.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(gn); gn.connect(out); o.start(t); o.stop(t + d + 0.05); } }
+function heartH(t) { thump(t, 78, 0.5, 0.15); thump(t + 0.11, 68, 0.3, 0.12); }
+function beep(t, f = 1046, amp = 0.08, dur = 0.09) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'square'; o.frequency.value = f; const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400; gn.gain.setValueAtTime(amp, t); gn.gain.setValueAtTime(amp, t + dur * 0.8); gn.gain.linearRampToValueAtTime(0.0001, t + dur); o.connect(lp); lp.connect(gn); gn.connect(out); o.start(t); o.stop(t + dur + 0.02); }
+const CHORDS = [[57, 60, 64], [53, 57, 60], [48, 52, 55, 59], [55, 59, 62]];   // Am F Cmaj7 G
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+function pad(t, ri, dur) {
+  const ch = CHORDS[ri % 4];
+  for (const m of ch) for (const det of [-4, 4]) { const o = ac.createOscillator(), gn = ac.createGain(), lp = ac.createBiquadFilter(); o.type = 'triangle'; o.frequency.value = mtof(m); o.detune.value = det; lp.type = 'lowpass'; lp.frequency.value = 900; gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.022, t + 0.8); gn.gain.setValueAtTime(0.022, t + dur - 0.6); gn.gain.linearRampToValueAtTime(0.0001, t + dur + 0.4); o.connect(lp); lp.connect(gn); gn.connect(out); o.start(t); o.stop(t + dur + 0.5); }
+  const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.value = mtof(ch[0] + 24); gn.gain.setValueAtTime(0.05, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + 2.2); o.connect(gn); gn.connect(out); o.start(t); o.stop(t + 2.3);
+}
+function schedule() {
+  const now = ac.currentTime, horizon = now + 0.25;
+  while (evI < EV.length && startAt + EV[evI].t < horizon) {
+    const e = EV[evI++], at = startAt + e.t; if (at < now - 0.05) continue;
+    // only the heart monitor: a soft beep on every heartbeat (하은's a little higher), a brighter one on the 4th
+    if (e.type === 'pulse') monBeep(at, e.lane === 1 ? 988 : 880, 0.045);
+    else if (e.type === 'click') monBeep(at, 660, 0.025);
+    else if (e.type === 'demo') monBeep(at, 1175, 0.07);
+  }
+}
+const songT = () => ac ? ac.currentTime - startAt : -99;
+
+// ---------- input and judging ----------
+const WIN_P = 0.05, WIN_G = 0.11, WIN_M = 0.18;
+const stats = { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 };
+const FX = { pops: [], lane: [{ beatAt: -9, hitAt: -9, missAt: -9, arriveAt: -9 }, { beatAt: -9, hitAt: -9, missAt: -9, arriveAt: -9 }], flashAt: -9, kickAt: -9, runners: [], milestone: null };
+function press(tIn) {
+  if (!playing) return;
+  const t = tIn - syncMs / 1000;
+  let best = null, bd = 1e9; for (const tg of TARGETS) { if (tg.demo || tg.judge) continue; const d = Math.abs(t - tg.t); if (d < bd) { bd = d; best = tg; } }
+  if (!best || bd > WIN_M) return;
+  const d = t - best.t, now = performance.now();
+  // a press on a beat both rows share keeps both
+  const same = TARGETS.filter(tg => !tg.demo && !tg.judge && Math.abs(tg.t - best.t) < 0.02);
+  if (Math.abs(d) <= WIN_G) {
+    const j = Math.abs(d) <= WIN_P ? 'perfect' : 'good';
+    for (const tg of same) { tg.judge = j; tg.d = d; tg.hitT = t; stats[j]++; stats.combo++; FX.lane[tg.lane].hitAt = now; burst(COL, LANEY[tg.lane], j); FX.pops.push({ lane: tg.lane, text: j === 'perfect' ? '딱' : '좋아', sub: j === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: now, c: j === 'perfect' ? '#ffffff' : '#cfe8d6' }); }
+    stats.best = Math.max(stats.best, stats.combo); FX.flashAt = now; FX.kickAt = now;
+    if (stats.combo > 0 && stats.combo % 8 === 0) FX.milestone = { n: stats.combo, at: now };
+    monBeep(ac.currentTime, 1175, 0.07);
+  } else for (const tg of same) { tg.d = d; missIt(tg, d < 0 ? '빠름' : '늦음'); }
+}
+function missIt(tg, why) { tg.judge = 'miss'; stats.miss++; stats.combo = 0; FX.lane[tg.lane].missAt = performance.now(); FX.pops.push({ lane: tg.lane, text: '놓침', sub: why, at: performance.now(), c: '#ff6a5a' }); }
+function tick(t) {
+  for (const tg of TARGETS) {
+    if (tg.judge) continue;
+    if (tg.demo && t >= tg.t) { tg.judge = 'demo'; tg.d = 0; tg.hitT = tg.t; FX.lane[0].hitAt = performance.now(); continue; }
+    if (!tg.demo && t > tg.t + WIN_M) missIt(tg, '');
+  }
+  // each lane's heart beats with its heard pulses
+  for (const e of EV) { if (e.type !== 'pulse' && e.type !== 'demo') continue; if (e.t > t) break; if (!e.seen) { e.seen = 1; FX.lane[e.lane].beatAt = performance.now(); } }
+}
+const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyK', 'KeyD']);
+addEventListener('keydown', e => { if (!KEYS.has(e.code) || e.repeat) return; if (!playing) return; e.preventDefault(); press(songT() + (e.timeStamp - performance.now()) / 1000); });
+$('stage').addEventListener('pointerdown', e => { if (!playing || e.target.closest('.overlay')) return; e.preventDefault(); press(songT() + (e.timeStamp - performance.now()) / 1000); });
+
+// ---------- the movie on top ----------
+const mov = $('mov'); let movOK = false;
+$('file').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; mov.src = URL.createObjectURL(f); mov.load(); mov.onloadeddata = () => { movOK = true; $('fname').textContent = '영상: ' + f.name + ` (${mov.videoWidth}×${mov.videoHeight}, ${mov.duration.toFixed(1)}초)`; }; });
+function drawMovie(t) {
+  if (movOK) {
+    if (playing && t >= 0) { if (mov.paused) mov.play().catch(() => {}); if (Math.abs(mov.currentTime - t) > 0.2 && t < mov.duration) mov.currentTime = t; }
+    // cover-crop the movie into the top band, then let the pixel canvas carry it
+    const vw = mov.videoWidth, vh = mov.videoHeight, s = Math.max(W / vw, MOV_H / vh), sw = W / s, sh = MOV_H / s;
+    g.imageSmoothingEnabled = true; g.drawImage(mov, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, W, MOV_H); g.imageSmoothingEnabled = false;
+    return;
+  }
+  placeholderWard(t);
+}
+// stand-in until the movie exists: the ward before dawn, the blinds letting in more light as the song goes, the bedside monitor
+// beating with the strip below, 하은 asleep sitting up with her head on the bed's edge
+function placeholderWard(t) {
+  const p = clamp(t / END_T, 0, 1);
+  R(0, 0, W, MOV_H, '#141a24'); R(0, 100, W, 116, '#10151c'); for (let y = 140; y < H; y += 6) R(0, y, W, 1, '#141a22');
+  const sky = ['#1a2440', '#2a3466', '#5a4e7e', '#b07a7a'].map(c => c);
+  for (let i = 0; i < 4; i++) R(236, 14 + i * 16, 112, 16, lerpCol('#121a2c', sky[i], p));
+  for (let y = 18; y < 78; y += 6) R(236, y, 112, 2, '#0c1018');
+  R(234, 12, 116, 2, '#2a303a'); R(234, 78, 116, 2, '#2a303a'); R(234, 12, 2, 68, '#2a303a'); R(348, 12, 2, 68, '#2a303a');
+  g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,200,160,${0.06 + 0.12 * p})`; g.beginPath(); g.moveTo(236, 80); g.lineTo(348, 80); g.lineTo(330, 216); g.lineTo(110, 216); g.closePath(); g.fill(); g.restore();
+  R(60, 82, 190, 22, '#cfd6e0'); R(60, 82, 190, 3, '#e8eef4'); R(60, 104, 190, 6, '#8a94a2'); R(64, 110, 4, 36, '#5a6270'); R(242, 110, 4, 36, '#5a6270');
+  R(70, 72, 46, 14, '#e8eef4'); R(72, 74, 30, 8, '#c49a80');
+  for (let x = 110; x < 246; x += 2) R(x, 78 + Math.round(Math.sin(x / 22) * 2), 2, 6, '#9fb4cc');
+  R(170, 80, 34, 22, '#1e1a1a'); R(172, 70, 22, 12, '#3a2a24'); R(168, 66, 28, 8, '#d8463b'); R(160, 102, 44, 44, '#1e1a1a'); R(164, 102, 36, 20, '#7ec8e3');
+  const beat = Math.max(0, 1 - (performance.now() - FX.lane[0].beatAt) / 250);
+  R(20, 30, 40, 30, '#0c0f10'); R(22, 32, 36, 26, '#06120c'); R(38, 60, 4, 50, '#3a3f45');
+  g.fillStyle = `rgba(143,214,148,${0.5 + 0.5 * beat})`; for (let x = 0; x < 34; x++) { const d = Math.abs(x - 17), y = 45 - (d < 2 ? 9 * beat : 0); g.fillRect(23 + x, y, 1, 1); }
+  g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(40, 45, 2, 40, 45, 50); gr.addColorStop(0, `rgba(143,214,148,${0.12 + 0.12 * beat})`); gr.addColorStop(1, 'rgba(143,214,148,0)'); g.fillStyle = gr; g.fillRect(0, 0, 100, 110); g.restore();
+  g.font = '7px "IBM Plex Mono", monospace'; g.textBaseline = 'top'; g.fillStyle = 'rgba(239,230,210,.45)'; g.fillText('컷씬 영상 자리 (임시 병실)', 6, 6);
+}
+function lerpCol(a, b, p) { const A = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), B = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16)); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], p))).join(',')})`; }
+
+// ---------- the patient rows (after Rhythm Doctor's) ----------
+// The rows lie over the scene, each running to a heart at the right. A pen traces the heartbeats along the row, one spot per
+// beat, and each peak glows like a monitor's phosphor, white when fresh, green as it fades. The 4th spot sits in a pale cyan
+// column that crosses every row; a ring closing on it counts the last beat in. A press in time draws a tall white peak there,
+// sends a ring out and sparks up, and the heart pumps; a miss leaves a jittering red flatline and a big X, and cracks the heart.
+const X0 = 8, HEART = 3, HX = 356, COL = 292, XE = COL + 32, GAP = (COL - X0 - 26) / 3, SPOT = k => Math.round(X0 + 26 + k * GAP);   // the four spots along the line (the 4th is the column) and the gap between them
+const ease = p => p < 0 ? 0 : p > 1 ? 1 : p * p * (3 - 2 * p);
+const rnd = (i, k) => { const s = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return s - Math.floor(s); };
+const LANE = [{ name: '어머니', tag: '502호' }, { name: '하은', tag: '보호자' }];
+function txt(s, x, y, c, size = 7, align = 'left', weight = '600', font = '"IBM Plex Sans KR", sans-serif') {
+  if (LOW.on) { const m = g.getTransform(); LOW.text.push({ s, x, y, c, size, align, weight, font, m, a: g.globalAlpha, sc: g.shadowColor, sb: g.shadowBlur }); return; } g.font = `${weight} ${size}px ${font}`; g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = c; g.fillText(s, x, y); g.textAlign = 'left'; }
+function glowTxt(s, x, y, c, size, align, font, glow) { g.save(); g.shadowColor = glow; g.shadowBlur = 6 * SC; txt(s, x, y, c, size, align, '400', font); g.restore(); txt(s, x, y, c, size, align, '400', font); }
+// one heartbeat on the line at x (the R peak), sharp like a monitor's: a small P, the flat PR, a little Q, a needle-thin R, a deep
+// S, the ST segment and a low T; amp is the R peak's height
+const BEAT_W = 32, AMP = 17;   // the R peak's height in game pixels
+function beatPts(amp) {
+  return [[-32, 0], [-27, -amp * 0.06], [-24, -amp * 0.11], [-21, -amp * 0.06], [-18, 0], [-5, 0], [-2.6, amp * 0.14], [0, -amp], [2.4, amp * 0.46], [4, 0], [10, -amp * 0.03],
+    [13, -amp * 0.09], [16, -amp * 0.17], [19, -amp * 0.2], [22, -amp * 0.15], [25, -amp * 0.06], [28, 0], [32, 0]];
+}
+// a whole row's trace, left edge to the heart: flat line with a beat at each spot that beats (1 to 3 unless skipped, the 4th
+// only once the player has made it)
+function rowPts(row, amp) {
+  const pts = [[X0, 0]];
+  for (let k = 0; k <= HEART; k++) {
+    const x = SPOT(k), j = row.tg.judge, on = k < HEART ? !row.skip.includes(k) : (j && j !== 'miss');
+    if (!on) continue;
+    for (const [dx, dy] of beatPts(k === HEART ? amp * 1.2 : amp)) pts.push([x + dx, dy]);
+  }
+  pts.push([XE, 0]); return pts;
+}
+// the trace in three passes like phosphor: a wide soft bloom, a tighter glow, a thin bright core
+// a trace as pixels: the polyline is sampled finely and each pixel column filled from its lowest to its highest point, so
+// steep strokes become solid pixel columns and the flat line a single pixel row; an optional halo one pixel wider all round
+function pixSpans(pts) {
+  const sp = new Map();
+  for (let i = 0; i + 1 < pts.length; i++) { const [ax, ay] = pts[i], [bx, by] = pts[i + 1], n = Math.max(1, Math.ceil(Math.abs(bx - ax) * 4 + Math.abs(by - ay) * 0.5));
+    for (let k = 0; k <= n; k++) { const x = ax + (bx - ax) * k / n, y = ay + (by - ay) * k / n, c = Math.round(x), e = sp.get(c); if (!e) sp.set(c, [y, y]); else { if (y < e[0]) e[0] = y; if (y > e[1]) e[1] = y; } } }
+  return sp;
+}
+function pixDraw(sp, lo, hi, colAt, halo) {
+  const sa = g.globalAlpha;
+  if (halo) for (const [x, [y0, y1]] of sp) { if (x < lo || x > hi) continue; const [, a] = colAt(x); if (a <= 0) continue; g.globalAlpha = sa * a * 0.4; R(x - 1, Math.round(y0) - 1, 3, Math.round(y1) - Math.round(y0) + 3, halo(x)); }
+  for (const [x, [y0, y1]] of sp) { if (x < lo || x > hi) continue; const [c, a] = colAt(x); if (a <= 0) continue; g.globalAlpha = sa * a; R(x, Math.round(y0), 1, Math.round(y1) - Math.round(y0) + 1, c); }
+  g.globalAlpha = sa;
+}
+function wave(x, y, amp, core, bloom, alpha = 1) {
+  const sp = pixSpans(beatPts(amp).map(([dx, dy]) => [x + dx, y + dy]));
+  pixDraw(sp, -1e9, 1e9, () => [core, alpha], bloom ? () => bloom : null);
+}
+const mixc = (a, b, p) => { const A = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), B = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16)); return '#' + A.map((v, i) => Math.round(lerp(v, B[i], clamp(p, 0, 1))).toString(16).padStart(2, '0')).join(''); };
+// a fresh peak is near white; it cools to green and then to a dim green as it fades
+const ageCol = a => a < 0.12 ? mixc('#f4fff0', '#9cf58a', a / 0.12) : mixc('#9cf58a', '#3e8c38', (a - 0.12) / 0.88);
+// the heart at the end of a row: a drawn heart with a dark rim, a lit top-left lobe and a shine; it glows when it beats, and
+// after a miss it is cracked and greyed until the next row
+function heartPath(cx, cy, s) { g.beginPath(); g.moveTo(cx, cy + 6 * s); g.bezierCurveTo(cx - 9 * s, cy - 1 * s, cx - 7.5 * s, cy - 9 * s, cx - 3.5 * s, cy - 8.5 * s); g.bezierCurveTo(cx - 1.5 * s, cy - 8.2 * s, cx, cy - 6.5 * s, cx, cy - 5 * s); g.bezierCurveTo(cx, cy - 6.5 * s, cx + 1.5 * s, cy - 8.2 * s, cx + 3.5 * s, cy - 8.5 * s); g.bezierCurveTo(cx + 7.5 * s, cy - 9 * s, cx + 9 * s, cy - 1 * s, cx, cy + 6 * s); g.closePath(); }
+function heartV(cx, cy, s, glow, cracked, idle) {
+  if (glow > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(cx, cy - 2, 1, cx, cy - 2, 22 * s); gr.addColorStop(0, `rgba(255,90,90,${0.45 * glow})`); gr.addColorStop(1, 'rgba(255,90,90,0)'); g.fillStyle = gr; g.fillRect(cx - 24 * s, cy - 26 * s, 48 * s, 48 * s); g.restore(); }
+  heartPath(cx, cy, s * 1.12); g.fillStyle = '#1a0e10'; g.fill();
+  heartPath(cx, cy, s); const gr = g.createLinearGradient(cx - 8 * s, cy - 9 * s, cx + 6 * s, cy + 6 * s);
+  if (cracked) { gr.addColorStop(0, '#8a5a5e'); gr.addColorStop(1, '#4a2a2e'); } else if (idle) { gr.addColorStop(0, '#f2c0c0'); gr.addColorStop(1, '#c48888'); } else { gr.addColorStop(0, '#ff7a6e'); gr.addColorStop(0.55, '#e0343a'); gr.addColorStop(1, '#9c1824'); }
+  g.fillStyle = gr; g.fill();
+  if (!cracked) { g.fillStyle = 'rgba(255,255,255,.75)'; g.beginPath(); g.ellipse(cx - 4 * s, cy - 5.5 * s, 1.6 * s, 1 * s, -0.6, 0, Math.PI * 2); g.fill(); }
+  else { g.strokeStyle = '#140a0c'; g.lineWidth = 0.9; g.beginPath(); g.moveTo(cx - 0.5, cy - 5 * s); g.lineTo(cx + 2 * s, cy - 2 * s); g.lineTo(cx - 1.5 * s, cy + 0.5 * s); g.lineTo(cx + 1 * s, cy + 4 * s); g.stroke(); }
+}
+function laneRow(lane, t) { let r = null; for (const row of ROWS) if (row.lane === lane && row.t0 <= t + 0.001) r = row; return r && t < r.t8 + 0.6 ? r : null; }
+const SPARKS = [], RINGS = [], FLOATS = [], LANEY = [186, 202];
+function burst(x, y, j = 'perfect') {
+  const big = j === 'perfect';
+  for (let i = 0; i < 18 + (big ? 14 : 0); i++) { const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.6, v = 50 + Math.random() * 100; SPARKS.push({ x, y: y - 6, vx: Math.cos(a) * v, vy: Math.sin(a) * v, at: performance.now(), life: 700 + Math.random() * 600, s: 2.4 + Math.random() * 1.8, c: Math.random() < 0.5 ? '#bfffe0' : '#ffffff', plus: true }); }
+  if (big) RINGS.push({ x, y, at: performance.now() + 90, big: true });
+  for (let i = 0; i < (big ? 60 : 34); i++) { const a = Math.random() * Math.PI * 2, v = 40 + Math.random() * 120; SPARKS.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.8 - 20, at: performance.now(), life: 550 + Math.random() * 650, s: Math.random() < 0.25 ? 2.2 : 1.2, c: Math.random() < 0.35 ? '#ffffff' : '#7ef06a' }); }
+  RINGS.push({ x, y, at: performance.now() });
+}
+function drawLane(lane, y, t, show) {
+  const now = performance.now(), F = FX.lane[lane];
+  const hurt = clamp(1 - (now - F.missAt) / 450, 0, 1), shake = hurt > 0 ? (rnd(now, lane) - 0.5) * 4 * hurt : 0;
+  g.save(); g.translate(shake, 0); g.globalAlpha = show;
+  const r = laneRow(lane, t), tg = r && r.tg;
+  // beat by beat, drawn on like a monitor: a pen point sweeps through each row and traces each heartbeat as it passes (the R tip
+  // lands exactly on the beat), then that peak cools and fades while the pen traces the next one a spot further. Beats 1 to 3
+  // are traced by themselves; at the 4th spot, in the column, a closing ring counts it in, and the
+  // player's press is what the pen traces there, white and tall. A skipped beat's spot stays dark.
+  // where this lane's pen is now (the row it is drawing), so older traces are erased just ahead of it, like a monitor's sweep
+  let penNow = -99; for (const row of ROWS) { if (row.lane !== lane) continue; const kf = tBeat(t) - row.b0, pen = SPOT(0) + kf * GAP; if (pen >= X0 && pen < XE) penNow = pen; }
+  for (const row of ROWS) {
+    if (row.lane !== lane) continue;
+    const kf = tBeat(t) - row.b0; if (kf < -0.6 || kf > ROW + 3) continue;
+    const pen = SPOT(0) + kf * GAP, drawing = pen >= X0 && pen < XE, x1 = Math.min(pen, XE);   // the line exists only where this row's pen has been
+    // one continuous trace from the left edge to the pen: each stretch is coloured by how long ago the pen drew it, fresh white
+    // through green to nothing about two seconds later
+    const xAt = x => beatT(row.b0 + (x - SPOT(0)) / GAP), cool = x => t - xAt(x);
+    const lo = drawing ? X0 : Math.max(X0, penNow > 0 ? penNow + 8 : X0);
+    if (x1 > lo + 1 && cool(x1) < 2.4) {
+      // a made 4th beat is the same trace, drawn white around the box and cooling a little slower
+      const tgr = row.tg, made = tgr.judge && tgr.judge !== 'miss', wsec = made ? t - tgr.hitT : 9;
+      const colAt = x => { let a = Math.max(0, cool(x)); const near4 = made && Math.abs(x - COL) <= BEAT_W; if (near4) a = Math.max(0, a - 0.5); const al = x > x1 + 0.5 ? 0 : clamp(1 - Math.pow(a / 2.2, 2), 0, 1); let c = a < 0.12 ? mixc('#f4fff0', '#9cf58a', a / 0.12) : mixc('#9cf58a', '#3e8c38', (a - 0.12) / 1.6); if (near4) c = mixc('#ffffff', c, clamp((wsec - 0.3) / 0.9, 0, 1)); return [c, al * show]; };
+      const sp = pixSpans(rowPts(row, AMP).map(([x, dy]) => [x, y + dy]));
+      pixDraw(sp, Math.ceil(lo), Math.floor(x1), colAt, () => '#0e2a10');
+    }
+    for (let k = 0; k <= HEART; k++) {
+      const tk = beatT(row.b0 + k), x = SPOT(k), dt = t - tk;
+      if (k === HEART) {
+        const tgk = row.tg, waiting = !tgk.judge || (tgk.judge === 'demo' && t < tgk.t);
+        if (waiting && kf > HEART - 1.6) {
+          
+          const sp = beatT(row.b0 + HEART) - beatT(row.b0 + HEART - 1), p = clamp(1 + dt / sp, 0, 1);
+          if (p > 0 && p < 1) { g.save(); g.globalAlpha = show * (0.4 + 0.6 * p); g.strokeStyle = '#fff2b8'; g.lineWidth = 1; g.beginPath(); g.arc(x, y - 9, 4 + 20 * (1 - p), 0, Math.PI * 2); g.stroke(); g.restore(); }
+        }
+        else if (tgk.judge === 'miss' && t - tgk.t < 1.2) { const f = clamp(1 - (t - tgk.t - 0.4) / 0.8, 0, 1); g.save(); g.globalAlpha = show * f; g.strokeStyle = '#ff5a5a'; g.lineWidth = 0.9; g.beginPath(); for (let i = -BEAT_W; i <= BEAT_W; i += 2) g.lineTo(x + i, y + (rnd(i, Math.floor(now / 50)) - 0.5) * 2.4); g.stroke(); g.restore(); }
+      }
+    }
+    // the pen point: a hot dot with a short flare and a halo
+    if (drawing) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(pen, y, 0, pen, y, 10); gr.addColorStop(0, 'rgba(210,255,190,.75)'); gr.addColorStop(0.4, 'rgba(140,255,120,.25)'); gr.addColorStop(1, 'rgba(140,255,120,0)'); g.fillStyle = gr; g.fillRect(pen - 10, y - 10, 20, 20); g.restore(); const py = y + (rowPts(row, AMP).reduce((acc, [px, dy], i, arr) => { if (i && arr[i - 1][0] <= pen && px >= pen) return arr[i - 1][1] + (dy - arr[i - 1][1]) * ((pen - arr[i - 1][0]) / Math.max(0.001, px - arr[i - 1][0])); return acc; }, 0)); g.fillStyle = '#ffffff'; g.beginPath(); g.arc(pen, py, 0.9, 0, Math.PI * 2); g.fill(); }
+    if (row.demo && t > beatT(row.b0 + HEART - 0.6) && t < beatT(row.b0 + HEART + 1)) txt('하은이 누름', COL, y + 8, '#e8ffd8', 6, 'center', '400');
+  }
+  // a miss: the big X where the beat should have been, split red and cyan for a moment
+  if (tg && tg.judge === 'miss' && t - tg.t < 1.6) { const a = clamp(1 - (t - tg.t - 1.0) / 0.6, 0, 1), xx = COL + clamp(tg.d / WIN_M, -1, 1) * 10, jit = hurt * 1.5; g.save(); g.lineCap = 'round'; g.lineWidth = 2.4; for (const [dx, c, al] of [[-jit, 'rgba(80,220,255,.7)', hurt], [jit, 'rgba(255,60,60,.7)', hurt], [0, '#ff4a7a', 1]]) { if (al <= 0) continue; g.globalAlpha = show * a * al; g.strokeStyle = c; g.beginPath(); g.moveTo(xx - 7 + dx, y - 15); g.lineTo(xx + 7 + dx, y - 1); g.moveTo(xx + 7 + dx, y - 15); g.lineTo(xx - 7 + dx, y - 1); g.stroke(); } g.restore(); }
+  const hit = tg && tg.judge && tg.judge !== 'miss', since = hit ? t - tg.hitT : 9;
+  // the heart
+  const beatK = clamp(1 - (now - F.beatAt) / 220, 0, 1), hitK = hit && since < 0.35 ? 1 - since / 0.35 : 0, arrK = clamp(1 - (now - F.arriveAt) / 300, 0, 1), pump = 1 + 0.18 * beatK + 0.3 * hitK + 0.65 * arrK;
+  // a good press lights the whole row for a moment, brightest at the column
+  { const rf = clamp(1 - (now - F.hitAt) / 380, 0, 1); if (rf > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const lg = g.createLinearGradient(X0, 0, HX, 0); lg.addColorStop(0, 'rgba(140,255,170,0)'); lg.addColorStop((COL - X0) / (HX - X0), `rgba(200,255,230,${0.5 * rf})`); lg.addColorStop(1, 'rgba(200,255,230,0)'); g.fillStyle = lg; g.fillRect(X0, y - 34, HX - X0, 48); g.restore(); } }
+  g.globalAlpha = show;
+  // the judgement over the column: it pops in large and settles
+  for (const p of FX.pops) { if (p.lane !== lane) continue; const age = (now - p.at) / 650, a = 1 - age; if (a <= 0) continue; const sc = 1 + 0.8 * clamp(1 - age / 0.15, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(COL - 22, y - 28 - age * 4); g.scale(sc, sc); glowTxt(p.text, 0, -7, p.c, 15, 'center', '"Black Han Sans", sans-serif', p.text === '놓침' ? 'rgba(255,60,60,.8)' : 'rgba(180,255,200,.8)'); if (p.sub) txt(p.sub, 0, 7, p.c, 5, 'center', '400'); g.restore(); }
+  g.restore();
+}
+const LOW = { on: false, text: [], cv: null, g: null }, BOX = { rgb: '242,196,58', a: 0.3, near: 0, fl: 0 };
+// the yellow scan box, or the part of it between y0 and y1 (redrawn over each row's band so it stays solid)
+function laneBand(y, show) {
+  const BT = Math.round(y) - 22, BH = 31, band = g.createLinearGradient(0, 0, W, 0); band.addColorStop(0, 'rgba(4,10,8,0)'); band.addColorStop(0.06, 'rgba(4,10,8,.5)'); band.addColorStop(0.94, 'rgba(4,10,8,.5)'); band.addColorStop(1, 'rgba(4,10,8,0)');
+  g.save(); g.globalAlpha = show; g.fillStyle = band; g.fillRect(0, BT, W, BH);
+  g.fillStyle = 'rgba(80,160,110,.09)'; for (let x = X0; x < HX; x += 6) g.fillRect(x, BT + 2, 1, BH - 4); for (let yy = BT + 3; yy < BT + BH - 2; yy += 6) g.fillRect(X0, yy, HX - X0, 1);
+  g.restore();
+}
+// the scan point: a soft column of warm light, brightest down the middle and fading out to both sides and toward the top, a
+// thin brighter line down its centre; it swells as the beat comes and flares on a press
+function scanBox(y0, y1) {
+  const hw = 22 + 6 * BOX.near + 10 * BOX.fl, a = BOX.a, col = BOX.rgb;
+  const v = g.createLinearGradient(0, y0 - 14, 0, y1); v.addColorStop(0, `rgba(${col},0)`); v.addColorStop(0.3, `rgba(${col},1)`); v.addColorStop(1, `rgba(${col},1)`);
+  g.save(); g.beginPath(); g.rect(COL - hw, y0 - 14, hw * 2, y1 - y0 + 14); g.clip();
+  const hz = g.createLinearGradient(COL - hw, 0, COL + hw, 0); hz.addColorStop(0, `rgba(${col},0)`); hz.addColorStop(0.3, `rgba(${col},${a * 0.55})`); hz.addColorStop(0.5, `rgba(${col},${a})`); hz.addColorStop(0.7, `rgba(${col},${a * 0.55})`); hz.addColorStop(1, `rgba(${col},0)`);
+  g.fillStyle = hz; g.fillRect(COL - hw, y0 - 14, hw * 2, y1 - y0 + 14);
+  g.globalCompositeOperation = 'destination-in'; g.fillStyle = v; g.fillRect(COL - hw, y0 - 14, hw * 2, y1 - y0 + 14); g.restore();
+  g.save(); const c2 = g.createLinearGradient(0, y0, 0, y1); c2.addColorStop(0, `rgba(255,244,200,0)`); c2.addColorStop(0.35, `rgba(255,244,200,${0.35 + 0.4 * BOX.fl})`); c2.addColorStop(1, `rgba(255,244,200,${0.35 + 0.4 * BOX.fl})`); g.fillStyle = c2; g.fillRect(COL, y0, 1, y1 - y0); g.restore();
+}
+function drawRows(t) {
+  if (!LOW.cv) { LOW.cv = document.createElement('canvas'); LOW.cv.width = W; LOW.cv.height = H; LOW.g = LOW.cv.getContext('2d'); }
+  const lg = LOW.g; lg.setTransform(1, 0, 0, 1, 0, 0); lg.globalAlpha = 1; lg.globalCompositeOperation = 'source-over'; lg.clearRect(0, 0, W, H);
+  LOW.on = true; LOW.text = []; g = lg;
+  try { drawRowsAt(t); } finally { g = G0; LOW.on = false; }
+  // step the alpha into a few levels so soft glows read as pixel bands
+  const im = lg.getImageData(0, 0, W, H), d = im.data; for (let i = 3; i < d.length; i += 4) { const a = d[i]; d[i] = a < 22 ? 0 : a > 200 ? 255 : Math.round(a / 56) * 56 + 31; } lg.putImageData(im, 0, 0);
+  g.save(); g.imageSmoothingEnabled = false; g.drawImage(LOW.cv, 0, 0, W, H); g.restore();
+  for (const q of LOW.text) { g.save(); g.transform(q.m.a, q.m.b, q.m.c, q.m.d, q.m.e, q.m.f); g.globalAlpha = q.a; g.shadowColor = q.sc; g.shadowBlur = q.sb; txt(q.s, q.x, q.y, q.c, q.size, q.align, q.weight, q.font); g.restore(); }
+}
+function drawRowsAt(t) {
+  // a soft shade over the lower part of the scene so the rows read
+  const sh = g.createLinearGradient(0, 96, 0, H); sh.addColorStop(0, 'rgba(6,10,9,0)'); sh.addColorStop(1, 'rgba(6,10,9,.6)'); g.fillStyle = sh; g.fillRect(0, 96, W, H - 96);
+  const two = clamp((t - TWO_AT) / 0.6, 0, 1), e2 = ease(two);
+  const y0 = lerp(186, 162, e2), y1 = lerp(246, 204, e2); LANEY[0] = y0; LANEY[1] = y1;
+  // the 4th beat's column, across every row: a wide solid yellow box with a dark rim and a lit edge; it brightens as the beat
+  // comes and flashes white on a press
+  const near = Math.max(...[0, 1].map(l => { const r = laneRow(l, t); return r ? clamp(1 - Math.abs(t - r.tg.t) / 0.5, 0, 1) : 0; })), fl = clamp(1 - (performance.now() - FX.flashAt) / 220, 0, 1);
+  for (const [yy, sh2] of [[y0, 1], [y1, e2]]) if (sh2 > 0) laneBand(yy, sh2);
+  { const top = Math.round(lerp(158, 134, e2)); BOX.near = near; BOX.fl = fl; BOX.rgb = fl > 0.3 ? '255,236,150' : '242,196,58'; BOX.a = 0.32 + 0.16 * near + 0.3 * fl; scanBox(top, H);
+    if (fl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fx = g.createRadialGradient(COL, (LANEY[0] + LANEY[1]) / 2, 0, COL, (LANEY[0] + LANEY[1]) / 2, 70); fx.addColorStop(0, `rgba(255,240,170,${0.4 * fl})`); fx.addColorStop(1, 'rgba(255,240,170,0)'); g.fillStyle = fx; g.fillRect(COL - 70, 100, 140, H - 100); g.restore(); } }
+  drawLane(0, y0, t, 1);
+  if (two > 0) drawLane(1, y1, t, e2);
+  const now = performance.now();
+  // the rings and sparks from good presses
+  for (let i = RINGS.length - 1; i >= 0; i--) { const r = RINGS[i], a = (now - r.at) / (r.big ? 600 : 450); if (a < 0) continue; if (a >= 1) { RINGS.splice(i, 1); continue; } const k = r.big ? 3.2 : 2; g.save(); g.globalAlpha = (1 - a) * (r.big ? 0.7 : 0.9); g.strokeStyle = r.big ? '#bfffe0' : '#d8fbff'; g.lineWidth = 2.4 * (1 - a) + 0.4; g.beginPath(); g.ellipse(r.x, r.y - 6, 6 + 26 * k * ease(a), 4 + 14 * k * ease(a), 0, 0, Math.PI * 2); g.stroke(); g.restore(); }
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (let i = SPARKS.length - 1; i >= 0; i--) { const p = SPARKS[i], a = (now - p.at) / p.life; if (a >= 1) { SPARKS.splice(i, 1); continue; } const tt = (now - p.at) / 1000; g.globalAlpha = (1 - a); g.fillStyle = p.c; if (p.plus) { const px = p.x + p.vx * tt * (1 - a * 0.5), py = p.y + p.vy * tt * (1 - a * 0.5) + 10 * tt * tt, z = p.s * (1 - a * 0.4); g.fillRect(px - z, py - z * 0.3, z * 2, z * 0.6); g.fillRect(px - z * 0.3, py - z, z * 0.6, z * 2); continue; } g.beginPath(); g.arc(p.x + p.vx * tt, p.y - 6 + p.vy * tt + 50 * tt * tt, p.s * (1 - a * 0.5), 0, Math.PI * 2); g.fill(); }
+  g.restore(); g.globalAlpha = 1;
+  // every 8 in a row: the count jumps out over the column
+  if (FX.milestone) { const a = (now - FX.milestone.at) / 1000; if (a < 1) { const sc = 1 + 0.6 * clamp(1 - a / 0.12, 0, 1); g.save(); g.globalAlpha = clamp(1 - (a - 0.6) / 0.4, 0, 1); g.translate(COL, Math.min(LANEY[0], LANEY[1]) - 48 - a * 6); g.scale(sc, sc); glowTxt(`연속 ${FX.milestone.n}!`, 0, -8, '#ffffff', 15, 'center', '"Black Han Sans", sans-serif', 'rgba(120,255,180,.95)'); g.restore(); } }
+  // the row's cue, top right of the rows
+  const cueRow = ROWS.filter(r => r.cue && t >= r.t0 - 0.2 && t < r.t0 + (r.t8 - r.t0) * 0.8).pop();
+  if (cueRow) { const a = clamp(Math.min((t - cueRow.t0 + 0.2) * 3, ((cueRow.t8 - cueRow.t0) * 0.8 - (t - cueRow.t0)) * 2), 0, 1); g.globalAlpha = a; g.save(); g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 4 * SC; txt(cueRow.cue, 378, 108, '#ffffff', 8, 'right'); g.restore(); g.globalAlpha = 1; }
+  if (stats.combo > 1) { g.save(); g.shadowColor = 'rgba(0,0,0,.8)'; g.shadowBlur = 3 * SC; txt(`연속 ${stats.combo}`, 8, 108, '#c8ffc8', 7, 'left', '500', '"IBM Plex Mono", monospace'); g.restore(); }
+}
+
+// ---------- flow ----------
+function start() {
+  audio(); if (ac.state === 'suspended') ac.resume();
+  compile();
+  Object.assign(stats, { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 }); FX.pops = []; for (const l of FX.lane) Object.assign(l, { beatAt: -9, hitAt: -9, missAt: -9 });
+  startAt = ac.currentTime + 0.3; evI = 0; playing = true;
+  if (movOK) { mov.currentTime = 0; mov.pause(); }
+  $('title').hidden = true; $('result').hidden = true;
+}
+function finish() {
+  playing = false; if (movOK) mov.pause();
+  const n = stats.perfect + stats.good + stats.miss, acc = n ? Math.round((stats.perfect + stats.good * 0.6) / n * 100) : 0;
+  $('r-counts').textContent = `딱 ${stats.perfect} · 좋아 ${stats.good} · 놓침 ${stats.miss}`; $('r-acc').textContent = acc + '%'; $('r-combo').textContent = stats.best;
+  $('r-title').textContent = stats.miss <= 2 ? '심박 안정' : '다시, 옆에서 같이';
+  $('result').hidden = false;
+}
+$('start').onclick = start; $('retry').onclick = start; $('back').onclick = () => { $('result').hidden = true; $('title').hidden = false; };
+const showSync = () => $('sv').textContent = (syncMs > 0 ? '+' : '') + syncMs + ' ms';
+$('sm').onclick = () => { syncMs -= 10; showSync(); }; $('sp').onclick = () => { syncMs += 10; showSync(); };
+
+function frame() {
+  requestAnimationFrame(frame);
+  const t = playing ? songT() : -1;
+  if (playing) { schedule(); tick(t); FX.pops = FX.pops.filter(p => performance.now() - p.at < 650); if (t > END_T) finish(); }
+  const kick = clamp(1 - (performance.now() - FX.kickAt) / 180, 0, 1), z = 1 + 0.03 * kick * kick; g.setTransform(SC * z, 0, 0, SC * z, W * SC * (1 - z) / 2, H * SC * (1 - z) / 2);
+  drawMovie(t); drawRows(playing ? t : 0);
+  const tl = beatT(SEG.length * 8 - 2);
+  if (t > tl) { const a = clamp((t - tl) / 0.8, 0, 1), sc = 1 + 0.15 * (1 - a); g.save(); g.globalAlpha = a; g.translate(W / 2, 64); g.scale(sc, sc); glowTxt('심박 안정', 0, -10, '#f0fff4', 20, 'center', '"Black Han Sans", sans-serif', 'rgba(120,255,170,.9)'); g.restore(); g.globalAlpha = 1; }
+}
+requestAnimationFrame(frame);
+// for testing: window.__16 exposes the chart, a press at a song time and a jump
+window.__16 = { ROWS, TARGETS: () => TARGETS, stats, END_T: () => END_T, beatT, press: t => press(t), songT, start, jump: t => { startAt = ac.currentTime - t; evI = EV.findIndex(e => e.t >= t); if (evI < 0) evI = EV.length; for (const e of EV) e.seen = e.t < t ? 1 : 0; } };
+})();
+</script>
+</body>
+</html>
