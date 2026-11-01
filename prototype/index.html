@@ -1065,7 +1065,7 @@ const LEVELS = [
     // ...then shoves him aside (he stumbles back behind 반장 and stays there, his earbud hanging) and takes the middle, between
     // the belts, from where she loads both on her own (soloFrom: one loader, 하은)
     visit: { go: [95.5, 99.5], back: [126, 128], x: 72, top: 92, yank: 104, shove: 122.3, to: 'center' },
-    stairs: { x: 86, dx: -5, dy: 7, steps: 4 },   // at the upper belt's left end, from her deck down to the floor
+    stairs: { x: 86, dx: -2, dy: 7, steps: 4 },   // at the upper belt's left end, from her deck down to the floor
     soloFrom: 128, metalShift: 3, farLoaderDy: 14, farLoaderDx: 10, oneSpot: { x: 80, top: 96 },
     // the camera (no box lands while it is in close or easing out): his doze as a cutscene (him nodding off, her watching,
     // the two of them as she wakes him), his track opening, and the row: the two of them, then him knocked back and staring
@@ -5212,7 +5212,7 @@ function buildEvents() {
 }
 let events = [], evI = 0, T0 = 0;
 function schedule() {
-  if (state !== 'play' || !ctx) return;
+  if (state !== 'play' || !ctx || GUIDE.on) return;
   const horizon = ctx.currentTime + 0.2;
   while (evI < events.length && T0 + events[evI][0] < horizon) { const [st, fn] = events[evI++]; fn(Math.max(T0 + st, ctx.currentTime)); }
 }
@@ -5692,7 +5692,7 @@ function skipPractice() {
   if (!TUT.on || state !== 'play') return;
   guideOff(); TUT.on = false; TUT.line = null; TUT.count = null; CAM.to = null; SLOW.on = false; stopHum(); stopHold(); loadLevel(TUT.lvl); startPlay();
 }
-function guideOff() { if (!GUIDE.on) return; GUIDE.on = false; GUIDE.resuming = false; $('guide').hidden = true; if (ctx) ctx.resume(); }
+function guideOff() { if (!GUIDE.on) return; guideResume(); $('guide').hidden = true; }
 $('tutskip').addEventListener('click', e => { e.stopPropagation(); skipPractice(); $('tutskip').blur(); });
 // ---------- developer mode ----------
 // The DEV button (corner, during a shift) opens a panel: jump to a part of the shift (the level's devMarks, else the starts of
@@ -5809,14 +5809,14 @@ function drawSlowFx(now) {
   // letterbox bars while it is slowed
   const lb = Math.min(1, (now - SLOW.at) / 150) * Math.min(1, (SLOW.until - now) / 200) * 14; g.fillStyle = '#000'; g.fillRect(0, 0, W, lb); g.fillRect(0, H - lb, W, lb);
 }
-// a guided practice run (drill.guide): as each box reaches its gate the shift stops (the audio is suspended and the clock
-// held), the camera closes on that gate and a prompt says which side to press - the lower belt's box with the right hand,
+// a guided practice run (drill.guide): as each box reaches its gate the shift stops (the clock is held, nothing new is
+// scheduled and the music fades out; the audio itself keeps running, so its clock stays true), the camera closes on that gate and a prompt says which side to press - the lower belt's box with the right hand,
 // the upper's with the left; the right press scans it and the shift runs on, the wrong side shakes the prompt
 function guideTick(t) {
   const d = TUT.lvl.practice.drills[TUT.i]; if (!d || !d.guide || GUIDE.on) return;
   const n = TUT.run.find(m => m.state === 'pending' && !m.guided && t >= m.arr - 0.004); if (!n) return;
   n.guided = true; Object.assign(GUIDE, { on: true, t: n.arr, n, side: n.lane === 1 ? 'R' : 'L' });
-  if (ctx) ctx.suspend();
+  if (ctx) { const T = ctx.currentTime; mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(mus.gain.value, T); mus.gain.linearRampToValueAtTime(0.0001, T + 0.08); }
   const gy = n.lane === 0 ? farY(BELT_Y) - 12 : BELT_Y - 18;
   CAM.to = { x: SCAN_X - 20, y: gy, k: 2.2 };
   const el = $('guide'); el.textContent = GUIDE.side === 'R' ? '오른쪽을 누르세요 ▶' : '◀ 왼쪽을 누르세요'; el.className = 'guide ' + GUIDE.side; el.hidden = false;
@@ -5828,13 +5828,12 @@ function guidePress(ts, key, lane) {
   CAM.to = null; onHit(ts, key, lane);   // judged on the held clock: right on the beat (a run's last hit then goes slow-mo)
   el.hidden = true; guideResume();
 }
-// let the shift run on from exactly where it was held: the audio may have run a few ms past the gate before it stopped (and a
-// press can come before the suspend has even taken), so resume unconditionally and move the clock back onto the held time
+// let the shift run on from exactly where it was held: move the song's start on by however long it was held, so the clock
+// picks up at the held time, and bring the music back
 function guideResume() {
-  GUIDE.resuming = true;
-  const done = () => { if (!GUIDE.on) return; T0 += songRaw(performance.now()) - GUIDE.t; GUIDE.on = false; GUIDE.resuming = false; };
-  if (!ctx) { done(); return; }
-  ctx.resume().then(done, done);
+  if (!GUIDE.on) return;
+  if (ctx) { T0 += songRaw(performance.now()) - GUIDE.t; const T = ctx.currentTime; mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(0.0001, T); mus.gain.linearRampToValueAtTime(1, T + 0.05); }
+  GUIDE.on = false; GUIDE.resuming = false;
 }
 function tutTick(t) {
   if (TUT.phase === 'run') guideTick(t);
