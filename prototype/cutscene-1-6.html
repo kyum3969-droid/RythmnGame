@@ -494,6 +494,19 @@ const SUN = { x: 318, y: 112 };
 const FENCE_END = 230;
 // a window is lit or dark for good; about half the lit ones go dark once somewhere along the walk as morning comes (never back on)
 const winLit = (id, p, t) => rnd(id, 61) < p && (rnd(id, 62) < 0.5 || t < 16 + rnd(id, 63) * 12);   // the yard's fence stops here and the shops begin
+// (his walk) the street awake: people walking toward him and past, someone at the shop with a phone (legs behind the low wall)
+let PEDS_ = null;
+const PEDS = () => PEDS_ || (PEDS_ = [
+  { q: 250, v: 0, p: { hair: 'short', hc: '#1a1618', sk: SK[1], top: '#4a4a52', bot: '#2a2c30', act: 'phone', m: true } },
+  { q: 330, v: -22, p: { hair: 'long', hc: '#2a1e1a', sk: SK[0], top: '#c97a6a', bot: '#2b2b30', act: 'bag', bag: '#5a3a2a' } },
+  { q: 430, v: -30, p: { hair: 'short', hc: '#2a2220', sk: SK[3], top: '#2b3550', sh: '#e8e8e2', tie: '#6a2a2a', bot: '#2b3550', act: 'bag', bag: '#2b2e33' } },
+  { q: 520, v: 0, p: { hair: 'bun', hc: '#8a8480', sk: SK[2], top: '#6a7a5a', bot: '#4a463e', act: 'hang' } },
+  { q: 600, v: -18, p: { hair: 'cap', hc: '#2a3a5a', sk: SK[0], top: '#3a5a4a', bot: '#3a3f45', act: 'phone', pack: '#5a6a3a', buds: true } },
+  { q: 700, v: 14, p: { hair: 'bob', hc: '#3a2a22', sk: SK[1], top: '#e8e2d6', bot: '#3a4a6a', act: 'phone', m: true } }
+]);
+function pedestrians(d, t) {
+  for (const { q, v, p } of PEDS()) { const x = Math.round(q - d + HX + v * (t - 10)); if (x < -20 || x > W + 20) continue; const bob = v && Math.floor(t * 3.4 + q) % 2 ? 1 : 0; person(x, HTOP + 2 + bob, p); }
+}
 function exterior(d, t) {
   // the dawn sky, low sun ahead of her
   const gr = g.createLinearGradient(0, 0, 0, 150); gr.addColorStop(0, '#3e5a90'); gr.addColorStop(0.45, '#c98e94'); gr.addColorStop(0.78, '#ffd3a2'); gr.addColorStop(1, '#fff0c8');
@@ -579,7 +592,7 @@ function street(t) {
   const outside = fn => { if (bx >= W) return; g.save(); g.beginPath(); g.rect(bx, 0, W - bx, H); g.clip(); fn(); g.restore(); };
   let room = { wins: [], tubes: [] };
   inside(() => { room = interior(d, t); lineBelt(d, t, false); });
-  outside(() => exterior(d, t));
+  outside(() => { exterior(d, t); if (WHO === 'jiwoo') pedestrians(d, t); });
   // the end wall: lintel over the door and the rolled-up shutter, the door's rails
   if (bx > -20 && bx < W + 20) {
     R(bx - 6, 0, 14, 98, '#2e2521'); R(bx - 6, 0, 2, 98, '#3d322c'); R(bx + 6, 0, 2, 98, '#1a1412');
@@ -663,7 +676,7 @@ function station(t, dest) {
     // the car's doors (the train stops with one right behind her, x 224); when they open, the lit, crowded car shows
     const op = Math.round(ease(dest ? 1 - seg(t, DEST.close, DEST.close + 0.6) : seg(t, ST.open, ST.open + 0.6)) * 11);
     for (let c = tx + 50; c < Math.min(W + 20, tx + L); c += 160) {
-      if (op > 0) { R(c - op, 54, 2 * op, 94, '#e7eae2'); for (let k = -1; k <= 1; k++) { const px = c + k * 7; R(px - 3, 70 + Math.abs(k) * 3, 6, 6, '#3a3330'); R(px - 4, 76 + Math.abs(k) * 3, 8, 70, ['#2b3550', '#6b5a4a', '#3a3d42'][k + 1]); } }
+      if (op > 0) { R(c - op, 54, 2 * op, 94, '#e7eae2'); if (WHO === 'jiwoo') for (let k = -1; k <= 1; k++) { const px = c + k * 7; R(px - 3, 70 + Math.abs(k) * 3, 6, 6, '#3a3330'); R(px - 4, 76 + Math.abs(k) * 3, 8, 70, ['#2b3550', '#6b5a4a', '#3a3d42'][k + 1]); } }
       R(c - 12 - op, 54, 12, 94, '#b5bcbf'); R(c + op, 54, 12, 94, '#b5bcbf');
       R(c - 10 - op, 62, 8, 26, '#f3f0da'); R(c + 2 + op, 62, 8, 26, '#f3f0da'); R(c - 1 - op, 54, 1, 94, '#8d9497'); R(c + op, 54, 1, 94, '#8d9497');
     }
@@ -700,6 +713,8 @@ function station(t, dest) {
   R(-200, 158, W + 400, 7, '#e0b93a'); for (let x = -200; x < W; x += 3) { R(x, 159, 1, 1, '#c79f25'); R(x + 1, 162, 1, 1, '#c79f25'); }
   // a tiled pillar
   R(88, 0, 20, 158, '#d6d1c3'); R(88, 0, 2, 158, '#ebe7dc'); R(106, 0, 2, 158, '#b3ae9f'); for (let y = 6; y < 156; y += 8) R(90, y, 16, 1, '#c4bfb0');
+  // (in 지우's walk) people on the platform: commuters waiting for the train, or (where he gets off) heading for the exit
+  if (WHO === 'jiwoo') for (const p of (dest ? PLATFORM_OFF : PLATFORM_WAIT)) person(p.x, HTOP + (p.h || 0), p);
   // (in 지우's walk) a flower stall open early by the exit, an older woman in an apron behind it; she takes his money and
   // hands him the flowers over the counter (in song time STALL_S, see BUY)
   if (dest && WHO === 'jiwoo') { const x = HX + 18, ss = STALL_S;
@@ -749,6 +764,30 @@ const SEATED = [
   { x: 278, hair: 'short', hc: '#1a1618', sk: SK[1], top: '#1f2a44', sh: '#f0f0ec', bot: '#1f2a44', act: 'hang', sleep: true, buds: true },
   { x: 322, hair: 'bob', hc: '#3a2a22', sk: SK[0], top: '#c97a6a', bot: '#2b2b30', act: 'phone', mask: true },
   { x: 366, hair: 'short', hc: '#2a2220', sk: SK[3], top: '#3a3d42', sh: '#d8dde6', bot: '#2a2c30', act: 'phone', glasses: true, m: true }
+];
+// (his walk: people waiting on the platform, and getting off at hers)
+const PLATFORM_WAIT = [
+  { x: 28, hair: 'short', hc: '#1a1618', sk: SK[1], top: '#2b3550', sh: '#e8e8e2', tie: '#6a2a2a', bot: '#2b3550', act: 'phone', m: true },
+  { x: 60, hair: 'long', hc: '#2a1e1a', sk: SK[0], top: '#c9a27a', bot: '#2b2b30', act: 'bag', bag: '#5a3a2a', h: 2 },
+  { x: 140, hair: 'cap', hc: '#2a3a5a', sk: SK[2], top: '#3a5a4a', bot: '#3a3f45', act: 'hang', pack: '#5a6a3a', h: 1, buds: true },
+  { x: 288, hair: 'bun', hc: '#3a2a22', sk: SK[1], top: '#7a8a9a', bot: '#2b2b30', act: 'phone', m: true, h: 3 },
+  { x: 322, hair: 'grey', hc: '#9a9894', sk: SK[2], top: '#5a5a4e', bot: '#4a463e', act: 'book', glasses: true },
+  { x: 360, hair: 'short', hc: '#2a2220', sk: SK[3], top: '#4a4a52', sh: '#f0f0ec', bot: '#2a2c30', act: 'hang', mask: true, m: true, h: 1 }
+];
+const PLATFORM_OFF = [
+  { x: 36, hair: 'short', hc: '#1a1618', sk: SK[0], top: '#1f2a44', sh: '#f0f0ec', bot: '#1f2a44', act: 'bag', bag: '#2b2e33', h: 1 },
+  { x: 74, hair: 'bob', hc: '#4a3226', sk: SK[1], top: '#b8a27a', bot: '#2b2b30', act: 'phone', h: 3 },
+  { x: 150, hair: 'grey', hc: '#8a8884', sk: SK[2], top: '#6a5a6a', bot: '#3a3a3a', act: 'hang', m: true, h: 2 },
+  { x: 338, hair: 'long', hc: '#1a1618', sk: SK[0], top: '#e8e2d6', bot: '#3a4a6a', act: 'phone', m: true, h: 2 },
+  { x: 368, hair: 'short', hc: '#2a2220', sk: SK[2], top: '#2b3550', sh: '#e8e8e2', tie: '#2f4f7a', bot: '#2b3550', act: 'hang', m: true }
+];
+// (his ride: more people squeezed into the aisle)
+const STANDING_MORE = [
+  { x: 92, hair: 'bob', hc: '#1a1618', sk: SK[0], top: '#c9c2b2', bot: '#2b2b30', act: 'phone', h: 4 },
+  { x: 120, hair: 'short', hc: '#2a2220', sk: SK[3], top: '#2b3550', sh: '#e8e8e2', tie: '#2f5a3a', bot: '#2b3550', act: 'strap', m: true },
+  { x: 246, hair: 'long', hc: '#3a2a22', sk: SK[1], top: '#8a3a3a', bot: '#2b2b30', act: 'bag', bag: '#2b2e33', m: true, h: 2 },
+  { x: 316, hair: 'cap', hc: '#4a4a52', sk: SK[2], top: '#5a6a3a', bot: '#3a3f45', act: 'strap', pack: '#7a4a3a' },
+  { x: 352, hair: 'short', hc: '#1a1618', sk: SK[0], top: '#e8e2d6', bot: '#3a4a6a', act: 'phone', buds: true, m: true, h: 1 }
 ];
 const STANDING = [
   { x: 30, hair: 'long', hc: '#1a1618', sk: SK[1], top: '#e8e2d6', bot: '#2b2b30', act: 'bag', bag: '#7a4a3a', m: true, h: 3 },
@@ -831,15 +870,16 @@ function car(t) {
   R(78, 100, 3, 56, '#aab3b6');
   R(0, 156, W, 60, '#8b8f89'); R(0, 156, W, 2, '#6e726d'); for (let k = 0; k < 120; k++) R(Math.floor(rnd(k, 31) * W), 160 + Math.floor(rnd(k, 32) * 54), 1, 1, '#9ea29c');
   // the bench, full
-  for (const p of SEATED) person(p.x, 108, { ...p, seated: true });   // sitting: the lap on the seat at y 144
+  const crowd = WHO === 'jiwoo';   // her ride: the car empty; his: rush hour, and more of it
+  if (crowd) for (const p of SEATED) person(p.x, 108, { ...p, seated: true });   // sitting: the lap on the seat at y 144
   R(0, 84, W, 2, '#aab3b6'); R(0, 84, W, 1, '#d4dadc');
   // free straps swing with the car; held ones hang straight from the hand
-  const held = STANDING.filter(p => p.act === 'strap').map(p => strapHand(p.x, HTOP + (p.h || 0), p.m).x).concat(233);
+  const STAND = crowd ? STANDING.concat(STANDING_MORE) : [], held = STAND.filter(p => p.act === 'strap').map(p => strapHand(p.x, HTOP + (p.h || 0), p.m).x).concat(233);
   for (let sx = 17; sx < W; sx += 24) if (!held.some(h => Math.abs(h - sx) < 8)) ring(sx, 104, Math.round(Math.sin(t * 2.1 + sx * 0.05) * (u > 0 ? 1.4 : 0.4)));
   for (const px of [130, 340]) { R(px, 32, 2, 124, '#b9c2c6'); R(px, 32, 1, 124, '#e1e6e8'); }
   // the people standing in the aisle (rocking as the train pulls out), and her among them, a strap in her hand
   g.save(); g.translate(-lurch, 0);
-  for (const p of STANDING) { const top = HTOP + (p.h || 0); if (p.act === 'strap') { const hd = strapHand(p.x, top, p.m); ring(hd.x, hd.y + 2, 0); } person(p.x, top, p); }
+  for (const p of STAND) { const top = HTOP + (p.h || 0); if (p.act === 'strap') { const hd = strapHand(p.x, top, p.m); ring(hd.x, hd.y + 2, 0); } person(p.x, top, p); }
   const k = seg(t, RIDE.strap, RIDE.strap + 0.35);
   ring(233, 104, k >= 1 ? 0 : Math.round(Math.sin(t * 2.1 + 233 * 0.05) * (u > 0 ? 1.4 : 0.4)));   // her strap, still once she holds it
   haeunSprite({ mirror: true, look: 0.2, arms: k > 0 ? 'strap' : undefined, strap: k, sway: 0 });
@@ -941,7 +981,7 @@ function lobby(t) {
   // reception: the sign, the guard asleep behind the counter, a monitor and a lamp
   { const x = l1(110); if (x > -110 && x < W + 10) {
     R(x + 18, 40, 60, 12, '#2f6f9a'); R(x + 18, 40, 60, 1, '#4a8ab4'); pixText('RECEPTION', x + 48 - Math.floor(pixTextW('RECEPTION') / 2), 44, '#f4f8fa');
-    person(x + 34, 98, { hair: 'grey', hc: '#8a8884', sk: SK[2], top: '#2b3550', sh: '#d8dde6', bot: '#2b3550', act: 'hang', sleep: true });
+    if (WHO === 'jiwoo') person(x + 34, 98, { hair: 'grey', hc: '#8a8884', sk: SK[2], top: '#2b3550', sh: '#d8dde6', bot: '#2b3550', act: 'hang', sleep: true });
     R(x + 58, 104, 16, 12, '#2b2f32'); R(x + 59, 105, 14, 9, '#5a8aa8'); R(x + 64, 116, 4, 4, '#5a6064');
     R(x + 80, 108, 2, 12, '#5a6064'); R(x + 76, 104, 10, 5, '#e8c070');
     R(x, 120, 96, 32, '#b89a72'); R(x, 120, 96, 3, '#d8bc92'); R(x, 149, 96, 3, '#8a7050'); for (let k = 1; k < 4; k++) R(x + k * 24, 124, 1, 25, '#a88a62'); } }
@@ -1093,6 +1133,30 @@ const DOOR502 = Math.round(walk3D(WALK3.stop)) + 34;   // the door she stops at 
 const LIGHT_CUE = { 0: 109.42, 64: 118.34, 128: 121.06 };
 const lightOn = q => q in LIGHT_CUE ? LIGHT_CUE[q] : 121.06 + (q / 64 - 2) * 0.9;
 function lightI(q, t) { if (WHO === 'jiwoo') return 1; const u = t - lightOn(q); if (u < 0) return 0; if (u < 0.36) return [1, 0, 1, 0, 0, 1][Math.floor(u / 0.06)] * 0.85; return 1; }
+// (his walk) the hospital morning: a visitor dozing on the bench, a patient shuffling with his drip, a nurse at her cart, and
+// a doctor (a nod to Rhythm Doctor) at a laptop on a cart with headphones on, tapping a key in time: on every heartbeat of the
+// row, and on the 4th (the one the player presses) the screen's trace flares
+let PAGE_T = 0;
+function hallPeople(t, L) {
+  const tv = t;
+  { const x = L(-40) + 20; person(x, 96, { hair: 'grey', hc: '#9a9894', sk: SK[2], top: '#7a6a5a', bot: '#4a463e', act: 'hang', seated: true, sleep: true }); }
+  { const x = Math.round(L(170) - (tv - 112) * 5), top = HTOP + 2;   // the patient: striped gown, his drip on its pole
+    R(x + 10, top - 6, 2, 62, '#9aa3a6'); R(x + 7, top - 6, 8, 2, '#9aa3a6'); R(x + 8, top - 3, 6, 9, '#eef6f8'); R(x + 8, top + 54, 7, 2, '#7a8286');
+    person(x, top, { hair: 'short', hc: '#4a4446', sk: SK[0], top: '#a9c4dc', bot: '#a9c4dc', act: 'hang' }); for (let y = top + 18; y < top + 38; y += 4) R(x - 7, y, 14, 1, '#8fa9c4'); }
+  { const x = L(46), top = HTOP + 1;   // the nurse at her cart
+    R(x - 30, top + 22, 22, 3, '#d8dde0'); R(x - 30, top + 34, 22, 3, '#d8dde0'); R(x - 29, top + 25, 2, 30, '#9aa3a6'); R(x - 11, top + 25, 2, 30, '#9aa3a6'); R(x - 27, top + 18, 6, 4, '#e8eef0'); R(x - 19, top + 19, 5, 3, '#6a9ad8');
+    person(x, top, { hair: 'bun', hc: '#2a1e1a', sk: SK[1], top: '#e29aaa', bot: '#e29aaa', act: 'hang' }); }
+  { const x = L(320), top = HTOP + 1, bt = tBeat(PAGE_T), ph = ((bt % 1) + 1) % 1, tap = ph < 0.12 ? 1 : 0, fourth = ((Math.floor(bt) % 4) + 4) % 4 === 3 && ph < 0.3;   // the doctor
+    R(x - 34, top + 26, 26, 3, '#b9c2c6'); R(x - 33, top + 29, 2, 26, '#8d969a'); R(x - 11, top + 29, 2, 26, '#8d969a'); R(x - 34, top + 52, 26, 2, '#8d969a');   // the cart
+    R(x - 31, top + 14, 18, 12, '#2b2f32'); R(x - 30, top + 15, 16, 10, '#08140c');   // the laptop, its screen
+    for (let i = 0; i < 16; i++) { const k = (i + Math.floor(PAGE_T * 12)) % 16, y = top + 20 - (k === 10 ? (fourth ? 4 : 3) : k === 9 || k === 11 ? 1 : 0); R(x - 30 + i, y, 1, 1, fourth ? '#c8ffb8' : '#7ef06a'); }
+    R(x - 32, top + 26, 20, 1, '#4a4e52');
+    person(x, top, { hair: 'short', hc: '#2a2220', sk: SK[0], top: '#f4f4f0', sh: '#9ad0e0', bot: '#3a4a6a', act: 'hang', glasses: true });
+    R(x - 7, top - 1, 14, 2, '#1b1d1e'); R(x - 8, top + 4, 3, 5, '#1b1d1e'); R(x + 5, top + 4, 3, 5, '#1b1d1e');   // headphones
+    thick(x - 6, top + 22, x - 4, top + 34, 2, '#3a3d42'); R(x - 5, top + 33, 3, 2, '#9aa3a6');   // the stethoscope
+    R(x + 2, top + 22, 5, 3, '#2f6f9a'); R(x - 8, top + 17, 3, 9, '#f4f4f0'); thick(x - 8, top + 18, x - 18, top + 25 - tap * 2, 3, '#f4f4f0'); R(x - 20, top + 24 - tap * 2, 3, 3, SK[0]);   // badge; the near arm out to the keys, tapping
+    if (fourth) { g.save(); g.globalCompositeOperation = 'lighter'; glow(x - 22, top + 20, 14, '126,240,106', 0.35); g.restore(); } }
+}
 function corridor(t) {
   const d = walk3D(t), L = q => Math.round(q - d + HX);
   R(0, 0, W, H, '#d6dfdb');
@@ -1110,6 +1174,7 @@ function corridor(t) {
   const bx = L(-40); if (bx > -50 && bx < W) { R(bx, 132, 40, 4, '#8a9aa4'); R(bx + 2, 136, 3, 12, '#6a7a84'); R(bx + 35, 136, 3, 12, '#6a7a84'); }
   const hs = L(270); if (hs > -10 && hs < W) { R(hs, 92, 6, 12, '#e8eef0'); R(hs + 2, 104, 2, 3, '#6a9ad8'); }
   const ex = L(720); if (ex > -20 && ex < W) { R(ex, 34, 22, 9, '#2f9a5a'); R(ex + 3, 36, 4, 5, '#f4f8fa'); R(ex + 9, 37, 10, 3, '#f4f8fa'); }
+  if (WHO === 'jiwoo') hallPeople(t, L);
   // floor
   R(0, 150, W, 66, '#c6d0cb'); R(0, 150, W, 2, '#9aa6a0'); for (let q = -64; q < 900; q += 32) { const x = L(q); if (x > -2 && x < W) R(x, 152, 1, 64, '#b9c4bf'); } R(0, 180, W, 1, '#b9c4bf');
   // the fixtures (dark housings; they glow once the light is applied)
@@ -1335,7 +1400,7 @@ function rewindFX(s) {
   g.restore();
 }
 function render(t) {
-  g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false;
+  PAGE_T = t; g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false;
   g.clearRect(0, 0, W, H);
   if (t >= REW.t0) repWorld(t); else drawWorld(t);
   if (t >= CUT_END) { out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = '#000'; out.fillRect(0, 0, cv.width, cv.height); return; }
@@ -1371,6 +1436,14 @@ function drawWorld(t) {
   if (t >= WARD.t1 && t < EXIT.stand) { g = wctx; wardScene(t); }
   if (t >= EXIT.stand) { g = wctx; doorScene(t); }
   g = wctx;
+  if (WHO === 'haeun') spotlight();
+}
+// her part, as if she were the only one left: the world sinks toward a cold dark at the edges and the light stays on her
+function spotlight() {
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'multiply';
+  const gr = g.createRadialGradient(HX, HTOP + 26, 14, HX, HTOP + 26, 250);
+  gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.22, '#f2f0ec'); gr.addColorStop(0.55, '#8c8e9e'); gr.addColorStop(1, '#2e303e');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H); g.restore();
 }
 
 // ---------- sound ----------
@@ -1610,7 +1683,7 @@ const LOOK2 = [
   { x: 14, y: 40, al: 'l', w: 190, p: LOOK.lamp, s: 1.05 },         // her corridor, every light still on
   { x: 250, y: 40, al: 'l', w: 130, p: LOOK.lamp, s: 1.05 },
   { x: 14, y: 100, al: 'l', w: 180, p: LOOK.lamp },
-  { x: 250, y: 100, al: 'l', w: 130, p: LOOK.lamp },
+  { x: 250, y: 40, al: 'l', w: 130, p: LOOK.lamp },   // (up high: the doctor's cart is below)
   { x: 192, y: 30, al: 'c', w: 360, p: LOOK.four, s: 1.3, st: 0.8, ink: true },   // one, two, three (his knocks), and four (the player)
   { x: 192, y: 34, al: 'c', w: 360, p: LOOK.warm },                 // the top bar, the door
   { x: 192, y: 34, al: 'c', w: 360, p: LOOK.four },

@@ -63,6 +63,95 @@ Let me count with you
 [Outro] (hummed)
 ```
 
+## 길게 다시 뽑기 (프롬프트 v2, 약 2:10)
+
+지우 파트를 늘리고 사람들 속을 걷게 하려고 2절과 브리지를 붙인 버전. 하은 파트(사람 없이 혼자, 어둡게)와 반대로 지우 파트는 **사람들 사이**를 걷는다. 장면 맞춤:
+
+| 노래 | 지우 파트 |
+|---|---|
+| 인트로 0:00–0:08 | 반장에게 "다녀오겠습니다!" 하고 공장을 나섬 |
+| 1절 0:08–0:24 | 아침 거리, 출근하는 사람들 사이 |
+| 프리코러스 1 0:24–0:32 (비트 들어옴) | 사람들이 기다리는 승강장, 열차가 들어옴 |
+| 코러스 1 0:32–0:48 | 꽉 찬 출근 열차 |
+| 2절 0:48–1:04 | 내리는 역, 출구로 가는 사람들 |
+| 프리코러스 2 1:04–1:12 (비트 잠깐 빠짐) | 꽃집에서 꽃다발 |
+| 코러스 2 1:12–1:28 | 골목, 병원 로비(깬 경비, 기다리는 환자들) |
+| 브리지 1:28–1:44 (비트 얇아지고 멀리 모니터 같은 삑) | 병원 복도: 간호사, 링거대 끄는 환자, 노트북 앞에서 박자에 맞춰 키를 누르는 의사(리듬닥터 오마주) |
+| 마지막 코러스 1:44–2:00 | 502호 앞, 하나·둘·셋 노크와 넷, 문을 가운데 둔 단면, 하은이 문으로 걸어옴 |
+| 아웃트로 2:00–2:10 | 문이 열림, 암전 |
+
+```
+A tender, quietly hopeful ballad with English vocals, the companion piece to a dark, sad piano ballad. 2:10 long, 62 BPM, 4/4. Starts in A minor and turns to C major in the choruses.
+
+Mood: a 21-year-old young man walking at dawn along the same streets a woman he works with walked an hour before him, through a city waking up and full of people, to her mother's hospital room, carrying flowers to apologise. He once asked her what her dream was and hurt her; now he understands why she never had time to dream, and he admires the rhythm she has in her hands. Shy, warm, a little nervous, full of feeling he doesn't say out loud. Early morning light, the day beginning around him.
+
+Vocals: young male, soft and warm, close-mic, slightly husky, gentle and a little shy, mid register, clear natural English diction. Intimate, like singing to himself under his breath. No belting, no falsetto pop runs, no autotune. Natural breaths left in.
+
+Instruments: felt upright piano as the core. A warm, muted electric piano (Rhodes-like) answering the piano softly. From the first pre-chorus, a soft lo-fi hip-hop beat: a muffled kick on 1 and a brushed, quiet snare on 2 and 4, low in the mix, like a beat heard through someone else's earbuds. Low warm strings in the choruses. In the bridge, very faint soft electronic beeps on the beat, like distant heart monitors down a hospital hall. No synth bass, no EDM drop, no rap. Slight room reverb, a little tape warmth.
+
+Structure with timestamps:
+0:00–0:08 Intro: soft piano and muted electric piano, a few gentle chords in A minor.
+0:08–0:24 Verse 1: his voice enters softly, piano only, sparse.
+0:24–0:32 Pre-chorus 1: the muffled kick and brushed snare come in very quietly, with the electric piano.
+0:32–0:48 Chorus 1: warmer, turning to C major. Piano, electric piano, the soft beat, low strings.
+0:48–1:04 Verse 2: the beat stays, a little busier, like a city morning.
+1:04–1:12 Pre-chorus 2: the beat drops out; just piano and voice, tender and shy.
+1:12–1:28 Chorus 2: the beat returns, fuller and warmer than chorus 1, still gentle.
+1:28–1:44 Bridge: the beat thins to just the kick; the faint monitor-like beeps on the beat; piano and voice close and quiet.
+1:44–2:00 Final chorus: the warmest part, strings, piano, electric piano and the soft beat together, hopeful but shy, not loud.
+2:00–2:10 Outro: everything drops out; piano and a soft hummed line, ending on one held, unresolved piano chord that fades, then silence.
+
+Lyrics:
+
+[Verse 1]
+I asked you what you dream of
+You didn't say a word
+Now I walk the way you walked
+And hear what you have heard
+
+[Pre-chorus 1]
+There's a beat inside your hands
+You never let me hear
+
+[Chorus 1]
+Three steps behind you
+I'm counting too
+Every step you took
+Is leading me to you
+
+[Verse 2]
+The city's waking up now
+A thousand hurried feet
+But in the noise I only hear
+The count you never speak
+
+[Pre-chorus 2]
+I don't have the words to say
+So I'm bringing flowers instead
+
+[Chorus 2]
+Three steps behind you
+I'm counting too
+Every light you left on
+Is leading me to you
+
+[Bridge]
+Down the hall the monitors
+Are keeping someone's time
+Every heart in here is counting
+Yours, and hers, and mine
+
+[Final Chorus]
+One, two, three, and four
+Now I know what it's for
+If you're counting to four
+Let me count with you
+
+[Outro] (hummed)
+```
+
+한국어 가사(참고): 네 꿈이 뭐냐고 물었지 / 너는 아무 말 없었어 / 이제 네가 걷던 길을 걸어 / 네가 듣던 걸 들어 — 네 손 안에 박자가 있어 / 한 번도 들려주지 않던 — 세 걸음 뒤에서 / 나도 같이 세 / 네가 걸은 걸음마다 / 나를 너에게 데려가 — 도시가 깨어나 / 수많은 바쁜 발소리 / 그 소음 속에서 내게 들리는 건 / 네가 말하지 않던 셈 — 할 말을 못 찾아서 / 대신 꽃을 들고 가 — 세 걸음 뒤에서 / 나도 같이 세 / 네가 켜 두고 간 불들이 / 나를 너에게 데려가 — 복도 끝 모니터들이 / 누군가의 박을 세고 있어 / 여기 모든 심장이 세고 있어 / 너의 것도, 그분의 것도, 나의 것도 — 하나, 둘, 셋, 그리고 넷 / 이제야 그게 뭔지 알아 / 네가 넷까지 센다면 / 나도 같이 셀게
+
 ## 한국어 가사 (참고)
 
 네 꿈이 뭐냐고 물었지 / 너는 아무 말 없었어 / 이제 네가 걷던 길을 걸어 / 네가 듣던 걸 들어 — 네 손 안에 박자가 있어 / 한 번도 들려주지 않던 — 네가 켜 두고 간 불들이 / 나를 너에게 데려가 / 세 걸음 뒤에서 / 나도 같이 세 / 하나, 둘, 셋, 그리고 넷 / 이제야 그게 뭔지 알아 / 네가 넷까지 센다면 / 나도 같이 셀게
