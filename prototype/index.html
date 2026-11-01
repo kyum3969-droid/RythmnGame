@@ -1044,19 +1044,18 @@ const LEVELS = [
       { who:'지우', text:'(작게) …괜찮아요, 형. 다음에 또 하면 돼요.' }]
   }
   ,{
-    id:'s1-5', stageNo:'1-5', who:'지우 + 하은', role:'지우 · 하은 · 104 BPM · 벨트 둘', tag:'고장 난 벨트 · 튀는 상자 · 꿈', bpm:104, style:'duo15', fxTheme:'blues',
+    id:'s1-5', stageNo:'1-5', who:'지우 + 하은', role:'지우 · 하은 · 104 BPM · 벨트 둘', tag:'정박과 엇박 · 다툼 · 메탈 · 꿈', bpm:104, style:'duo15', fxTheme:'blues',
     // 지우 is back. 반장 sits on a crate with his back and only keeps time; 하은 loads the upper belt and 지우 the lower, and you scan
-    // both with one button as in 1-4, every light on the whole way. The rule: 지우's belt has a bad motor. It chugs, long-short on
-    // every beat (it drags for two thirds of the beat and rushes the last third: you hear it, 쿵-딱, and its lamp blinks with it),
-    // so his boxes, set down on the 'and', land late, two thirds into the beat. 하은's belt is fine and she loads on the beat.
-    // A tutorial first (see practice). Then the shift, in two phases, the music changing genre as the row grows.
+    // both with one button as in 1-4, every light on the whole way. 하은 loads on the beat; 지우's boxes come on the shuffle's
+    // 'and' (two thirds into the beat, written on a 12-cell bar), his own rhythm against hers. No tutorial: the shift starts
+    // after the intro, in two phases, the music changing genre as the row grows. (The broken-motor rule that swung his belt
+    // and its tutorial are gone; the off-beat as a rule of its own is for stage 2's inspection.)
     // Phase 1 (lo-fi): their bars trade over a sleepy lo-fi shuffle; 지우 dozes for a long stretch (the music sags like a slow
     // tape) while 하은 works on alone; his future-funk track opens up when his earbuds go in and the camera is on him; he loads
     // ragged and won't take them out; 반장 gets up; 하은 walks over and pulls his earbud out - a record scratch, the band cut;
     // he snaps (누나, 대체 왜 그래요? 저도 제 리듬이 있다구요.), she: 니 맘대로 할 거면… 꺼져, 그냥. She shoves him aside and takes the middle.
     // Phase 2 (악바리, heavy metal): she loads both belts on her own, long crates and taps trading between them, the tempo
     // creeping up; a key change for the last stretch and a last hit on both belts; then only the motor.
-    // The motor is never fixed: his belt swings to the end.
     show: true,   // 1-5's light show (drawShow15) and her rage aura
     lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, allLit: true, bossSeat: { x: 22, stand: [] }, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 232]],
     // 하은 goes over to him (she leaves her belt, walks down to beside him), stands there through the row, pulls his earbud out
@@ -1074,12 +1073,11 @@ const LEVELS = [
     cutscene: [[40.5, 62.5], [96, 128]],   // letterboxed
     devMarks: [[0, '처음'], [16, '꿈 질문'], [36, '졸음 컷씬'], [68, '지우 음악'], [92, '이어폰·다툼·밀치기'], [128, '2페이즈 메탈'], [164, '정점 1'], [196, '정점 2 (전조)'], [212, '마지막 한 방']],
     farBeltLeft: 36,   // the upper belt runs on to the left, past her legs, up to the stairs
-    beltSwing: { lane: 1, until: Infinity }, fixAt: Infinity,   // the motor is never fixed
     heads: { h: [92, 60], j: [50, 92], b: [22, 98], v: [72, 86], k: [24, 90] },
     clock:'03:20', title:'꿈', offTilt: true,
     chords: S15.lofi.ch, roots: S15.lofi.rt, chordAt: bar => bar % 4,
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 232,
-    hints: false, special:['밀린 박', 'swung', '개'],
+    hints: false, special:['엇박 상자', 'off', '받아냄'],
     sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [32, 'metal'], [54, 'finale'], [55, 'end'], [56, 'outro']],
     // phase 2 runs away with her, a step at a time, up to 112 for the last four bars
     tempo: [[0, 104], [136, 106], [144, 108], [160, 110], [200, 112]],
@@ -1102,19 +1100,18 @@ const LEVELS = [
       'x.xx.xx..x.x', 'xxxx.xx..xxx', 'xxxx..xxxxxx', 'xxxxxxxxxxxx', 'x.......',
       '........', '........', '........'
     ],
-    // lower belt (8 cells, written straight; every 'and' lands two thirds into the beat; a long crate here starts and ends on
-    // the beat, where his swing changes nothing). Phase 1: 지우's bars, his doze (bars 10-15 empty) and his rush on waking,
+    // lower belt: 8 cells, or 12 (the shuffle's grid) where his 'and's are, two thirds into the beat. Phase 1: 지우's bars, his doze (bars 10-15 empty) and his rush on waking,
     // ragged with his earbuds in. Phase 2: 하은's, on the beat, answering her upper belt
     bars2: [
       '........', '........',
-      '.x...x..', '.x.x.x..', '........', '........', '.x.x.x.x', '.x...x.x', '.x...x..', '.....x.x',
-      '........', '........', '........', '........', '........', '........', '.......x', '........',
-      '........', '........', '.....x..', '........', '.......x', '........', '........', '........',
+      '..x.....x...', '..x..x..x...', '........', '........', '..x..x..x..x', '..x.....x..x', '..x.....x...', '........x..x',
+      '........', '........', '........', '........', '........', '........', '...........x', '........',
+      '........', '........', '........x...', '........', '...........x', '........', '........', '........',
       '........', '........', '........', '........', '........', '........',
       '........', '........', '....h=..', '......x.', '....h=..', '......x.',
-      '....h===', '....h===', '..x.h=..', '..x...x.', '.....x..', '.....x..',
-      '...x....', '........', '....h===', '....h===', '..x.h=..', '..x...x.',
-      '.....x..', '.....x..', '...x....', '........', 'x.......',
+      '....h===', '....h===', '..x.h=..', '..x...x.', '........x...', '........x...',
+      '.....x......', '........', '....h===', '....h===', '..x.h=..', '..x...x.',
+      '........x...', '........x...', '.....x......', '........', 'x.......',
       '........', '........', '........'
     ],
     // [beat, text, beats shown, lane, speaker]: 'h' 하은 (upper loading end), 'j' 지우 (lower), 'b' 반장 (on his crate)
@@ -1137,33 +1134,6 @@ const LEVELS = [
       { who:'반장', text:'…됐다. 오늘은 너희 둘이 싣는다.' },
       { who:'지우', text:'누나가 하은 누나죠? 지우예요! 잘 부탁해요!' },
       { who:'하은', text:'(시계를 본다) …응. 위는 내가.' }],
-    // the tutorial, played on the running belts with its own music going the whole time (a shuffle: a kick on every beat for her
-    // boxes, the hats' long-short and a woodblock where his land). Lines come up over heads (spk: j 지우, h 하은, b 반장) and wait
-    // for a press; the music and the belts don't stop. First 지우 notices his belt (`talk`), then the practice runs: each starts
-    // on the bar after the last line, then a line for how it went; a `loop` run comes again till every box is taken, `after` is
-    // said either way. up = 하은's belt, lo = 지우's (his boxes land two thirds into the beat). Then the shift proper
-    practice: {
-      talk: [
-        { spk:'j', text:'어? 어어? 반장님! 제 벨트 왜 이래요?!', cam: { x: 66, y: 126, k: 1.7 } },
-        { spk:'j', text:'막 덜컹덜컹해요! 이거 고장 난 거 아니에요?', cam: { x: 66, y: 126, k: 1.7 } },
-        { spk:'b', text:'…모터가 맛이 갔네. 어쩔 수 없지.', stand: true, cam: { x: 48, y: 126, k: 1.7 } },
-        { spk:'b', text:'그래도 돌아가긴 하니까.', cam: { x: 48, y: 126, k: 1.7 } },
-        { spk:'b', text:'신입, 할 수 있지?' }],
-      drills: [
-        { lo: ['.....x..'], loop: true, ok: [{ spk:'b', text:'어때, 할 만하지?' }], fail: [{ spk:'b', text:'타이밍 잘 맞춰 봐.' }] },
-        { lo: ['...x....'], loop: true, ok: [{ spk:'b', text:'이제 좀 할 만하지?' }, { spk:'b', text:'자, 이번엔 연속으로 가 볼까?' }], fail: [{ spk:'b', text:'조금만 더 집중해 봐.' }] },
-        { lo: ['.x.x.x..'], loop: true, ok: [{ spk:'b', text:'좋아.' }, { spk:'h', text:'여기는 정상이네.', cam: { x: 92, y: 64, k: 2 } }], fail: [{ spk:'b', text:'조금만 더 집중해 봐.' }] },
-        { up: ['x...x...', 'x.x.x.x.'], after: [
-          { spk:'j', text:'앗, 근데 저희 둘이 동시에 보내면 어떡해요?', cam: { x: 58, y: 108, k: 2 } },
-          { spk:'h', text:'바보냐? 두 손으로 타닥 누르면 되잖아.', cam: { x: 92, y: 64, k: 2 } }] },
-        { up: ['..x.....'], lo: ['.x......'], guide: true, ok: [{ spk:'b', text:'그렇지. 오른손, 그다음 바로 왼손.' }, { spk:'b', text:'이번엔 혼자 해 봐.' }] },
-        { up: ['..x.....'], lo: ['.x......'], loop: true, ok: [{ spk:'b', text:'그렇지.' }], fail: [{ spk:'b', text:'조금만 더 집중해 봐.' }] },
-        { up: ['..x.x.x.'], lo: ['.x.x.x..'], loop: true, ok: [{ spk:'b', text:'됐다. 이제 진짜 간다.' }], fail: [{ spk:'b', text:'조금만 더 집중해 봐.' }] }
-      ]
-    },
-    // the outro sets up 1-6 (her last night, her mother in hospital) without saying it: she is gone the moment the shift ends,
-    // 반장 knows something and won't say what, the dream 지우 threw at her comes back (she has no room for one), and he is told
-    // not to put the apology off. Then the office, framed like 1-1's opening: 지우 in the middle, 반장 in through the door
     outro: (good) => good ? [
       { who:'', text:'일이 끝났다. 아무도 먼저 말하지 않았다.' },
       { who:'하은', text:'(시계를 본다) …먼저 갈게.' },
@@ -4971,17 +4941,16 @@ function buildEvents() {
       if (chorus) for (const [ob, nm, len] of RMEL_B) if (Math.floor(ob) === (b - (sec === 'chorus1' ? 64 : sec === 'chorus2' ? 144 : 208)) % 32) E((ob - Math.floor(ob)) * s, T => { voice(T, RN[nm] * lf, len * s * 0.95, 0.032); if (len >= 1) gtrDist(T, RN[nm] * lf, len * s * 0.9, 0.03); if (lift) voice(T + 0.02, RN[nm] * lf * 0.75, len * s * 0.9, 0.016); });
       if (solo) for (const [ob, nm, len, bend] of RSOLO) if (Math.floor(ob) === (b - 176) % 32) E((ob - Math.floor(ob)) * s, T => gtrDist(T, RN[nm], len * s * 0.92, 0.065, !!bend));
     } else if (style === 'duo15') {
-      // 1-5, the genre changing with the row. Under all of it 지우's bad motor chugs, heavy on the beat and light two thirds in,
-      // and every 'and' in the band swings with it. lofi: a sleepy lo-fi shuffle (soft kick and snare, swung hats, rhodes, a
+      // 1-5, the genre changing with the row, all of it on a shuffle (every 'and' two thirds into the beat, where 지우's boxes
+      // land). lofi: a sleepy lo-fi shuffle (soft kick and snare, swung hats, rhodes, a
       // bass, vinyl), sagging like a slow tape while he dozes and snapping back when he wakes. funk: his own future-funk track,
       // leaking from his earbuds, takes the room (four on the floor, claps, swung open hats, slap octave bass, bright chord stabs
-      // on the 'and', plucks, his hum). clash: a record scratch and the band cut; silence: the motor and the rollers. metal:
-      // 하은 alone, heavy metal on the motor's shuffle (palm-muted power chords on the beat and two thirds in, a double kick
+      // on the 'and', plucks, his hum). clash: a record scratch and the band cut; silence: the rollers. metal:
+      // 하은 alone, heavy metal on the shuffle (palm-muted power chords on the beat and two thirds in, a double kick
       // galloping with them, a big snare on 2 and 4, crashes). together: the metal with his synth lead over it, a key change
-      // for the last four bars. outro: the motor alone, then nothing. The tutorial's practice runs have their own bare shuffle.
+      // for the last four bars. outro: the rollers, then nothing.
       const sec = sectionAt(Math.floor(b / 4)), bar = Math.floor(b / 4), ch = chords[ci], rt = roots[ci];
-      const swung = b < L.fixAt, AND = swung ? s * 2 / 3 : s / 2;
-      if (swung && sec !== 'clash') { E(0, T => motorChug(T, 1)); E(s * 2 / 3, T => motorChug(T, 0.55)); }
+      const AND = s * 2 / 3;   // the band's shuffle: every 'and' two thirds into the beat
       if (sec === 'intro' || sec === 'outro') { E(0, T => roller(T, 0.03)); E(s / 2, T => roller(T, 0.02)); continue; }
       // the tutorial: a plain shuffle to practise to. A kick on every beat (her boxes), the hats long-short, a woodblock where his
       // boxes land (two thirds in), claps on 2 and 4, the bass and rhodes on 1 and 3, a pad under it
