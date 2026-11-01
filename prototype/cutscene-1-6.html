@@ -693,7 +693,7 @@ function station(t, dest) {
   R(-200, 22, W + 400, 18, '#3a4044'); R(-200, 22, W + 400, 1, '#4a5156');
   // the LED board: a message running right to left in amber dots
   R(150, 25, 96, 11, '#0b0c0c');
-  { const msg = dest ? 'WAY OUT >   MIND THE GAP   ' : 'TRAIN APPROACHING   STAND BEHIND THE LINE   ', mw = pixTextW(msg) + 12, off = Math.floor(t * 16) % mw;
+  { const msg = dest ? 'WAY OUT >   MIND THE GAP   ' : 'TRAIN APPROACHING   STAND BEHIND THE LINE   ', mw = pixTextW(msg) + 12, off = Math.floor(PAGE_T * 16) % mw;
     g.save(); g.beginPath(); g.rect(152, 27, 92, 7); g.clip(); pixText(msg, 244 - off, 28, '#ffb43a'); pixText(msg, 244 - off + mw, 28, '#ffb43a'); g.restore(); }
   R(30, 25, 11, 11, LINE); R(31, 24, 9, 13, LINE); R(29, 26, 13, 9, LINE); pixText('2', 34, 28, '#f4f1ea');
   // the station sign: the name, the line's colour along its top
@@ -718,7 +718,7 @@ function station(t, dest) {
   // a tiled pillar
   R(88, 0, 20, 158, '#d6d1c3'); R(88, 0, 2, 158, '#ebe7dc'); R(106, 0, 2, 158, '#b3ae9f'); for (let y = 6; y < 156; y += 8) R(90, y, 16, 1, '#c4bfb0');
   // (in 지우's walk) people on the platform: commuters waiting for the train, or (where he gets off) heading for the exit
-  if (WHO === 'jiwoo') (dest ? PLATFORM_OFF : PLATFORM_WAIT).forEach((p, i) => { const go = dest ? Math.max(0, STALL_S - 66) * (16 + i * 5) : 0, x = p.x - go; if (x > -20) person(x, HTOP + (p.h || 0) + (go > 0 && Math.floor(STALL_S * 3.2 + i) % 2 ? 1 : 0), { ...p, m: dest ? false : p.m }); });
+  if (WHO === 'jiwoo') (dest ? PLATFORM_OFF : PLATFORM_WAIT).forEach((p, i) => { const go = dest ? Math.max(0, STALL_S - 58) * (16 + i * 5) : 0, x = p.x - go; if (x > -20) person(x, HTOP + (p.h || 0) + (go > 0 && Math.floor(STALL_S * 3.2 + i) % 2 ? 1 : 0), { ...p, m: dest ? false : p.m }); });
   // (in 지우's walk) a flower stall open early by the exit, an older woman in an apron behind it; she takes his money and
   // hands him the flowers over the counter (in song time STALL_S, see BUY)
   if (dest && WHO === 'jiwoo') { const x = HX + 18, ss = STALL_S;
@@ -1088,7 +1088,7 @@ function jiwoo(cx, top, t) {
   else { thick(cx + 4, top + 19, bx - 2, by + 15, 3, hood); R(bx - 3, by + 14, 3, 3, skin); }   // the near arm, his hand on the cone
 }
 function doorScene(t) {
-  const P = Math.round(WX.D(t)), wx0 = WALL.x0 + P, wx1 = WALL.x1 + P;
+  const P = DOOR_P != null ? DOOR_P : Math.round(WX.D(t)), wx0 = WALL.x0 + P, wx1 = WALL.x1 + P;
   // the corridor side, lit now: wall, handrail, a ceiling panel over 지우, the floor
   g.save(); g.beginPath(); g.rect(0, 0, Math.max(0, wx0), H); g.clip();
   R(0, 0, W, 150, '#d6dfdb'); R(0, 0, W, 30, '#dfe4e2'); R(0, 29, W, 1, '#b9c2be');
@@ -1363,15 +1363,16 @@ function crossTo(t, t0, t1, ctx, canvas, drawNext, pose, tintA, tintB, clipY, dr
 // his walk to the reprise (third take), in song time s. Each section replays a stretch of her timeline (tv) with him in her place:
 //   intro + verse 1 (0 to 25.7): the factory, out onto the morning street (people about)
 //   pre-chorus 1 (to 34.5): the platform, people waiting, the train coming in, its doors opening
-//   chorus 1 and the interlude after it (to 56.7): boarding, the packed car pulling out and running
-//   verse 2 (to 72.7), 'a thousand hurried feet': the train slowing, stopping, the platform she got off at, the crowd heading out
+//   chorus 1 (to 49.4): boarding, the packed car pulling out, running and braking to the stop (her 11.4 s over 14.9: near its own pace)
+//   the interlude after it (to 56.7): the doors open and the car turns slowly into the platform she got off at
+//   verse 2 (to 72.7), 'a thousand hurried feet': on the platform (her clock held), the crowd heading out for the exit
 //   pre-chorus 2 (to 80.0), 'so I'm bringing flowers instead': the flower stall (her timeline held)
 //   chorus 2 (to 95.0): off the platform, down the alley with the flowers, to the hospital
 //   bridge (to 110.7), 'down the hall the monitors': the corridor with every light on, the people, Ian at his laptop; 502
 //   the quiet stretch (to 127.9): at 502 he hesitates, looks at the flowers; the door in section; 하은 walks to it
 //   'One, two, three, and four' (a quick last chorus): he steps up and knocks on one, two, three; the player has four;
 //   'Now I know what it's for': she opens the door
-const SEGS = [[0, 10.2], [25.7, 27.5], [34.5, 35.0], [56.7, 44.5], [72.7, 49.45], [80.0, 49.45], [95.0, 67.6]];
+const SEGS = [[0, 10.2], [25.7, 27.5], [34.5, 35.0], [49.4, 46.4], [56.7, 49.45], [72.7, 49.45], [80.0, 49.45], [95.0, 67.6]];
 const vtPath = s => { for (let k = SEGS.length - 1; k >= 0; k--) if (s >= SEGS[k][0]) { const [s0, v0] = SEGS[k], nx = SEGS[k + 1]; return nx ? lerp(v0, nx[1], (s - s0) / (nx[0] - s0)) : v0; } return SEGS[0][1]; };
 const RS = { stall: 72.7, toHall: [94.3, 95.9], atDoor: 110.5, door: 113.5, step: 113.9, knock1: 114.6, call: 115.3, call2: 118.3, knock: 119.1, open: 123.35 };
 // the stall, in song time: he turns to it, looks over the buckets, holds out the money, the seller hands him the flowers,
@@ -1384,7 +1385,7 @@ const vtC = s => s >= RS.atDoor ? 125.0 : lerp(112.6, 125.0, (s - RS.toHall[0]) 
 const rewT = r => lerp(177.8, TALK.scene, ease(seg(r, 0.15, REW.dur - 0.35)));   // where the rewind is in her cutscene (r: time into it)
 // in her timeline, the time that drives the room's sound beds (null: no beds)
 function bedTime(t) { if (t < REW.t0) return t; if (t < REW.t0 + REW.dur) return null; if (t < REP.t0) return TALK.scene; const s = t - REP.t0; if (s < RS.toHall[0]) return vtPath(s); if (s < RS.door) return vtC(s); return EXIT.reach + 0.6; }
-let DOOR_OPEN = 0, HAEUN_DOOR = null, JSTEP = 0, JKNOCK = 0;   // JSTEP: 지우's step up to the door (0..1); JKNOCK: his knocking arm   // HAEUN_DOOR: where and how she is drawn in the door scene (null: as in her part)
+let DOOR_OPEN = 0, HAEUN_DOOR = null, JSTEP = 0, JKNOCK = 0, DOOR_P = null;   // DOOR_P: the door scene's pan when set (his side: framed on him at HX)   // JSTEP: 지우's step up to the door (0..1); JKNOCK: his knocking arm   // HAEUN_DOOR: where and how she is drawn in the door scene (null: as in her part)
 function repWorld(t) {
   if (t < REW.t0 + REW.dur) { const r = t - REW.t0; drawWorld(rewT(r)); rewindFX(r); return; }
   if (t < REP.t0) {   // the talk: the factory as she left it, 지우 at the belt turned to 반장 on his chair
@@ -1420,20 +1421,23 @@ function repWorld(t) {
 // the door at the end, in the same order as her side of it: 지우 steps up and knocks, calls '누나!'; 하은 comes from inside the
 // ward (off to the right, from the bed) and walks to the door while he calls again; as she gets there he knocks on the beat,
 // one, two, three, the player has four, and she opens
-const HDOOR = { from: 114.8, at: 120.4, reach: 123.05, dist: 175 };   // (dist: she starts just off the right edge)
+const HDOOR = { from: 114.8, at: 120.4, reach: 123.05, dist: 115 };   // (dist: she starts just off the right edge)
+const HIS_P = HX + 36 - WALL.x0;   // the pan that puts 지우 at HX, where he stood in the corridor; she stops 18 px past the wall's ward side
+const HER_X = WALL.x1 + HIS_P + 18;
 function doorEnd(s) {
   DOOR_OPEN = ease(seg(s, RS.open, RS.open + 1.6));
   JSTEP = ease(seg(s, RS.step, RS.step + 0.8));
   { const arm = (t0, taps) => ease(seg(s, t0, t0 + 0.4)) * (1 - ease(seg(s, taps[taps.length - 1] + 0.35, taps[taps.length - 1] + 0.8)));   // the arm up for a knock, down after its last tap
     const up = Math.max(arm(RS.knock1 - 0.4, KNOCKS1), arm(RS.knock, KNOCKS)), tap = Math.max(...KNOCKS1.concat(KNOCKS).map(q => clamp(1 - Math.abs(s - q) / 0.14, 0, 1)));
     JKNOCK = up > 0 ? { up, tap } : 0; }
-  const u = seg(s, HDOOR.from, HDOOR.at), d = HDOOR.dist * (u < 1 ? (u * u * (3 - 2 * u)) : 1), x = HX + HDOOR.dist - d;
+  const u = seg(s, HDOOR.from, HDOOR.at), d = HDOOR.dist * (u < 1 ? (u * u * (3 - 2 * u)) : 1), x = HER_X + HDOOR.dist - d;
   let pose;
   if (s < HDOOR.at) { const w = walking(d, Math.min(1, d / STRIDE, (HDOOR.dist - d) / 12 + 0.2), 0.2); w.o.mirror = false; pose = w; }
   else { const k = ease(seg(s, HDOOR.reach, HDOOR.reach + 0.6)) * (1 - DOOR_OPEN), look = lerp(0.2, 0.35, ease(seg(s, HDOOR.at, HDOOR.at + 0.5)));
-    pose = k > 0 ? { o: { mirror: false, look, arms: 'reach', reach: { dx: Math.round(lerp(-8, WALL.x1 + EXIT_D + 3 - HX, k)), dy: Math.round(lerp(31, DOOR.handle - HTOP, k)) }, sway: 0 }, top: HTOP } : { o: { mirror: false, look, sway: 0 }, top: HTOP }; }
+    pose = k > 0 ? { o: { mirror: false, look, arms: 'reach', reach: { dx: Math.round(lerp(-8, WALL.x1 + HIS_P + 3 - HER_X, k)), dy: Math.round(lerp(31, DOOR.handle - HTOP, k)) }, sway: 0 }, top: HTOP } : { o: { mirror: false, look, sway: 0 }, top: HTOP }; }
   HAEUN_DOOR = { x, pose };
-  try { doorScene(EXIT.reach + 0.6); } finally { DOOR_OPEN = 0; HAEUN_DOOR = null; JSTEP = 0; JKNOCK = 0; }
+  DOOR_P = HIS_P;
+  try { doorScene(EXIT.reach + 0.6); } finally { DOOR_OPEN = 0; HAEUN_DOOR = null; JSTEP = 0; JKNOCK = 0; DOOR_P = null; }
 }
 // the rewind's look: a worn tape running backwards (tracking bands sliding, scanlines, a cold wash, speckle, ◀◀ in the corner)
 function rewindFX(s) {
