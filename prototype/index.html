@@ -52,6 +52,12 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .tutskip{position:absolute;top:6cqw;right:2.2cqw;z-index:6;font:inherit;font-size:max(11px,1.7cqw);padding:.35em .8em;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(10,8,8,.6);color:#f4ead8;cursor:pointer}
 .tutskip:hover{background:rgba(40,30,26,.8)}
 /* developer mode: a faint button in the corner opens a panel to jump to a part of the shift or straight to an ending */
+/* the tutorial's guide: the shift stops at the gate and a big prompt says which side to press */
+.guide{position:absolute;bottom:7%;z-index:6;font-weight:700;font-size:max(14px,2.6cqw);color:#fff3c8;background:rgba(10,8,8,.72);border:2px solid #ffd27a;border-radius:12px;padding:.45em .9em;pointer-events:none;animation:guidePulse .7s ease-in-out infinite alternate}
+.guide.L{left:6%}.guide.R{right:6%}
+.guide.no{animation:guideNo .25s}
+@keyframes guidePulse{from{transform:scale(1)}to{transform:scale(1.07)}}
+@keyframes guideNo{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 .devbtn{position:absolute;left:1.2cqw;bottom:1.2cqw;z-index:7;font:inherit;font-size:max(10px,1.3cqw);padding:.2em .55em;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(10,8,8,.45);color:rgba(244,234,216,.6);cursor:pointer}
 .devbtn:hover,.devbtn.on{color:#f4ead8;background:rgba(40,30,26,.85)}
 .devpanel{position:absolute;left:1.2cqw;bottom:5.2cqw;z-index:7;display:flex;flex-direction:column;gap:.3em;max-height:80%;overflow:auto;padding:.5em;border-radius:8px;background:rgba(10,8,8,.85);border:1px solid rgba(255,255,255,.2);font-size:max(10px,1.4cqw)}
@@ -180,6 +186,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
     <canvas id="cv" width="384" height="216" aria-label="컨베이어 벨트 작업 화면"></canvas>
     <button class="tutskip" id="tutskip" type="button" hidden>튜토리얼 건너뛰기 ▸</button>
     <button class="devbtn" id="devbtn" type="button" hidden>DEV</button>
+    <div class="guide" id="guide" hidden></div>
     <div class="devpanel" id="devpanel" hidden></div>
     <div class="hud" id="hud" hidden><span id="clock">B동 3번 라인 · 03:12</span><span id="combo">콤보 0</span></div>
     <div class="bubble" id="bubble" hidden></div>
@@ -1057,7 +1064,8 @@ const LEVELS = [
     // of them for the row
     // ...then shoves him aside (he stumbles back behind 반장 and stays there, his earbud hanging) and takes the middle, between
     // the belts, from where she loads both on her own (soloFrom: one loader, 하은)
-    visit: { go: [96, 99.5], back: [125.5, 127.5], x: 80, top: 86, yank: 104, shove: 122.3, to: 'center' },
+    visit: { go: [95.5, 99.5], back: [126, 128], x: 72, top: 92, yank: 104, shove: 122.3, to: 'center' },
+    stairs: { x: 86, dx: -5, dy: 7, steps: 4 },   // at the upper belt's left end, from her deck down to the floor
     soloFrom: 128, metalShift: 3, farLoaderDy: 14, farLoaderDx: 10, oneSpot: { x: 80, top: 96 },
     // the camera (no box lands while it is in close or easing out): his doze as a cutscene (him nodding off, her watching,
     // the two of them as she wakes him), his track opening, and the row: the two of them, then him knocked back and staring
@@ -1065,9 +1073,9 @@ const LEVELS = [
       [72, 78, { x: 58, y: 112, k: 1.6 }], [96, 122.3, { x: 70, y: 114, k: 1.4 }], [122.3, 128, { x: 46, y: 108, k: 1.6 }]],
     cutscene: [[40.5, 62.5], [96, 128]],   // letterboxed
     devMarks: [[0, '처음'], [16, '꿈 질문'], [36, '졸음 컷씬'], [68, '지우 음악'], [92, '이어폰·다툼·밀치기'], [128, '2페이즈 메탈'], [164, '정점 1'], [196, '정점 2 (전조)'], [212, '마지막 한 방']],
-    farBeltLeft: 14,   // the upper belt runs on to the left, past her legs
+    farBeltLeft: 36,   // the upper belt runs on to the left, past her legs, up to the stairs
     beltSwing: { lane: 1, until: Infinity }, fixAt: Infinity,   // the motor is never fixed
-    heads: { h: [92, 60], j: [50, 92], b: [22, 98], v: [80, 80], k: [24, 90] },
+    heads: { h: [92, 60], j: [50, 92], b: [22, 98], v: [72, 86], k: [24, 90] },
     clock:'03:20', title:'꿈', offTilt: true,
     chords: S15.lofi.ch, roots: S15.lofi.rt, chordAt: bar => bar % 4,
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 232,
@@ -1148,6 +1156,7 @@ const LEVELS = [
         { up: ['x...x...', 'x.x.x.x.'], after: [
           { spk:'j', text:'앗, 근데 저희 둘이 동시에 보내면 어떡해요?', cam: { x: 58, y: 108, k: 2 } },
           { spk:'h', text:'바보냐? 두 손으로 타닥 누르면 되잖아.', cam: { x: 92, y: 64, k: 2 } }] },
+        { up: ['..x.....'], lo: ['.x......'], guide: true, ok: [{ spk:'b', text:'그렇지. 오른손, 그다음 바로 왼손.' }, { spk:'b', text:'이번엔 혼자 해 봐.' }] },
         { up: ['..x.....'], lo: ['.x......'], loop: true, ok: [{ spk:'b', text:'그렇지.' }], fail: [{ spk:'b', text:'조금만 더 집중해 봐.' }] },
         { up: ['..x.x.x.'], lo: ['.x.x.x..'], loop: true, ok: [{ spk:'b', text:'됐다. 이제 진짜 간다.' }], fail: [{ spk:'b', text:'조금만 더 집중해 봐.' }] }
       ]
@@ -1891,16 +1900,17 @@ const PARTNERS = {
     base: 86,
     draw(pose, nowMs, active) {
       const top = bodyTop(86, pose) + (pose.bob ? 1 : 0);
-      drawHaeunAt(BOSS_X, top, nowMs, { mirror: !pose.look, watch: pose.phone, load: true, bob: 0, rest: pose.look, eyes: active && inRange(pose.beat, L.fever) });
+      drawHaeunAt(BOSS_X, top, nowMs, { mirror: !pose.look, watch: pose.phone, load: true, bob: 0, rest: pose.look, noFar: pose.solo });
     },
     arm(pose) {
       const top = bodyTop(86, pose), shirt = '#1e1a1a', glove = C.skin;
       if (pose.phone) return;
-      if (pose.wave && !pose.carry) { thick(BOSS_X + 5, top + 23, BOSS_X + 9, top + 2, 4, shirt); R(BOSS_X + 7, top - 2, 5, 5, glove); return; }
-      // an arm her own size (it cannot stretch past its reach), from the front shoulder or, for the lower belt when she feeds
-      // both, the back one; a hand, the watch on the wrist
-      const sx = BOSS_X + (pose.left ? -5 : 5), sy = top + 23;
-      const h = reachArm(sx, sy, pose.hand.x, pose.hand.y, shirt, pose.reach || 22); R(h.x - 2, h.y - 2, 4, 4, glove);
+      // her loading arm from the near shoulder (she faces the belt: the shoulder is at the right side of her body) or, for the
+      // lower belt when she feeds both, the far one; her own size (it cannot stretch past its reach), 3 px sleeves; the hand,
+      // the watch on the wrist
+      const sx = BOSS_X + (pose.left ? -7 : 7), sy = top + 17;
+      if (pose.wave && !pose.carry) { thick(sx, sy, BOSS_X + 9, top + 2, 3, shirt); R(BOSS_X + 7, top - 2, 5, 5, glove); return; }
+      const h = reachArm(sx, sy, pose.hand.x, pose.hand.y, shirt, pose.reach || 22, 3); R(h.x - 2, h.y - 2, 4, 4, glove);
       R(lerp(sx, h.x, 0.8) - 1, lerp(sy, h.y, 0.8) - 1, 3, 3, '#d8dde0');
     }
   },
@@ -1979,12 +1989,12 @@ function elbowArm(sx, sy, hx, hy, col, seg = 16) {
   return { x: hx2, y: hy2 };
 }
 // a straight arm with a slight bend at the elbow, never longer than its reach; returns where the hand ends up
-function reachArm(sx, sy, hx, hy, col, reach) {
+function reachArm(sx, sy, hx, hy, col, reach, w = 4) {
   let dx = hx - sx, dy = hy - sy; const d = Math.hypot(dx, dy) || 1;
   if (d > reach) { dx *= reach / d; dy *= reach / d; }
   let px = -dy / d, py = dx / d; if (py < 0 || (py === 0 && px > 0)) { px = -px; py = -py; }
   const b = Math.min(3, d / 5), elx = Math.round(sx + dx / 2 + px * b), ely = Math.round(sy + dy / 2 + py * b), hx2 = Math.round(sx + dx), hy2 = Math.round(sy + dy);
-  thick(sx, sy, elx, ely, 4, col); thick(elx, ely, hx2, hy2, 4, col);
+  thick(sx, sy, elx, ely, w, col); thick(elx, ely, hx2, hy2, w, col);
   return { x: hx2, y: hy2 };
 }
 function drawPartnerBody(id, pose, nowMs, active) { PARTNERS[id].draw(pose, nowMs, active); }
@@ -2099,36 +2109,43 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
   const hair = '#17121a', hairL = '#2e2630', shirt = '#1e1a1a', shirtD = '#121010', cap = '#d8463b', capD = '#a83328', brim = '#c43d33', glove = C.skin, sky = '#86c3e8', tee = '#e9f3f7', leg = '#3a3f45', shoe = '#1e1a1a';
   g.save(); if (o.mirror) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
   // legs: weight on the near leg, or a stride
-  if (o.step != null) { const st = o.step ? 3 : -3; R(cx - 5 + st, top + 38, 5, 16, leg); R(cx + 2 - st, top + 38, 5, 15, leg); R(cx - 6 + st, top + 53, 6, 3, shoe); R(cx + 2 - st, top + 52, 6, 3, shoe); }
+  // walking, one leg at a time: the moving leg lifts and swings forward in an arc and sets down while the other stays planted,
+  // then the other leg's turn (a step every 0.3 s)
+  if (o.step != null) { const ph = (nowMs / 300) % 2, lg = Math.floor(ph), a = Math.sin(Math.PI * (ph - lg)), fw = Math.round(3 * a), li = Math.round(2 * a);
+    const nx = lg === 0 ? -fw : 0, ny = lg === 0 ? -li : 0, fx = lg === 1 ? -fw : 0, fy = lg === 1 ? -li : 0;
+    R(cx + 2 + fx, top + 38, 5, 15 + fy, leg); R(cx + 2 + fx, top + 52 + fy, 6, 3, shoe); R(cx - 5 + nx, top + 38, 5, 16 + ny, leg); R(cx - 6 + nx, top + 53 + ny, 6, 3, shoe); }
   else { R(cx - 5, top + 38, 5, 16, leg); R(cx + 2, top + 38, 5, 15, leg); R(cx - 6, top + 53, 6, 3, shoe); R(cx + 2, top + 52, 6, 3, shoe); }
-  // long straight hair hanging behind her down past the shoulders, swaying a little when she fires or strides
+  // only the back hair, long and straight down her back past the shoulders, swaying a little when she fires or strides
   const sw = Math.round(kick * 2) + bob + (o.step != null ? 1 : 0);
-  R(cx - 9, top + 3, 18, 28, hair); R(cx + 7 + sw, top + 14, 3, 18, hair); R(cx - 10, top + 14, 3, 17, hair);
-  R(cx + 8 + sw, top + 16, 1, 12, hairL); R(cx - 9, top + 16, 1, 11, hairL);
+  R(cx + 6 + sw, top + 14, 4, 18, hair); R(cx + 8 + sw, top + 16, 1, 12, hairL);
   // body: the sky-blue tee with a white stripe over black sleeves, black bottoms
   R(cx - 7, top + 16, 14, 23, shirt); R(cx - 7, top + 15, 14, 16, sky); R(cx - 7, top + 27, 14, 2, tee); R(cx - 7, top + 30, 14, 9, shirtD);
-  // the face, the same 12x14 as everyone, framed by the hair to the shoulders
-  R(cx - 6, top + 1, 12, 14, C.skin); R(cx - 8, top + 3, 3, 15, hair); R(cx + 5, top + 3, 3, 15, hair); R(cx - 7, top + 6, 1, 10, hairL);
-  // the snapback, 14 wide like 반장's cap, pulled down: front panel with a seam and a button, the patch, the brim out to the left
-  R(cx - 7, top - 2, 14, 6, cap); R(cx - 6, top - 3, 12, 1, cap); R(cx - 7, top + 3, 14, 1, capD); R(cx - 2, top - 3, 1, 7, capD); R(cx - 1, top - 4, 2, 1, capD);
-  R(cx - 6, top - 1, 4, 2, '#f4e6e0');
-  R(cx - 15, top + 2, 9, 2, brim); R(cx - 15, top + 2, 9, 1, cap); R(cx - 15, top + 4, 9, 1, capD);
-  // bangs down over her eyes under the cap; a scan lights two pinpoints in them for a moment
-  R(cx - 6, top + 4, 12, 3, hair); R(cx - 6, top + 7, 12, 1, '#6b4631');
-  if (kick > 0.4 || o.eyes) { R(cx - 4, top + 5, 1, 1, o.eyes ? '#bfe9ff' : '#f4f1ea'); R(cx + 1, top + 5, 1, 1, o.eyes ? '#bfe9ff' : '#f4f1ea'); }
-  R(cx - 3, top + 9, 2, 1, '#b07a58'); R(cx - 3, top + 11, 2, 1, '#b2565a');
-  // front arm: the gun on the upper gate (kicks back toward her when a scan fires there), the watch check, a swing while walking,
-  // or nothing (the loading arm is drawn with the belt). The other hand stays in a pocket.
-  if (o.watch) { thick(cx - 6, top + 22, cx - 2, top + 30, 4, shirt); R(cx - 4, top + 28, 4, 4, glove); R(cx - 3, top + 26, 3, 3, '#d8dde0'); R(cx - 2, top + 27, 1, 1, C.ink); }
+  // the head, smaller than the rest of the cast (a 10x12 face under a 12-wide cap, the chin where theirs is): the back of her head
+  // under the cap running into the hair down her back, the face, the snapback pulled down with its patch, the brim out to the left
+  R(cx + 3, top + 3, 4, 12, hair);
+  R(cx - 5, top + 3, 10, 12, C.skin);
+  R(cx - 6, top, 12, 6, cap); R(cx - 5, top - 1, 10, 1, cap); R(cx - 6, top + 5, 12, 1, capD); R(cx - 2, top - 1, 1, 7, capD); R(cx - 1, top - 2, 2, 1, capD);
+  R(cx - 5, top + 1, 3, 2, '#f4e6e0');
+  R(cx - 13, top + 4, 7, 2, brim); R(cx - 13, top + 4, 7, 1, cap); R(cx - 13, top + 6, 7, 1, capD);
+  // the cap's shadow over her eyes, always: deep under the brim, softening down to the cheeks
+  R(cx - 5, top + 6, 10, 3, '#3a2622'); R(cx - 5, top + 9, 10, 1, '#8a5a44');
+  // a thin dark line down the front of her face, from under the brim to the chin
+  R(cx - 6, top + 6, 1, 9, '#1b1716');
+  R(cx - 3, top + 10, 2, 1, '#b07a58'); R(cx - 3, top + 12, 2, 1, '#b2565a');
+  // arms, hung from the shoulders at the sides of her body (3 px sleeves). The near arm: the gun on the upper gate (kicks back
+  // toward her when a scan fires there), the watch check, a swing while walking, a tap on the belt, hanging, or nothing (the
+  // loading arm is drawn with the belt). The far hand hangs at her side, a little back while she walks.
+  const NX = cx - 8, FX = cx + 8, SY = top + 17;
+  if (o.watch) { thick(NX, SY, cx - 2, top + 28, 3, shirt); R(cx - 4, top + 28, 4, 4, glove); R(cx - 3, top + 26, 3, 3, '#d8dde0'); R(cx - 2, top + 27, 1, 1, C.ink); }
   else if (o.gun != null) {
     const gx = cx - 14 + kick * 3 - Math.round((o.knock || 0) * 7), gy = top + 24;
-    thick(cx - 6, top + 22, gx + 6, gy + 3, 4, shirt);
+    thick(NX, SY, gx + 6, gy + 3, 3, shirt);
     R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33'); R(gx - 10, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser); R(gx, gy + 2, 3, 3, glove);
   }
-  else if (o.step != null) { const st = o.step ? 4 : -2; thick(cx - 6, top + 22, cx - 9 + st, top + 33, 4, shirt); R(cx - 11 + st, top + 32, 4, 3, glove); }
-  else if (o.tap != null) { const hy = top + 30 + Math.round(o.tap * 6); thick(cx - 6, top + 22, cx - 15, hy, 4, shirt); R(cx - 17, hy - 1, 4, 3, glove); }
-  else if (o.rest) { thick(cx - 6, top + 22, cx - 8, top + 34, 4, shirt); R(cx - 10, top + 33, 4, 3, glove); }
-  thick(cx + 6, top + 22, cx + 8, top + 32, 4, shirt); R(cx + 6, top + 31, 4, 3, glove);
+  else if (o.step != null) { const f = o.step ? 2 : -1; thick(NX, SY, NX - f, top + 31, 3, shirt); R(NX - f - 1, top + 30, 3, 3, glove); }
+  else if (o.tap != null) { const hy = top + 30 + Math.round(o.tap * 6); thick(NX, SY, cx - 15, hy, 3, shirt); R(cx - 17, hy - 1, 4, 3, glove); }
+  else if (o.rest) { thick(NX, SY, NX, top + 31, 3, shirt); R(NX - 1, top + 30, 3, 3, glove); }
+  if (!o.noFar) { const f = o.step != null ? (o.step ? 2 : -1) : 0; thick(FX, SY, FX + f, top + 31, 3, shirt); R(FX + f - 1, top + 30, 3, 3, glove); }
   g.restore();
 }
 // 하은 before she takes the upper belt: at her gate (knocking on it, checking her watch), crossing behind the upper belt to 반장,
@@ -2241,7 +2258,14 @@ function drawRage15(t, nowMs, who) {
 function visitAt(b) {
   const V = L.visit; if (!V || b < V.go[0] || b >= V.back[1]) return null;
   const home = haeunHome(), dest = { x: V.x, top: V.top }, end = V.to === 'center' ? soloSpot() : home;
-  if (b < V.go[1]) { const p = ease((b - V.go[0]) / (V.go[1] - V.go[0])); return { x: lerp(home.x, dest.x, p), top: lerp(home.top, dest.top, p), walk: true, back: false }; }
+  if (b < V.go[1]) {
+    const q = (b - V.go[0]) / (V.go[1] - V.go[0]), S = L.stairs;
+    if (!S) { const p = ease(q); return { x: lerp(home.x, dest.x, p), top: lerp(home.top, dest.top, p), walk: true, back: false }; }
+    // by the stairs: along her deck behind the belt to the top step, down the steps one at a time, onto the floor to him
+    if (q < 0.2) return { x: lerp(home.x, S.x, q / 0.2), top: home.top, walk: true, back: false, deck: true };
+    if (q < 0.8) { const p = (q - 0.2) / 0.6 * S.steps, k = Math.min(S.steps - 1, Math.floor(p)), f = p - k; return { x: S.x + S.dx * (k + f), top: home.top + S.dy * (k + ease(Math.min(1, f * 1.6))), walk: true, back: false }; }
+    const p = ease((q - 0.8) / 0.2); return { x: lerp(S.x + S.dx * S.steps, dest.x, p), top: lerp(home.top + S.dy * S.steps, dest.top, p), walk: true, back: false };
+  }
   const hit = at => at != null && b >= at - 0.5 && b < at + 0.6 ? Math.max(0, 1 - Math.abs(b - at) * 2) : null;
   if (b < V.back[0]) return { x: dest.x, top: dest.top, walk: false, yank: hit(V.yank) ?? hit(V.shove) };
   const p = ease((b - V.back[0]) / (V.back[1] - V.back[0])); return { x: lerp(dest.x, end.x, p), top: lerp(dest.top, end.top, p), walk: true, back: end.x > dest.x };
@@ -2285,7 +2309,10 @@ function drawVisit(b, nowMs) {
   const v = visitAt(b); if (!v) return;
   // she lunges into the shove
   const lunge = L.visit.shove != null && b >= L.visit.shove - 0.3 && b < L.visit.shove + 0.6 ? Math.round(Math.sin((b - L.visit.shove + 0.3) / 0.9 * Math.PI) * 4) : 0;
+  // on her deck the upper belt still hides her legs (up to its left end)
+  g.save(); if (v.deck) { g.beginPath(); g.rect(0, 0, W, farY(BELT_Y) + 2); g.rect(0, 0, Math.round(farX(L.farBeltLeft != null ? L.farBeltLeft : 48)), H); g.clip(); }
   drawHaeunAt(Math.round(v.x) - lunge, Math.round(v.top), nowMs, v.walk ? { step: Math.floor(nowMs / 150) % 2, mirror: v.back } : v.yank != null ? { tap: v.yank } : { rest: true });
+  g.restore();
   if (L.visit.yank != null && b >= L.visit.yank && b < L.visit.yank + 0.4 && ctx && !FX.yankFx) { FX.yankFx = true; noise(ctx.currentTime, 'bandpass', 3000, 0.2, 0.05, 2, bus); }
 }
 function drawTosses(t) {
@@ -2826,13 +2853,23 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   // the arm to the far belt is drawn in screen space so it stays on the body; only the hand goes through the perspective
   if (far && DUO.mode === 'two' && !(active && L.visit && visitAt(castBeatAt(t, active)))) { const who = pid, o = placerOff(0), h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
 }
+// 1-5: metal stairs from her deck behind the upper belt down to the floor at its left end: a landing at the deck's height,
+// four steps (tread and riser), a stringer under them and a hand rail on posts
+function drawStairs() {
+  const S = L.stairs, deck = haeunHome().top + 56, lt = '#6a7075', md = '#4d5156', dk = '#2b2e31', rail = '#8a8f94';
+  thick(S.x + 6, deck + 6, S.x + S.dx * S.steps - 6, deck + S.dy * S.steps + 4, 3, dk);
+  R(S.x - 10, deck, 18, 2, lt); R(S.x - 10, deck + 2, 18, S.dy - 2, md);
+  for (let k = 1; k <= S.steps; k++) { const cx = S.x + S.dx * k, y = deck + S.dy * k; R(cx - 5, y, 10, 2, lt); R(cx - 5, y + 2, 10, S.dy - 2, md); R(cx - 5, y + S.dy - 1, 10, 1, dk); }
+  const top = { x: S.x - 8, y: deck - 12 }, bot = { x: S.x + S.dx * S.steps - 4, y: deck + S.dy * S.steps - 12 };
+  R(top.x, top.y, 1, 12, rail); R(bot.x, bot.y, 1, 12, rail); thick(top.x, top.y, bot.x, bot.y, 1, rail);
+}
 // 1-5 phase 2: 하은 alone between the belts, in front of the upper one (her far arm over its front edge) and behind the lower
 // one, which hides her legs
 function drawSoloLoader(poses, nowMs, active) {
   const o = placerOff(1), bp = { ...poses[1], wince: poses[0].wince || poses[1].wince, dip: Math.max(poses[0].dip, poses[1].dip), nod: Math.max(poses[0].nod, poses[1].nod) };
   const fp = poses[0], h = { x: farX(fp.hand.x), y: farY(fp.hand.y) };
   g.save(); g.translate(o.dx, o.dy); PARTNERS[L.partners[1]].arm({ ...bp, carry: fp.carry, wave: fp.wave, back: true, reach: 26, hand: { x: h.x - o.dx, y: h.y - o.dy } });
-  drawPartnerBody(L.partners[1], bp, nowMs, active); g.restore();
+  drawPartnerBody(L.partners[1], { ...bp, solo: true }, nowMs, active); g.restore();
 }
 // ---------- 2-1 검수: the inspector at the middle of the line ----------
 // 순자 이모 stands at a post behind the belt halfway along it. Every box that passes her gets the stamp (her 탁); the ones she
@@ -3621,6 +3658,7 @@ function drawScene(t, bt, active, nowMs) {
       g.save(); g.translate(o.dx, o.dy); drawPartnerBody(L.partners[1], bp, nowMs, active); g.restore();
       drawLiftDrop(active ? mb : -1, t);
     }
+    if (L.stairs) drawStairs();
     drawLane(0, poses[0], t, beltT, active, nowMs, laneFx);
     if (DUO.mode !== 'two' && L.oneSpot) drawSoloLoader(poses, nowMs, active);
     if (active && L.visit) drawShoved(mb, nowMs);
@@ -3635,10 +3673,10 @@ function drawScene(t, bt, active, nowMs) {
   if (L.daw) drawLaptop(t, active, nowMs);
   if (L.inspector) drawInspector(t, active, nowMs);
   if (L.bossSeat && L.lanes !== 2) drawBossSeat(castBeatAt(t, active), nowMs, active);
+  if (L.visit && active) drawVisit(beatAt(t), nowMs);
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
   if (L.toss && active) drawTosses(t);
-  if (L.visit && active) drawVisit(beatAt(t), nowMs);
   if (L.lanes === 2 && !L.allLit) drawIdleShade(t, nowMs, active);
   if (L.dock) drawDockFront(dockBeat, t, nowMs, active); else if (L.lanes === 2) drawPairBolt(nowMs);
   drawGauge(nowMs);
@@ -5193,8 +5231,10 @@ function startHold(beat) {
 }
 function stopHold() { if (holdOsc) { fadeStop(holdOsc, holdOsc._gn, holdOsc._lf); holdOsc = null; } stopHypeHold(); }
 
+const GUIDE = { on: false, t: 0, n: null, side: '' };   // see guideTick
 function songAt(perfMs) {
   if (!ctx) return -99;
+  if (GUIDE.on) return GUIDE.t;   // the tutorial's guide holds the shift still at the gate
   if (ctx.getOutputTimestamp) {
     const ts = ctx.getOutputTimestamp();
     if (ts.contextTime > 0 && ts.performanceTime > 0) return ts.contextTime + (perfMs - ts.performanceTime) / 1000 - T0;
@@ -5642,8 +5682,9 @@ function startPractice(level) {
 // skip the rest of the tutorial: straight to the shift
 function skipPractice() {
   if (!TUT.on || state !== 'play') return;
-  TUT.on = false; TUT.line = null; TUT.count = null; CAM.to = null; SLOW.on = false; stopHum(); stopHold(); loadLevel(TUT.lvl); startPlay();
+  guideOff(); TUT.on = false; TUT.line = null; TUT.count = null; CAM.to = null; SLOW.on = false; stopHum(); stopHold(); loadLevel(TUT.lvl); startPlay();
 }
+function guideOff() { if (!GUIDE.on) return; GUIDE.on = false; $('guide').hidden = true; if (ctx && ctx.state === 'suspended') ctx.resume(); }
 $('tutskip').addEventListener('click', e => { e.stopPropagation(); skipPractice(); $('tutskip').blur(); });
 // ---------- developer mode ----------
 // The DEV button (corner, during a shift) opens a panel: jump to a part of the shift (the level's devMarks, else the starts of
@@ -5760,7 +5801,27 @@ function drawSlowFx(now) {
   // letterbox bars while it is slowed
   const lb = Math.min(1, (now - SLOW.at) / 150) * Math.min(1, (SLOW.until - now) / 200) * 14; g.fillStyle = '#000'; g.fillRect(0, 0, W, lb); g.fillRect(0, H - lb, W, lb);
 }
+// a guided practice run (drill.guide): as each box reaches its gate the shift stops (the audio is suspended and the clock
+// held), the camera closes on that gate and a prompt says which side to press - the lower belt's box with the right hand,
+// the upper's with the left; the right press scans it and the shift runs on, the wrong side shakes the prompt
+function guideTick(t) {
+  const d = TUT.lvl.practice.drills[TUT.i]; if (!d || !d.guide || GUIDE.on) return;
+  const n = TUT.run.find(m => m.state === 'pending' && !m.guided && t >= m.arr - 0.004); if (!n) return;
+  n.guided = true; Object.assign(GUIDE, { on: true, t: n.arr, n, side: n.lane === 1 ? 'R' : 'L' });
+  if (ctx && ctx.state === 'running') ctx.suspend();
+  const gy = n.lane === 0 ? farY(BELT_Y) - 12 : BELT_Y - 18;
+  CAM.to = { x: SCAN_X - 20, y: gy, k: 2.2 };
+  const el = $('guide'); el.textContent = GUIDE.side === 'R' ? '오른쪽을 누르세요 ▶' : '◀ 왼쪽을 누르세요'; el.className = 'guide ' + GUIDE.side; el.hidden = false;
+}
+function guidePress(ts, key, lane) {
+  const el = $('guide');
+  if (lane !== GUIDE.side) { el.classList.remove('no'); void el.offsetWidth; el.classList.add('no'); return; }
+  CAM.to = null; onHit(ts, key, lane);   // judged on the held clock: right on the beat (a run's last hit then goes slow-mo)
+  GUIDE.on = false; el.hidden = true;
+  if (ctx && ctx.state === 'suspended') ctx.resume();
+}
 function tutTick(t) {
+  if (TUT.phase === 'run') guideTick(t);
   if (TUT.phase === 'wait' && beatAt(t) >= 6) tutSay(TUT.lvl.practice.talk, tutArm);
   if (TUT.phase === 'run' && t > TUT.endT && !SLOW.on) {
     const d = TUT.lvl.practice.drills[TUT.i], ok = stats.miss === TUT.miss0 && TUT.run.every(n => n.state === 'hit');
@@ -5815,7 +5876,8 @@ const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyD', 'KeyK']);
 function laneOf(side) { if (L.oneButton) return side; return L.lanes === 2 ? (L.autoLane != null ? 1 - L.autoLane : side === 'L' ? 0 : 1) : 0; }
 function handLabels() {}
 function press(ts, key, lane) {
-  if (state === 'play' && TUT.on && TUT.phase === 'talk') tutAdvance();
+  if (state === 'play' && GUIDE.on) guidePress(ts, key, lane);
+  else if (state === 'play' && TUT.on && TUT.phase === 'talk') tutAdvance();
   else if (state === 'play') onHit(ts, key, lane);
   else if (dlg) advanceDialog();
   else if (state === 'title') openBoard();
