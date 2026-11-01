@@ -1062,7 +1062,7 @@ const LEVELS = [
     visit: { go: [95.5, 99.5], back: [126, 128], yank: 104, shove: 122.3, ret: [128.5, 130.5] },
     stairs: { x: 86, dx: -2, dy: 7, steps: 4 },   // at the upper belt's left end, from his deck down to the floor
     metalShift: 3, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
-    hitKit: 'ticktock',   // a tick for his belt, a tock for hers: no pitch, so they sit with his beat and the song
+    hitKit: 'ticktock', bareBand: true,   // a tick for his belt, a tock for hers: no pitch, so they sit with his beat and the song
     slam: [[160, 999]],   // from her first verse she slams her boxes down rather than carrying them
     // phase 2's turns, by bar: hers, his, or both at once
     // the battle is recorded songs with her rapping alone, three rounds, each song cut after its first hook. Round one (phase
@@ -1070,27 +1070,29 @@ const LEVELS = [
     // "Tick-tock" hook 48-51. The switch 52-53: the song cut with a record scratch, the camera on him - 이 비트도 한번 받아봐요!
     // Round two (phase 3): his slow 'The Lazy Shift' (75.5 BPM, 0.068 s) from beat 216: a quiet intro 54-57, his beat 58-61,
     // her verse 62-69, the hook ("Is that it?") 70-73. The second switch 74-75, on him again. Round three (phase 4, the climax):
-    // 'Your Beat, My Belt' (105 BPM, heavy and half-time, 0.236 s) from beat 304: the "Tick-tock" chant 76-79, her "You play, I
-    // pay" verse 80-87, a breakdown 88-97 (the drums gone but for a boom every other bar; "Somebody's waiting" at 93), the
-    // last four bars at full weight 98-101, one hit on 102 and silence
+    // 'Your Beat, My Belt' (105 BPM, heavy and half-time, 0.236 s). The song comes in at full weight, so two bars lead into it
+    // (76-77, a heartbeat kick, a clock ticking faster, a riser, the boxes ticking in on the second bar, a breath of silence);
+    // from beat 312: the "Tick-tock" chant 78-81, her "You play, I pay" verse 82-89, a breakdown 90-99 (the drums gone but for
+    // a boom every other bar; "Somebody's waiting" at 95), the last four bars at full weight 100-103, one hit on 104 and silence.
+    // Before her first verse in round one (bars 38-39) the camera goes in on her: 뭐? 해보자고?
     songs: [{ src: 'audio/1-5-you-play-i-pay.mp3', at: 128, lead: 0.055, gain: 0.9, sec: 'diss' },
             { src: 'audio/1-5-the-lazy-shift.mp3', at: 216, lead: 0.068, gain: 0.9, sec: 'lazy' },
-            { src: 'audio/1-5-your-beat-my-belt.mp3', at: 304, lead: 0.236, gain: 0.9, sec: 'climax' }],
-    battle: { h: [[40, 52], [62, 74]], j: [[32, 40], [52, 54], [54, 62], [74, 76]] }, battleHard: [98, 103], breakdown: [88, 98], lastHit: 102,
+            { src: 'audio/1-5-your-beat-my-belt.mp3', at: 312, lead: 0.236, gain: 0.9, sec: 'climax' }],
+    battle: { h: [[40, 52], [62, 74]], j: [[32, 40], [52, 54], [54, 62], [74, 76]] }, battleHard: [100, 105], breakdown: [90, 100], lastHit: 104,
     // the camera (no box lands while it is in close or easing out): his doze as a cutscene (him nodding off, her watching,
     // the two of them as she wakes him), his track opening, and the row: the two of them, then him knocked back and staring
     camPlay: [[40.5, 46, { x: 104, y: 84, k: 2.2 }], [46, 57, { x: 56, y: 108, k: 2 }], [57, 62.5, { x: 76, y: 96, k: 1.5 }],
-      [72, 78, { x: 104, y: 84, k: 1.8 }], [96, 122.3, { x: 90, y: 92, k: 1.5 }], [122.3, 128, { x: 108, y: 88, k: 1.6 }],
+      [72, 78, { x: 104, y: 84, k: 1.8 }], [96, 122.3, { x: 90, y: 92, k: 1.5 }], [152, 158.5, { x: 56, y: 104, k: 2.4 }], [122.3, 128, { x: 108, y: 88, k: 1.6 }],
       [208, 216, { x: 104, y: 80, k: 2.4 }], [296, 304, { x: 104, y: 80, k: 2.6 }]],
-    cutscene: [[40.5, 62.5], [96, 128], [208, 216], [296, 304]],   // letterboxed
-    devMarks: [[0, '처음'], [8, '3점슛'], [36, '졸음 컷씬'], [68, '지우 음악·떨어뜨림'], [92, '다툼·밀치기'], [128, '1라운드 You Play, I Pay'], [160, '하은 1절'], [192, 'Tick-tock 훅'], [204, '곡 전환 1·지우 클로즈업'], [216, '2라운드 The Lazy Shift'], [248, '하은 1절'], [280, '훅 Is that it?'], [292, '곡 전환 2·지우 클로즈업'], [304, '3라운드 Your Beat, My Belt'], [320, 'You play, I pay'], [352, '브레이크다운'], [392, '마지막 4마디']],
+    cutscene: [[40.5, 62.5], [96, 128], [152, 158.5], [208, 216], [296, 304]],   // letterboxed
+    devMarks: [[0, '처음'], [8, '3점슛'], [36, '졸음 컷씬'], [68, '지우 음악·떨어뜨림'], [92, '다툼·밀치기'], [128, '1라운드 You Play, I Pay'], [160, '하은 1절'], [192, 'Tick-tock 훅'], [204, '곡 전환 1·지우 클로즈업'], [216, '2라운드 The Lazy Shift'], [248, '하은 1절'], [280, '훅 Is that it?'], [292, '곡 전환 2·지우 클로즈업'], [304, '3라운드 도입'], [312, '3라운드 Your Beat, My Belt'], [328, 'You play, I pay'], [360, '브레이크다운'], [400, '마지막 4마디']],
     farBeltLeft: 36,   // the upper belt runs on to the left, past his legs, up to the stairs
     heads: { j: [104, 58], h: [52, 90], v: [86, 58], k: [130, 58] },
     clock:'03:20', title:'꿈', offTilt: true,
     chords: S15.lofi.ch, roots: S15.lofi.rt, chordAt: bar => bar % 4,
-    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 420,
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 428,
     hints: false, special:['떨어진 상자', 'drop', '받아냄'],
-    sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [32, 'diss'], [52, 'switch'], [54, 'lazy'], [74, 'switch'], [76, 'climax'], [103, 'end'], [104, 'outro']],
+    sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [32, 'diss'], [52, 'switch'], [54, 'lazy'], [74, 'switch'], [76, 'rise'], [78, 'climax'], [105, 'end'], [106, 'outro']],
     // 94 (his beat in phase 1 is round one's beat) through round one, the slow song's 75.5 for round two, 105 for the climax
     tempo: [[0, 94], [216, 75.5], [304, 105]],
     // upper belt: 하은, on the beat (8 cells; h= a long crate, held). Phase 1: her taps and long crates on their own, and alone
@@ -1107,16 +1109,16 @@ const LEVELS = [
       '..x...x.', '....x.x.', '........', '........', '........', '........', '........', '........',
       '......x.', '........', '........', '........', '......x.', '........', '....x...', '........',
       '........', '........', '........', '........', '........', '........', '........', '........',
-      '........', '........', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.....', 'x...x...', 'x.x.x...',
+      '........', '........', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.....', '........', '........',
       '..u...u.', '......u.', '........', '........', '..u...u.', '......u.', '........', '........',
       '..u.....', '..u.....', '..u.....', '..u...u.', '........', '........', '........', '........',
       'x.......', 'x...x...', 'x...x...', 'x.x.....', 'x...x...', 'x.x.x...', '..u...u.', '......u.',
       '........', '........', '..u...u.', '......u.', '........', '........', '..u.....', '..u.....',
-      '..u.....', '..u...u.', '........', '........', 'x...x...', 'x...x...', 'x...x...', 'x...x...',
-      '........', '......u.', '..u.....', 'u.......', '........', '..u.....', '......u.', '..u.....',
-      '........', '........', '........', '....x...', '........', '........', '........', '........',
-      'x.......', 'x.x.....', '..x...x.', 'x...x...', 'x.x.x.x.', 'x.x.x.x.', 'x.......', '........',
-      '........'
+      '..u.....', '..u...u.', '........', '........', '........', 'x...x...', 'x...x...', 'x...x...',
+      'x...x...', 'x...x...', '........', '......u.', '..u.....', 'u.......', '........', '..u.....',
+      '......u.', '..u.....', '........', '........', '........', '....x...', '........', '........',
+      '........', '........', 'x.......', 'x.x.....', '..x...x.', 'x...x...', 'x.x.x.x.', 'x.x.x.x.',
+      'x.......', '........', '........'
     ],
     // lower belt: 하은 (8 cells, on the beat; h= a long crate, held) and his boxes that miss and fall onto it ('d', written
     // where they are scanned: he throws them two beats before). Phase 1: two by accident, then a rain while he is in his music.
@@ -1126,16 +1128,16 @@ const LEVELS = [
       'x...x...', 'h===....', '........', '........', '........', '........', '........', '........',
       '..x.x...', 'x.x...d.', '........', '........', 'x.d.x...', 'x.d.x.d.', 'h===..x.', 'x.d.x.d.',
       '........', '........', '........', '........', '........', '........', '........', '........',
-      '........', '........', '........', '........', '..d...d.', '....d.d.', '..d...d.', '......d.',
+      '........', '........', '........', '........', '..d...d.', '....d.d.', '........', '........',
       'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.', 'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.',
       '......x.', '......x.', '......x.', 'x...x...', '........', '........', '........', '........',
       '........', '........', '..d...d.', '....d.d.', '..d...d.', '......d.', 'x...x...', 'x.x.x...',
       'h===..x.', 'x.x.x.x.', 'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.', '....x...', '....x...',
-      '....x...', 'x...x...', '........', '........', '..x...x.', '..x...x.', '..x...x.', '..x...x.',
-      'x...x...', 'x.x.x...', 'x...x...', '....x.x.', 'x...x.x.', '......x.', 'x.x.x...', 'x...x.d.',
-      'x.......', '........', 'h=======', '........', 'h=======', '........', 'h===....', '..d.....',
-      '....h===', '....x.x.', 'x...x.d.', '..x...x.', 'x.x.x.x.', 'x.x.x.x.', 'x.......', '........',
-      '........'
+      '....x...', 'x...x...', '........', '........', '........', '..x...x.', '..x...x.', '..x...x.',
+      '..x...x.', '..x...x.', 'x...x...', 'x.x.x...', 'x...x...', '....x.x.', 'x...x.x.', '......x.',
+      'x.x.x...', 'x...x.d.', 'x.......', '........', 'h=======', '........', 'h=======', '........',
+      'h===....', '..d.....', '....h===', '....x.x.', 'x...x.d.', '..x...x.', 'x.x.x.x.', 'x.x.x.x.',
+      'x.......', '........', '........'
     ],
     // [beat, text, beats shown, lane, speaker]: 'h' 하은 (upper loading end), 'j' 지우 (lower), 'v' 하은 beside him, 'k' 지우 shoved aside
     say: [[6, '누나, 이 비트 들어봐요!', 3, 0, 'j'], [9.5, '…일이나 해.', 2, 1, 'h'],
@@ -1155,9 +1157,10 @@ const LEVELS = [
           [124.5, '…어?', 1.5, 0, 'k'], [126.5, '…와. 진짜 밀었어요?', 2.5, 0, 'k'],
           // back at his belt he answers with a beat: the battle
           [129, '좋아요. 그럼 박으로 해요.', 2.5, 0, 'j'], [132, '누나 박이 그렇게 잘났으면, 따라와 봐요!', 3, 0, 'j'],
-          // round one: she shrugs his beat off
-          [159, '…이 정도?', 2, 1, 'h'],
-          // the first switch: he cuts his own song off; the camera on him
+          // round one: before her first verse the camera goes in on her as his drums drop out
+          [152.5, '뭐? 해보자고?', 4, 1, 'h'],
+          // she shrugs his song off at the end of her hook; he cuts it, the camera on him
+          [204.5, '…이 정도?', 2.5, 1, 'h'],
           [209, '…하. 그래요?', 2, 0, 'j'], [212, '이 비트도 한번 받아봐요!', 3.5, 0, 'j'],
           // round two, his slow beat
           [247, '…또?', 1.5, 1, 'h'], [293, '…그게 다야?', 2, 1, 'h'],
@@ -2269,6 +2272,17 @@ function drawShow15(t, nowMs) {
     ember(red ? ['#ff5a2a', '#ffb03a'] : ['#5ad7ff', '#bfe9ff']);
     return;
   }
+  if (sec === 'rise') {
+    // the way into the climax: the dark lifts in red and cyan throbs on the beat that come faster and brighter, the floor
+    // trembling more and more, and on the last half beat it all goes black
+    const k = b - secStartAt(bar) * 4, pr = Math.min(1, k / 8);
+    if (k >= 7.5) { dim(0.75); FX.rumble = 0; return; }
+    const rate = k < 4 ? 1 : k < 6 ? 2 : 4, pp = (b * rate) % 1, red = Math.floor(b * rate) % 2 === 0;
+    dim(0.5 - 0.3 * pr); tint(red ? '255,110,90' : '120,200,255', 0.2 + 0.25 * pr); add(red ? '255,60,40' : '60,190,255', (0.04 + 0.12 * pr) * Math.max(0, 1 - pp * 3));
+    FX.rumble = (0.6 + 2.2 * pr) * Math.max(0, 1 - pp * 3);
+    if (crossed && (inBar === 0 || k >= 6)) punch(1.02 + 0.03 * pr, 120, 2);
+    ember(['#ff5a2a', '#5ad7ff']); return;
+  }
   if (sec === 'climax') {
     // the climax, heavy and half-time: the room flips between her red and his cyan on every beat, a white flash on the big
     // snare (the third beat), the floor slamming on every beat and the camera punching in on every bar, harder in the last four
@@ -2300,6 +2314,7 @@ function drawRage15(t, nowMs, who) {
   const bA = beatAt(t), sec = sectionAt(Math.floor(bA / 4)), b = bA - sh15(sec), bar = Math.floor(b / 4), e = Math.max(0, 1 - (b % 1) * 3);
   let k = 0;
   if (sec === 'diss' || sec === 'lazy') { const turn = battleAt(bar); k = (turn === who ? 0.85 : turn === 'both' ? 0.7 : 0.2) * (sec === 'lazy' ? 0.7 : 1); }
+  else if (sec === 'rise') k = 0.3 + 0.5 * Math.min(1, (b - secStartAt(bar) * 4) / 8);
   else if (sec === 'climax') k = bar >= (L.lastHit || 999) ? 0 : L.breakdown && bar >= L.breakdown[0] && bar < L.breakdown[1] ? 0.5 : battleHardAt(bar) ? 1 : 0.9;
   else if (who === 'h') k = sec === 'metal' ? (bar < 31 ? 0.25 : bar === 35 || bar === 36 ? 0.95 : 0.7) : sec === 'together' ? 0.6 : sec === 'finale' ? 0.9 : 0;
   else k = sec === 'together' && bar >= 42 ? 0.6 : sec === 'finale' ? 0.9 : 0;
@@ -4527,8 +4542,9 @@ function buildEvents() {
     if (b < 4) { E(0, T => rim(T, inBar === 0 ? 0.5 : 0.3)); continue; }
     if (b >= total - 4) continue;
     // combo layers shared by every track
-    for (let k = 0; k < 4; k++) E(k * s / 4, T => { if (stats.combo >= 8) noise(T, 'highpass', 6000, k % 2 ? 0.035 : 0.06, 0.03); });
-    if (inBar === 0) E(0, T => { if (stats.combo >= 20) { osc('sine', chords[ci][2] * 4, T, 0.003, 0.05, 0.6); osc('sine', chords[ci][0] * 4, T + s / 2, 0.003, 0.035, 0.5); } });
+    // (a level with bareBand has none: 1-5 plays recorded songs, and nothing of the engine's may sound under them)
+    if (!L.bareBand) for (let k = 0; k < 4; k++) E(k * s / 4, T => { if (stats.combo >= 8) noise(T, 'highpass', 6000, k % 2 ? 0.035 : 0.06, 0.03); });
+    if (inBar === 0 && !L.bareBand) E(0, T => { if (stats.combo >= 20) { osc('sine', chords[ci][2] * 4, T, 0.003, 0.05, 0.6); osc('sine', chords[ci][0] * 4, T + s / 2, 0.003, 0.035, 0.5); } });
     if (style === 'straight') {
       const AND = L.beltSwing ? s * 2 / 3 : s / 2;   // a swung belt swings the band too
       if (inBar === 0) E(0, T => pad(T, chords[ci], s * 4));
@@ -5165,6 +5181,19 @@ function buildEvents() {
         if (!songReady(si)) hipBeat15(E, bar, inBar, s, 1, 'demo');
         continue;
       }
+      if (sec === 'rise') {
+        // the two bars into the climax: a heartbeat kick getting louder, a clock ticking on the beat, then on every half beat,
+        // then every quarter of one; a riser over both bars, a snare roll in the last beat, and half a beat of silence before
+        // the song lands
+        const r0 = secStartAt(bar) * 4, k = b - r0;
+        if (k === 0) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); riser(T, s * 7.5, 0.1); subDrop(T); });
+        E(0, T => bbKick(T, 0.45 + 0.07 * k)); if (k % 2) E(s * 0.28, T => bbKick(T, 0.3 + 0.05 * k));
+        const ticks = k < 4 ? 1 : k < 6 ? 2 : 4;
+        if (k < 7) for (let q = 0; q < ticks; q++) E(q * s / ticks, T => tak(T, 0.25 + 0.05 * k));
+        if (k === 6) for (let q = 0; q < 4; q++) E(q * s / 4, T => bbSnare(T, 0.12 + 0.05 * q));
+        if (k === 7) for (let q = 0; q < 4; q++) E(q * s / 8, T => bbSnare(T, 0.3 + 0.06 * q));
+        continue;
+      }
       if (sec === 'climax') {
         // 1-5 phase 4: the climax (the recorded 'Your Beat, My Belt'); without it his beat at full tilt stands in
         const si = L.songs.findIndex(sp => sp.sec === 'climax');
@@ -5374,6 +5403,7 @@ function buildEvents() {
     if (L.style === 'disco22') { kick(T, 0.9); crash(T); clap(T, 0.25); supersaw(T, chords[0].map(f => f * 2), SPB * 5, 0.014, 2600, true); brassStab(T, chords[0].slice(0, 3).map(f => f * 2), SPB * 1.5, 0.03); slap(T, roots[0], SPB * 3); voice(T, FN.G4, SPB * 4, 0.03); voice(T + 0.02, FN.D5, SPB * 4, 0.02); tak(T + SPB * 3, 0.2); tak(T + SPB * 4, 0.2); tak(T + SPB * 4.25, 0.17); tak(T + SPB * 5, 0.2); return; }
     if (L.style === 'rock22') { kick(T, 0.9); crash(T); [1, 1.5, 2, 4].forEach((m, i) => gtrDist(T, roots[6] * 2 * m, SPB * 6, [0.07, 0.055, 0.04, 0.02][i], i === 3)); bass(T, roots[6], SPB * 4, 600); supersaw(T, chords[6].map(f => f * 2), SPB * 5, 0.012, 2600, true); truckHorn(T + SPB * 3); forklift(T + SPB * 5, 0.04); forklift(T + SPB * 5.5, 0.04); return; }
     if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[4], SPB * 4, 0.016, 2400); anthem(T, N_.D5, SPB * 3, 2); return; }
+    if (L.style === 'duo15') return;   // the song has its own last hit
     if (L.style === 'duo14') { bbKick(T, 0.9); crash(T); organ(T, chords[0], SPB * 6, 0.035); sub808(T, roots[0], SPB * 4); gtrLead(T, N_.A4, SPB * 4, 0.05, true); forklift(T + SPB * 4.5, 0.02); return; }
     if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
     kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4);
@@ -5396,7 +5426,7 @@ function startHum() {
 }
 function stopHum() { if (hum) { try { hum.stop(); } catch (e) {} hum = null; } }
 function startHold(beat) {
-  stopHold(); holdOsc = ctx.createOscillator(); const gn = ctx.createGain(), lf = ctx.createOscillator(), lg = ctx.createGain();
+  stopHold(); if (L.bareBand) return;   // no held tone under a recorded song holdOsc = ctx.createOscillator(); const gn = ctx.createGain(), lf = ctx.createOscillator(), lg = ctx.createGain();
   const tones = CHORDS[chordIdx(beat || 0)], th = fxTheme(beat || 0);
   holdOsc.type = th === 'neon' ? 'sawtooth' : th === 'chill' ? 'triangle' : 'sine'; holdOsc.frequency.value = tones[0] * 4;
   lf.frequency.value = 6; lg.gain.value = 8; lf.connect(lg); lg.connect(holdOsc.detune); lf.start(); holdOsc._lf = lf;
@@ -5574,6 +5604,11 @@ function pairFx(a, b) {
   spawn(SCAN_X, BELT_Y - 10, both ? 24 : 14, th.spark, -170, 170, -220, -60, 300, 900, [2, 2]);
   spawn(farX(SCAN_X), farY(BELT_Y - 10), both ? 18 : 10, th.spark, -140, 140, -180, -50, 300, 800, [2, 2]);
   popPair(a.lane === 0 ? a : b, a.lane === 0 ? b : a);
+  if (L.hitKit === 'ticktock') {
+    // no chord: the tick and the tock at once, and a thump
+    thud(tc, 1.3); osc('square', 2300, tc, 0.001, 0.05, 0.02, bus); noise(tc, 'bandpass', 3400, 0.22, 0.03, 3, bus); osc('sine', 820, tc, 0.001, 0.12, 0.05, bus); noise(tc, 'bandpass', 1300, 0.2, 0.04, 2.2, bus);
+    return;
+  }
   thud(tc, 1.3); organ(tc, fs.map(f => f * 2), 0.45, 0.06); noise(tc, 'highpass', 2600, 0.22, 0.14, 0.8, bus);
   if (L.dock) { const up = a.lane === 0 ? a : b; if (inFever(up.beat)) feverHit(tc, up.beat, up.judge); else haeunHit(tc, fs, both ? 'perfect' : 'good', false); }
   else if (L.laneSound) { haeunHit(tc, fs, both ? 'perfect' : 'good', false); sfxPluck(tc, fs[0] * 4, 0.06, 0.22); }

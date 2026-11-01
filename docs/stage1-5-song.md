@@ -233,3 +233,51 @@ BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
 ```
 
 **받은 곡**: `prototype/audio/1-5-your-beat-my-belt.mp3`(62.85초, 실측 105.0 BPM, 첫 다운비트 0.236초, 26마디 + 마지막 한 방, 60.1초부터 정적). 받아쓰기(whisper)로 찾은 실제 구조(곡 마디): 0–3 Tick-tock ×4, 4–11 "You play, I pay" 벌스(줄마다 반 박쯤 앞서 들어감), 12–21 브레이크다운(드럼이 빠지고 짝수 마디에 붐 한 번; Tick-tock, "What's it for? Somebody's waiting.", "That's the beat. Keep time.", "You throw it, I catch it…", "Your beat, my belt…", "Can't keep up? Watch me" — 1라운드 브레이크다운·3절 가사를 제미나이가 넣음), 22–25 전부("One more box, one more drop", Tick-tock ×2, "But the clock… watch it drop"), 26 마지막 한 방. 게임 76–102마디(`docs/stage1.md` 4페이즈 표).
+
+### 절정 곡 다시 뽑기: 도입부 포함
+
+받은 곡은 첫 박부터 전부 터져서 확 들어온다(게임은 지금 도입 두 마디를 직접 붙여 메움). 도입 4마디(약 9초)를 넣은 버전. 받은 곡과 같은 105 BPM.
+
+```
+A HEAVY, POWERFUL, anthemic rap-rock / trap-metal track with ONE solo female rapper: the final blow of a rap battle on a night shift. It must feel huge and crushing, not fast. Stadium-sized: every drum hit is a cannon, the guitars are a wall. English rap vocals, one female voice only, no male vocals, no singing. 0:41 long, 105 BPM, 4/4, A minor. Clean lyrics.
+
+The sound:
+- Half-time drums: a massive kick and a giant snare with a big hall reverb on beat 3, slow and heavy, like stomping. A crash on every bar.
+- Thick distorted electric guitars playing low power chords, chugging: the riff walks down by half steps, A, G#, F#, E, one chord per beat, hammered.
+- A loud, overdriven 808 sub that shakes the floor, doubling the guitar riff.
+- Low brass and choir hits on the downbeats, epic and dark.
+- Mixed loud, wide and aggressive.
+
+The rapper: a young woman of 23, cold and forceful, every word hitting with the snare. Her voice is doubled and stacked, like a crowd made of her own voice. The last line is screamed.
+
+Structure (one bar = 2.29 seconds):
+0:00–0:09 Intro (4 bars), NO vocals, building up from almost nothing:
+  bar 1: only a slow heartbeat kick and a ticking clock, dark and tense.
+  bar 2: low war drums and a deep choir hum come in under it; the clock ticks twice as fast.
+  bar 3: the distorted guitars fade in on the riff, a rising riser, the drums getting louder.
+  bar 4: a snare roll building to the top, the riser at its peak; on the last half beat everything cuts to silence for a breath.
+0:09–0:18 (4 bars): everything slams in at once on the downbeat with her voice. The chant "Tick-tock on the line", one line per bar.
+0:18–0:37 (8 bars): her verse "You play, I pay", one line per bar, heavier and louder to the end.
+0:37–0:41 Ending: one huge hit on the downbeat of the last bar, then silence. No fade out.
+
+Lyrics (all by the one female rapper):
+
+[Intro – no vocals, building]
+
+[Final]
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+"Haeun, why so cold, did the night shift steal your heart?"
+That's what you said, so let me take it from the start
+Every time you start, I'm the one who has to finish
+You play, I pay. That's the difference.
+You don't know what I need, you don't know what I've seen
+Stay up on your stage, I'll stay down at the machine
+Call me stiff, call me slow, say I live by the clock
+BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
+
+[Ending]
+(one huge hit, then silence)
+```
