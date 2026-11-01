@@ -112,7 +112,7 @@ const SCAN_X = 300, BELT_Y = 146;
 const BEATS = [2.972, 3.947, 4.923, 5.898, 6.873, 7.848, 8.824, 9.799, 10.773, 11.745, 12.718, 13.689, 14.661, 15.632, 16.602, 17.57, 18.532, 19.493, 20.454, 21.414, 22.372, 23.33, 24.287, 25.243, 26.201, 27.165, 28.131, 29.1, 30.072, 31.05, 32.032, 33.014, 33.995, 34.98, 35.966, 36.956, 37.947, 38.933, 39.916, 40.894, 41.869, 42.845, 43.816, 44.785, 45.751, 46.712, 47.674, 48.637, 49.602, 50.572, 51.548, 52.53, 53.513, 54.499, 55.492, 56.485, 57.48, 58.472, 59.459, 60.439, 61.417, 62.393, 63.369, 64.34, 65.311, 66.283, 67.257, 68.233, 69.212, 70.19, 71.165, 72.139, 73.111, 74.081, 75.048, 76.014, 76.982, 77.952, 78.925, 79.902, 80.882, 81.863, 82.846, 83.83, 84.813, 85.795, 86.773, 87.746, 88.716, 89.683, 90.647, 91.61, 92.573, 93.535, 94.495, 95.455, 96.417, 97.379, 98.342, 99.307, 100.272, 101.239, 102.209, 103.18, 104.151, 105.118, 106.086, 107.054, 108.023, 108.993, 109.965, 110.937, 111.912, 112.893, 113.878, 114.867, 115.857, 116.848, 117.835, 118.82, 119.805, 120.789, 121.772, 122.752, 123.728, 124.7, 125.673, 126.646, 127.617, 128.588, 129.56, 130.53, 131.5, 132.472, 133.448, 134.427, 135.416, 136.409, 137.4, 138.388, 139.376, 140.365, 141.353, 142.338, 143.32, 144.294, 145.265, 146.239, 147.215, 148.19, 149.165, 150.14, 151.115];
 // When 하은's hand is on the handle the cutscene rewinds (REW, the tape whirring, no song) back to the factory at the end of the
 // shift, where 반장 and 지우 talk (TALK: the game's dialogue, click to go on); then 지우's reprise (Three Steps Behind,
-// media/three-steps-behind.mp3, 2:12.4, the long version) starts with his first step and he walks her way. Its quarter beats (62.3 BPM, tracked the same way) from the first verse
+// media/three-steps-behind.mp3, 2:16.9, the third take) starts with his first step and he walks her way. Its quarter beats (62.3 BPM, tracked the same way) from the first verse
 // downbeat to the beat after the last press: 지우's heart, 13 rows; the kick is on 1, the brushed snare on 2 and 4, and the sung
 // 'four' (49.5 s) falls on a pressed 4th beat. Between the two songs the chart runs on filler beats that carry no rows.
 const REW = { t0: 178.2, dur: 4.8 };
@@ -130,8 +130,8 @@ const TALK = { t0: REW.t0 + REW.dur, scene: 10.0, lines: [
 const typeHold = (a, b) => Math.max(0.45, Math.max([...a].length, [...b].length) * 0.032 + 0.25);
 { let at = TALK.t0 + 0.8; TALK.ats = TALK.lines.map(([, ko, en]) => { const a = at; at += typeHold(ko, en) + 0.55; return a; }); TALK.end = at; }
 TALK.at = k => TALK.ats[k];
-const REP = { t0: TALK.end + 0.5, len: 132.36, src: 'media/three-steps-behind.mp3' };
-const QREP = [9.777, 10.743, 11.711, 12.677, 13.644, 14.612, 15.581, 16.547, 17.513, 18.481, 19.449, 20.417, 21.386, 22.353, 23.322, 24.288, 25.257, 26.226, 27.194, 28.162, 29.129, 30.097, 31.064, 32.031, 32.999, 33.966, 34.933, 35.901, 36.869, 37.838, 38.806, 39.773, 40.741, 41.708, 42.678, 43.647, 44.615, 45.582, 46.55, 47.517, 48.485, 49.453, 50.422, 51.388, 52.356, 53.323, 54.291, 55.257, 56.222, 57.189, 58.157, 59.123, 60.091, 61.058, 62.027, 62.994, 63.965, 64.936, 65.906, 66.875, 67.844, 68.814, 69.782, 70.75, 71.717, 72.682, 73.65, 74.617, 75.585, 76.552, 77.52, 78.487, 79.456, 80.425, 81.395, 82.362, 83.329, 84.295, 85.261, 86.227, 87.194, 88.16, 89.127, 90.095, 91.064, 92.032, 93.001, 93.97, 94.939, 95.907, 96.875, 97.841, 98.809, 99.775, 100.741, 101.71, 102.68, 103.649, 104.618, 105.586, 106.555, 107.521, 108.485, 109.446, 110.402, 111.355, 112.307, 113.259, 114.211, 115.162, 116.113, 117.062, 118.01, 118.958, 119.907, 120.855, 121.8];
+const REP = { t0: TALK.end + 0.5, len: 136.88, src: 'media/three-steps-behind.mp3' };
+const QREP = [7.904, 8.86, 9.814, 10.77, 11.731, 12.694, 13.656, 14.622, 15.591, 16.564, 17.538, 18.513, 19.488, 20.459, 21.431, 22.4, 23.366, 24.328, 25.287, 26.245, 27.206, 28.171, 29.14, 30.111, 31.085, 32.06, 33.037, 34.012, 34.987, 35.96, 36.929, 37.892, 38.853, 39.813, 40.772, 41.729, 42.69, 43.654, 44.622, 45.594, 46.565, 47.538, 48.512, 49.486, 50.461, 51.432, 52.401, 53.365, 54.326, 55.287, 56.245, 57.204, 58.165, 59.128, 60.097, 61.067, 62.039, 63.013, 63.988, 64.963, 65.937, 66.91, 67.88, 68.843, 69.806, 70.768, 71.728, 72.686, 73.647, 74.613, 75.581, 76.551, 77.524, 78.499, 79.474, 80.448, 81.423, 82.397, 83.366, 84.331, 85.292, 86.253, 87.21, 88.167, 89.129, 90.092, 91.058, 92.028, 93.0, 93.974, 94.948, 95.923, 96.897, 97.87, 98.838, 99.803, 100.764, 101.725, 102.685, 103.645, 104.606, 105.571, 106.538, 107.51, 108.485, 109.461, 110.437, 111.411, 112.385, 113.356, 114.325, 115.292, 116.255, 117.213, 118.169, 119.125, 120.085, 121.048, 122.016, 122.986, 123.953, 124.926, 125.9, 126.876, 127.854, 128.828, 129.798, 130.766, 131.731];
 { const last = BEATS[BEATS.length - 1], first = REP.t0 + QREP[0], n = 36; for (let k = 1; k < n; k++) BEATS.push(last + (first - last) * k / n); for (const q of QREP) BEATS.push(REP.t0 + q); }
 const SONG1_BEATS = 152, REP_B0 = SONG1_BEATS + 36;   // the reprise's first row starts on this beat
 const LEAD = BEATS[0], NBEAT = BEATS.length - 1, BP0 = BEATS[1] - BEATS[0], BPN = BEATS[NBEAT] - BEATS[NBEAT - 1];
@@ -156,10 +156,10 @@ const SHOTS = [
   { id: 'door', t0: 165.8, t1: 178.2, name: '문 너머', note: '하은이 일어나 병실 문으로 걸어가고, 위아래 검은 띠가 시네마처럼 크게 들어온다. 카메라가 따라가며 벽과 문이 들어오고, 문 건너편 복도에 꽃다발을 든 지우. 하은이 문손잡이에 손을 뻗고, 암전.' },
   { id: 'rewind', t0: 178.2, t1: 183.0, name: '되감기', note: '하은이 문손잡이를 잡는 순간 컷씬이 빠르게 거꾸로 감긴다(테이프 감기는 소리): 문, 병실, 복도, 로비, 골목, 열차, 공장.' },
   { id: 'talk', t0: 183.0, t1: REP.t0, name: '반장과 지우', note: '하은이 떠난 빈 벨트 앞. 반장(의자)과 지우의 대화, 클릭해서 넘김. "…지우. 따라가든가."' },
-  { id: 'jiwoo', t0: REP.t0, t1: REP.t0 + 105.9, name: '지우의 길', note: '지우의 노래(긴 버전)와 함께 같은 길을 사람들 사이로 걷는다: 아침 거리, 승강장, 꽉 찬 열차, 내린 역(출구로 가는 사람들), 꽃집에서 천천히 꽃다발, 골목을 지나 병원, 이안이 있는 복도, 502호 앞에서 노크 셋, 넷째는 플레이어.' },
-  { id: 'open', t0: REP.t0 + 105.9, t1: REP.t0 + 131.0, name: '문이 열린다', note: '문을 가운데 둔 단면, 위아래 띠가 닫히고, 하은이 병실 안쪽에서 문으로 걸어와 손잡이를 잡고, Let me count with you에 문이 열린다. 허밍, 암전.' }
+  { id: 'jiwoo', t0: REP.t0, t1: REP.t0 + 119.0, name: '지우의 길', note: '지우의 노래와 함께 같은 길을 사람들 사이로 걷는다: 아침 거리, 승강장, 꽉 찬 열차, 내린 역(출구로 가는 사람들), 꽃집에서 천천히 꽃다발, 골목을 지나 병원, 이안이 있는 복도, 502호 앞에서 꽃을 내려다보며 망설임.' },
+  { id: 'open', t0: REP.t0 + 119.0, t1: REP.t0 + 136.5, name: '문이 열린다', note: '문을 가운데 둔 단면, 위아래 띠가 닫히고, 하은이 병실 안쪽에서 문으로 걸어와 선다. 지우가 문 앞으로 한 걸음 다가가 하나·둘·셋 노크, 넷은 플레이어, Now I know what it\'s for에 하은이 문을 연다. 암전.' }
 ];
-const CUT_END = REP.t0 + 131.0;   // 하은's part, then 지우's reprise (REP) to its last hum   // the drawn cutscene's length: the song (Four Steps Home, 2:37.5), then the knock and the door; it fades to black here
+const CUT_END = REP.t0 + 136.5;   // 하은's part, then 지우's reprise (REP) to its last hum   // the drawn cutscene's length: the song (Four Steps Home, 2:37.5), then the knock and the door; it fades to black here
 const ROWS_END = 158.6;
 // 지우's heart in the reprise: from a little before his first row to just after his last
 const inRows = t => t < ROWS_END || (t >= REP.t0 + QREP[0] - 2.5 && t < REP.t0 + QREP[QREP.length - 1] + 0.6);
@@ -717,7 +717,7 @@ function station(t, dest) {
   // a tiled pillar
   R(88, 0, 20, 158, '#d6d1c3'); R(88, 0, 2, 158, '#ebe7dc'); R(106, 0, 2, 158, '#b3ae9f'); for (let y = 6; y < 156; y += 8) R(90, y, 16, 1, '#c4bfb0');
   // (in 지우's walk) people on the platform: commuters waiting for the train, or (where he gets off) heading for the exit
-  if (WHO === 'jiwoo') (dest ? PLATFORM_OFF : PLATFORM_WAIT).forEach((p, i) => { const go = dest ? Math.max(0, STALL_S - 52) * (16 + i * 5) : 0, x = p.x - go; if (x > -20) person(x, HTOP + (p.h || 0) + (go > 0 && Math.floor(STALL_S * 3.2 + i) % 2 ? 1 : 0), { ...p, m: dest ? false : p.m }); });
+  if (WHO === 'jiwoo') (dest ? PLATFORM_OFF : PLATFORM_WAIT).forEach((p, i) => { const go = dest ? Math.max(0, STALL_S - 66) * (16 + i * 5) : 0, x = p.x - go; if (x > -20) person(x, HTOP + (p.h || 0) + (go > 0 && Math.floor(STALL_S * 3.2 + i) % 2 ? 1 : 0), { ...p, m: dest ? false : p.m }); });
   // (in 지우's walk) a flower stall open early by the exit, an older woman in an apron behind it; she takes his money and
   // hands him the flowers over the counter (in song time STALL_S, see BUY)
   if (dest && WHO === 'jiwoo') { const x = HX + 18, ss = STALL_S;
@@ -1083,7 +1083,8 @@ function jiwoo(cx, top, t) {
   for (let r = 0; r < 18; r++) { const w = Math.round(12 - r * 0.55); R(bx - Math.floor(w / 2), by + 4 + r, w, 1, r % 5 === 0 ? '#cbbd9e' : '#e8dcc4'); }
   R(bx - 3, by + 13, 6, 2, '#d8463b');
   for (const [dx, dy, c] of [[-5, 0, '#4a8a3a'], [4, 1, '#4a8a3a'], [-4, -2, '#f2a6c8'], [0, -4, '#e86a6a'], [3, -2, '#ffd27a'], [-1, 0, '#f8f4ec'], [2, 1, '#f2a6c8'], [-3, 2, '#ffd27a']]) R(bx + dx, by + dy, 3, 3, c);
-  thick(cx + 4, top + 19, bx - 2, by + 15, 3, hood); R(bx - 3, by + 14, 3, 3, skin);   // the near arm, his hand on the cone
+  if (JKNOCK && JKNOCK.up > 0) { const k = JKNOCK.up, hx = Math.round(lerp(cx + 6, cx + 15 + 2 * JKNOCK.tap, k)), hy = Math.round(lerp(top + 31, top + 22, k)); thick(cx + 4, top + 19, hx, hy, 3, hood); R(hx - 1, hy - 1, 3, 3, skin); }   // knocking
+  else { thick(cx + 4, top + 19, bx - 2, by + 15, 3, hood); R(bx - 3, by + 14, 3, 3, skin); }   // the near arm, his hand on the cone
 }
 function doorScene(t) {
   const P = Math.round(WX.D(t)), wx0 = WALL.x0 + P, wx1 = WALL.x1 + P;
@@ -1097,7 +1098,7 @@ function doorScene(t) {
   { const x = P - 168; R(x, 92, 6, 12, '#e8eef0'); R(x + 2, 104, 2, 3, '#6a9ad8'); }   // a hand sanitiser
   const lx = WALL.x0 - 52 + P; R(lx - 1, 23, 32, 6, '#9aa3a0'); R(lx, 24, 30, 4, '#fffffa');
   g.globalCompositeOperation = 'lighter'; glow(lx + 15, 60, 90, '255,250,240', 0.12); glow(lx + 15, 28, 14, '240,248,255', 0.25); g.globalCompositeOperation = 'source-over';
-  jiwoo(WALL.x0 - 36 + P, HTOP, t);
+  jiwoo(WALL.x0 - 36 + Math.round(18 * JSTEP) + P, HTOP + (JSTEP > 0 && JSTEP < 1 && Math.floor(JSTEP * 4) % 2 ? -1 : 0), t);
   g.restore();
   // the ward side: carried on past its left edge to the wall, her, then the morning over it
   g.save(); g.beginPath(); g.rect(wx1, 0, W - wx1, H); g.clip();
@@ -1358,29 +1359,30 @@ function crossTo(t, t0, t1, ctx, canvas, drawNext, pose, tintA, tintB, clipY, dr
 //   the flower stall (he buys them at her 47.8 to 48.6);  chorus (31.6 to 46): her corridor with every light still on;
 //   'One, two, three, and four' (46 to 49.7): at 502 he knocks on one, two, three (the player has four);
 //   then (from 49.7) the door again, cut through, and on 'Let me count with you' it opens.
-// his walk to the long reprise, in song time s. Each section replays a stretch of her timeline (tv) with him in her place:
-//   intro + verse 1 (0 to 23.8): the factory, out onto the morning street (people about)
-//   pre-chorus 1 (to 32.8): the platform, people waiting, the train coming in, its doors opening
-//   chorus 1 (to 47.7): boarding, the packed car pulling out and running
-//   verse 2 (to 62.3), 'a thousand hurried feet': the train slowing, stopping, the platform she got off at, the crowd heading out
-//   pre-chorus 2 (to 70.2), 'so I'm bringing flowers instead': the flower stall (her timeline held)
-//   chorus 2 (to 86.5): off the platform, down the alley with the flowers, to the hospital
-//   bridge (to 101.2), 'down the hall the monitors': the corridor with every light on, the people, Ian at his laptop
-//   'One, two, three, and four': at 502 he knocks on one, two, three; the player has four
-//   then the door in section, 하은 walking to it, and on 'Let me count with you' it opens
-const SEGS = [[0, 10.2], [23.8, 27.5], [32.8, 35.0], [47.7, 43.4], [62.3, 49.45], [70.2, 49.45], [86.5, 67.6]];
+// his walk to the reprise (third take), in song time s. Each section replays a stretch of her timeline (tv) with him in her place:
+//   intro + verse 1 (0 to 25.7): the factory, out onto the morning street (people about)
+//   pre-chorus 1 (to 34.5): the platform, people waiting, the train coming in, its doors opening
+//   chorus 1 and the interlude after it (to 56.7): boarding, the packed car pulling out and running
+//   verse 2 (to 72.7), 'a thousand hurried feet': the train slowing, stopping, the platform she got off at, the crowd heading out
+//   pre-chorus 2 (to 80.0), 'so I'm bringing flowers instead': the flower stall (her timeline held)
+//   chorus 2 (to 95.0): off the platform, down the alley with the flowers, to the hospital
+//   bridge (to 110.7), 'down the hall the monitors': the corridor with every light on, the people, Ian at his laptop; 502
+//   the quiet stretch (to 127.9): at 502 he hesitates, looks at the flowers; the door in section; 하은 walks to it
+//   'One, two, three, and four' (a quick last chorus): he steps up and knocks on one, two, three; the player has four;
+//   'Now I know what it's for': she opens the door
+const SEGS = [[0, 10.2], [25.7, 27.5], [34.5, 35.0], [56.7, 44.5], [72.7, 49.45], [80.0, 49.45], [95.0, 67.6]];
 const vtPath = s => { for (let k = SEGS.length - 1; k >= 0; k--) if (s >= SEGS[k][0]) { const [s0, v0] = SEGS[k], nx = SEGS[k + 1]; return nx ? lerp(v0, nx[1], (s - s0) / (nx[0] - s0)) : v0; } return SEGS[0][1]; };
-const RS = { stall: 62.3, toHall: [85.8, 87.4], knock: 101.6, door: 107.3, open: 119.1 };
+const RS = { stall: 72.7, toHall: [94.3, 95.9], atDoor: 110.5, door: 119.0, step: 126.4, knock: 127.3, open: 131.1 };
 // the stall, in song time: he turns to it, looks over the buckets, holds out the money, the seller hands him the flowers,
 // he looks down at them and gives her a little bow
-const BUY = { look: 62.7, browse: 63.3, pay: 64.5, hand: 65.3, take: 66.0, bow: 67.0 };
-const KNOCKS = [QREP[96], QREP[97], QREP[98]];   // song time: one, two, three (QREP[99], the four, is the player's)
+const BUY = { look: 73.0, browse: 73.6, pay: 74.8, hand: 75.6, take: 76.3, bow: 77.3 };
+const KNOCKS = [QREP[124], QREP[125], QREP[126]];   // song time: one, two, three (QREP[127], the four, is the player's)
 const STALL_T = 49.45;
-const vtC = s => s >= 101.0 ? 125.0 : lerp(112.6, 125.0, (s - RS.toHall[0]) / (101.0 - RS.toHall[0]));   // the corridor
+const vtC = s => s >= RS.atDoor ? 125.0 : lerp(112.6, 125.0, (s - RS.toHall[0]) / (RS.atDoor - RS.toHall[0]));   // the corridor
 const rewT = r => lerp(177.8, TALK.scene, ease(seg(r, 0.15, REW.dur - 0.35)));   // where the rewind is in her cutscene (r: time into it)
 // in her timeline, the time that drives the room's sound beds (null: no beds)
 function bedTime(t) { if (t < REW.t0) return t; if (t < REW.t0 + REW.dur) return null; if (t < REP.t0) return TALK.scene; const s = t - REP.t0; if (s < RS.toHall[0]) return vtPath(s); if (s < RS.door) return vtC(s); return EXIT.reach + 0.6; }
-let DOOR_OPEN = 0, HAEUN_DOOR = null;   // HAEUN_DOOR: where and how she is drawn in the door scene (null: as in her part)
+let DOOR_OPEN = 0, HAEUN_DOOR = null, JSTEP = 0, JKNOCK = 0;   // JSTEP: 지우's step up to the door (0..1); JKNOCK: his knocking arm   // HAEUN_DOOR: where and how she is drawn in the door scene (null: as in her part)
 function repWorld(t) {
   if (t < REW.t0 + REW.dur) { const r = t - REW.t0; drawWorld(rewT(r)); rewindFX(r); return; }
   if (t < REP.t0) {   // the talk: the factory as she left it, 지우 at the belt turned to 반장 on his chair
@@ -1394,7 +1396,7 @@ function repWorld(t) {
   try {
     if (s < RS.toHall[1]) {
       JFLOWERS = s >= BUY.take;
-      if (s >= RS.stall && s < RS.stall + 7.9) {   // at the stall: standing, his look and hands through the buying
+      if (s >= RS.stall && s < RS.stall + 7.3) {   // at the stall: standing, his look and hands through the buying
         const look = s < BUY.look ? 0.2 : s < BUY.browse ? lerp(0.2, -0.4, ease(seg(s, BUY.look, BUY.browse))) : s < BUY.pay ? -0.4 : s < BUY.take ? 0.1 : s < BUY.bow ? -0.5 : s < BUY.bow + 0.5 ? -0.9 : lerp(-0.5, 0.2, ease(seg(s, BUY.bow + 0.5, BUY.bow + 1.2)));
         const k = ease(seg(s, BUY.pay, BUY.pay + 0.5)) * (1 - ease(seg(s, BUY.take, BUY.take + 0.4)));   // his hand out: the money, then taking them
         JPOSE = o => ({ mirror: true, look, sway: 0, ...(k > 0 ? { arms: 'reach', reach: { dx: Math.round(lerp(-6, HX - STALL_HAND.x - 1, k)), dy: Math.round(lerp(31, STALL_HAND.y - HTOP, k)) } } : {}) });
@@ -1403,9 +1405,9 @@ function repWorld(t) {
       if (s > RS.toHall[0]) { JFLOWERS = true; JPOSE = null; crossTo(t, REP.t0 + RS.toHall[0], REP.t0 + RS.toHall[1], wdctx, WDW, () => corridorScene(vtC(s)), { o: {}, top: HTOP }, '#ffffff', '#ffffff', 0); }
     } else if (s < RS.door) {
       JFLOWERS = true;
-      if (s >= RS.knock) {   // knocking on one, two, three: the near hand to the door, a tap on each
-        const ks = KNOCKS.map(q => clamp(1 - Math.abs(s - q) / 0.16, 0, 1)), kk = Math.max(...ks), up = ease(seg(s, RS.knock, RS.knock + 0.4));
-        JPOSE = o => ({ ...o, look: 0.4, arms: 'reach', reach: { dx: Math.round(lerp(-6, -18 - 3 * kk, up)), dy: Math.round(lerp(31, 24, up)) } });
+      if (s >= RS.atDoor + 0.6) {   // at 502: he stops, looks down at the flowers, breathes, looks up at the door
+        const look = s < RS.atDoor + 2.5 ? lerp(0.2, -0.5, ease(seg(s, RS.atDoor + 0.6, RS.atDoor + 1.4))) : lerp(-0.5, 0.4, ease(seg(s, RS.door - 4.5, RS.door - 3.2)));
+        JPOSE = o => ({ ...o, look });
       }
       drawWorld(vtC(s));
       if (s > RS.door - 1.4) { const keep = WHO; WHO = 'haeun'; JPOSE = null; crossTo(t, REP.t0 + RS.door - 1.4, REP.t0 + RS.door, frctx, FRW, () => doorEnd(s), { o: {}, top: HTOP }, '#ffffff', '#ffffff', 0); WHO = keep; }
@@ -1415,16 +1417,17 @@ function repWorld(t) {
 // the door at the end: as 하은's part left it (her hand on the handle, 지우 with the flowers beyond the wall), then it opens
 // the door at the end: 지우 beyond the wall with the flowers; 하은 comes from inside the ward (from the bed, off to the right),
 // walks to the door, stops, looks up, puts her hand on the handle; on 'Let me count with you' it opens
-const HDOOR = { from: 108.6, at: 112.8, reach: 113.4, dist: 125 };
+const HDOOR = { from: 119.6, at: 123.6, reach: 130.85, dist: 125 };
 function doorEnd(s) {
   DOOR_OPEN = ease(seg(s, RS.open, RS.open + 1.6));
+  JSTEP = ease(seg(s, RS.step, RS.step + 0.8)); JKNOCK = s < RS.knock ? 0 : { up: ease(seg(s, RS.knock, RS.knock + 0.4)) * (1 - ease(seg(s, KNOCKS[2] + 0.35, KNOCKS[2] + 0.8))), tap: Math.max(...KNOCKS.map(q => clamp(1 - Math.abs(s - q) / 0.14, 0, 1))) };
   const u = seg(s, HDOOR.from, HDOOR.at), d = HDOOR.dist * (u < 1 ? (u * u * (3 - 2 * u)) : 1), x = HX + HDOOR.dist - d;
   let pose;
   if (s < HDOOR.at) { const w = walking(d, Math.min(1, d / STRIDE, (HDOOR.dist - d) / 12 + 0.2), 0.2); w.o.mirror = false; pose = w; }
   else { const k = ease(seg(s, HDOOR.reach, HDOOR.reach + 0.6)) * (1 - DOOR_OPEN), look = lerp(0.2, 0.35, ease(seg(s, HDOOR.at, HDOOR.at + 0.5)));
     pose = k > 0 ? { o: { mirror: false, look, arms: 'reach', reach: { dx: Math.round(lerp(-8, WALL.x1 + EXIT_D + 3 - HX, k)), dy: Math.round(lerp(31, DOOR.handle - HTOP, k)) }, sway: 0 }, top: HTOP } : { o: { mirror: false, look, sway: 0 }, top: HTOP }; }
   HAEUN_DOOR = { x, pose };
-  try { doorScene(EXIT.reach + 0.6); } finally { DOOR_OPEN = 0; HAEUN_DOOR = null; }
+  try { doorScene(EXIT.reach + 0.6); } finally { DOOR_OPEN = 0; HAEUN_DOOR = null; JSTEP = 0; JKNOCK = 0; }
 }
 // the rewind's look: a worn tape running backwards (tracking bands sliding, scanlines, a cold wash, speckle, ◀◀ in the corner)
 function rewindFX(s) {
@@ -1744,12 +1747,11 @@ const LOOK2 = [
   { x: 14, y: 64, al: 'l', w: 190, p: LOOK.lamp },
   { x: 14, y: 40, al: 'l', w: 200, p: LOOK.four, s: 1.05 },
   { x: 14, y: 64, al: 'l', w: 200, p: LOOK.warm, s: 1.05 },
-  { x: 192, y: 30, al: 'c', w: 360, p: LOOK.four, s: 1.3, st: 0.96, ink: true },   // one, two, three (his knocks), and four (the player)
+  { x: 192, y: 30, al: 'c', w: 360, p: LOOK.four, s: 1.3, st: 0.45, ink: true },   // one, two, three (his knocks), and four (the player)
   { x: 192, y: 34, al: 'c', w: 360, p: LOOK.warm },                 // the top bar, the door
   { x: 192, y: 34, al: 'c', w: 360, p: LOOK.four },
-  { x: 192, y: 34, al: 'c', w: 360, p: LOOK.gold, s: 1.2 },
 ];
-SUBS.push(...[{"t0": 8.64, "t1": 12.6, "en": "I asked you what you dream of", "ko": "네 꿈이 뭐냐고 물었지"}, {"t0": 12.6, "t1": 16.7, "en": "You didn't say a word", "ko": "너는 아무 말 없었어"}, {"t0": 16.7, "t1": 19.78, "en": "Now I walk the way you walked", "ko": "이제 네가 걷던 길을 걸어"}, {"t0": 19.78, "t1": 23.8, "en": "And hear what you have heard", "ko": "네가 듣던 걸 들어"}, {"t0": 23.8, "t1": 27.78, "en": "There's a beat inside your hands", "ko": "네 손 안에 박자가 있어"}, {"t0": 27.78, "t1": 32.8, "en": "You never let me hear", "ko": "한 번도 들려주지 않던"}, {"t0": 32.8, "t1": 35.78, "en": "Three steps behind you", "ko": "세 걸음 뒤에서"}, {"t0": 35.78, "t1": 39.8, "en": "I'm counting too", "ko": "나도 같이 세"}, {"t0": 39.8, "t1": 43.0, "en": "Every step you took", "ko": "네가 걸은 걸음마다"}, {"t0": 43.0, "t1": 47.7, "en": "Is leading me to you", "ko": "나를 너에게 데려가"}, {"t0": 47.7, "t1": 51.16, "en": "The city's waking up now", "ko": "도시가 깨어나"}, {"t0": 51.16, "t1": 54.22, "en": "A thousand hurried feet", "ko": "수많은 바쁜 발소리"}, {"t0": 54.22, "t1": 59.16, "en": "But in the noise I only hear", "ko": "그 소음 속에서 내게 들리는 건"}, {"t0": 59.16, "t1": 62.3, "en": "The count you never speak", "ko": "네가 말하지 않던 셈"}, {"t0": 62.3, "t1": 66.06, "en": "I don't have the words to say", "ko": "할 말을 못 찾아서"}, {"t0": 66.06, "t1": 70.2, "en": "So I'm bringing flowers instead", "ko": "대신 꽃을 들고 가"}, {"t0": 70.2, "t1": 74.52, "en": "Three steps behind you", "ko": "세 걸음 뒤에서"}, {"t0": 74.52, "t1": 77.98, "en": "I'm counting too", "ko": "나도 같이 세"}, {"t0": 77.98, "t1": 82.22, "en": "Every light you left on", "ko": "네가 켜 두고 간 불들이"}, {"t0": 82.22, "t1": 86.52, "en": "Is leading me to you", "ko": "나를 너에게 데려가"}, {"t0": 86.52, "t1": 90.31, "en": "Down the hall the monitors", "ko": "복도 끝 모니터들이"}, {"t0": 90.31, "t1": 94.52, "en": "Are keeping someone's time", "ko": "누군가의 박을 세고 있어"}, {"t0": 94.52, "t1": 98.1, "en": "Every heart in here is counting", "ko": "여기 모든 심장이 세고 있어"}, {"t0": 98.1, "t1": 101.24, "en": "Yours, and hers, and mine", "ko": "너의 것도, 그분의 것도, 나의 것도"}, {"t0": 101.24, "t1": 106.1, "en": "One, two, three, and four", "ko": "하나, 둘, 셋, 그리고 넷"}, {"t0": 106.1, "t1": 111.6, "en": "Now I know what it's for", "ko": "이제야 그게 뭔지 알아"}, {"t0": 113.24, "t1": 118.74, "en": "If you're counting to four", "ko": "네가 넷까지 센다면"}, {"t0": 119.08, "t1": 123.4, "en": "Let me count with you", "ko": "나도 같이 셀게"}].map(c => ({ ...c, t0: c.t0 + REP.t0, t1: c.t1 + REP.t0 }))); LYRIC_LOOK.push(...LOOK2);
+SUBS.push(...[{"t0": 10.36, "t1": 14.58, "en": "I asked you what you dream of", "ko": "네 꿈이 뭐냐고 물었지"}, {"t0": 14.58, "t1": 18.12, "en": "You didn't say a word", "ko": "너는 아무 말 없었어"}, {"t0": 18.12, "t1": 23.0, "en": "Now I walk the way you walked", "ko": "이제 네가 걷던 길을 걸어"}, {"t0": 23.0, "t1": 25.68, "en": "And hear what you have heard", "ko": "네가 듣던 걸 들어"}, {"t0": 25.68, "t1": 30.36, "en": "There's a beat inside your hands", "ko": "네 손 안에 박자가 있어"}, {"t0": 30.36, "t1": 34.46, "en": "You never let me hear", "ko": "한 번도 들려주지 않던"}, {"t0": 34.46, "t1": 37.58, "en": "Three steps behind you", "ko": "세 걸음 뒤에서"}, {"t0": 37.58, "t1": 41.68, "en": "I'm counting too", "ko": "나도 같이 세"}, {"t0": 41.68, "t1": 44.82, "en": "Every step you took", "ko": "네가 걸은 걸음마다"}, {"t0": 44.82, "t1": 49.5, "en": "Is leading me to you", "ko": "나를 너에게 데려가"}, {"t0": 56.72, "t1": 60.54, "en": "The city's waking up now", "ko": "도시가 깨어나"}, {"t0": 60.54, "t1": 64.68, "en": "A thousand hurried feet", "ko": "수많은 바쁜 발소리"}, {"t0": 64.68, "t1": 69.08, "en": "But in the noise I only hear", "ko": "그 소음 속에서 내게 들리는 건"}, {"t0": 69.08, "t1": 72.68, "en": "The count you never speak", "ko": "네가 말하지 않던 셈"}, {"t0": 72.68, "t1": 76.58, "en": "I don't have the words to say", "ko": "할 말을 못 찾아서"}, {"t0": 76.58, "t1": 80.02, "en": "So I'm bringing flowers instead", "ko": "대신 꽃을 들고 가"}, {"t0": 80.02, "t1": 84.5, "en": "Three steps behind you", "ko": "세 걸음 뒤에서"}, {"t0": 84.5, "t1": 87.36, "en": "I'm counting too", "ko": "나도 같이 세"}, {"t0": 87.36, "t1": 91.76, "en": "Every light you left on", "ko": "네가 켜 두고 간 불들이"}, {"t0": 91.76, "t1": 95.38, "en": "Is leading me to you", "ko": "나를 너에게 데려가"}, {"t0": 95.38, "t1": 99.66, "en": "Down the hall the monitors", "ko": "복도 끝 모니터들이"}, {"t0": 99.66, "t1": 104.3, "en": "Are keeping someone's time", "ko": "누군가의 박을 세고 있어"}, {"t0": 104.3, "t1": 107.68, "en": "Every heart in here is counting", "ko": "여기 모든 심장이 세고 있어"}, {"t0": 107.68, "t1": 111.0, "en": "Yours, and hers, and mine", "ko": "너의 것도, 그분의 것도, 나의 것도"}, {"t0": 128.0, "t1": 130.26, "en": "One, two, three, and four", "ko": "하나, 둘, 셋, 그리고 넷"}, {"t0": 130.26, "t1": 132.1, "en": "Now I know what it's for", "ko": "이제야 그게 뭔지 알아"}, {"t0": 132.1, "t1": 134.6, "en": "If you're counting to four", "ko": "네가 넷까지 센다면"}].map(c => ({ ...c, t0: c.t0 + REP.t0, t1: c.t1 + REP.t0 }))); LYRIC_LOOK.push(...LOOK2);
 let subLang = 'en';
 // the lines through the door, in the game's dialogue box: each is typed out, then the cutscene waits on it (a blinking ▼) until a
 // click, a tap or Space/Enter, as dialogue does in the game; after it, a knock again, then the next call
