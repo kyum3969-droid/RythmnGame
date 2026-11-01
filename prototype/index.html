@@ -1831,6 +1831,7 @@ function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
   const top = playerTop(kick, nowMs);
   if (L.daw) { drawPadArm(kick, nowMs, top, twoHands); return; }
   const gx = 324 - kick * 4, gy = 117;
+  if (L.callResp) { const hx = SCAN_X + 7 - Math.round(kick * 4), hy = Math.round(lerp(110, 123, kick)); thick(PLAYER_X - 6, top + 22, hx + 2, hy + 1, 4, C.hoodie); R(hx - 1, hy - 1, 5, 4, C.skin); R(hx, hy + 3, 3, 3, '#6a4a30'); R(hx - 2, hy + 6, 7, 2, '#c8372d'); return; }
   if (L.lanes === 2 && (!L.coScanner || DUO.mode !== 'one')) {
     // the left hand works the upper (far) gate, the right hand the lower one
     const ux = 320 - upperKick * 4, uy = 86;
@@ -1916,6 +1917,7 @@ function drawBox(n, cx, bottom, mark, t, sq = 0) {
   if (n.pair && L.oneButton) R(x, y, w, 2, '#ffe9a8');
   if (n.grab && t >= n.tRel) { R(x + 2, y + 2, 5, 4, '#d8463b'); R(x + 3, y + 3, 3, 2, '#f08a7a'); }
   if (L.callResp && t >= n.place) { R(x + 2, y + 3, 6, 5, '#c8372d'); R(x + 3, y + 4, 4, 3, C.kraft); R(x + 4, y + 5, 2, 1, '#c8372d'); }
+  if (L.callResp && n.state === 'hit' && n.judge) { const sx = x + w - 11; R(sx, y + 3, 9, 8, '#c8372d'); R(sx + 1, y + 4, 7, 6, C.kraft); R(sx + 2, y + 5, 5, 1, '#c8372d'); R(sx + 4, y + 5, 1, 4, '#c8372d'); R(sx + 2, y + 8, 5, 1, '#c8372d'); }
   const lw = Math.min(7, w - 4);
   if (lw >= 3) { R(x + 2, y + h - 6, lw, 4, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink); }
   if (n.heavy) { R(x + 2, y + 3, w - 4, 4, '#1b1716'); for (let k = 2; k < w - 5; k += 4) R(x + k + 1, y + 4, 2, 2, '#f0b429'); }
@@ -3027,6 +3029,8 @@ function brassStab(t, fs, d, v = 0.03) {
 }
 const tamb21 = (t, v) => { noise(t, 'highpass', 6500, v, 0.05, 0.7); noise(t + 0.012, 'highpass', 8000, v * 0.6, 0.04, 0.7); };
 // 이모's stamp in 2-1: the rubber block on paper on wood, a sharp woody crack over a body thump, loud above the band
+// 2-1: your stamp, her sound a little brighter and lighter, played the instant you press (like the tutorial prototype)
+const myStamp = (t, a = 1) => { const o = osc('sine', 190, t, 0.002, 0.6 * a, 0.12, bus); o.frequency.exponentialRampToValueAtTime(90, t + 0.08); const c = osc('triangle', 1250, t, 0.001, 0.26 * a, 0.04, bus); c.frequency.exponentialRampToValueAtTime(900, t + 0.03); noise(t, 'bandpass', 1500, 0.4 * a, 0.06, 1.4, bus); noise(t + 0.004, 'lowpass', 600, 0.24 * a, 0.08, 0.7, bus); };
 const inspStamp = t => { const o = osc('sine', 170, t, 0.002, 0.9, 0.13, bus); o.frequency.exponentialRampToValueAtTime(80, t + 0.08); const c = osc('triangle', 980, t, 0.001, 0.4, 0.05, bus); c.frequency.exponentialRampToValueAtTime(700, t + 0.03); noise(t, 'bandpass', 1700, 0.55, 0.05, 2.2, bus); noise(t, 'highpass', 3800, 0.18, 0.025, 0.7, bus); noise(t + 0.004, 'lowpass', 700, 0.3, 0.09, 0.7, bus); };
 const tak = (t, v = 0.3) => { osc('square', 1700, t, 0.001, v * 0.12, 0.018); noise(t, 'bandpass', 2600, v, 0.022, 1.6); noise(t, 'lowpass', 500, v * 0.5, 0.02, 0.7); };
 function phoneRing(t) { for (let k = 0; k < 2; k++) for (let j = 0; j < 8; j++) osc('sine', j % 2 ? 1750 : 1400, t + k * 0.9 + j * 0.05, 0.004, 0.028, 0.045, bus); }
@@ -4080,7 +4084,7 @@ function judgeNote(target, t) {
     const milestone = addCombo();
     const tones = CHORDS[chordIdx(target.beat)];
     const th = THEME[fxTheme(target.beat)];
-    if (target.gtr) gtrSample(j, target.beat); else if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false);
+    if (target.gtr) gtrSample(j, target.beat); else if (!inRange(target.beat, L.hype) && !pairQuiet && !L.callResp) hitSound(j, tones, target.beat, false);
     const lightUp = phase3(target.beat);
     lastGood = now; FX.goodLane = target.lane; FX.glow = th.glow; ring(th.ring[(stats.combo + (j === 'good' ? 1 : 0)) % 2], target.lane);
     spawnBits(j === 'perfect' ? 14 : 6, th);
@@ -4145,13 +4149,14 @@ function onHit(ts, key, lane = 0) {
     judgeNote(tg, t); return;
   }
   if (lane === L.autoLane) return;
+  if (L.callResp) myStamp(ctx.currentTime);
   if (L.lanes === 2 && lane === 0) lastPressUpper = performance.now(); else lastPress = performance.now();
   if (heavyPend) {
     const hp = heavyPend;
     if (hp.key !== key && performance.now() - hp.at < 110) { clearTimeout(hp.timer); heavyPend = null; judgeNote(hp.n, hp.t); return; }
   }
   const target = findTarget(t, lane);
-  if (!target) { click(ctx.currentTime); return; }
+  if (!target) { if (!L.callResp) click(ctx.currentTime); return; }
   if (target.heavy) {
     if (heavyPend && heavyPend.n === target) return;
     heavyPend = { n: target, t, key, at: performance.now(), timer: setTimeout(() => {

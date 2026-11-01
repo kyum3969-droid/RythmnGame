@@ -73,7 +73,7 @@ dl{display:grid;grid-template-columns:auto 1fr;gap:.15em 1.2em;margin:.5em 0 1em
     </div>
   </div>
 </div>
-<p class="help">확장 시안 · 1 기본(2-1) → 2 리듬(16분·당김) → 3 긴 리듬(두 마디) → 4 이어 찍기(쉬는 마디 없음) → 5 박씨도 던진다(지게차 쿵, 마지막엔 둘이 나눠 찍음)</p>
+<p class="help">확장 시안 · 1 기본(2-1) → 2 리듬(16분·당김) → 3 긴 리듬(두 마디) → 4 이어 찍기(쉬는 마디 없음) → 5 박씨도 던진다(지게차 쿵, 마지막엔 둘이 나눠 찍음) → 6 엑스레이(벨트 가운데가 가려져 소리만 듣고 찍음)</p>
 <script>
 (() => {
 'use strict';
@@ -101,7 +101,11 @@ const LEVELS = [
   { name: '4 · 이어 찍기', sub: '쉬는 마디 없음', bpm: 88, canon: true, phrases: [P('imo', [0, 1, 2, 3]), P('imo', [0, 1, 2, 3]), P('imo', [0, 1, 1.5, 2]), P('imo', [0, 1, 1.5, 2]), P('imo', [0, 2, 3]), P('imo', [0, 1, 1.5, 2, 3]), P('imo', [0, 1.5, 2, 3]), P('imo', [0, 1, 2, 3]), P('imo', [0, 0.5, 1, 2]), P('imo', [0, 1, 1.5, 2]), P('imo', [0, 1, 2, 3])],
     say: { 0: '쉬지 말고 간다. 듣고, 찍고.' } },
   { name: '5 · 박씨도 던진다', sub: '지게차 쿵 · 둘이 나눠', bpm: 92, phrases: [P('imo', [0, 1, 1.5, 2]), P('park', [0, 2, 3]), P('imo', [0, 1, 1.5, 2, 3]), P('park', [0, 1.5, 2, 3]), P('imo', [0, 1, [1.5, 'park'], 2, [3, 'park']]), P('imo', [[0, 'park'], 1, 1.5, 2, [2.5, 'park'], [3, 'park']]), P('imo', [0, [1, 'park'], 1.5, 2, [3, 'park']])],
-    say: { 0: '지게차 저 양반도 오늘은 박자 맞추네.', 4: '같이 간다!' }, park: true }
+    say: { 0: '지게차 저 양반도 오늘은 박자 맞추네.', 4: '같이 간다!' }, park: true },
+  // 6 엑스레이: an X-ray tunnel covers the middle of the belt; the boxes go in right after her stamp and come out only at the
+  // red line, so you play what you heard
+  { name: '6 · 엑스레이', sub: '상자가 안 보인다 · 소리만', bpm: 92, xray: true, phrases: [P('imo', [0, 1, 2, 3]), P('imo', [0, 1, 1.5, 2]), P('imo', [0, 1, 1.5, 2, 3]), P('imo', [0, 0.5, 1, 2]), P('imo', [0, 1.5, 2, 3]), P('imo', [0, 0.75, 1.5, 2]), P('imo', [0.5, 1.5, 2, 3]), P('imo', [0, 1, 1.75, 2.5, 3])],
+    say: { 0: '엑스레이 들어가면 안 보여. 귀로 찍어.', 5: '눈 감아도 돼.' } }
 ];
 let LV = LEVELS[0], SPB = 60 / 92, BAR = 4 * SPB, LEAD = 0, END_T = 0;
 let STAMPS = [], TARGETS = [], SEGS = [];
@@ -229,6 +233,25 @@ function imo(t, glow) {
   R(x - 5, y + 5, 5, 4, '#2a2a2a'); R(x + 1, y + 5, 5, 4, '#2a2a2a'); R(x - 4, y + 6, 3, 2, '#c8d8e8'); R(x + 2, y + 6, 3, 2, '#c8d8e8'); R(x, y + 6, 1, 1, '#2a2a2a'); R(x - 1, y + 11, 4, 1, '#a86a5a');
   for (const [cx, cy] of [[-8, -2], [-4, -4], [0, -5], [4, -4], [8, -2], [-9, 2], [9, 2], [-8, 6], [9, 6]]) { R(x + cx - 2, y + cy - 1, 5, 5, '#8a8288'); R(x + cx - 1, y + cy - 1, 2, 2, '#aaa2a8'); }
 }
+// the X-ray tunnel over the middle of the belt: grey housing, lead curtains at both ends, a monitor and a warning lamp on top.
+// Nothing shows through it, so the boxes are only heard between her stamp and your line
+const XR0 = 104, XR1 = SCAN_X - 16;
+function xray(t) {
+  const y = BELT_Y - 30, w = XR1 - XR0;
+  R(XR0, y, w, 50, '#4e545c'); R(XR0, y, w, 3, '#6c737c'); R(XR0, y + 46, w, 4, '#3a3f45');
+  R(XR0 + 4, y + 6, w - 8, 26, '#40464d'); for (let x = XR0 + 10; x < XR1 - 8; x += 22) R(x, y + 8, 1, 22, '#4a5058');
+  // the curtains: dark strips at each mouth
+  for (const cx of [XR0, XR1 - 6]) { R(cx, y + 3, 6, 47, '#1c1f23'); for (let k = 0; k < 3; k++) R(cx + 1 + k * 2, y + 4, 1, 44, k % 2 ? '#2a2e33' : '#33383e'); }
+  // the label and the yellow and black band
+  for (let x = XR0 + 6; x < XR1 - 6; x += 8) { R(x, y + 36, 4, 5, '#e2b23a'); R(x + 4, y + 36, 4, 5, '#1c1f23'); }
+  R(XR0 + w / 2 - 22, y + 13, 44, 12, '#1c1f23'); txt('X-RAY', XR0 + w / 2, y + 15.5, '#e2b23a', 8, 'center', '{s}px "Black Han Sans", sans-serif');
+  // monitor on top: a green screen with a slow scan line, no boxes on it
+  const mx = XR0 + w / 2 - 20, my = y - 24; R(mx + 18, my + 18, 4, 6, '#2a2e33'); R(mx, my, 40, 19, '#2a2e33'); R(mx + 2, my + 2, 36, 15, '#0f2a1c');
+  const sl = Math.floor((t * 20) % 15); R(mx + 2, my + 2 + sl, 36, 1, '#2f7a4c'); for (let k = 0; k < 15; k += 3) R(mx + 2, my + 2 + k, 36, 1, 'rgba(0,0,0,.25)');
+  // the warning lamp blinks on the beat
+  const on = playing && ((t / SPB) % 1) < 0.25; R(XR1 - 20, y - 7, 8, 7, '#2a2e33'); R(XR1 - 19, y - 6, 6, 5, on ? '#ffcf4a' : '#6a5420');
+  if (on) { const gr = g.createRadialGradient(XR1 - 16, y - 4, 0, XR1 - 16, y - 4, 14); gr.addColorStop(0, 'rgba(255,207,74,.35)'); gr.addColorStop(1, 'rgba(255,207,74,0)'); g.fillStyle = gr; g.fillRect(XR1 - 30, y - 18, 28, 28); }
+}
 // 박씨 on his forklift behind the belt: the forks drop on each of his beats with a pallet on them
 function park(t, glow) {
   const x = PARK_X, y = 92, down = downOf(t, 'park'), fy = y + 30 - 10 * (1 - down);
@@ -251,6 +274,7 @@ function draw(t) {
   imo(t, callIs('imo') ? 1 : 0);
   belt(t);
   for (const tg of TARGETS) { const x = SCAN_X - (tg.t - t) * V(); if (x < -12 || x > W + 12) continue; box(x, tg); }
+  if (LV.xray) xray(t);
   // you: the stamping hand at the red line
   { const k = clamp(1 - (now - FX.stampAt) / 120, 0, 1), hx = SCAN_X + 18, hy = BELT_Y - 34 + 10 * k; R(hx - 2, hy - 30, 8, 30, '#2a3a5a'); R(hx - 4, hy, 12, 7, '#e8b898'); R(hx - 5, hy + 6, 14, 4, '#c8372d'); }
   const f = clamp(1 - (now - FX.flash) / 260, 0, 1); if (f > 0) { g.save(); g.globalAlpha = f; g.strokeStyle = '#ffe8a8'; g.lineWidth = 1.2; g.beginPath(); g.ellipse(SCAN_X, BELT_Y - 4, 10 + 18 * (1 - f), 6 + 10 * (1 - f), 0, 0, Math.PI * 2); g.stroke(); g.restore(); }
