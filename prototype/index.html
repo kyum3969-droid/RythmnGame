@@ -1051,13 +1051,16 @@ const LEVELS = [
     // creeping up; a key change for the last stretch and a last hit on both belts; then only the motor.
     // The motor is never fixed: his belt swings to the end.
     show: true,   // 1-5's light show (drawShow15) and her rage aura
-    lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, allLit: true, bossSeat: { x: 22, stand: [[86, 91]] }, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 232]],
+    lanes: 2, partners: ['haeun', 'jiwoo'], oneButton: true, laneSound: true, allLit: true, bossSeat: { x: 22, stand: [[91, 96]] }, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 232]],
     // 하은 goes over to him (she leaves her belt, walks down to beside him), stands there through the row, pulls his earbud out
     // at the record scratch, and walks back to start her metal; the camera closes in on him when his track opens and on the two
     // of them for the row
     // ...then shoves him aside (he stumbles back behind 반장 and stays there, his earbud hanging) and takes the middle, between
     // the belts, from where she loads both on her own (soloFrom: one loader, 하은)
     visit: { go: [96, 99.5], back: [125.5, 127.5], x: 80, top: 86, yank: 104, shove: 122.3, to: 'center' },
+    // the box he fumbles (earbuds in, loading sloppily): set down on the lurching belt at 89.6 it bounces up onto the upper belt
+    // into her box riding to 91, and both tumble off the far side; neither is in the chart (drawKnock)
+    knock: { at: 89.6, upper: 91 },
     soloFrom: 128, metalShift: 3, farLoaderDy: 14, farLoaderDx: 10, oneSpot: { x: 80, top: 96 },
     // the camera (no box lands while it is in close or easing out): his doze as a cutscene (him nodding off, her watching,
     // the two of them as she wakes him), his track opening, and the row: the two of them, then him knocked back and staring
@@ -1086,7 +1089,7 @@ const LEVELS = [
       '........', '........',
       '........', '........', 'h===..x.', 'x.x.x...', '........', '........', 'x...x...', 'h===....',
       '........', '........', '........', '........', '........', '........', '..x.x...', 'x.x.....',
-      '........', '........', 'x...x...', 'x...x...', 'h===..x.', 'x...x...', '........', '........',
+      '........', '........', 'x...x...', 'x...x...', 'h===....', 'x...x...', '........', '........',
       '........', '........', '........', '........', '........', '........',
       '........', '..x...x.', 'x.....x.', 'x...h=..', 'x.....x.', 'x...h=..',
       'h===....', 'h===....', 'x.....x.', 'x...h=..', 'x.xx.xx..x.x', 'xxxx.xx..xxx',
@@ -1101,7 +1104,7 @@ const LEVELS = [
       '........', '........',
       '.x...x..', '.x.x.x..', '........', '........', '.x.x.x.x', '.x...x.x', '.x...x..', '.....x.x',
       '........', '........', '........', '........', '........', '........', '.x.x.x.x', '.....x..',
-      '........', '........', '.x.x..x.', '.......x', '.....x.x', '..x..x..', '........', '........',
+      '........', '........', '.x.x..x.', '.......x', '.....x..', '..x..x..', '........', '........',
       '........', '........', '........', '........', '........', '........',
       '........', '........', '....h=..', '......x.', '....h=..', '......x.',
       '....h===', '....h===', '..x.h=..', '..x...x.', '.....x..', '.....x..',
@@ -1111,17 +1114,24 @@ const LEVELS = [
     ],
     // [beat, text, beats shown, lane, speaker]: 'h' 하은 (upper loading end), 'j' 지우 (lower), 'b' 반장 (on his crate)
     say: [[9, '누나, 이 비트 들어봐요!', 3, 1, 'j'], [12.5, '…일해.', 2, 0, 'h'],
+          // (why he dozes off later: he was up all night on the track)
+          [16, '(하암…) 이거 만드느라 어제 한숨도 못 잤거든요.', 3.5, 1, 'j'], [20, '…잠은 집에서 자.', 2, 0, 'h'],
           // the question that stays open into 1-6
           [24, '누나는 꿈이 뭐예요? 저는 이 곡으로 대회 나가는 거!', 4, 1, 'j'], [29, '…없어.', 2, 0, 'h'], [32, '에이, 하나쯤은 있잖아요.', 2.5, 1, 'j'],
           [35, '(시계를 본다)', 2, 0, 'h'],
           [41, '(꾸벅…)', 2.5, 1, 'j'], [47, '…지우?', 2, 0, 'h'], [53, '하… 진짜.', 2.5, 0, 'h'], [58.5, '(드르렁…)', 2, 1, 'j'],
           [61, '…야. 지우.', 1.5, 0, 'h'], [62.5, '넵! 안 잤어요!', 2.5, 1, 'j'], [66, '침이나 닦아.', 2, 0, 'h'],
           [73, '(흥얼흥얼) 여기서 드롭…!', 3.5, 1, 'j'], [81, '이어폰 빼.', 2, 0, 'h'], [83, '한 곡만요, 딱 한 곡만!', 3, 1, 'j'],
-          [86, '…내가 한다.', 2, 1, 'b'], [88.5, '반장님 앉아 계세요.', 2.5, 0, 'h'],
+          // the box he fumbles bounces up into hers and both go over the far side (knock); 반장 gets up for them with his bad back
+          [90.2, '앗!', 1.2, 1, 'j'], [91.5, '…내가 한다.', 2, 1, 'b'], [93.8, '반장님 앉아 계세요!', 2, 0, 'h'],
           [100, '야. 반장님 허리 다친 거 안 보여? 정신 차려.', 3.5, 1, 'v'], [104, '(이어폰 줄을 확 잡아뺀다)', 2, 1, 'v'],
           [106.5, '…아, 진짜.', 2, 1, 'j'], [109, '누나나 악바리로 해요.', 2.5, 1, 'j'], [112, '저는 제가 하고 싶은 대로 할 거라구요.', 3, 1, 'j'],
           [116.5, '…니 맘대로 할 거면…', 2.5, 1, 'v'], [119.5, '꺼져, 그냥.', 2, 1, 'v'], [122, '(지우를 확 밀쳐낸다) 비켜.', 2, 1, 'v'],
-          [124.5, '…어?', 1.5, 1, 'k'], [126.5, '와… 진짜 밀었어요?', 2.5, 1, 'k']],
+          [124.5, '…어?', 1.5, 1, 'k'], [126.5, '와… 진짜 밀었어요?', 2.5, 1, 'k'],
+          // her beat, thrown at him before the metal: the answer to '누나, 이 비트 들어봐요'. He hears it from behind 반장 (the
+          // last stretch, where his synth comes in under her metal: he can't help counting along)
+          [130, '비트? …잘 봐.', 2.5, 1, 'v'],
+          [196.5, '…뭐야, 저 박자.', 2.5, 1, 'k'], [200, '(저도 모르게 발로 박을 센다)', 2.5, 1, 'k']],
     comfort: ['…괜찮다. 다음 거.', '…박 봐라.'],
     intro: [
       { who:'', text:'며칠 뒤. 명절 물량은 그대로다. 반장님은 허리 때문에 의자에 앉았다.' },
@@ -1168,6 +1178,7 @@ const LEVELS = [
       { who:'반장', text:'힘든 애야.', scene:'office' },
       { who:'지우', text:'…뭐가 힘든데요? 누나는 꿈 같은 것도 없대요. 맨날 시계만 보고.', scene:'office', jpose:'think' },
       { who:'반장', text:'…꿈 생각할 틈이 없는 애다.', scene:'office' },
+      { who:'지우', text:'…근데 누나 손은요. 아까 그 박자, 진짜던데.', scene:'office', jpose:'think' },
       { who:'반장', text:'사과, 미루지 마라.', scene:'office' },
       { who:'지우', text:'…네.', scene:'office', jpose:'down' },
       { who:'', text:'반장님은 카드꽂이에서 하은 누나 카드를 꺼내 한참 들여다봤다.', scene:'office', jpose:'down' }] : [
@@ -2303,6 +2314,34 @@ function drawTosses(t) {
     if (!n.tossFx) { n.tossFx = true; if (ctx) noise(ctx.currentTime, 'bandpass', 1200, 0.06, 0.12, 1.4, bus); }
     const p = (t - (n.place - fly)) / fly, x = lerp(x0, x1, p), y = lerp(y0, y1, p) - Math.sin(Math.PI * p) * 16;
     g.save(); g.translate(x, y); g.rotate((1 - p) * -0.6); drawBox(n, 0, 0, '', t); g.restore();
+  }
+}
+// 1-5: 지우, earbuds in and loading sloppily, sets a box down on the edge of the lurching belt; the chug tosses it, it bounces up
+// onto the upper belt into 하은's box, and the two of them tumble off the far side (neither is scanned: both are left out of the
+// chart). 반장 gets up for them with his bad back, and that is what brings 하은 down to 지우.
+function drawKnock(t) {
+  const K = L.knock, b = beatAt(t); if (b < K.upper - TRAVEL - 0.2 || b > K.at + 3) return;
+  const tk = timeAt(K.at), fly = 0.55 * SPB, tHit = tk + fly, tumble = 1.0 * SPB;
+  const her = { w: 18, h: 13, lane: 0 }, his = { w: 17, h: 12, lane: 1 };
+  const hx0 = PLACE_X + LANE_DX[1] + 2, hy0 = BELT_Y;   // his, just set down at the loading end of the lower belt
+  const herArr = timeAt(K.upper), herX = tt => SCAN_X + (tt - herArr) * SPEED + LANE_DX[0], herY = BELT_Y + LANE_DY[0];
+  if (t < tHit) {
+    if (t >= herArr - TRAVEL * SPB) drawBox(her, herX(t), herY, '', t);   // hers rides the upper belt like any box
+    if (t >= tk - 0.5 * SPB && t < tk) drawBox(his, hx0, hy0, '', t);   // his, set down crooked on the edge
+    else if (t >= tk) {   // the chug pops it: up and over onto the upper belt, turning, into hers
+      if (!FX.knockFx) { FX.knockFx = 1; if (ctx) noise(ctx.currentTime, 'bandpass', 900, 0.1, 0.1, 1.5, bus); }
+      const p = (t - tk) / fly, x = lerp(hx0, herX(tHit) - 8, p), y = lerp(hy0, herY, p) - Math.sin(Math.PI * p) * 26;
+      g.save(); g.translate(x, y); g.rotate(p * 2.2); drawBox(his, 0, 0, '', t); g.restore();
+    }
+  } else if (t < tHit + tumble) {
+    if (FX.knockFx === 1) { FX.knockFx = 2; if (ctx) { noise(ctx.currentTime, 'lowpass', 500, 0.25, 0.14, 0.8, bus); noise(ctx.currentTime + 0.06, 'bandpass', 1600, 0.08, 0.22, 1.2, bus); }
+      if (!reduce) spawn(herX(tHit), herY - 8, 10, ['rgba(200,170,120,.6)', 'rgba(120,100,80,.5)'], -30, 30, -50, -10, 300, 500, [2, 1]); }
+    // the hit: both go over the far edge of the upper belt, turning, and drop out of sight behind it
+    const p = (t - tHit) / tumble, x = herX(tHit);
+    g.save(); g.beginPath(); g.rect(0, 0, W, herY - 5); g.clip();
+    for (const [n, dx, rot] of [[her, 10, 1], [his, -6, -1]]) { const px = x + dx + p * 12 * Math.sign(dx), py = herY - 8 - Math.sin(Math.PI * Math.min(1, p * 1.4)) * 16 + p * p * 70;
+      g.save(); g.translate(px, py); g.rotate(rot * p * 3); drawBox(n, 0, 0, '', t); g.restore(); }
+    g.restore();
   }
 }
 // 1-5: 지우's belt's bad motor, hung under the loading end of the lower belt: a housing that shudders on every chug (a heavy one
@@ -3646,6 +3685,7 @@ function drawScene(t, bt, active, nowMs) {
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
   if (L.toss && active) drawTosses(t);
+  if (L.knock && active) drawKnock(t);
   if (L.visit && active) drawVisit(beatAt(t), nowMs);
   if (L.lanes === 2 && !L.allLit) drawIdleShade(t, nowMs, active);
   if (L.dock) drawDockFront(dockBeat, t, nowMs, active); else if (L.lanes === 2) drawPairBolt(nowMs);
@@ -5224,7 +5264,7 @@ let progress = {};
 try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}; } catch (e) {}
 
 function resetRun() {
-  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.jamFx = false; n.tossFx = false; }); BANG.done = false; FX.yankFx = false;
+  notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.jamFx = false; n.tossFx = false; }); BANG.done = false; FX.yankFx = false; FX.knockFx = 0;
   FX.particles = []; FX.marks = []; FX.yankFx = false; FX.shoveFx = false; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.splashes = []; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9; FX.goodBoth = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
   rings = []; heavyPend = null;
