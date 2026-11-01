@@ -1046,38 +1046,39 @@ const LEVELS = [
   ,{
     id:'s1-5', stageNo:'1-5', who:'지우 + 하은', role:'지우 · 하은 · 104 BPM · 벨트 둘', tag:'둘의 다툼 · 메탈', bpm:104, style:'duo15', fxTheme:'blues',
     // 지우 is back (반장 is not in this one). 지우 loads the upper belt and 하은 the lower, and you scan both with one button as
-    // in 1-4, every light on the whole way, every box on the beat. Their fight is played on the belts: 지우 loads any old way and
-    // his boxes rock and fall off the upper belt onto hers ('d' on the lower belt: scanned at her gate), first by accident, more
-    // and more as he slacks. No tutorial: the shift starts after the intro, in two phases.
-    // Phase 1 (lo-fi, then his future funk): their bars, his boasting, a box of his falling onto her belt; he dozes (a cutscene);
-    // his track opens in his earbuds and his boxes rain onto her belt; she warns him twice, climbs the stairs to his deck, pulls
-    // his earbud out (a record scratch, the band cut), they row in the silence and she shoves him back along his deck.
-    // Phase 2 (a diss battle): her boom bap gone hard against his funk, bar for bar - her turns on her belt, his on his, and now
-    // he drops his boxes onto hers on purpose; then the two of them at once, and a last hit on both belts.
+    // in 1-4, every light on the whole way, every box on the beat. Their fight is played on the belts: 지우 throws his boxes up
+    // any old way and some miss, tumbling down onto 하은's belt ('d' on the lower belt: scanned at her gate) - by accident at
+    // first, then a rain of them while he is in his music, then on purpose. No tutorial: the shift starts after the intro.
+    // Phase 1 (lo-fi, then his future funk): his "3-pointer" that lands on her belt, his contest, her days off ("…일."); he
+    // dozes (a cutscene); his track in his earbuds and his boxes raining onto her belt; two warnings; she climbs the stairs to
+    // his deck and pulls his earbud out (a record scratch, the band cut); the row in the silence; she shoves him back along
+    // his deck. Phase 2: he answers with a beat - a diss battle (a song with both of them rapping, made in Gemini; for now a
+    // stand-in beat): his turns throw boxes at her belt on purpose, hers slam her own on the beat, then both at once.
     show: true,   // 1-5's light show (drawShow15) and their auras
-    lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 232]], unplugMuffle: false,
+    lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 300]], unplugMuffle: false,
     // the row: she crosses to the stairs at the upper belt's left end and climbs to his deck, stands with him, pulls his earbud
     // out at the record scratch, shoves him back along his deck (he stares, then walks back to his belt) and goes back down
     visit: { go: [95.5, 99.5], back: [126, 128], yank: 104, shove: 122.3, ret: [128.5, 130.5] },
     stairs: { x: 86, dx: -2, dy: 7, steps: 4 },   // at the upper belt's left end, from his deck down to the floor
     metalShift: 3, farLoaderDy: 14, farLoaderDx: 22, dropLead: 1,
     // phase 2's turns, by bar: hers, his, or both at once
-    battle: { h: [[32, 36], [38, 40], [42, 43], [44, 45]], j: [[36, 38], [40, 42], [43, 44], [45, 46]] },
+    // (the song's plan: his intro 32-35, his verse 36-43, hers 44-51, two bars each 52-59, a bar each 60-63, both 64-71)
+    battle: { h: [[44, 52], [54, 56], [58, 60], [61, 62], [63, 64]], j: [[32, 44], [52, 54], [56, 58], [60, 61], [62, 63]] },
     // the camera (no box lands while it is in close or easing out): his doze as a cutscene (him nodding off, her watching,
     // the two of them as she wakes him), his track opening, and the row: the two of them, then him knocked back and staring
     camPlay: [[40.5, 46, { x: 104, y: 84, k: 2.2 }], [46, 57, { x: 56, y: 108, k: 2 }], [57, 62.5, { x: 76, y: 96, k: 1.5 }],
       [72, 78, { x: 104, y: 84, k: 1.8 }], [96, 122.3, { x: 90, y: 92, k: 1.5 }], [122.3, 128, { x: 108, y: 88, k: 1.6 }]],
     cutscene: [[40.5, 62.5], [96, 128]],   // letterboxed
-    devMarks: [[0, '처음'], [16, '대회 얘기'], [36, '졸음 컷씬'], [68, '지우 음악·떨어뜨림'], [92, '이어폰·다툼·밀치기'], [128, '2페이즈 디스 배틀'], [168, '둘이 동시에'], [184, '끝판'], [212, '마지막 한 방']],
+    devMarks: [[0, '처음'], [8, '3점슛'], [36, '졸음 컷씬'], [68, '지우 음악·떨어뜨림'], [92, '다툼·밀치기'], [128, '배틀 도발'], [144, '지우 벌스'], [176, '하은 벌스'], [208, '주고받기'], [240, '브레이크다운'], [256, '끝판'], [288, '마지막 한 방']],
     farBeltLeft: 36,   // the upper belt runs on to the left, past his legs, up to the stairs
     heads: { j: [104, 58], h: [52, 82], v: [86, 58], k: [130, 58] },
     clock:'03:20', title:'꿈', offTilt: true,
     chords: S15.lofi.ch, roots: S15.lofi.rt, chordAt: bar => bar % 4,
-    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 232,
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 300,
     hints: false, special:['떨어진 상자', 'drop', '받아냄'],
-    sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [32, 'diss'], [54, 'finale'], [55, 'end'], [56, 'outro']],
-    // phase 2 runs away with her, a step at a time, up to 112 for the last four bars
-    tempo: [[0, 104], [136, 106], [144, 108], [160, 110], [200, 112]],
+    sections: [[0, 'intro'], [2, 'lofi'], [18, 'funk'], [26, 'clash'], [27, 'silence'], [32, 'diss'], [72, 'finale'], [73, 'end'], [74, 'outro']],
+    // one tempo throughout (the battle song is made at 104)
+    tempo: [[0, 104]],
     // upper belt: 하은, on the beat (8 cells; h= a long crate, held). Phase 1: her taps and long crates on their own, and alone
     // through his doze. Phase 2 (bars 29-50, her alone in the middle on both belts) follows the metal's guitar: a tap on each
     // bar's first chug, a long crate where a chord rings (riff A: G on the third beat, a beat long; riff B: D on the third
@@ -1085,54 +1086,66 @@ const LEVELS = [
     // her straight belt on the gallop's triplet grid (12 cells a bar, like the music: the beat and two thirds in, then the
     // whole triplet), and now and then a single box drops onto his belt on a swung 'and' (two thirds in, the gallop's own
     // slot) where hers has a gap, never together with one of hers; the last bar all hers. Then the last hit on both belts
-    // upper belt: 지우 (8 cells, every box on the beat). Phase 1: his bars, sparse after his doze and in his music. Phase 2: his
-    // turns, and both of them at once at the end
+    // upper belt: 지우 (8 cells, every box on the beat). Phase 1: his bars, sparse after his doze and in his music. Phase 2 by the
+    // song: his intro and verse, his turns in the trading, a held crate in each of his breakdown bars, both at the end
     bars: [
       '........', '........',
       'x...x...', 'x.x.x...', '........', '........', 'x.x.x.x.', 'x...x.x.', '..x...x.', '....x.x.',
       '........', '........', '........', '........', '........', '........', '......x.', '........',
       '........', '........', '......x.', '........', '....x...', '........', '........', '........',
       '........', '........', '........', '........', '........', '........',
-      '........', '........', '........', '........', 'x...x...', 'x.x.....', '........', '........',
-      'x...x...', 'x.x.x...', '........', 'x...x...', '........', 'x...x...', '....h===', '....h===',
-      '....x...', 'x.x.x...', 'x...x...', 'x.x.x...', 'x.x.x.x.', 'x.x.x.x.', 'x.......',
-      '........', '........', '........'
+      '........', '........', 'x...x...', 'x.x.x...',
+      'x...x...', 'x.x.....', 'x...x...', 'x.x.....', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.',
+      '........', '........', '........', '........', '........', '........', '........', '........',
+      'x...x...', 'x.x.....', '........', '........', 'x...x...', 'x.x.x...', '........', '........',
+      'h=======', '........', 'h=======', '........',
+      'x...x...', 'x...x...', 'x.x.x.x.', 'x...x...', 'x...x...', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.',
+      'x.......', '........', '........'
     ],
-    // lower belt: 하은 (8 cells, on the beat; h= a long crate, held) and the boxes he drops onto it ('d': they come along the
-    // upper belt, rock, fall off a beat before her gate and are scanned there). Phase 1: her bars, two of his falling by
-    // accident, then a rain of them while he is in his music. Phase 2: her turns, his turns dropping onto her on purpose, both
+    // lower belt: 하은 (8 cells, on the beat; h= a long crate, held) and his boxes that miss and fall onto it ('d', written
+    // where they are scanned: he throws them two beats before). Phase 1: two by accident, then a rain while he is in his music.
+    // Phase 2: his verse throwing at her belt on purpose, her verse and her turns on her own, both at the end
     bars2: [
       '........', '........',
       '........', '......d.', 'h===..x.', 'x.x.x...', '........', '..d.....', 'x...x...', 'h===....',
       '........', '........', '........', '........', '........', '........', '..x.x...', 'x.x...d.',
       '........', '........', 'x.d.x...', 'x.d.x.d.', 'h===..x.', 'x.d.x.d.', '........', '........',
       '........', '........', '........', '........', '........', '........',
-      '........', 'x...x...', 'x.x.x.x.', 'x...h=..', '..d...d.', '....d.d.', 'x.x.x.x.', 'h===..x.',
-      '..d...d.', '......d.', 'x.x.x.x.', '..d...d.', 'x.x.x.x.', '..d...d.', 'h===....', 'h===....',
-      '..d...d.', '......d.', '..d...d.', '......d.', 'x...x...', 'x...x...', 'x.......',
-      '........', '........', '........'
+      '........', '........', '........', '........',
+      '..d...d.', '....d.d.', '..d...d.', '....d.d.', '..d...d.', '......d.', '..d.d.d.', '........',
+      'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.', 'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.',
+      '..d...d.', '....d.d.', 'x.x.x.x.', 'h===..x.', '..d.d.d.', '......d.', 'x.x.x.x.', 'x.x.x.x.',
+      '........', 'h=======', '........', 'h===....',
+      '..x...x.', '..d...d.', 'x...x...', '..d...d.', '..x...x.', '..d...d.', 'x.x.x.x.', 'x.x.x.x.',
+      'x.......', '........', '........'
     ],
     // [beat, text, beats shown, lane, speaker]: 'h' 하은 (upper loading end), 'j' 지우 (lower), 'v' 하은 beside him, 'k' 지우 shoved aside
-    say: [[9, '누나, 이 비트 들어봐요!', 3, 0, 'j'], [12.5, '…일이나 해.', 2, 1, 'h'], [15.6, '앗, 죄송!', 1.5, 0, 'j'],
-          // his plans out loud, and her answer is her watch (what she has room for is shown, never said)
-          [22, '형, 저 이 곡으로 대회 나갈 거예요!', 3.5, 0, 'j'], [26, '(시계를 본다)', 2, 1, 'h'],
-          [41, '(꾸벅…)', 2.5, 1, 'j'], [47, '…지우?', 2, 0, 'h'], [53, '하… 진짜.', 2.5, 0, 'h'], [58.5, '(드르렁…)', 2, 1, 'j'],
-          [61, '…야. 지우.', 1.5, 0, 'h'], [62.5, '넵! 안 잤어요!', 2.5, 1, 'j'], [66, '침이나 닦아.', 2, 0, 'h'],
-          [73, '(흥얼흥얼) 여기서 드롭…!', 3.5, 1, 'j'], [81, '이어폰 빼.', 2, 0, 'h'], [83, '한 곡만요, 딱 한 곡만!', 3, 1, 'j'],
-          [88.5, '야… 저기 택배 쌓인 거 안 보여?', 2.5, 0, 'h'], [92, '야. 제대로 안 해? 정신 차려.', 3, 0, 'h'],
-          [104, '(이어폰 줄을 확 잡아뺀다)', 2, 1, 'v'],
-          [106.5, '…아, 진짜.', 2, 1, 'j'], [109, '누나, 대체 왜 그래요?', 2.5, 1, 'j'], [112, '저도 제 리듬이 있다구요.', 3, 1, 'j'],
-          [116.5, '…니 맘대로 할 거면…', 2.5, 1, 'v'], [119.5, '꺼져, 그냥.', 2, 1, 'v'], [122, '(지우를 확 밀쳐낸다) 비켜.', 2, 1, 'v'],
-          [124.5, '…어?', 1.5, 1, 'k'], [126.5, '와… 진짜 밀었어요?', 2.5, 1, 'k']],
+    say: [[6, '누나, 이 비트 들어봐요!', 3, 0, 'j'], [9.5, '…일이나 해.', 2, 1, 'h'],
+          // his "3-pointer" misses and lands on her belt: the rule, shown
+          [12, '형, 이거 봐요. 3점—', 2, 0, 'j'], [14.5, '앗… 죄송! 손이 미끄러졌어요.', 2.5, 0, 'j'], [17.5, '…', 1.5, 1, 'h'],
+          // his plans out loud; hers is one word (what she has room for is shown, never said)
+          [21, '형, 저 이 곡으로 대회 나갈 거예요!', 3.5, 0, 'j'], [25, '누나는 쉬는 날 뭐 해요?', 2.5, 0, 'j'], [28, '…일.', 1.5, 1, 'h'], [30, '(시계를 본다)', 2, 1, 'h'],
+          [41, '(꾸벅…)', 2.5, 0, 'j'], [47, '…지우?', 2, 1, 'h'], [53, '하… 진짜.', 2.5, 1, 'h'], [58.5, '(드르렁…)', 2, 0, 'j'],
+          [61, '…야. 지우.', 1.5, 1, 'h'], [62.5, '넵! 안 잤어요!', 2.5, 0, 'j'], [66, '침이나 닦아.', 2, 1, 'h'],
+          [73, '(흥얼흥얼) 여기서 드롭…!', 3.5, 0, 'j'], [81, '이어폰 빼.', 2, 1, 'h'], [83, '한 곡만요, 딱 한 곡만!', 3, 0, 'j'],
+          [88.5, '야. 네 거 다 내 쪽으로 떨어지잖아.', 3, 1, 'h'], [92, '…제대로 안 해?', 2.5, 1, 'h'],
+          // the row on his deck ('v' her beside him)
+          [100, '야.', 1.5, 0, 'v'], [104, '(이어폰 줄을 확 잡아뺀다)', 2, 0, 'v'],
+          [106, '…아, 진짜. 누나, 왜 그래요?', 2.5, 0, 'j'], [108.5, '네가 던진 거, 누가 받는 줄 알아?', 3, 0, 'v'],
+          [111.5, '몇 개 떨어진 거 갖고… 저도 제 리듬이 있다구요.', 3.5, 0, 'j'], [115, '…네 리듬 때문에 내 박이 다 꼬여.', 2.5, 0, 'v'],
+          [117.5, '누나는 맨날 박, 시계, 박, 시계… 숨 막혀요.', 3, 0, 'j'], [120.5, '…꺼져, 그냥.', 1.5, 0, 'v'], [122, '(지우를 확 밀쳐낸다) 비켜.', 2, 0, 'v'],
+          [124.5, '…어?', 1.5, 0, 'k'], [126.5, '…와. 진짜 밀었어요?', 2.5, 0, 'k'],
+          // back at his belt he answers with a beat: the battle
+          [129, '좋아요. 그럼 박으로 해요.', 2.5, 0, 'j'], [132, '누나 박이 그렇게 잘났으면, 따라와 봐요!', 3, 0, 'j']],
     comfort: [],   // nobody steadies you here
     intro: [
       { who:'', text:'며칠 뒤. 명절 물량은 그대로다.' },
-      { who:'지우', text:'형! 저 왔어요! …아, 누나가 하은 누나죠? 지우예요! 잘 부탁해요!' },
-      { who:'하은', text:'(시계를 본다) …응. 아래는 내가.' }],
+      { who:'지우', text:'형! 저 왔어요! …아, 누나가 하은 누나죠? 지우예요! 저 위에서 할게요, 위가 뷰가 좋거든요!' },
+      { who:'하은', text:'(시계를 본다) …떨어뜨리지만 마.' }],
     // the outro sets up 1-6 (her last night, her mother in hospital) without saying any of it: she is gone the moment the shift
     // ends, and on the notice board 지우 finds next week's rota with her name in every row, day and night; he puts his earbuds away
     outro: (good) => good ? [
-      { who:'', text:'일이 끝났다. 아무도 먼저 말하지 않았다.' },
+      { who:'', text:'비트가 끊겼다. 둘 다 숨을 몰아쉬었다. 아무도 먼저 말하지 않았다.' },
       { who:'하은', text:'(시계를 본다) …먼저 갈게.' },
       { who:'', text:'휴게실. 하은 누나는 벌써 카드를 찍고 나갔다.', scene:'office', office: { j: 184 }, jpose:'down' },
       { who:'지우', text:'형… 제가 많이 잘못했나요?', scene:'office', jpose:'down' },
@@ -1279,9 +1292,9 @@ function prepNote(n, i, level) {
   if (n.push) { n.arr0 = timeAt(n.beat0); n.place = n.arr0 - TRAVEL * SPB; n.tPush = n.arr0 - (SCAN_X - INSPECT_X) / SPEED; n.k = (SCAN_X - INSPECT_X) / ((n.arr - n.tPush) * SPEED); }
   // a grabbed box rides to her post, waits there in her hand for the half beat, and goes on at the belt's speed
   if (n.grab) { n.arr0 = timeAt(n.beat0); n.place = n.arr0 - TRAVEL * SPB; n.tPass = n.arr0 - (SCAN_X - INSPECT_X) / SPEED; n.tRel = n.tPass + (n.arr - n.arr0); }
-  // a dropped box ('d' on the lower belt, 1-5): loaded onto the upper belt by its loader, it rides there, wobbles and falls off
-  // onto the lower belt dropLead beats before it reaches the gate (the fall takes a quarter of a beat), and is scanned below
-  if (n.drop) { n.tFall = timeAt(n.beat - (level.dropLead || 1)); n.fallDur = 0.25 * SPB; }
+  // a dropped box ('d' on the lower belt, 1-5): the upper belt's loader throws it any old way at the upper belt's loading end
+  // and it misses, tumbling down onto the lower belt's loading end (a third of a beat), rides that belt and is scanned below
+  if (n.drop) { n.tFall = n.place; n.fallDur = SPB / 3; }
   if (n.jam && level.jam) { const m = n.jg.length, R = n.jg[0].beat - level.jam.dash; n.leave = timeAt(n.beat - level.jam.dash); n.jR = timeAt(R); n.place = timeAt(Math.floor(R - 1) - (m - 1 - n.jk)); }
   if (n.len) { n.w = Math.round((n.end - n.arr) * SPEED) + 16; n.h = 12; }
   else if (n.heavy) { n.w = 26 + Math.floor(rnd(i, 1) * 5); n.h = 17 + Math.floor(rnd(i, 2) * 4); }
@@ -1770,7 +1783,7 @@ function basePose(t, bt, active, lane = 0) {
 // belt from her hip, and alone between the belts from beside her on either side
 function carryFrom(n) {
   if (L.lanes === 2 && DUO.mode !== 'two' && L.oneSpot) return n.lane === 0 ? { x: 47, y: 155, arc: 8 } : { x: 70, y: 122, arc: 6 };
-  if (L.lanes === 2 && DUO.mode === 'two' && loadLane(n) === 0 && L.farLoaderDy) return { x: 54, y: 132, arc: 8 };
+  if (L.lanes === 2 && DUO.mode === 'two' && loadLane(n) === 0 && L.farLoaderDy) return { x: 54, y: 132, arc: n.drop ? 22 : 8 };
   return { x: L.lanes === 2 ? 28 : 16, y: 112, arc: 14 };
 }
 function carryPos(n, p) {
@@ -2216,7 +2229,7 @@ function drawShow15(t, nowMs) {
     ember(red ? ['#ff5a2a', '#ffb03a'] : ['#5ad7ff', '#bfe9ff']);
     return;
   }
-  if (sec === 'finale') { add('255,255,255', 0.95 * Math.exp(-(b - 204) * 1.4)); if (crossed && inBar === 0) punch(1.14, 600, 5); return; }
+  if (sec === 'finale') { const f0 = (L.sections.find(x => x[1] === 'finale') || [51])[0] * 4; add('255,255,255', 0.95 * Math.exp(-(bA - f0) * 1.4)); if (crossed && inBar === 0) punch(1.14, 600, 5); return; }
   if (sec === 'end' || sec === 'outro') dim(0.35);
 }
 // her rage in phase 2 (and his in phase 3): a fire-coloured glow behind her that flares on the beat; a cyan one behind him
@@ -2822,8 +2835,6 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
       }
       // an off-beat box was set down crooked: it leans, and its tape is red
       if (n.jam && t >= n.leave && t < n.arr) for (let k = 0; k < 3; k++) R(Math.round(x - n.w / 2 - 6 - k * 5), BELT_Y - 4 - k * 4, 4 + k, 1, 'rgba(255,255,255,.55)');   // thrown: speed lines
-      // a box he set down any old way: it rocks harder and harder and goes over the edge
-      if (n.drop && t < n.tFall) { const w = Math.max(0, 1 - (n.tFall - t) / (0.75 * SPB)); g.save(); g.translate(x, BELT_Y); g.rotate(Math.sin(t * 38) * 0.08 * w + 0.35 * w * w * w); drawBox(n, 0, 0, n.state, t, sq); g.restore(); continue; }
       if (n.off && L.offTilt && !n.top) { g.save(); g.translate(x, BELT_Y); g.rotate((n.i % 2 ? 1 : -1) * 0.12); drawBox(n, 0, 0, n.state, t, sq); g.restore(); }
       else drawBox(n, x, n.top ? BELT_Y - 12 : BELT_Y, n.state, t, sq);
     }
@@ -2844,8 +2855,8 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   // the arm to the far belt is drawn in screen space so it stays on the body; only the hand goes through the perspective
   if (far && DUO.mode === 'two' && !(active && shovedAt(castBeatAt(t, active)))) { const who = pid, o = placerOff(0), h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
 }
-// a dropped box in the air: off the upper belt's edge (its far, smaller picture) down onto the lower belt, turning over; a thud,
-// a puff of dust and a jolt when it lands
+// a thrown box that missed, in the air: from the upper belt's loading end (its far, smaller picture) down onto the lower belt's,
+// turning over; a thud, a puff of dust and a jolt when it lands
 function drawDropFall(n, t, nowMs) {
   const p = Math.min(1, (t - n.tFall) / n.fallDur), x = SCAN_X + (t - n.arr) * SPEED;
   const x0 = farX(x), y0 = farY(BELT_Y), k = lerp(FAR.k, 1, p), y = lerp(y0, BELT_Y, p * p) - Math.sin(Math.PI * p) * 6;
