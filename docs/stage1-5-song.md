@@ -1,6 +1,6 @@
 # 1-5 노래: 하은의 랩 두 곡 — 제미나이(Lyria) 프롬프트
 
-**세 라운드**: 2페이즈(1라운드)는 아래의 "You Play, I Pay"(94), 3페이즈(2라운드)는 느린 곡 "The Lazy Shift"(`prototype/audio/1-5-the-lazy-shift.mp3`, 91.98초, 실측 75.5 BPM, 28마디, 첫 다운비트 0.068초, 끝에 테이프 정지), 4페이즈(3라운드, 절정)는 새 곡(100 BPM 하프타임, 무겁고 파워풀하게, Final 벌스 하나만, 프롬프트는 이 문서 끝). The Lazy Shift 마지막 줄 "You want it faster? … Play me another."가 절정으로 넘어가는 다리.
+**세 라운드**: 2페이즈(1라운드)는 아래의 "You Play, I Pay"(94), 3페이즈(2라운드)는 느린 곡 "The Lazy Shift"(`prototype/audio/1-5-the-lazy-shift.mp3`, 91.98초, 실측 75.5 BPM, 28마디, 첫 다운비트 0.068초, 끝에 테이프 정지), 4페이즈(3라운드, 절정)는 "Your Beat, My Belt"(`prototype/audio/1-5-your-beat-my-belt.mp3`, 프롬프트와 실측은 이 문서 끝). **게임에서는 세 곡 모두 첫 훅(Hook 1)까지만** 쓰고 스크래치로 끊는다(절정 곡은 짧아서 끝까지).
 
 
 1-5 2페이즈(32–72마디)에 깔 곡. 다툼 끝에 하은이 지우를 밀쳐내자, 자기 벨트로 돌아온 지우가 "좋아요. 그럼 박으로 해요. 누나 박이 그렇게 잘났으면, 따라와 봐요!" 하고 자기 비트를 튼다. **지우는 비트로 도발하고(가사 없음, 으스스한 멜로디 리프 + 상자 던지기), 하은이 그 비트를 뺏어 랩으로 받아친다.** 랩은 하은 혼자. **95 BPM**, 4/4, A 단조(어두운 반음 하강 루프), **2:34**(61마디). 게임은 정적이 끝나는 128박부터 95. 1-6 노래처럼 글로벌 출시용 영어 가사(한국어는 자막).
@@ -231,3 +231,5 @@ BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
 [Ending]
 (one huge hit, then silence)
 ```
+
+**받은 곡**: `prototype/audio/1-5-your-beat-my-belt.mp3`(62.85초, 실측 105.0 BPM, 첫 다운비트 0.236초, 26마디 + 마지막 한 방, 60.1초부터 정적). 받아쓰기(whisper)로 찾은 실제 구조(곡 마디): 0–3 Tick-tock ×4, 4–11 "You play, I pay" 벌스(줄마다 반 박쯤 앞서 들어감), 12–21 브레이크다운(드럼이 빠지고 짝수 마디에 붐 한 번; Tick-tock, "What's it for? Somebody's waiting.", "That's the beat. Keep time.", "You throw it, I catch it…", "Your beat, my belt…", "Can't keep up? Watch me" — 1라운드 브레이크다운·3절 가사를 제미나이가 넣음), 22–25 전부("One more box, one more drop", Tick-tock ×2, "But the clock… watch it drop"), 26 마지막 한 방. 게임 76–102마디(`docs/stage1.md` 4페이즈 표).
