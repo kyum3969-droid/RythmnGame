@@ -1065,8 +1065,9 @@ const LEVELS = [
     hitKit: 'ticktock', bareBand: true,
     // from phase 3 the stage (drawStage15): the turn into it on beat 216; in her round (from 304) her boxes thrown hard, the belt
     // tipping towards him, him pushed back a step every four bars as his light goes; in her last fast verse every box is hers
-    // the final on two belts (from 304): his from his end to hers, hers from hers to his, trading across the scanner
-    stage: { from: 216, two: 304, fast: 304, push: [304, 460], hers: [[428, 461]], tilt: [[304, 0], [392, 0.02], [428, 0.045], [459.9, 0.08], [460, 0]] },   // a tick for his belt, a tock for hers: no pitch, so they sit with his beat and the song
+    // the final on two belts (from 304): she storms both of them at him (the upper belt takes the upper lane's boxes, the lower
+    // the lower's); he stands at their far end trying to lift a box to throw back and is knocked back a step every four bars
+    stage: { from: 216, two: 304, fast: 304, push: [304, 460], hers: [[304, 461]], tilt: [[304, 0], [392, 0.02], [428, 0.045], [459.9, 0.08], [460, 0]] },   // a tick for his belt, a tock for hers: no pitch, so they sit with his beat and the song
     slam: [[160, 999]],   // from her first verse she slams her boxes down rather than carrying them
     // phase 2's turns, by bar: hers, his, or both at once
     // the battle is recorded songs with her rapping alone, three rounds, each song cut after its first hook. Round one (phase
@@ -2985,7 +2986,7 @@ function drawPops(nowMs) {
 // the right (whose turn it is reads off which way they run); his slide in slow, hers are thrown hard in the last round. In
 // her round the belt tips down towards him, his light goes out a little at a time and he is pushed back a step every four
 // bars; in the last fast verse every box is hers. Playing is unchanged: one button, the same chart (L.stage)
-const STG = { on: false, cx: W / 2, hx: 40, jx: 344, dyLo: 0, dyHi: 0 };
+const STG = { on: false, cx: W / 2, hx: 40, jx: 344, dyLo: 0, dyHi: 0, box: { w: 14, h: 12, lane: 0 } };
 const pw = (pts, b) => { if (!pts || !pts.length) return 0; if (b <= pts[0][0]) return pts[0][1]; for (let i = 1; i < pts.length; i++) if (b < pts[i][0]) { const [a, va] = pts[i - 1], [z, vz] = pts[i]; return va + (vz - va) * (b - a) / (z - a); } return pts[pts.length - 1][1]; };
 // the turn into the stage: the factory turns and goes dark over the beat and a half before it, the stage turns back in over the
 // beat and a half after
@@ -3009,15 +3010,15 @@ function stageJiwoo(b) {
   const S = L.stage, p0 = S.push ? S.push[0] : 1e9;
   if (b < p0) return { dx: 0, light: 1, stumble: 0 };
   const k = Math.floor((b - p0) / 16), f = ((b - p0) % 16) / 0.7, steps = Math.min(k, 9);
-  const dx = Math.min(24, (steps + (k < 10 ? ease(Math.min(1, f)) : 0)) * 2.4), stumble = k < 10 && f < 1 ? Math.sin(f * Math.PI) : 0;
-  return { dx: Math.round(dx), light: 1 - 0.75 * Math.min(1, (b - p0) / (S.push[1] - p0)), stumble };
+  const dx = Math.min(26, (steps + (k < 10 ? ease(Math.min(1, f)) : 0)) * 2.9), stumble = k < 10 && f < 1 ? Math.sin(f * Math.PI) : 0;
+  return { dx: Math.round(dx), light: 1 - 0.75 * Math.min(1, (b - p0) / (S.push[1] - p0)), stumble, k, f: (b - p0) % 16 };
 }
 function drawStage15(t, nowMs, sv) {
   STG.on = true;
   const b = beatAt(t), S = L.stage, bar = Math.floor(b / 4), sec = sectionAt(bar), cx = STG.cx;
   // one belt across the middle in round two; in the final, two: his (the upper one, from his end to hers) and hers (the
   // lower, from her end to his), the two of them trading boxes across the scanner
-  const two = S.two != null && b >= S.two, yOf = side => two ? (side < 0 ? 136 : 108) : 122, midY = two ? 122 : 122;
+  const two = S.two != null && b >= S.two, yOf = n => two ? (n.lane === 0 || n.up ? 108 : 136) : 122, midY = 122;
   STG.dyLo = (two ? 136 : 122) - BELT_Y; STG.dyHi = (two ? 108 : 122) - BELT_Y + 36;
   const FY = two ? 157 : 143;
   const shakeA = Math.max(nowMs < FX.shakeUntil ? FX.shakeAmp || 1 : 0, FX.rumble || 0);
@@ -3054,30 +3055,42 @@ function drawStage15(t, nowMs, sv) {
   cone(jx, jl * (0.85 + 0.25 * beatK * (turn === 'j' ? 1 : 0)), '150,215,255', 8, 34);
   cone(cx, 0.5, '255,250,235', 5, 26);
   const glow = (x, y, col, k) => { if (k <= 0.02) return; g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 3, x, y, 38 + 8 * beatK); gr.addColorStop(0, `rgba(${col},${(0.4 + 0.3 * beatK) * k})`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.fillRect(x - 50, y - 50, 100, 100); g.restore(); };
-  const hDy = (two ? 136 : 122) - BELT_Y, jDy = (two ? 108 : 122) - BELT_Y;
+  const hDy = two ? 5 : 122 - BELT_Y, jDy = two ? 5 : 122 - BELT_Y;
   glow(hx, 116 + hDy, '255,90,40', fin ? 1 : turn === 'h' ? 0.85 : 0.3);
   glow(jx, 116 + jDy, '80,210,255', (fin ? 0.25 : turn === 'j' ? 0.85 : 0.3) * J.light);
   // the belts tip towards him in her round (about the scanner); they stand at the ends, so they ride them up and down
   const tilt = pw(S.tilt, b), lift = x => Math.round((x - cx) * Math.tan(tilt));
-  const throwK = side => { let k = 0; for (const n of notes) { if (n.beat < b - 4) continue; if (n.beat > b + 8) break; if (stageSide(n) !== side) continue; const v = stageSpeed(side, n.beat), go = n.arr - (STG.cx - 56) / v; const q = (t - go) / 0.16; if (q >= 0 && q < 1) k = Math.max(k, Math.sin(q * Math.PI)); } return k; };
-  const pose = (k, dip) => ({ hand: { x: BOSS_X + 15 + Math.round(8 * k), y: 138 - Math.round(3 * k) }, carry: null, wince: false, dip, bob: beatK > 0.6 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 1, beat: b, vibe: false, unplug: true });
-  const hp = pose(throwK(-1), 0), jp = pose(throwK(1), Math.round(2 * J.stumble));
+  let upLast = false;
+  const throwK = side => { let k = 0; for (const n of notes) { if (n.beat < b - 4) continue; if (n.beat > b + 8) break; if (stageSide(n) !== side) continue; const v = stageSpeed(side, n.beat), go = n.arr - (STG.cx - 56) / v; const q = (t - go) / 0.16; if (q >= -0.6 && q < 1) { const kk = q < 0 ? 0.3 : Math.sin(q * Math.PI); if (kk >= k) { k = kk; if (side < 0) upLast = yOf(n) < 122; } } } return k; };
+  const pose = (k, dip, hy) => ({ hand: { x: BOSS_X + 15 + Math.round(8 * k), y: hy - Math.round(3 * k) }, carry: null, wince: false, dip, bob: beatK > 0.6 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 1, beat: b, vibe: false, unplug: true, reach: 34 });
+  const hk = throwK(-1), hp = pose(hk, 0, two ? (upLast ? 108 : 136) - hDy - 4 : 138), jp = pose(two ? 0 : throwK(1), Math.round(2 * J.stumble), 138);
+  // in the final he tries to fight back: each four bars he gets a box up off the floor and over his head to throw it back,
+  // and the boxes she sends knock him back a step before he can; the box drops
+  let jCarry = null, jDrop = null;
+  if (two && J.k != null) {
+    const f = J.f;
+    if (f >= 3 && f < 16) { const lift = Math.min(1, (f - 3) / 10); jp.hand = { x: BOSS_X + 10 - Math.round(4 * lift), y: Math.round(150 - 52 * ease(lift)) + (lift >= 1 ? Math.round(Math.sin(nowMs / 40)) : 0) }; jp.reach = 40; jCarry = jp.hand; }
+    if (J.k >= 1 && f < 1.2) jDrop = f / 1.2;
+  }
   // in the final he is up on a riser behind his belt ("stay up on your stage"), she is down at hers
-  if (two) { const rx = jx - 22 + Math.round(J.dx * 0), ry = 84 + jDy + 81 + lift(jx); R(rx, ry, 46, FY - ry, '#1a161c'); R(rx, ry, 46, 2, '#3a3440'); for (let x = rx + 4; x < rx + 44; x += 10) R(x, ry + 4, 1, FY - ry - 6, '#120f14'); }
   g.save(); g.translate(0, hDy + lift(hx)); drawActor('haeun', hx, false, hp, nowMs, true, () => PARTNERS.haeun.arm(hp)); g.restore();
-  g.save(); g.translate(0, jDy + lift(jx)); drawActor('jiwoo', jx, true, jp, nowMs, true, () => PARTNERS.jiwoo.arm(jp)); g.restore();
+  g.save(); g.translate(0, jDy + lift(jx)); drawActor('jiwoo', jx, true, jp, nowMs, true, () => { PARTNERS.jiwoo.arm(jp); if (jCarry) drawBox(STG.box, jCarry.x, jCarry.y + 5, '', t); });
+  if (jDrop != null) { const q = jDrop, x = jx - 8 + Math.round(18 * q), y = 98 + Math.round(60 * q * q); g.save(); g.translate(x, y); g.rotate(q * 4); drawBox(STG.box, 0, 6, '', t); g.restore(); }
+  g.restore();
   STG.heads = { h: [hx + 2, 92 + hDy + lift(hx)], j: [jx - 2, 90 + jDy + lift(jx)] };
   // the belts and everything on them, about the scanner
   g.save(); g.translate(cx, midY); g.rotate(tilt); g.translate(-cx, -midY);
-  const xL = -30, xR = W + 30, run = (t * 60) % 8;
+  const xL = hx + 12, xR = STG.jx - 12, run = (t * 60) % 8;   // (pushed back, he ends up off the end of the belts)
   const belt = (y, dir) => {
     R(xL, y, xR - xL, 3, '#4a5058'); R(xL, y + 3, xR - xL, 9, '#23272c'); R(xL, y + 12, xR - xL, 2, '#15181b');
+    // the end drums
+    for (const ex of [xL, xR - 6]) { R(ex, y, 6, 14, '#5a616b'); R(ex + 1, y + 1, 4, 12, '#3a4048'); R(ex + 2, y + 6, 2, 2, '#8a929c'); }
     // rollers: into the scanner from both ends (one belt), or all one way (two)
     if (!dir) { for (let x = cx - 4 - run; x > xL; x -= 8) R(Math.round(x), y + 5, 3, 4, '#353a41'); for (let x = cx + 4 + run; x < xR; x += 8) R(Math.round(x), y + 5, 3, 4, '#353a41'); }
-    else for (let x = xL + ((dir > 0 ? run : 8 - run) % 8); x < xR; x += 8) R(Math.round(x), y + 5, 3, 4, '#353a41');
-    for (let x = 20; x < W; x += 52) R(x, y + 14, 3, FY - y - 14, '#1b1e22');
+    else for (let x = xL + 6 + ((dir > 0 ? run : 8 - run) % 8); x < xR - 8; x += 8) R(Math.round(x), y + 5, 3, 4, '#353a41');
+    for (let x = xL + 8; x < xR - 4; x += 52) R(x, y + 14, 3, FY - y - 14, '#1b1e22');
   };
-  if (two) { belt(108, -1); belt(136, 1); } else belt(122, 0);
+  if (two) { belt(108, 1); belt(136, 1); } else belt(122, 0);
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160), mAge = nowMs - FX.lastMiss, miss = mAge < 260, top = (two ? 108 : 122) - 48, bot = two ? 136 : 122;
   R(cx - 13, top + 4, 3, bot - top - 4, '#59606a'); R(cx + 10, top + 4, 3, bot - top - 4, '#59606a'); R(cx - 14, top, 28, 5, '#6d7480'); R(cx - 6, top + 1, 12, 2, miss ? '#ff5040' : flash > 0 ? '#8fd694' : '#d8463b');
   g.globalAlpha = 0.55 + 0.45 * Math.max(flash, miss ? 1 : 0); R(cx, top + 6, 1, bot - top - 6, miss ? '#ff5040' : flash > 0 ? '#b8f0bc' : '#ff3b2f'); g.globalAlpha = 1;
@@ -3087,36 +3100,48 @@ function drawStage15(t, nowMs, sv) {
   // code works as it is
   for (const side of [-1, 1]) {
     g.save();
-    const by = yOf(side);
-    if (side < 0) g.translate(cx - SCAN_X, by - BELT_Y); else { g.translate(cx + SCAN_X, by - BELT_Y); g.scale(-1, 1); }
+    if (side < 0) g.translate(cx - SCAN_X, 0); else { g.translate(cx + SCAN_X, 0); g.scale(-1, 1); }
     for (const n of notes) {
       if (t < n.place - 2) break;
       if (stageSide(n) !== side) continue;
+      g.save(); g.translate(0, yOf(n) - BELT_Y); drawStageBox(n, side, t);
+      g.restore();
+    }
+    g.restore();
+  }
+  g.restore();
+  STG.jEnd = xR;
+  drawStageRest(t, nowMs, sv, b, sec, beatK, fin);
+}
+function drawStageBox(n, side, t) {
+  const S = L.stage, two = S.two != null && beatAt(t) >= S.two;
+  {
+    {
       const v = stageSpeed(side, n.beat), go = n.arr - (STG.cx - 56) / v;
-      if (t < go || n.beat < S.from) continue;
+      if (t < go || n.beat < S.from) return;
       let x = SCAN_X + (t - n.arr) * v;
       // with two belts a box runs on all the way to the other end
-      const far = two ? 150 : 110;
+      const far = two ? Math.max(60, (STG.jEnd || 330) - 8 - STG.cx) : 110;
       if (n.len) {
-        if (x - (n.end - n.arr) * v > SCAN_X + far) continue;
-        const sp = SPEED; SPEED = v; drawCrate(n, x, BELT_Y, t); SPEED = sp; continue;
+        if (x - (n.end - n.arr) * v > SCAN_X + far) return;
+        const sp = SPEED; SPEED = v; drawCrate(n, x, BELT_Y, t); SPEED = sp; return;
       }
       if (n.state === 'hit' && n.hitAt != null) x -= v * hitLag(t - n.hitAt, n.judge === 'perfect' ? HITSTOP : HITSTOP * 0.6);
       const past = x - SCAN_X;
       if (n.state === 'miss' && past > 6) {
-        const dt = (past - 6) / v; if (dt > 0.9) continue;
-        g.save(); g.globalAlpha = 1 - dt / 0.9; g.translate(x, BELT_Y + 0.5 * 520 * dt * dt - n.h / 2); g.rotate(dt * 5); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); continue;
+        const dt = (past - 6) / v; if (dt > 0.9) return;
+        g.save(); g.globalAlpha = 1 - dt / 0.9; g.translate(x, BELT_Y + 0.5 * 520 * dt * dt - n.h / 2); g.rotate(dt * 5); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); return;
       }
-      if (past > far) continue;
+      if (past > far) return;
       const ha = n.state === 'hit' ? t - n.hitAt : 9, sq = ha < 0.16 ? Math.sin(ha / 0.16 * Math.PI) * (n.judge === 'perfect' ? 1 : 0.6) * (ha < 0.08 ? 1 : -0.5) : 0;
       const fl = (t - go) / 0.22, hop = fl < 1 ? -Math.round(Math.sin(fl * Math.PI) * (side < 0 && S.fast != null && n.beat >= S.fast ? 9 : 4)) : 0;
       g.globalAlpha = past > far - 70 ? Math.max(0, 1 - (past - (far - 70)) / 70) : 1;
       drawBox(n, x, BELT_Y + hop, n.state === 'miss' ? 'miss' : '', t, sq);
       g.globalAlpha = 1;
-    }
-    g.restore();
   }
-  g.restore();
+  }
+}
+function drawStageRest(t, nowMs, sv, b, sec, beatK, fin) {
   drawParticles(nowMs);
   // the crowd in front: the night shift standing round, nodding to the beat, more hands and phones up as it goes on (and in
   // the final, all of them)
