@@ -1,6 +1,6 @@
 # 1-5 노래: 하은의 랩 두 곡 — 제미나이(Lyria) 프롬프트
 
-**두 라운드**: 2페이즈(1라운드)는 느린 곡 "The Lazy Shift"(`prototype/audio/1-5-the-lazy-shift.mp3`, 받은 곡 91.98초, 실측 75.5 BPM, 28마디, 첫 다운비트 0.068초, 끝에 테이프 정지), 3페이즈(2라운드)는 아래의 "You Play, I Pay". 1라운드 프롬프트는 이 문서 끝.
+**세 라운드**: 2페이즈(1라운드)는 아래의 "You Play, I Pay"(94), 3페이즈(2라운드)는 느린 곡 "The Lazy Shift"(`prototype/audio/1-5-the-lazy-shift.mp3`, 91.98초, 실측 75.5 BPM, 28마디, 첫 다운비트 0.068초, 끝에 테이프 정지), 4페이즈(3라운드, 절정)는 새 곡(110 BPM, 프롬프트는 이 문서 끝). The Lazy Shift 마지막 줄 "You want it faster? … Play me another."가 절정으로 넘어가는 다리.
 
 
 1-5 2페이즈(32–72마디)에 깔 곡. 다툼 끝에 하은이 지우를 밀쳐내자, 자기 벨트로 돌아온 지우가 "좋아요. 그럼 박으로 해요. 누나 박이 그렇게 잘났으면, 따라와 봐요!" 하고 자기 비트를 튼다. **지우는 비트로 도발하고(가사 없음, 으스스한 멜로디 리프 + 상자 던지기), 하은이 그 비트를 뺏어 랩으로 받아친다.** 랩은 하은 혼자. **95 BPM**, 4/4, A 단조(어두운 반음 하강 루프), **2:34**(61마디). 게임은 정적이 끝나는 128박부터 95. 1-6 노래처럼 글로벌 출시용 영어 가사(한국어는 자막).
@@ -178,7 +178,7 @@ TICK-TOCK ON THE LINE, AND NOBODY'S GONNA STOP
 
 "Stay up on your stage / down at the machine"은 지우가 위 벨트(무대), 하은이 아래 벨트(기계)라는 자리를 그대로 쓴 것. "Somebody's waiting."(기다리는 사람이 있어)이 1-6 병원 사정(어머니)의 유일한 실마리. 돈 얘기는 하지 않는다. "What's it for?"는 원래 지우가 묻던 말을 하은이 스스로 묻고 답하는 식.
 
-## 1라운드 곡 "The Lazy Shift" 프롬프트 (받아서 씀)
+## 2라운드 곡 "The Lazy Shift" 프롬프트 (받아서 씀)
 
 ```
 A slow, lazy, swaggering hip-hop track with ONE solo female rapper. A young woman on the night shift answers a careless coworker who keeps playing his sleepy beat at her: she takes it over and raps on it, cool and unimpressed. English rap vocals, one female voice only, no male vocals, no singing. 1:29 long, 78 BPM, 4/4, A minor. Clean lyrics.
@@ -190,3 +190,91 @@ A slow, lazy, swaggering hip-hop track with ONE solo female rapper. A young woma
 ```
 
 받은 곡의 실제 구조(곡 마디): 0–3 조용한 인트로(저음 없음), 4–7 지우 비트, 8–15 1절, 16–19 훅(2·3박 강세), 20–23 지우 비트, 24–27 2절, 28 정적. 템포는 75.5에서 ±0.03초 안으로 맞음.
+
+## 3라운드(절정) 곡 프롬프트
+
+절정. The Lazy Shift 끝("Play me another")에 지우가 가장 빠르고 센 비트를 튼다. 110 BPM, 45마디, 1:38. 같은 A 단조, 같은 반음 하강 베이스를 두 배 빠르게. 브리지(조용한 4마디)는 심박처럼 뛰는 킥과 시계처럼 반복되는 높은 피아노 한 음 위에서 하은이 가장 솔직한 말을 한다 → 1-6 병실 심전도로 이어짐("Somebody's waiting"). 마지막은 1라운드의 Tick-tock 훅이 돌아오고 "Faster" 훅과 겹치며 끝.
+
+```
+A fast, explosive, relentless hip-hop track with ONE solo female rapper: the climax of a rap battle on a night shift. Her careless coworker plays his fastest, hardest beat to break her, and she rides it harder than ever. English rap vocals, one female voice only, no male vocals, no singing. 1:38 long, 110 BPM, 4/4, A minor. Clean lyrics.
+
+The beat (the same loop under the whole song):
+- A hard, driving, dark beat: punchy boom bap drums with trap-style rolling hi-hats, a loud cracking snare on 2 and 4, a heavy distorted 808.
+- The bass walks down by half steps (A, G#, F#, E), now twice as fast and pounding.
+- Big and cinematic: orchestral hits on the downbeats, a tense siren-like synth stab.
+
+The rapper: a young woman of 23. Low and cool at first, then faster, sharper and louder with every section; double-time flow in the verses; she breaks only in the quiet bridge, then explodes at the end.
+
+Two kinds of sections:
+- BEAT sections (no rap): the siren-like synth riff and chopped vocal stabs on top, frantic and cocky, like someone trying to break her. Every BEAT section starts with a chopped vocal stab.
+- RAP and HOOK sections: the riff drops out and the hard loop is left under her voice. Every RAP section starts with a record scratch.
+- Every switch lands exactly on the bar line.
+
+Structure with timestamps (one bar = 2.2 seconds):
+0:00–0:09 Intro, BEAT (4 bars): the beat bursts in at full power, the siren riff and stabs. On the last bar the drums cut out. No rap.
+0:09–0:26 Verse 1, RAP (8 bars): record scratch, the drums slam back in. Fast, double-time, sharp.
+0:26–0:35 Hook (4 bars): a chant, punchy, on the beat.
+0:35–0:44 BEAT (4 bars): the riff again, even more frantic. No rap.
+0:44–1:01 Verse 2, RAP (8 bars): record scratch; faster and harder.
+1:01–1:10 Hook (4 bars): the chant again, louder, doubled.
+1:10–1:19 Bridge (4 bars): everything drops away except a soft kick pulsing like a heartbeat and one high piano note repeating like a clock. She raps quietly, almost spoken, honest.
+1:19–1:36 Final (8 bars): everything back at once, the biggest the song gets, a crash on every bar. The first four lines are the old chant "Tick-tock on the line", the last four are the hook, stacked and shouted.
+1:36–1:38 Ending: one huge hit on the downbeat of the last bar, then silence. No fade out.
+
+Lyrics (all by the one female rapper):
+
+[Intro – BEAT, no vocals]
+
+[Verse 1 – female rap, double-time]
+You wanted it faster, so here we go
+Every box in the air and I'm running the show
+You throw it, I catch it before it can land
+Your beat's in my pocket, your clock's in my hand
+Turn it up louder, it's still in my lane
+Speed it up, slow it down, it's all the same
+You play with the rhythm, I play it for real
+You talk about a feeling, I'm the one who has to deal
+
+[Hook – chant]
+Faster, faster, I don't fall behind
+Faster, faster, every box is mine
+Faster, faster, keep it on the line
+Faster, faster, I'm still keeping time
+
+[BEAT, no vocals]
+
+[Verse 2 – female rap, faster]
+Night after night and the belt never sleeps
+I'm counting the boxes, you're counting the beats
+You drop it, I lift it, you laugh, I don't
+You tell me "let it go", I tell you "I won't"
+Two shifts, one clock, and it's ticking for me
+You've got your tomorrow, I've got what I need to be
+So go on, make it harder, make it fast as you can
+I was keeping this line before you ever began
+
+[Hook – chant, louder]
+Faster, faster, I don't fall behind
+Faster, faster, every box is mine
+Faster, faster, keep it on the line
+Faster, faster, I'm still keeping time
+
+[Bridge – quiet, almost spoken]
+Every night I count the minutes
+Somebody's waiting at the end of it
+You don't have to know, and that's alright
+Just keep the time tonight
+
+[Final – everything]
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Faster, faster, I don't fall behind
+Faster, faster, every box is mine
+Faster, faster, keep it on the line
+FASTER, FASTER, I'M STILL KEEPING TIME
+
+[Ending]
+(one huge hit, then silence)
+```
