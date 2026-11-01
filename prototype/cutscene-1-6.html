@@ -126,8 +126,11 @@ const TALK = { t0: REW.t0 + REW.dur, scene: 10.0, lines: [
   ['boss', '…지우. 따라가든가.', '…Jiwoo. Follow her, if you want.'],
   ['jiwoo', '…! 다녀오겠습니다!', '…! I\u2019m going!'],
 ] };
-TALK.at = k => TALK.t0 + 0.8 + k * 1.0;
-const REP = { t0: TALK.t0 + 0.8 + TALK.lines.length * 1.0 + 0.5, len: 132.36, src: 'media/three-steps-behind.mp3' };
+// a line types at 0.032 s a letter and waits for the click only once it is all out; the next follows 0.55 s after that
+const typeHold = (a, b) => Math.max(0.45, Math.max([...a].length, [...b].length) * 0.032 + 0.25);
+{ let at = TALK.t0 + 0.8; TALK.ats = TALK.lines.map(([, ko, en]) => { const a = at; at += typeHold(ko, en) + 0.55; return a; }); TALK.end = at; }
+TALK.at = k => TALK.ats[k];
+const REP = { t0: TALK.end + 0.5, len: 132.36, src: 'media/three-steps-behind.mp3' };
 const QREP = [9.777, 10.743, 11.711, 12.677, 13.644, 14.612, 15.581, 16.547, 17.513, 18.481, 19.449, 20.417, 21.386, 22.353, 23.322, 24.288, 25.257, 26.226, 27.194, 28.162, 29.129, 30.097, 31.064, 32.031, 32.999, 33.966, 34.933, 35.901, 36.869, 37.838, 38.806, 39.773, 40.741, 41.708, 42.678, 43.647, 44.615, 45.582, 46.55, 47.517, 48.485, 49.453, 50.422, 51.388, 52.356, 53.323, 54.291, 55.257, 56.222, 57.189, 58.157, 59.123, 60.091, 61.058, 62.027, 62.994, 63.965, 64.936, 65.906, 66.875, 67.844, 68.814, 69.782, 70.75, 71.717, 72.682, 73.65, 74.617, 75.585, 76.552, 77.52, 78.487, 79.456, 80.425, 81.395, 82.362, 83.329, 84.295, 85.261, 86.227, 87.194, 88.16, 89.127, 90.095, 91.064, 92.032, 93.001, 93.97, 94.939, 95.907, 96.875, 97.841, 98.809, 99.775, 100.741, 101.71, 102.68, 103.649, 104.618, 105.586, 106.555, 107.521, 108.485, 109.446, 110.402, 111.355, 112.307, 113.259, 114.211, 115.162, 116.113, 117.062, 118.01, 118.958, 119.907, 120.855, 121.8];
 { const last = BEATS[BEATS.length - 1], first = REP.t0 + QREP[0], n = 36; for (let k = 1; k < n; k++) BEATS.push(last + (first - last) * k / n); for (const q of QREP) BEATS.push(REP.t0 + q); }
 const SONG1_BEATS = 152, REP_B0 = SONG1_BEATS + 36;   // the reprise's first row starts on this beat
@@ -152,9 +155,9 @@ const SHOTS = [
   { id: 'ward', t0: 125.4, t1: 165.8, name: '병실', note: '마지막 코러스와 함께 병실. 의자에 앉고, I\'ll lay my hand에 어머니 손을 잡고, All the way home에 고개를 숙이고, 첫 Four…에 어머니 손가락이 움직이자 고개를 든다. 노래가 끝나고 노크, 천천히 뒤돌아봄, 문 밖에서 "누나!" "누나?" "누나!!"' },
   { id: 'door', t0: 165.8, t1: 178.2, name: '문 너머', note: '하은이 일어나 병실 문으로 걸어가고, 위아래 검은 띠가 시네마처럼 크게 들어온다. 카메라가 따라가며 벽과 문이 들어오고, 문 건너편 복도에 꽃다발을 든 지우. 하은이 문손잡이에 손을 뻗고, 암전.' },
   { id: 'rewind', t0: 178.2, t1: 183.0, name: '되감기', note: '하은이 문손잡이를 잡는 순간 컷씬이 빠르게 거꾸로 감긴다(테이프 감기는 소리): 문, 병실, 복도, 로비, 골목, 열차, 공장.' },
-  { id: 'talk', t0: 183.0, t1: 191.3, name: '반장과 지우', note: '하은이 떠난 빈 벨트 앞. 반장(의자)과 지우의 대화, 클릭해서 넘김. "…지우. 따라가든가."' },
-  { id: 'jiwoo', t0: 191.3, t1: 297.2, name: '지우의 길', note: '지우의 노래(긴 버전)와 함께 같은 길을 사람들 사이로 걷는다: 아침 거리, 승강장, 꽉 찬 열차, 내린 역(출구로 가는 사람들), 꽃집에서 천천히 꽃다발, 골목을 지나 병원, 이안이 있는 복도, 502호 앞에서 노크 셋, 넷째는 플레이어.' },
-  { id: 'open', t0: 297.2, t1: 322.3, name: '문이 열린다', note: '문을 가운데 둔 단면, 위아래 띠가 닫히고, 하은이 병실 안쪽에서 문으로 걸어와 손잡이를 잡고, Let me count with you에 문이 열린다. 허밍, 암전.' }
+  { id: 'talk', t0: 183.0, t1: REP.t0, name: '반장과 지우', note: '하은이 떠난 빈 벨트 앞. 반장(의자)과 지우의 대화, 클릭해서 넘김. "…지우. 따라가든가."' },
+  { id: 'jiwoo', t0: REP.t0, t1: REP.t0 + 105.9, name: '지우의 길', note: '지우의 노래(긴 버전)와 함께 같은 길을 사람들 사이로 걷는다: 아침 거리, 승강장, 꽉 찬 열차, 내린 역(출구로 가는 사람들), 꽃집에서 천천히 꽃다발, 골목을 지나 병원, 이안이 있는 복도, 502호 앞에서 노크 셋, 넷째는 플레이어.' },
+  { id: 'open', t0: REP.t0 + 105.9, t1: REP.t0 + 131.0, name: '문이 열린다', note: '문을 가운데 둔 단면, 위아래 띠가 닫히고, 하은이 병실 안쪽에서 문으로 걸어와 손잡이를 잡고, Let me count with you에 문이 열린다. 허밍, 암전.' }
 ];
 const CUT_END = REP.t0 + 131.0;   // 하은's part, then 지우's reprise (REP) to its last hum   // the drawn cutscene's length: the song (Four Steps Home, 2:37.5), then the knock and the door; it fades to black here
 const ROWS_END = 158.6;
@@ -1227,7 +1230,7 @@ function corridorLight(t) {
   const d = walk3D(t);
   // light bouncing off the walls and floor: the more panels are on, the less black the corners
   const lit = LIGHT_Q.reduce((a, q) => a + lightI(q, t), 0);
-  lmctx.globalCompositeOperation = 'source-over'; lmctx.globalAlpha = 1; lmctx.fillStyle = mix('#020304', '#3a4044', Math.min(1, lit / 6)); lmctx.fillRect(0, 0, W, H);
+  lmctx.globalCompositeOperation = 'source-over'; lmctx.globalAlpha = 1; lmctx.fillStyle = WHO === 'jiwoo' ? '#c4cac6' : mix('#020304', '#3a4044', Math.min(1, lit / 6));   // (his walk: the morning in, the whole hall bright) lmctx.fillRect(0, 0, W, H);
   lmctx.globalCompositeOperation = 'lighter';
   for (const q of LIGHT_Q) { const I = lightI(q, t), x = Math.round(q - d + HX); if (I <= 0 || x < -260 || x > W + 260) continue; lmctx.globalAlpha = I; lmctx.drawImage(LSTAMP, x - 260, 0); }
   lmctx.globalAlpha = 1; lmctx.globalCompositeOperation = 'source-over';
@@ -1498,7 +1501,8 @@ function initAudio() {
   { const nz = (type, f, q) => { const s = ac.createBufferSource(); s.buffer = NB; s.loop = true; const fl = ac.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const gn = ac.createGain(); gn.gain.value = 0; s.connect(fl); fl.connect(gn); gn.connect(master); s.start(0, Math.random() * 1.8); return { gn, fl }; };
     const roar = nz('bandpass', 220, 0.7), hiss = nz('highpass', 1800, 0.5), mg = ac.createGain(), ml = ac.createBiquadFilter(), m1 = ac.createOscillator(), m2 = ac.createOscillator();
     m1.type = 'sawtooth'; m2.type = 'sine'; ml.type = 'lowpass'; ml.frequency.value = 700; mg.gain.value = 0; m1.connect(ml); m2.connect(ml); ml.connect(mg); mg.connect(master); m1.start(); m2.start();
-    trainBed = { roar, hiss, motor: mg, m1, m2 }; }
+    const crowd = nz('bandpass', 520, 0.9), crowd2 = nz('bandpass', 1150, 1.6);   // voices: two bands of murmur
+    trainBed = { roar, hiss, motor: mg, m1, m2, crowd: crowd.gn, crowd2: crowd2.gn }; }
 }
 function newBus() { if (bus) { const b = bus; b.gain.setTargetAtTime(0, ac.currentTime, 0.03); setTimeout(() => b.disconnect(), 500); } bus = ac.createGain(); bus.connect(master); }
 function thump(t, f, amp, dec) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f * 1.6, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.04); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.006); gn.gain.exponentialRampToValueAtTime(0.0001, t + dec); o.connect(gn); gn.connect(bus); o.start(t); o.stop(t + dec + 0.05); }
@@ -1579,7 +1583,7 @@ EV.push({ t: 0, fn: 'beltDown' }, ...S1.taps.map(t => ({ t, fn: 'tap' })), { t: 
   { t: CORR.t0 + 1, fn: 'pad', dur: WARD.t0 - CORR.t0 - 1, notes: [146.83, 174.61, 220, 261.63, 329.63] },   // Dm9 down the corridor
   { t: RIDE.stop - 1.4, fn: 'brake' }, { t: RIDE.open, fn: 'doors' }, { t: DEST.close, fn: 'doors' }, { t: DEST.leave, fn: 'leaving' },
   { t: 56.5, fn: 'bird' }, { t: 59.8, fn: 'bird' }, { t: 63.1, fn: 'bird' }, { t: 56.2, fn: 'meow' },
-  { t: ST.open, fn: 'doors' }, { t: RIDE.close, fn: 'doors' }, { t: RIDE.depart, fn: 'pullout' }, { t: BOARD.t0 + 0.4, fn: 'murmur', dur: DEST.t0 + 1 - BOARD.t0 },
+  { t: ST.open, fn: 'doors' }, { t: RIDE.close, fn: 'doors' }, { t: RIDE.depart, fn: 'pullout' }, { t: -999, fn: 'murmur', dur: DEST.t0 + 1 - BOARD.t0 },
   { t: ST.chime, fn: 'chime' }, { t: ST.light, fn: 'approach', dur: ST.arrive[1] - ST.light }, { t: ST.arrive[1] - 1.3, fn: 'brake' },
   { t: doorT - 0.5, fn: 'whoosh' }, { t: 19.2, fn: 'bird' }, { t: 21.4, fn: 'bird' }, { t: 23.1, fn: 'bird' }, { t: WALK.lampOff, fn: 'lamp' });
 for (let k = 1; ; k++) { const t = walkT(k * STRIDE); if (t > WALK.stop - 0.05) break; EV.push({ t, fn: 'step', out: t > doorT }); }
@@ -1597,13 +1601,14 @@ function audioStart(t) {
   if (!ac) return; ac.resume(); newBus(); schedTo = t; songStart(t);
   for (const e of EV) if (e.dur && e.t < t && e.t + e.dur > t) SFX[e.fn](ac.currentTime + 0.02, e, t - e.t);
 }
-function audioStop() { if (!ac) return; songStop(); newBus(); for (const k in amb) amb[k].gain.setTargetAtTime(0, ac.currentTime, 0.05); for (const g of [trainBed.roar.gn, trainBed.hiss.gn, trainBed.motor]) g.gain.setTargetAtTime(0, ac.currentTime, 0.05); }
+function audioStop() { if (!ac) return; songStop(); newBus(); for (const k in amb) amb[k].gain.setTargetAtTime(0, ac.currentTime, 0.05); for (const g of [trainBed.roar.gn, trainBed.hiss.gn, trainBed.motor, trainBed.crowd, trainBed.crowd2]) g.gain.setTargetAtTime(0, ac.currentTime, 0.05); }
 function audioTick(t) {
   if (!ac || !playing) return;
   const until = t + 0.25;
   for (const e of EV) if (e.t >= schedTo && e.t < until) SFX[e.fn](ac.currentTime + Math.max(0, e.t - t), e, 0);
   schedTo = until;
-  { const tb = bedTime(t); if (tb === null) { for (const k in amb) amb[k].gain.setTargetAtTime(0, ac.currentTime, 0.1); for (const g2 of [trainBed.roar.gn, trainBed.hiss.gn, trainBed.motor]) g2.gain.setTargetAtTime(0, ac.currentTime, 0.1); return; } t = tb; }
+  const his = t >= REP.t0, tReal = t;   // 지우's walk: the train quieter, people talking where there are people
+  { const tb = bedTime(t); if (tb === null) { for (const k in amb) amb[k].gain.setTargetAtTime(0, ac.currentTime, 0.1); for (const g2 of [trainBed.roar.gn, trainBed.hiss.gn, trainBed.motor, trainBed.crowd, trainBed.crowd2]) g2.gain.setTargetAtTime(0, ac.currentTime, 0.1); return; } t = tb; }
   // beds: room tone indoors, the tubes' buzz while they burn, wind outside
   const outK = t > doorT ? 1 : 0, lit = TUBE_Q.reduce((s, _, k) => s + tubeOn(k, t), 0);
   amb.room.gain.setTargetAtTime(0.05 * (1 - outK) + (t > LOBBY.t0 && t < CUT_END ? 0.022 : 0), ac.currentTime, 0.2);
@@ -1611,17 +1616,20 @@ function audioTick(t) {
   const onTrain = t > WIPE.t0 ? 1 : 0;
   const street2 = t > ALLEY.t0 && t < LOBBY.t0 + 1.5 ? 1 : 0, running = t > RIDE.depart && t < RIDE.stop ? seg(t, RIDE.depart, RIDE.depart + 3) * (1 - seg(t, RIDE.slow, RIDE.stop)) : 0;
   amb.wind.gain.setTargetAtTime(Math.max(outK * (1 - onTrain), street2) * (0.025 + 0.012 * Math.sin(t * 0.8)), ac.currentTime, onTrain ? 0.08 : 0.4);
-  amb.rumble.gain.setTargetAtTime(street2 ? 0 : onTrain * (0.035 + 0.06 * running), ac.currentTime, 0.15);   // the station's low hum, the train running
+  amb.rumble.gain.setTargetAtTime((his ? 0.5 : 1) * (street2 ? 0 : onTrain * (0.035 + 0.06 * running)), ac.currentTime, 0.15);   // the station's low hum, the train running
   // in the car (from boarding until the platform has taken over again): a quiet idle (fans, the motor's whine) with the doors
   // open; running, the wheels roar and the car sways (the roar swells and darkens on a slow uneven rock), air hisses past, the
   // motor hums higher with speed, and loose fittings rattle now and then
   { const now = ac.currentTime, inCar = seg(t, BOARD.t0 + 0.8, BOARD.t1) * (1 - seg(t, DEST.t0, DEST.t1 - 0.6)), tr = trainBed;
     const sway = 0.5 + 0.35 * Math.sin(t * 2 * Math.PI * 0.55) + 0.15 * Math.sin(t * 2 * Math.PI * 1.37 + 1);
-    tr.roar.gn.gain.setTargetAtTime(inCar * (0.025 + 0.55 * running * (0.75 + 0.5 * sway)), now, 0.06);   // running about 14 dB under the song
+    const tq = his ? 0.45 : 1; tr.roar.gn.gain.setTargetAtTime(tq * inCar * (0.025 + 0.55 * running * (0.75 + 0.5 * sway)), now, 0.06);   // running about 14 dB under the song
     tr.roar.fl.frequency.setTargetAtTime(160 + 260 * running + 70 * sway * running, now, 0.08);
-    tr.hiss.gn.gain.setTargetAtTime(inCar * (0.02 + 0.09 * running * (0.8 + 0.4 * sway)), now, 0.1);
+    tr.hiss.gn.gain.setTargetAtTime(tq * inCar * (0.02 + 0.09 * running * (0.8 + 0.4 * sway)), now, 0.1);
     const f = 48 + 120 * running; tr.m1.frequency.setTargetAtTime(f, now, 0.1); tr.m2.frequency.setTargetAtTime(f * 7.1, now, 0.1);
-    tr.motor.gain.setTargetAtTime(inCar * (0.006 + 0.035 * running), now, 0.12);
+    tr.motor.gain.setTargetAtTime(tq * inCar * (0.006 + 0.035 * running), now, 0.12);
+    // the crowd: a babble of voices, thickest in the packed car, on the platforms and the street, softer in the hospital hall
+    const crowd = !his ? 0 : t < WIPE.t0 ? (t > doorT ? 0.28 : 0) : t < BOARD.t0 + 1 ? 0.38 : t < DEST.t1 ? 0.5 : t < ALLEY.t0 + 1 ? 0.36 : t < LOBBY.t0 ? 0.06 : 0.2;
+    trainBed.crowd.gain.setTargetAtTime(crowd * (0.55 + 0.45 * Math.abs(Math.sin(tReal * 27) * Math.sin(tReal * 7.1 + 1))) * (0.8 + 0.2 * Math.sin(tReal * 0.7)), now, 0.04); trainBed.crowd2.gain.setTargetAtTime(crowd * 0.5 * (0.5 + 0.5 * Math.abs(Math.sin(tReal * 33 + 2) * Math.sin(tReal * 5.3))), now, 0.03);   // syllable-quick swells, so it sounds like talk
     if (inCar > 0.5 && running > 0.2 && Math.random() < 0.05 * running) noise(now + 0.01, 0.025 + Math.random() * 0.03, 0.04 + Math.random() * 0.06, 'bandpass', 1800 + Math.random() * 2600, 4);   // a rattle
     if (inCar > 0.5 && running > 0.5 && Math.random() < 0.006) { thump(now + 0.01, 52, 0.14, 0.14); noise(now + 0.02, 0.12, 0.04, 'bandpass', 700, 2); }   // the body knocking on a joint
   }
@@ -1748,7 +1756,7 @@ let subLang = 'en';
 const LINES = [{ t0: WARD.voice, who: '???', en: 'Haeun!', ko: '누나!' }, { t0: WARD.voice2, who: '???', en: 'Haeun?', ko: '누나?' }, { t0: WARD.voice3, who: '???', en: 'Haeun!!', ko: '누나!!' }];
 // 반장 and 지우 at the empty belt (before his song, so each can wait for a click)
 for (const [k, [who, ko, en]] of TALK.lines.entries()) LINES.push({ t0: TALK.at(k), who: who === 'boss' ? { ko: '반장', en: 'Foreman' } : { ko: '지우', en: 'Jiwoo' }, ko, en, boss: who === 'boss' });
-for (const l of LINES) { l.hold = l.t0 + 0.45; l.done = false; }
+for (const l of LINES) { l.hold = l.t0 + typeHold(l.ko, l.en); l.done = false; }
 let waiting = null;   // the line the clock is held on
 const lineAt = t => LINES.find(l => t >= l.t0 && (l.timed ? t < l.t1 : l.done ? t < l.hold : t <= l.hold + 1e-6));   // on screen from its start until dismissed
 function dismissLine() { if (!waiting) return false; waiting.done = true; waiting = null; return true; }
@@ -1767,7 +1775,9 @@ function drawSubs(t) {
     out.beginPath(); out.roundRect(px, py, tw + 1.1 * ws, th, 3); out.fillStyle = '#f07a2a'; out.fill();
     out.fillStyle = '#1b120c'; out.textAlign = 'left'; out.textBaseline = 'middle'; out.fillText(who, px + 0.55 * ws, py + th / 2 + 1);
     out.font = `500 ${Math.round(3.3 * u)}px "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; out.fillStyle = '#efe6d2'; out.textBaseline = 'top';
-    out.fillText(full.slice(0, n), px, py + th + 0.5 * ws);
+    { const maxW = bw - 6 * u, shown = full.slice(0, n), words = full.split(' '), rows = [[]]; let used = 0;   // wrap to the box (by the whole line, so the typing doesn't jump)
+      for (const w of words) { const ww = out.measureText(w + ' ').width; if (used + ww > maxW && rows[rows.length - 1].length) { rows.push([]); used = 0; } rows[rows.length - 1].push(w); used += ww; }
+      let k = 0; rows.forEach((r, i) => { const line = r.join(' '), part = shown.slice(k, k + line.length); k += line.length + 1; if (part) out.fillText(part, px, py + th + 0.5 * ws + i * 3.9 * u); }); }
     if (waiting === ln && Math.floor(performance.now() / 500) % 2 === 0) { out.font = `${Math.round(1.8 * u)}px "IBM Plex Mono", monospace`; out.fillStyle = '#a6978a'; out.textAlign = 'right'; out.textBaseline = 'bottom'; out.fillText('▼', bx + bw - 2.2 * u, by + bh - 1.4 * u); }
     out.restore();
   }
