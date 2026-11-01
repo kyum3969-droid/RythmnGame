@@ -1,6 +1,6 @@
 # 1-5 노래: 하은의 랩 — 제미나이(Lyria) 프롬프트
 
-1-5 2페이즈(32–72마디)에 깔 곡. 다툼 끝에 하은이 지우를 밀쳐내자, 자기 벨트로 돌아온 지우가 "좋아요. 그럼 박으로 해요. 누나 박이 그렇게 잘났으면, 따라와 봐요!" 하고 자기 비트를 튼다. **지우는 비트로 도발하고(가사 없음, 펑키한 층 + 상자 던지기), 하은이 그 비트를 뺏어 랩으로 받아친다.** 랩은 하은 혼자. **95 BPM**, 4/4, A 단조(어두운 반음 하강 루프), **1:44**(41마디). 게임은 정적이 끝나는 128박부터 95. 1-6 노래처럼 글로벌 출시용 영어 가사(한국어는 자막).
+1-5 2페이즈(32–72마디)에 깔 곡. 다툼 끝에 하은이 지우를 밀쳐내자, 자기 벨트로 돌아온 지우가 "좋아요. 그럼 박으로 해요. 누나 박이 그렇게 잘났으면, 따라와 봐요!" 하고 자기 비트를 튼다. **지우는 비트로 도발하고(가사 없음, 으스스한 멜로디 리프 + 상자 던지기), 하은이 그 비트를 뺏어 랩으로 받아친다.** 랩은 하은 혼자. **95 BPM**, 4/4, A 단조(어두운 반음 하강 루프), **2:34**(61마디). 게임은 정적이 끝나는 128박부터 95. 1-6 노래처럼 글로벌 출시용 영어 가사(한국어는 자막).
 
 **왜 싱글 래퍼**: 남녀 두 사람이 주고받는 버전은 제미나이가 남자 파트와 여자 파트를 계속 헷갈렸다(이름에 성별을 붙여도). 그래서 랩은 하은 혼자 하고, 지우 차례는 가사 없는 비트 구간으로 바꿨다. 지우가 하던 "Haeun, why so cold, did the night shift steal your heart?"는 하은이 2절 첫 줄에서 그대로 따라 하며 비꼰다.
 
@@ -17,45 +17,57 @@
 
 | 노래 | 마디(게임) | 차례 | 게임에서 |
 |---|---|---|---|
-| 0:00–0:10 인트로 | 32–35 | 지우 비트(가사 없음) | 지우가 비트를 틀고 도발. 34마디부터 지우 상자 |
-| 0:10–0:20 지우 구간 | 36–39 | 지우 비트(보컬 찹만) | 지우가 **일부러** 하은 벨트로 던져 떨어뜨림 |
-| 0:20–0:40 1절 | 40–47 | 하은 랩 | 스크래치, 날것의 어두운 루프. 하은 벨트에 정박, 지우 벨트는 빔 |
-| 0:40–0:51 지우 구간 | 48–51 | 지우 비트 | 펑키한 층이 돌아오고 지우가 또 던짐 |
-| 0:51–1:11 2절 | 52–59 | 하은 랩 | 더 세게. 하은 벨트 |
-| 1:11–1:21 브레이크다운 | 60–63 | 1마디씩 지우 비트·하은·지우 비트·하은 | 한 마디짜리 긴 화물이 위·아래 번갈아. 하은은 짧은 두 줄 |
-| 1:21–1:41 끝판 | 64–71 | 둘 동시에, 하은 랩 | 떨어뜨림과 하은 상자가 번갈아, 끝 두 마디는 박마다 둘이 같이 |
-| 1:41–1:44 마지막 한 방 | 72 | 둘 | 두 벨트 같은 박 하나, 그리고 정적 |
+| 0:00–0:10 인트로 | 32–35 | 지우 비트 | 지우가 비트를 틀고 도발. 34마디부터 지우 상자 |
+| 0:10–0:20 지우 비트 | 36–39 | 지우 | **일부러** 하은 벨트로 던져 떨어뜨림. 끝 마디에 드럼이 빠짐 |
+| 0:20–0:40 1절 | 40–47 | 하은 랩 | 스크래치, 하은 벨트에 정박(긴 화물 포함), 지우 벨트는 빔 |
+| 0:40–0:51 훅 1 (×4, 낮게) | 48–51 | 하은 | "Tick-tock on the line…" 하은 벨트 째깍째깍 |
+| 0:51–1:01 지우 비트 | 52–55 | 지우 | 또 던져 떨어뜨림 |
+| 1:01–1:21 2절 | 56–63 | 하은 랩 | 더 세게, 더 빽빽하게 |
+| 1:21–1:31 훅 2 (×4, 더 세게) | 64–67 | 하은 | 째깍째깍 |
+| 1:31–1:41 지우 비트 | 68–71 | 지우 | 또 던짐. 끝 마디에 드럼이 빠짐 |
+| 1:41–1:51 브레이크다운 | 72–75 | 1마디씩 지우·하은·지우·하은 | 한 마디짜리 긴 화물이 위·아래 번갈아. 하은은 짧은 두 줄 |
+| 1:51–2:11 3절 | 76–83 | 둘 동시에, 하은 랩 | "You throw it, I catch it": 던지면 받고, 떨어뜨림과 하은 상자가 번갈아 |
+| 2:11–2:32 마지막 훅 (×8, 고조) | 84–91 | 둘 동시에 | tick은 위, tock은 아래로 번갈아 → 끝 두 마디는 박마다 둘이 같이 |
+| 2:32–2:34 마지막 한 방 | 92 | 둘 | 두 벨트 같은 박 하나, 그리고 정적 |
 
-곡 전체에 같은 어두운 루프가 깔린다. 지우 구간엔 펑키한 층(슬랩 베이스, 오프비트 코드 스탭, 보컬 찹)이 얹히고, 하은 구간엔 날것의 루프 위에 하은 랩. 하은 구간으로 넘어갈 때 레코드 스크래치, 지우 구간으로 넘어갈 때 보컬 찹 → 게임의 조명(하은 빨강, 지우 하늘)과 박마다 바닥 진동이 같은 자리에서 바뀐다.
+곡 전체에 같은 어두운 루프가 깔린다. 지우 비트 구간엔 높고 으스스한 멜로디 리프와 보컬 찹(펑키한 층은 뺐다), 하은 구간엔 날것의 루프 위에 하은 랩. 하은 구간으로 넘어갈 때 레코드 스크래치, 지우 구간으로 넘어갈 때 보컬 찹 → 게임의 조명(하은 빨강, 지우 하늘)과 박마다 바닥 진동이 같은 자리에서 바뀐다.
+
+**훅 "Tick-tock on the line, and nobody's gonna stop"**: 1절 뒤 4번(낮게, 반쯤 속삭이듯), 2절 뒤 4번(제 목소리, 겹쳐 녹음), 마지막에 8번(2마디마다 쌓임: 킥만 → 스네어·하이햇 → 겹친 목소리와 라이저 → 전부, 박마다 크래시, 마지막 줄은 소리쳐서 마지막 한 방으로).
 
 가사 원칙: 반장·허리 얘기 없음. **꿈은 직접 말하지 않는다**(하은은 "Somebody's waiting." 정도로만, 사정은 1-6에서. 돈·월세 얘기 아님). 욕 없음.
 
 ## 프롬프트 (그대로 붙여 넣기)
 
 ```
-A dark, swaggering boom bap track with ONE solo female rapper. A young woman on the night shift answers a show-off coworker: he keeps playing his funky beat and throwing things around, and she takes over the beat and raps back, cool and precise. English rap vocals, one female voice only, no male vocals, no singing. 1:44 long, 95 BPM, 4/4, A minor. Clean lyrics.
+A dark, swaggering boom bap track with ONE solo female rapper. A young woman on the night shift answers a show-off coworker: he keeps playing his beat and throwing things around, and she takes over the beat and raps back, cool and precise. English rap vocals, one female voice only, no male vocals, no singing. 2:34 long, 95 BPM, 4/4, A minor. Clean lyrics.
 
 The beat (the same loop under the whole song):
 - A heavy, dark two-bar loop with a cinematic feel: the bass line walks down by half steps (A, G#, F#, E), with tense dissonant notes ringing on top.
 - Hard-hitting dusty drums: a heavy kick with a long, deep low end, a loud cracking snare on 2 and 4, busy crisp sixteenth-note hi-hats.
-- Driving and hard-hitting, pushing forward, but still heavy with lots of room for the vocal.
+- Driving and hard-hitting, pushing forward, but still heavy with lots of room for the vocal. Not funky, no disco, no slap bass.
 
-The rapper: a young woman of 23. Low, calm, cool, precise, lands every word right on the beat, confident and steady, never shouting until the final section, where she gets fired up.
+The rapper: a young woman of 23. Low, calm, cool, precise, lands every word right on the beat, confident and steady, getting harder with every section and shouting only at the very end.
 
 Two kinds of sections:
-- BEAT sections (no rap): a funky layer joins the loop, slap bass and short chord stabs on the off-beats, with chopped vocal stabs ("yah!", "uh!") as ear candy. Bouncy and cocky, like someone showing off. Every BEAT section starts with a chopped vocal stab.
-- RAP sections: the funky layer drops out and only the raw dark loop is left under her voice. Every RAP section starts with a record scratch.
+- BEAT sections (no rap): the full dark beat plays out loud with a catchy, high, eerie melodic riff on top (a cold bell-like synth) and chopped vocal stabs ("yah!", "uh!"), cocky and showing off. Every BEAT section starts with a chopped vocal stab.
+- RAP and HOOK sections: the riff drops out and only the raw dark loop is left under her voice. Every RAP section starts with a record scratch.
 - Every switch lands exactly on the bar line.
 
+The hook is one line, "Tick-tock on the line, and nobody's gonna stop", one line per bar, and it builds every time it comes back.
+
 Structure with timestamps (one bar = 2.5 seconds):
-0:00–0:10 Intro, BEAT (4 bars): the dark loop and the funky layer come in loud and cocky. No rap.
-0:10–0:20 BEAT (4 bars): the funky layer keeps showing off with vocal stabs; on the last bar the drums cut out. No rap.
+0:00–0:10 Intro, BEAT (4 bars): the dark loop and the riff come in loud and cocky. No rap.
+0:10–0:20 BEAT (4 bars): the riff keeps showing off with vocal stabs; on the last bar the drums cut out. No rap.
 0:20–0:40 Verse 1, RAP (8 bars): record scratch, the drums slam back in, raw loop only. She is calm and precise.
-0:40–0:51 BEAT (4 bars): the funky layer comes back, cocky, vocal stabs. No rap.
-0:51–1:11 Verse 2, RAP (8 bars): record scratch, raw loop; she is sharper and harder now.
-1:11–1:21 Breakdown (4 bars): the drums drop to just the bass line and claps, half-time feel. Bar 1: a funky stab hit, no rap. Bar 2: her first short line. Bar 3: a funky stab hit, no rap. Bar 4: her second short line.
-1:21–1:41 Final, RAP (8 bars): everything back in at once, the funky layer and the dark loop together, louder, double-time hi-hats, a crash on every bar. She raps the final lines, fired up.
-1:41–1:44 Ending: one big hit on the downbeat of the last bar, then silence. No fade out.
+0:40–0:51 Hook 1 (4 bars): the hook four times, low and half-whispered, eerily calm.
+0:51–1:01 BEAT (4 bars): the riff comes back, cocky, vocal stabs. No rap.
+1:01–1:21 Verse 2, RAP (8 bars): record scratch, raw loop; she is sharper and harder now.
+1:21–1:31 Hook 2 (4 bars): the hook four times, full voice, doubled, the drums hitting harder.
+1:31–1:41 BEAT (4 bars): the riff again, the longest and loudest show-off; on the last bar the drums cut out. No rap.
+1:41–1:51 Breakdown (4 bars): just the bass line and claps, half-time feel. Bar 1: a stab hit, no rap. Bar 2: her first short line. Bar 3: a stab hit, no rap. Bar 4: her second short line.
+1:51–2:11 Verse 3, RAP (8 bars): everything back in at once, the riff and the dark loop together, louder. Quick, punchy lines.
+2:11–2:32 Final hook (8 bars): the hook eight times, building in four steps of two bars: (1) her voice over just the kick, (2) the snare and double-time hi-hats come in, (3) her voice stacked and layered with a rising riser, (4) everything at full power, a crash on every beat, the last line shouted.
+2:32–2:34 Ending: one huge hit on the downbeat of the last bar, then silence. No fade out.
 
 Lyrics (all by the one female rapper):
 
@@ -73,6 +85,12 @@ I'm counting the minutes to the next set of doors
 Keep your rhythm, kid, keep it loud in your ears
 Some of us can't stop long enough to hear
 
+[Hook 1 – low, half-whispered]
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+
 [BEAT, no vocals]
 
 [Verse 2 – female rap]
@@ -85,22 +103,40 @@ Stay up on your stage, I'll stay down at the machine
 Call me stiff, call me slow, say I live by the clock
 But the clock keeps the line moving while you watch it drop
 
+[Hook 2 – full voice, doubled]
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+
+[BEAT, no vocals]
+
 [Breakdown – female rap, one short line every other bar]
 What's it for? Somebody's waiting.
 That's the beat. Keep time.
 
-[Final – female rap]
+[Verse 3 – female rap]
 You throw it, I catch it
 You're careless, I'm counting
 Your beat, my belt
 Your way? Every day
 Can't keep up? Watch me
 One more box, one more drop
+Go on, throw another, I'll catch every one
+Count it with me now, we're not done
+
+[Final hook – building to the end]
 Tick-tock on the line, and nobody's gonna stop
 Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+TICK-TOCK ON THE LINE, AND NOBODY'S GONNA STOP
 
 [Ending]
-(one big hit, then silence)
+(one huge hit, then silence)
 ```
 
 ## 가사 뜻 (자막 초안)
@@ -131,6 +167,8 @@ Tick-tock on the line, and nobody's gonna stop
 | Your way? Every day | 네 방식? 매일이 그래 |
 | Can't keep up? Watch me | 못 따라온다고? 봐 |
 | One more box, one more drop | 상자 하나 더, 하나 더 떨궈 |
+| Go on, throw another, I'll catch every one | 더 던져 봐, 하나도 안 놓쳐 |
+| Count it with me now, we're not done | 같이 세, 아직 안 끝났어 |
 | Tick-tock on the line, and nobody's gonna stop | 라인 위에 째깍째깍, 아무도 안 멈춰 |
 
 "Stay up on your stage / down at the machine"은 지우가 위 벨트(무대), 하은이 아래 벨트(기계)라는 자리를 그대로 쓴 것. "Somebody's waiting."(기다리는 사람이 있어)이 1-6 병원 사정(어머니)의 유일한 실마리. 돈 얘기는 하지 않는다. "What's it for?"는 원래 지우가 묻던 말을 하은이 스스로 묻고 답하는 식.
