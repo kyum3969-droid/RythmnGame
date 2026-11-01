@@ -1942,7 +1942,7 @@ const HB = (() => {
       SCREEN_HIT.at = performance.now(); SCREEN_HIT.perfect = j === 'perfect';
       for (const tg of same) { tg.judge = j; tg.d = d; tg.hitT = t; stats[j]++; stats.combo++; FX.lane[tg.lane].hitAt = now; burst(COL, LANEY[tg.lane], j); FX.pops.push({ lane: tg.lane, text: j === 'perfect' ? '딱' : '좋아', sub: j === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: now, c: j === 'perfect' ? '#ffffff' : '#cfe8d6' }); }
       stats.best = Math.max(stats.best, stats.combo); FX.flashAt = now; FX.kickAt = now;
-      if (ac.currentTime - startAt >= WARD.t0) monBeep(ac.currentTime, 1175, 0.07); else { heart(ac.currentTime, 0.9, true); monBeep(ac.currentTime, 1175, 0.015); }
+      { const st = ac.currentTime - startAt; if (st >= WARD.t0 && st < REP.t0) monBeep(ac.currentTime, 1175, 0.07); else { heart(ac.currentTime, 0.9, true); monBeep(ac.currentTime, 1175, 0.015); } }   // (the monitor in the ward only; his heart in the reprise, as its pulses are)
     } else for (const tg of same) { tg.d = d; missIt(tg, d < 0 ? '빠름' : '늦음'); }
   }
   function missIt(tg, why) { tg.judge = 'miss'; stats.miss++; stats.combo = 0; FX.lane[tg.lane].missAt = performance.now(); FX.pops.push({ lane: tg.lane, text: '놓침', sub: why, at: performance.now(), c: '#ff6a5a' }); }
@@ -2075,7 +2075,7 @@ const HB = (() => {
     { const rf = clamp(1 - (now - F.hitAt) / 380, 0, 1); if (rf > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const lg = g.createLinearGradient(X0, 0, HXR, 0); lg.addColorStop(0, 'rgba(140,255,170,0)'); lg.addColorStop((COL - X0) / (HXR - X0), `rgba(200,255,230,${0.5 * rf})`); lg.addColorStop(1, 'rgba(200,255,230,0)'); g.fillStyle = lg; g.fillRect(X0, y - 34, HXR - X0, 48); g.restore(); } }
     g.globalAlpha = show;
     // the judgement over the column: it pops in large and settles
-    for (const p of FX.pops) { if (p.lane !== lane) continue; const age = (now - p.at) / 650, a = 1 - age; if (a <= 0) continue; const sc = 1 + 0.8 * clamp(1 - age / 0.15, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(COL - 22, y - 38 - age * 4); g.scale(sc, sc); glowTxt(p.text, 0, -7, p.c, 15, 'center', '"Black Han Sans", sans-serif', p.text === '놓침' ? 'rgba(255,60,60,.8)' : 'rgba(180,255,200,.8)'); if (p.sub) txt(p.sub, 0, 7, p.c, 5, 'center', '400'); g.restore(); }
+    for (const p of FX.pops) { if (p.lane !== lane) continue; const age = (now - p.at) / 650, a = 1 - age; if (a <= 0) continue; const sc = 1 + 0.8 * clamp(1 - age / 0.15, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(COL + BOX_HW + 32, y - 14 - age * 4); g.scale(sc, sc); glowTxt(p.text, 0, -7, p.c, 15, 'center', '"Black Han Sans", sans-serif', p.text === '놓침' ? 'rgba(255,60,60,.8)' : 'rgba(180,255,200,.8)'); if (p.sub) txt(p.sub, 0, 7, p.c, 5, 'center', '400'); g.restore(); }
     g.restore();
   }
   const LOW = { on: false, text: [], cv: null, g: null }, BOX = { rgb: '242,196,58', a: 0.3, near: 0, fl: 0 };
@@ -2108,14 +2108,16 @@ const HB = (() => {
   function drawRowsAt(t) {
     // a soft shade over the lower part of the scene so the rows read
     const two = 0, e2 = 0;   // one row only
-    const y0 = lerp(177, 162, e2), y1 = lerp(246, 204, e2); LANEY[0] = y0; LANEY[1] = y1;
+    // with the cinema bars in (the door), the bar and the row move down with the bottom bar (BAR_TOP 141 to LETTERBOX.bottom 148), so the picture's bottom edge stays put when the row fades
+    const lbk = letterK(t), barTop = Math.round(lerp(BAR_TOP, LETTERBOX.bottom, lbk)), dy = barTop - BAR_TOP;
+    const y0 = lerp(177, 162, e2) + dy, y1 = lerp(246, 204, e2) + dy; LANEY[0] = y0; LANEY[1] = y1;
     // the 4th beat's column, across every row: a wide solid yellow box with a dark rim and a lit edge; it brightens as the beat
     // comes and flashes white on a press
     const near = Math.max(...[0, 1].map(l => { const r = laneRow(l, t); return r ? clamp(1 - Math.abs(t - r.tg.t) / 0.5, 0, 1) : 0; })), fl = clamp(1 - (performance.now() - FX.flashAt) / 220, 0, 1);
     // a black bar across the bottom of the screen for the row to sit on, so the sides beside the narrow row are black too
-    g.fillStyle = '#000'; g.fillRect(0, BAR_TOP, W, H);
+    g.fillStyle = '#000'; g.fillRect(0, barTop, W, H);
     for (const [yy, sh2] of [[y0, 1], [y1, e2]]) if (sh2 > 0) laneBand(yy, sh2);
-    { const top = Math.round(lerp(158, 134, e2)); BOX.near = near; BOX.fl = fl; BOX.rgb = fl > 0.3 ? '255,236,150' : '242,196,58'; BOX.a = 0.32 + 0.16 * near + 0.3 * fl; scanBox(BAR_TOP, H);   // from the black bar's top edge to the bottom of the screen
+    { const top = Math.round(lerp(158, 134, e2)); BOX.near = near; BOX.fl = fl; BOX.rgb = fl > 0.3 ? '255,236,150' : '242,196,58'; BOX.a = 0.32 + 0.16 * near + 0.3 * fl; scanBox(barTop, H);   // from the black bar's top edge to the bottom of the screen
       if (fl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fx = g.createRadialGradient(COL, y0 - 7, 0, COL, y0 - 7, 26); fx.addColorStop(0, `rgba(255,240,170,${0.4 * fl})`); fx.addColorStop(1, 'rgba(255,240,170,0)'); g.fillStyle = fx; g.fillRect(COL - 26, y0 - 33, 52, 52); g.restore(); } }
     drawLane(0, y0, t, 1);
     if (two > 0) drawLane(1, y1, t, e2);
