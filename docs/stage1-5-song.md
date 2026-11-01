@@ -329,3 +329,51 @@ BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
 [Ending]
 (one huge hit, then silence)
 ```
+
+### 절정 곡 장르 후보: 드릴
+
+드릴은 원래 140대 BPM에 하프타임(스네어가 3박)이라 105로 두면 드릴 같지 않다. 142 BPM(1마디 1.69초), 0:29. 미끄러지는 808이 A–G#–F#–E 하강선을 타고, 어두운 피아노·현, 통통 튀는 하이햇과 셋잇단 롤.
+
+```
+A dark, menacing, hard-hitting drill track with ONE solo female rapper: the final round of a rap battle on a night shift. Cold, heavy and powerful. English rap vocals, one female voice only, no male vocals, no singing. No guitars. 0:29 long, 142 BPM, 4/4 with a half-time feel, A minor. Clean lyrics.
+
+The sound:
+- Drill drums: a heavy kick, a hard snare and clap on beat 3 of every bar (half-time), skippy sliding hi-hats with triplet rolls, sparse off-beat percussion.
+- A huge, distorted sliding 808 that glides between notes, walking down by half steps: A, G#, F#, E.
+- A dark, eerie melody on top: a cold piano and haunting strings, with a low choir pad underneath.
+- A ticking clock sound running through the whole song, like time running out.
+- Mixed loud, wide and aggressive.
+
+The rapper: a young woman of 23, cold, sharp and controlled, every word landing on the beat, menacing rather than loud. Her voice is doubled on the ends of lines. The last line is shouted.
+
+Structure (one bar = 1.69 seconds):
+0:00–0:07 Intro (4 bars), NO vocals, building up:
+  bar 1: only the ticking clock and the cold piano melody, dark and tense.
+  bar 2: the strings and a low choir come in; the clock ticks twice as fast.
+  bar 3: the hi-hats start, a rising swell.
+  bar 4: a hi-hat roll building up; on the last half beat everything cuts to silence for a breath.
+0:07–0:14 (4 bars): the drums and the sliding 808 slam in on the downbeat with her voice. The chant "Tick-tock on the line", one line per bar.
+0:14–0:27 (8 bars): her verse "You play, I pay", one line per bar, harder to the end.
+0:27–0:29 Ending: one huge 808 hit on the downbeat of the last bar, then silence. No fade out.
+
+Lyrics (all by the one female rapper):
+
+[Intro – no vocals, building]
+
+[Final]
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+"Haeun, why so cold, did the night shift steal your heart?"
+That's what you said, so let me take it from the start
+Every time you start, I'm the one who has to finish
+You play, I pay. That's the difference.
+You don't know what I need, you don't know what I've seen
+Stay up on your stage, I'll stay down at the machine
+Call me stiff, call me slow, say I live by the clock
+BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
+
+[Ending]
+(one huge 808 hit, then silence)
+```
