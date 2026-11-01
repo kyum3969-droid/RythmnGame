@@ -1059,7 +1059,10 @@ const LEVELS = [
     lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, vibe: [[72, 104]], doze: [[40, 62.5]], unplug: [[104, 999]], unplugMuffle: false,
     // the row: she crosses to the stairs at the upper belt's left end and climbs to his deck, stands with him, pulls his earbud
     // out at the record scratch, shoves him back along his deck (he stares, then walks back to his belt) and goes back down
-    visit: { go: [95.5, 99.5], back: [126, 128], yank: 104, shove: 122.3, ret: [128.5, 130.5] },
+    visit: { go: [95.5, 99.5], back: [126, 128], yank: 104, shove: 122.3, ret: [128.5, 130.5], taps: [115, 116, 117, 118] },   // taps: her four hits on his belt, dead on the beat, in the silence (리듬? …이게 박이야)
+    // the dropped box that knocks hers off (94): his slips as the others do, but lands on her box riding to 95 and the two of
+    // them go over the front of her belt onto the floor, where they lie until the stage; neither is in the chart (drawKnock)
+    knock: { at: 94, hers: 95 },
     stairs: { x: 86, dx: -2, dy: 7, steps: 4 },   // at the upper belt's left end, from his deck down to the floor
     metalShift: 3, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
     hitKit: 'ticktock', bareBand: true, crowdClap: [[70, 74], [98, 104]],   // the crowd clapping along (bars)
@@ -1140,7 +1143,7 @@ const LEVELS = [
     bars2: [
       '........', '........', '........', '......d.', 'h===..x.', 'x.x.x...', '........', '..d.....',
       'x...x...', 'h===....', '........', '........', '........', '........', '........', '........',
-      '..x.x...', 'x.x...d.', '........', '........', 'x.d.x...', 'x.d.x.d.', 'h===..x.', 'x.d.x.d.',
+      '..x.x...', 'x.x...d.', '........', '........', 'x.d.x...', 'x.d.x.d.', 'h===..x.', 'x.d.....',
       '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........', '........', '........', '..d...d.', '....d.d.', '........', '........',
       'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.', 'x...x...', 'x.x.x...', 'h===..x.', 'x.x.x.x.',
@@ -1159,16 +1162,18 @@ const LEVELS = [
           // his "3-pointer" misses and lands on her belt: the rule, shown
           [12, '형, 이거 봐요. 3점—', 2, 0, 'j'], [14.5, '앗… 죄송! 손이 미끄러졌어요.', 2.5, 0, 'j'], [17.5, '…', 1.5, 1, 'h'],
           // his plans out loud; hers is one word (what she has room for is shown, never said)
-          [21, '형, 저 이 곡으로 대회 나갈 거예요!', 3.5, 0, 'j'], [25, '누나는 쉬는 날 뭐 해요?', 2.5, 0, 'j'], [28, '…일.', 1.5, 1, 'h'], [30, '(시계를 본다)', 2, 1, 'h'],
+          [19, '(하암…) 이거 만드느라 어제 밤샜거든요.', 2.4, 0, 'j'], [21.5, '형, 저 이 곡으로 대회 나갈 거예요!', 3.3, 0, 'j'], [25, '누나는 쉬는 날 뭐 해요?', 2.5, 0, 'j'], [28, '…일.', 1.5, 1, 'h'], [30, '(시계를 본다)', 2, 1, 'h'],
           [41, '(꾸벅…)', 2.5, 0, 'j'], [47, '…지우?', 2, 1, 'h'], [53, '하… 진짜.', 2.5, 1, 'h'], [58.5, '(드르렁…)', 2, 0, 'j'],
           [61, '…야. 지우.', 1.5, 1, 'h'], [62.5, '넵! 안 잤어요!', 2.5, 0, 'j'], [66, '침이나 닦아.', 2, 1, 'h'],
           [73, '(흥얼흥얼) 여기서 드롭…!', 3.5, 0, 'j'], [81, '이어폰 빼.', 2, 1, 'h'], [83, '한 곡만요, 딱 한 곡만!', 3, 0, 'j'],
-          [88.5, '야. 네 거 다 내 쪽으로 떨어지잖아.', 3, 1, 'h'], [92, '…제대로 안 해?', 2.5, 1, 'h'],
+          [88.5, '야. 네 거 다 내 쪽으로 떨어지잖아.', 3, 1, 'h'], [94.4, '…제대로 안 해?', 1.6, 1, 'h'],
           // the row on his deck ('v' her beside him)
           [100, '야.', 1.5, 0, 'v'], [104, '(이어폰 줄을 확 잡아뺀다)', 2, 0, 'v'],
-          [106, '…아, 진짜. 누나, 왜 그래요?', 2.5, 0, 'j'], [108.5, '네가 던진 거, 누가 받는 줄 알아?', 3, 0, 'v'],
-          [111.5, '몇 개 떨어진 거 갖고… 저도 제 리듬이 있다구요.', 3.5, 0, 'j'], [115, '…네 리듬 때문에 내 박이 다 꼬여.', 2.5, 0, 'v'],
-          [117.5, '누나는 맨날 박, 시계, 박, 시계… 숨 막혀요.', 3, 0, 'j'], [120.5, '…꺼져, 그냥.', 1.5, 0, 'v'], [122, '(지우를 확 밀쳐낸다) 비켜.', 2, 0, 'v'],
+          [106, '…아, 진짜. 누나, 왜 그래요?', 2, 0, 'j'], [108, '네가 던진 거, 누가 받는 줄 알아?', 2.5, 0, 'v'],
+          [110.5, '몇 개 떨어진 거 갖고… 저도 제 리듬이 있다구요.', 3, 0, 'j'], [113.5, '리듬?', 1.3, 0, 'v'],
+          // (115-118: she taps the belt four times, dead on the beat, in the silence: visit.taps)
+          [118.5, '…이게 박이야. 네가 못 맞추는 거.', 2, 0, 'v'], [120.5, '…박, 시계, 박, 시계. 숨 막혀요.', 1.8, 0, 'j'],
+          [122, '(지우를 확 밀쳐낸다) 꺼져, 그냥.', 2, 0, 'v'],
           [124.5, '…어?', 1.5, 0, 'k'], [126.5, '…와. 진짜 밀었어요?', 2.5, 0, 'k'],
           // back at his belt he answers with a beat: the battle
           [129, '좋아요. 그럼 박으로 해요.', 2.5, 0, 'j'], [132, '누나 박이 그렇게 잘났으면, 따라와 봐요!', 3, 0, 'j'],
@@ -2410,7 +2415,9 @@ function drawVisit(b, nowMs) {
   const v = visitAt(b); if (!v) return;
   // she lunges into the shove
   const lunge = L.visit.shove != null && b >= L.visit.shove - 0.3 && b < L.visit.shove + 0.6 ? Math.round(Math.sin((b - L.visit.shove + 0.3) / 0.9 * Math.PI) * 4) : 0;
-  drawHaeunAt(Math.round(v.x) + (v.right ? lunge : -lunge), Math.round(v.top), nowMs, v.walk ? { step: Math.floor(nowMs / 150) % 2, mirror: v.right } : v.yank != null ? { tap: v.yank, mirror: v.right } : { rest: true, mirror: v.right });
+  // her taps on his belt (visit.taps): the hand comes down on each beat; a tock, a little '똑' over the belt
+  let tp = null; for (const tb of (L.visit.taps || [])) { if (b >= tb - 0.25 && b < tb + 0.3) tp = Math.max(0, 1 - Math.abs(b - tb) / 0.3); if (b >= tb && b < tb + 0.5 && ctx && !(FX.tapsFx || (FX.tapsFx = {}))[tb]) { FX.tapsFx[tb] = true; const T = ctx.currentTime; osc('sine', 820, T, 0.001, 0.14, 0.05, bus); noise(T, 'bandpass', 1300, 0.22, 0.04, 2.2, bus); noise(T, 'lowpass', 400, 0.12, 0.03, 0.7, bus); FX.pops = (FX.pops || []).concat([{ x: Math.round(v.x) + 16, y: Math.round(v.top) + 26, at: nowMs, text: '똑' }]); } }
+  drawHaeunAt(Math.round(v.x) + (v.right ? lunge : -lunge), Math.round(v.top), nowMs, v.walk ? { step: Math.floor(nowMs / 150) % 2, mirror: v.right } : v.yank != null ? { tap: v.yank, mirror: v.right } : tp != null ? { tap: tp, mirror: v.right } : { rest: true, mirror: v.right });
   if (L.visit.yank != null && b >= L.visit.yank && b < L.visit.yank + 0.4 && ctx && !FX.yankFx) { FX.yankFx = true; noise(ctx.currentTime, 'bandpass', 3000, 0.2, 0.05, 2, bus); }
 }
 function drawTosses(t) {
@@ -2982,6 +2989,36 @@ function drawDropFall(n, t, nowMs) {
     if (!reduce) spawn(xe, BELT_Y - 2, 12, ['#8a7a68', '#6d6052', '#b8a890'], -70, 70, -70, -20, 260, 520); }
 }
 // the little comic words over the belts (툭!) and his '!' when a box gets away from him
+// 1-5: the dropped box that knocks hers off. One of his slips (K.at) flies as the others do, but lands on her box riding to K.hers
+// instead of the empty belt: both go over the front of her belt and onto the floor, where they lie until the stage turn.
+// Neither is in the chart; both are drawn here.
+function drawKnock(t, nowMs) {
+  const K = L.knock, b = beatAt(t); if (b < K.hers - TRAVEL - 0.1 || b >= (L.stage ? L.stage.from : 999)) return;
+  const arr = timeAt(K.hers), tHit = timeAt(K.at), tFall = tHit - SPB, tumble = 0.9 * SPB;
+  const hers = { w: 19, h: 14, lane: 1 }, his = { w: 17, h: 13, lane: 0, drop: true };
+  const xe = SCAN_X + (tHit - arr) * SPEED;   // where hers is when his lands on it
+  if (t < tHit) {
+    if (t >= arr - TRAVEL * SPB) drawBox(hers, SCAN_X + (t - arr) * SPEED, BELT_Y, '', t);   // hers rides the lower belt like any box
+    if (t >= tFall) {   // his: out of his hands at the upper belt's loading end, up and over in a big spinning arc, onto hers
+      if (!FX.knockFx) { FX.knockFx = 1; FX.slipAt = nowMs; if (ctx) { const T = ctx.currentTime; const o = osc('sine', 320, T, 0.004, 0.09, 0.22, bus); o.frequency.exponentialRampToValueAtTime(900, T + 0.18); noise(T, 'bandpass', 1500, 0.12, 0.2, 1.4, bus); } }
+      const p = (t - tFall) / SPB, x0 = farX(PLACE_X), y0 = farY(BELT_Y) - 6, x = lerp(x0, xe, p), y = lerp(y0, BELT_Y - hers.h, p * p) - Math.sin(Math.PI * p) * 40, k = lerp(FAR.k, 1, p);
+      g.save(); g.translate(x, y); g.rotate(p * Math.PI * 3); g.scale(k, k); drawBox(his, 0, 0, '', t); g.restore();
+    }
+    return;
+  }
+  if (FX.knockFx === 1) {   // the hit: a crack, the jolt, dust, '쿵!'
+    FX.knockFx = 2; FX.pops = (FX.pops || []).concat([{ x: xe, y: BELT_Y - 26, at: nowMs, text: '쿵!' }]);
+    if (ctx) { thud(ctx.currentTime, 1); tak(ctx.currentTime, 0.5); noise(ctx.currentTime + 0.08, 'bandpass', 1700, 0.1, 0.25, 1.2, bus); }
+    FX.shakeUntil = Math.max(FX.shakeUntil, nowMs + 200); FX.shakeAmp = Math.max(FX.shakeAmp || 1, 2.4);
+    if (!reduce) spawn(xe, BELT_Y - 4, 14, ['#8a7a68', '#6d6052', '#b8a890'], -80, 80, -80, -20, 260, 560);
+  }
+  // over the front edge and down to the floor, turning; then they lie there, one on its side
+  const p = Math.min(1, (t - tHit) / tumble), FLOOR = BELT_Y + 50;
+  for (const [n, dx, rot, ry] of [[hers, 14, 0.9, 0], [his, -10, -1.6, -4]]) {
+    const x = xe + dx * Math.min(1, p * 1.2), y = p < 1 ? lerp(BELT_Y - 2, FLOOR + ry, p * p) - Math.sin(Math.PI * Math.min(1, p * 1.3)) * 12 : FLOOR + ry;
+    g.save(); g.translate(x, y); g.rotate(rot * Math.min(1, p)); drawBox(n, 0, 0, '', t); g.restore();
+  }
+}
 function drawPops(nowMs) {
   FX.pops = (FX.pops || []).filter(o => nowMs - o.at < 650);
   g.save(); g.font = '700 10px sans-serif'; g.textAlign = 'center';
@@ -4039,6 +4076,7 @@ function drawScene(t, bt, active, nowMs) {
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
   if (L.toss && active) drawTosses(t);
+  if (L.knock && active) drawKnock(t, nowMs);
   if (L.lanes === 2 && !L.allLit) drawIdleShade(t, nowMs, active);
   if (L.dock) drawDockFront(dockBeat, t, nowMs, active); else if (L.lanes === 2) drawPairBolt(nowMs);
   drawGauge(nowMs);
@@ -5716,7 +5754,7 @@ try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}
 
 function resetRun() {
   notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.jamFx = false; n.tossFx = false; n.dropFx = false; n.slipFx = false; n.slamFx = false; }); BANG.done = false; FX.yankFx = false;
-  FX.particles = []; FX.marks = []; FX.yankFx = false; FX.shoveFx = false; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.splashes = []; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9; FX.goodBoth = -1e9;
+  FX.particles = []; FX.marks = []; FX.yankFx = false; FX.shoveFx = false; FX.knockFx = 0; FX.tapsFx = {}; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.splashes = []; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9; FX.goodBoth = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
   rings = []; heavyPend = null;
 }
