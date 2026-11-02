@@ -762,30 +762,41 @@ const LEVELS = [
     // on the left, '2' = 마르코's on the right, 'x' both; 16 cells a bar). Charted from the stems (Demucs): the left hand on
     // the kick on 1 and 3 (every beat in the finale) and the bass's strongest push; the right on the claps on 2 and 4 and the
     // horns' strongest offbeats (two in the choruses); stops and the bass-less breakdown thinned. B bars 2-9 are the lesson.
-    mid: { at: 56, zoom: [57, 62], keys: 68, from: 18, guide: [64, 88], tags: [72, 96, 104], boombox: 63.5, bars: [
-      '1.......1.......', '1.......1.......', '....2.......2...', '....2.......2...',
-      '1...2...1...2...', '1...2...1...2...', 'x.......1...2...', 'x...2...x...2...',
-      '12..2.1.1...2...', '1...2..21.1.2...', '1.2.2.1.1...2...', '1...2.1.1...2...',
-      '1.2.2...1...2...', '1.2.2.1.1...2...', '12..2.1.1...2...', '1...2..21.1.2...',
-      '1.2.2...1...2...', '1...2...1...2...', '1...2...1...2...', '1.2.2...1...2...',
-      '1...2...1...2...', '1.2.2...1...2...', '1...2...1...2...', '1.......1.......',
-      '....2...1...2.1.', '1.2.2..21...2.1.', '1...2...1.1.2.2.', '12..2...1...2.1.',
-      '1.2.2...1...2.2.', '12..2...1...2.1.', '1...2..21...2..2', '1...2...1.1.2...',
-      '..2.2...1...2.2.', '1.2.2.2.1...2.1.', '1.2.2.1.1...2..2', '1.2.2.1.1.2.2...',
-      '1...2...1.1.2.2.', '1.2.2...1...2...', '....2...1.......', '........1...2...',
-      '1...2...1...2.1.', '1...2...1...2.1.', '12..2...1...2...', '1...2..21.1.2...',
-      '1...2...1...2...', '1...2...1...2.1.', '1.2.2...1...2...', '1...2...1...2...',
-      '1.2.2...1...2...', '12..2...1...2...', '1...2...1.1.2...', '1...2.1.1...2...',
-      '1.2.2.1.1...2...', '12..2.1.1...2...', '1...2...1...2...', '1...........2...',
-      '1...2...1...2...', '1...2...1...2...', '1...2...1...2...', '1...2.......2...',
-      '1...2...1...2...', '1...2...1...2...', '1...2...1...2...', '1...2...1...2...',
-      '....2.......2...', '1...2.......2...', '....2.......2...', '1...2.......2...',
-      '1...2.......2...', '1...2...1...2...', '1...2...1...2...', '1...2.......2...',
-      '....2...1.1.2...', '1.1.2...1...2...', '1...2...1.1.2...', '1...2.2.1.1.2...',
-      '1...2...1.1.2...', '1.1.2...1...2...', '1...2...1...2...', '1...2...1...2...',
-      '1...............', '............2...', '1...........2...', '............2...',
-      '1...x...1...x...', '1...x...1...x...', '1...x...1...x...', '12..x...1...x...',
-      '................'
+    // the whole night is drawn on the floor renderer (at 0): the upper belt of line 3 (하은's) stands idle in phase 1. Over
+    // `zoom` the camera pulls back on all four lines; the keys split at `keys`; the chart is from bar 0 ('1' left lower =
+    // 반장's, '2' right lower, '3' left upper, '4' right upper; 16 cells a bar). 마르코 runs the route (rl, ru, lu, ll, c
+    // beside you) and throws the boxes he loads; the radio dies at `radio`; while he talks (`talk`) the camera comes in.
+    // A STAND-IN CHART on the current songs, to be redone on the new funk.
+    mid: { at: 0, zoom: [57, 62], keys: 68, from: 0, radio: 56, boombox: 63.5, talk: [298, 356], guide: [64, 84], tags: [72, 80, 88],
+      route: [[56, 'rl'], [69, 'rl'], [85, 'ru'], [101, 'lu'], [117, 'll'], [133, 'rl'], [149, 'ru'], [165, 'lu'], [181, 'rl'], [197, 'ru'], [213, 'lu'], [229, 'rl'], [245, 'ru'], [261, 'lu'], [277, 'rl'], [294, 'c'], [357, 'rl'], [365, 'ru'], [373, 'lu'], [381, 'rl'], [389, 'ru'], [397, 'lu'], [405, 'rl'], [413, 'ru']],
+      bars: [
+      '................', '1.......1.......', '1.......1.......', '1.......1.......',
+      '1.......1.......', '1.......1.......', '1.......1.......', '1.......1.......',
+      '1.......1.......', '1...1...1.......', '1.......1.......', '1.....1.1.......',
+      '1.1.....1.......', '................', '................', '................',
+      '................', '................', '....2.......2...', '2...2...2...2...',
+      '2...2...2...2...', '2...2...2...2...', '....4.......4...', '4...4...4...4...',
+      '4...4...4...4...', '4...4...4...4...', '....3.......3...', '3...3...3...3...',
+      '3...3...3...3...', '3...3...3...3...', '....1.......1...', '1...1...1...1...',
+      '1...1...1...1...', '1...1...1...1...', '1.2.2...1...2...', '1...2...1...21..',
+      '1.2.2...1...2...', '1.2.2...1...2...', '1...4...1...4...', '1.4.4...1...4...',
+      '1...4...1...4...', '1...4.......4...', '....3...1...3.1.', '1...3..31...3.1.',
+      '1...31..1...3...', '131.3...1...3...', '1...2...1..12...', '12..2...1...2.1.',
+      '1...2...1..12...', '1...2...1.1.2...', '..4.4...1...4...', '1...4...1..14...',
+      '1.4.4...1...41..', '1.4.4.1.1...4...', '1...3...1...313.', '1.3.3...1...3...',
+      '1...3...1...3...', '....3.......3...', '1...2...1...2.1.', '1...2...1...2.1.',
+      '12..2...1...2...', '1...2..21.1.2...', '1...4...1...41..', '1...4...1...4.1.',
+      '1.4.4...1...4...', '1...4...1...4...', '1.3.3...1...3...', '13..3...1...3...',
+      '1...3...1.1.3...', '1...3.1.1...3...', '1.2.2.1.1...2...', '12..2.1.1...2...',
+      '1.2.2...1...2...', '12..2...1...2...', '1...............', '1.......1.....1.',
+      '1...............', '1.......1.1.....', '1...............', '1.......1....1..',
+      '1...............', '1.......1.......', '1..1............', '1.......1.......',
+      '1...............', '1.......1.....1.', '1...............', '1.......1.......',
+      '1...............', '1.......1.......', '....2...1..12...', '1.1.2...1...2...',
+      '1...4...1.1.4...', '1...4.4.1.1.4...', '1...3...1...31..', '1.1.3...1...3...',
+      '1...2...1...2...', '1...2...1...2...', '1...4.......4...', '....4.......4.4.',
+      '1...3.......3...', '....3.....3.3...', '1...2...1...2...', '1...2...1...21..',
+      '1...4...1...4...', '14..4...1...4...', '................', '................'
     ] },
     comfort: ['…다음 거.', '손 봐, 손.'],
     // the phases on screen: line 3's lamps broken until the drop (broken, gloom), line 4's lamps clicking on as it is revealed
@@ -802,48 +813,19 @@ const LEVELS = [
     sections: [[0, 'intro'], [1, 'a1'], [14, 'build'], [18, 'groove'], [42, 'chorus'], [58, 'groove2'], [82, 'breakdown'], [98, 'build2'], [106, 'outro']],
     // phase 1 on the one belt (16 cells a bar), from the blues' stems: the slow pulse on 1 and 3, the bass's push from bar 5,
     // a guitar lick from bar 9; bars 14-17 (the radio dying, the reveal, 마르코's intro) and everything after on the two lines
-    bars: [
-      '................', 'x.......x.......', 'x.......x.......', 'x.......x.......',
-      'x.......x.......', 'x.......x.......', 'x.......x.......', 'x.......x.......',
-      'x.......x.......', 'x...x...x.......', 'x.......x.......', 'x.....x.x.......',
-      'x.x.....x.......', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................',
-      '................', '................', '................', '................'
-    ],
+    bars: Array(108).fill('................'),
     // 'b' 반장, 'v' 마르코 (no speaker: 반장 on line 3 in phase 1, his bubble at the left)
+    // 'b' 반장, 'v' 마르코 (no speaker: 반장 in phase 1, his bubble at the left). Stand-in timings on the current songs.
     say: [[6, '…하나 빠지니까 티 나네.', 3.5], [22, '(시계를 본다) …오늘도 트럭 기다리게 하겠다.', 4],
           [38.5, '(뒤에서 쾅, 쾅) …뭐야, 뒤에서.', 3.5], [50.5, '(또 쾅) …저 소리 뭐냐니까.', 3],
-          [56, '(드릴 소리에 라디오가 죽는다) …라디오까지.', 2],
-          [57, '헤이헤이헤이~! 3라인 여러분, 굿 이브닝!', 3, 0, 'v'], [60, '4라인 에이스! 볼트의 마법사! 마르코 등장!', 3.5, 0, 'v'],
-          [63.5, '일할 땐 음악부터 깔아야죠~ 뮤직, 큐!', 2.5, 0, 'v'], [66, '…마르코. 이게 뭐야.', 2.5, 0, 'b'],
-          [68.5, '우리 쪽 스캔하던 친구가 관뒀어요. 그래서 붙였죠!', 3.5, 0, 'v'],
-          [73, '왼손은 반장님 거!', 3.5, 0, 'v'], [77, '…남의 라인에 볼트를 박아?', 3.5, 0, 'b'],
-          [81, '같이 잘되면 좋잖아요~ 오른손은 내 거!', 4, 0, 'v'], [89, '번갈아! 왼, 오, 왼, 오!', 3.5, 0, 'v'],
-          [93, '…소장한텐 말했고?', 3, 0, 'b'], [97, '같이 오면 양손! …소장님한텐 끝나고 말할게요.', 4.5, 0, 'v'],
-          [105, '오~ 대박. 내가 본 대로야!', 3.5, 0, 'v'], [176, '…빠르긴 하네.', 3, 0, 'b'],
-          [300, '반장님, 내일은 볼트 하나 더 박을게요!', 4, 0, 'v'], [305, '…박지 마.', 2.5, 0, 'b'],
-          [408, '라스트! 신입, 가즈아!', 3, 0, 'v']],
+          [56, '(드릴 불꽃에 라디오가 죽는다) …라디오까지.', 2],
+          [57, '헤이헤이헤이~! 비켜요 비켜!', 3, 0, 'v'], [61, '음악부터 깔고! 뮤직, 큐!', 2.5, 0, 'v'], [66, '…저 양반 뭐야.', 2.5, 0, 'b'],
+          [74, '오른쪽 아래!', 2.5, 0, 'v'], [90, '이번엔 위!', 2.5, 0, 'v'], [106, '여기 비었네? 내가 할게요!', 3, 0, 'v'],
+          [122, '반장님, 옆에 좀 낄게요~', 3, 0, 'v'], [126, '…좁다.', 2.5, 0, 'b'],
+          [300, '(옆으로 와서) 자, 정식으로 인사할게요.', 4, 0, 'v'], [306, '4라인 에이스, 마르코! 취미는 볼트, 특기는 리듬!', 5, 0, 'v'],
+          [314, '우리 쪽 스캔하던 친구가 관뒀거든요. 그래서 라인을 이쪽에 붙였어요.', 5.5, 0, 'v'], [322, '…허락은 받았고?', 3, 0, 'b'],
+          [326, '같이 잘되면 좋잖아요~ 허락은 끝나고!', 4.5, 0, 'v'], [334, '신입, 손 좋던데? 내가 며칠 봤거든.', 4.5, 0, 'v'],
+          [346, '자, 이제 진짜 간다!', 3, 0, 'v'], [380, '…빠르긴 하네.', 3, 0, 'b'], [408, '라스트! 신입, 가즈아!', 3, 0, 'v']],
     intro: [
       { who:'', text:'하은이 그만둔 뒤로 3라인은 늘 늦다. 형광등도 반은 나갔다. 새벽 2시 40분.' },
       { who:'반장', text:'…오늘도 둘이서 간다. 아무 손이나 편한 걸로.' }],
@@ -1411,7 +1393,7 @@ function loadLevel(level) {
   // the four-lane part (L.quad): one note per cell, n.q = the chute (0-3); they are on no belt (lane 0 only for the effects).
   // The two-line part (L.mid) the same with '1' = the left line, '2' = the right, 'x' = both at once
   const QD = level.quad || level.mid;
-  if (QD) QD.bars.forEach((bar, k) => { const div = bar.length / 4; for (let c = 0; c < bar.length; c++) { const beat = (QD.from + k) * 4 + c / div; const ds = level.mid && bar[c] === 'x' ? [0, 1] : ['1234'.indexOf(bar[c])]; for (const d of ds) { if (d < 0) continue; notes.push({ beat, beat0: beat, q: d, quad: true, right: !!level.mid && d === 1, len: 0, lane: 0 }); } } });
+  if (QD) QD.bars.forEach((bar, k) => { const div = bar.length / 4; for (let c = 0; c < bar.length; c++) { const beat = (QD.from + k) * 4 + c / div; const ds = level.mid && bar[c] === 'x' ? [0, 1] : ['1234'.indexOf(bar[c])]; for (const d of ds) { if (d < 0) continue; const q = level.mid ? d % 2 : d; notes.push({ beat, beat0: beat, q, up: !!level.mid && d >= 2, quad: true, right: !!level.mid && q === 1, len: 0, lane: 0 }); } } });
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
   // jams: a run of 'j' boxes (half a beat apart or closer) piles up behind the stuck roller and is let go one by one
   if (level.jam) { let grp = []; const flush = () => { grp.forEach((n, k) => { n.jk = k; n.jg = grp; }); grp = []; };
@@ -3499,90 +3481,144 @@ const MID = { ax: PLAYER_X, ww: 2 * PLAYER_X, wh: 432, oy: 108 };
 let midCv = null, midG = null;
 // (the far ends are trimmed a little and the view sits a touch higher, so the floor fills the screen). sEnd: the pulled-back
 // scale, rounded so that at the screen's real resolution one dot of the floor is a whole number of device pixels
-function midView(b, sEnd) { const z = L.mid.zoom, e = b < z[0] ? 0 : b >= z[1] ? 1 : ease((b - z[0]) / (z[1] - z[0])); return { s: lerp(1, sEnd, e), cx: lerp(W / 2, MID.ax, e), cy: lerp(H / 2, H / 2 - 12, e), e }; }
+function midView(b, sEnd) {
+  const z = L.mid.zoom, e = b < z[0] ? 0 : b >= z[1] ? 1 : ease((b - z[0]) / (z[1] - z[0]));
+  let s = lerp(1, sEnd, e), cx = lerp(W / 2, MID.ax, e), cy = lerp(H / 2, H / 2 - 12, e);
+  // while 마르코 introduces himself beside you the camera comes in on the two of you, and goes back out after
+  const tk = L.mid.talk; if (tk && b >= tk[0] && b < tk[1] + 2) { const f = ease(Math.min(1, (b - tk[0]) / 2, (tk[1] + 2 - b) / 2)); s = lerp(s, 0.95, f); cx = lerp(cx, MID.ax + 20, f); cy = lerp(cy, H / 2 + 6, f); }
+  return { s, cx, cy, e };
+}
 const cvHi = document.getElementById('cvhi'), gHi = cvHi.getContext('2d');
+// 마르코's corners in the floor's coordinates: the lower ends of the two lines (rl, and ll squeezed in beside 반장), the upper
+// belts' loading ends behind them (ru, lu; he stands lower there, the upper belt hides his legs), and c, beside you
+const MARCO_SPOTS = () => ({ rl: { x: MID.ww - BOSS_X, dy: 0, mir: true }, ru: { x: MID.ww - (BOSS_X + LANE_DX[0] + 22), dy: -22, mir: true },
+  lu: { x: BOSS_X + LANE_DX[0] + 22, dy: -22, mir: false }, ll: { x: 22, dy: 0, mir: false }, c: { x: MID.ax + 64, dy: -2, mir: true } });
+const midSpotAt = bb => { let sp = L.mid.route[0][1]; for (const [rb, s] of L.mid.route) if (bb >= rb) sp = s; return sp; };
+function midMarco(b) {
+  const R0 = L.mid.route, S = MARCO_SPOTS(); let i = 0; for (let k = 0; k < R0.length; k++) if (b >= R0[k][0]) i = k;
+  const cur = S[R0[i][1]], prev = S[R0[Math.max(0, i - 1)][1]], p = i === 0 ? 1 : Math.min(1, (b - R0[i][0]) / 1.5), e = ease(p);
+  const up = (cur.dy < -10 && p > 0.6) || (prev.dy < -10 && p < 0.4);
+  return { x: lerp(prev.x, cur.x, e), dy: lerp(prev.dy, cur.dy, e), mir: p < 0.5 ? prev.x > cur.x || (prev.x === cur.x && prev.mir) : cur.mir, walking: p < 1, up, spot: R0[i][1] };
+}
 function drawMid(t, nowMs, active) {
-  const F = L.phaseFx, bReal = active ? beatAt(t) : END_BEAT, live = active || state === 'outro' || state === 'result';
+  const F = L.phaseFx, M = L.mid, bReal = active ? beatAt(t) : castBeatAt(t, active), live = active || state === 'outro' || state === 'result';
   // the last hit holds the picture still for a moment (a hitstop) before the lights start going out
-  const frozen = F && active && bReal >= F.last && bReal < F.last + 1.2, b = frozen ? F.last : bReal, T = frozen ? timeAt(F.last) : active ? t : timeAt(END_BEAT), AX = MID.ax;
+  const frozen = F && active && bReal >= F.last && bReal < F.last + 1.2, b = frozen ? F.last : bReal, T = frozen ? timeAt(F.last) : active ? t : live ? timeAt(END_BEAT) : 0, AX = MID.ax, WW = MID.ww;
   if (!midCv) { midCv = document.createElement('canvas'); midCv.width = MID.ww; midCv.height = MID.wh; midG = midCv.getContext('2d'); }
   const g0 = g; g = midG; g.setTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
   // above and below the 216 px the screen used to show: the dark of the roof and the floor going on
-  g.fillStyle = '#120d0c'; g.fillRect(0, -MID.oy, MID.ww, MID.oy); g.fillStyle = '#18120f'; g.fillRect(0, H, MID.ww, MID.wh - MID.oy - H);
-  for (let x = 0; x < MID.ww; x += 14) R(x, 200, 8, 3, '#c99a1e');
-  const ph = b - Math.floor(b);
-  const carryOf = q => { for (const n of notes) { if (!n.quad || n.q !== q) continue; const k = (T - (n.place - n.carry)) / n.carry; if (k >= 0 && k < 1) return { n, k }; } return null; };
-  const pk = i => Math.max(0, 1 - (nowMs - QUADFX.press[i]) / 140);
-  // one side of the floor in its own frame (line 3 as it is; line 4 drawn through a mirror): the back (room, loader), then
-  // after you have been drawn, the front (belt, boxes, scanner)
-  const mirror = (q, fn) => { g.save(); if (q) { g.translate(MID.ww, 0); g.scale(-1, 1); } g.beginPath(); g.rect(0, -MID.oy, AX, MID.wh); g.clip(); fn(); g.restore(); };
-  const sideBack = (q, who) => {
-    MID_SIDE = q;
-    g.drawImage(bg, 0, 0);
-    if (who === 'marco') { R(180, 44, 27, 15, '#d9a520'); R(180, 58, 27, 1, '#8a6a12'); ['101', '101', '111', '001', '001'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') R(196 - x * 2, 46 + y * 2, 2, 2, '#1d1815'); })); }
+  g.fillStyle = '#120d0c'; g.fillRect(0, -MID.oy, WW, MID.oy); g.fillStyle = '#18120f'; g.fillRect(0, H, WW, MID.wh - MID.oy - H);
+  for (let x = 0; x < WW; x += 14) R(x, 200, 8, 3, '#c99a1e');
+  const ph = b - Math.floor(b), pk = i => Math.max(0, 1 - (nowMs - QUADFX.press[i]) / 140);
+  const marco = midMarco(b);
+  // who loads a box: 반장 the left lower line's, unless 마르코 has squeezed in there; 마르코 throws all the rest from wherever he is
+  const bossLoads = n => n.q === 0 && !n.up && midSpotAt(n.place ? beatAt(n.place) : n.beat) !== 'll';
+  let held = null;
+  if (live) for (const n of notes) { if (!n.quad || !bossLoads(n)) continue; const k = (T - (n.place - n.carry)) / n.carry; if (k >= 0 && k < 1) { const f = { x: 16, y: 112 }, x = lerp(f.x, PLACE_X, k), y = lerp(f.y, BELT_Y - n.h / 2, ease(k)) - Math.sin(Math.PI * k) * 14; held = { n, x, y }; break; } }
+  const mirror = (q, fn) => { g.save(); if (q) { g.translate(WW, 0); g.scale(-1, 1); } g.beginPath(); g.rect(0, -MID.oy, AX, MID.wh); g.clip(); fn(); g.restore(); };
+  // the back of each side: the room, its lamps (line 3's broken until the drop), the radio on line 3's stack, 마르코's boombox
+  const back = q => {
+    MID_SIDE = q; g.drawImage(bg, 0, 0);
+    if (q === 1) { R(180, 44, 27, 15, '#d9a520'); R(180, 58, 27, 1, '#8a6a12'); ['101', '101', '111', '001', '001'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') R(196 - x * 2, 46 + y * 2, 2, 2, '#1d1815'); })); }
     drawLights(nowMs / 1000, T, active); MID_SIDE = 0;
-    // the loader at the far end, setting each box down
-    const c = live ? carryOf(q) : null, pose = { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: active && ph < 0.18 ? 1 : 0, nod: 0, doze: false, phone: false, lane: q === 0 ? 0 : 2 };
-    let held = null;
-    if (c) { const f = { x: 16, y: 112 }, x = lerp(f.x, PLACE_X, c.k), y = lerp(f.y, BELT_Y - c.n.h / 2, ease(c.k)) - Math.sin(Math.PI * c.k) * 14; held = { n: c.n, x, y }; pose.hand = { x: x - c.n.w / 2 + 1, y: y + 2 }; }
-    FX.react[2] = FX.react[2] || { type: '', at: nowMs };
-    drawActor(who, BOSS_X, false, pose, nowMs, active, () => PARTNERS[who].arm(pose));
-    if (q === 1 && L.mid.boombox != null && bReal >= L.mid.boombox) {
-      const x = 4, y = 106, pump = bReal >= L.mid.boombox + 0.5 ? Math.max(0, 1 - (bReal % 1) * 3) : 0;
+    const x = 4, y = 106;
+    if (q === 0 && M.radio) {
+      // an old radio, its dial glowing while the blues plays; the drill's spark kills it
+      const on = live ? bReal < M.radio : true;
+      R(x + 18, y - 9, 1, 9, '#3a332c'); R(x, y, 24, 12, '#6b4a2e'); R(x, y, 24, 1, '#8a6a42'); R(x + 2, y + 3, 9, 5, '#2a1a10');
+      if (on) { R(x + 3, y + 4, 7, 3, '#f0a040'); R(x + 3 + Math.floor((nowMs / 900) % 6), y + 4, 1, 3, '#fff0c0'); }
+      for (let k = 0; k < 3; k++) R(x + 14 + k * 3, y + 3, 2, 6, '#3a2a1c');
+      if (live && bReal >= M.radio - 0.4 && bReal < M.radio + 0.3 && !reduce) { g.globalAlpha = 0.9; R(x + 12 + Math.round(Math.random() * 6), y - 6 + Math.round(Math.random() * 4), 2, 2, '#fff6c0'); R(x + 8 + Math.round(Math.random() * 10), y - 3, 1, 1, '#ffd060'); g.globalAlpha = 1; }
+    }
+    if (q === 1 && M.boombox != null && bReal >= M.boombox) {
+      const pump = bReal >= M.boombox + 0.5 ? Math.max(0, 1 - (bReal % 1) * 3) : 0;
       R(x + 6, y - 4, 12, 1, '#2a2d33'); R(x + 6, y - 4, 1, 4, '#2a2d33'); R(x + 17, y - 4, 1, 4, '#2a2d33');
       R(x, y, 24, 12, '#1b1b1f'); R(x, y, 24, 1, '#3a3d45');
-      for (const sx of [x + 2, x + 16]) { R(sx, y + 3, 6, 6, '#2a2d33'); R(sx + 1 - (pump > 0.5 ? 1 : 0), y + 4 - (pump > 0.5 ? 1 : 0), 4 + (pump > 0.5 ? 2 : 0), 4 + (pump > 0.5 ? 2 : 0), '#4a4d55'); R(sx + 2, y + 5, 2, 2, '#14151a'); }
+      for (const sx of [x + 2, x + 16]) { const o = pump > 0.5 ? 1 : 0; R(sx, y + 3, 6, 6, '#2a2d33'); R(sx + 1 - o, y + 4 - o, 4 + 2 * o, 4 + 2 * o, '#4a4d55'); R(sx + 2, y + 5, 2, 2, '#14151a'); }
       R(x + 10, y + 3, 4, 2, pump > 0.3 ? '#8fe3f0' : '#3d6b78'); R(x + 10, y + 7, 4, 1, '#d8463b');
     }
-    held_[q] = held;
   };
-  const held_ = [null, null];
-  const sideFront = q => {
-    BELT_L = 48; drawScannerBack(0); drawBeltTop(T, live);
-    if (live) drawLaserGlow(Math.max(0, 1 - (nowMs - QUADFX.press[q]) / 160) * 0.6);
+  // one belt of one side: the upper one drawn further back (smaller, raised, as in 1-4), the lower one as line 3 always was.
+  // A scanned box rides on to the end and drops into the cart between the lines; a missed one tumbles off the end
+  const flashOf = (q, up) => live && notes.some(n => n.quad && n.q === q && !!n.up === up && n.state === 'hit' && T - n.hitAt < 0.16) ? 1 : 0;
+  const missOf = (q, up) => live && notes.some(n => n.quad && n.q === q && !!n.up === up && n.state === 'miss' && T - n.hitAt < 0.25);
+  const belt = (q, up) => {
+    BELT_L = up ? 14 : 48; g.save(); if (up) { g.translate(0, LANE_DY[0]); farXform(); }
+    drawScannerBack(0); drawBeltTop(T, live);
+    if (live) drawLaserGlow(flashOf(q, up) * 0.6);
+    const end = up ? SCAN_X + (AX - 8 - SCAN_X) / FAR.k : AX - 8;
     if (live) for (const n of notes) {
-      if (!n.quad || n.q !== q || T < n.place) continue;
-      let x = noteX(n, T);
-      if (n.state === 'hit') { const end = AX - 8; if (x < end) drawBox(n, x, BELT_Y, '', T, T - n.hitAt < 0.1 ? 0.8 : 0); else { const dt = (x - end) / SPEED; if (dt < 0.5) { g.globalAlpha = 1 - dt / 0.5; drawBox(n, end, BELT_Y + 0.5 * 900 * dt * dt, '', T); g.globalAlpha = 1; } } continue; }
-      if (n.state === 'miss') { const end = AX - 8; if (x < end) drawBox(n, x, BELT_Y, 'miss', T); else { const dt = (x - end) / SPEED; if (dt < 0.6) { g.save(); g.globalAlpha = 1 - dt / 0.6; g.translate(end, BELT_Y + 0.5 * 700 * dt * dt - n.h / 2); g.rotate(dt * 5); drawBox(n, 0, n.h / 2, 'miss', T); g.restore(); } } continue; }
+      if (!n.quad || n.q !== q || !!n.up !== up || T < n.place) continue;
+      const x = noteX(n, T);
+      if (n.state === 'hit') { if (x < end) drawBox(n, x, BELT_Y, '', T, T - n.hitAt < 0.1 ? 0.8 : 0); else { const dt = (x - end) / SPEED; if (dt < 0.5) { g.globalAlpha = 1 - dt / 0.5; drawBox(n, end, BELT_Y + 0.5 * 900 * dt * dt, '', T); g.globalAlpha = 1; } } continue; }
+      if (n.state === 'miss') { if (x < end) drawBox(n, x, BELT_Y, 'miss', T); else { const dt = (x - end) / SPEED; if (dt < 0.6) { g.save(); g.globalAlpha = 1 - dt / 0.6; g.translate(end, BELT_Y + 0.5 * 700 * dt * dt - n.h / 2); g.rotate(dt * 5); drawBox(n, 0, n.h / 2, 'miss', T); g.restore(); } } continue; }
       drawBox(n, x, BELT_Y, '', T);
     }
-    const held = held_[q]; if (held) drawBox(held.n, held.x, held.y + held.n.h / 2, '', T);
-    drawBeltFront(T);
-    drawScannerFront(Math.max(0, 1 - (nowMs - QUADFX.press[q]) / 160) * (live && notes.some(n => n.quad && n.q === q && n.state === 'hit' && T - n.hitAt < 0.16) ? 1 : 0), false, live && notes.some(n => n.quad && n.q === q && n.state === 'miss' && T - n.hitAt < 0.25), 0);
+    if (!up && q === 0 && held) drawBox(held.n, held.x, held.y + held.n.h / 2, '', T);
+    drawBeltFront(T); if (up) drawBeltLegs();
+    drawScannerFront(flashOf(q, up), false, missOf(q, up), 0);
+    g.restore(); BELT_L = 48;
   };
-  mirror(0, () => sideBack(0, 'boss')); mirror(1, () => sideBack(1, 'marco'));
-  // you, between the two scanners (the belts in front hide your legs)
+  // 마르코, where the route has him: walking between corners, throwing the boxes he loads
+  const toss = live ? notes.find(n => n.quad && !bossLoads(n) && T >= n.place - 0.3 && T < n.place + 0.05) : null;
+  const drawMarco = () => {
+    const pose = { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: active && (marco.walking ? ph < 0.5 : ph < 0.18) ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
+    if (toss) pose.hand = { x: BOSS_X + 16, y: 104 };
+    if (marco.spot === 'c' && !marco.walking && active) pose.hand = { x: BOSS_X + 14, y: 100 + Math.round(Math.sin(nowMs / 160) * 3) };   // waving it about as he talks
+    FX.react[2] = FX.react[2] || { type: '', at: nowMs };
+    g.save(); if (marco.up) { g.beginPath(); g.rect(0, -MID.oy, WW, farY(BELT_Y) + 2 + MID.oy); g.clip(); }
+    g.translate(0, Math.round(marco.dy)); drawActor('marco', Math.round(marco.x), marco.mir, pose, nowMs, active, () => PARTNERS.marco.arm(pose)); g.restore();
+  };
+  mirror(0, () => back(0)); mirror(1, () => back(1));
+  if (marco.up) drawMarco();
+  mirror(0, () => belt(0, true)); mirror(1, () => belt(1, true));
+  // 반장 at line 3's lower end, carrying his boxes
+  mirror(0, () => {
+    const pose = { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: active && ph < 0.18 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 0 };
+    if (held) pose.hand = { x: held.x - held.n.w / 2 + 1, y: held.y + 2 };
+    drawActor('boss', BOSS_X, false, pose, nowMs, active, () => PARTNERS.boss.arm(pose));
+  });
+  if (!marco.up) drawMarco();
   drawPlayer(Math.max(pk(0), pk(1)), nowMs);
-  mirror(0, () => sideFront(0)); mirror(1, () => sideFront(1));
+  mirror(0, () => belt(0, false)); mirror(1, () => belt(1, false));
+  // a thrown box in the air, from his hands to the belt it is meant for
+  if (toss) {
+    const k = Math.max(0, Math.min(1, (T - (toss.place - 0.3)) / 0.3)), side = toss.q ? -1 : 1, fx = marco.x + side * 10 * (marco.mir ? -1 : 1), fy = marco.dy + 104;
+    const px = toss.up ? farX(PLACE_X) : PLACE_X, py = toss.up ? farY(BELT_Y - toss.h / 2) : BELT_Y - toss.h / 2, tx = toss.q ? WW - px : px;
+    const x = lerp(fx, tx, k), y = lerp(fy, py, k) - Math.sin(Math.PI * k) * 22, sc = toss.up ? lerp(1, FAR.k, k) : 1;
+    g.save(); g.translate(x, y); g.rotate(k * 3 * side); g.scale(sc, sc); drawBox(toss, 0, toss.h / 2, '', T); g.restore();
+  }
   // between the lines: the cart catching the scanned boxes (a few on it, more as the night goes)
   const done = live ? notes.filter(n => n.quad && n.state === 'hit').length : 0;
   R(AX - 18, 176, 36, 16, '#3a3f45'); R(AX - 18, 176, 36, 1, '#6a7178'); R(AX - 15, 192, 4, 4, '#1b1716'); R(AX + 11, 192, 4, 4, '#1b1716');
-  for (let k = 0; k < Math.min(8, Math.floor(done / 12)); k++) R(AX - 16 + (k % 4) * 8, 170 - Math.floor(k / 4) * 6, 7, 6, C.kraft);
-  // a gun at each scanner
-  const top = playerTop(0, nowMs), two = b >= L.mid.zoom[0];
-  thick(AX - 5, top + 20, 326 - pk(0) * 4, 120, 4, C.hoodie); drawGun(324 - pk(0) * 4, 117, pk(0));
-  if (two) { thick(AX + 5, top + 20, MID.ww - 326 + pk(1) * 4, 120, 4, C.hoodie); g.save(); g.translate(MID.ww, 0); g.scale(-1, 1); drawGun(324 - pk(1) * 4, 117, pk(1)); g.restore(); }
+  for (let k = 0; k < Math.min(8, Math.floor(done / 16)); k++) R(AX - 16 + (k % 4) * 8, 170 - Math.floor(k / 4) * 6, 7, 6, C.kraft);
+  // your guns: each hand at its side's lower scanner, or up at the upper one when the next box on that side is up there
+  const top = playerTop(0, nowMs), open = b >= M.zoom[0];
+  for (const q of [0, 1]) {
+    if (q === 1 && !open) continue;
+    const nx = live ? notes.find(n => n.quad && n.q === q && n.state === 'pending' && n.arr > T - 0.15) : null, upAim = nx && nx.up && nx.arr - T < 0.6;
+    g.save(); if (q) { g.translate(WW, 0); g.scale(-1, 1); }
+    if (upAim) { thick(AX - 5, top + 20, 320 - pk(q) * 4 + 2, 89, 4, C.hoodie); drawGun(320 - pk(q) * 4, 86, pk(q)); }
+    else { thick(AX - 5, top + 20, 326 - pk(q) * 4, 120, 4, C.hoodie); drawGun(324 - pk(q) * 4, 117, pk(q)); }
+    g.restore();
+  }
   drawParticles(nowMs);
   // the lamps: line 4 dark until its three lamps click on (nearest you first); at the end every lamp goes out from the far
   // ends in, both lines at once, and only the one over you is left
   if (F) {
-    const soft = 18, slices = [[AX, AX + 113], [AX + 113, AX + 226], [AX + 226, MID.ww]];
+    const soft = 18, slices = [[AX, AX + 113], [AX + 113, AX + 226], [AX + 226, WW]];
     // a dark band with soft sides (the light of the next lamp spills over its edge); the floor's own ends stay hard
-    const dark = (x0, x1, a) => { const l = x0 <= 0 ? 0 : soft, r = x1 >= MID.ww ? 0 : soft, gr = g.createLinearGradient(x0 - l, 0, x1 + r, 0), w = x1 - x0 + l + r;
+    const dark = (x0, x1, a) => { const l = x0 <= 0 ? 0 : soft, r = x1 >= WW ? 0 : soft, gr = g.createLinearGradient(x0 - l, 0, x1 + r, 0), w = x1 - x0 + l + r;
       gr.addColorStop(0, `rgba(4,3,5,${l ? 0 : a})`); gr.addColorStop(Math.min(0.5, (2 * l) / w), `rgba(4,3,5,${a})`); gr.addColorStop(Math.max(0.5, 1 - (2 * r) / w), `rgba(4,3,5,${a})`); gr.addColorStop(1, `rgba(4,3,5,${r ? 0 : a})`);
       g.fillStyle = gr; g.fillRect(x0 - l, -MID.oy, w, MID.wh); };
     slices.forEach(([x0, x1], i) => { if (bReal < F.lineOn[i]) dark(x0, x1, 0.82); });
-    const outs = [[[0, AX - 226], [AX + 226, MID.ww]], [[AX - 226, AX - 113], [AX + 113, AX + 226]], [[AX - 113, AX - 40], [AX + 40, AX + 113]]];
+    const outs = [[[0, AX - 226], [AX + 226, WW]], [[AX - 226, AX - 113], [AX + 113, AX + 226]], [[AX - 113, AX - 40], [AX + 40, AX + 113]]];
     outs.forEach((pair, i) => { if (bReal >= F.out[i] || !active && state !== 'play' && live) for (const [x0, x1] of pair) dark(x0, x1, 0.8); });
   }
   g = g0;
   // the camera. Before it moves it draws into the game canvas like any frame; once it pulls back it draws into a canvas the size
-  // of the screen in device pixels laid over it, at a scale where each dot of the floor is a whole number of device pixels, so
-  // the far view stays crisp instead of being squeezed into 384 px
+  // of the screen in device pixels laid over it (each dot of the floor a whole number of device pixels where the framing allows)
   const dpr = window.devicePixelRatio || 1, hw = Math.max(W, Math.round(cv.clientWidth * dpr)), hh = Math.round(hw * H / W), k = hw / W;
-  // (a whole number of device pixels per dot where that keeps the framing; on a small screen the framing wins and the dots are
-  // sampled nearest, still sharp)
   const want = W / (MID.ww - 70), mInt = Math.round(k * want), sEnd = mInt >= 2 && Math.abs(mInt / k - want) / want < 0.06 ? mInt / k : want, V = midView(b, sEnd), sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
   const [jx, jy] = phaseJolt(bReal);
   if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx + jx, sy + jy, sw, sh, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); return; }
@@ -3616,7 +3652,7 @@ function midGuide(b, T, nowMs, v) {
     const a = b < TG[1] ? 1 : Math.max(0, (TG[2] - b) / (TG[2] - TG[1]));
     for (const n of notes) {
       if (!n.quad || n.state !== 'pending' || n.beat < TG[0] || n.beat >= TG[2] || T < n.place) continue;
-      const lx = noteX(n, T), wx = n.q ? MID.ww - lx : lx, x = toX(wx), y = toY(BELT_Y - n.h - 9), w = 15 * u, h = 10 * u;
+      const lx = noteX(n, T), fx = n.up ? farX(lx) : lx, wx = n.q ? MID.ww - fx : fx, x = toX(wx), y = toY(n.up ? farY(BELT_Y - n.h - 9) : BELT_Y - n.h - 9), w = 15 * u, h = 10 * u;
       pill(x, y, w, h, cols[n.q], a); gHi.globalAlpha = a; gHi.fillStyle = `rgb(${cols[n.q]})`; gHi.font = `700 ${Math.round(7 * u)}px sans-serif`; gHi.textAlign = 'center'; gHi.textBaseline = 'middle'; gHi.fillText(n.q ? '▶' : '◀', x, y + 0.5 * u);
     }
   }
@@ -6515,7 +6551,10 @@ let PRESS_SIDE = null;   // which hand pressed (one-button mode), so a long crat
 function onHit(ts, key, lane = 0) {
   const t = songAt(ts) - offsetMs / 1000;
   // a chute (2-1's four lanes): lane 100 + chute
-  if (lane >= 100) { const q = lane - 100, now = performance.now(); lastPress = now; QUADFX.press[q] = now; const tg = findTarget(t, 0, q); if (!tg) { click(ctx.currentTime); return; } judgeNote(tg, t); return; }
+  if (L.mid && lane < 100) lane = 100;   // 2-1 before the floor opens: one belt, any key
+  if (lane >= 100) { const q = lane - 100, now = performance.now(); lastPress = now; QUADFX.press[q] = now; const tg = findTarget(t, 0, q); if (!tg) { click(ctx.currentTime); return; } judgeNote(tg, t);
+    if (L.mid) for (const n of notes) if (n !== tg && n.quad && n.q === q && n.state === 'pending' && Math.abs(n.beat - tg.beat) < 1e-6) judgeNote(n, t);
+    return; }
   if (L.oneButton) {
     PRESS_SIDE = lane === 'L' || lane === 'R' ? lane : null;
     const now = performance.now(); lastPress = now;
