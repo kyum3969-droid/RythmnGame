@@ -118,6 +118,12 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   border:1px solid var(--line);border-radius:3px;padding:.2em .6em;cursor:pointer}
 .dialog .skip:focus-visible{outline:2px solid var(--tube);outline-offset:2px}
 @keyframes blink{50%{opacity:0}}
+/* a held line on the floor (2-1's entrance), as 1-7's cutscene shows its lines: the picture closes into a letterbox and the
+   box sits in the black under it, the name and the line bigger */
+.dialog.cine{left:4cqw;right:4cqw;bottom:3cqw;min-height:16cqw;padding:2cqw 3cqw;box-sizing:border-box;border-color:#3a2f28}
+.dialog.cine .who{font-size:2.5cqw;padding:.08em .5em}
+.dialog.cine .text{font-size:3.3cqw;line-height:1.4}
+.dialog.cine .next{font-size:1.8cqw;right:3cqw;bottom:1.6cqw}
 
 .overlay{position:absolute;inset:0;display:grid;place-items:center;background:rgba(10,8,7,.5);padding:3cqw}
 .label{width:min(100%,60cqw);max-height:100%;overflow:auto;background:var(--paper);color:var(--paper-ink);border-radius:4px;
@@ -3704,11 +3710,11 @@ function drawMid(t, nowMs, active) {
   const want = W / (MID.ww - 70), mInt = Math.round(k * want), sEnd = mInt >= 2 && Math.abs(mInt / k - want) / want < 0.06 ? mInt / k : want, V = midView(b, sEnd), sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
   const [jx, jy] = phaseJolt(bReal);
   MIDCAM = { sx, sy, sw, sh };
-  if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx + jx, sy + jy, sw, sh, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); return; }
+  if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx + jx, sy + jy, sw, sh, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); cineBars(g, W, H); return; }
   if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
   cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#0c0a09'; gHi.fillRect(0, 0, hw, hh);
   gHi.drawImage(midCv, sx + jx / V.s, sy + jy / V.s, sw, sh, 0, 0, hw, hh);
-  phaseLook(gHi, hw, hh, bReal, active);
+  phaseLook(gHi, hw, hh, bReal, active); cineBars(gHi, hw, hh);
   if (active) { midGuide(b, T, nowMs, { sx, sy, sw, sh, hw, hh, k }); midAdlib(nowMs, { sx, sy, sw, sh, hw, hh }); }
   // the game canvas under it still gets the plain floor colour (nothing else shows through)
   g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
@@ -7196,16 +7202,23 @@ function guidePress(ts, key, lane) {
 // line the shift runs on. The clock and the scheduling stop like the guide's hold, so nothing slips; the lamps between run on
 // their own timing.
 const HOLD = { done: new Set() };
+// the letterbox while a line holds: black bars close in over a third of a second (the bottom one deep enough for the box)
+const CINE = { on: false, at: -1e9 };
+function cineBars(c, w, h) {
+  const k0 = Math.min(1, (performance.now() - CINE.at) / 320), k = ease(CINE.on ? k0 : 1 - k0); if (k <= 0) return;
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalCompositeOperation = 'source-over'; c.fillStyle = '#000';
+  c.fillRect(0, 0, w, Math.round(h * 0.05 * k)); c.fillRect(0, Math.round(h - h * 0.36 * k), w, Math.ceil(h * 0.36 * k)); c.restore();
+}
 function holdTick(t) {
   const hs = L.mid && L.mid.holds; if (!hs || GUIDE.on) return;
   const b = beatAt(t); if (b < hs[0][0] - 1) HOLD.done.clear();
   for (const [h, lines] of hs) if (!HOLD.done.has(h) && b >= h && b < h + 0.3) {
     HOLD.done.add(h); Object.assign(GUIDE, { on: true, t: timeAt(h), n: null, side: '', hold: true, at: performance.now() });
-    $('skip').hidden = true; runDialog(lines, holdEnd); break;
+    $('skip').hidden = true; dialogEl.classList.add('cine'); CINE.on = true; CINE.at = performance.now(); runDialog(lines, holdEnd); break;
   }
 }
 function holdPress() { if (performance.now() - GUIDE.at < 300) return; advanceDialog(); }   // not on a press already on its way
-function holdEnd() { $('skip').hidden = false; GUIDE.hold = false; guideResume(); }
+function holdEnd() { $('skip').hidden = false; dialogEl.classList.remove('cine'); if (CINE.on) { CINE.on = false; CINE.at = performance.now(); } GUIDE.hold = false; guideResume(); }
 function holdCancel() { if (!GUIDE.hold) return; clearInterval(typeTimer); dlg = null; dialogEl.hidden = true; holdEnd(); }
 function guideResume() {
   if (!GUIDE.on) return;
