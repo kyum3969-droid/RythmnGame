@@ -729,45 +729,55 @@ const LEVELS = [
       { who:'반장', text:'내 허리 탓이다. 내일 또 하자.' }]
   }
   ,{
-    id:'s2-1', stageNo:'2-1', who:'순자 이모', role:'반장 · 순자 이모 · 92→98 BPM', tag:'소울 알앤비 · 검수 밀기 · 반 박 빨리', bpm:92, style:'soul21', fxTheme:'warm', inspector: true,
-    // 2-1 검수: the morning after the 회식, 순자 이모 joins the line as the inspector at a post halfway along the belt. 반장 loads
-    // on the beat as always; she stamps what passes and pushes some of it ('P'): a pushed box reaches the gate half a beat early.
-    // Phase 2 after her phone call: she comes back pushing in earnest and the band switches up (98, double-time hats).
-    tempo: [[0, 92], [120, 98]], clock:'02:40', title:'검수', partners:['boss'], hints:true,
+    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'반장 → 빅토르 · 순자 이모 · 92 BPM', tag:'소울 알앤비 · 검수 도장', bpm:92, style:'soul21', fxTheme:'warm', inspector: true,
+    // 2-1 (stage 2 「인수인계」): 반장 brings 김 빅토르, his first 신입 fifteen years ago, over from the day shift. The new rule is
+    // 순자 이모's pass stamp: her post sits one bar up the belt from the gate (the belt is slowed to six beats to make room), so
+    // every stamp falls exactly a bar before its box lands and what she stamps is what you play next bar. Here it is only a
+    // sound; nothing says so (the X-ray that hides the boxes comes in 2-2). 반장 loads the first half; in the break his phone
+    // rings (소장), he hands the line and his radio to 빅토르 and watches from behind the belt, and 빅토르 loads phase 2.
+    tempo: [[0, 92]], travel: 6, stampBar: 1, clock:'02:40', title:'검수', partners:['boss'], hints:false,
+    cast: { first: 'boss', ids: ['boss', 'viktor'], seq: [[106, 'viktor']], obsX: 238, phone: [[107, 121]], tired: [[150, 156]] },
+    comfort: ['…다음 거.', '손 봐, 손.'], comfortBy: { boss: ['…다음 거.', '손 봐, 손.'], viktor: ['일없다, 다음 거!', '어이, 신입! 정신!'] },
     chords: SOUL.chords, roots: SOUL.roots,
     chordAt: bar => bar < 2 ? 0 : bar < 18 ? SOUL.verse[(bar - 2) % 4] : bar < 26 ? SOUL.chorus[(bar - 18) % 4] : bar < 30 ? 0 : bar < 38 ? SOUL.verse[(bar - 30) % 4] : bar < 46 ? 5 + SOUL.chorus[(bar - 38) % 4] : 5,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 184,
-    // the grandchild calls in the break: she answers, nothing gets stamped or pushed, the band thins to the Rhodes
-    phone: [[106, 118]], special:['밀린 상자', 'push', '받아냄'],
+    special:['빅토르가 실은 상자', 'range', '받아냄', [120, 184]],
     sections: [[0, 'intro'], [2, 'a1'], [10, 'a2'], [18, 'b1'], [26, 'call'], [30, 'a3'], [38, 'b2'], [46, 'outro']],
-    // 8 cells per bar, on the beat. 'P' = a box she pushes (written on its beat, lands half a beat early). Never a box in the
-    // cell right before a 'P' (they would land together); a box one beat ahead is fine (it stays ahead by half a beat).
+    // 8 cells per bar (half beats). The belt is slow (39 px a beat), so no two boxes in neighbouring cells.
     bars: [
       '........', '........',
-      // verse 1: she only stamps
+      // verse 1 (반장): on the beat, the stamps just ahead of it
       'x.......', 'x...x...', 'x.......', 'x...x...', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x...',
-      // verse 2: the first pushes, one every bar or two
-      'x...P...', 'x...x...', 'x.....P.', 'x...x...', 'P...x...', 'x...x...', 'x...P...', 'x.x.x...',
-      // chorus: a push a bar, the long crate with a push after it
-      'x...P...', 'x.x...P.', 'x...P...', 'h===..P.', 'x...P...', 'P...x...', 'x...P.x.', 'x.x.x...',
-      // the phone: nothing gets pushed
-      'x.......', '........', '........', '....x...',
-      // phase 2: she is back and pushing in earnest, two a bar
-      'x...P...', 'x.P.x...', 'x...x.P.', 'h===..P.', 'P...P...', 'x.x.x...', 'x...P.P.', 'x.x.x...',
-      'x...P...', 'x.x...P.', 'x...P.P.', 'h===..P.', 'P...x.P.', 'x.P.x...', 'x...P.P.', 'x.x.x.x.',
+      // verse 2: the first 'and's, heard in the stamp a bar before they come
+      'x...x...', 'x.x.x...', 'x...x.x.', 'x..x....', 'x.x.x...', 'x..x..x.', 'x...x.x.', 'x.x.x...',
+      // chorus
+      'x.x.x.x.', 'x..x..x.', 'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'x..x..x.', 'x.x..x..', 'x.x.x...',
+      // the break: 반장's phone, the line changes hands
+      'x.......', '........', '........', '........',
+      // phase 2 (빅토르): livelier, more of the 'and's
+      'x.x.x.x.', 'x..x..x.', 'x.x.x.x.', 'h===..x.', 'x..x.x..', 'x..x..x.', 'x.x.x.x.', 'x.x.x...',
+      'x.x.x.x.', 'x..x.x..', 'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'x..x..x.', 'x.x.x.x.', 'x.x.x.x.',
       '........', '........'
-    ],    say: [[4, '탁, 탁탁, 탁.', 3, 0, 's'], [34, '지게차 저 양반, 팔레트 삐뚤게 놓네.', 3.5, 0, 's'], [40, '느린 건 내가 민다?', 3, 0, 's'], [104, '(전화) 어, 우리 강아지. 할머니 일하지.', 4, 0, 's'], [112, '…응, 응. 끊어. 할머니 일해.', 3.5, 0, 's'], [122, '자, 이제 제대로 민다!', 3, 0, 's'], [168, '총각, 손 잘 보네.', 3, 0, 's']],
-    comfort: ['괜찮아, 다음 거.', '총각! 손 봐, 손!'],
+    ],
+    // [beat, line, beats on screen, lane, speaker]: 'b' 반장, 'v' 빅토르, 's' 이모
+    say: [[4, '…시작한다.', 2.5, 0, 'b'], [12, '이모님, 도장 소리 좋네요. 쾅, 쾅.', 3.5, 0, 'v'],
+          [20, '주간 사람이 밤에 와서. 괜찮아요?', 3.5, 0, 's'], [24, '일없슴다.', 2.5, 0, 'v'], [27, '일이 없긴, 산더미구만.', 3, 0, 's'], [31, '이게 원래 한국말이에요. 여기서 바꾼 거지.', 4, 0, 'v'],
+          [48, '반장님, 허리는 좀 어때요?', 3, 0, 'v'], [52, '…일 해라.', 2.5, 0, 'b'], [62, '(신입에게) 이 양반 원래 이래. 십오 년째.', 4, 0, 'v'],
+          [92, '총각, 손 좀 보네.', 3, 0, 's'],
+          [107, '(전화) …네, 소장님.', 3, 0, 'b'], [111, '(무전기를 내민다) 받아.', 2.5, 0, 'b'], [114, '…제가요? 네, 네.', 3, 0, 'v'],
+          [122, '자, 갑니다!', 2.5, 0, 'v'], [136, '주간 양반이 손은 빠르네.', 3, 0, 's'], [148, '이모님, 저 주간 양반 아니고 빅토르예요.', 4, 0, 'v'],
+          [153, '빅… 뭐?', 2.5, 0, 's'], [156, '빅토르. 그냥 빅 씨 해요.', 3.5, 0, 'v'], [176, '마지막!', 2, 0, 'v']],
     intro: [
-      { who:'', text:'하은이 그만둔 다음 주, 새벽 2시 40분. 오배송 클레임 때문에 소장이 라인에 검수를 붙였다.' },
-      { who:'순자 이모', text:'검수 순자. 오늘부터 내가 보고 넘긴다.' },
-      { who:'순자 이모', text:'탁, 탁탁, 탁. 내 손만 보면 돼. 느린 건 민다.' },
-      { who:'반장', text:'(작게) …말 많은 양반 왔네.' }],
+      { who:'', text:'12월, 새벽 2시 40분. 오배송 클레임이 쌓여서 소장이 라인 가운데에 검수대를 붙였다.' },
+      { who:'순자 이모', text:'검수 순자예요. 오늘부터 여기서 보고 넘겨요.' },
+      { who:'반장', text:'…그리고 이쪽. 주간에서 왔다. 오래 같이 일했어.' },
+      { who:'빅토르', text:'오래가 아니라 15년이요. 반장님 머리 까맸을 때부터.' },
+      { who:'빅토르', text:'(신입에게) 네가 그 신입이구나. 반장님이 나 이후로 처음 칭찬하더라. …거짓말이야. 칭찬 안 해, 이 양반.' }],
     outro: good => good ? [
-      { who:'순자 이모', text:'…손 좀 보네, 총각.' },
-      { who:'반장', text:'…내일 또 봅시다.' },
-      { who:'', text:'이모는 전화기를 앞치마 주머니에 넣고 먼저 나갔다. 주차장에서 지게차가 팔레트를 내리고 있었다.' }] : [
-      { who:'순자 이모', text:'…내일은 내 손만 봐.' }]
+      { who:'빅토르', text:'반장님, 무전기요.' },
+      { who:'반장', text:'…내일 줘.' },
+      { who:'', text:'다음 날에도 반장은 무전기를 돌려받지 않았다.' }] : [
+      { who:'빅토르', text:'일없다, 일없어. 내일 또 하면 돼.' }]
   }
   ,{
     id:'s2-2', stageNo:'2-2', who:'순자 이모', role:'반장 · 순자 이모 · 112 BPM', tag:'디스코 펑크 · 밀기와 붙잡기', bpm:112, style:'disco22', fxTheme:'neon', inspector: true,
@@ -1303,6 +1313,7 @@ function loadLevel(level) {
   // who loads each belt, as the level wrote it (1-5 swaps in 하은 for the lower belt mid-shift; a new run starts from the original)
   if (level.partners) { level.partners0 = level.partners0 || level.partners.slice(); level.partners = level.partners0.slice(); }
   L = level; TRAVEL = level.travel || 2; setTempo(level); SPB = 60 / level.bpm; SPEED = (SCAN_X - PLACE_X) / (TRAVEL * SPB); CHORDS = level.chords;
+  INSPECT_X = level.stampBar ? Math.round(SCAN_X - level.stampBar * 4 * SPB * SPEED) : 184;
   notes = [];
   [level.bars, level.bars2 || []].forEach((bars, lane) => bars.forEach((bar, bi) => {
     const div = bar.length / 4;
@@ -2009,6 +2020,30 @@ const PARTNERS = {
       R(pose.hand.x - 3, pose.hand.y - 7, 6, 6, '#c3c9cd'); R(pose.hand.x - 2, pose.hand.y - 6, 4, 4, '#efe6d2'); R(pose.hand.x, pose.hand.y - 9, 1, 2, '#c3c9cd');
     }
   },
+  // 김 빅토르 (stage 2): 반장's first 신입, fifteen years on. Broad, a knit beanie for the winter nights, a dark fleece under
+  // the same orange vest as 반장, stubble, and a grin (he is the one who talks)
+  viktor: {
+    base: 87,
+    draw(pose, nowMs, active) {
+      const cx = BOSS_X, top = bodyTop(87, pose), fleece = '#34433f', fleeceD = '#26312e', knit = '#3b3a46', band = '#56556a', stub = '#a8805f';
+      R(cx - 12, top + 20, 3, 17, fleece);
+      R(cx - 10, top + 18, 20, 42, fleece);
+      R(cx - 10, top + 18, 6, 42, C.vest); R(cx + 4, top + 18, 6, 42, C.vest);
+      R(cx - 10, top + 34, 20, 2, C.reflect); R(cx - 4, top + 18, 8, 3, fleeceD);
+      R(cx - 2, top + 15, 5, 4, C.skinDark);
+      R(cx - 6, top + 2, 12, 14, C.skin);
+      R(cx - 6, top + 5, 2, 5, C.hairDark);
+      R(cx - 1, top + 11, 7, 4, stub); R(cx - 4, top + 12, 3, 3, stub);
+      R(cx - 7, top - 3, 14, 6, knit); R(cx - 7, top + 2, 14, 2, band); R(cx - 5, top - 4, 10, 1, knit);
+      for (let k = 0; k < 3; k++) R(cx - 5 + k * 4, top - 2, 1, 4, '#4a4958');
+      faceFx(cx, top, cx + 3, top + 7, pose, nowMs, C.hairDark, active);
+      R(cx + 2, top + 12, 4, 1, '#6a3a2e'); R(cx + 6, top + 11, 1, 1, '#6a3a2e');
+    },
+    arm(pose) {
+      const top = bodyTop(87, pose);
+      thick(BOSS_X + 8, top + 22, pose.hand.x, pose.hand.y, 5, '#34433f'); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
+    }
+  },
 };
 // an arm with an elbow (two 16 px bones) that cannot stretch past its reach; returns where the hand ends up
 function elbowArm(sx, sy, hx, hy, col, seg = 16) {
@@ -2074,22 +2109,34 @@ const castPlacer = beat => L.cast.seq ? seqPlacer(beat) : beat < L.cast.swap + 6
 function seqPlacer(beat) { let p = L.cast.first; for (const [b0, id] of L.cast.seq) if (beat >= b0 + 4) p = id; return p; }
 function seqSwap(beat) { for (const [b0, id, mode] of L.cast.seq) if (beat >= b0 && beat < b0 + 8) return { rel: beat - b0, to: id, exit: mode === 'exit' }; return null; }
 function seqGone(beat, id) { return L.cast.seq.some(([b0, to, mode]) => mode === 'exit' && to !== id && beat >= b0 + 8); }
-function drawCast2(t, nowMs, active, placerPose) {
-  const beat = castBeatAt(t, active), ph = beat - Math.floor(beat), placer = seqPlacer(beat), sw = seqSwap(beat), walkBob = ph < 0.5 ? 1 : 0;
-  const xs = {};
+// where each of the cast stands at a beat (cast.obsX moves the spot behind the belt where the one not loading waits)
+function castXs(beat) {
+  const placer = seqPlacer(beat), sw = seqSwap(beat), xs = {}, obs = L.cast.obsX || OBS_X;
   const ids = L.cast.ids || ['boss', 'jiwoo'], off = L.cast.offUntil || {};
-  for (const id of ids) xs[id] = sw ? (id === sw.to ? lerp(off[id] != null ? W + 30 : OBS_X, BOSS_X, ease(sw.rel / 6)) : lerp(BOSS_X, sw.exit ? W + 30 : OBS_X, ease((sw.rel - 2) / 6))) : id === placer ? BOSS_X : seqGone(beat, id) || (off[id] != null && beat < off[id]) ? W + 30 : OBS_X;
+  for (const id of ids) xs[id] = sw ? (id === sw.to ? lerp(off[id] != null ? W + 30 : obs, BOSS_X, ease(sw.rel / 6)) : lerp(BOSS_X, sw.exit ? W + 30 : obs, ease((sw.rel - 2) / 6))) : id === placer ? BOSS_X : seqGone(beat, id) || (off[id] != null && beat < off[id]) ? W + 30 : obs;
   const leaving = L.cast.leave != null && beat >= L.cast.leave;
   if (leaving) xs[placer] = lerp(BOSS_X, W + 30, ease((beat - L.cast.leave) / 6));
+  return xs;
+}
+function drawCast2(t, nowMs, active, placerPose) {
+  const beat = castBeatAt(t, active), ph = beat - Math.floor(beat), placer = seqPlacer(beat), sw = seqSwap(beat), walkBob = ph < 0.5 ? 1 : 0;
+  const xs = castXs(beat), ids = L.cast.ids || ['boss', 'jiwoo'];
+  const leaving = L.cast.leave != null && beat >= L.cast.leave;
   CAST.dx = xs[placer] - BOSS_X; CAST.hideArm = !!sw || leaving;
   for (const id of ids) {
     if (xs[id] >= W + 20) continue;
-    const atLine = !sw && !leaving && id === placer, mirror = sw ? id === sw.to : id !== placer && !leaving, tired = id === 'boss' && !atLine && beat >= 88 && beat < 144;
-    const pose = atLine ? placerPose : { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: tired, dip: 0, bob: !active ? 0 : (sw || leaving) ? walkBob : (id === 'jiwoo' && ph < 0.25 ? 1 : 0),
+    const atLine = !sw && !leaving && id === placer, mirror = sw ? id === sw.to : id !== placer && !leaving;
+    const tired = id === 'boss' && !atLine && (L.cast.tired ? active && inRange(beat, L.cast.tired) : beat >= 88 && beat < 144);
+    const onPhone = id === 'boss' && !atLine && active && L.cast.phone && inRange(beat, L.cast.phone);
+    // 빅토르 waiting behind the belt can't keep still: a bob on every other beat while the line is someone else's
+    const fidget = id === 'viktor' && !atLine && !sw && active && Math.floor(beat) % 2 === 0 && ph < 0.25;
+    const pose = atLine ? placerPose : { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: tired, dip: 0, bob: !active ? 0 : (sw || leaving) ? walkBob : (id === 'jiwoo' && ph < 0.25) || fidget ? 1 : 0,
       nod: 0, doze: false, phone: false, vibe: false, unplug: id === 'jiwoo', lane: atLine ? 0 : 2 };
     if (!atLine) FX.react[2] = { type: '', at: nowMs };
     drawActor(id, xs[id], mirror, pose, nowMs, active, top => {
-      if (id === 'boss' && !atLine && !sw && !leaving) { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); }
+      // 반장 on the phone: the arm up, the phone at his ear
+      if (onPhone) { thick(BOSS_X + 7, top + 22, BOSS_X + 8, top + 12, 4, C.shirt); R(BOSS_X + 6, top + 9, 4, 4, C.skin); R(BOSS_X + 6, top + 4, 3, 7, '#1e1a1a'); R(BOSS_X + 7, top + 5, 1, 4, '#8fe3f0'); return; }
+      if ((id === 'boss' || id === 'viktor') && !atLine && !sw && !leaving) { const sl = id === 'viktor' ? '#34433f' : C.shirt; R(BOSS_X - 9, top + 25, 18, 5, sl); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); }
     });
   }
 }
@@ -2644,6 +2691,7 @@ function drawBox(n, cx, bottom, mark, t, sq = 0) {
   R(x + (w >> 1) - 1, y, 3, h, n.off && L.offTilt ? '#d8463b' : L.lanes === 2 ? (n.lane === 0 ? C.vest : C.vest2) : C.tape);
   if (n.pair && L.oneButton) R(x, y, w, 2, '#ffe9a8');
   if (n.grab && t >= n.tRel) { R(x + 2, y + 2, 5, 4, '#d8463b'); R(x + 3, y + 3, 3, 2, '#f08a7a'); }
+  if (L.stampBar && t >= passAt(n)) { const sx = x + 2, sy = y + 2; R(sx + 1, sy, 3, 1, '#c8352a'); R(sx + 1, sy + 4, 3, 1, '#c8352a'); R(sx, sy + 1, 1, 3, '#c8352a'); R(sx + 4, sy + 1, 1, 3, '#c8352a'); R(sx + 2, sy + 2, 1, 1, '#c8352a'); }
   const lw = Math.min(7, w - 4);
   if (lw >= 3) { R(x + 2, y + h - 6, lw, 4, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink); }
   if (n.heavy) { R(x + 2, y + 3, w - 4, 4, '#1b1716'); for (let k = 2; k < w - 5; k += 4) R(x + k + 1, y + 4, 2, 2, '#f0b429'); }
@@ -3234,8 +3282,10 @@ function drawSoloLoader(poses, nowMs, active) {
 // 순자 이모 stands at a post behind the belt halfway along it. Every box that passes her gets the stamp (her 탁); the ones she
 // pushes get her hand instead: it winds up half a beat before the box reaches her, shoves as it passes, and the box skids to the
 // gate half a beat early. Reading her hand is the level's rule. On the phone she stamps nothing and pushes nothing.
-const INSPECT_X = 184;
-const passAt = n => (n.push || n.grab ? n.arr0 : n.arr) - (SCAN_X - INSPECT_X) / SPEED;
+// stage 2 (L.stampBar): her post moves up the belt so the stamp falls exactly that many bars before the box reaches the gate
+// (the belt is slowed with `travel` to make room); what she stamps is what you play a bar later
+let INSPECT_X = 184;
+const passAt = n => L.stampBar ? n.arr - L.stampBar * 4 * SPB : (n.push || n.grab ? n.arr0 : n.arr) - (SCAN_X - INSPECT_X) / SPEED;
 function noteX(n, t) {
   if (n.push && t < n.arr) return t < n.tPush ? SCAN_X + (t - n.arr0) * SPEED : INSPECT_X + (t - n.tPush) * SPEED * n.k;
   if (n.grab && t < n.tRel) return t < n.tPass ? SCAN_X + (t - n.arr0) * SPEED : INSPECT_X;
@@ -4514,6 +4564,8 @@ function brassStab(t, fs, d, v = 0.03) {
   fs.forEach(f => { osc('sawtooth', f, t, 0.012, v, d, fl); osc('sawtooth', f * 1.006, t, 0.012, v * 0.7, d, fl); });
 }
 const tamb21 = (t, v) => { noise(t, 'highpass', 6500, v, 0.05, 0.7); noise(t + 0.012, 'highpass', 8000, v * 0.6, 0.04, 0.7); };
+// 이모's pass stamp (stage 2): the wooden handle knocks, the rubber slaps the cardboard
+const stampSnd = (t, v = 0.32) => { const o = osc('sine', 210, t, 0.002, v * 0.9, 0.09); o.frequency.exponentialRampToValueAtTime(95, t + 0.08); noise(t, 'lowpass', 900, v * 0.8, 0.05, 0.7); noise(t + 0.004, 'bandpass', 1900, v * 0.45, 0.028, 1.4); };
 const tak = (t, v = 0.3) => { osc('square', 1700, t, 0.001, v * 0.12, 0.018); noise(t, 'bandpass', 2600, v, 0.022, 1.6); noise(t, 'lowpass', 500, v * 0.5, 0.02, 0.7); };
 function phoneRing(t) { for (let k = 0; k < 2; k++) for (let j = 0; j < 8; j++) osc('sine', j % 2 ? 1750 : 1400, t + k * 0.9 + j * 0.05, 0.004, 0.028, 0.045, bus); }
 // 1-4: a box on 하은's belt answers with her sound, a short rhodes stab with a vinyl tick; 반장's belt keeps the organ
@@ -5149,8 +5201,7 @@ function buildEvents() {
       const chorus = sec === 'b1' || sec === 'b2', call = sec === 'call', snaps = sec !== 'a1', p2 = sec === 'a3' || sec === 'b2';
       if (sec === 'intro') {
         E(0, T => roller(T, 0.03)); if (b === 1) E(0, T => forklift(T));
-        // her count on the snaps, 탁, 탁탁, 탁, and the Rhodes answers
-        if (b === 4 || b === 6) E(0, T => tak(T, 0.3)); if (b === 5) { E(0, T => tak(T, 0.3)); E(s / 4 + sw, T => tak(T, 0.26)); }
+        // (2-1 now: her stamps are the only 탁 in the song, so the old finger-snap count is gone) the Rhodes comes in
         if (b === 6) E(0, T => rhodes(T, chords[0], s * 2, 0.03)); if (b === 7) E(s / 2, T => { sub808(T, roots[0], s * 1.2, 0.2); hat(T, 0.04); });
         continue;
       }
@@ -5187,8 +5238,7 @@ function buildEvents() {
       // horns on the 'and' of 2 every other bar in the chorus, a choir pad under it
       if (chorus && inBar === 1 && bar % 2 === 1) E(s / 2 + sw, T => brassStab(T, chords[ci].slice(0, 3).map(f => f * 2), s * 0.3, 0.022));
       if (chorus && inBar === 0) E(0, T => chords[ci].slice(0, 3).forEach(f => voice(T, f * 2, s * 3.6, 0.009)));
-      // 탁, 탁탁, 탁: her snaps from the second verse (1, the double on 2, 3)
-      if (snaps) { if (inBar === 0 || inBar === 2) E(0, T => tak(T, chorus ? 0.16 : 0.2)); if (inBar === 1) { E(0, T => tak(T, 0.2)); E(s / 4 + sw, T => tak(T, 0.17)); } }
+      // (no finger snaps any more: the pass stamps a bar ahead of the boxes are her part, and a second 탁 would muddle them)
       // the tune: sung in the verses with the Rhodes shadowing it, the hook on the sax in the chorus (half a step up the second time)
       const rel = (b - (sec === 'a1' ? 8 : sec === 'a2' ? 40 : sec === 'b1' ? 72 : sec === 'a3' ? 120 : 152)) % 32;
       if (chorus) { for (const [ob, nm, len, fall] of SMEL_B) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { sax(T, SN[nm] * up, len * s * 0.92, p2 ? 0.055 : 0.05, !!fall); if (len >= 1.5) voice(T, SN[nm] * up / 2, len * s * 0.9, 0.012); if (p2 && len >= 1.5) brassStab(T, [SN[nm] * up, SN[nm] * up * 1.26], len * s * 0.6, 0.016); }); }
@@ -5649,7 +5699,7 @@ function buildEvents() {
       else { noise(T + SPB * 2.5, 'bandpass', 700, 0.08, 0.12, 1.5, bus); noise(T + SPB * 3.4, 'lowpass', 500, 0.14, 0.09, 0.7, bus); }
       return;
     }
-    if (L.style === 'soul21') { kick(T, 0.8); crash(T, 0.7); rhodes(T, chords[5], SPB * 6, 0.045); sub808(T, roots[5], SPB * 4, 0.22); brassStab(T, chords[5].slice(0, 3).map(f => f * 2), SPB * 1.2, 0.03); sax(T, SN.D5 * SOUL.half, SPB * 3.5, 0.05, true); chords[5].slice(0, 3).forEach(f => voice(T, f * 2, SPB * 5, 0.01)); tak(T + SPB * 4, 0.3); tak(T + SPB * 5, 0.3); tak(T + SPB * 5.25, 0.26); tak(T + SPB * 6, 0.3); return; }
+    if (L.style === 'soul21') { kick(T, 0.8); crash(T, 0.7); rhodes(T, chords[5], SPB * 6, 0.045); sub808(T, roots[5], SPB * 4, 0.22); brassStab(T, chords[5].slice(0, 3).map(f => f * 2), SPB * 1.2, 0.03); sax(T, SN.D5 * SOUL.half, SPB * 3.5, 0.05, true); chords[5].slice(0, 3).forEach(f => voice(T, f * 2, SPB * 5, 0.01)); stampSnd(T + SPB * 4, 0.4); return; }
     if (L.style === 'dembow23') { kick(T, 0.9); crash(T); sub808(T, roots[0], SPB * 4, 0.24); piano(T, chords[0].map(f => f * 2), SPB * 4, 0.05); brassStab(T, chords[0].slice(0, 3).map(f => f * 2), SPB * 1.5, 0.03); synthLead(T, DN.F5, SPB * 3, 0.03); voice(T, DN.F4, SPB * 4, 0.025); rim(T + SPB * 0.75, 0.3); rim(T + SPB * 1.5, 0.3); return; }
     if (L.style === 'finale26') { kick(T, 0.9); crash(T); [1, 1.5, 2].forEach((m, i) => gtrDist(T, roots[6] * 2 * m, SPB * 6, [0.07, 0.055, 0.04][i], i === 2)); slap(T, roots[6], SPB * 3); supersaw(T, chords[6].map(f => f * 2), SPB * 5, 0.012, 2400, true); brassStab(T, chords[6].slice(0, 3).map(f => f * 2), SPB * 1.5, 0.03); voice(T, FN.G4, SPB * 5, 0.03); voice(T + 0.02, FN.D5, SPB * 5, 0.02); tak(T + SPB * 4, 0.2); tak(T + SPB * 5, 0.2); tak(T + SPB * 5.25, 0.17); tak(T + SPB * 6, 0.2); truckHorn(T + SPB * 6.5); return; }
     if (L.style === 'disco22') { kick(T, 0.9); crash(T); clap(T, 0.25); supersaw(T, chords[0].map(f => f * 2), SPB * 5, 0.014, 2600, true); brassStab(T, chords[0].slice(0, 3).map(f => f * 2), SPB * 1.5, 0.03); slap(T, roots[0], SPB * 3); voice(T, FN.G4, SPB * 4, 0.03); voice(T + 0.02, FN.D5, SPB * 4, 0.02); tak(T + SPB * 3, 0.2); tak(T + SPB * 4, 0.2); tak(T + SPB * 4.25, 0.17); tak(T + SPB * 5, 0.2); return; }
@@ -5660,8 +5710,10 @@ function buildEvents() {
     if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
     kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4);
   }]);
-  notes.forEach(n => ev.push([n.place, T => thud(T, n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1)]));
-  if (L.inspector) for (const n of notes) { if (n.top || inRange(n.beat0, L.phone)) continue; if (n.grab) { ev.push([passAt(n), T => { rim(T, 0.4); rim(T + 0.11, 0.4); }]); ev.push([n.tRel, T => roller(T, 0.06)]); } else ev.push([passAt(n), n.push ? T => { tak(T, 0.3); shoop(T); } : T => tak(T, 0.3)]); }
+  // with the stamp a bar ahead the set-down would be a third, off-grid echo of the chart: keep it to a soft touch
+  notes.forEach(n => ev.push([n.place, T => thud(T, (n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1) * (L.stampBar ? 0.25 : 1))]));
+  if (L.stampBar) for (const n of notes) { if (!n.top) ev.push([passAt(n), T => stampSnd(T)]); }
+  else if (L.inspector) for (const n of notes) { if (n.top || inRange(n.beat0, L.phone)) continue; if (n.grab) { ev.push([passAt(n), T => { rim(T, 0.4); rim(T + 0.11, 0.4); }]); ev.push([n.tRel, T => roller(T, 0.06)]); } else ev.push([passAt(n), n.push ? T => { tak(T, 0.3); shoop(T); } : T => tak(T, 0.3)]); }
   return ev.sort((a, b) => a[0] - b[0]);
 }
 let events = [], evI = 0, T0 = 0;
@@ -5678,7 +5730,8 @@ function startHum() {
 }
 function stopHum() { if (hum) { try { hum.stop(); } catch (e) {} hum = null; } }
 function startHold(beat) {
-  stopHold(); if (L.bareBand) return;   // no held tone under a recorded song holdOsc = ctx.createOscillator(); const gn = ctx.createGain(), lf = ctx.createOscillator(), lg = ctx.createGain();
+  stopHold(); if (L.bareBand) return;   // no held tone under a recorded song
+  holdOsc = ctx.createOscillator(); const gn = ctx.createGain(), lf = ctx.createOscillator(), lg = ctx.createGain();
   const tones = CHORDS[chordIdx(beat || 0)], th = fxTheme(beat || 0);
   holdOsc.type = th === 'neon' ? 'sawtooth' : th === 'chill' ? 'triangle' : 'sine'; holdOsc.frequency.value = tones[0] * 4;
   lf.frequency.value = 6; lg.gain.value = 8; lf.connect(lg); lg.connect(holdOsc.detune); lf.start(); holdOsc._lf = lf;
@@ -5991,11 +6044,11 @@ function updateHud(t) {
     const lane = line ? (line[3] || 0) : 0, spk = line && line[4];
     bubble.style.bottom = L.lanes === 2 ? (lane === 0 ? '78%' : '58%') : '61%';
     let bx = null;
-    if (L.cast && L.cast.seq && spk) bx = spk === 's' ? INSPECT_X - 24 : 0; else if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X; else if (spk === 'h' && !L.coScanner && !L.heads) { if (duoMode(beat) === 'one') { bx = HAEUN_X - 70; bubble.style.bottom = '84%'; } else { bx = 0; bubble.style.bottom = '78%'; } } else if (spk === 'h' || spk === 'd') bx = null;
+    if (L.cast && L.cast.seq && spk) { const id = { b: 'boss', v: 'viktor' }[spk], xs = castXs(beat); bx = spk === 's' ? INSPECT_X - 24 : id && xs[id] != null ? xs[id] : 0; } else if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X; else if (spk === 'h' && !L.coScanner && !L.heads) { if (duoMode(beat) === 'one') { bx = HAEUN_X - 70; bubble.style.bottom = '84%'; } else { bx = 0; bubble.style.bottom = '78%'; } } else if (spk === 'h' || spk === 'd') bx = null;
     if (spk === 's') { bx = INSPECT_X - 24; bubble.style.bottom = '66%'; }
     if (L.daw) { if (spk === 'b') { bx = 0; bubble.style.bottom = '32%'; } else if (spk === 'h') { bx = 34; bubble.style.bottom = '32%'; } else if (spk === 'd') { bx = 200; bubble.style.bottom = '19%'; } }
     bubble.style.left = bx == null || bx < 60 ? '3cqw' : (bx / W * 100 - 5).toFixed(1) + '%'; bubble.style.right = 'auto'; bubble.classList.remove('tr');
-    bubble.classList.toggle('obs', !!(spk && (L.cast ? (spk === 'b') !== (castPlacer(beat) === 'boss') : spk === 'b' || spk === 's' || (L.daw && spk !== 'j'))));
+    bubble.classList.toggle('obs', !!(spk && (L.cast ? spk === 's' || (spk === 'b') !== (castPlacer(beat) === 'boss') : spk === 'b' || spk === 's' || (L.daw && spk !== 'j'))));
     bubble.classList.remove('loud');
     if (line && line[5] === 'loud') { void bubble.offsetWidth; bubble.classList.add('loud'); FX.shakeUntil = performance.now() + 240; FX.shakeAmp = 2; }
   }
@@ -6014,7 +6067,7 @@ function updateHud(t) {
   hintFor('heavy', '무거운 상자: 양쪽을 같이');
   hintFor('top', '긴 화물 위 상자: 누른 채로 다른 손으로 톡');
   { const fl = firstWith('late'); if (L.id !== 'jiwoo' && fl && fl.state === 'pending' && t > fl.place - SPB) h = L.lateHint || '반장님 손이 늦어요. 음악 말고 손을 봐요'; }
-  if (L.id === 's2-1' || L.id === 's2-2') { const ps = notes.filter(n => n.push).slice(0, 3), p = ps.find(n => n.state === 'pending'); if (p && t > p.place && t < p.arr) h = '이모가 미는 상자: 반 박 빨리 와요. 손을 봐요'; const gs = notes.filter(n => n.grab).slice(0, 3), gq = gs.find(n => n.state === 'pending'); if (gq && t > gq.place && t < gq.arr) h = '이모가 붙잡은 상자: 반 박 늦게 와요'; }
+  if (L.id === 's2-2') { const ps = notes.filter(n => n.push).slice(0, 3), p = ps.find(n => n.state === 'pending'); if (p && t > p.place && t < p.arr) h = '이모가 미는 상자: 반 박 빨리 와요. 손을 봐요'; const gs = notes.filter(n => n.grab).slice(0, 3), gq = gs.find(n => n.state === 'pending'); if (gq && t > gq.place && t < gq.arr) h = '이모가 붙잡은 상자: 반 박 늦게 와요'; }
   if (L.id === 's1-4') {
     if (beat >= 2 && beat < 10) h = '위 벨트는 하은이 알아서 찍어요. 나는 아래만';
     if (beat >= 57 && beat < 72) h = '이제 양쪽 다 내가 찍어요. 버튼은 하나, 닿는 쪽';
@@ -6076,7 +6129,7 @@ function showLine() {
   dlg.full = L_.text; dlg.n = 0; clearInterval(typeTimer);
   if (reduce) { dlg.n = L_.text.length; textEl.textContent = L_.text; return; }
   textEl.textContent = '';
-  const pitch = { '반장': 220, '지우': 392, '박씨': 196, '순자 이모': 440 }[L_.who] || 330;
+  const pitch = { '반장': 220, '지우': 392, '박씨': 196, '순자 이모': 440, '빅토르': 262 }[L_.who] || 330;
   typeTimer = setInterval(() => {
     if (!dlg) return clearInterval(typeTimer);
     dlg.n++; textEl.textContent = dlg.full.slice(0, dlg.n);
