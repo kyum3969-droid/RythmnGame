@@ -778,8 +778,13 @@ const LEVELS = [
       '1...1...........', '....x...1...x...', '................'
     ] },
     comfort: ['…다음 거.', '손 봐, 손.'],
+    // the phases on screen (phaseFx): line 3 grey and tired, a tube flickering (quiet), warming through the build; line 4's
+    // lights clicking on one by one as the camera pulls back (lineOn: beats, nearest first); a white flash and a jolt on the
+    // drop; the choruses in amber, breathing with the beat; the last hit frozen, then the lights going out from the far ends in
+    quiet: [[4, 36]],
+    phaseFx: { gloom: [4, 36, 64], lineOn: [60.5, 61.5, 62.5], drop: 68, amber: [[136, 188], [248, 288]], last: 316, out: [317.4, 318.1, 318.8] },
     // behind your back in the build: 마르코 bolting his line on (a clank, the drill, a clank)
-    sfx: [[50, 'clank'], [50.75, 'clank'], [52, 'drill'], [54.5, 'clank'], [55, 'clank'], [56, 'drill'], [58.5, 'clank']],
+    sfx: [[50, 'clank'], [50.75, 'clank'], [52, 'drill'], [54.5, 'clank'], [55, 'clank'], [56, 'drill'], [58.5, 'clank'], [60.5, 'lamp'], [61.5, 'lamp'], [62.5, 'lamp'], [317.4, 'lampOff'], [318.1, 'lampOff'], [318.8, 'lampOff']],
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     // wide windows: this is played on phones (딱 ±80 ms, 좋아 ±150 ms, past 220 ms a miss)
     win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 316,
@@ -3447,6 +3452,23 @@ function drawInspector(t, active, nowMs) {
     drawActor('park', x, true, pose2, nowMs, active, top => { R(BOSS_X - 9, top + 25, 18, 5, '#6e4a33'); R(BOSS_X + 4, top + 2, 2, 2, '#f4f1ea'); for (let k = 0; k < 6; k++) R(BOSS_X + 5, top + 4 + k, 1, 1, '#f4f1ea'); });
   }
 }
+// ---------- 2-1 the phases on screen ----------
+function phaseGloom(b) { const G = L.phaseFx && L.phaseFx.gloom; if (!G || b < G[0]) return 0; return b < G[1] ? Math.min(1, (b - G[0]) / 2) : b < G[2] ? 1 - (b - G[1]) / (G[2] - G[1]) : 0; }
+function phaseLook(c, w, h, b, active) {
+  const F = L.phaseFx; if (!F || !active) return;
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
+  // grey and tired: the colour drained, the room a little darker
+  const gl = phaseGloom(b);
+  if (gl > 0) { c.globalCompositeOperation = 'saturation'; c.fillStyle = `rgba(128,128,128,${0.75 * gl})`; c.fillRect(0, 0, w, h); c.globalCompositeOperation = 'multiply'; c.fillStyle = `rgba(150,150,165,${0.45 * gl})`; c.fillRect(0, 0, w, h); }
+  // the choruses: amber, breathing with the beat
+  const am = F.amber.find(([x, y]) => b >= x - 1 && b < y + 1);
+  if (am) { const k = Math.min(1, b - (am[0] - 1), am[1] + 1 - b), ph = b - Math.floor(b); c.globalCompositeOperation = 'overlay'; c.fillStyle = `rgba(255,160,50,${(0.22 + 0.12 * Math.max(0, 1 - ph * 3)) * k})`; c.fillRect(0, 0, w, h); }
+  // the drop, and the last hit: a white flash
+  for (const [at, v] of [[F.drop, 0.7], [F.last, 0.45]]) { const d = b - at; if (d >= 0 && d < 1.5) { c.globalCompositeOperation = 'lighter'; c.fillStyle = `rgba(255,250,235,${v * (1 - d / 1.5) ** 2})`; c.fillRect(0, 0, w, h); } }
+  c.restore();
+}
+// the jolt on the drop: a few pixels, shrinking (in game pixels)
+function phaseJolt(b) { const F = L.phaseFx; if (!F || reduce) return [0, 0]; const d = b - F.drop; if (d < 0 || d > 0.6) return [0, 0]; const k = 3 * (1 - d / 0.6); return [Math.round((Math.random() * 2 - 1) * k), Math.round((Math.random() * 2 - 1) * k)]; }
 // ---------- 2-1 the two lines ----------
 // From mid.at the whole floor is drawn into a wider canvas and the camera looks at part of it. Line 3 (the screen you know:
 // 반장, the belt, the scanner) is the left half; the right half is its mirror about where you stand: line 4, 마르코 loading it,
@@ -3459,7 +3481,9 @@ let midCv = null, midG = null;
 function midView(b, sEnd) { const z = L.mid.zoom, e = b < z[0] ? 0 : b >= z[1] ? 1 : ease((b - z[0]) / (z[1] - z[0])); return { s: lerp(1, sEnd, e), cx: lerp(W / 2, MID.ax, e), cy: lerp(H / 2, H / 2 - 12, e), e }; }
 const cvHi = document.getElementById('cvhi'), gHi = cvHi.getContext('2d');
 function drawMid(t, nowMs, active) {
-  const b = active ? beatAt(t) : END_BEAT, live = active || state === 'outro' || state === 'result', T = active ? t : timeAt(END_BEAT), AX = MID.ax;
+  const F = L.phaseFx, bReal = active ? beatAt(t) : END_BEAT, live = active || state === 'outro' || state === 'result';
+  // the last hit holds the picture still for a moment (a hitstop) before the lights start going out
+  const frozen = F && active && bReal >= F.last && bReal < F.last + 1.2, b = frozen ? F.last : bReal, T = frozen ? timeAt(F.last) : active ? t : timeAt(END_BEAT), AX = MID.ax;
   if (!midCv) { midCv = document.createElement('canvas'); midCv.width = MID.ww; midCv.height = MID.wh; midG = midCv.getContext('2d'); }
   const g0 = g; g = midG; g.setTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
   // above and below the 216 px the screen used to show: the dark of the roof and the floor going on
@@ -3511,6 +3535,18 @@ function drawMid(t, nowMs, active) {
   thick(AX - 5, top + 20, 326 - pk(0) * 4, 120, 4, C.hoodie); drawGun(324 - pk(0) * 4, 117, pk(0));
   if (two) { thick(AX + 5, top + 20, MID.ww - 326 + pk(1) * 4, 120, 4, C.hoodie); g.save(); g.translate(MID.ww, 0); g.scale(-1, 1); drawGun(324 - pk(1) * 4, 117, pk(1)); g.restore(); }
   drawParticles(nowMs);
+  // the lamps: line 4 dark until its three lamps click on (nearest you first); at the end every lamp goes out from the far
+  // ends in, both lines at once, and only the one over you is left
+  if (F) {
+    const soft = 18, slices = [[AX, AX + 113], [AX + 113, AX + 226], [AX + 226, MID.ww]];
+    // a dark band with soft sides (the light of the next lamp spills over its edge); the floor's own ends stay hard
+    const dark = (x0, x1, a) => { const l = x0 <= 0 ? 0 : soft, r = x1 >= MID.ww ? 0 : soft, gr = g.createLinearGradient(x0 - l, 0, x1 + r, 0), w = x1 - x0 + l + r;
+      gr.addColorStop(0, `rgba(4,3,5,${l ? 0 : a})`); gr.addColorStop(Math.min(0.5, (2 * l) / w), `rgba(4,3,5,${a})`); gr.addColorStop(Math.max(0.5, 1 - (2 * r) / w), `rgba(4,3,5,${a})`); gr.addColorStop(1, `rgba(4,3,5,${r ? 0 : a})`);
+      g.fillStyle = gr; g.fillRect(x0 - l, -MID.oy, w, MID.wh); };
+    slices.forEach(([x0, x1], i) => { if (bReal < F.lineOn[i]) dark(x0, x1, 0.82); });
+    const outs = [[[0, AX - 226], [AX + 226, MID.ww]], [[AX - 226, AX - 113], [AX + 113, AX + 226]], [[AX - 113, AX - 40], [AX + 40, AX + 113]]];
+    outs.forEach((pair, i) => { if (bReal >= F.out[i] || !active && state !== 'play' && live) for (const [x0, x1] of pair) dark(x0, x1, 0.8); });
+  }
   g = g0;
   // the camera. Before it moves it draws into the game canvas like any frame; once it pulls back it draws into a canvas the size
   // of the screen in device pixels laid over it, at a scale where each dot of the floor is a whole number of device pixels, so
@@ -3519,10 +3555,12 @@ function drawMid(t, nowMs, active) {
   // (a whole number of device pixels per dot where that keeps the framing; on a small screen the framing wins and the dots are
   // sampled nearest, still sharp)
   const want = W / (MID.ww - 70), mInt = Math.round(k * want), sEnd = mInt >= 2 && Math.abs(mInt / k - want) / want < 0.06 ? mInt / k : want, V = midView(b, sEnd), sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
-  if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx, sy, sw, sh, 0, 0, W, H); g.restore(); return; }
+  const [jx, jy] = phaseJolt(bReal);
+  if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx + jx, sy + jy, sw, sh, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); return; }
   if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
   cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#0c0a09'; gHi.fillRect(0, 0, hw, hh);
-  gHi.drawImage(midCv, sx, sy, sw, sh, 0, 0, hw, hh);
+  gHi.drawImage(midCv, sx + jx / V.s, sy + jy / V.s, sw, sh, 0, 0, hw, hh);
+  phaseLook(gHi, hw, hh, bReal, active);
   if (active) midGuide(b, T, nowMs, { sx, sy, sw, sh, hw, hh, k });
   // the game canvas under it still gets the plain floor colour (nothing else shows through)
   g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
@@ -5051,6 +5089,8 @@ const inFever = beat => !!L.fever && inRange(beat, L.fever);
 // one-off level sounds: a clank of a bolt going home, a cordless drill
 function levelSfx(t, kind) {
   if (kind === 'clank') { osc('square', 760, t, 0.001, 0.05, 0.12, bus); osc('square', 1130, t, 0.001, 0.035, 0.09, bus); noise(t, 'bandpass', 3200, 0.16, 0.06, 3, bus); noise(t, 'lowpass', 500, 0.12, 0.05, 0.7, bus); }
+  if (kind === 'lamp') { osc('square', 1900, t, 0.001, 0.05, 0.02, bus); noise(t, 'bandpass', 4200, 0.18, 0.02, 4, bus); noise(t + 0.03, 'highpass', 6000, 0.04, 0.25, 0.7, bus); }
+  if (kind === 'lampOff') { osc('square', 1500, t, 0.001, 0.05, 0.02, bus); noise(t, 'bandpass', 3600, 0.16, 0.02, 4, bus); osc('sine', 120, t, 0.003, 0.05, 0.25, bus); }
   if (kind === 'drill') { const o = osc('sawtooth', 140, t, 0.02, 0.05, 0.7, bus); o.frequency.setValueAtTime(140, t); o.frequency.linearRampToValueAtTime(230, t + 0.25); o.frequency.linearRampToValueAtTime(190, t + 0.7); noise(t, 'bandpass', 2400, 0.05, 0.7, 2, bus); }
 }
 // 2-1's chutes play the band's percussion: D a kick, F claps, J a rim, K a cowbell (quieter on a 좋아)
@@ -7017,7 +7057,7 @@ function frame(now) {
   else if (SCENE.kind === 'wings' && !active) drawWings(now);
   else if (L.mid && castBeatAt(t, active) >= L.mid.at && state !== 'select' && state !== 'title') { drawMid(t, now, active); drawSceneFade(now); }
   else if (L.quad && quadP(castBeatAt(t, active)) >= 1) { drawQuad(t, now, active); drawSceneFade(now); }
-  else { drawScene(t, now / 1000, active, now); if (L.quad && quadP(castBeatAt(t, active)) > 0) drawQuadTurn(t, now, active); drawSceneFade(now); }
+  else { drawScene(t, now / 1000, active, now); if (L.quad && quadP(castBeatAt(t, active)) > 0) drawQuadTurn(t, now, active); if (L.phaseFx) phaseLook(g, W, H, castBeatAt(t, active), active); drawSceneFade(now); }
   FX.rumble = 0; if (active && L.show && !L.practiceOf) drawShow15(t, now);
   drawCamera(now);
   if (!active) CAM.lbTo = 0;
