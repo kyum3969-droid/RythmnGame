@@ -777,7 +777,9 @@ const LEVELS = [
       '....x...1...x...', '1...x...1...x...', '1...x...1...x...', '....2...........',
       '1...1...........', '....x...1...x...', '................'
     ] },
-    comfort: [],
+    comfort: ['…다음 거.', '손 봐, 손.'],
+    // behind your back in the build: 빅토르 bolting his line on (a clank, the drill, a clank)
+    sfx: [[50, 'clank'], [50.75, 'clank'], [52, 'drill'], [54.5, 'clank'], [55, 'clank'], [56, 'drill'], [58.5, 'clank']],
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     // wide windows: this is played on phones (딱 ±80 ms, 좋아 ±150 ms, past 220 ms a miss)
     win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 316,
@@ -808,13 +810,28 @@ const LEVELS = [
       '................', '................', '................', '................',
       '................', '................', '................', '................'
     ],
-    // 빅토르 teaches the two lines as the camera pulls back and through the first bars (the rest of the script is not written
-    // yet): [beat, line, beats on screen, lane, speaker 'v']
-    say: [[60.5, '어이, 신입. 뒤도 좀 봐.', 3.5, 0, 'v'], [64.5, '왼쪽은 반장님 거, 오른쪽은 내 거.', 3.5, 0, 'v'],
-          [69, '왼손. 반장님 상자.', 3.5, 0, 'v'], [77, '이제 오른손. 내 거.', 3.5, 0, 'v'], [85, '번갈아. 왼, 오, 왼, 오.', 4, 0, 'v'],
-          [93, '같이 오면 양손!', 3.5, 0, 'v'], [101, '오, 신입 손 좋네.', 3, 0, 'v']],
-    intro: [],
-    outro: () => [],
+    // The story (C): 4라인's scanner hand has quit, and 빅토르 has been watching yours. Through the build he bolts the end of his
+    // line onto your station behind your back without asking anyone (the clanks and the drill), and when the camera pulls back
+    // 반장 wants to know what this is. 빅토르: we both do better this way, isn't that the point - and he'll tell 소장 after.
+    // His lines carry the lesson too. 'b' 반장, 'v' 빅토르 (no speaker: 반장 on line 3 in phase 1, his bubble at the left).
+    say: [[6, '…하나 빠지니까 티 나네.', 3.5], [26, '(시계를 본다) …오늘도 트럭 기다리게 하겠다.', 4],
+          [50.5, '(뒤에서 쾅, 쾅) …뭐야, 뒤에서.', 3.5],
+          [60.5, '어이, 신입. 뒤도 좀 봐.', 3.5, 0, 'v'], [64, '…빅토르. 이게 뭐야.', 3, 0, 'b'],
+          [67, '우리 쪽 스캔하던 애가 관뒀어요. 왼손은 반장님 거!', 4.5, 0, 'v'], [72, '…남의 라인에 볼트를 박아?', 3.5, 0, 'b'],
+          [76, '같이 잘되면 좋잖아요. 오른손은 내 거!', 4.5, 0, 'v'], [84, '번갈아, 왼, 오, 왼, 오.', 4, 0, 'v'],
+          [88.5, '…소장한텐 말했고?', 3, 0, 'b'], [92, '같이 오면 양손! …말은 끝나고 하려고요.', 4.5, 0, 'v'],
+          [101, '오, 손 좋네. 내가 본 대로네.', 3.5, 0, 'v'], [142, '…빠르긴 하네.', 3, 0, 'b'],
+          [250, '반장님, 내일은 볼트 하나 더 박을게요.', 4, 0, 'v'], [255, '…박지 마.', 2.5, 0, 'b'],
+          [292, '마지막! 신입, 몰아쳐!', 3, 0, 'v']],
+    intro: [
+      { who:'', text:'하은이 그만둔 뒤로 3라인은 늘 늦다. 새벽 2시 40분.' },
+      { who:'반장', text:'…오늘도 둘이서 간다. 아무 손이나 편한 걸로.' }],
+    outro: good => good ? [
+      { who:'', text:'새벽 5시. 두 라인이 같이 멈췄다.' },
+      { who:'반장', text:'…소장한테 혼나는 건 너다.' },
+      { who:'빅토르', text:'일없슴다. 같이 잘됐잖아요.' },
+      { who:'', text:'4라인 끝에는 볼트 네 개가 삐뚤게 박혀 있었다.' }] : [
+      { who:'빅토르', text:'어… 볼트를 덜 박았나. 내일 다시 하자, 신입.' }],
   }
   ,{
     id:'s2-2', stageNo:'2-2', who:'순자 이모', role:'반장 · 순자 이모 · 112 BPM', tag:'디스코 펑크 · 밀기와 붙잡기', bpm:112, style:'disco22', fxTheme:'neon', inspector: true,
@@ -5028,6 +5045,11 @@ function feverHit(t, beat, j) {
   noise(t, 'highpass', 3800, 0.05, 0.02, 0.7, bus);
 }
 const inFever = beat => !!L.fever && inRange(beat, L.fever);
+// one-off level sounds: a clank of a bolt going home, a cordless drill
+function levelSfx(t, kind) {
+  if (kind === 'clank') { osc('square', 760, t, 0.001, 0.05, 0.12, bus); osc('square', 1130, t, 0.001, 0.035, 0.09, bus); noise(t, 'bandpass', 3200, 0.16, 0.06, 3, bus); noise(t, 'lowpass', 500, 0.12, 0.05, 0.7, bus); }
+  if (kind === 'drill') { const o = osc('sawtooth', 140, t, 0.02, 0.05, 0.7, bus); o.frequency.setValueAtTime(140, t); o.frequency.linearRampToValueAtTime(230, t + 0.25); o.frequency.linearRampToValueAtTime(190, t + 0.7); noise(t, 'bandpass', 2400, 0.05, 0.7, 2, bus); }
+}
 // 2-1's chutes play the band's percussion: D a kick, F claps, J a rim, K a cowbell (quieter on a 좋아)
 function quadHit(q, j) {
   const t = ctx.currentTime, v = j === 'good' ? 0.7 : 1;
@@ -5287,6 +5309,7 @@ function buildEvents() {
     const t = timeAt(b), s = spbAt(t), ci = chordIdx(b), inBar = b % 4;
     const quiet = inRange(b, L.quiet), doze = inRange(b, L.doze), phone = inRange(b, L.phone), dark = blackout(b);
     const E = (dt, fn) => ev.push([t + dt, fn]);
+    if (L.sfx) for (const [sb, kind] of L.sfx) if (Math.floor(sb) === b) E((sb - b) * s, T => levelSfx(T, kind));
     if (L.songStart === b) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(0)) startSong(T, 0, 0); });
     if (b < 4 && !L.noCount) { E(0, T => rim(T, inBar === 0 ? 0.5 : 0.3)); continue; }
     if (b >= total - 4) continue;
@@ -6545,6 +6568,7 @@ function updateHud(t) {
     if (spk === 's') { if (L.inspector) { bx = INSPECT_X - 24; bubble.style.bottom = '66%'; } else if (L.partners.indexOf('sunja') === 0) { bx = haeunHome().x - 14; bubble.style.bottom = '84%'; } else { bx = BOSS_X + LANE_DX[1]; bubble.style.bottom = '58%'; } }
     if (L.daw) { if (spk === 'b') { bx = 0; bubble.style.bottom = '32%'; } else if (spk === 'h') { bx = 34; bubble.style.bottom = '32%'; } else if (spk === 'd') { bx = 200; bubble.style.bottom = '19%'; } }
     if (L.mid && spk === 'v') { bx = 250; bubble.style.bottom = '64%'; }
+    if (L.mid && spk === 'b' && beat >= L.mid.at) { bx = 0; bubble.style.bottom = '64%'; }
     bubble.style.left = bx == null || bx < 60 ? '3cqw' : (bx / W * 100 - 5).toFixed(1) + '%'; bubble.style.right = 'auto'; bubble.classList.remove('tr');
     bubble.classList.toggle('obs', !!(spk && (L.cast ? spk === 's' || (spk === 'b') !== (castPlacer(beat) === 'boss') : spk === 'b' || spk === 's' || (L.daw && spk !== 'j'))));
     bubble.classList.remove('loud');
