@@ -749,7 +749,7 @@ const LEVELS = [
     // was let go, and its belts now run to your scanner. Two recorded songs. Phase 1 is line 3 as it always looks, its lamps
     // half broken, a tired half-time blues on the old radio ("Across the Empty Floor", 110.01 BPM, the game's beat 0 at 1.0707 s
     // into the file; only its first 14 bars are used). 반장 loads, you scan, any key. Behind your back 마르코 is bolting line 4
-    // onto your station; at beat 56 his drill kills the radio (a tape stop), the camera pulls back on all four belts and he
+    // onto your station; at beat 56 he switches the radio off (a tape stop), the camera pulls back on all four belts and he
     // puts his boombox on: "The Copper Stomp" (120 BPM; its first downbeat 1.116 s into the file = game beat 64, so its bar R
     // is game bar 16 + R). Its drums alone for three bars; the band at game beat 76 (the drop: the lamps come back). First you
     // get to know him: 반장 on his belt on 1 and 3, 마르코 on his on 2 and 4, his horn hits creeping in, once up on his upper
@@ -759,13 +759,17 @@ const LEVELS = [
     tempo: [[0, 110.01], [56, 120]], clock:'02:40', title:'에이스', partners:['boss'], hints:false,
     songs: [{ src: 'audio/2-1-across-the-empty-floor.mp3', at: 0, lead: 1.0707, gain: 0.9, until: 56 },
             { src: 'audio/2-1-the-copper-stomp.mp3', at: 62, lead: 0.116, gain: 0.85 }],
-    songStart: 0, songCues: [[56, 'tape'], [62, 1]], songDuck: [144, 208, 420, 0.7], noCount: true, bareBand: true, hitKit: 'ticktock',
+    songStart: 0, songCues: [[56, 'tape'], [62, 1]], songDuck: [144, 208, 1100, 0.93, 0.5], noCount: true, bareBand: true, hitKit: 'ticktock',
     // the whole night is drawn on the floor renderer (at 0): the upper belt of line 3 (하은's) stands idle in phase 1. Over
     // `zoom` the camera pulls back on all four belts; the keys split at `keys` (left hand: both left belts, right hand: both
     // right); the chart is in `bars` ('1' left lower = 반장's, '2' right lower, '3' left upper, '4' right upper, 'x' both lower;
     // 16 cells a bar; one hand's notes at least an 8th apart). 마르코 runs `route` ([beat, spot]: rl, ru, lu, ll, c beside you)
-    // and throws the boxes he loads; the radio dies at `radio`; while he talks (`talk`) the camera comes in.
-    mid: { at: 0, zoom: [57, 62], keys: 70, from: 0, radio: 56, boombox: 61.5, talk: [146, 204], guide: [66, 100], tags: [72, 88, 100],
+    // and throws the boxes he loads; he switches the radio off at `radio`; while he talks (`talk`) the camera comes in.
+    mid: { at: 0, zoom: [57, 62], keys: 70, from: 0, radio: 56, boombox: 61.5, talk: [146, 204], guide: [66, 100], tags: [72, 88, 100], upTags: [[124, 132, 140], [248, 252, 258]],
+      // the floor shouts (sound and ad-lib): a gang 'hey!' on the drop, in the band's stop and through the last run, 'yeah!'
+      // when the horns come back, a brass fanfare (landing half a beat after its entry) on the second drop and the last hit
+      shouts: [[76, 'hey', '헤이!'], [108, 'hey', '헤이!'], [142.5, 'hey', '헤이!'], [208, 'yeah', '예에~!'], [239.5, 'fanfare', '빠바밤~!'],
+               [240, 'hey', '가즈아~!'], [272, 'hey', '헤이!'], [288, 'yeah', '예에~!'], [304, 'hey', '헤이!'], [312, 'yeah', '후~!'], [318.5, 'fanfare', '대박!!']],
       route: [[56, 'rl'], [121, 'ru'], [138, 'rl'], [142, 'c'], [204, 'rl'], [234, 'ru'], [237, 'ru'], [245, 'lu'], [253, 'll'], [261, 'rl'], [269, 'ru'], [273, 'lu'], [277, 'rl'], [281, 'ru'], [285, 'lu'], [289, 'll'], [293, 'rl'], [297, 'ru'], [301, 'lu'], [305, 'rl'], [309, 'rl']],
       bars: [
         '................', '1.......1.......', '1.......1.......', '1.......1.......',
@@ -795,8 +799,8 @@ const LEVELS = [
     // (lineOn), a flash and a jolt on both drops, the second drop's run in amber, the last hit frozen and the lamps going out
     broken: [[0, 76]],
     phaseFx: { gloom: [0, 76], lineOn: [57.5, 58.5, 59.5], drop: 76, drop2: 240, amber: [[240, 312]], last: 319, out: [320.4, 321.1, 321.8] },
-    // behind your back in phase 1: 마르코 bolting his line on (clanks, the drill), the drill that kills the radio; the lamps
-    sfx: [[38, 'clank'], [38.75, 'clank'], [40, 'drill'], [44.5, 'clank'], [45, 'clank'], [46, 'drill'], [50.5, 'clank'], [55, 'drill'],
+    // behind your back in phase 1: 마르코 bolting his line on (clanks); the lamps
+    sfx: [[38, 'clank'], [38.75, 'clank'], [44.5, 'clank'], [45, 'clank'], [50.5, 'clank'], [51, 'clank'],
           [57.5, 'lamp'], [58.5, 'lamp'], [59.5, 'lamp'], [320.4, 'lampOff'], [321.1, 'lampOff'], [321.8, 'lampOff']],
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     // wide windows: this is played on phones (딱 ±80 ms, 좋아 ±150 ms, past 220 ms a miss)
@@ -807,8 +811,8 @@ const LEVELS = [
     // 'b' 반장, 'v' 마르코 (no speaker: 반장 in phase 1, his bubble at the left)
     say: [[6, '…하나 빠지니까 티 나네.', 3.5], [22, '(공지를 본다) …사람은 빼고, 라인은 붙이고.', 4],
           [38.5, '(뒤에서 쾅, 쾅) …벌써 붙이나.', 3.5], [50.5, '(또 쾅) …조용히 좀 붙이지.', 3],
-          [56, '(드릴 불꽃에 라디오가 죽는다) …라디오까지.', 2],
-          [57, '헤이헤이헤이~! 3·4 통합 라인, 개통!', 2.5, 0, 'v'], [60, '음악부터 깔고! 뮤직, 큐!', 2.5, 0, 'v'], [64.5, '…저 양반이 4라인 에이스냐.', 2.5, 0, 'b'],
+          [56, '(라디오가 뚝 끊긴다) …어?', 1.5],
+          [57, '헤이헤이헤이~! 그 노래 너무 졸려요! 3·4 통합 라인, 개통!', 3, 0, 'v'], [60, '음악부터 깔고! 뮤직, 큐!', 2.5, 0, 'v'], [64.5, '…저 양반이 4라인 에이스냐.', 2.5, 0, 'b'],
           [68, '신입! 왼손은 반장님 거, 오른손은 내 거!', 3.5, 0, 'v'], [80, '그렇지! 쿵, 짝! 쿵, 짝!', 3, 0, 'v'],
           [96, '…시끄러운 게 하나 붙었네.', 3, 0, 'b'], [104, '조금만 양념 칠게요~', 3, 0, 'v'],
           [120, '위 벨트도 우리 거예요! 위!', 3, 0, 'v'], [132, '…오늘 하루에 다 가르칠 셈이냐.', 3, 0, 'b'],
@@ -3518,12 +3522,11 @@ function drawMid(t, nowMs, active) {
     drawLights(nowMs / 1000, T, active); MID_SIDE = 0;
     const x = 4, y = 106;
     if (q === 0 && M.radio) {
-      // an old radio, its dial glowing while the blues plays; the drill's spark kills it
+      // an old radio, its dial glowing while the blues plays, until 마르코 switches it off
       const on = live ? bReal < M.radio : true;
       R(x + 18, y - 9, 1, 9, '#3a332c'); R(x, y, 24, 12, '#6b4a2e'); R(x, y, 24, 1, '#8a6a42'); R(x + 2, y + 3, 9, 5, '#2a1a10');
       if (on) { R(x + 3, y + 4, 7, 3, '#f0a040'); R(x + 3 + Math.floor((nowMs / 900) % 6), y + 4, 1, 3, '#fff0c0'); }
       for (let k = 0; k < 3; k++) R(x + 14 + k * 3, y + 3, 2, 6, '#3a2a1c');
-      if (live && bReal >= M.radio - 0.4 && bReal < M.radio + 0.3 && !reduce) { g.globalAlpha = 0.9; R(x + 12 + Math.round(Math.random() * 6), y - 6 + Math.round(Math.random() * 4), 2, 2, '#fff6c0'); R(x + 8 + Math.round(Math.random() * 10), y - 3, 1, 1, '#ffd060'); g.globalAlpha = 1; }
     }
     if (q === 1 && M.boombox != null && bReal >= M.boombox) {
       const pump = bReal >= M.boombox + 0.5 ? Math.max(0, 1 - (bReal % 1) * 3) : 0;
@@ -3587,13 +3590,14 @@ function drawMid(t, nowMs, active) {
   // his ad-libs (drawn crisp over the floor, in midAdlib) and the sparks off his hands when you hit one of his boxes
   if (!FX.adlibs || b < 57) { FX.adlibs = []; FX.adOnce = {}; FX.adWalk = false; FX.adCombo = 0; FX.adMiss = FX.lastMiss; }
   if (active && b >= 62) {
-    const ad = (text) => FX.adlibs.push({ text, at: nowMs, x: marco.x, y: 86 + marco.dy - 14 });
+    const ad = (text) => { const live_ = FX.adlibs.filter(a => nowMs - a.at < 700).length; FX.adlibs.push({ text, at: nowMs, x: marco.x, y: 86 + marco.dy - 14 - live_ * 11 }); };
     const pick = xs => xs[Math.floor(Math.random() * xs.length)];
-    if (F) for (const [d, text] of [[F.drop, '예에~!'], [F.drop2, '가즈아~!'], [F.last, '대박!!']]) if (d != null && b >= d && b < d + 1 && !FX.adOnce[d]) { FX.adOnce[d] = 1; ad(text); }
-    if (FX.adWalk && !marco.walking && marco.spot !== 'c' && F && F.drop2 != null && b >= F.drop2) ad(pick(['여기!', '헤이!', '후!', '오우!', '펑키~!', '짠!']));
+    let shoutNear = false;
+    for (const [sb, , text] of M.shouts || []) { if (Math.abs(b - sb) < 1.5) shoutNear = true; if (b >= sb && b < sb + 1 && !FX.adOnce[sb]) { FX.adOnce[sb] = 1; ad(text); } }
+    if (FX.adWalk && !marco.walking && marco.spot !== 'c' && F && F.drop2 != null && b >= F.drop2 && !shoutNear) ad(pick(['여기!', '헤이!', '후!', '오우!', '펑키~!', '짠!']));
     FX.adWalk = marco.walking;
-    if (stats.combo >= 30 && stats.combo % 30 === 0 && FX.adCombo !== stats.combo && !sayV) { FX.adCombo = stats.combo; ad(pick(['나이스 신입!', '그루브 좋아!', '손 좋다~!', '오~ 리듬 탔어!'])); }
-    if (FX.lastMiss !== FX.adMiss) { FX.adMiss = FX.lastMiss; if (!sayV && Math.random() < 0.35) ad(pick(['괜찮아~ 괜찮아~', '노 프라블럼!'])); }
+    if (stats.combo >= 30 && stats.combo % 30 === 0 && FX.adCombo !== stats.combo && !sayV && !shoutNear) { FX.adCombo = stats.combo; ad(pick(['나이스 신입!', '그루브 좋아!', '손 좋다~!', '오~ 리듬 탔어!'])); }
+    if (FX.lastMiss !== FX.adMiss) { FX.adMiss = FX.lastMiss; if (!sayV && !shoutNear && Math.random() < 0.35) ad(pick(['괜찮아~ 괜찮아~', '노 프라블럼!'])); }
     FX.adlibs = FX.adlibs.filter(a => nowMs - a.at < 900);
   }
   mirror(0, () => back(0)); mirror(1, () => back(1));
@@ -3688,14 +3692,22 @@ function midGuide(b, T, nowMs, v) {
       gHi.fillText(q ? '마르코 라인 · J' : 'F · 반장 라인', x, y + 6.5 * u);
     }
   }
-  if (b >= TG[0] - 2 && b < TG[2]) {
+  // the hand tags over the boxes: [from, fading from, gone by]; `upTags` windows tag only the upper belts' boxes, the first
+  // time boxes come along them, the first of them also saying it in words (the same hand as the belt under it)
+  const tagWin = (TG, upOnly) => {
+    if (!(b >= TG[0] - 2 && b < TG[2])) return;
     const a = b < TG[1] ? 1 : Math.max(0, (TG[2] - b) / (TG[2] - TG[1]));
+    let first = upOnly;
     for (const n of notes) {
-      if (!n.quad || n.state !== 'pending' || n.beat < TG[0] || n.beat >= TG[2] || T < n.place) continue;
-      const lx = noteX(n, T), fx = n.up ? farX(lx) : lx, wx = n.q ? MID.ww - fx : fx, x = toX(wx), y = toY(n.up ? farY(BELT_Y - n.h - 9) : BELT_Y - n.h - 9), w = 15 * u, h = 10 * u;
-      pill(x, y, w, h, cols[n.q], a); gHi.globalAlpha = a; gHi.fillStyle = `rgb(${cols[n.q]})`; gHi.font = `700 ${Math.round(7 * u)}px sans-serif`; gHi.textAlign = 'center'; gHi.textBaseline = 'middle'; gHi.fillText(n.q ? '▶' : '◀', x, y + 0.5 * u);
+      if (!n.quad || n.state !== 'pending' || n.beat < TG[0] || n.beat >= TG[2] || T < n.place || (upOnly && !n.up)) continue;
+      if (upOnly && !first) break;   // on the upper belts only the next box gets a tag, in words
+      const lx = noteX(n, T), fx = n.up ? farX(lx) : lx, wx = n.q ? MID.ww - fx : fx, x = toX(wx), y = toY(n.up ? farY(BELT_Y - n.h - 9) : BELT_Y - n.h - 9);
+      const text = first ? (n.q ? '위도 오른손 ▶' : '◀ 위도 왼손') : n.q ? '▶' : '◀', w = (first ? 46 : 15) * u, h = 10 * u; first = false;
+      pill(x, y, w, h, cols[n.q], a); gHi.globalAlpha = a; gHi.fillStyle = `rgb(${cols[n.q]})`; gHi.font = `700 ${Math.round(7 * u)}px "IBM Plex Sans KR", sans-serif`; gHi.textAlign = 'center'; gHi.textBaseline = 'middle'; gHi.fillText(text, x, y + 0.5 * u);
     }
-  }
+  };
+  tagWin(TG, false);
+  for (const W_ of M.upTags || []) tagWin(W_, true);
   gHi.globalAlpha = 1;
 }
 // ---------- 2-1 the turn: the four chutes ----------
@@ -5192,7 +5204,35 @@ function feverHit(t, beat, j) {
 }
 const inFever = beat => !!L.fever && inRange(beat, L.fever);
 // one-off level sounds: a clank of a bolt going home, a cordless drill
+// a shout from the floor: several voices (a sawtooth each, through the formants of the vowel), breathy at the start
+function shout21(t, kind) {
+  const voices = [[205, 0], [172, 0.012], [240, 0.02], [150, 0.028], [222, 0.035]], yeah = kind === 'yeah', dur = yeah ? 0.38 : 0.2;
+  const F = yeah ? [[300, 700], [2200, 1250], [2900, 2500]] : [[560, 470], [1850, 2250], [2600, 2900]];
+  const out = ctx.createGain(); out.gain.value = 1; out.connect(bus);
+  const fs = F.map(([a, z], k) => { const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 7 - k * 1.5; f.frequency.setValueAtTime(a, t); f.frequency.linearRampToValueAtTime(z, t + dur); const gk = ctx.createGain(); gk.gain.value = [1, 0.6, 0.35][k]; f.connect(gk); gk.connect(out); return f; });
+  for (const [f0, d] of voices) {
+    const o = ctx.createOscillator(), gn = ctx.createGain(), t0 = t + d; o.type = 'sawtooth';
+    o.frequency.setValueAtTime(f0 * 1.06, t0); o.frequency.linearRampToValueAtTime(f0, t0 + 0.05); o.frequency.linearRampToValueAtTime(f0 * (yeah ? 0.86 : 0.8), t0 + dur);
+    gn.gain.setValueAtTime(0.0001, t0); gn.gain.exponentialRampToValueAtTime(0.09, t0 + 0.035); gn.gain.setValueAtTime(0.09, t0 + dur * 0.6); gn.gain.exponentialRampToValueAtTime(0.0001, t0 + dur + 0.06);
+    o.connect(gn); fs.forEach(f => gn.connect(f)); o.start(t0); o.stop(t0 + dur + 0.08);
+    noise(t0, 'bandpass', 1800, 0.05, 0.05, 1.2, bus);   // the 'h'
+  }
+}
+// a brass fanfare: three quick pickups into a held E flat major chord (the chord lands 0.25 s after t: a half beat at 120)
+function fanfare21(t) {
+  const brass = (f, t0, d, a) => {
+    const fl = ctx.createBiquadFilter(), gn = ctx.createGain(); fl.type = 'lowpass'; fl.Q.value = 1.5;
+    fl.frequency.setValueAtTime(700, t0); fl.frequency.exponentialRampToValueAtTime(3800, t0 + 0.04); fl.frequency.exponentialRampToValueAtTime(1800, t0 + d);
+    gn.gain.setValueAtTime(0.0001, t0); gn.gain.exponentialRampToValueAtTime(a, t0 + 0.02); gn.gain.setValueAtTime(a, t0 + d * 0.8); gn.gain.exponentialRampToValueAtTime(0.0001, t0 + d + 0.12);
+    fl.connect(gn); gn.connect(bus);
+    for (const det of [-7, 0, 8]) { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = det; o.connect(fl); o.start(t0); o.stop(t0 + d + 0.15); }
+  };
+  [233.08, 311.13, 392].forEach((f, k) => brass(f, t + 0.04 + k * 0.07, 0.06, 0.05));
+  for (const f of [311.13, 392, 466.16, 622.25]) brass(f, t + 0.25, 0.7, 0.035);
+}
 function levelSfx(t, kind) {
+  if (kind === 'hey' || kind === 'yeah') return shout21(t, kind);
+  if (kind === 'fanfare') return fanfare21(t);
   if (kind === 'clank') { osc('square', 760, t, 0.001, 0.05, 0.12, bus); osc('square', 1130, t, 0.001, 0.035, 0.09, bus); noise(t, 'bandpass', 3200, 0.16, 0.06, 3, bus); noise(t, 'lowpass', 500, 0.12, 0.05, 0.7, bus); }
   if (kind === 'lamp') { osc('square', 1900, t, 0.001, 0.05, 0.02, bus); noise(t, 'bandpass', 4200, 0.18, 0.02, 4, bus); noise(t + 0.03, 'highpass', 6000, 0.04, 0.25, 0.7, bus); }
   if (kind === 'lampOff') { osc('square', 1500, t, 0.001, 0.05, 0.02, bus); noise(t, 'bandpass', 3600, 0.16, 0.02, 4, bus); osc('sine', 120, t, 0.003, 0.05, 0.25, bus); }
@@ -5459,6 +5499,7 @@ function buildEvents() {
     const E = (dt, fn) => ev.push([t + dt, fn]);
     if (L.sfx) for (const [sb, kind] of L.sfx) if (Math.floor(sb) === b) E((sb - b) * s, T => levelSfx(T, kind));
     if (L.songCues) for (const [cb, cue] of L.songCues) if (Math.floor(cb) === b) E((cb - b) * s, cue === 'tape' ? T => tapeStop(T) : T => { if (songReady(cue)) startSong(T, 0, cue); });
+    if (L.mid && L.mid.shouts) for (const [sb, kind] of L.mid.shouts) if (Math.floor(sb) === b) E((sb - b) * s, T => levelSfx(T, kind));
     if (L.songDuck) { if (b === L.songDuck[0]) E(0, T => duckSong(T, true, 2 * s)); if (b === L.songDuck[1] - 1) E(0, T => duckSong(T, false, s)); }
     if (L.songStart === b) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(0)) startSong(T, 0, 0); });
     if (b < 4 && !L.noCount) { E(0, T => rim(T, inBar === 0 ? 0.5 : 0.3)); continue; }
@@ -6888,19 +6929,30 @@ function stopSong() { if (SONG.src) { try { SONG.src.stop(); } catch (e) {} SONG
 function startSong(T, into = 0, i = 0) {
   stopSong(); const sp = L.songs && L.songs[i], buf = sp && SONG.bufs[sp.src]; if (!buf || !ctx) return;
   const off = sp.lead + into; if (off >= buf.duration) return;
-  const s = ctx.createBufferSource(), gn = ctx.createGain(), lp = ctx.createBiquadFilter(); s.buffer = buf; gn.gain.value = sp.gain || 0.9;
-  lp.type = 'lowpass'; lp.frequency.value = 20000; lp.Q.value = 0.8;
-  s.connect(lp); lp.connect(gn); gn.connect(mus); s.start(Math.max(T, ctx.currentTime), off); SONG.src = s; SONG.gn = gn; SONG.lp = lp; SONG.g0 = gn.gain.value;
-  // started (or sought) inside the muffled stretch: start muffled
-  const d = L.songDuck, bb = beatAt(timeAt(sp.at) + into); if (d && bb >= d[0] && bb < d[1]) { lp.frequency.value = d[2] || 420; gn.gain.value = SONG.g0 * (d[3] || 0.7); }
+  const s = ctx.createBufferSource(), gn = ctx.createGain(), lp = ctx.createBiquadFilter(), wet = ctx.createGain(); s.buffer = buf; gn.gain.value = sp.gain || 0.9;
+  lp.type = 'lowpass'; lp.frequency.value = 20000; lp.Q.value = 0.5; wet.gain.value = 0;
+  const cv = ctx.createConvolver(), vlp = ctx.createBiquadFilter(); cv.buffer = songVerbBuf(); vlp.type = 'lowpass'; vlp.frequency.value = 2400;
+  s.connect(lp); lp.connect(gn); lp.connect(wet); wet.connect(cv); cv.connect(vlp); vlp.connect(gn); gn.connect(mus);
+  s.start(Math.max(T, ctx.currentTime), off); SONG.src = s; SONG.gn = gn; SONG.lp = lp; SONG.wet = wet; SONG.g0 = gn.gain.value;
+  // started (or sought) inside the pushed-back stretch: start there
+  const d = L.songDuck, bb = beatAt(timeAt(sp.at) + into); if (d && bb >= d[0] && bb < d[1]) { lp.frequency.value = d[2]; gn.gain.value = SONG.g0 * d[3]; wet.gain.value = d[4] || 0; }
 }
-// a stretch of the song pushed back (`songDuck: [from, to, cutoff, gain]`): low-passed and quieter, so only the bass and the
-// kick come through, as if the speaker were turned away while somebody talks; it opens back up over a beat
+// a room for the song (a warehouse: a long, dark tail): decaying noise, made once per audio context
+function songVerbBuf() {
+  if (SONG.verbBuf && SONG.verbCtx === ctx) return SONG.verbBuf;
+  const n = Math.round(ctx.sampleRate * 1.8), buf = ctx.createBuffer(2, n, ctx.sampleRate);
+  for (let c = 0; c < 2; c++) { const d = buf.getChannelData(c); let e = 0; for (let i = 0; i < n; i++) { d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2.6) * (i < 400 ? i / 400 : 1); e += d[i] * d[i]; } const k = 1 / Math.sqrt(e); for (let i = 0; i < n; i++) d[i] *= k; }   // unit energy: the echo as loud as the song at wet 1
+  SONG.verbBuf = buf; SONG.verbCtx = ctx; return buf;
+}
+// a stretch of the song pushed back (`songDuck: [from, to, cutoff, gain, echo]`): not much quieter, but further away, as if the
+// boombox were across the floor while somebody talks beside you: the top rolled off gently and a warehouse's echo on it;
+// it comes back close over a beat
 function duckSong(T, on, dur) {
-  const lp = SONG.lp, gn = SONG.gn, d = L.songDuck; if (!lp || !d) return;
-  const f = on ? (d[2] || 420) : 20000, g = SONG.g0 * (on ? (d[3] || 0.7) : 1);
+  const lp = SONG.lp, gn = SONG.gn, wet = SONG.wet, d = L.songDuck; if (!lp || !d) return;
+  const f = on ? d[2] : 20000, g = SONG.g0 * (on ? d[3] : 1), w = on ? d[4] || 0 : 0;
   lp.frequency.cancelScheduledValues(T); lp.frequency.setValueAtTime(lp.frequency.value, T); lp.frequency.exponentialRampToValueAtTime(f, T + dur);
   gn.gain.cancelScheduledValues(T); gn.gain.setValueAtTime(gn.gain.value, T); gn.gain.linearRampToValueAtTime(g, T + dur);
+  if (wet) { wet.gain.cancelScheduledValues(T); wet.gain.setValueAtTime(wet.gain.value, T); wet.gain.linearRampToValueAtTime(w, T + dur); }
 }
 // the song on the radio dies: the tape slows to a groan and stops
 function tapeStop(T) {
