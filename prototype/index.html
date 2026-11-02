@@ -729,35 +729,25 @@ const LEVELS = [
       { who:'반장', text:'내 허리 탓이다. 내일 또 하자.' }]
   }
   ,{
-    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'순자 이모 · 반장 → 빅토르 · 92 BPM · 벨트 둘', tag:'소울 알앤비 · 검수 도장 · 버튼 하나', bpm:92, style:'soul21', fxTheme:'warm',
-    // 2-1 (stage 2 「인수인계」): two belts, one button. The upper belt is 순자 이모's inspection line: she stamps each box (her
+    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'반장 → 빅토르 · 순자 이모 · 104 BPM · 벨트 둘', tag:'소울 알앤비 · 검수 도장 · 버튼 하나', bpm:104, style:'soul21', fxTheme:'warm',
+    // 2-1 (stage 2 「인수인계」): two belts, one button. The near belt is 순자 이모's inspection line: she stamps each box (her
     // pass stamp) as she sets it down, and the belts are a bar long (travel 4), so every stamp is exactly one bar ahead of its
     // box and what she stamps is what you play next bar. Here it is only a sound; nothing says so (the X-ray that hides her
-    // boxes comes in 2-2). The lower belt is the ordinary line: 반장 loads it, brings 김 빅토르 over from the day shift (his first
-    // 신입, fifteen years ago), and in the break, on the phone to 소장, hands him the line and his radio and watches from behind.
-    lanes: 2, partners: ['sunja', 'boss'], oneButton: true, farLoaderDy: 14, farLoaderDx: 22,
-    tempo: [[0, 92]], travel: 4, stampBar: 1, stampLane: 0, clock:'02:40', title:'검수', hints:false,
-    cast: { first: 'boss', ids: ['boss', 'viktor'], seq: [[106, 'viktor']], obsX: 238, phone: [[107, 121]], tired: [[150, 156]] },
-    comfort: ['…다음 거.', '손 봐, 손.'], comfortBy: { boss: ['…다음 거.', '손 봐, 손.'], viktor: ['일없다, 다음 거!', '어이, 신입! 정신!'] },
+    // boxes comes in 2-2). The far belt is the ordinary line: 반장 loads it, and in the break, on the phone to 소장, hands it to
+    // 김 빅토르 (his first 신입, fifteen years ago) and watches from behind it.
+    lanes: 2, partners: ['boss', 'sunja'], oneButton: true, farLoaderDy: 14, farLoaderDx: 22,
+    tempo: [[0, 104]], travel: 4, stampBar: 1, stampLane: 1, clock:'02:40', title:'검수', hints:false,
+    cast: { lane: 0, first: 'boss', ids: ['boss', 'viktor'], seq: [[106, 'viktor']], obsX: 176, phone: [[107, 121]], tired: [[150, 156]] },
+    comfort: [],
     chords: SOUL.chords, roots: SOUL.roots,
     chordAt: bar => bar < 2 ? 0 : bar < 18 ? SOUL.verse[(bar - 2) % 4] : bar < 26 ? SOUL.chorus[(bar - 18) % 4] : bar < 30 ? 0 : bar < 38 ? SOUL.verse[(bar - 30) % 4] : bar < 46 ? 5 + SOUL.chorus[(bar - 38) % 4] : 5,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 184,
     special:['도장 찍힌 상자', 'stamp', '받아냄'],
     sections: [[0, 'intro'], [2, 'a1'], [10, 'a2'], [18, 'b1'], [26, 'call'], [30, 'a3'], [38, 'b2'], [46, 'outro']],
-    // 8 cells per bar (half beats). bars = 이모's upper belt, bars2 = the lower belt (반장, then 빅토르). The lower belt keeps 1 and 3;
+    // 8 cells per bar (half beats). bars = the far belt (반장, then 빅토르), bars2 = 이모's belt in front. The far belt keeps 1 and 3;
     // 이모 answers in between, her 탁, 탁탁, 탁 (2, the 'and' of 2, 4). One button: a box on each belt on the same beat is one press,
-    // and nothing lands on her belt while a long crate is held below.
+    // and nothing lands on her belt while a long crate is held on the far one.
     bars: [
-      '........', '........',
-      '........', '........', '........', '........', '..x.....', '..x...x.', '..x.....', '..x...x.',
-      '..xx....', '..x...x.', '..xx....', '..x..x..', '..xx....', '..x...x.', '..xx..x.', '..x.x...',
-      '..xx..x.', '..x..x..', '..xx..x.', '......x.', '..xx..x.', '..x..x..', '..xx..x.', '..x.x.x.',
-      '..x.....', '........', '........', '........',
-      '..xx..x.', '.x.x..x.', '..xx..x.', '......x.', '..xx.x..', '.x.x..x.', '..xx..x.', '..x.x...',
-      '..xx..xx', '.x.x..x.', '..xx..xx', '......x.', '..xx.x.x', '.x.x..x.', '..xx..xx', '..x.x.x.',
-      '........', '........'
-    ],
-    bars2: [
       '........', '........',
       'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x.x.',
       'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...',
@@ -767,25 +757,20 @@ const LEVELS = [
       'x...x...', 'x.x.x...', 'x...x...', 'h===....', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.',
       '........', '........'
     ],
-    // [beat, line, beats on screen, lane, speaker]: 'b' 반장, 'v' 빅토르, 's' 이모
-    say: [[4, '…시작한다.', 2.5, 1, 'b'], [12, '이모님, 도장 소리 좋네요. 쾅, 쾅.', 3.5, 1, 'v'],
-          [20, '주간 사람이 밤에 와서. 괜찮아요?', 3.5, 0, 's'], [24, '일없슴다.', 2.5, 1, 'v'], [27, '일이 없긴, 산더미구만.', 3, 0, 's'], [31, '이게 원래 한국말이에요. 여기서 바꾼 거지.', 4, 1, 'v'],
-          [48, '반장님, 허리는 좀 어때요?', 3, 1, 'v'], [52, '…일 해라.', 2.5, 1, 'b'], [62, '(신입에게) 이 양반 원래 이래. 십오 년째.', 4, 1, 'v'],
-          [92, '총각, 손 좀 보네.', 3, 0, 's'],
-          [107, '(전화) …네, 소장님.', 3, 1, 'b'], [111, '(무전기를 내민다) 받아.', 2.5, 1, 'b'], [114, '…제가요? 네, 네.', 3, 1, 'v'],
-          [122, '자, 갑니다!', 2.5, 1, 'v'], [136, '주간 양반이 손은 빠르네.', 3, 0, 's'], [148, '이모님, 저 주간 양반 아니고 빅토르예요.', 4, 1, 'v'],
-          [153, '빅… 뭐?', 2.5, 0, 's'], [156, '빅토르. 그냥 빅 씨 해요.', 3.5, 1, 'v'], [176, '마지막!', 2, 1, 'v']],
-    intro: [
-      { who:'', text:'12월, 새벽 2시 40분. 오배송 클레임이 쌓여서 소장이 위 벨트를 검수 라인으로 돌렸다.' },
-      { who:'순자 이모', text:'검수 순자예요. 오늘부터 여기서 보고 넘겨요.' },
-      { who:'반장', text:'…그리고 이쪽. 주간에서 왔다. 오래 같이 일했어.' },
-      { who:'빅토르', text:'오래가 아니라 15년이요. 반장님 머리 까맸을 때부터.' },
-      { who:'빅토르', text:'(신입에게) 네가 그 신입이구나. 반장님이 나 이후로 처음 칭찬하더라. …거짓말이야. 칭찬 안 해, 이 양반.' }],
-    outro: good => good ? [
-      { who:'빅토르', text:'반장님, 무전기요.' },
-      { who:'반장', text:'…내일 줘.' },
-      { who:'', text:'다음 날에도 반장은 무전기를 돌려받지 않았다.' }] : [
-      { who:'빅토르', text:'일없다, 일없어. 내일 또 하면 돼.' }]
+    bars2: [
+      '........', '........',
+      '........', '........', '........', '........', '..x.....', '..x...x.', '..x.....', '..x...x.',
+      '..xx....', '..x...x.', '..xx....', '..x..x..', '..xx....', '..x...x.', '..xx..x.', '..x.x...',
+      '..xx..x.', '..x..x..', '..xx..x.', '......x.', '..xx..x.', '..x..x..', '..xx..x.', '..x.x.x.',
+      '..x.....', '........', '........', '........',
+      '..xx..x.', '.x.x..x.', '..xx..x.', '......x.', '..xx.x..', '.x.x..x.', '..xx..x.', '..x.x...',
+      '..xx..xx', '.x.x..x.', '..xx..xx', '......x.', '..xx.x.x', '.x.x..x.', '..xx..xx', '..x.x.x.',
+      '........', '........'
+    ],
+    // the script is cleared for a rewrite
+    say: [],
+    intro: [],
+    outro: () => [],
   }
   ,{
     id:'s2-2', stageNo:'2-2', who:'순자 이모', role:'반장 · 순자 이모 · 112 BPM', tag:'디스코 펑크 · 밀기와 붙잡기', bpm:112, style:'disco22', fxTheme:'neon', inspector: true,
@@ -2100,7 +2085,7 @@ function drawObserver(t, nowMs, active) {
 }
 function drawPartnerArmOf(id, pose, lane = 0) {
   if (SCENE.walk) return;
-  if (L.cast && (L.lanes !== 2 || lane === 1)) {
+  if (L.cast && (L.lanes !== 2 || lane === castLane())) {
     if (CAST.hideArm) return; g.save();
     if (L.lanes === 2) { const o = placerOff(lane), sy = o.dy - LANE_DY[lane]; g.translate(CAST.dx + o.dx, sy); pose = { ...pose, hand: { x: pose.hand.x - o.dx, y: pose.hand.y - sy } }; } else g.translate(CAST.dx, 0);
     PARTNERS[id].arm(pose); g.restore(); return;
@@ -2161,6 +2146,7 @@ function drawActor(id, x, mirrored, pose, nowMs, active, extra) {
   g.restore();
 }
 // after the shift the cast stays where the song left them (반장 on the line, 지우 behind the belt) through the outro and result
+const castLane = () => L.cast.lane != null ? L.cast.lane : L.lanes === 2 ? 1 : 0;
 const castBeatAt = (t, active) => active ? beatAt(t) : (state === 'outro' || state === 'result') ? END_BEAT : 0;
 function drawCast(t, nowMs, active, placerPose) {
   if (L.cast.seq) return drawCast2(t, nowMs, active, placerPose);
@@ -2998,9 +2984,14 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
       if (n.off && L.offTilt && !n.top) { g.save(); g.translate(x, BELT_Y); g.rotate((n.i % 2 ? 1 : -1) * 0.12); drawBox(n, 0, 0, n.state, t, sq); g.restore(); }
       else {
         // a box that came down out of the air (dropped or hurled) bounces once where it lands; a slammed one squashes
-        const lt = n.tFall != null ? n.tFall + n.fallDur : n.slam ? n.place : null, q = lt != null ? (t - lt) / (0.4 * SPB) : 9;
+        const lt = n.tFall != null ? n.tFall + n.fallDur : n.slam || n.stamp ? n.place : null, q = lt != null ? (t - lt) / (0.4 * SPB) : 9;
         const bo = q >= 0 && q < 1 ? -Math.abs(Math.sin(q * Math.PI * (n.drop ? 2 : 1))) * (n.drop ? 7 : 3) * (1 - q) : 0;
         drawBox(n, x, (n.top ? BELT_Y - 12 : BELT_Y) + Math.round(bo), n.state, t, q >= 0 && q < 0.4 ? Math.max(sq, (0.4 - q) * 1.6) : sq);
+        // 이모's stamp coming down on it: a red ring of ink and a few flecks off the lid
+        if (n.stamp && t >= n.place && t < n.place + 0.28) { const a = (t - n.place) / 0.28, cy = BELT_Y - n.h - 1, r = Math.round(3 + a * 9);
+          g.globalAlpha = 1 - a; g.strokeStyle = '#e0453a'; g.lineWidth = 2; g.beginPath(); g.arc(Math.round(x), cy, r, 0, Math.PI * 2); g.stroke();
+          for (let k = 0; k < 4; k++) { const ang = -Math.PI * (0.15 + k * 0.23); R(Math.round(x + Math.cos(ang) * (r + 3)), Math.round(cy + Math.sin(ang) * (r + 3)), 2, 2, '#e0453a'); }
+          g.globalAlpha = 1; }
         if (n.slam && !n.slamFx && t >= n.place && t < n.place + 0.3 * SPB) { n.slamFx = true; FX.shakeUntil = Math.max(FX.shakeUntil, nowMs + 70); if (ctx) noise(ctx.currentTime, 'lowpass', 600, 0.22, 0.05, 0.7, bus); if (!reduce) spawn(x, BELT_Y - 2, 5, ['#8a7a68', '#b8a890'], -40, 40, -40, -10, 260, 380); }
       }
     }
@@ -3019,7 +3010,8 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   if (!far && !armFirst && !(active && L.visit && visitAt(beatAt(t)))) drawPartnerArmOf(pid, pose, lane);
   g.restore();
   // the arm to the far belt is drawn in screen space so it stays on the body; only the hand goes through the perspective
-  if (far && DUO.mode === 'two' && !(active && shovedAt(castBeatAt(t, active)))) { const who = pid, o = placerOff(0), h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
+  const castFar = far && L.cast && castLane() === 0;
+  if (far && DUO.mode === 'two' && !(castFar && CAST.hideArm) && !(active && shovedAt(castBeatAt(t, active)))) { const who = pid, o0 = placerOff(0), o = castFar ? { dx: o0.dx + CAST.dx, dy: o0.dy } : o0, h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
 }
 // a thrown box that missed, in the air: from the upper belt's loading end (its far, smaller picture) down onto the lower belt's,
 // turning over; a thud, a puff of dust and a jolt when it lands
@@ -4073,9 +4065,9 @@ function drawScene(t, bt, active, nowMs) {
   const beltT = active ? (L.beltStop || L.beltSwing ? beltClockT(t) : t) : bt;
   const laneFx = { delivered: 0, binned: 0, falling: [] };
   if (L.lanes === 2) {
-    const mb = castBeatAt(t, active); DUO.mode = duoMode(mb); if (L.soloFrom != null) L.partners[1] = active && mb >= L.soloFrom ? 'haeun' : 'jiwoo'; DUO.p = L.handover ? Math.max(0, Math.min(1, (mb - L.handover[0]) / (L.handover[1] - L.handover[0]))) : 1;
+    const mb = castBeatAt(t, active); DUO.mode = duoMode(mb); if (L.cast) L.partners[castLane()] = castPlacer(mb); if (L.soloFrom != null) L.partners[1] = active && mb >= L.soloFrom ? 'haeun' : 'jiwoo'; DUO.p = L.handover ? Math.max(0, Math.min(1, (mb - L.handover[0]) / (L.handover[1] - L.handover[0]))) : 1;
     if (DUO.mode !== 'two' && L.coScanner) drawHaeunScene(mb, upperKick, nowMs, active);
-    if (DUO.mode === 'two') { const fa = active ? feverAura(mb) : 0; if (fa) drawHaeunAura(mb, fa, nowMs, false); if (L.show && active) { drawRage15(t, nowMs, 'h'); drawRage15(t, nowMs, 'j'); } if (active && shovedAt(mb)) drawShoved(mb, nowMs); else { g.save(); clipBehindUpper(); { const o = placerOff(0); g.translate(o.dx, o.dy); } drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); } if (fa) drawHaeunAura(mb, fa, nowMs, true); }
+    if (DUO.mode === 'two') { const fa = active ? feverAura(mb) : 0; if (fa) drawHaeunAura(mb, fa, nowMs, false); if (L.show && active) { drawRage15(t, nowMs, 'h'); drawRage15(t, nowMs, 'j'); } if (active && shovedAt(mb)) drawShoved(mb, nowMs); else { g.save(); clipBehindUpper(); { const o = placerOff(0); g.translate(o.dx, o.dy); } if (L.cast && castLane() === 0) drawCast(t, nowMs, active, poses[0]); else drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); } if (fa) drawHaeunAura(mb, fa, nowMs, true); }
     else if (!L.oneSpot) {
       // one loader between the belts: his body follows whichever belt is busy
       const o = placerOff(1), bp = { ...poses[1], wince: poses[0].wince || poses[1].wince, dip: Math.max(poses[0].dip, poses[1].dip), nod: Math.max(poses[0].nod, poses[1].nod) };
@@ -4093,7 +4085,7 @@ function drawScene(t, bt, active, nowMs) {
   }
   const lo = L.lanes === 2 ? 1 : 0;
   // the cast changes hands on the one belt, or on the lower belt when there are two (2-1: 이모 keeps the upper one)
-  if (L.cast) { L.partners[lo] = castPlacer(castBeatAt(t, active)); if (L.lanes === 2) { const o = placerOff(1); g.save(); g.translate(o.dx, o.dy); drawCast(t, nowMs, active, poses[lo]); g.restore(); } else drawCast(t, nowMs, active, poses[lo]); }
+  if (L.cast && castLane() === lo) { L.partners[lo] = castPlacer(castBeatAt(t, active)); if (L.lanes === 2) { const o = placerOff(1); g.save(); g.translate(o.dx, o.dy); drawCast(t, nowMs, active, poses[lo]); g.restore(); } else drawCast(t, nowMs, active, poses[lo]); }
   else if (SCENE.walk && !active) drawWalkingBoss(nowMs);
   else if (!(L.lanes === 2 && DUO.mode !== 'two') && !(active && visitAt(castBeatAt(t, active)))) { const o = L.lanes === 2 ? placerOff(1) : { dx: 0, dy: 0 }; g.save(); g.translate(laneSlide(lo, t, active) + o.dx, o.dy); drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); g.restore(); drawObserver(t, nowMs, active); }
   if (L.daw) drawLaptop(t, active, nowMs);
@@ -6060,8 +6052,8 @@ function updateHud(t) {
     const lane = line ? (line[3] || 0) : 0, spk = line && line[4];
     bubble.style.bottom = L.lanes === 2 ? (lane === 0 ? '78%' : '58%') : '61%';
     let bx = null;
-    if (L.cast && L.cast.seq && spk) { const id = { b: 'boss', v: 'viktor' }[spk], xs = castXs(beat); bx = spk === 's' ? INSPECT_X - 24 : id && xs[id] != null ? xs[id] + (L.lanes === 2 ? LANE_DX[1] : 0) : 0; } else if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X; else if (spk === 'h' && !L.coScanner && !L.heads) { if (duoMode(beat) === 'one') { bx = HAEUN_X - 70; bubble.style.bottom = '84%'; } else { bx = 0; bubble.style.bottom = '78%'; } } else if (spk === 'h' || spk === 'd') bx = null;
-    if (spk === 's') { if (L.inspector) { bx = INSPECT_X - 24; bubble.style.bottom = '66%'; } else { bx = haeunHome().x - 14; bubble.style.bottom = '84%'; } }
+    if (L.cast && L.cast.seq && spk) { const id = { b: 'boss', v: 'viktor' }[spk], xs = castXs(beat); bx = spk === 's' ? INSPECT_X - 24 : id && xs[id] != null ? xs[id] + (L.lanes === 2 ? placerOff(castLane()).dx : 0) : 0; } else if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X; else if (spk === 'h' && !L.coScanner && !L.heads) { if (duoMode(beat) === 'one') { bx = HAEUN_X - 70; bubble.style.bottom = '84%'; } else { bx = 0; bubble.style.bottom = '78%'; } } else if (spk === 'h' || spk === 'd') bx = null;
+    if (spk === 's') { if (L.inspector) { bx = INSPECT_X - 24; bubble.style.bottom = '66%'; } else if (L.partners.indexOf('sunja') === 0) { bx = haeunHome().x - 14; bubble.style.bottom = '84%'; } else { bx = BOSS_X + LANE_DX[1]; bubble.style.bottom = '58%'; } }
     if (L.daw) { if (spk === 'b') { bx = 0; bubble.style.bottom = '32%'; } else if (spk === 'h') { bx = 34; bubble.style.bottom = '32%'; } else if (spk === 'd') { bx = 200; bubble.style.bottom = '19%'; } }
     bubble.style.left = bx == null || bx < 60 ? '3cqw' : (bx / W * 100 - 5).toFixed(1) + '%'; bubble.style.right = 'auto'; bubble.classList.remove('tr');
     bubble.classList.toggle('obs', !!(spk && (L.cast ? spk === 's' || (spk === 'b') !== (castPlacer(beat) === 'boss') : spk === 'b' || spk === 's' || (L.daw && spk !== 'j'))));
@@ -6130,7 +6122,7 @@ function drawLetterbox(now) {
   if (CAM.lb < 0.01) { CAM.lb = 0; return; }
   const h = Math.round(20 * ease(CAM.lb)); g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, h); g.fillRect(0, H - h, W, h); g.restore();
 }
-function runDialog(lines, done) { dlg = { lines, i: 0, done, n: 0, full: '' }; dialogEl.hidden = false; showLine(); }
+function runDialog(lines, done) { if (!lines || !lines.length) { dlg = null; dialogEl.hidden = true; if (done) done(); return; } dlg = { lines, i: 0, done, n: 0, full: '' }; dialogEl.hidden = false; showLine(); }
 function showLine() {
   const sc = dlg.lines[dlg.i].scene || 'line', ln = dlg.lines[dlg.i];
   // who stands in the office (an outro can put 지우 there and bring 반장 in through the door) and how 지우 holds himself
