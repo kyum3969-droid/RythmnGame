@@ -1044,6 +1044,81 @@ const LEVELS = [
       { who:'지우', text:'(작게) …괜찮아요, 형. 다음에 또 하면 돼요.' }]
   }
   ,{
+    id:'s1-5', stageNo:'1-5', who:'지우 + 하은', role:'지우 · 하은 · 118 BPM · 벨트 둘', tag:'첫눈에 · 두근두근 · 가벼운 팝', bpm:118, style:'pop15', fxTheme:'neon',
+    // 지우 is back, and on the lower belt there is someone he has never seen: 하은. He loads the upper belt, she the lower, and you
+    // scan both with one button as in 1-4. A light, bright band-pop song (for now a stand-in from the engine: 118 BPM, A major,
+    // I-V-vi-IV, the kick on every beat). He shows
+    // off how fast he is, fumbles a box, and it sails down at her; she catches it one-handed without looking, on the beat, and
+    // only then looks up - "…조심해." Everything stops but his heart (the moment, a cutscene in slow motion), and the chorus
+    // drops: his boxes come in heartbeats (두근: a beat and the 'and' after it), with hearts on them, pink in the room and
+    // hearts rising off him; staring at her, he lets a box or two fall onto her belt. In the second verse he tries to talk to
+    // her (one word back each time); in the bridge he hums and she says the one kind thing - …박자는 맞네. - and the last
+    // chorus goes off. Sets up 1-6: the beat he plays her there is the one he starts writing here.
+    lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
+    heads: { j: [104, 58], h: [52, 90] },
+    clock:'02:50', title:'첫눈에', hints: false, special:['떨어진 상자', 'drop', '받아냄'],
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 168,
+    chords: [[220, 277.18, 329.63], [207.65, 246.94, 329.63], [220, 277.18, 369.99], [220, 293.66, 369.99]], roots: [110, 82.41, 92.5, 73.42], chordAt: bar => bar % 4,
+    sections: [[0, 'intro'], [2, 'verse'], [10, 'pre'], [11, 'hush'], [13, 'chorus'], [21, 'verse2'], [29, 'bridge'], [31, 'chorus2'], [39, 'end'], [40, 'outro']],
+    tempo: [[0, 118]],
+    // the moment (love): his fumble (44) flies down at her in slow motion and she catches it (46.5) and holds it up (to 49.4);
+    // pink comes up round them; from then on he is smitten (hearts rising off him, his cheeks pink); his boxes in the
+    // choruses carry hearts
+    love: { fumble: 44, catch: 46.5, hold: [46.5, 49.4], moment: [44, 52], glow: [[52, 84], [124, 160]], smit: [[49.5, 168]], heart: [[52, 84], [124, 157]] },
+    act: { lookUp: [[16, 19], [47.4, 50], [120, 123]], upAtDrops: true, alarmAt: [[44, 45.5], [122.8, 124]] },
+    camPlay: [[44, 46.5, { x: 84, y: 100, k: 1.4 }], [46.5, 49.5, { x: 58, y: 104, k: 2.4 }], [49.5, 52, { x: 104, y: 84, k: 2.4 }]],
+    cutscene: [[44, 52]],
+    devMarks: [[0, '처음'], [36, '자랑'], [44, '받아내기'], [52, '후렴 1'], [84, '2절'], [116, '브리지'], [124, '후렴 2']],
+    // upper belt: 지우 (8 cells; in the choruses his heartbeat: a beat and its 'and'); lower: 하은, and his boxes that fall
+    // onto her belt while he stares at her ('d')
+    bars: [
+      '........', '........', 'x...x...', 'x...x...', 'x.x.x...', '..x...x.', 'x...x...', 'x.x.x...',
+      'x...x...', 'x.x.x.x.', 'x.x.x.x.', '........', '........', '....xx..', 'xx..xx..', 'xx......',
+      'xx..xx..', 'xx..xx..', 'xx......', 'xx..xx..', 'xx..x...', 'x...x...', 'x.x.x...', 'x...x...',
+      '........', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.', '....x...', '........', 'xx..xx..',
+      'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'x.x.x.x.', 'x.x.x.x.', 'x.......',
+      '........', '........'
+    ],
+    bars2: [
+      '........', '........', '........', '..x...x.', '..x...x.', 'x...x...', '..x.x.x.', '......x.',
+      '..x...x.', '........', '..x.....', '........', '........', '......x.', '..x...x.', '..x.x.x.',
+      '..x...d.', '..x...x.', '..x.x.x.', '..d...x.', '..x...x.', '..x...x.', '......x.', '..x.x...',
+      'x...d...', '..x...x.', '......x.', '..x...x.', '........', 'x.......', 'x...x...', '..x...x.',
+      'x.x.x.x.', '..x...x.', 'x.x.x.x.', '..x...x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.......',
+      '........', '........'
+    ],
+    // [beat, text, beats shown, lane, speaker]
+    say: [[9, '형! 저 비트 새로 만들었어요. 이따 들려줄게요!', 3.5, 0, 'j'],
+          [16, '…어? 근데 저 누나는 누구예요?', 3, 0, 'j'], [19.5, '…일해.', 1.8, 1, 'h'], [23, '아, 넵! 일해요, 일!', 2.5, 0, 'j'],
+          [30, '(와… 손 진짜 빠르다…)', 3, 0, 'j'], [37, '형, 봐요. 저도 빨라요—', 2.5, 0, 'j'],
+          // the moment
+          [44.1, '앗!', 1.4, 0, 'j'], [47.6, '…조심해.', 2.2, 1, 'h'], [50, '(두근)', 1.8, 0, 'j'],
+          // chorus one: he can't stop looking
+          [60, '(멍…)', 2, 0, 'j'], [68, '…형. 방금 봤어요? 안 보고 잡았어요.', 3.5, 0, 'j'], [76, '박자까지 딱 맞춰서…', 3, 0, 'j'],
+          // verse two: he tries
+          [86, '누나! 저 지우예요! 아까 진짜 멋있었어요!', 3.5, 0, 'j'], [91, '…상자.', 1.6, 1, 'h'], [93.5, '앗, 넵!', 1.5, 0, 'j'],
+          [100, '누나는 노래 좋아해요?', 2.5, 0, 'j'], [103.5, '…시끄러.', 1.6, 1, 'h'], [106.5, '(좋아…)', 2, 0, 'j'],
+          // the bridge: he hums; the one kind thing she says
+          [116, '(흥얼흥얼)', 2.5, 0, 'j'], [119.8, '…박자는 맞네.', 2.8, 1, 'h'], [122.8, '…!!', 1.2, 0, 'j'],
+          [140, '형! 저 오늘 일 진짜 잘 되는 것 같아요!', 3, 0, 'j']],
+    comfort: [],
+    intro: [
+      { who:'', text:'명절 물량 셋째 주. 지우가 돌아왔다.' },
+      { who:'지우', text:'형! 저 왔어요! 저 없는 동안 심심했죠?' },
+      { who:'', text:'아래 벨트에 처음 보는 사람이 서 있다. 모자를 깊게 눌러쓰고, 시계를 본다.' },
+      { who:'지우', text:'…어? 저 누나는…' },
+      { who:'하은', text:'…하은. 위에 실어.' },
+      { who:'지우', text:'아, 넵! 지우예요! 위에서 할게요!' }],
+    outro: (good) => good ? [
+      { who:'', text:'근무가 끝났다. 하은 누나는 인사도 없이 다음 라인으로 갔다.' },
+      { who:'', text:'휴게실.', scene:'office', office: { j: 184 }, jpose:'think' },
+      { who:'지우', text:'형… 아까 그 손 봤어요? 하나도 안 보고 잡았어요. 박자까지 딱 맞춰서.', scene:'office', jpose:'think' },
+      { who:'지우', text:'하은 누나… 이름도 예쁘다.', scene:'office', jpose:'down' },
+      { who:'지우', text:'형, 저 비트 다시 만들 거예요. 처음부터 다.', scene:'office', jpose:'fluster' },
+      { who:'', text:'지우는 폰 메모장에 한참 무언가를 적었다. 제목 칸에 \'하은\'이라고 썼다가, 지웠다.', scene:'office', jpose:'down' }] : [
+      { who:'지우', text:'…형, 저 오늘 왜 이렇게 손이 안 가죠?' }]
+  }
+  ,{
     id:'s1-6', stageNo:'1-6', who:'지우 + 하은', role:'지우 · 하은 · 94 BPM · 벨트 둘', tag:'둘의 다툼 · 랩 배틀', bpm:94, style:'duo15', fxTheme:'blues',
     // 지우 is back (반장 is not in this one). 지우 loads the upper belt and 하은 the lower, and you scan both with one button as
     // in 1-4, every light on the whole way, every box on the beat. Their fight is played on the belts: 지우 throws his boxes up
@@ -1303,6 +1378,7 @@ const STAGE1 = [
   { level: LEVELS[1] },
   { level: LEVELS[2] },
   { level: LEVELS[3] },
+  { level: LEVELS.find(l => l.id === 's1-5') },
   { level: LEVELS.find(l => l.id === 's1-6') },
   ...LEVELS.filter(l => l.lab).map(level => ({ level, lab: true })),
   { level: LEVELS[4], stage2: true },
@@ -1350,6 +1426,8 @@ function loadLevel(level) {
   if (level.beltSwing) notes.forEach(n => { n.beat = realBeat(n.beat, n.lane); if (n.off && swingOn(n.lane, n.beat)) n.swung = true; });
   // boxes she throws onto the lower belt (1-6's phase 2): his hand doesn't carry them
   if (level.toss) notes.forEach(n => { if (n.lane === 1 && inRange(n.beat, level.toss)) n.toss = true; });
+  // his boxes in 1-5's choruses carry a heart
+  if (level.love && level.love.heart) notes.forEach(n => { if (n.lane === 0 && inRange(n.beat, level.love.heart)) n.heart = true; });
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
   // jams: a run of 'j' boxes (half a beat apart or closer) piles up behind the stuck roller and is let go one by one
   if (level.jam) { let grp = []; const flush = () => { grp.forEach((n, k) => { n.jk = k; n.jg = grp; }); grp = []; };
@@ -1776,6 +1854,8 @@ function act15(p, t, lane) {
     // his head sinking over two beats and jerking up, again and again, while he dozes; the jolt and a '!' when he wakes
     if (p.doze) p.nod = Math.round(3 * Math.min(1, (b % 2) / 1.6));
     if (A.wake != null && b >= A.wake && b < A.wake + 1.2) { p.alarm = true; p.doze = false; if (b < A.wake + 0.4) p.bob = -3; }
+    if (inRange(b, A.alarmAt)) { p.alarm = true; p.wince = true; }
+    if (L.love && inRange(b, L.love.smit)) p.smit = true;
     if (inRange(b, A.away)) p.away = true;
     if (A.pickup && b >= A.pickup[0] && b < A.pickup[1]) {
       // down behind the belt for the earbud on his deck, then up to his ear with it
@@ -1788,6 +1868,8 @@ function act15(p, t, lane) {
     // her fingers on the edge of her belt, down on every beat of his music; her look up at him
     if (inRange(b, A.tap)) p.tapK = Math.max(0, 1 - ph * 4);
     if (inRange(b, A.lookUp)) p.up = true;
+    // 1-5: her hand up, holding the box she caught
+    if (L.love && b >= L.love.hold[0] && b < L.love.hold[1]) { p.wave = true; p.carry = null; }
     if (A.upAtDrops) for (const n of notes) if (n.drop && n.tFall != null && t >= n.tFall + n.fallDur && t < n.tFall + n.fallDur + 1.4 * SPB) p.up = true;
     // one of hers knocked off: she flinches and stares at it, then up at him
     for (const n of notes) if (n.victim) { const kT = n.by.tFall + n.by.fallDur; if (t >= kT && t < kT + 0.8 * SPB) { p.wince = true; p.dip = Math.max(p.dip, 2); p.up = false; } }
@@ -1980,6 +2062,8 @@ const PARTNERS = {
       // his face turned away (the side of his hood towards us), and the '!' of waking with a start
       if (pose.away) { R(cx - 5, top + 3, 8, 12, hood); R(cx - 5, top + 3, 8, 2, hoodD); R(cx + 3, top + 6, 2, 8, C.skin); }
       if (pose.alarm) { R(cx + 11, top - 12, 2, 6, '#ffe27a'); R(cx + 11, top - 4, 2, 2, '#ffe27a'); }
+      // smitten (1-5): pink cheeks
+      if (pose.smit) { R(cx - 4, top + 11, 2, 1, '#ff8fb0'); R(cx + 3, top + 11, 2, 1, '#ff8fb0'); }
     },
     arm(pose) {
       const top = bodyTop(84, pose);
@@ -2295,6 +2379,43 @@ const sectionStart = name => { const x = (L.sections || []).find(z => z[1] === n
 const secStartAt = bar => { let s0 = -1; for (const [b0] of (L.sections || [])) if (bar >= b0) s0 = b0; return s0; };
 const battleAt = bar => { const B = L.battle; if (!B) return 'both'; if (B.h.some(([a, z]) => bar >= a && bar < z)) return 'h'; if (B.j.some(([a, z]) => bar >= a && bar < z)) return 'j'; return 'both'; };
 const sh15 = sec => sec === 'metal' || sec === 'together' || sec === 'finale' || sec === 'end' || sec === 'outro' ? (L.metalShift || 0) * 4 : 0;
+// 1-5: falling for her. The box he fumbles floats down to her in slow motion and she catches it one-handed (L.love.fumble ->
+// catch) and holds it up; pink comes up round the room for the moment, and in the choruses a soft pink that beats like a
+// heart; hearts rise off him from the moment on
+const LOVE = { fx: new Set(), lastB: -1e9 };
+const pxHeart = (x, y, c) => { R(x - 2, y, 2, 1, c); R(x + 1, y, 2, 1, c); R(x - 2, y + 1, 5, 1, c); R(x - 1, y + 2, 3, 1, c); R(x, y + 3, 1, 1, c); };
+function drawLove15(t, nowMs) {
+  const V = L.love, b = beatAt(t), ph = b - Math.floor(b);
+  if (b < LOVE.lastB - 0.5) LOVE.fx.clear(); LOVE.lastB = b;
+  const beatK = Math.max(0, 1 - ph * 3), dub = Math.max(0, 1 - Math.abs(ph - 0.28) * 6);
+  let k = 0;
+  if (b >= V.moment[0] && b < V.moment[1]) k = 0.3 + 0.4 * Math.min(1, (b - V.moment[0]) / 3);
+  else if (inRange(b, V.glow)) k = 0.16 + 0.12 * Math.max(beatK, dub);
+  if (k > 0) {
+    g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,90,150,${0.12 * k})`; g.fillRect(0, 0, W, H);
+    const gr = g.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, 230); gr.addColorStop(0, 'rgba(255,120,170,0)'); gr.addColorStop(1, `rgba(255,120,170,${0.45 * k})`);
+    g.fillStyle = gr; g.fillRect(0, 0, W, H); g.restore();
+  }
+  // sparkles round her while it floats down to her
+  if (b >= V.fumble && b < V.hold[1]) for (let i = 0; i < 10; i++) { const q = (nowMs / 900 + i / 10) % 1, x = 40 + ((i * 37) % 60), y = 70 + ((i * 53) % 50) - q * 10; g.globalAlpha = Math.sin(Math.PI * q); R(x, y, 1, 3, '#ffe9f2'); R(x - 1, y + 1, 3, 1, '#ffe9f2'); g.globalAlpha = 1; }
+  // hearts rising off him
+  if (inRange(b, V.smit)) {
+    const strong = inRange(b, V.glow) || b < V.moment[1];
+    for (let i = 0; i < (strong ? 5 : 2); i++) { const q = (nowMs / 1700 + i / 5) % 1, x = Math.round(108 + Math.sin(i * 2.3 + q * 5) * 6 + i * 2), y = Math.round(62 - q * 44); g.globalAlpha = Math.sin(Math.PI * q) * (strong ? 0.95 : 0.6); pxHeart(x, y, i % 2 ? '#ff7fae' : '#ffb3cf'); g.globalAlpha = 1; }
+  }
+  // the box: out of his hands, floating down to her, turning slowly; caught; held up
+  if (b >= V.fumble && b < V.hold[1]) {
+    const x0 = farX(PLACE_X), y0 = farY(BELT_Y) - 6, o = placerOff(1), hx = BOSS_X + 9 + o.dx, hy = 86 + o.dy + 2;
+    if (b < V.catch) {
+      const p0 = (b - V.fumble) / (V.catch - V.fumble), p = p0 < 0.5 ? 2 * p0 * p0 : 1 - 2 * (1 - p0) * (1 - p0), x = lerp(x0, hx, p), y = lerp(y0, hy, p) - Math.sin(Math.PI * p) * 30, sc = lerp(FAR.k, 1, p);
+      if (!LOVE.fx.has('slip') && ctx) { LOVE.fx.add('slip'); const T = ctx.currentTime, o2 = osc('sine', 320, T, 0.004, 0.09, 0.22, bus); o2.frequency.exponentialRampToValueAtTime(900, T + 0.18); }
+      g.save(); g.translate(Math.round(x), Math.round(y)); g.rotate(p * Math.PI * 1.25); g.scale(sc, sc); drawBox(STG.box, 0, 6, '', t); g.restore();
+    } else {
+      if (!LOVE.fx.has('catch') && ctx) { LOVE.fx.add('catch'); const T = ctx.currentTime; tak(T, 0.45); bell15(T + 0.02, 1318.5, 1.4, 0.05); bell15(T + 0.12, 1760, 1.2, 0.035); }
+      drawBox(STG.box, hx, hy + 2, '', t);
+    }
+  }
+}
 function drawShow15(t, nowMs) {
   const bA = beatAt(t), sec = sectionAt(Math.floor(bA / 4)), b = bA - sh15(sec), fb = Math.floor(b), bar = Math.floor(b / 4), ph = b - fb, inBar = ((fb % 4) + 4) % 4;
   const crossed = fb !== SHOW15.lastB; SHOW15.lastB = fb;
@@ -2726,6 +2847,7 @@ function drawBox(n, cx, bottom, mark, t, sq = 0) {
   R(x, y, w, h, C.kraft); R(x, y, w, 2, C.kraftTop); R(x + w - 2, y + 2, 2, h - 2, C.kraftDark);
   R(x + (w >> 1) - 1, y, 3, h, n.off && L.offTilt ? '#d8463b' : L.lanes === 2 ? (n.lane === 0 ? C.vest : C.vest2) : C.tape);
   if (n.pair && L.oneButton) R(x, y, w, 2, '#ffe9a8');
+  if (n.heart) { const hx = x + (w >> 1), hy = y + (h >> 1) - 2; R(hx - 3, hy - 1, 6, 4, '#ffe9e0'); R(hx - 2, hy, 2, 1, '#ff5a8f'); R(hx + 1, hy, 2, 1, '#ff5a8f'); R(hx - 2, hy + 1, 5, 1, '#ff5a8f'); R(hx - 1, hy + 2, 3, 1, '#ff5a8f'); R(hx, hy + 3, 1, 1, '#ff5a8f'); }
   if (n.grab && t >= n.tRel) { R(x + 2, y + 2, 5, 4, '#d8463b'); R(x + 3, y + 3, 3, 2, '#f08a7a'); }
   const lw = Math.min(7, w - 4);
   if (lw >= 3) { R(x + 2, y + h - 6, lw, 4, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink); }
@@ -5797,6 +5919,30 @@ function buildEvents() {
         if (bar === oB + 28 && inBar === 0) for (const [ob, nm, len] of WHISTLE) if (ob < 16) E(ob * s, T => whistle(T, N_[nm], len * s * 0.95, 0.055));
         if (b === L.endAt) E(0, T => { noise(T, 'bandpass', 700, 0.32, 0.22, 1.5, bus); osc('square', 140, T, 0.003, 0.07, 0.12, bus); noise(T + 0.06, 'lowpass', 420, 0.2, 0.5, 0.7, bus); });
       }
+    } else if (style === 'pop15') {
+      // 1-5's stand-in pop (until the recorded song): bright, four on the floor, claps on 2 and 4, a bouncy octave bass, bell
+      // chords on the 'and' in the verses, a hook on top in the choruses. The moment is a hush: a shimmer and his heart, 두근.
+      const bar = Math.floor(b / 4), sec = sectionAt(bar), C = chords[ci], r = roots[ci], AND = s / 2;
+      const HOOK = [[659.25, 659.25, 739.99, 659.25, 554.37, 493.88, 554.37, 0], [493.88, 554.37, 659.25, 554.37, 493.88, 440, 440, 0]];
+      if (sec === 'hush') {
+        if (b === bar * 4 && bar === 11) E(0, T => { crash(T); pad(T, C.map(f => f * 2), s * 8, 'sine', 0.035); });
+        E(0, T => { kick(T, 0.45); kick(T + s * 0.28, 0.3); });
+        if (inBar === 0) E(0, T => bell15(T, C[2] * 4, s * 3, 0.03));
+        continue;
+      }
+      if (sec === 'end') { if (inBar === 0) E(0, T => { crash(T); kick(T, 1); stab(T, C.map(f => f * 2), s * 1.5); bell15(T, 880, s * 3, 0.05); }); continue; }
+      if (sec === 'outro') continue;
+      const full = sec === 'chorus' || sec === 'chorus2', big = sec === 'chorus2', bridge = sec === 'bridge';
+      if (inBar === 0) E(0, T => pad(T, C, s * 4, 'sawtooth', full ? 0.028 : 0.02));
+      if (inBar === 0 && full && (bar === sectionStart(sec) || (big && bar % 2 === 1))) E(0, T => crash(T));
+      if (bridge) { if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.55)); if (inBar === 2) E(0, T => clap(T, 0.16)); E(0, T => bell15(T, C[inBar % 3] * 2, s * 0.9, 0.025)); continue; }
+      E(0, T => kick(T, full ? 0.95 : 0.8));
+      if (inBar === 1 || inBar === 3) E(0, T => { clap(T, full ? 0.24 : 0.17); if (full) snare(T, 0.16); });
+      E(AND, T => hat(T, 0.09)); if (full) { E(s / 4, T => hat(T, 0.04)); E(3 * s / 4, T => hat(T, 0.04)); }
+      E(0, T => bass(T, r, s * 0.35)); E(AND, T => bass(T, r * 2, s * 0.3));
+      if (!full) E(AND, T => bell15(T, C[(inBar + 1) % 3] * 2, s * 0.5, 0.022));
+      if (full) for (let j = 0; j < 2; j++) { const f = HOOK[bar % 2][inBar * 2 + j]; if (f) E(j * AND, T => { lead(T, f, s * 0.42); if (big) bell15(T, f * 2, s * 0.4, 0.015); }); }
+      if (sec === 'pre') { for (let q = 0; q < 4; q++) E(q * s / 4, T => snare(T, 0.06 + 0.03 * (inBar + q / 4))); if (inBar === 0) E(0, T => riser(T, s * 4, 0.07)); }
     } else if (style === 'duo') {
       if (dark) {
         // power is out: only the partner's thuds, a battery radio hiss and the alarm
@@ -6628,6 +6774,7 @@ function frame(now) {
   else if (SCENE.kind === 'wings' && !active) drawWings(now);
   else { drawScene(t, now / 1000, active, now); drawSceneFade(now); }
   FX.rumble = 0; if (active && L.show && !L.practiceOf) drawShow15(t, now);
+  if (active && L.love && !L.practiceOf) drawLove15(t, now);
   drawCamera(now);
   if (!active) CAM.lbTo = 0;
   drawLetterbox(now);
