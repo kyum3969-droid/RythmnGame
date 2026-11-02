@@ -757,8 +757,8 @@ const LEVELS = [
     // from `at` the scene is drawn as the whole floor; over `zoom` the camera pulls back and shows the line on the other side
     // of you (빅토르's), the keys become left and right at `keys`, and the two-sided chart starts at bar `from` ('1' = 반장's
     // line on the left, '2' = 빅토르's on the right)
-    mid: { at: 58, zoom: [60, 66], keys: 64, from: 17, bars: [
-      '1.2.1.2.', '1.2.1.2.', '1.2.1.21', '1.2.112.', '122.1.2.', '1.2.1.2.', '1.2.122.', '1.211.2.',
+    mid: { at: 58, zoom: [60, 66], keys: 64, from: 17, guide: [63, 80], tags: [68, 92, 100], bars: [
+      '1...1...', '1...1...', '..2...2.', '..2...2.', '1.2.1.2.', '1.2.1.2.', 'x...1.2.', 'x.2.x.2.',
       '122.1.2.', '122.1.2.', '1.2.112.', '1.211.2.', '122.1.2.', '1.2.1.21', '1.2.1.21', '1.211.2.',
       '122.1.2.', '....1...', '1.211.2.', '1.2.1.2.', '1.211.2.', '122.1.2.', '1.211.2.', '112.1.2.',
       '1.211.2.', '1.221.2.', '1.211.2.', '112.1.2.', '1.211.2.', '112.1.2.', '1.2.1121', '1.21112.',
@@ -786,8 +786,11 @@ const LEVELS = [
       '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........', '........', '........', '........', '........', '........', '........'
     ],
-    // the script is not written yet
-    say: [],
+    // 빅토르 teaches the two lines as the camera pulls back and through the first bars (the rest of the script is not written
+    // yet): [beat, line, beats on screen, lane, speaker 'v']
+    say: [[60.5, '어이, 신입. 뒤도 좀 봐.', 3.5, 0, 'v'], [64.5, '왼쪽은 반장님 거, 오른쪽은 내 거.', 3.5, 0, 'v'],
+          [69, '왼손. 반장님 상자.', 3.5, 0, 'v'], [77, '이제 오른손. 내 거.', 3.5, 0, 'v'], [85, '번갈아. 왼, 오, 왼, 오.', 4, 0, 'v'],
+          [93, '같이 오면 양손!', 3.5, 0, 'v'], [101, '오, 신입 손 좋네.', 3, 0, 'v']],
     intro: [],
     outro: () => [],
   }
@@ -1345,9 +1348,10 @@ function loadLevel(level) {
   if (level.beltSwing) notes.forEach(n => { n.beat = realBeat(n.beat, n.lane); if (n.off && swingOn(n.lane, n.beat)) n.swung = true; });
   // boxes she throws onto the lower belt (1-5's phase 2): his hand doesn't carry them
   if (level.toss) notes.forEach(n => { if (n.lane === 1 && inRange(n.beat, level.toss)) n.toss = true; });
-  // the four-lane part (L.quad): one note per cell, n.q = the chute (0-3); they are on no belt (lane 0 only for the effects)
+  // the four-lane part (L.quad): one note per cell, n.q = the chute (0-3); they are on no belt (lane 0 only for the effects).
+  // The two-line part (L.mid) the same with '1' = the left line, '2' = the right, 'x' = both at once
   const QD = level.quad || level.mid;
-  if (QD) QD.bars.forEach((bar, k) => { const div = bar.length / 4; for (let c = 0; c < bar.length; c++) { const d = '1234'.indexOf(bar[c]); if (d < 0) continue; const beat = (QD.from + k) * 4 + c / div; notes.push({ beat, beat0: beat, q: d, quad: true, right: !!level.mid && d === 1, len: 0, lane: 0 }); } });
+  if (QD) QD.bars.forEach((bar, k) => { const div = bar.length / 4; for (let c = 0; c < bar.length; c++) { const beat = (QD.from + k) * 4 + c / div; const ds = level.mid && bar[c] === 'x' ? [0, 1] : ['1234'.indexOf(bar[c])]; for (const d of ds) { if (d < 0) continue; notes.push({ beat, beat0: beat, q: d, quad: true, right: !!level.mid && d === 1, len: 0, lane: 0 }); } } });
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
   // jams: a run of 'j' boxes (half a beat apart or closer) piles up behind the stuck roller and is let go one by one
   if (level.jam) { let grp = []; const flush = () => { grp.forEach((n, k) => { n.jk = k; n.jg = grp; }); grp = []; };
@@ -3477,8 +3481,37 @@ function drawMid(t, nowMs, active) {
   if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
   cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#0c0a09'; gHi.fillRect(0, 0, hw, hh);
   gHi.drawImage(midCv, sx, sy, sw, sh, 0, 0, hw, hh);
+  if (active) midGuide(b, T, nowMs, { sx, sy, sw, sh, hw, hh, k });
   // the game canvas under it still gets the plain floor colour (nothing else shows through)
   g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
+}
+// 2-1's lesson, drawn on the device-resolution canvas: as the camera pulls back, a big hand label on each side (the left in
+// 반장's orange, the right in 빅토르's teal, lit while that hand is pressed), and over the first bars' boxes a small arrow tag
+// saying which hand, fading out (L.mid.guide: when the labels show; L.mid.tags: [from, fade from, gone by])
+function midGuide(b, T, nowMs, v) {
+  const M = L.mid, G = M.guide, TG = M.tags, toX = wx => (wx - v.sx) * v.hw / v.sw, toY = wy => (wy + MID.oy - v.sy) * v.hh / v.sh, u = v.hw / W;
+  const cols = ['240,122,42', '90,215,232'];
+  const pill = (x, y, w, h, col, a) => { gHi.globalAlpha = a; gHi.fillStyle = 'rgba(12,9,8,.82)'; gHi.beginPath(); gHi.roundRect(x - w / 2, y - h / 2, w, h, h / 2); gHi.fill(); gHi.strokeStyle = `rgb(${col})`; gHi.lineWidth = Math.max(1, u * 0.8); gHi.stroke(); };
+  if (b >= G[0] && b < G[1]) {
+    const a = Math.min(1, (b - G[0]) / 1.5, (G[1] - b) / 3);
+    for (const q of [0, 1]) {
+      const pr = Math.max(0, 1 - (nowMs - QUADFX.press[q]) / 200), x = q ? v.hw * 0.78 : v.hw * 0.22, y = v.hh * 0.84, w = 104 * u, h = 22 * u;
+      pill(x, y, w, h, cols[q], a);
+      if (pr > 0) { gHi.globalAlpha = a * pr * 0.5; gHi.fillStyle = `rgb(${cols[q]})`; gHi.fill(); }
+      gHi.globalAlpha = a; gHi.fillStyle = `rgb(${cols[q]})`; gHi.font = `700 ${Math.round(11 * u)}px "IBM Plex Sans KR", sans-serif`; gHi.textAlign = 'center'; gHi.textBaseline = 'middle';
+      gHi.fillText(q ? '오른손 ▶' : '◀ 왼손', x, y - 2 * u); gHi.font = `600 ${Math.round(6 * u)}px "IBM Plex Sans KR", sans-serif`; gHi.fillStyle = 'rgba(244,234,216,.8)';
+      gHi.fillText(q ? '빅토르 라인 · J' : 'F · 반장 라인', x, y + 6.5 * u);
+    }
+  }
+  if (b >= TG[0] - 2 && b < TG[2]) {
+    const a = b < TG[1] ? 1 : Math.max(0, (TG[2] - b) / (TG[2] - TG[1]));
+    for (const n of notes) {
+      if (!n.quad || n.state !== 'pending' || n.beat < TG[0] || n.beat >= TG[2] || T < n.place) continue;
+      const lx = noteX(n, T), wx = n.q ? MID.ww - lx : lx, x = toX(wx), y = toY(BELT_Y - n.h - 9), w = 15 * u, h = 10 * u;
+      pill(x, y, w, h, cols[n.q], a); gHi.globalAlpha = a; gHi.fillStyle = `rgb(${cols[n.q]})`; gHi.font = `700 ${Math.round(7 * u)}px sans-serif`; gHi.textAlign = 'center'; gHi.textBaseline = 'middle'; gHi.fillText(n.q ? '▶' : '◀', x, y + 0.5 * u);
+    }
+  }
+  gHi.globalAlpha = 1;
 }
 // ---------- 2-1 the turn: the four chutes ----------
 // In the break the camera swings round to your end of the line and the belt becomes 김 빅토르's four-way sort: four chutes
@@ -6489,6 +6522,7 @@ function updateHud(t) {
     if (L.cast && L.cast.seq && spk) { const id = { b: 'boss', v: 'viktor' }[spk], xs = castXs(beat); bx = spk === 's' ? INSPECT_X - 24 : id && xs[id] != null ? xs[id] + (L.lanes === 2 ? placerOff(castLane()).dx : 0) : 0; } else if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X; else if (spk === 'h' && !L.coScanner && !L.heads) { if (duoMode(beat) === 'one') { bx = HAEUN_X - 70; bubble.style.bottom = '84%'; } else { bx = 0; bubble.style.bottom = '78%'; } } else if (spk === 'h' || spk === 'd') bx = null;
     if (spk === 's') { if (L.inspector) { bx = INSPECT_X - 24; bubble.style.bottom = '66%'; } else if (L.partners.indexOf('sunja') === 0) { bx = haeunHome().x - 14; bubble.style.bottom = '84%'; } else { bx = BOSS_X + LANE_DX[1]; bubble.style.bottom = '58%'; } }
     if (L.daw) { if (spk === 'b') { bx = 0; bubble.style.bottom = '32%'; } else if (spk === 'h') { bx = 34; bubble.style.bottom = '32%'; } else if (spk === 'd') { bx = 200; bubble.style.bottom = '19%'; } }
+    if (L.mid && spk === 'v') { bx = 250; bubble.style.bottom = '64%'; }
     bubble.style.left = bx == null || bx < 60 ? '3cqw' : (bx / W * 100 - 5).toFixed(1) + '%'; bubble.style.right = 'auto'; bubble.classList.remove('tr');
     bubble.classList.toggle('obs', !!(spk && (L.cast ? spk === 's' || (spk === 'b') !== (castPlacer(beat) === 'boss') : spk === 'b' || spk === 's' || (L.daw && spk !== 'j'))));
     bubble.classList.remove('loud');
