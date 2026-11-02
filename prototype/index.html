@@ -758,7 +758,7 @@ const LEVELS = [
     // corner to corner, two bars each and then one, on the horn riff, 반장 on 1 and 3 throughout; the last hit at 319.
     tempo: [[0, 110.01], [56, 120]], clock:'02:40', title:'에이스', partners:['boss'], hints:false,
     songs: [{ src: 'audio/2-1-across-the-empty-floor.mp3', at: 0, lead: 1.0707, gain: 0.9, until: 56 },
-            { src: 'audio/2-1-the-copper-stomp.mp3', at: 62, lead: 0.116, gain: 0.78 }],
+            { src: 'audio/2-1-the-copper-stomp.mp3', at: 62, lead: 0.116, gain: 0.85 }],
     songStart: 0, songCues: [[56, 'tape'], [62, 1]], songDuck: [144, 208, 420, 0.7], noCount: true, bareBand: true, hitKit: 'ticktock',
     // the whole night is drawn on the floor renderer (at 0): the upper belt of line 3 (하은's) stands idle in phase 1. Over
     // `zoom` the camera pulls back on all four belts; the keys split at `keys` (left hand: both left belts, right hand: both
@@ -3461,15 +3461,12 @@ function phaseLook(c, w, h, b, active) {
   // the choruses: amber, breathing with the beat
   const am = F.amber.find(([x, y]) => b >= x - 1 && b < y + 1);
   if (am) { const k = Math.min(1, b - (am[0] - 1), am[1] + 1 - b), ph = b - Math.floor(b); c.globalCompositeOperation = 'overlay'; c.fillStyle = `rgba(255,160,50,${(0.22 + 0.12 * Math.max(0, 1 - ph * 3)) * k})`; c.fillRect(0, 0, w, h); }
-  // your presses: a warm wash on 마르코's horn stabs, a dimmer one on 반장's kicks
-  const sa = performance.now() - (FX.stabAt || -1e9), ka = performance.now() - (FX.thumpAt || -1e9);
-  if (sa < 140 || ka < 110) { c.globalCompositeOperation = 'lighter'; c.fillStyle = sa < 140 ? `rgba(255,190,90,${0.07 * (1 - sa / 140)})` : `rgba(255,230,190,${0.04 * (1 - ka / 110)})`; c.fillRect(0, 0, w, h); }
   // the drop, and the last hit: a white flash
   for (const [at, v] of [[F.drop, 0.7], [F.drop2, 0.7], [F.last, 0.45]]) { const d = b - at; if (d >= 0 && d < 1.5) { c.globalCompositeOperation = 'lighter'; c.fillStyle = `rgba(255,250,235,${v * (1 - d / 1.5) ** 2})`; c.fillRect(0, 0, w, h); } }
   c.restore();
 }
 // the jolt on the drop: a few pixels, shrinking (in game pixels)
-function phaseJolt(b) { const F = L.phaseFx; if (!F || reduce) return [0, 0]; if (performance.now() - (FX.thumpAt || -1e9) < 70) return [0, 1]; const d = F.drop2 != null && b >= F.drop2 ? b - F.drop2 : b - F.drop; if (d < 0 || d > 0.6) return [0, 0]; const k = 3 * (1 - d / 0.6); return [Math.round((Math.random() * 2 - 1) * k), Math.round((Math.random() * 2 - 1) * k)]; }
+function phaseJolt(b) { const F = L.phaseFx; if (!F || reduce) return [0, 0]; const d = F.drop2 != null && b >= F.drop2 ? b - F.drop2 : b - F.drop; if (d < 0 || d > 0.6) return [0, 0]; const k = 3 * (1 - d / 0.6); return [Math.round((Math.random() * 2 - 1) * k), Math.round((Math.random() * 2 - 1) * k)]; }
 // ---------- 2-1 the two lines ----------
 // From mid.at the whole floor is drawn into a wider canvas and the camera looks at part of it. Line 3 (the screen you know:
 // 반장, the belt, the scanner) is the left half; the right half is its mirror about where you stand: line 4, 마르코 loading it,
@@ -3588,7 +3585,7 @@ function drawMid(t, nowMs, active) {
     g.translate(sway, Math.round(marco.dy) - lift); drawActor('marco', Math.round(marco.x), mir, pose, nowMs, active, () => PARTNERS.marco.arm(pose)); g.restore();
   };
   // his ad-libs (drawn crisp over the floor, in midAdlib) and the sparks off his hands when you hit one of his boxes
-  if (!FX.adlibs || b < 57) { FX.adlibs = []; FX.adOnce = {}; FX.adWalk = false; FX.adCombo = 0; FX.adStab = FX.stabAt || 0; FX.adMiss = FX.lastMiss; }
+  if (!FX.adlibs || b < 57) { FX.adlibs = []; FX.adOnce = {}; FX.adWalk = false; FX.adCombo = 0; FX.adMiss = FX.lastMiss; }
   if (active && b >= 62) {
     const ad = (text) => FX.adlibs.push({ text, at: nowMs, x: marco.x, y: 86 + marco.dy - 14 });
     const pick = xs => xs[Math.floor(Math.random() * xs.length)];
@@ -3597,7 +3594,6 @@ function drawMid(t, nowMs, active) {
     FX.adWalk = marco.walking;
     if (stats.combo >= 30 && stats.combo % 30 === 0 && FX.adCombo !== stats.combo && !sayV) { FX.adCombo = stats.combo; ad(pick(['나이스 신입!', '그루브 좋아!', '손 좋다~!', '오~ 리듬 탔어!'])); }
     if (FX.lastMiss !== FX.adMiss) { FX.adMiss = FX.lastMiss; if (!sayV && Math.random() < 0.35) ad(pick(['괜찮아~ 괜찮아~', '노 프라블럼!'])); }
-    if ((FX.stabAt || 0) !== FX.adStab) { FX.adStab = FX.stabAt; if (!reduce) spawn(marco.x + (marco.mir ? -12 : 12), 100 + marco.dy, 5, ['#ffd84a', '#fff3c8', '#d8463b'], -40, 40, -60, -10, 260, 380, [1, 1]); }
     FX.adlibs = FX.adlibs.filter(a => nowMs - a.at < 900);
   }
   mirror(0, () => back(0)); mirror(1, () => back(1));
@@ -5203,29 +5199,8 @@ function levelSfx(t, kind) {
   if (kind === 'drill') { const o = osc('sawtooth', 140, t, 0.02, 0.05, 0.7, bus); o.frequency.setValueAtTime(140, t); o.frequency.linearRampToValueAtTime(230, t + 0.25); o.frequency.linearRampToValueAtTime(190, t + 0.7); noise(t, 'bandpass', 2400, 0.05, 0.7, 2, bus); }
 }
 // 2-1's chutes play the band's percussion: D a kick, F claps, J a rim, K a cowbell (quieter on a 좋아)
-// 2-1's keysounds: your press plays a part of the band. 반장's boxes are the drums: in the blues the half-time kick on 1 and
-// the snare on 3, then the kick (a low tom off the beat); 마르코's are the horns: a C minor 7 stab (the funk is in C minor),
-// with a clap under it on 2 and 4. Each also gives the picture a small thump or a warm flash.
-function kick21(t, v) { const o = osc('sine', 165, t, 0.001, 0.62 * v, 0.2, bus); o.frequency.exponentialRampToValueAtTime(44, t + 0.13); osc('triangle', 1800, t, 0.0005, 0.05 * v, 0.012, bus); noise(t, 'lowpass', 1200, 0.1 * v, 0.02, 0.7, bus); }
-function tom21(t, v) { const o = osc('sine', 120, t, 0.001, 0.38 * v, 0.16, bus); o.frequency.exponentialRampToValueAtTime(70, t + 0.12); noise(t, 'bandpass', 900, 0.08 * v, 0.03, 1.2, bus); }
-function snare21(t, v) { noise(t, 'bandpass', 1900, 0.34 * v, 0.12, 0.9, bus); const o = osc('triangle', 210, t, 0.001, 0.16 * v, 0.07, bus); o.frequency.exponentialRampToValueAtTime(150, t + 0.06); }
-function clap21(t, v) { for (const [d, a] of [[0, 0.22], [0.009, 0.18], [0.019, 0.26]]) noise(t + d, 'bandpass', 1500, a * v, d === 0.019 ? 0.1 : 0.012, 1.6, bus); }
-function stab21(t, v, hi) {
-  const fl = ctx.createBiquadFilter(), gn = ctx.createGain(); fl.type = 'lowpass'; fl.Q.value = 2.5;
-  fl.frequency.setValueAtTime(900, t); fl.frequency.exponentialRampToValueAtTime(4200, t + 0.025); fl.frequency.exponentialRampToValueAtTime(1100, t + 0.17);
-  gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(0.11 * v, t + 0.012); gn.gain.setValueAtTime(0.11 * v, t + 0.09); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
-  fl.connect(gn); gn.connect(bus);
-  const r = hi ? 392 : 261.63, ch = [r, r * 1.189, r * 1.498, r * 1.782];
-  for (const f of ch) for (const det of [-6, 7]) { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = det; o.connect(fl); o.start(t); o.stop(t + 0.22); }
-}
-function quadHit(q, j, n) {
+function quadHit(q, j) {
   const t = ctx.currentTime, v = j === 'good' ? 0.7 : 1;
-  if (L.mid && n) {
-    const b = n.beat, ph = ((b % 4) + 4) % 4, boss = n.q === 0 && !n.up && midSpotAt(n.place != null ? beatAt(n.place) : b) !== 'll';
-    if (b < L.mid.radio) { if (ph === 0) kick21(t, v); else if (ph === 2) snare21(t, v); else tom21(t, v * 0.8); FX.thumpAt = performance.now(); return; }
-    if (boss) { if (Math.abs(b - Math.round(b)) < 0.01) kick21(t, v); else tom21(t, v); FX.thumpAt = performance.now(); return; }
-    stab21(t, v, n.up); if (ph === 1 || ph === 3) clap21(t, v * 0.9); FX.stabAt = performance.now(); return;
-  }
   if (L.mid) { if (q === 0) { osc('sine', 820, t, 0.001, 0.12 * v, 0.05, bus); noise(t, 'bandpass', 1300, 0.2 * v, 0.04, 2.2, bus); noise(t, 'lowpass', 400, 0.12 * v, 0.03, 0.7, bus); } else { osc('square', 2300, t, 0.001, 0.05 * v, 0.02, bus); noise(t, 'bandpass', 3400, 0.22 * v, 0.03, 3, bus); } return; }
   if (q === 0) { const o = osc('sine', 140, t, 0.002, 0.5 * v, 0.16, bus); o.frequency.exponentialRampToValueAtTime(50, t + 0.12); noise(t, 'lowpass', 900, 0.12 * v, 0.03, 0.7, bus); }
   else if (q === 1) { noise(t, 'bandpass', 1300, 0.3 * v, 0.07, 1.4, bus); noise(t + 0.011, 'bandpass', 1500, 0.24 * v, 0.09, 1.4, bus); }
@@ -6545,7 +6520,7 @@ function judgeNote(target, t) {
     const milestone = addCombo();
     const tones = CHORDS[chordIdx(target.beat)];
     const th = THEME[fxTheme(target.beat)];
-    if (target.quad) quadHit(target.q, j, target); else if (target.gtr) gtrSample(j, target.beat); else if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false, target.lane);
+    if (target.quad) quadHit(target.q, j); else if (target.gtr) gtrSample(j, target.beat); else if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false, target.lane);
     const lightUp = phase3(target.beat);
     lastGood = now; FX.goodLane = target.lane; FX.glow = th.glow; ring(th.ring[(stats.combo + (j === 'good' ? 1 : 0)) % 2], target.lane);
     spawnBits(j === 'perfect' ? 14 : 6, th);
