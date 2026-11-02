@@ -836,46 +836,103 @@ const LEVELS = [
       { who:'마르코', text:'어… 첫날이니까! 내일 다시 가자, 신입!' }],
   }
   ,{
-    id:'s2-2', stageNo:'2-2', who:'순자 이모', role:'반장 · 순자 이모 · 112 BPM', tag:'디스코 펑크 · 밀기와 붙잡기', bpm:112, style:'disco22', fxTheme:'neon', inspector: true,
-    // 2-2 재검: 순자 이모's second night. 소장 wants a second look at anything odd, so to her push she adds the grab ('R'): she
-    // takes a box off the belt as it passes, looks it over for half a beat (two stamps, a question mark), and sends it on half a
-    // beat late with her red mark on it. Her hand now says early or late. 반장 loads.
-    tempo: [[0, 112]], clock:'02:20', title:'재검', partners:['boss'], hints:true, cameo: { from: 94, to: 112 },
-    chords: DISCO.chords, roots: DISCO.roots,
-    chordAt: bar => bar < 2 ? 0 : bar < 10 ? DISCO.verse[(bar - 2) % 4] : bar < 18 ? DISCO.chorus[(bar - 10) % 4] : bar < 26 ? DISCO.verse[(bar - 18) % 4] : bar < 34 ? DISCO.chorus[(bar - 26) % 4] : bar < 40 ? DISCO.bridge[(bar - 34) % 4] : bar < 56 ? DISCO.chorus[(bar - 40) % 4] : 0,
-    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 224,
-    special:['밀리거나 붙잡힌 상자', 'off', '받아냄'],
-    sections: [[0, 'intro'], [2, 'v1'], [10, 'ch1'], [18, 'v2'], [26, 'ch2'], [34, 'break'], [38, 'build'], [40, 'ch3'], [48, 'ch4'], [56, 'outro']],
-    // 8 cells per bar, on the beat. 'P' = pushed (half a beat early), 'R' = grabbed (half a beat late). No box in the cell before
-    // a 'P' or the cell after an 'R'; arrivals stay at least half a beat apart (the chart checker).
-    bars: [
-      '........', '........',
-      // verse 1: the push, as last night
-      'x...x...', 'x...P...', 'x.x.x...', 'P...x...', 'x...x.x.', 'x...P...', 'x.x.x...', 'x...P.x.',
-      // chorus 1: the grab comes in
-      'x...R...', 'x.x.x...', 'R...x...', 'x...x.R.', 'x...R...', 'x.R.x...', 'x.x.x...', 'R...x...',
-      // verse 2: both
-      'x...P...', 'x...R...', 'P...x.R.', 'x.x.x...', 'R...P...', 'x...x.P.', 'x.R.x...', 'P...x...',
-      // chorus 2: thicker
-      'x...R...', 'P...x.x.', 'x.R.x...', 'x...P.P.', 'R...x...', 'x...R.x.', 'P.x.P...', 'x.x.x.x.',
-      // the breakdown and the build: she lets the line breathe, then the floor
-      'x.......', 'x.......', 'x...x...', 'x...x...', 'x.x.x.x.', 'x.x.x.x.',
-      // the last two choruses: everything
-      'x...P...', 'R...x.x.', 'x...R.x.', 'P...P...', 'x.R.x...', 'x...P.R.', 'x.x.x...', 'R...x.P.',
-      'P...R...', 'x.x.x.x.', 'x...P.P.', 'R...x...', 'x.P.x...', 'x...R...', 'P...x.P.', 'x.x.x.x.',
-      '........', '........'
-    ],
-    say: [[4, '소장이 재검 돌리래.', 3, 0, 's'], [40, '잡으면 늦게 간다. 알지?', 3, 0, 's'], [72, '빠른 거, 늦은 거. 손 봐.', 3, 0, 's'], [100, '(지게차가 멈춘다) …뭘 봐.', 3, 0, 's'], [136, '…숨 좀 돌리자.', 3, 0, 's'], [140, '(전화기를 보며) 우리 강아지 열은 내렸나…', 4, 0, 's'], [160, '자, 간다!', 2.5, 0, 's']],
-    comfort: ['괜찮아, 다음 거.', '총각! 내 손 봐, 손!'],
+    id:'s2-2', stageNo:'2-2', who:'반장 ↔ 마르코', role:'반장 · 마르코 · 54 ↔ 108 BPM · 라인 넷', tag:'라디오 대 붐박스 · 기싸움 · 과열', bpm:107.97, style:'funk21', fxTheme:'warm',
+    // 2-2 천천히: the night after the merge. Yesterday the line was fast, so today's target went up. 반장's old radio (a slow
+    // shuffle blues, "Monday Without a Clock", 53.99 BPM) and 마르코's boombox (a beach-party funk, "The Solstice Parade",
+    // stretched to 107.97 = exactly twice the blues, so a blues bar is two of the game's bars) fight over the line. Whoever has
+    // it turns his song up, his look floods the floor from his side (반장's warehouse from the left, 마르코's midsummer beach
+    // from the right) and his hand leads: the left hand on the blues' shuffle, the right on the funk's straight 16ths. The turns
+    // shorten (8, 8, 4, 4, 2 ×4, 1 ×4, half a bar ×4), the belt motor heats up, both songs blast at once and speed up (176-184),
+    // and the motor blows (184): both tapes stop, the alarm, silence and the argument. Phase 2 (208-): the radio alone from the
+    // blues' third time round; 반장's shuffle on the left against 마르코's straight eighths on the right, never meeting; through
+    // the guitar solo 마르코 stops; the last chord on 315. The night ends with nothing settled.
+    tempo: [[0, 107.97], [176, 109.27], [177, 110.56], [178, 111.86], [179, 113.15], [180, 114.45], [181, 115.74], [182, 117.04], [183, 118.34], [184, 107.97]], clock:'01:40', title:'천천히', partners:['boss'], hints:false,
+    songs: [{ src: 'audio/2-2-monday-without-a-clock.mp3', at: 0, lead: 2.2748, gain: 0.9 },
+            { src: 'audio/2-2-the-solstice-parade.mp3', at: 0, lead: 0.6277, gain: 0.8 }],
+    songStart: -1, noCount: true, bareBand: true, hitKit: 'ticktock',
+    // the two songs side by side (L.rb): the blues runs on from beat 0 (file time = lead + beat · 60/107.97, its rate follows
+    // the tempo through the heat); each of 마르코's turns starts the funk afresh at a bar of its own (`f`, the song's bars from
+    // its first downbeat, 4 beats each) so every takeover lands on a loud stretch. turns: [beat, 'b' 반장 | 'v' 마르코 | 'h'
+    // both, funk bar]. boom: the motor blows; radio: [the static, the blues back on at this beat, from this many seconds in]
+    rb: { turns: [[0, 'b'], [24, 'v', 28], [56, 'b'], [88, 'v', 49], [104, 'b'], [120, 'v', 53], [128, 'b'], [136, 'v', 55], [144, 'b'],
+             [152, 'v', 57], [156, 'b'], [160, 'v', 58], [164, 'b'], [168, 'v', 59], [170, 'b'], [172, 'v', 59.5], [174, 'b'], [176, 'h', 60]],
+      boom: 184, radio: [206.5, 208, 113.417], low: 0.07, bar: 2.22284 },
+    mid: { at: 0, zoom: [-2, -1], keys: 0, from: 0, adFrom: 20, guide: [-9, -8], tags: [-9, -8, -7],
+      shouts: [[24, 'hey', '헤이!'], [88, 'hey', '노노노~!'], [176, 'hey', '더!!']],
+      route: [[0, 'rl'], [40, 'ru'], [88, 'rl'], [90, 'ru'], [98, 'rl'], [120, 'rl'], [124, 'ru'], [136, 'ru'], [140, 'rl'], [160, 'ru'], [164, 'rl'], [180, 'ru'], [184, 'rl'], [228, 'ru'], [236, 'rl'], [244, 'rl'], [268, 'ru'], [276, 'rl']],
+      bars: [
+        '................................................', '................................................',
+        '1.......................1.......................', '1.......................1.......................',
+        '1...............1.......1.......................', '1...............1.......1.......................',
+        'x.....2.....2...........1.....2.....2...........', '1.....2.....2...........1.....2.....2...........',
+        '1.....2.....2........2..1.....2...........2.....', '1.....2.....2........2..1.....2...........2.....',
+        '1.....4...........4.....1.....4.....4.....4.....', '1.....4...........4.....1.....4.....4.....4.....',
+        '1..4........4........4..1.....4........4........', '1.....4.....4.....4.....1.....4.....4.....4.....',
+        '1...............1.......x.......................', '1...............1.......x...............1.......',
+        '1...............1.......x.......................', '1...............1.......x...............1.......',
+        '1...............1.......x.......................', '1...............1.......x...............1.......',
+        '1...............1.......x.......................', '1...............1.......x...............1.......',
+        '1.....2...........2.....1.....2.....2.....2.....', '1..4........4........4..1.....4........4........',
+        '1.....4.....4.....4.....1.....4.....4.....4.....', '1.....2.....2.....2.....1.....2.....2.....2.....',
+        '1...............1.......x.......................', '1...............1.......x...............1.......',
+        '1...............1.......x.......................', '1...............1.......x...............1.......',
+        '1.....2.....2........2..1.....2...........2.....', '1..4........4........4..1.....4........4........',
+        '1...............1.......x.......................', '1...............1.......x...............1.......',
+        '1..4........4........4..1.....4........4........', '1.....2.....2.....2.....1.....2.....2.....2.....',
+        '1...............1.......x.......................', '1...............1.......x...............1.......',
+        '1.....2.....2.....2.....1.....2.....2.....2.....', '1...............1.......1...............1.......',
+        '1.....4.....4.....4.....1.....4.....4.....4.....', '1...............1.......1...............1.......',
+        '2.....2.....2.....2.....1...............1.......', '2.....2.....2.....2.....1...............1.......',
+        'x.....2.....x.....2.....x.....2.....x.....2.....', 'x.....4.....x.....4.....x.....4.....x...........',
+        '................................................', '................................................',
+        '................................................', '................................................',
+        '................................................', '................................................',
+        '1.....2.........1.......1.....2.....2.....2.....', '1.....2.....2.....2.....1.....2.........1.......',
+        '1.....4.........1.......1.....4.....4.....4.....', '1.....4.....4.....4.....1.....4.........1.......',
+        '1.....2.........1.......1.....2.....2.....2.....', '1.....2.....2.....2.....1.....2.........1.......',
+        '1.....4.........1.......1.....4.....4.....4.....', '1.....4.....4.....4.....1.....4.........1.......',
+        '1...............1.......1...............1.......', '1...............1.......1...............1.......',
+        '1...............1.......1...............1.......', '1...............1.......1...............1.......',
+        '1...............1.......1...............1.......', '1...............1.......1...............1.......',
+        '1.....4.........1.......1.....4.....4.....4.....', '1.....4.....4.....4.....1.....4.........1.......',
+        '1.....2.........1.......1.....2.....2.....2.....', '1.....2.....2.....2.....1.....2.........1.......',
+        '1.....4.........1.......1.....4.....4.....4.....', '1.....4.....4.....4.....1.....4.........1.......',
+        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
+        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
+        '1...............................................', '................................................',
+        '....................................x...........', '................................................'
+    ] },
+    comfort: ['…다음 거.', '손 봐, 손.'],
+    phaseFx: { amber: [], lineOn: [-9, -9, -9], drop: 24, drop2: 184, last: 315, out: [316.4, 317.1, 317.8] },
+    sfx: [[56, 'knob'], [104, 'knob'], [128, 'knob'], [144, 'knob'], [156, 'knob'], [164, 'knob'], [170, 'knob'], [174, 'knob'],
+          [184, 'boom'], [184.6, 'alarm'], [186.6, 'alarm'], [188.6, 'alarm'], [205.5, 'switchOff'], [206.5, 'static'],
+          [316.4, 'lampOff'], [317.1, 'lampOff'], [317.8, 'lampOff']],
+    chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
+    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 316,
+    special:['마르코가 보낸 상자', 'right', '받아냄'],
+    sections: [[0, 'intro'], [6, 'tug'], [30, 'tug2'], [42, 'heat'], [46, 'boom'], [52, 'radio'], [60, 'solo'], [66, 'radio2'], [72, 'last']],
+    bars: Array(80).fill('................'),
+    // 'b' 반장, 'v' 마르코
+    say: [[10, '…천천히 가자.', 3, 0, 'b'], [16, '반장님~ 이거 너무 졸려요!', 3, 0, 'v'], [21, '뮤직, 큐!', 2.5, 0, 'v'],
+          [28, '어제보다 빨리! 가즈아~!', 3, 0, 'v'], [57, '(라디오를 올린다) …천천히.', 3, 0, 'b'],
+          [88.5, '이거죠, 이거!', 2.5, 0, 'v'], [104.5, '…내 라인이다.', 2.5, 0, 'b'],
+          [120.5, '에이스는 안 멈춰요~', 2.5, 0, 'v'], [128.5, '마르코.', 2, 0, 'b'], [176.5, '더! 더!', 2, 0, 'v'],
+          [184.6, '어, 어?', 2, 0, 'v'], [188, '…어제 빨랐지.', 3, 0, 'b'], [192, '(실적표를 본다) 그래서 오늘 이거다.', 3.5, 0, 'b'],
+          [196.5, '빠르면 다들 좋아하잖아요.', 3.5, 0, 'v'], [201, '(빈자리를 잠깐 본다) …위에서나.', 3.5, 0, 'b'],
+          [212, '…천천히 가자.', 3, 0, 'b'], [242, '…이게 더 느리잖아.', 3, 0, 'v']],
     intro: [
-      { who:'', text:'둘째 밤, 새벽 2시 20분. 소장: "이상한 건 전부 재검."' },
-      { who:'순자 이모', text:'잡으면 늦게 가. 민 건 빨리 가고. 손만 봐.' },
-      { who:'반장', text:'소장 말은 반만 들어요.' },
-      { who:'순자 이모', text:'반만 듣고 반은 잡지.' }],
+      { who:'', text:'둘째 밤. 새벽 1시 40분. 실적표가 새로 붙었다. 3·4 통합 라인, 목표 수량 옆에 빨간 펜으로 고친 숫자.' },
+      { who:'마르코', text:'반장님! 우리 어제 1등이래요!' },
+      { who:'반장', text:'(실적표를 본다) …목표도 올랐네.' },
+      { who:'', text:'반장은 집에서 낡은 라디오를 하나 들고 왔다.' },
+      { who:'마르코', text:'그럼 오늘은 더 빨리 가면 되죠!' }],
     outro: good => good ? [
-      { who:'순자 이모', text:'…내 손 잘 보네.' },
-      { who:'', text:'지게차가 팔레트를 내려놓고 갔다. 이번엔 반듯했다. 이모는 못 본 척했다.' }] : [
-      { who:'순자 이모', text:'…내일은 손만 봐.' }]
+      { who:'', text:'새벽 5시. 실적표의 숫자는 어제보다 조금 모자랐다.' },
+      { who:'반장', text:'…이 정도면 된다.' },
+      { who:'', text:'마르코는 대꾸하지 않았다.' },
+      { who:'', text:'그날 마르코는 붐박스를 켜지 않고 퇴근했다.' }] : [
+      { who:'반장', text:'…오늘은 접자.' },
+      { who:'', text:'마르코는 말이 없었다.' }],
   }
   ,{
     id:'s2-3', stageNo:'2-3', who:'반장 + 지우', role:'반장 · 지우 · 순자 이모 · 96 BPM · 벨트 둘', tag:'레게톤 · 버튼 둘 · 본선 사흘 전', bpm:96, style:'dembow23', fxTheme:'neon', inspector: true,
@@ -3538,6 +3595,100 @@ function midMarco(b) {
   const up = (cur.dy < -10 && p > 0.6) || (prev.dy < -10 && p < 0.4);
   return { x: lerp(prev.x, cur.x, e), dy: lerp(prev.dy, cur.dy, e), mir: p < 0.5 ? prev.x > cur.x || (prev.x === cur.x && prev.mir) : cur.mir, walking: p < 1, p, up, spot: R0[i][1] };
 }
+// ---------- 2-2 the tug of war on the floor (L.rb) ----------
+// Whoever has the line floods the floor with his look from his side: 마르코 a midsummer beach from the right (sky, sea,
+// sand, parasols), 반장 his warehouse back from the left. The belts, the scanners and the people stay as they are.
+const rbFunkOn = b => { const tn = rbTurn(b); return !!tn && tn[1] !== 'b'; };
+function rbEdge(b) {
+  const D = L.rb, WW = MID.ww; if (b < 0 || b >= D.boom) return WW;
+  let i = 0; for (let k = 0; k < D.turns.length; k++) if (b >= D.turns[k][0]) i = k;
+  const tn = D.turns[i], nx = D.turns[i + 1] ? D.turns[i + 1][0] : D.boom, d = Math.min(0.8, (nx - tn[0]) / 4), e = ease((b - tn[0]) / d);
+  if (tn[1] === 'v') return lerp(WW, 0, e);
+  if (tn[1] === 'b') return i === 0 ? WW : lerp(0, WW, e);
+  // the heat: both at once, the edge thrashing back and forth across the middle
+  return WW / 2 + Math.sin(b * Math.PI * 1.5) * WW * 0.38 + (rnd(Math.floor(b * 8), 3) - 0.5) * 30;
+}
+// how hot the belt motor is: rising with every turn from 반장's first, red through the heat; dead after the boom, cool again
+// once the radio is back on
+function rbHeat(b) { const D = L.rb; if (b >= D.radio[1]) return 0.25; if (b >= D.boom) return 1; if (b >= 176) return 0.75 + 0.25 * (b - 176) / (D.boom - 176); return Math.max(0, Math.min(0.75, (b - 56) / (176 - 56) * 0.75)); }
+// the belts stand still from the boom until the radio comes back (and run on from where they stopped)
+function rbBeltT(T) { const D = L.rb, tb = timeAt(D.boom), tr = timeAt(D.radio[1]); return T < tb ? T : T < tr ? tb : T - (tr - tb); }
+const RB_RADIO = { x: 92, y: 96 }, RB_BOX = { x: MID.ww - 92 - 24, y: 96 };
+function rbBeach(nowMs) {
+  const WW = MID.ww, t = nowMs / 1000;
+  const sky = g.createLinearGradient(0, -MID.oy, 0, 88); sky.addColorStop(0, '#4fa9e4'); sky.addColorStop(0.6, '#9fd6f2'); sky.addColorStop(1, '#ffe0a0');
+  g.fillStyle = sky; g.fillRect(0, -MID.oy, WW, 88 + MID.oy);
+  g.fillStyle = 'rgba(255,244,190,.35)'; g.beginPath(); g.arc(540, 22, 30, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#fff6cc'; g.beginPath(); g.arc(540, 22, 17, 0, Math.PI * 2); g.fill();
+  for (const [cx, cy, w] of [[90, 4, 34], [250, -20, 46], [380, 14, 28], [640, -8, 36]]) { const x = (cx + t * 3) % (WW + 60) - 30; R(x, cy, w, 5, '#ffffff'); R(x + 6, cy - 4, w - 14, 4, '#ffffff'); R(x + 3, cy + 5, w - 6, 2, '#e3f1fa'); }
+  R(0, 88, WW, 28, '#2a86c2'); R(0, 88, WW, 4, '#4aa6d8'); R(0, 104, WW, 12, '#2479b3');
+  for (let i = 0; i < 26; i++) { const x = (i * 53 + t * (8 + (i % 3) * 4)) % (WW + 20) - 10, y = 93 + (i % 4) * 5; R(x, y, 7 + (i % 3) * 2, 1, '#e6f6ff'); }
+  for (let x = 0; x < WW; x += 4) R(x, 116 + Math.round(Math.sin(x / 13 + t * 2) * 1.5), 4, 3, '#f2fbfc');
+  R(0, 119, WW, MID.wh, '#f1d49a'); R(0, 119, WW, 5, '#dcb87c');
+  for (let i = 0; i < 160; i++) R(rnd(i, 1) * WW, 126 + rnd(i, 2) * 190, 1, 1, '#d8b676');
+  // parasols and two palms behind the belts; a towel and a beach ball on the sand in front
+  [[120, '#e84b4b', '#fff4e6'], [262, '#f3c43a', '#2d7fd0'], [452, '#2fbf8f', '#fff4e6'], [598, '#e84b4b', '#f3c43a']].forEach(([x, a, c]) => {
+    R(x, 92, 2, 34, '#e9e4d8'); for (let r = 0; r < 5; r++) { const w = 10 + r * 6; for (let k = 0; k < w; k += 4) R(x + 1 - w / 2 + k, 84 + r * 2, 4, 2, (Math.floor((k + r) / 4) % 2) ? a : c); } });
+  for (const px of [30, 652]) { for (let k = 0; k < 9; k++) R(px + Math.round(Math.sin(k / 3) * 3), 60 + k * 7, 5, 7, k % 2 ? '#8a5a32' : '#7a4e2a');
+    for (const [dx, dy] of [[-16, 2], [-9, -3], [0, -5], [9, -3], [16, 2]]) { R(px + 2 + dx, 56 + dy, 10, 3, '#2f9d4f'); R(px + 2 + dx + (dx < 0 ? -4 : 6), 59 + dy, 6, 2, '#24813f'); } }
+  R(168, 210, 46, 16, '#e8505b'); for (let k = 0; k < 46; k += 8) R(168 + k, 210, 4, 16, '#fff2e0');
+  g.fillStyle = '#ffffff'; g.beginPath(); g.arc(512, 214, 8, 0, Math.PI * 2); g.fill(); R(504, 212, 16, 3, '#e84b4b'); R(511, 206, 3, 16, '#2d7fd0');
+}
+function rbBack(b, bReal, nowMs, active, live) {
+  const WW = MID.ww, x0 = live ? rbEdge(bReal) : WW;
+  if (x0 < WW) {
+    g.save(); g.beginPath(); g.rect(x0, -MID.oy, WW - x0, MID.wh); g.clip(); rbBeach(nowMs); g.restore();
+    if (x0 > 0) { const gr = g.createLinearGradient(x0 - 14, 0, x0, 0); gr.addColorStop(0, 'rgba(255,236,170,0)'); gr.addColorStop(1, 'rgba(255,236,170,.45)'); g.fillStyle = gr; g.fillRect(x0 - 14, -MID.oy, 14, MID.wh); R(x0 - 1, -MID.oy, 2, MID.wh, 'rgba(255,252,230,.8)'); }
+  }
+  // 반장's radio on the left, 마르코's boombox on the right; whichever is playing out loud gives off notes
+  const D = L.rb, tn = live ? rbTurn(bReal) : null, ph = bReal - Math.floor(bReal);
+  const radioOn = !live || bReal < D.boom || bReal >= D.radio[1], radioLoud = live && ((tn && tn[1] !== 'v') || bReal >= D.radio[1]);
+  const boxOn = live && rbFunkOn(bReal), boxPlugged = !live || bReal < D.radio[0] - 1;
+  { const { x, y } = RB_RADIO; R(x + 18, y - 9, 1, 9, '#3a332c'); R(x, y, 24, 12, '#6b4a2e'); R(x, y, 24, 1, '#8a6a42'); R(x + 2, y + 3, 9, 5, '#2a1a10');
+    if (radioOn) { R(x + 3, y + 4, 7, 3, '#f0a040'); R(x + 3 + Math.floor((nowMs / 900) % 6), y + 4, 1, 3, '#fff0c0'); }
+    if (live && bReal >= D.radio[0] && bReal < D.radio[1]) R(x + 3 + Math.floor(Math.random() * 6), y + 4, 1, 3, '#fff0c0');
+    for (let k = 0; k < 3; k++) R(x + 14 + k * 3, y + 3, 2, 6, '#3a2a1c'); }
+  { const { x, y } = RB_BOX, pump = boxOn ? Math.max(0, 1 - ph * 3) : 0;
+    R(x + 6, y - 4, 12, 1, '#2a2d33'); R(x + 6, y - 4, 1, 4, '#2a2d33'); R(x + 17, y - 4, 1, 4, '#2a2d33'); R(x, y, 24, 12, '#1b1b1f'); R(x, y, 24, 1, '#3a3d45');
+    for (const sx of [x + 2, x + 16]) { const o = pump > 0.5 ? 1 : 0; R(sx, y + 3, 6, 6, '#2a2d33'); R(sx + 1 - o, y + 4 - o, 4 + 2 * o, 4 + 2 * o, '#4a4d55'); R(sx + 2, y + 5, 2, 2, '#14151a'); }
+    R(x + 10, y + 3, 4, 2, boxOn ? (pump > 0.3 ? '#8fe3f0' : '#5fb0c0') : '#3d6b78'); R(x + 10, y + 7, 4, 1, boxPlugged ? '#d8463b' : '#3a2020');
+    if (!boxPlugged) { R(x + 24, y + 10, 10, 1, '#222'); R(x + 34, y + 10, 2, 2, '#555'); } }
+  // the notes: little quavers floating up off whichever is loud
+  const note = (x, y, k, col) => { const p = ((nowMs / 1400) + k * 0.37) % 1, nx = x + Math.sin(p * 6 + k) * 4, ny = y - p * 26; g.globalAlpha = Math.min(1, (1 - p) * 1.6); R(nx, ny, 2, 2, col); R(nx + 1, ny - 5, 1, 5, col); R(nx + 2, ny - 5, 2, 1, col); g.globalAlpha = 1; };
+  if (radioLoud && radioOn) for (let k = 0; k < 2; k++) note(RB_RADIO.x + 8 + k * 6, RB_RADIO.y - 4, k, '#ffd9a0');
+  if (boxOn) for (let k = 0; k < 3; k++) note(RB_BOX.x + 6 + k * 6, RB_BOX.y - 4, k + 5, '#9ff0ff');
+}
+function rbFront(b, bReal, nowMs, active, live) {
+  if (!live) return;
+  const D = L.rb, WW = MID.ww, AX = MID.ax, h = rbHeat(bReal), boom = bReal - D.boom;
+  // the motor's temperature gauge over your head: a dial, its needle climbing into the red; a beacon on top for the alarm
+  const gx = AX - 14, gy = 40;
+  R(gx - 1, gy - 1, 30, 22, '#2b2f36'); R(gx, gy, 28, 20, '#e9e2cf'); R(gx + 13, gy + 20, 2, 10, '#2b2f36');
+  for (let k = 0; k <= 10; k++) { const a = Math.PI * (1 - k / 10), r = 10; R(gx + 14 + Math.cos(a) * r - 0.5, gy + 16 - Math.sin(a) * r - 0.5, 2, 2, k >= 7 ? '#d8463b' : k >= 5 ? '#e0a43a' : '#4a7a4a'); }
+  const jit = h > 0.8 && boom < 0 ? (Math.random() - 0.5) * 0.08 : 0, na = Math.PI * (1 - Math.min(1, h + jit));
+  g.strokeStyle = '#1b1b1f'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(gx + 14, gy + 16); g.lineTo(gx + 14 + Math.cos(na) * 9, gy + 16 - Math.sin(na) * 9); g.stroke(); R(gx + 13, gy + 15, 3, 3, '#1b1b1f');
+  const alarm = boom >= 0.6 && bReal < D.boom + 12;
+  R(gx + 11, gy - 6, 6, 5, alarm && (bReal * 2) % 1 < 0.5 ? '#ff7a2a' : '#6a3a2a');
+  // steam off the two belt motors as it heats, sparks near the top, smoke after the boom
+  const motors = [AX - 44, AX + 44];
+  const puffs = (x, y, n, col, a0, rise) => { for (let k = 0; k < n; k++) { const p = ((nowMs / 1100) + k / n + x * 0.013) % 1, sz = 3 + p * 7; g.fillStyle = `rgba(${col},${a0 * (1 - p)})`; g.fillRect(Math.round(x + Math.sin(p * 5 + k) * 5 - sz / 2), Math.round(y - p * rise - sz / 2), Math.round(sz), Math.round(sz)); } };
+  if (boom < 0 && h > 0.35) for (const mx of motors) puffs(mx, 150, 5, '235,235,235', 0.5 * (h - 0.35) / 0.65, 34);
+  if (boom < 0 && h > 0.7 && !reduce) for (const mx of motors) for (let k = 0; k < Math.round((h - 0.7) * 30); k++) R(mx + (Math.random() - 0.5) * 14, 150 - Math.random() * 16, 1, 1, Math.random() < 0.5 ? '#ffd34a' : '#fff2b0');
+  if (boom >= 0 && bReal < D.radio[1]) for (const mx of motors) puffs(mx, 150, 6, '90,90,95', 0.55 * Math.max(0, 1 - boom / 24), 46);
+  // the boom: sparks thrown out of both motors
+  if (boom >= 0 && boom < 1.4 && !reduce) for (const mx of motors) for (let k = 0; k < 26; k++) {
+    const a = rnd(k, mx) * Math.PI - Math.PI, v = 40 + rnd(k, 7) * 90, dt = boom * SPB;
+    g.globalAlpha = Math.max(0, 1 - boom / 1.4); R(mx + Math.cos(a) * v * dt, 150 + Math.sin(a) * v * dt + 160 * dt * dt, 2, 2, k % 3 ? '#ffd34a' : '#ff8a2a'); g.globalAlpha = 1;
+  }
+  // the boxes that piled up and spilled round the cart when the belts stopped, until the line runs again
+  if (boom >= 0 && bReal < D.radio[1]) [[-38, 188, -0.4], [-22, 196, 0.35], [-6, 184, 0.1], [12, 197, -0.5], [28, 186, 0.3], [44, 196, 0.15], [-50, 199, 0.6], [2, 203, -0.25]].forEach(([dx, y, r], k) => {
+    const fall = Math.min(1, boom / 0.5); g.save(); g.translate(AX + dx, y - (1 - fall) * 30); g.rotate(r * fall);
+    g.fillStyle = '#d6a06a'; g.fillRect(-7, -6, 14, 11); g.fillStyle = '#e9bb83'; g.fillRect(-7, -6, 14, 3); g.fillStyle = '#a0703f'; g.fillRect(-1, -6, 2, 11); g.restore(); });
+  // the lights: a flicker as it overheats, black for a moment at the boom, the alarm's orange breathing over the floor
+  if (boom < 0 && h > 0.85 && !reduce && Math.random() < 0.09) { g.fillStyle = 'rgba(4,3,5,.3)'; g.fillRect(0, -MID.oy, WW, MID.wh); }
+  if (boom >= 0.05 && boom < 0.7) { g.fillStyle = `rgba(4,3,5,${boom < 0.35 || (boom > 0.45 && boom < 0.55) ? 0.8 : 0.3})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
+  if (alarm) { const k = 0.5 + 0.5 * Math.sin(bReal * Math.PI * 2); g.fillStyle = `rgba(255,110,25,${0.12 * k * Math.min(1, (D.boom + 12 - bReal) / 2)})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
+}
 function drawMid(t, nowMs, active) {
   const F = L.phaseFx, M = L.mid, bReal = active ? beatAt(t) : castBeatAt(t, active), live = active || state === 'outro' || state === 'result';
   // the last hit holds the picture still for a moment (a hitstop) before the lights start going out
@@ -3581,7 +3732,7 @@ function drawMid(t, nowMs, active) {
   const missOf = (q, up) => live && notes.some(n => n.quad && n.q === q && !!n.up === up && n.state === 'miss' && T - n.hitAt < 0.25);
   const belt = (q, up) => {
     BELT_L = up ? 14 : 48; g.save(); if (up) { g.translate(0, LANE_DY[0]); farXform(); }
-    drawScannerBack(0); drawBeltTop(T, live);
+    drawScannerBack(0); drawBeltTop(L.rb ? rbBeltT(T) : T, live);
     if (live) drawLaserGlow(flashOf(q, up) * 0.6);
     const end = up ? SCAN_X + (AX - 8 - SCAN_X) / FAR.k : AX - 8;
     if (live) for (const n of notes) {
@@ -3605,11 +3756,11 @@ function drawMid(t, nowMs, active) {
   const drawMarco = () => {
     const pose = { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: active && (marco.walking ? ph < 0.5 : ph < 0.18) ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
     let sway = 0, lift = 0, mir = marco.mir;
-    const on = active && M.boombox != null && b >= M.boombox + 0.5;
+    const on = L.rb ? active && rbFunkOn(b) : active && M.boombox != null && b >= M.boombox + 0.5;
     if (toss) pose.hand = { x: BOSS_X + 16, y: 104 };
     else if (on && marco.walking) {
       lift = Math.round(Math.sin(Math.PI * Math.min(1, marco.p * 1.4)) * 7); pose.hand = { x: BOSS_X + 10, y: 80 };
-      if (F && F.drop2 != null && b >= F.drop2 && marco.p < 0.72) mir = Math.floor(marco.p * 9) % 2 ? !mir : mir;
+      if (F && F.drop2 != null && b >= F.drop2 && marco.p < 0.72 && !L.rb) mir = Math.floor(marco.p * 9) % 2 ? !mir : mir;
     } else if (on && marco.spot === 'c') {
       if (sayV) pose.hand = { x: BOSS_X + 14, y: 100 + Math.round(Math.sin(nowMs / 160) * 3) };
       else { pose.hand = { x: BOSS_X + 9 + (bph < 0.2 ? 1 : 0), y: 124 + (bph < 0.2 ? 3 : 0) }; sway = beatI % 2 ? 1 : 0; }
@@ -3627,19 +3778,21 @@ function drawMid(t, nowMs, active) {
     g.translate(sway, Math.round(marco.dy) - lift); drawActor('marco', Math.round(marco.x), mir, pose, nowMs, active, () => PARTNERS.marco.arm(pose)); g.restore();
   };
   // his ad-libs (drawn crisp over the floor, in midAdlib) and the sparks off his hands when you hit one of his boxes
-  if (!FX.adlibs || b < 57) { FX.adlibs = []; FX.adOnce = {}; FX.adWalk = false; FX.adCombo = 0; FX.adMiss = FX.lastMiss; }
-  if (active && b >= 62) {
+  const adFrom = M.adFrom != null ? M.adFrom : 62;
+  if (!FX.adlibs || b < adFrom - 5) { FX.adlibs = []; FX.adOnce = {}; FX.adWalk = false; FX.adCombo = 0; FX.adMiss = FX.lastMiss; }
+  if (active && b >= adFrom) {
     const ad = (text) => { const live_ = FX.adlibs.filter(a => nowMs - a.at < 700).length; FX.adlibs.push({ text, at: nowMs, x: marco.x, y: 86 + marco.dy - 14 - live_ * 11 }); };
     const pick = xs => xs[Math.floor(Math.random() * xs.length)];
     let shoutNear = false;
     for (const [sb, , text] of M.shouts || []) { if (Math.abs(b - sb) < 1.5) shoutNear = true; if (b >= sb && b < sb + 1 && !FX.adOnce[sb]) { FX.adOnce[sb] = 1; ad(text); } }
-    if (FX.adWalk && !marco.walking && marco.spot !== 'c' && F && F.drop2 != null && b >= F.drop2 && !shoutNear) ad(pick(['여기!', '헤이!', '후!', '오우!', '펑키~!', '짠!']));
+    if (FX.adWalk && !marco.walking && marco.spot !== 'c' && F && F.drop2 != null && b >= F.drop2 && !shoutNear && !L.rb) ad(pick(['여기!', '헤이!', '후!', '오우!', '펑키~!', '짠!']));
     FX.adWalk = marco.walking;
-    if (stats.combo >= 30 && stats.combo % 30 === 0 && FX.adCombo !== stats.combo && !sayV && !shoutNear) { FX.adCombo = stats.combo; ad(pick(['나이스 신입!', '그루브 좋아!', '손 좋다~!', '오~ 리듬 탔어!'])); }
-    if (FX.lastMiss !== FX.adMiss) { FX.adMiss = FX.lastMiss; if (!sayV && !shoutNear && Math.random() < 0.35) ad(pick(['괜찮아~ 괜찮아~', '노 프라블럼!'])); }
+    if (stats.combo >= 30 && stats.combo % 30 === 0 && FX.adCombo !== stats.combo && !sayV && !shoutNear && (!L.rb || rbFunkOn(b))) { FX.adCombo = stats.combo; ad(pick(['나이스 신입!', '그루브 좋아!', '손 좋다~!', '오~ 리듬 탔어!'])); }
+    if (FX.lastMiss !== FX.adMiss) { FX.adMiss = FX.lastMiss; if (!sayV && !shoutNear && (!L.rb || rbFunkOn(b)) && Math.random() < 0.35) ad(pick(['괜찮아~ 괜찮아~', '노 프라블럼!'])); }
     FX.adlibs = FX.adlibs.filter(a => nowMs - a.at < 900);
   }
   mirror(0, () => back(0)); mirror(1, () => back(1));
+  if (L.rb) rbBack(b, bReal, nowMs, active, live);
   if (marco.up) drawMarco();
   mirror(0, () => belt(0, true)); mirror(1, () => belt(1, true));
   // 반장 at line 3's lower end, carrying his boxes
@@ -3673,6 +3826,7 @@ function drawMid(t, nowMs, active) {
     g.restore();
   }
   drawParticles(nowMs);
+  if (L.rb) rbFront(b, bReal, nowMs, active, live);
   // the lamps: line 4 dark until its three lamps click on (nearest you first); at the end every lamp goes out from the far
   // ends in, both lines at once, and only the one over you is left
   if (F) {
@@ -5282,6 +5436,18 @@ function fanfare21(t) {
   for (const f of [311.13, 392, 466.16, 622.25]) brass(f, t + 0.25, 0.7, 0.035);
 }
 function levelSfx(t, kind) {
+  // 2-2: the radio's volume knob turned up (a click and a breath of static); the motor blowing (a crack, a deep thump and a
+  // hiss of steam); the line's alarm (a two-tone buzzer); the radio being switched back on (a crackle tuning in)
+  if (kind === 'knob') { osc('square', 1300, t, 0.0005, 0.05, 0.012, bus); noise(t, 'bandpass', 3000, 0.12, 0.018, 3, bus); noise(t + 0.02, 'bandpass', 2200, 0.05, 0.22, 0.8, bus); return; }
+  if (kind === 'boom') {
+    noise(t, 'lowpass', 2500, 0.9, 0.08, 0.7, bus); noise(t + 0.01, 'bandpass', 5200, 0.5, 0.05, 1.5, bus);
+    const o = osc('sine', 110, t, 0.002, 0.9, 0.55, bus); o.frequency.exponentialRampToValueAtTime(32, t + 0.5);
+    noise(t + 0.08, 'lowpass', 600, 0.45, 0.6, 0.7, bus); noise(t + 0.15, 'highpass', 3500, 0.12, 1.6, 0.7, bus);
+    for (let k = 0; k < 7; k++) osc('square', 2200 + Math.random() * 2600, t + 0.04 + Math.random() * 0.5, 0.0005, 0.03, 0.01, bus);
+    return;
+  }
+  if (kind === 'alarm') { for (let k = 0; k < 4; k++) { osc('square', k % 2 ? 620 : 830, t + k * 0.22, 0.004, 0.045, 0.2, bus); } return; }
+  if (kind === 'static') { noise(t, 'bandpass', 2400, 0.16, 0.9, 0.9, bus); for (let k = 0; k < 6; k++) noise(t + Math.random() * 0.8, 'bandpass', 3800, 0.14, 0.02, 4, bus); osc('sine', 1600, t + 0.55, 0.05, 0.02, 0.25, bus); return; }
   if (kind === 'hey' || kind === 'yeah') return shout21(t, kind);
   if (kind === 'fanfare') return fanfare21(t);
   if (kind === 'clank') { osc('square', 760, t, 0.001, 0.05, 0.12, bus); osc('square', 1130, t, 0.001, 0.035, 0.09, bus); noise(t, 'bandpass', 3200, 0.16, 0.06, 3, bus); noise(t, 'lowpass', 500, 0.12, 0.05, 0.7, bus); }
@@ -6481,6 +6647,7 @@ function buildEvents() {
   notes.forEach(n => { if (n.quad || (n.grp && n !== n.grp.items[0])) return; if (!n.stamp || passAt(n) - n.place > 0.05) ev.push([n.place, T => thud(T, (n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1) * (L.stampBar && L.travel > 4 ? 0.25 : 1))]); });
   if (L.stampBar) for (const n of notes) { if (n.stamp) ev.push([passAt(n), T => stampSnd(T)]); }
   else if (L.inspector) for (const n of notes) { if (n.top || inRange(n.beat0, L.phone)) continue; if (n.grab) { ev.push([passAt(n), T => { rim(T, 0.4); rim(T + 0.11, 0.4); }]); ev.push([n.tRel, T => roller(T, 0.06)]); } else ev.push([passAt(n), n.push ? T => { tak(T, 0.3); shoop(T); } : T => tak(T, 0.3)]); }
+  if (L.rb) rbEvents(ev);
   return ev.sort((a, b) => a[0] - b[0]);
 }
 let events = [], evI = 0, T0 = 0;
@@ -6857,7 +7024,6 @@ function updateHud(t) {
   hintFor('heavy', '무거운 상자: 양쪽을 같이');
   hintFor('top', '긴 화물 위 상자: 누른 채로 다른 손으로 톡');
   { const fl = firstWith('late'); if (L.id !== 'jiwoo' && fl && fl.state === 'pending' && t > fl.place - SPB) h = L.lateHint || '반장님 손이 늦어요. 음악 말고 손을 봐요'; }
-  if (L.id === 's2-2') { const ps = notes.filter(n => n.push).slice(0, 3), p = ps.find(n => n.state === 'pending'); if (p && t > p.place && t < p.arr) h = '이모가 미는 상자: 반 박 빨리 와요. 손을 봐요'; const gs = notes.filter(n => n.grab).slice(0, 3), gq = gs.find(n => n.state === 'pending'); if (gq && t > gq.place && t < gq.arr) h = '이모가 붙잡은 상자: 반 박 늦게 와요'; }
   if (L.id === 's1-4') {
     if (beat >= 2 && beat < 10) h = '위 벨트는 하은이 알아서 찍어요. 나는 아래만';
     if (beat >= 57 && beat < 72) h = '이제 양쪽 다 내가 찍어요. 버튼은 하나, 닿는 쪽';
@@ -6984,7 +7150,7 @@ function loadSong(sp) {
 }
 const loadSongs = level => (level.songs || []).forEach(loadSong);
 const songReady = (i = 0) => !!(L.songs && L.songs[i] && SONG.bufs[L.songs[i].src]);
-function stopSong() { if (SONG.src) { try { SONG.src.stop(); } catch (e) {} SONG.src = null; } }
+function stopSong() { if (SONG.src) { try { SONG.src.stop(); } catch (e) {} SONG.src = null; } if (typeof rbStop === 'function') rbStop(); }
 // start song i at audio time T, `into` seconds past its first downbeat
 function startSong(T, into = 0, i = 0) {
   stopSong(); const sp = L.songs && L.songs[i], buf = sp && SONG.bufs[sp.src]; if (!buf || !ctx) return;
@@ -7021,6 +7187,55 @@ function tapeStop(T) {
   gn.gain.setValueAtTime(gn.gain.value, T); gn.gain.linearRampToValueAtTime(0.0001, T + 0.8);
   try { s.stop(T + 0.85); } catch (e) {}
   SONG.src = null;
+}
+// ---------- 2-2 the radio and the boombox (L.rb) ----------
+// Two recorded songs at once: 반장's blues runs on from beat 0 (its file position is lead + beat · SPB0 whatever the tempo,
+// because its rate follows the tempo through the heat) and 마르코's funk is started afresh at the bar named by each of his
+// turns. Whoever has the line is loud; the other is down (the radio a whisper under the boombox, the boombox off). In the
+// heat both are up and both speed up with the tempo; at the boom both tapes stop; the radio comes back for phase 2.
+const RB = { b: null, f: null };
+const rbSPB0 = () => 60 / L.bpm;
+function rbKill(k, T) { const x = RB[k]; if (!x) return; RB[k] = null; if (T == null) { try { x.s.stop(); } catch (e) {} return; }
+  x.g.gain.cancelScheduledValues(T); x.g.gain.setValueAtTime(x.g.gain.value, T); x.g.gain.linearRampToValueAtTime(0.0001, T + 0.06); try { x.s.stop(T + 0.08); } catch (e) {} }
+function rbStop() { rbKill('b'); rbKill('f'); }
+// one song on its own chain: the blues through a radio's band (the low end and the top trimmed a little), the funk full
+function rbPlay(k, T, off, gain) {
+  rbKill(k, T); const i = k === 'b' ? 0 : 1, sp = L.songs[i], buf = SONG.bufs[sp.src]; if (!buf || !ctx || off >= buf.duration) return;
+  const s = ctx.createBufferSource(), g_ = ctx.createGain(); s.buffer = buf; s.playbackRate.value = rbRate(beatAt(T - T0));
+  let head = s;
+  if (k === 'b') { const hp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 140; lp.type = 'lowpass'; lp.frequency.value = 6500; s.connect(hp); hp.connect(lp); head = lp; }
+  head.connect(g_); g_.connect(mus); g_.gain.setValueAtTime(0.0001, Math.max(T, ctx.currentTime)); g_.gain.linearRampToValueAtTime(gain, Math.max(T, ctx.currentTime) + 0.05);
+  s.start(Math.max(T, ctx.currentTime), Math.max(0, off) + Math.max(0, ctx.currentTime - T) * s.playbackRate.value);
+  RB[k] = { s, g: g_ };
+}
+function rbGain(k, T, v, dur = 0.08) { const x = RB[k]; if (!x) return; x.g.gain.cancelScheduledValues(T); x.g.gain.setValueAtTime(x.g.gain.value, T); x.g.gain.linearRampToValueAtTime(Math.max(0.0001, v), T + dur); }
+// the tempo against the songs' own: through the heat both play faster
+const rbRate = b => bpmAt(b) / L.bpm;
+function bpmAt(b) { let v = L.bpm; for (const x of L.tempo || []) if (b >= x[0]) v = x[1]; return v; }
+// who has the line at beat b: 'b', 'v' or 'h' (and the turn's start and funk bar), or null after the boom
+function rbTurn(b) { const D = L.rb; if (b >= D.boom) return null; let t = D.turns[0]; for (const x of D.turns) if (b >= x[0]) t = x; return t; }
+const rbFunkOff = (tn, b) => L.songs[1].lead + tn[2] * L.rb.bar + (b - tn[0]) * rbSPB0();
+const rbBluesOff = b => b >= L.rb.radio[1] ? L.rb.radio[2] + (b - L.rb.radio[1]) * rbSPB0() : L.songs[0].lead + b * rbSPB0();
+const rbLoud = () => L.songs[0].gain, rbFunkLoud = () => L.songs[1].gain;
+// the events: every turn, the heat's rate steps, the boom, the radio back on
+function rbEvents(ev) {
+  const D = L.rb, at = (b, fn) => ev.push([timeAt(b), fn]);
+  at(0, T => rbPlay('b', T, rbBluesOff(0), rbLoud()));
+  for (const tn of D.turns) at(tn[0], T => rbTake(tn, T, tn[0]));
+  for (const x of L.tempo || []) if (x[0] > 0 && x[0] < D.boom) at(x[0], T => { for (const k of ['b', 'f']) if (RB[k]) RB[k].s.playbackRate.setValueAtTime(x[1] / L.bpm, T); });
+  at(D.boom, T => { for (const k of ['b', 'f']) { const x = RB[k]; if (!x) continue; RB[k] = null; x.s.playbackRate.setValueAtTime(x.s.playbackRate.value, T); x.s.playbackRate.linearRampToValueAtTime(0.1, T + 0.7); x.g.gain.setValueAtTime(x.g.gain.value, T); x.g.gain.linearRampToValueAtTime(0.0001, T + 0.75); try { x.s.stop(T + 0.8); } catch (e) {} } });
+  at(D.radio[1], T => rbPlay('b', T, rbBluesOff(D.radio[1]), rbLoud()));
+}
+function rbTake(tn, T, b) {
+  if (tn[1] === 'b') { rbKill('f', T); if (RB.b) rbGain('b', T, rbLoud()); else rbPlay('b', T, rbBluesOff(b), rbLoud()); return; }
+  rbPlay('f', T, rbFunkOff(tn, b), rbFunkLoud());
+  if (RB.b) rbGain('b', T, tn[1] === 'h' ? rbLoud() : rbLoud() * L.rb.low); else rbPlay('b', T, rbBluesOff(b), tn[1] === 'h' ? rbLoud() : rbLoud() * L.rb.low);
+}
+// a jump (DEV): whatever should be sounding at that beat, from the right place
+function rbSeek(b, T) {
+  rbStop(); const D = L.rb, tn = rbTurn(b);
+  if (tn) { rbPlay('b', T, rbBluesOff(b), tn[1] === 'v' ? rbLoud() * D.low : rbLoud()); if (tn[1] !== 'b') rbPlay('f', T, rbFunkOff(tn, b), rbFunkLoud()); }
+  else if (b >= D.radio[1]) rbPlay('b', T, rbBluesOff(b), rbLoud());
 }
 function beginShift(level) {
   TUT.on = false; TUT.line = null; CAM.to = null; SLOW.on = false;
@@ -7076,7 +7291,7 @@ function devSeek(beat) {
   musHP.frequency.cancelScheduledValues(now); musHP.frequency.setValueAtTime(20, now);
   mus.gain.cancelScheduledValues(now); mus.gain.setValueAtTime(1, now);
   if (L.visit) { FX.yankFx = L.visit.yank != null && beat > L.visit.yank; FX.shoveFx = L.visit.shove != null && beat > L.visit.shove; }
-  stopSong(); if (L.songs) { let i = -1; L.songs.forEach((sp, k) => { if (beat > sp.at) i = sp.until != null && beat >= sp.until ? -1 : k; }); if (i >= 0 && songReady(i)) startSong(T0 + tB, tB - timeAt(L.songs[i].at), i); }
+  if (L.rb) { stopSong(); rbSeek(beat, T0 + tB); } else { stopSong(); if (L.songs) { let i = -1; L.songs.forEach((sp, k) => { if (beat > sp.at) i = sp.until != null && beat >= sp.until ? -1 : k; }); if (i >= 0 && songReady(i)) startSong(T0 + tB, tB - timeAt(L.songs[i].at), i); } }
   DEV.open = false; devSync();
 }
 function devEnd(good) {
