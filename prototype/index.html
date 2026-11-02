@@ -756,16 +756,16 @@ const LEVELS = [
     // belt. The band stops on 142 and the bass time (144-208, drums and bass only, pushed back further by `songDuck`) is his
     // introduction, beside you; the horns come back at 208, a dead stop at 233, and at the second drop (240) he lets loose,
     // corner to corner, two bars each and then one, on the horn riff, 반장 on 1 and 3 throughout; the last hit at 319.
-    tempo: [[0, 110.01], [56, 120]], clock:'02:40', title:'통합 라인', partners:['boss'], hints:false,
+    tempo: [[0, 110.01], [56, 40], [63, 120]], clock:'02:40', title:'통합 라인', partners:['boss'], hints:false,
     songs: [{ src: 'audio/2-1-across-the-empty-floor.mp3', at: 0, lead: 1.0707, gain: 0.9, until: 56 },
-            { src: 'audio/2-1-the-copper-stomp.mp3', at: 62, lead: 0.116, gain: 0.85 }],
-    songStart: 0, songCues: [[56, 'tape'], [62, 1]], songDuck: [144, 208, 1100, 0.93, 0.5], noCount: true, bareBand: true, hitKit: 'ticktock',
+            { src: 'audio/2-1-the-copper-stomp.mp3', at: 63, lead: 0.616, gain: 0.85 }],
+    songStart: 0, songCues: [[56, 'tape'], [63, 1]], songDuck: [144, 208, 1100, 0.93, 0.5], noCount: true, bareBand: true, hitKit: 'ticktock',
     // the whole night is drawn on the floor renderer (at 0): the upper belt of line 3 (하은's) stands idle in phase 1. Over
     // `zoom` the camera pulls back on all four belts; the keys split at `keys` (left hand: both left belts, right hand: both
     // right); the chart is in `bars` ('1' left lower = 반장's, '2' right lower, '3' left upper, '4' right upper, 'x' both lower;
     // 16 cells a bar; one hand's notes at least an 8th apart). 마르코 runs `route` ([beat, spot]: rl, ru, lu, ll, c beside you)
     // and throws the boxes he loads; he switches the radio off at `radio`; while he talks (`talk`) the camera comes in.
-    mid: { at: 0, zoom: [57, 62], keys: 70, from: 0, radio: 56, boombox: 61.5, talk: [146, 204], guide: [66, 100], tags: [72, 88, 100], upTags: [[124, 132, 140]],
+    mid: { at: 0, zoom: [56.6, 60.9], keys: 70, from: 0, radio: 56, boombox: 62.6, talk: [146, 204], guide: [66, 100], tags: [72, 88, 100], upTags: [[124, 132, 140]],
       // the floor shouts (sound and ad-lib): a gang 'hey!' on the drop, in the band's stop and through the last run, 'yeah!'
       // when the horns come back, a brass fanfare (landing half a beat after its entry) on the second drop and the last hit
       shouts: [[76, 'hey', '헤이!'], [108, 'hey', '헤이!'], [142.5, 'hey', '헤이!'], [208, 'yeah', '예에~!'], [239.5, 'fanfare', '빠바밤~!'],
@@ -798,10 +798,10 @@ const LEVELS = [
     // the phases on screen: line 3's lamps broken until the drop (broken, gloom), line 4's lamps clicking on as it is revealed
     // (lineOn), a flash and a jolt on both drops, the second drop's run in amber, the last hit frozen and the lamps going out
     broken: [[0, 76]],
-    phaseFx: { gloom: [0, 76], blackout: [56, 58], lineOn: [59, 60, 61.5], drop: 76, drop2: 240, amber: [[240, 312]], last: 319, out: [320.4, 321.1, 321.8] },
+    phaseFx: { gloom: [0, 76], blackout: [56, 58], lineOn: [59, 60, 61], drop: 76, drop2: 240, amber: [[240, 312]], last: 319, out: [320.4, 321.1, 321.8] },
     // phase 1 is quiet (반장 thinks the night will be). 마르코's entrance: the radio cut with a breaker and the floor black
     // (blackout), then three breakers, 탁 탁 탁, his line's lamps flickering on one by one (lineOn); the lamps going out at the end
-    sfx: [[56, 'switchOff'], [58, 'switchOn'], [59, 'switchOn'], [60, 'switchOn'], [61.5, 'switchOn'], [320.4, 'lampOff'], [321.1, 'lampOff'], [321.8, 'lampOff']],
+    sfx: [[0, 'radioOn'], [56, 'switchOff'], [58, 'switchOn'], [59, 'switchOn'], [60, 'switchOn'], [61, 'switchOn'], [320.4, 'lampOff'], [321.1, 'lampOff'], [321.8, 'lampOff']],
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     // wide windows: this is played on phones (딱 ±80 ms, 좋아 ±150 ms, past 220 ms a miss)
     win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 319,
@@ -811,8 +811,8 @@ const LEVELS = [
     // 'b' 반장, 'v' 마르코 (no speaker: 반장 in phase 1, his bubble at the left)
     say: [[6, '…하나 빠지니까 티 나네.', 3.5], [22, '…오히려 적적하니 좋네.', 4],
           [38.5, '신입, 여유롭지?', 3.5], [50.5, '…왠지 오늘은 조용할 거 같구만.', 3.5],
-          [56, '(라디오가 뚝 끊긴다) …어?', 1.5],
-          [57, '헤이헤이헤이~! 그 노래 너무 졸려요! 3·4 통합 라인, 개통!', 3, 0, 'v'], [60, '음악부터 깔고! 뮤직, 큐!', 2.5, 0, 'v'], [64.5, '…저 양반이 4라인 에이스냐.', 2.5, 0, 'b'],
+          [56.4, '(라디오가 뚝 끊긴다) …어? 이게 뭐야?', 1.5],
+          [61.05, '헤이헤이헤이~! 3·4 통합 라인, 개통!', 1.1, 0, 'v'], [62.2, '그 노래 너무 졸려요! 음악부터 깔고, 뮤직 큐!', 1.4, 0, 'v'], [64.5, '…저 양반이 4라인 에이스냐.', 2.5, 0, 'b'],
           [68, '신입! 왼손은 반장님 거, 오른손은 내 거!', 3.5, 0, 'v'], [80, '그렇지! 쿵, 짝! 쿵, 짝!', 3, 0, 'v'],
           [96, '…시끄러운 게 하나 붙었네.', 3, 0, 'b'], [104, '조금만 양념 칠게요~', 3, 0, 'v'],
           [120, '위 벨트도 우리 거예요! 위!', 3, 0, 'v'],
@@ -827,7 +827,8 @@ const LEVELS = [
     intro: [
       { who:'', text:'하은이 그만둔 뒤로 3라인은 늘 늦다. 형광등도 반은 나갔다. 새벽 2시 40분.' },
       { who:'', text:'게시판에 새 공지가 붙었다. 인력 감축. 오늘부터 3·4라인 통합.' },
-      { who:'반장', text:'…일단은 우리 것부터 한다. 아무 손이나 편한 걸로.' }],
+      { who:'반장', text:'…일단은 우리 것부터 한다. 아무 손이나 편한 걸로.' },
+      { who:'반장', text:'오늘은 라디오나 틀고 할까?' }],
     outro: good => good ? [
       { who:'', text:'새벽 5시. 합친 라인이 제시간에 멈췄다.' },
       { who:'반장', text:'…사람 빼고 더 빨라졌다고 위에서 좋아하겠네.' },
@@ -5287,6 +5288,7 @@ function levelSfx(t, kind) {
   if (kind === 'clank') { osc('square', 760, t, 0.001, 0.05, 0.12, bus); osc('square', 1130, t, 0.001, 0.035, 0.09, bus); noise(t, 'bandpass', 3200, 0.16, 0.06, 3, bus); noise(t, 'lowpass', 500, 0.12, 0.05, 0.7, bus); }
   // the big switches for 마르코's entrance: a breaker thrown ("탁!": a low thump and a hard click), on: the tube's flicker
   // ticking and its hum coming up; off: the hum dying
+  if (kind === 'radioOn') { osc('square', 900, t, 0.0005, 0.06, 0.012, bus); noise(t, 'bandpass', 2400, 0.22, 0.02, 3, bus); noise(t + 0.02, 'bandpass', 1800, 0.05, 0.35, 0.6, bus); return; }
   if (kind === 'switchOn' || kind === 'switchOff') {
     const o = osc('sine', 95, t, 0.001, 0.4, 0.12, bus); o.frequency.exponentialRampToValueAtTime(48, t + 0.1);
     noise(t, 'bandpass', 2600, 0.42, 0.025, 2.5, bus); osc('square', 1700, t, 0.0005, 0.07, 0.015, bus); noise(t, 'lowpass', 700, 0.25, 0.06, 0.8, bus);
