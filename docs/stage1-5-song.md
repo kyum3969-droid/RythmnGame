@@ -551,3 +551,46 @@ Structure (one bar = 1.64 seconds):
 **v2와 바뀐 가사**: 1절 첫 줄은 지우 대사를 따옴표로 인용하던 걸 "Why so cold, did the night shift steal my heart? / That's what they say"로(이름과 인용 빼기), "while you watch it drop" → "and the boxes never drop", 2절 "you're careless" → "I'm careful", "I'm still not drowning" → "I keep on counting", "one more drop" → "one more box on the top", "Every second you waste" → "Every second on the clock". 91마디 상자는 "drop" 단어 자리 그대로라 차트는 같다.
 
 **그래도 막히면**: (1) 가사 블록의 1절 첫 두 줄을 빼 본다, (2) 맨 앞 문장에서 "drill-style"을 "dark trap"으로, (3) 그래도 안 되면 B로 비트를 받고 그 비트로 랩을 다시 요청한다.
+
+### 결승 곡 v4: 짧은 프롬프트
+
+v3을 줄인 것. 구조는 마디 수만 한 줄로 적었다(시간은 146 BPM이면 저절로 맞음).
+
+```
+Cinematic dark trap anthem, one confident female rapper, English, clean. A night-shift worker keeping perfect time. 146 BPM, half-time (snare on 3), A minor, 1:05. Trap drums, gliding 808 (A, G#, F#, E), dark piano, strings, a ticking clock throughout.
+
+Bars: intro 4 (no vocals, building, a breath of silence) / chant 6 (one line every 2 bars) / verse 10 (one line per bar) / break 2 (one hit, then only the clock) / full beat 6 / drop-out 3 (no drums, chant softly) / fast verse 8 (double time). Ends abruptly mid-line, no fade.
+
+[Chant]
+Tick-tock on the line, and nobody's gonna stop (x3)
+
+[Verse]
+Why so cold, did the night shift steal my heart?
+That's what they say, so let me take it from the start
+Every time it starts, I'm the one who has to finish
+You play, I pay. That's the difference.
+You don't know what I need, you don't know what I've seen
+You stay up on the stage, I'll stay down at the machine
+You wanted a beat? Then listen to mine
+Every box on my line lands right on time
+Call me stiff, call me slow, say I live by the clock
+But the clock keeps the line moving, and the boxes never drop
+
+[Full beat]
+Tick! Tock! (on every beat)
+
+[Drop-out]
+Tick-tock on the line, and nobody's gonna stop (x2)
+
+[Fast verse]
+Throw it, I catch it, I'm careful, I'm counting
+Your beat on my belt and I keep on counting
+Can't keep up? Watch me, one more box on the top
+Every second on the clock is a second I've got
+Go on, send another, I'll catch every one
+I was here before the night, I'll be here when it's done
+Count it with me now, one, two, three, four
+Tick-tock on the line and I'm not done, I'm not
+```
+
+비트만: 첫 문단과 `Bars:` 줄만 쓰고 "one confident female rapper, English, clean"을 "instrumental, no vocals"로.
