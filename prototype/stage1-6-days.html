@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>1-6 빈자리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* 1-6 빈자리 (a cutscene, no play): the nights 하은 doesn't come, on 3번 라인 in the same frame as the 1-7 cutscene; then 1-7's
+   opening: 반장 and 하은 at the belt, the heartbeat tutorial, and on into the cutscene (cutscene-1-6.html). */
+:root{
+  --night:#15110e; --panel:#1f1915; --line:#3a2f28; --ink:#efe6d2; --muted:#a6978a; --accent:#d9a520; --vest:#f07a2a; --vest-dark:#9c4512;
+  --display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--night:#15110e}}
+:root[data-theme="dark"]{--night:#15110e}
+[hidden]{display:none!important}
+html,body{min-height:100%} body{box-sizing:border-box;margin:0}
+body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding:10px 16px;
+  display:flex;flex-direction:column;align-items:center;min-height:100dvh}
+.page{width:min(100%,calc((100dvh - 110px) * 16 / 9));max-width:100%;display:flex;flex-direction:column;gap:8px;margin-block:auto}
+.stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:#000;
+  box-shadow:0 0 0 1px #000,0 0 40px rgba(0,0,0,.6);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.stage canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:16px;
+  background:radial-gradient(ellipse at 50% 30%,rgba(255,233,168,.08),transparent 60%),rgba(8,6,5,.9)}
+.cover .k{font:500 clamp(11px,1.6vw,13px) var(--mono);letter-spacing:.14em;color:var(--muted)}
+.cover h1{margin:0;font:400 clamp(30px,6.4vw,60px)/1 var(--display);letter-spacing:.01em}
+.cover p{margin:0;max-width:34em;color:#cfc3b4;font-size:clamp(12px,1.7vw,15px)}
+.go{font:400 clamp(16px,2.4vw,20px)/1 var(--display);background:var(--vest);color:#1b120c;border:0;border-radius:3px;padding:.6em 1.2em;
+  box-shadow:0 3px 0 var(--vest-dark);cursor:pointer;text-decoration:none;display:inline-block}
+.go:active{transform:translateY(2px);box-shadow:0 1px 0 var(--vest-dark)}
+.go:focus-visible,.btn:focus-visible{outline:3px solid #ffe9a8;outline-offset:3px}
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{font:600 14px var(--body);min-height:36px;padding:0 14px;border-radius:3px;border:0;background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.help{margin:0;font-size:12.5px;color:var(--muted)} .help b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="stage" id="stage">
+    <canvas id="cv" width="1152" height="648" aria-label="1-6 빈자리: 하은이 나오지 않는 며칠 밤, 3번 라인의 빈자리"></canvas>
+    <div class="cover" id="title">
+      <div class="k">STAGE 1 · 1-6 · 컷씬</div>
+      <h1>빈자리</h1>
+      <p>1-5 다음 날부터. 하은이 나오지 않는다.</p>
+      <button class="go" id="start" type="button">▶ 재생</button>
+    </div>
+    <div class="cover" id="end6" hidden>
+      <div class="k">1-6 끝</div>
+      <h1>1-7 하은의 새벽</h1>
+      <p>오프닝 대화, 심박 튜토리얼, 그리고 컷씬으로 이어집니다.</p>
+      <button class="go" id="to7" type="button">1-7 시작 ▸</button>
+    </div>
+    <div class="cover" id="end7" hidden>
+      <div class="k">1-7 · 심박 튜토리얼 끝</div>
+      <h1>하은의 새벽</h1>
+      <p id="tutres"></p>
+      <a class="go" id="tocut" href="cutscene-1-6.html">컷씬으로 ▸</a>
+    </div>
+  </div>
+  <div class="bar">
+    <button class="btn" id="r6" type="button">1-6 처음부터</button>
+    <button class="btn" id="r7" type="button">1-7 오프닝부터</button>
+    <a class="btn" href="cutscene-1-6.html">1-7 컷씬 바로 열기</a>
+    <p class="help">1-7 대화는 클릭이나 <b>Enter</b>로 넘김. 심박은 <b>넷째 박</b>에 화면을 누르거나 Space·J·F·K·D.</p>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const W = 384, H = 216, SC = 3;
+// the same frame as the 1-7 cutscene: the picture 20 px higher than the game's screen, a black bar along the bottom from y 141
+const CROP = 20, BAR_TOP = 141, LETTERBOX = { bottom: 148 };
+const cv = $('cv'), out = cv.getContext('2d');
+const wb = document.createElement('canvas'); wb.width = W; wb.height = H; const wctx = wb.getContext('2d');
+const SPR_W = 64, SPR_H = 96, SPR_CX = 32, SPR_TOP = 24;
+const sb = document.createElement('canvas'); sb.width = SPR_W; sb.height = SPR_H; const sctx = sb.getContext('2d');
+const rb = document.createElement('canvas'); rb.width = SPR_W; rb.height = SPR_H; const rctx = rb.getContext('2d');
+let g = wctx;
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+const lerp = (a, b, p) => a + (b - a) * p;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease = p => p <= 0 ? 0 : p >= 1 ? 1 : p * p * (3 - 2 * p);
+const seg = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+const rnd = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
+const thick = (x1, y1, x2, y2, s, c) => { const d = Math.max(1, Math.hypot(x2 - x1, y2 - y1)); for (let k = 0; k <= d; k++) { const p = k / d; R(lerp(x1, x2, p) - s / 2, lerp(y1, y2, p) - s / 2, s, s, c); } };
+const hex = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+const mix = (a, b, p) => { const A = hex(a), B = hex(b); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], p))).join(',')})`; };
+const C = {
+  kraft:'#c48b52', kraftTop:'#d9a468', kraftDark:'#8f6236', tape:'#e6c88f', ink:'#1b1716', skin:'#d9a27a', skinDark:'#b98260',
+  laser:'#ff4a3d', ok:'#8fd694', belt:'#38302c', slat:'#2a2320', face:'#171312', metal:'#6a7075',
+  hoodie:'#2f4f58', vest2:'#cfe04a', reflect:'#ebe5c9', hairDark:'#1e1a1a', label:'#efe6d2'
+};
+const SCAN_X = 300, BELT_Y = 146, HX = 222, HTOP = 106, JX = 262, PLAYER_X = 340, BOSS_X = 132;
+const SK = ['#d9a27a', '#e3b48f', '#c99470', '#b8825e'];
+let FACE_LINE = null, JFLOWERS = false, WHO = 'haeun', JPOSE = null;
+
+// ---------- the room as the cutscene draws it (its own code), with the hour, the tubes, the belt and the laser set per shot ----------
+const MARK = 29.25, SLOPE = 0.5;
+const lay = (d, f) => q => q - d * f + HX;
+const TUBE_Q = [-158, -38, 82];
+const S1 = { tubesOff: [-99, -99, -99], laserOff: 1e9 };
+let SUNK = 0, TUBEK = [1, 1, 1], RUN = 0;
+const sunAt = () => SUNK, tubeOn = k => TUBEK[k], beltRun = () => RUN;
+const GATES = [78, 338], BELT_END = -174;
+const inShaft = (px, py, x, y, w) => { if (py < y) return 0; const s = (py - y) * SLOPE, a = x - s, b = x + w - s; return px < a || px > b ? 0 : Math.min(1, (px - a) / 6, (b - px) / 6); };
+function drawWindow(x, y, w, h, k) {
+  R(x - 2, y - 2, w + 4, h + 4, '#3a2f28');
+  const hh = h >> 1;
+  R(x, y, w, hh, mix('#2b3550', '#fff0c4', k)); R(x, y + hh, w, h - hh, mix('#232b44', '#ffd690', k));
+  for (let mx = x + 15; mx < x + w - 4; mx += 16) R(mx, y, 2, h, '#3a2f28');
+  R(x, y + hh - 1, w, 2, '#3a2f28');
+  for (let i = 0; i < 5; i++) R(x + 2 + Math.floor(rnd(x + i, 7) * (w - 4)), y + 1 + Math.floor(rnd(x + i, 8) * (h - 2)), 1, 1, mix('#1c2238', '#e8c27a', k));
+}
+function shaft(x, y, w, yEnd, a) {
+  if (a <= 0.005) return;
+  const dx = (yEnd - y) * SLOPE;
+  const gr = g.createLinearGradient(0, y, 0, yEnd); gr.addColorStop(0, `rgba(255,206,140,${a})`); gr.addColorStop(1, `rgba(255,190,120,${a * 0.18})`);
+  g.fillStyle = gr; g.beginPath(); g.moveTo(x, y); g.lineTo(x + w, y); g.lineTo(x + w - dx, yEnd); g.lineTo(x - dx, yEnd); g.closePath(); g.fill();
+  // a softer, wider halo around it
+  const gr2 = g.createLinearGradient(0, y, 0, yEnd); gr2.addColorStop(0, `rgba(255,190,130,${a * 0.35})`); gr2.addColorStop(1, 'rgba(255,190,130,0)');
+  g.fillStyle = gr2; g.beginPath(); g.moveTo(x - 6, y); g.lineTo(x + w + 6, y); g.lineTo(x + w + 14 - dx, yEnd); g.lineTo(x - 14 - dx, yEnd); g.closePath(); g.fill();
+}
+function dust(t, shafts, a, area) {
+  if (a <= 0.01) return;
+  for (let i = 0; i < 90; i++) {
+    const x = area.x + ((rnd(i, 1) * area.w + t * (2 + rnd(i, 2) * 3) * (rnd(i, 5) < 0.5 ? -1 : 1) - (area.ox || 0)) % area.w + area.w) % area.w;
+    const y = area.y + rnd(i, 3) * area.h + Math.sin(t * (0.4 + rnd(i, 4) * 0.5) + i) * 3 - t * 0.8;
+    let m = 0; for (const s of shafts) m = Math.max(m, inShaft(x, y, s.x, s.y, s.w));
+    if (m <= 0) continue;
+    const tw = 0.5 + 0.5 * Math.sin(t * (1.5 + rnd(i, 6) * 2) + i * 3);
+    g.globalAlpha = a * m * (0.35 + 0.65 * tw); R(x, y, 1, 1, '#fff1c8');
+  }
+  g.globalAlpha = 1;
+}
+function ambient(color, holes = []) {
+  if (color === '#ffffff') return;
+  g.save(); g.globalCompositeOperation = 'multiply'; g.fillStyle = color; g.beginPath(); g.rect(0, 0, W, H);
+  for (const [x, y, w, h] of holes) g.rect(x + w, y, -w, h);
+  g.fill('evenodd'); g.restore();
+}
+function glow(x, y, r, rgb, a) { if (a <= 0.005) return; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
+function interior(d, t) {
+  const wl = lay(d, 0.7), sun = sunAt(t);
+  R(0, 0, W, H, '#231b17');
+  // ceiling band with its trusses, the high windows, the tubes (the first three lit until they click off)
+  R(0, 0, W, 34, '#191311');
+  for (let q = -240; q < 900; q += 48) { const x = Math.round(wl(q)); if (x > -4 && x < W) R(x, 0, 3, 34, '#211915'); }
+  R(0, 34, W, 2, '#2e241f');
+  const wins = [], tubes = [];
+  for (let q = -342; q < 900; q += 120) {
+    const x = Math.round(wl(q)); if (x > -60 && x < W + 10) { drawWindow(x, 5, 50, 22, sun); wins.push([x, 5, 50, 22]); }
+    const tq = q + 64, tx = Math.round(wl(tq)), k = TUBE_Q.indexOf(tq), on = k >= 0 ? tubeOn(k, t) : 0;
+    if (tx > -50 && tx < W) {
+      const fl = k >= 0 && t > S1.tubesOff[k] - 0.18 && t < S1.tubesOff[k] && Math.sin(t * 90 + k) > 0.2;
+      R(tx + 4, 0, 1, 13, '#3a332c'); R(tx + 41, 0, 1, 13, '#3a332c'); R(tx - 2, 13, 50, 2, '#3a332c'); R(tx, 15, 46, 3, on > 0.5 && !fl ? '#fff3c8' : '#5d5446');
+      if (on > 0) tubes.push([tx, on]);
+    }
+  }
+  // the wall's seams and the racks of boxes
+  for (let q = -198; q < 900; q += 64) { const x = Math.round(wl(q)); if (x >= 0 && x < W) R(x, 36, 1, 132, '#2a211c'); }
+  for (let q = -156; q < 900; q += 180) {
+    const x0 = Math.round(wl(q)); if (x0 > W || x0 + 150 < 0) continue;
+    R(x0, 44, 3, 124, '#41332a'); R(x0 + 147, 44, 3, 124, '#41332a');
+    for (const y of [64, 100, 136]) {
+      let x = x0 + 5, sd = q * 7 + y + 1000;
+      while (x < x0 + 134) { const bw = 9 + Math.floor(rnd(sd, 3) * 12), bh = 8 + Math.floor(rnd(sd, 4) * 16), c = ['#5b4330', '#4f3a2a', '#66503a'][Math.floor(rnd(sd, 5) * 3)];
+        R(x, y - bh, bw, bh, c); R(x, y - bh, bw, 1, '#76604a'); R(x + (bw >> 1), y - bh, 1, bh, '#6e5a42'); x += bw + 2 + Math.floor(rnd(sd, 6) * 5); sd++; }
+      R(x0, y, 150, 3, '#4a3a2f'); R(x0, y + 3, 150, 1, '#1d1714');
+    }
+  }
+  // the 3라인 sign
+  const sg = Math.round(wl(-42)); R(sg + 6, 36, 1, 8, '#4a4038'); R(sg + 20, 36, 1, 8, '#4a4038'); R(sg, 44, 27, 15, '#d9a520'); R(sg, 58, 27, 1, '#8a6a12');
+  ['111', '001', '111', '001', '111'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') R(sg + 10 + x * 2, 46 + y * 2, 2, 2, '#1d1815'); }));
+  // the floor and its painted walkway; the boxes stacked at the loading end
+  R(0, 168, W, 48, '#18120f'); R(0, 168, W, 1, '#2e241f');
+  const fl = lay(d, 1.15); for (let q = -238; q < 900; q += 14) { const x = Math.round(fl(q)); if (x > -8 && x < W) R(x, 200, 8, 3, '#c99a1e'); }
+  const st = lay(d, 1.0), sx0 = Math.round(st(-222));
+  if (sx0 > -40) {
+    R(sx0, 158, 34, 4, '#6b4a2e'); R(sx0, 162, 34, 2, '#4a3220'); R(sx0 + 2, 164, 4, 4, '#4a3220'); R(sx0 + 28, 164, 4, 4, '#4a3220');
+    const sbx = (x, y) => { R(x, y, 15, 13, C.kraft); R(x, y, 15, 2, C.kraftTop); R(x + 13, y + 2, 2, 11, C.kraftDark); R(x + 6, y, 3, 13, C.tape); };
+    sbx(sx0 + 1, 145); sbx(sx0 + 17, 145); sbx(sx0 + 1, 132); sbx(sx0 + 17, 132); sbx(sx0 + 9, 119);
+  }
+  return { wins, tubes };
+}
+function lineBelt(d, t, front) {
+  const bl = lay(d, 1.0), run = beltRun(t), laser = t < S1.laserOff;
+  if (!front) { for (const q of GATES) { const x = Math.round(bl(q)); if (x > -20 && x < W + 20) { R(x - 11, 108, 4, 40, '#555a5f'); R(x - 11, 105, 24, 5, C.metal); R(x - 2, 110, 6, 3, '#2b2e31'); } } return; }
+  const x0 = Math.max(0, Math.round(bl(BELT_END)));
+  if (x0 < W) {
+    R(x0, BELT_Y, W - x0, 4, C.belt); R(x0, BELT_Y, W - x0, 1, '#4a403b');
+    const k0 = Math.floor((BELT_END - run) / MARK), k1 = Math.ceil((W - HX + d - run) / MARK);
+    for (let k = k0; k <= k1; k++) { const x = Math.round(bl(k * MARK + run)); if (x < x0 + 1 || x >= W) continue; const q = ((k % 4) + 4) % 4;
+      if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); } else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44'); else R(x, BELT_Y + 1, 1, 3, C.slat); }
+    R(x0, BELT_Y + 4, W - x0, 12, C.face);
+    for (let q = Math.floor((BELT_END - run % 14) / 14) * 14; q < W - HX + d + 14; q += 14) { const x = Math.round(bl(q + run % 14)); if (x >= x0 + 2 && x < W) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); } }
+    R(x0, BELT_Y + 15, W - x0, 1, '#0c0a09');
+    for (let q = BELT_END + 22; q < 1000; q += 80) { const x = Math.round(bl(q)); if (x > -4 && x < W) R(x, BELT_Y + 16, 4, 10, '#2b2422'); }
+    const ex = Math.round(bl(BELT_END - 4)); if (ex > -6) R(ex, BELT_Y - 1, 5, 17, '#3d3431');
+  }
+  GATES.forEach((q, i) => { const x = Math.round(bl(q)); if (x < -20 || x > W + 20) return; const on = laser && i === 0;
+    if (on) { g.globalAlpha = 0.22; R(x - 2, 113, 5, 33, C.laser); g.globalAlpha = 1; }
+    R(x + 8, 108, 4, 56, '#7b8288'); R(x + 8, 108, 4, 2, '#9aa1a6'); R(x, 113, 1, 33, on ? C.laser : '#3a2422'); R(x + 2, 103, 5, 2, on ? '#5a2b27' : '#2b2422'); });
+}
+function haeun(cx, top, o = {}) {
+  const hair = '#17121a', hairL = '#2e2630', shirt = '#1e1a1a', shirtD = '#121010', cap = '#d8463b', capD = '#a83328', brim = '#c43d33', sky = '#86c3e8', tee = '#e9f3f7', leg = '#3a3f45', shoe = '#1e1a1a';
+  const look = o.look || 0, sw = o.sway || 0;
+  const hx = look < -0.5 ? -1 : 0, hy = look < -0.25 ? Math.round(-look * 2) : look > 0.5 ? -1 : 0, tilt = look < -0.5 ? 1 : look > 0.5 ? -1 : 0;
+  g.save(); if (o.mirror) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
+  // legs: sitting (the lap on a chair, shins down), standing, or walking one leg at a time (o.stride = { leg: 0 near / 1 far, p: 0..1 through the step }): the moving
+  // leg lifts and swings forward in an arc and sets down, the other stays planted; the next step it's the other leg's turn
+  const sw_ = o.stride ? Math.sin(Math.PI * o.stride.p) : 0, fwd = Math.round(3 * sw_), lift = Math.round(2 * sw_);
+  const nx = o.stride && o.stride.leg === 0 ? -fwd : 0, ny = o.stride && o.stride.leg === 0 ? -lift : 0;
+  const fx_ = o.stride && o.stride.leg === 1 ? -fwd : 0, fy_ = o.stride && o.stride.leg === 1 ? -lift : 0;
+  if (o.seated) { R(cx - 8, top + 36, 15, 6, leg); R(cx - 9, top + 42, 4, 11, leg); R(cx - 3, top + 42, 4, 11, leg); R(cx - 11, top + 52, 6, 3, shoe); R(cx - 4, top + 52, 6, 3, shoe); }
+  else {
+    R(cx + 2 + fx_, top + 38, 5, 15 + fy_, leg); R(cx + 2 + fx_, top + 52 + fy_, 6, 3, shoe);
+    R(cx - 5 + nx, top + 38, 5, 16 + ny, leg); R(cx - 6 + nx, top + 53 + ny, 6, 3, shoe);
+  }
+  // only the back hair: long and straight, falling down her back past the shoulders (nothing in front of the face)
+  R(cx + 6 + sw, top + 14, 4, 18, hair); R(cx + 8 + sw, top + 16, 1, 12, hairL);
+  // sky-blue tee with the white stripe over black sleeves, black bottoms
+  R(cx - 7, top + 16, 14, 23, shirt); R(cx - 7, top + 15, 14, 16, sky); R(cx - 7, top + 27, 14, 2, tee); R(cx - 7, top + 30, 14, 9, shirtD);
+  // the head, smaller than the rest of the cast (a 10x12 face under a 12-wide cap, chin where theirs is). Tipped down it sinks
+  // two pixels into the collar and leans one forward.
+  const fx = cx + hx, ft = top + hy;
+  if (o.headFront) {
+    // the head turned to us, halfway through turning round: the cap square on, its brim straight across, the shadow under it,
+    // nose and mouth in the middle (no face line: that is her profile's edge)
+    R(fx - 5, ft + 3, 10, 12, C.skin);
+    R(fx - 6, ft, 12, 6, cap); R(fx - 5, ft - 1, 10, 1, cap); R(fx - 6, ft + 5, 12, 1, capD); R(fx - 1, ft - 2, 2, 1, capD); R(fx - 2, ft + 1, 4, 2, '#f4e6e0');
+    R(fx - 8, ft + 5, 16, 2, brim); R(fx - 8, ft + 5, 16, 1, cap); R(fx - 8, ft + 7, 16, 1, capD);
+    R(fx - 5, ft + 8, 10, 2, '#3a2622'); R(fx - 5, ft + 10, 10, 1, '#8a5a44');
+    R(fx - 1, ft + 11, 2, 1, '#b07a58'); R(fx - 1, ft + 13, 2, 1, '#b2565a');
+    FACE_LINE = null;
+  } else {
+    R(fx + 3, ft + 3, 4, 12, hair);   // the back of her head under the cap, running into the hair down her back
+    R(fx - 5, ft + 3, 10, 12, C.skin);
+    R(fx - 6, ft, 12, 6, cap); R(fx - 5, ft - 1, 10, 1, cap); R(fx - 6, ft + 5, 12, 1, capD); R(fx - 2, ft - 1, 1, 7, capD); R(fx - 1, ft - 2, 2, 1, capD);
+    R(fx - 5, ft + 1, 3, 2, '#f4e6e0');
+    // the brim: its tip dips with the head or tilts up with it
+    R(fx - 9, ft + 4, 3, 2, brim); R(fx - 9, ft + 4, 3, 1, cap); R(fx - 9, ft + 6, 3, 1, capD);
+    R(fx - 13, ft + 4 + tilt, 4, 2, brim); R(fx - 13, ft + 4 + tilt, 4, 1, cap); R(fx - 13, ft + 6 + tilt, 4, 1, capD);
+    // the cap's shadow over the eyes, always: deep under the brim, softening down to the cheeks
+    R(fx - 5, ft + 6, 10, 3, '#3a2622'); R(fx - 5, ft + 9, 10, 1, '#8a5a44');
+    // a thin dark line down the front of her face, from under the brim to the chin
+    R(fx - 6, ft + 6, 1, 9, '#1b1716');
+    FACE_LINE = { x: o.mirror ? 2 * cx - (fx - 6) - 1 : fx - 6, y: ft + 6, h: 9 };   // where it lands on the sheet, so the rim light leaves it dark
+    R(fx - 3, ft + 10, 2, 1, '#b07a58'); R(fx - 3, ft + 12, 2, 1, '#b2565a');
+  }
+  // arms, hung from the shoulders at the sides of her body (3 px sleeves, 3 px hands)
+  const arm = (sx, hx, hy) => { thick(sx, top + 17, hx, hy, 3, shirt); R(hx - 1, hy - 1, 3, 3, C.skin); };
+  if (o.arms === 'belt') {
+    const ly = Math.round((o.tap || 0) * 9);
+    arm(cx - 8, cx - 12, top + 38 - ly); arm(cx + 8, cx + 10, top + 38);
+  } else if (o.arms === 'walk') {
+    // both arms swing a little, opposite each other: fN = how far the near hand is forward (toward where she faces), fF = how
+    // far the far hand is back. The hand that is two pixels out lifts one.
+    const fN = Math.round(o.fN || 0), fF = Math.round(o.fF || 0);
+    arm(cx + 8, cx + 8 + fF, top + 31 - (fF <= -2 ? 1 : 0));
+    arm(cx - 8, cx - 8 - fN, top + 31 - (fN >= 2 ? 1 : 0));
+  } else if (o.arms === 'reach') {
+    // the near hand out to a point (o.reach: how far from her own centre and top, before any mirroring), the other in her lap
+    arm(cx + 8, cx + 6, top + 33); arm(cx - 8, cx + o.reach.dx, top + o.reach.dy);
+  } else if (o.arms === 'strap') {
+    // the near hand goes up to a strap (o.strap 0..1 on the way up)
+    const k = ease(o.strap || 0);
+    arm(cx + 8, cx + 8, top + 31); arm(cx - 8, Math.round(lerp(cx - 8, cx - 10, k)), Math.round(lerp(top + 31, top - 2, k)));
+  } else if (o.arms === 'watch') {
+    // the near wrist brought up in front of her to read the watch (o.watch 0..1 on the way up)
+    const k = ease(o.watch || 0), hx = Math.round(lerp(cx - 8, cx - 4, k)), hy = Math.round(lerp(top + 31, top + 25, k));
+    arm(cx + 8, cx + 8, top + 31); arm(cx - 8, hx, hy); if (k > 0.5) R(hx - 1, hy - 3, 3, 2, '#d8dde0');
+  } else {
+    arm(cx + 8, cx + 8, top + 31); arm(cx - 8, cx - 8, top + 31);
+  }
+  g.restore();
+}
+function jiwooFig(cx, top, o = {}) {
+  const hood = '#6b2f3f', hoodD = '#4a2030', skin = '#d9a27a', jean = '#3c4a66', shoe = '#e8e4dc', ink = '#1b1716';
+  const look = o.look || 0, down = look < -0.2 ? 1 : 0, up = look > 0.5 ? 1 : 0;
+  g.save(); if (o.mirror) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
+  const sw_ = o.stride ? Math.sin(Math.PI * o.stride.p) : 0, fwd = Math.round(3 * sw_), lift = Math.round(2 * sw_);
+  const nx = o.stride && o.stride.leg === 0 ? -fwd : 0, ny = o.stride && o.stride.leg === 0 ? -lift : 0, fx_ = o.stride && o.stride.leg === 1 ? -fwd : 0, fy_ = o.stride && o.stride.leg === 1 ? -lift : 0;
+  R(cx + 1 + fx_, top + 38, 5, 15 + fy_, jean); R(cx + 1 + fx_, top + 52 + fy_, 7, 3, shoe);
+  R(cx - 5 + nx, top + 38, 5, 16 + ny, jean); R(cx - 7 + nx, top + 53 + ny, 7, 3, shoe);
+  const arm = (sx, hx, hy) => { thick(sx, top + 18, hx, hy, 3, hood); R(hx - 1, hy - 1, 3, 3, skin); };
+  const fl = o.flowers || JFLOWERS;
+  if (!fl && o.arms !== 'reach' && o.arms !== 'strap') { if (o.arms === 'walk') arm(cx + 7, cx + 7 + Math.round(o.fF || 0), top + 31); else arm(cx + 7, cx + 7, top + 31); }   // the far arm
+  R(cx - 7, top + 16, 14, 24, hood); R(cx - 7, top + 37, 14, 3, hoodD); R(cx - 3, top + 18, 1, 7, '#e8e4dc');
+  R(cx - 9, top - 2, 18, 20, hood); R(cx - 9, top - 2, 18, 2, hoodD); R(cx + 5, top + 16, 4, 2, hoodD);
+  R(cx - 6, top + 3 - up, 10, 12, skin); R(cx - 6, top + 3 - up, 10, 2 + down, '#1e1a1a');
+  R(cx - 4, top + 8 + down - up, 2, down ? 1 : 2, ink); R(cx - 4, top + 12 + down - up, 2, 1, '#9a5a50');
+  for (let k = 0; k < 7; k++) R(cx - 5 + (k % 2), top + 13 + k, 1, 1, '#f4f1ea');   // the earbud's wire
+  // the flowers in front of him, the near hand on the cone (or the far one, while the near hand knocks or reaches)
+  const flowers = (bx, by) => { for (let r = 0; r < 18; r++) { const w = Math.round(12 - r * 0.55); R(bx - Math.floor(w / 2), by + 4 + r, w, 1, r % 5 === 0 ? '#cbbd9e' : '#e8dcc4'); } R(bx - 3, by + 13, 6, 2, '#d8463b');
+    for (const [dx, dy, c] of [[4, 0, '#4a8a3a'], [-5, 1, '#4a8a3a'], [3, -2, '#f2a6c8'], [-1, -4, '#e86a6a'], [-4, -2, '#ffd27a'], [0, 0, '#f8f4ec'], [-3, 1, '#f2a6c8'], [2, 2, '#ffd27a']]) R(bx + dx - 1, by + dy, 3, 3, c); };
+  if (o.arms === 'reach') { if (fl) { flowers(cx - 11, top + 18); arm(cx + 7, cx - 9, top + 30); } arm(cx - 7, cx + o.reach.dx, top + o.reach.dy); }
+  else if (o.arms === 'strap') { const k = ease(o.strap || 0); if (fl) { flowers(cx - 11, top + 18); arm(cx + 7, cx - 9, top + 30); } else arm(cx + 7, cx + 7, top + 31); arm(cx - 7, Math.round(lerp(cx - 7, cx - 10, k)), Math.round(lerp(top + 31, top - 2, k))); }
+  else if (fl) { flowers(cx - 13, top + 14); arm(cx + 6, cx - 11, top + 30); arm(cx - 6, cx - 13, top + 31); }
+  else if (o.arms === 'walk') arm(cx - 7, cx - 7 - Math.round(o.fN || 0), top + 31);
+  else arm(cx - 7, cx - 7, top + 31);
+  g.restore();
+}
+function person(cx, top, p) {
+  const ink = '#1b1716', shoe = '#1e1a1a', sleeve = p.top;
+  g.save(); if (p.m) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
+  if (p.pack) { R(cx + 5, top + 17, 6, 17, p.pack); R(cx + 5, top + 17, 6, 1, 'rgba(255,255,255,.15)'); }
+  if (p.hair === 'long') R(cx + 1, top + 1, 7, 22, p.hc);
+  // legs: standing, or seated (the lap on the cushion, shins down to the floor)
+  if (p.seated) { R(cx - 7, top + 36, 14, 6, p.bot); R(cx - 5, top + 42, 4, 11, p.bot); R(cx + 1, top + 42, 4, 11, p.bot); R(cx - 6, top + 52, 6, 3, shoe); R(cx + 1, top + 52, 6, 3, shoe); }
+  else { R(cx - 5, top + 38, 5, 16, p.bot); R(cx + 1, top + 38, 5, 15, p.bot); R(cx - 6, top + 53, 6, 3, shoe); R(cx + 1, top + 52, 6, 3, shoe); }
+  R(cx - 7, top + 16, 14, p.seated ? 21 : 23, p.top);
+  if (p.sh) { R(cx - 2, top + 16, 4, 7, p.sh); if (p.tie) R(cx - 1, top + 17, 2, 7, p.tie); }
+  // the head (asleep, it drops forward)
+  const hy = p.sleep ? 2 : 0, hx = p.sleep ? -1 : 0, fx = cx + hx, ft = top + hy;
+  R(fx - 6, ft + 1, 12, 14, p.sk);
+  const hc = p.hc;
+  if (p.hair === 'cap') { R(fx + 2, ft + 2, 4, 7, '#1a1618'); R(fx - 7, ft - 1, 14, 5, hc); R(fx - 12, ft + 3, 6, 2, hc); }
+  else {
+    R(fx - 7, ft - 1, 14, 5, hc); R(fx + 2, ft + 1, 5, p.hair === 'bob' ? 12 : p.hair === 'long' ? 14 : 8, hc);
+    if (p.hair === 'bob' || p.hair === 'long') R(fx - 7, ft + 3, 2, p.hair === 'long' ? 12 : 8, hc);
+    if (p.hair === 'bun') R(fx + 3, ft - 4, 5, 5, hc);
+    if (p.hair === 'grey') R(fx - 7, ft - 1, 14, 2, '#b8b6b0');
+  }
+  if (p.sleep) R(fx - 5, ft + 8, 3, 1, ink); else R(fx - 4, ft + 7, 2, 2, ink);
+  if (p.glasses) { R(fx - 6, ft + 6, 7, 1, '#2a2a2a'); R(fx - 6, ft + 6, 1, 3, '#2a2a2a'); R(fx - 1, ft + 6, 1, 3, '#2a2a2a'); }
+  if (p.mask) { R(fx - 6, ft + 9, 9, 5, '#eef0f2'); R(fx + 3, ft + 9, 3, 1, '#d8dce0'); } else R(fx - 3, ft + 11, 2, 1, '#9a5a50');
+  if (p.buds) R(fx + 3, ft + 8, 2, 2, '#f4f4f0');
+  // arms (3 px sleeves from the shoulders, like 하은)
+  const arm = (sx, hx2, hy2) => { thick(sx, top + 17, hx2, hy2, 3, sleeve); R(hx2 - 1, hy2 - 1, 3, 3, p.sk); };
+  arm(cx + 8, cx + 8, top + (p.seated ? 30 : 31));
+  if (p.act === 'strap') arm(cx - 8, cx - 10, top - 2);
+  else if (p.act === 'phone') { arm(cx - 8, cx - 4, top + 26); R(cx - 6, top + 22, 3, 5, '#1b1d1e'); R(cx - 6, top + 22, 3, 1, '#9fd0ff'); }
+  else if (p.act === 'book') { arm(cx - 8, cx - 3, top + 28); R(cx - 9, top + 24, 9, 6, '#a8443a'); R(cx - 8, top + 25, 7, 4, '#f2eee2'); }
+  else if (p.act === 'reach') arm(cx - 8, p.rx, p.ry);
+  else if (p.act === 'bag') { arm(cx - 8, cx - 8, top + 31); thick(cx - 6, top + 17, cx + 5, top + 31, 1, '#3a2a22'); R(cx + 3, top + 29, 9, 8, p.bag); }
+  else arm(cx - 8, cx - 8, top + (p.seated ? 30 : 31));
+  g.restore();
+}
+function haeunSprite(o) {
+  sctx.clearRect(0, 0, SPR_W, SPR_H); const keep = g; g = sctx;
+  if (WHO === 'jiwoo') { FACE_LINE = null; jiwooFig(SPR_CX, SPR_TOP, JPOSE ? JPOSE(o) : o); } else haeun(SPR_CX, SPR_TOP, o);
+  g = keep;
+}
+function tintSprite(color) {
+  if (color === '#ffffff') return;
+  rctx.globalCompositeOperation = 'source-over'; rctx.clearRect(0, 0, SPR_W, SPR_H); rctx.drawImage(sb, 0, 0);
+  sctx.globalCompositeOperation = 'multiply'; sctx.fillStyle = color; sctx.fillRect(0, 0, SPR_W, SPR_H);
+  sctx.globalCompositeOperation = 'destination-in'; sctx.drawImage(rb, 0, 0); sctx.globalCompositeOperation = 'source-over';
+}
+function putSprite(x, top) { g.drawImage(sb, Math.round(x) - SPR_CX, Math.round(top) - SPR_TOP); }
+function putRim(x, top, dx, dy, color, a, clipY = H) {
+  if (a <= 0.01) return;
+  rctx.globalCompositeOperation = 'source-over'; rctx.clearRect(0, 0, SPR_W, SPR_H); rctx.drawImage(sb, 0, 0);
+  rctx.globalCompositeOperation = 'source-in'; rctx.fillStyle = color; rctx.fillRect(0, 0, SPR_W, SPR_H);
+  rctx.globalCompositeOperation = 'destination-out'; rctx.drawImage(sb, -dx, -dy); rctx.globalCompositeOperation = 'source-over';
+  if (FACE_LINE) rctx.clearRect(FACE_LINE.x, FACE_LINE.y, 1, FACE_LINE.h);   // (null while her head faces us)
+  g.save(); g.beginPath(); g.rect(0, 0, W, clipY); g.clip(); g.globalAlpha = a; g.drawImage(rb, Math.round(x) - SPR_CX, Math.round(top) - SPR_TOP); g.restore();
+}
+
+// ---------- the people at the line ----------
+function bossSeated() {
+  const cx = BOSS_X, tp = HTOP + 7;
+  person(cx, tp, { hair: 'cap', hc: '#2c3b57', sk: SK[2], top: '#f07a2a', sh: '#6b7073', bot: '#3a3f45', act: 'hang', seated: true, m: true });
+  R(cx - 7, tp + 26, 14, 2, '#ebe5c9'); R(cx + 9, tp + 22, 3, 8, '#3a3f45');
+}
+function bossStanding(x, top, m) { person(x, top, { hair: 'cap', hc: '#2c3b57', sk: SK[2], top: '#f07a2a', sh: '#6b7073', bot: '#3a3f45', act: 'hang', m }); R(x - 7, top + 26, 14, 2, '#ebe5c9'); }
+function player(kick) {
+  const top = 100 + (kick > 0.5 ? 1 : 0), cx = PLAYER_X;
+  R(cx - 9, top + 18, 18, 36, C.hoodie); R(cx - 9, top + 20, 18, 22, C.vest2); R(cx - 9, top + 32, 18, 2, C.reflect);
+  R(cx - 7, top + 14, 15, 5, '#264149'); R(cx - 6, top + 1, 12, 14, C.skin);
+  R(cx - 7, top - 1, 14, 5, C.hairDark); R(cx + 1, top + 1, 6, 10, C.hairDark); R(cx - 4, top + 7, 2, 2, C.ink);
+  const gx = 324 - kick * 4, gy = 117; thick(cx - 6, top + 22, gx + 2, gy + 3, 4, C.hoodie);
+  R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33'); R(gx - 10, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser); R(gx, gy + 2, 3, 3, C.skin);
+}
+const SUB = { hair: 'short', hc: '#2a2220', sk: SK[3], top: '#56603e', bot: '#3a3f45', act: 'hang', m: true, h: 0 };   // the stand-in on 하은's spot
+// walking: legs one at a time, arms swinging opposite (the cutscene's stride)
+const STR = 10;
+function walkPose(d, mirror, look = 0.1) { const k = Math.floor(d / STR), sp = (d / STR) % 1, sw = Math.sin(sp * Math.PI) * (k % 2 ? -1.6 : 1.6); return { mirror, look, arms: 'walk', fN: sw, fF: -sw, stride: { leg: k % 2, p: sp } }; }
+function box(x, y, tint) {
+  const w = 14, h = 12, bx = Math.round(x - w / 2), by = Math.round(y - h);
+  R(bx + 1, Math.round(y), w, 1, 'rgba(0,0,0,.45)');
+  R(bx, by, w, h, C.kraft); R(bx, by, w, 2, C.kraftTop); R(bx + w - 2, by + 2, 2, h - 2, C.kraftDark); R(bx + 6, by, 3, h, C.tape);
+  R(bx + 2, by + h - 6, 6, 4, C.label); for (let k = 0; k < 2; k++) R(bx + 3 + k * 2, by + h - 5, 1, 2, C.ink);
+  if (tint) { g.globalAlpha = 0.35; R(bx, by, w, h, tint); g.globalAlpha = 1; }
+}
+function can(x, y) { R(x, y - 6, 4, 6, '#b8432f'); R(x, y - 6, 4, 1, '#d8d4c8'); R(x, y - 4, 4, 2, '#efe6d2'); R(x + 3, y - 5, 1, 4, '#8a2f22'); }
+
+// one shot of the line: the cutscene's room and belt, the people behind the belt, the boxes, then the room's light over it all
+// S: { sun, tubes, laser, run, boss: 'seat' | {x, top, m}, jiwoo: {x, top, o}, haeun: {x, top, o}, sub: {x, o?}, player, kick, boxes, can, scan }
+function shot(t, S) {
+  g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  SUNK = S.sun; TUBEK = S.tubes; RUN = S.run || 0; S1.laserOff = S.laser ? 1e9 : -1e9;
+  const room = interior(0, t); lineBelt(0, t, false);
+  if (S.boss === 'seat') bossSeated(); else if (S.boss) bossStanding(S.boss.x, S.boss.top, S.boss.m);
+  if (S.sub) person(S.sub.x, HTOP, { ...SUB, ...(S.sub.p || {}) });
+  if (S.jiwoo) jiwooFig(S.jiwoo.x, S.jiwoo.top || HTOP, S.jiwoo.o);
+  if (S.player) player(S.kick || 0);
+  let her = null; if (S.haeun) { haeunSprite(S.haeun.o); putSprite(S.haeun.x, S.haeun.top || HTOP); her = S.haeun; }
+  lineBelt(0, t, true);
+  if (S.can) can(S.can, BELT_Y);
+  for (const b of S.boxes || []) box(b.x, b.y ?? BELT_Y, b.tint);
+  // the gate's front post and its laser again, over the boxes (green as a box is scanned, red on a miss)
+  { const x = SCAN_X, sc = S.scan || 0, ms = S.miss || 0;
+    if (S.laser) { g.globalAlpha = 0.22; R(x - 2, 113, 5, 33, ms > 0 ? '#ff2a1a' : sc > 0 ? C.ok : C.laser); g.globalAlpha = 1; }
+    R(x + 8, 108, 4, 56, '#7b8288'); R(x + 8, 108, 4, 2, '#9aa1a6'); R(x, 113, 1, 33, S.laser ? (ms > 0 ? '#ffd0c8' : sc > 0 ? C.ok : C.laser) : '#3a2422'); R(x + 2, 103, 5, 2, S.laser ? (sc > 0 ? C.ok : '#5a2b27') : '#2b2422'); }
+  // the light (the cutscene's pass, standing still): the tubes' cones, the laser's glow, the dawn over the room, the sun's shafts
+  const dark = 1 - (S.tubes[0] + S.tubes[1] + S.tubes[2]) / 3, sun = S.sun;
+  const shafts = room.wins.map(([x, y, w, h]) => ({ x: x + 1, y: y + h, w: w - 2 }));
+  g.globalCompositeOperation = 'lighter';
+  for (const [x, on] of room.tubes) { const gr = g.createLinearGradient(0, 18, 0, 170); gr.addColorStop(0, `rgba(255,236,170,${0.15 * on})`); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 88, 170); g.lineTo(x - 42, 170); g.closePath(); g.fill(); }
+  if (S.laser) glow(SCAN_X, 130, 18, '255,74,61', 0.12);
+  g.globalCompositeOperation = 'source-over';
+  ambient(mix('#ffffff', '#7685b0', 0.25 + 0.6 * dark), room.wins);
+  g.globalCompositeOperation = 'lighter';
+  for (const s of shafts) shaft(s.x, s.y, s.w, 216, 0.2 * sun);
+  for (const s of shafts) { const y0 = 170, d0 = (y0 - s.y) * SLOPE; g.fillStyle = `rgba(255,200,130,${0.08 * sun})`; g.beginPath(); g.moveTo(s.x - d0, y0); g.lineTo(s.x + s.w - d0, y0); g.lineTo(s.x + s.w - d0 - 23, 216); g.lineTo(s.x - d0 - 23, 216); g.closePath(); g.fill(); }
+  for (const [x, y, w, h] of room.wins) glow(x + w / 2, y + h / 2, w * 0.9, '255,214,150', 0.18 * sun);
+  g.globalCompositeOperation = 'source-over';
+  dust(t, shafts, sun, { x: 0, y: 30, w: W, h: 170, ox: 0 });
+  if (her) { let li = 0; for (const s of shafts) li = Math.max(li, inShaft(her.x, (her.top || HTOP) + 8, s.x, s.y, s.w)); putRim(her.x, her.top || HTOP, her.o.mirror ? 1 : -1, -1, '#ffd9a0', Math.max(0.1, (0.12 + 0.45 * li) * sun), BELT_Y - 2); }
+}
+
+// ---------- 1-6: the nights she doesn't come ----------
+// Four nights, each its own shot of the line (no song: the line's own sound). The hour in the black bar at the start of each.
+const V = 112;   // the belt's speed (px/s)
+const stream = (u, gap, phase, from = 48) => { const out = []; for (let i = Math.floor((u - (W + 20 - from) / V - phase) / gap); i <= Math.floor((u - phase) / gap); i++) { const tIn = phase + i * gap, x = from + (u - tIn) * V; if (x >= from - 1 && x < W + 10) out.push({ x, tIn, i }); } return out; };
+const scanTime = b => b.tIn + (SCAN_X - (b.from || 48)) / V;
+const DAYS = [
+  { id: 'thu', day: '목요일 밤', hour: '03:10', dur: 11.5,
+    lines: [[1.9, 'j', '…누나 오늘 안 와요?', 2.6], [5.2, 'b', '…일해.', 1.8]],
+    at(u) {
+      const boxes = stream(u, 1.35, 0.2), look = u < 1.0 ? 0.1 : u < 7.2 ? 0.2 : -0.6, faceL = u > 0.9 && u < 7.0;
+      return { sun: 0, tubes: [1, 1, 1], laser: true, run: u * V, boss: 'seat', player: true, boxes, scanIn: boxes,
+        jiwoo: { x: JX, o: { mirror: !faceL, look } } };
+    } },
+  { id: 'fri', day: '금요일 밤', hour: '03:00 · 쉬는 시간', dur: 15.5, cut: 9.6,
+    lines: [], phone: { at: 5.6, text: '누나, 괜찮아요?', sent: 7.6 },
+    at(u) {
+      if (u >= this.cut) {   // 06:00: everyone gone, the tubes off, the dawn in the high windows, her can still on the belt
+        return { sun: 0.65, tubes: [0, 0, 0], laser: false, run: 0, can: HX - 2, caption: { day: '금요일', hour: '06:00 · 퇴근' } };
+      }
+      // he walks to her spot with two cans, leaves one on the belt, steps back, and messages her
+      const x = u < 0.8 ? JX : u < 3.0 ? lerp(JX, HX + 14, ease(seg(u, 0.8, 3.0))) : u < 4.4 ? HX + 14 : lerp(HX + 14, JX - 14, ease(seg(u, 4.4, 5.4)));
+      let o = { mirror: false, look: 0.1 };
+      if ((u > 0.8 && u < 3.0)) o = walkPose((u - 0.8) * 13, false);
+      else if (u > 4.4 && u < 5.4) o = walkPose((u - 4.4) * 13, true);
+      const pk = ease(seg(u, 3.1, 3.5)) * (1 - ease(seg(u, 3.8, 4.2)));
+      if (pk > 0) o = { mirror: false, look: -0.4, arms: 'reach', reach: { dx: Math.round(lerp(-6, -13, pk)), dy: Math.round(lerp(31, 36, pk)) } };
+      if (u > 5.4) { const ph = ease(seg(u, 5.4, 5.8)); o = { mirror: false, look: -0.6, arms: 'reach', reach: { dx: Math.round(lerp(-6, -4, ph)), dy: Math.round(lerp(31, 25, ph)) } }; }
+      return { sun: 0, tubes: [1, 1, 1], laser: true, run: 0, can: u > 3.65 ? HX - 2 : null, jiwoo: { x: Math.round(x), o } };
+    } },
+  { id: 'sat', day: '토요일 밤', hour: '03:20', dur: 13.5,
+    lines: [[1.7, 's', '이거 원래 이렇게 빨라요?', 2.5], [4.8, 'b', '…하아.', 1.4], [7.9, 'j', '…누나는 안 밀렸는데.', 2.8]],
+    // the stand-in puts boxes on from her spot, never on the line's beat; some reach the gate on top of another and are missed
+    sub: [0.5, 1.1, 1.5, 2.9, 3.3, 4.6, 5.0, 5.5, 6.9, 8.1, 8.4, 9.6, 10.9, 11.2, 12.4],
+    at(u) {
+      const boxes = stream(u, 1.35, 0.2).map(b => ({ ...b, from: 48 }));
+      for (const [i, tIn] of this.sub.entries()) { const x = HX + 8 + (u - tIn) * V; if (u >= tIn - 0.2 && x < W + 10) boxes.push({ x: u < tIn ? HX + 8 : x, y: u < tIn ? BELT_Y - 4 : BELT_Y, tIn, from: HX + 8, i: 100 + i }); }
+      for (const b of boxes) { const ts = scanTime(b); b.miss = boxes.some(o => o !== b && Math.abs(scanTime(o) - ts) < 0.16 && o.i < b.i); if (b.miss && u > ts) { b.tint = '#7a1f18'; b.y = BELT_Y + Math.min(40, ((u - ts) * 7) ** 2); } }
+      const pk = this.sub.reduce((m, tIn) => Math.max(m, ease(seg(u, tIn - 0.25, tIn - 0.05)) * (1 - ease(seg(u, tIn + 0.05, tIn + 0.3)))), 0);
+      const look = u < 7.6 ? 0.1 : -0.6;
+      return { sun: 0, tubes: [1, 1, 1], laser: true, run: u * V, boss: 'seat', player: true, boxes, scanIn: boxes,
+        sub: { x: HX, p: pk > 0.02 ? { act: 'reach', rx: HX - 6 - Math.round(4 * pk), ry: HTOP + Math.round(lerp(31, 37, pk)) } : {} },
+        jiwoo: { x: JX, o: { mirror: u < 2.0 || u > 4.4 && u < 7.6, look } } };
+    } },
+  { id: 'sun', day: '일요일 · 명절 마지막 밤', hour: '05:40', dur: 13.6,
+    lines: [[6.3, 'j', '…누나!', 1.7], [8.6, 'b', '…지우, 신입. 먼저 들어가.', 2.8]],
+    at(u) {
+      const boxes = stream(u, 1.35, 0.2);
+      // 하은 comes in from the left in her work clothes, behind the belt, to her spot, and puts her hands on the belt
+      let haeun = null;
+      if (u > 1.4) { const x = lerp(-14, HX, seg(u, 1.4, 5.6)); haeun = u < 5.6 ? { x: Math.round(x), o: walkPose((u - 1.4) * ((HX + 14) / 4.2), true, 0) } : { x: HX, o: { mirror: true, look: u < 6.0 ? 0 : -0.6, arms: 'belt', sway: 0 } }; }
+      const turned = u > 5.8;
+      return { sun: 0.12, tubes: [1, 1, 1], laser: true, run: u * V, boss: 'seat', player: true, boxes, scanIn: boxes, haeun,
+        jiwoo: { x: JX, o: { mirror: !turned, look: turned ? 0.2 : 0.1 } } };
+    } }
+];
+const DAY0 = 1.4;   // a moment of black before the first night
+{ let at = DAY0; for (const d of DAYS) { d.t0 = at; at += d.dur; } }
+const DAYS_END = DAYS[DAYS.length - 1].t0 + DAYS[DAYS.length - 1].dur;
+const WHO_KO = { j: '지우', b: '반장', h: '하은', s: '대타' };
+
+// ---------- 1-7's opening: 반장 and 하은 at the belt, 05:50 (the cutscene's first frame) ----------
+const TALK = [['b', '…하은아.'], ['b', '이제 그만둘 거냐.'], ['h', '…네.'], ['b', '…알겠다.']];
+const AFTER = { stand: 0.5, walk: [1.0, 4.4], turn: 4.9, down: [5.4, 6.4], bar: 6.6 };
+
+// ---------- state ----------
+let mode = 'title', t0 = 0, T = 0, talkK = 0, talkAt = 0, afterAt = 0, lastScan = -9, lastMiss = -9, scanned = new Set(), lineSeen = new Set();
+const now = () => performance.now() / 1000;
+function start6() { hideCovers(); mode = 'days'; t0 = now(); scanned = new Set(); lineSeen = new Set(); audio(); }
+function start7() { hideCovers(); mode = 'talk'; t0 = now(); talkK = 0; talkAt = 0.9; afterAt = 0; lineSeen = new Set(); stepSeen.clear(); audio(); HB.halt(); HB.unlock(); }
+function hideCovers() { for (const id of ['title', 'end6', 'end7']) $(id).hidden = true; }
+
+// ---------- the frame ----------
+function dayAt(t) { for (const d of DAYS) if (t >= d.t0 && t < d.t0 + d.dur) return d; return null; }
+function render() {
+  T = now() - t0;
+  out.setTransform(1, 0, 0, 1, 0, 0); out.globalAlpha = 1; out.fillStyle = '#000'; out.fillRect(0, 0, cv.width, cv.height);
+  let fade = 0, line = null, caption = null, phone = null;
+  if (mode === 'days') {
+    const d = dayAt(T);
+    if (d) {
+      const u = T - d.t0, S = d.at(u);
+      // the gate: a beep for each box that reaches it (red and a buzz for one that comes in on top of another)
+      for (const b of S.scanIn || []) { const key = d.id + b.i; if (!scanned.has(key) && u >= scanTime(b)) { scanned.add(key); if (u - scanTime(b) < 0.2) { if (b.miss) { lastMiss = T; sfx('buzz'); } else { lastScan = T; sfx('scan'); } } } }
+      S.kick = 1 - seg(T, lastScan, lastScan + 0.12); S.scan = 1 - seg(T, lastScan, lastScan + 0.15); S.miss = 1 - seg(T, lastMiss, lastMiss + 0.3);
+      shot(u, S);
+      fade = Math.max(1 - seg(u, 0, 0.7), seg(u, d.dur - 0.6, d.dur));
+      if (d.cut) fade = Math.max(fade, 1 - Math.abs(u - d.cut) / 0.5);
+      caption = S.caption ? (u - d.cut < 2.8 ? S.caption : null) : (u < 2.6 ? { day: d.day, hour: d.hour } : null);
+      if (S.caption && u - d.cut < 0.2 && !lineSeen.has(d.id + 'cut')) { lineSeen.add(d.id + 'cut'); sfx('clock'); }
+      if (u < 0.2 && !lineSeen.has(d.id + 'in')) { lineSeen.add(d.id + 'in'); sfx('clock'); }
+      for (const [at, who, text, dur] of d.lines) if (u >= at && u < at + dur) { line = { who, text, u: u - at, dur }; const k = d.id + at; if (!lineSeen.has(k)) { lineSeen.add(k); sfx(who === 'b' ? 'blipL' : who === 's' ? 'blipS' : 'blip'); } }
+      if (d.phone && u >= d.phone.at && u < (d.cut || d.dur) - 0.3) phone = { ...d.phone, u: u - d.phone.at, x: S.jiwoo.x };
+      if (d.phone && u >= d.phone.sent && !lineSeen.has('sent')) { lineSeen.add('sent'); sfx('send'); }
+      if (d.id === 'fri' && u > 3.65 && !lineSeen.has('can')) { lineSeen.add('can'); sfx('can'); }
+      ambience(S);
+      footsteps(d, u);
+    } else { fade = 1; ambience(null); }
+    if (T >= DAYS_END + 0.4) { mode = 'end6'; $('end6').hidden = false; ambience(null); }
+  } else if (mode === 'talk' || mode === 'tut' || mode === 'end7') {
+    const S = { sun: 0.22, tubes: [1, 1, 1], laser: true, run: T * 150, boxes: [] };
+    // 반장 on his chair, turned to her; once she has said it, he gets up and goes out to the left; she turns back to the belt
+    const a = afterAt ? T - afterAt : -1;
+    if (a < AFTER.stand) S.boss = 'seat';
+    else if (a < AFTER.walk[1]) { const x = lerp(BOSS_X, -16, seg(a, AFTER.walk[0], AFTER.walk[1])); S.boss = { x: Math.round(x), top: HTOP + (a > AFTER.walk[0] && ((a - AFTER.walk[0]) / 0.4) % 1 < 0.5 ? 1 : 0), m: false }; if (a < AFTER.walk[0]) S.boss = { x: BOSS_X, top: HTOP + 2, m: false }; }
+    const faceBoss = (talkK >= 1 || talkAt < T - 0.6) && (a < 0 || a < AFTER.turn);
+    const look = a >= AFTER.down[0] ? lerp(0, -1, ease(seg(a, AFTER.down[0], AFTER.down[1]))) : talkK === 2 ? -0.3 : 0;
+    S.haeun = { x: HX, o: { mirror: !faceBoss, look, sway: 0, ...(!faceBoss ? { arms: 'belt', tap: 0 } : {}) }, top: HTOP - (look > 0.5 ? 1 : 0) };
+    shot(T, S);
+    fade = 1 - seg(T, 0.1, 1.2);
+    if (mode === 'talk') {
+      if (!afterAt && T >= talkAt) { const [who, text] = TALK[talkK]; line = { who, text, u: T - talkAt, dur: 1e9, wait: true }; if (!lineSeen.has('t' + talkK)) { lineSeen.add('t' + talkK); sfx(who === 'b' ? 'blipL' : 'blipH'); } }
+      if (afterAt) { if (a > AFTER.walk[0] && a < AFTER.walk[1]) bossSteps(a); if (a >= AFTER.bar) startTut(); }
+    }
+    if (mode === 'tut') { tutFrame(); fade = Math.max(fade, tutFade()); }
+    if (mode === 'end7') fade = 1;
+    ambience(S);
+  }
+  out.imageSmoothingEnabled = false;
+  out.drawImage(wb, 0, CROP, W, H - CROP, 0, 0, cv.width, cv.height * (H - CROP) / H);
+  out.fillStyle = '#000'; out.fillRect(0, BAR_TOP * SC, cv.width, cv.height);
+  if (mode === 'tut') { const HG = HBCV.getContext('2d'); HG.setTransform(1, 0, 0, 1, 0, 0); HG.clearRect(0, 0, HBCV.width, HBCV.height); HB.draw(HB.clock() ?? 0); out.drawImage(HBCV, 0, 0); tutCue(); }
+  if (fade > 0) { out.fillStyle = `rgba(0,0,0,${fade})`; out.fillRect(0, 0, cv.width, cv.height); }
+  if (caption) drawCaption(caption, mode === 'days' ? Math.min(1, (T - (dayAt(T)?.t0 ?? 0)) / 0.4) : 1);
+  if (phone) drawPhone(phone);
+  if (line) drawLine(line);
+  requestAnimationFrame(render);
+}
+// steps (the people who walk in the shots)
+const stepSeen = new Set();
+function footsteps(d, u) {
+  const walks = d.id === 'fri' ? [[0.8, 3.0], [4.4, 5.4]] : d.id === 'sun' ? [[1.4, 5.6]] : [];
+  for (const [a, b] of walks) for (let s = a + 0.2; s < b; s += 0.4) { const k = d.id + s.toFixed(2); if (u >= s && u < s + 0.1 && !stepSeen.has(k)) { stepSeen.add(k); sfx('step'); } }
+  if (u < 0.1) for (const k of [...stepSeen]) if (k.startsWith(d.id)) stepSeen.delete(k);
+}
+function bossSteps(a) { for (let s = AFTER.walk[0] + 0.15; s < AFTER.walk[1]; s += 0.4) { const k = 'bs' + s.toFixed(2); if (a >= s && a < s + 0.1 && !stepSeen.has(k)) { stepSeen.add(k); sfx('step'); } } }
+
+// ---------- words: the game's dialogue box (as in the cutscene), the hour in the bar, his phone ----------
+function drawLine(ln) {
+  const full = ln.text, who = WHO_KO[ln.who], n = Math.min([...full].length, Math.floor(ln.u / 0.04) + 1), a = clamp(Math.min(ln.u / 0.12, ln.wait ? 1 : (ln.dur - ln.u) / 0.3), 0, 1);
+  const u = cv.width / 100, bx = 4 * u, bw = cv.width - 8 * u, bh = 13 * u, by = cv.height - 3 * u - bh, ws = 2.5 * u, px = bx + 3 * u, py = by + 2 * u, th = ws * 1.4;
+  out.save(); out.globalAlpha = a;
+  out.beginPath(); out.roundRect(bx, by, bw, bh, 6); out.fillStyle = 'rgba(17,13,11,.95)'; out.fill(); out.lineWidth = 1.5; out.strokeStyle = '#3a2f28'; out.stroke();
+  out.font = `${Math.round(ws)}px "Black Han Sans", "Apple SD Gothic Neo", sans-serif`; const tw = out.measureText(who).width;
+  out.beginPath(); out.roundRect(px, py, tw + 1.1 * ws, th, 3); out.fillStyle = ln.who === 'h' ? '#c43d33' : ln.who === 'j' ? '#8a3a50' : ln.who === 's' ? '#6b7073' : '#f07a2a'; out.fill();
+  out.fillStyle = ln.who === 'b' ? '#1b120c' : '#fff'; out.textAlign = 'left'; out.textBaseline = 'middle'; out.fillText(who, px + 0.55 * ws, py + th / 2 + 1);
+  out.font = `500 ${Math.round(3.3 * u)}px "IBM Plex Sans KR", "Apple SD Gothic Neo", sans-serif`; out.fillStyle = '#efe6d2'; out.textBaseline = 'top';
+  out.fillText([...full].slice(0, n).join(''), px, py + th + 0.5 * ws);
+  if (ln.wait && n >= [...full].length && Math.floor(performance.now() / 500) % 2 === 0) { out.font = `${Math.round(1.8 * u)}px "IBM Plex Mono", monospace`; out.fillStyle = '#a6978a'; out.textAlign = 'right'; out.textBaseline = 'bottom'; out.fillText('▼', bx + bw - 2.2 * u, by + bh - 1.4 * u); }
+  out.restore();
+}
+function drawCaption(c, a) {
+  out.save(); out.globalAlpha = a; const y = (BAR_TOP + (H - CROP - BAR_TOP) / 2 + 22) * SC / 1.0;
+  out.textBaseline = 'middle'; out.textAlign = 'left'; out.fillStyle = '#efe6d2'; out.font = '400 34px "Black Han Sans", sans-serif'; out.fillText(c.day, 56, 520);
+  const w = out.measureText(c.day).width; out.font = '500 22px "IBM Plex Mono", monospace'; out.fillStyle = '#a6978a'; out.fillText(c.hour, 56 + w + 20, 522);
+  out.fillStyle = '#d9a520'; out.fillRect(40, 500, 4, 40);
+  out.restore();
+}
+function drawPhone(p) {
+  // his message to her, over his head: typed, sent, and the little '1' that stays (she doesn't read it)
+  const a = clamp(Math.min(p.u / 0.25, 1), 0, 1), typed = Math.min([...p.text].length, Math.floor(Math.max(0, p.u - 0.4) / 0.11)), sent = p.u >= p.sent - p.at;
+  const x = p.x * SC, y = 66 * SC;
+  out.save(); out.globalAlpha = a; out.font = '500 24px "IBM Plex Sans KR", sans-serif'; out.textBaseline = 'middle';
+  const w = Math.max(240, out.measureText(p.text).width + 48), bx = clamp(x - w / 2, 16, cv.width - w - 16), by = y - 92;
+  out.fillStyle = 'rgba(17,13,11,.92)'; out.beginPath(); out.roundRect(bx, by, w, 112, 10); out.fill(); out.strokeStyle = '#3a2f28'; out.lineWidth = 1.5; out.stroke();
+  out.fillStyle = '#a6978a'; out.font = '600 17px "IBM Plex Sans KR", sans-serif'; out.fillText('하은 누나', bx + 18, by + 22);
+  out.font = '500 24px "IBM Plex Sans KR", sans-serif';
+  const text = [...p.text].slice(0, typed).join(''), tw = out.measureText(p.text).width;
+  if (sent) { const mx = bx + w - 18 - tw - 24; out.fillStyle = '#ffe9a8'; out.beginPath(); out.roundRect(mx, by + 46, tw + 24, 44, 14); out.fill(); out.fillStyle = '#1b120c'; out.fillText(p.text, mx + 12, by + 69);
+    out.font = '600 16px "IBM Plex Mono", monospace'; out.fillStyle = '#e8b830'; out.textAlign = 'right'; out.fillText('1', mx - 8, by + 80); out.textAlign = 'left'; }
+  else { out.fillStyle = '#2a2420'; out.beginPath(); out.roundRect(bx + 14, by + 48, w - 28, 40, 6); out.fill(); out.fillStyle = '#efe6d2'; out.fillText(text + (Math.floor(performance.now() / 400) % 2 ? '|' : ''), bx + 26, by + 69); }
+  out.restore();
+}
+
+// ---------- the heartbeat tutorial: the cutscene's heartbeat row (its own code), on a steady 62 BPM ----------
+const TUT = { rows: 14, demo: 2, need: 4, bpm: 62, lead: 2.2 };
+const BP = 60 / TUT.bpm, LEAD = TUT.lead, NBEAT = TUT.rows * 4;
+const beatT = b => LEAD + b * BP, tBeat = t => (t - LEAD) / BP;
+const letterK = () => 0, WARD = { t0: 1e9 }, REP = { t0: 1e9 };
+const SCREEN_HIT = { at: -1e9, perfect: false };
+const HBCV = document.createElement('canvas'); HBCV.width = cv.width; HBCV.height = cv.height;
+const HB = (() => {
+  const SC = 3, G0 = HBCV.getContext('2d'); let g = G0;
+  const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+  const ROW = 4;   // beats from a row's start to its arrival: three heartbeats come in by themselves, the 4th is the player's
+  const ROWS = [];
+  for (let k = 0; k < TUT.rows; k++) ROWS.push({ lane: 0, b0: 4 * k, demo: k < TUT.demo, skip: [] });
+  // (in the cutscene there is one row only, her mother's: 하은's second row is left out)
+  // 지우's heart: a little uneven while he walks behind her (a beat missing here and there), steady once her beat comes in
+  const TWO_AT = beatT(106) - 1.4;
+  let EV = [], TARGETS = [], END_T = 0;
+  function compile() {
+    EV = []; TARGETS = [];
+    ROWS.forEach((r, ri) => {
+      r.t0 = beatT(r.b0); r.t8 = beatT(r.b0 + ROW);
+      if (r.lane === 0) EV.push({ t: r.t0, type: 'chord', row: r.b0 / ROW, dur: r.t8 - r.t0 });
+      for (let k = 0; k < ROW - 1; k++) if (!r.skip.includes(k)) EV.push({ t: beatT(r.b0 + k), type: 'pulse', lane: r.lane });
+      const tg = { t: beatT(r.b0 + ROW - 1), row: ri, lane: r.lane, demo: !!r.demo, judge: null, d: 0 }; TARGETS.push(tg); r.tg = tg;
+      if (r.demo) EV.push({ t: tg.t, type: 'demo', lane: 0 });
+    });
+    EV.push({ t: LEAD - 1.2, type: 'click' }, { t: LEAD - 0.6, type: 'click' });
+    END_T = beatT(NBEAT) + 1.2; EV.sort((a, b) => a.t - b.t);
+  }
+  compile();
+  let ac = null, out = null, startAt = 0, evI = 0, playing = false, syncMs = 0, muted = false;
+  function audio() { if (ac) return; ac = new (window.AudioContext || window.webkitAudioContext)(); out = ac.createGain(); out.gain.value = muted ? 0 : 0.9; const comp = ac.createDynamicsCompressor(); out.connect(comp); comp.connect(ac.destination); }
+  function thump(t, f, amp, dec) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f * 1.6, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.04); gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.008); gn.gain.exponentialRampToValueAtTime(0.0001, t + dec); o.connect(gn); gn.connect(out); o.start(t); o.stop(t + dec + 0.05); }
+  function heart(t, amp = 0.9, bright = false) { thump(t, 58, amp, 0.22); thump(t + 0.14, 50, amp * 0.6, 0.18); if (bright) { thump(t, 120, amp * 0.35, 0.08); } }
+  function monBeep(t, f, amp) { const o = ac.createOscillator(), gn = ac.createGain(), lp = ac.createBiquadFilter(); o.type = 'sine'; o.frequency.value = f; lp.type = 'lowpass'; lp.frequency.value = 3000; gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(amp, t + 0.004); gn.gain.setValueAtTime(amp, t + 0.07); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.13); o.connect(lp); lp.connect(gn); gn.connect(out); o.start(t); o.stop(t + 0.16); }
+  function bell(t) { for (const [f, a, d] of [[1568, 0.05, 0.9], [2349, 0.025, 0.6], [3136, 0.012, 0.4]]) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.value = f; gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(a, t + 0.006); gn.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(gn); gn.connect(out); o.start(t); o.stop(t + d + 0.05); } }
+  function heartH(t) { thump(t, 78, 0.5, 0.15); thump(t + 0.11, 68, 0.3, 0.12); }
+  function beep(t, f = 1046, amp = 0.08, dur = 0.09) { const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'square'; o.frequency.value = f; const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400; gn.gain.setValueAtTime(amp, t); gn.gain.setValueAtTime(amp, t + dur * 0.8); gn.gain.linearRampToValueAtTime(0.0001, t + dur); o.connect(lp); lp.connect(gn); gn.connect(out); o.start(t); o.stop(t + dur + 0.02); }
+  const CHORDS = [[57, 60, 64], [53, 57, 60], [48, 52, 55, 59], [55, 59, 62]];   // Am F Cmaj7 G
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  function pad(t, ri, dur) {
+    const ch = CHORDS[ri % 4];
+    for (const m of ch) for (const det of [-4, 4]) { const o = ac.createOscillator(), gn = ac.createGain(), lp = ac.createBiquadFilter(); o.type = 'triangle'; o.frequency.value = mtof(m); o.detune.value = det; lp.type = 'lowpass'; lp.frequency.value = 900; gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.022, t + 0.8); gn.gain.setValueAtTime(0.022, t + dur - 0.6); gn.gain.linearRampToValueAtTime(0.0001, t + dur + 0.4); o.connect(lp); lp.connect(gn); gn.connect(out); o.start(t); o.stop(t + dur + 0.5); }
+    const o = ac.createOscillator(), gn = ac.createGain(); o.type = 'sine'; o.frequency.value = mtof(ch[0] + 24); gn.gain.setValueAtTime(0.05, t); gn.gain.exponentialRampToValueAtTime(0.0001, t + 2.2); o.connect(gn); gn.connect(out); o.start(t); o.stop(t + 2.3);
+  }
+  function schedule() {
+    const now = ac.currentTime, horizon = now + 0.25;
+    while (evI < EV.length && startAt + EV[evI].t < horizon) {
+      const e = EV[evI++], at = startAt + e.t; if (at < now - 0.05) continue;
+      // only the heart monitor: a soft beep on every heartbeat (하은's a little higher), a brighter one on the 4th
+      // until the ward, a heart's lub-dub with the monitor's beep faint under it; in the ward, the monitor
+      const ward = e.t >= WARD.t0 && e.t < REP.t0;
+      if (e.type === 'pulse') { if (ward) monBeep(at, 880, 0.045); else { heart(at, 0.55); monBeep(at, 880, 0.01); } }
+      else if (e.type === 'click') { if (ward) monBeep(at, 660, 0.025); else heart(at, 0.25); }
+      else if (e.type === 'demo') { if (ward) monBeep(at, 1175, 0.07); else { heart(at, 0.85, true); monBeep(at, 1175, 0.015); } }
+    }
+  }
+  const songT = () => ac ? ac.currentTime - startAt : -99;
+  const WIN_P = 0.05, WIN_G = 0.11, WIN_M = 0.18;
+  // (in the cutscene the judging is generous: the press counts whenever the beat's peak is inside the yellow box. BOX_HW is the
+  // box's half-width in pixels; the pen covers GAP pixels a beat, so the box is a time window that follows the tempo)
+  const BOX_HW = 14;
+  const boxWin = tg => { const b = tBeat(tg.t); return BOX_HW / GAP * (beatT(b + 1) - beatT(b)); };
+  const stats = { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 };
+  const FX = { pops: [], lane: [{ beatAt: -9, hitAt: -9, missAt: -9, arriveAt: -9 }, { beatAt: -9, hitAt: -9, missAt: -9, arriveAt: -9 }], flashAt: -9, kickAt: -9, runners: [], milestone: null };
+  function press(tIn) {
+    if (!playing) return;
+    const t = tIn - syncMs / 1000;
+    let best = null, bd = 1e9; for (const tg of TARGETS) { if (tg.demo || tg.judge) continue; const d = Math.abs(t - tg.t); if (d < bd) { bd = d; best = tg; } }
+    if (!best || bd > boxWin(best) + 0.15) return;
+    const d = t - best.t, now = performance.now();
+    // a press on a beat both rows share keeps both
+    const same = TARGETS.filter(tg => !tg.demo && !tg.judge && Math.abs(tg.t - best.t) < 0.02);
+    const bw = boxWin(best);
+    if (Math.abs(d) <= bw) {
+      const j = Math.abs(d) <= Math.max(0.08, bw * 0.4) ? 'perfect' : 'good';
+      SCREEN_HIT.at = performance.now(); SCREEN_HIT.perfect = j === 'perfect';
+      for (const tg of same) { tg.judge = j; tg.d = d; tg.hitT = t; stats[j]++; stats.combo++; FX.lane[tg.lane].hitAt = now; burst(COL, LANEY[tg.lane], j); FX.pops.push({ lane: tg.lane, text: j === 'perfect' ? '딱' : '좋아', sub: j === 'good' ? (d < 0 ? '빠름' : '늦음') : '', at: now, c: j === 'perfect' ? '#ffffff' : '#cfe8d6' }); }
+      stats.best = Math.max(stats.best, stats.combo); FX.flashAt = now; FX.kickAt = now;
+      { const st = ac.currentTime - startAt; if (st >= WARD.t0 && st < REP.t0) monBeep(ac.currentTime, 1175, 0.07); else { heart(ac.currentTime, 0.9, true); monBeep(ac.currentTime, 1175, 0.015); } }   // (the monitor in the ward only; his heart in the reprise, as its pulses are)
+    } else for (const tg of same) { tg.d = d; missIt(tg, d < 0 ? '빠름' : '늦음'); }
+  }
+  function missIt(tg, why) { tg.judge = 'miss'; stats.miss++; stats.combo = 0; FX.lane[tg.lane].missAt = performance.now(); FX.pops.push({ lane: tg.lane, text: '놓침', sub: why, at: performance.now(), c: '#ff6a5a' }); }
+  function tick(t) {
+    for (const tg of TARGETS) {
+      if (tg.judge) continue;
+      if (tg.demo && t >= tg.t) { tg.judge = 'demo'; tg.d = 0; tg.hitT = tg.t; FX.lane[0].hitAt = performance.now(); continue; }
+      if (!tg.demo && t > tg.t + boxWin(tg)) missIt(tg, '');
+    }
+    // each lane's heart beats with its heard pulses
+    for (const e of EV) { if (e.type !== 'pulse' && e.type !== 'demo') continue; if (e.t > t) break; if (!e.seen) { e.seen = 1; FX.lane[e.lane].beatAt = performance.now(); } }
+  }
+  // (in the cutscene the row is centred and narrower: 86 to 298)
+  const X0 = 86, HEART = 3, COL = 266, XE = COL + 32, HXR = XE + 12, GAP = (COL - X0 - 26) / 3, SPOT = k => Math.round(X0 + 26 + k * GAP);   // the four spots along the line (the 4th is the column) and the gap between them
+  const LANE = [{ name: '어머니', tag: '502호' }, { name: '하은', tag: '보호자' }];
+  function txt(s, x, y, c, size = 7, align = 'left', weight = '600', font = '"IBM Plex Sans KR", sans-serif') {
+    if (LOW.on) { const m = g.getTransform(); LOW.text.push({ s, x, y, c, size, align, weight, font, m, a: g.globalAlpha, sc: g.shadowColor, sb: g.shadowBlur }); return; } g.font = `${weight} ${size}px ${font}`; g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = c; g.fillText(s, x, y); g.textAlign = 'left'; }
+  function glowTxt(s, x, y, c, size, align, font, glow) { g.save(); g.shadowColor = glow; g.shadowBlur = 6 * SC; txt(s, x, y, c, size, align, '400', font); g.restore(); txt(s, x, y, c, size, align, '400', font); }
+  // one heartbeat on the line at x (the R peak), sharp like a monitor's: a small P, the flat PR, a little Q, a needle-thin R, a deep
+  // S, the ST segment and a low T; amp is the R peak's height
+  const BEAT_W = 32, AMP = 26;   // the R peak's height in game pixels (taller in the cutscene's deeper bar)
+  function beatPts(amp) {
+    return [[-32, 0], [-27, -amp * 0.06], [-24, -amp * 0.11], [-21, -amp * 0.06], [-18, 0], [-5, 0], [-2.6, amp * 0.14], [0, -amp], [2.4, amp * 0.46], [4, 0], [10, -amp * 0.03],
+      [13, -amp * 0.09], [16, -amp * 0.17], [19, -amp * 0.2], [22, -amp * 0.15], [25, -amp * 0.06], [28, 0], [32, 0]];
+  }
+  // a whole row's trace, left edge to the heart: flat line with a beat at each spot that beats (1 to 3 unless skipped, the 4th
+  // only once the player has made it)
+  // (the row is narrower in the cutscene, so each beat is squeezed to fit its spot: overlapping beats double back on the line
+  // and the pixel fill paints in under it)
+  const BSQ = Math.min(1, (GAP - 2) / (2 * BEAT_W));
+  function rowPts(row, amp) {
+    const pts = [[X0, 0]];
+    for (let k = 0; k <= HEART; k++) {
+      const x = SPOT(k), j = row.tg.judge, on = k < HEART ? !row.skip.includes(k) : (j && j !== 'miss');
+      if (!on) continue;
+      for (const [dx, dy] of beatPts(k === HEART ? amp * 1.2 : amp)) pts.push([x + dx * BSQ, dy]);
+    }
+    pts.push([XE, 0]); return pts;
+  }
+  // the trace in three passes like phosphor: a wide soft bloom, a tighter glow, a thin bright core
+  // a trace as pixels: the polyline is sampled finely and each pixel column filled from its lowest to its highest point, so
+  // steep strokes become solid pixel columns and the flat line a single pixel row; an optional halo one pixel wider all round
+  function pixSpans(pts) {
+    const sp = new Map();
+    for (let i = 0; i + 1 < pts.length; i++) { const [ax, ay] = pts[i], [bx, by] = pts[i + 1], n = Math.max(1, Math.ceil(Math.abs(bx - ax) * 4 + Math.abs(by - ay) * 0.5));
+      for (let k = 0; k <= n; k++) { const x = ax + (bx - ax) * k / n, y = ay + (by - ay) * k / n, c = Math.round(x), e = sp.get(c); if (!e) sp.set(c, [y, y]); else { if (y < e[0]) e[0] = y; if (y > e[1]) e[1] = y; } } }
+    return sp;
+  }
+  function pixDraw(sp, lo, hi, colAt, halo) {
+    const sa = g.globalAlpha;
+    if (halo) for (const [x, [y0, y1]] of sp) { if (x < lo || x > hi) continue; const [, a] = colAt(x); if (a <= 0) continue; g.globalAlpha = sa * a * 0.4; R(x - 1, Math.round(y0) - 1, 3, Math.round(y1) - Math.round(y0) + 3, halo(x)); }
+    for (const [x, [y0, y1]] of sp) { if (x < lo || x > hi) continue; const [c, a] = colAt(x); if (a <= 0) continue; g.globalAlpha = sa * a; R(x, Math.round(y0), 1, Math.round(y1) - Math.round(y0) + 1, c); }
+    g.globalAlpha = sa;
+  }
+  function wave(x, y, amp, core, bloom, alpha = 1) {
+    const sp = pixSpans(beatPts(amp).map(([dx, dy]) => [x + dx, y + dy]));
+    pixDraw(sp, -1e9, 1e9, () => [core, alpha], bloom ? () => bloom : null);
+  }
+  const mixc = (a, b, p) => { const A = [1, 3, 5].map(i => parseInt(a.slice(i, i + 2), 16)), B = [1, 3, 5].map(i => parseInt(b.slice(i, i + 2), 16)); return '#' + A.map((v, i) => Math.round(lerp(v, B[i], clamp(p, 0, 1))).toString(16).padStart(2, '0')).join(''); };
+  // a fresh peak is near white; it cools to green and then to a dim green as it fades
+  const ageCol = a => a < 0.12 ? mixc('#f4fff0', '#9cf58a', a / 0.12) : mixc('#9cf58a', '#3e8c38', (a - 0.12) / 0.88);
+  // the heart at the end of a row: a drawn heart with a dark rim, a lit top-left lobe and a shine; it glows when it beats, and
+  // after a miss it is cracked and greyed until the next row
+  function heartPath(cx, cy, s) { g.beginPath(); g.moveTo(cx, cy + 6 * s); g.bezierCurveTo(cx - 9 * s, cy - 1 * s, cx - 7.5 * s, cy - 9 * s, cx - 3.5 * s, cy - 8.5 * s); g.bezierCurveTo(cx - 1.5 * s, cy - 8.2 * s, cx, cy - 6.5 * s, cx, cy - 5 * s); g.bezierCurveTo(cx, cy - 6.5 * s, cx + 1.5 * s, cy - 8.2 * s, cx + 3.5 * s, cy - 8.5 * s); g.bezierCurveTo(cx + 7.5 * s, cy - 9 * s, cx + 9 * s, cy - 1 * s, cx, cy + 6 * s); g.closePath(); }
+  function heartV(cx, cy, s, glow, cracked, idle) {
+    if (glow > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(cx, cy - 2, 1, cx, cy - 2, 22 * s); gr.addColorStop(0, `rgba(255,90,90,${0.45 * glow})`); gr.addColorStop(1, 'rgba(255,90,90,0)'); g.fillStyle = gr; g.fillRect(cx - 24 * s, cy - 26 * s, 48 * s, 48 * s); g.restore(); }
+    heartPath(cx, cy, s * 1.12); g.fillStyle = '#1a0e10'; g.fill();
+    heartPath(cx, cy, s); const gr = g.createLinearGradient(cx - 8 * s, cy - 9 * s, cx + 6 * s, cy + 6 * s);
+    if (cracked) { gr.addColorStop(0, '#8a5a5e'); gr.addColorStop(1, '#4a2a2e'); } else if (idle) { gr.addColorStop(0, '#f2c0c0'); gr.addColorStop(1, '#c48888'); } else { gr.addColorStop(0, '#ff7a6e'); gr.addColorStop(0.55, '#e0343a'); gr.addColorStop(1, '#9c1824'); }
+    g.fillStyle = gr; g.fill();
+    if (!cracked) { g.fillStyle = 'rgba(255,255,255,.75)'; g.beginPath(); g.ellipse(cx - 4 * s, cy - 5.5 * s, 1.6 * s, 1 * s, -0.6, 0, Math.PI * 2); g.fill(); }
+    else { g.strokeStyle = '#140a0c'; g.lineWidth = 0.9; g.beginPath(); g.moveTo(cx - 0.5, cy - 5 * s); g.lineTo(cx + 2 * s, cy - 2 * s); g.lineTo(cx - 1.5 * s, cy + 0.5 * s); g.lineTo(cx + 1 * s, cy + 4 * s); g.stroke(); }
+  }
+  function laneRow(lane, t) { let r = null; for (const row of ROWS) if (row.lane === lane && row.t0 <= t + 0.001) r = row; return r && t < r.t8 + 0.6 ? r : null; }
+  const SPARKS = [], RINGS = [], FLOATS = [], LANEY = [177, 202];
+  function burst(x, y, j = 'perfect') {
+    const big = j === 'perfect';
+    for (let i = 0; i < 18 + (big ? 14 : 0); i++) { const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.6, v = 50 + Math.random() * 100; SPARKS.push({ x, y: y - 6, vx: Math.cos(a) * v, vy: Math.sin(a) * v, at: performance.now(), life: 700 + Math.random() * 600, s: 2.4 + Math.random() * 1.8, c: Math.random() < 0.5 ? '#bfffe0' : '#ffffff', plus: true }); }
+    if (big) RINGS.push({ x, y, at: performance.now() + 90, big: true });
+    for (let i = 0; i < (big ? 60 : 34); i++) { const a = Math.random() * Math.PI * 2, v = 40 + Math.random() * 120; SPARKS.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.8 - 20, at: performance.now(), life: 550 + Math.random() * 650, s: Math.random() < 0.25 ? 2.2 : 1.2, c: Math.random() < 0.35 ? '#ffffff' : '#7ef06a' }); }
+    RINGS.push({ x, y, at: performance.now() });
+  }
+  function drawLane(lane, y, t, show) {
+    const now = performance.now(), F = FX.lane[lane];
+    const hurt = clamp(1 - (now - F.missAt) / 450, 0, 1), shake = hurt > 0 ? (rnd(now, lane) - 0.5) * 4 * hurt : 0;
+    g.save(); g.translate(shake, 0); g.globalAlpha = show;
+    const r = laneRow(lane, t), tg = r && r.tg;
+    // beat by beat, drawn on like a monitor: a pen point sweeps through each row and traces each heartbeat as it passes (the R tip
+    // lands exactly on the beat), then that peak cools and fades while the pen traces the next one a spot further. Beats 1 to 3
+    // are traced by themselves; at the 4th spot, in the column, a closing ring counts it in, and the
+    // player's press is what the pen traces there, white and tall. A skipped beat's spot stays dark.
+    // where this lane's pen is now (the row it is drawing), so older traces are erased just ahead of it, like a monitor's sweep
+    let penNow = -99; for (const row of ROWS) { if (row.lane !== lane) continue; const kf = tBeat(t) - row.b0, pen = SPOT(0) + kf * GAP; if (pen >= X0 && pen < XE) penNow = pen; }
+    for (const row of ROWS) {
+      if (row.lane !== lane) continue;
+      const kf = tBeat(t) - row.b0; if (kf < -0.6 || kf > ROW + 3) continue;
+      const pen = SPOT(0) + kf * GAP, drawing = pen >= X0 && pen < XE, x1 = Math.min(pen, XE);   // the line exists only where this row's pen has been
+      // one continuous trace from the left edge to the pen: each stretch is coloured by how long ago the pen drew it, fresh white
+      // through green to nothing about two seconds later
+      const xAt = x => beatT(row.b0 + (x - SPOT(0)) / GAP), cool = x => t - xAt(x);
+      const lo = drawing ? X0 : Math.max(X0, penNow > 0 ? penNow + 8 : X0);
+      if (x1 > lo + 1 && cool(x1) < 2.4) {
+        // a made 4th beat is the same trace, drawn white around the box and cooling a little slower
+        const tgr = row.tg, made = tgr.judge && tgr.judge !== 'miss', wsec = made ? t - tgr.hitT : 9;
+        const colAt = x => { let a = Math.max(0, cool(x)); const near4 = made && Math.abs(x - COL) <= BEAT_W * BSQ; if (near4) a = Math.max(0, a - 0.5); const al = x > x1 + 0.5 ? 0 : clamp(1 - Math.pow(a / 2.2, 2), 0, 1); let c = a < 0.12 ? mixc('#f4fff0', '#9cf58a', a / 0.12) : mixc('#9cf58a', '#3e8c38', (a - 0.12) / 1.6); if (near4) c = mixc('#ffffff', c, clamp((wsec - 0.3) / 0.9, 0, 1)); return [c, al * show]; };
+        const sp = pixSpans(rowPts(row, AMP).map(([x, dy]) => [x, y + dy]));
+        pixDraw(sp, Math.ceil(lo), Math.floor(x1), colAt, () => '#0e2a10');
+      }
+      for (let k = 0; k <= HEART; k++) {
+        const tk = beatT(row.b0 + k), x = SPOT(k), dt = t - tk;
+        if (k === HEART) {
+          const tgk = row.tg, waiting = !tgk.judge || (tgk.judge === 'demo' && t < tgk.t);
+          if (waiting && kf > HEART - 1.6) {
+            
+            const sp = beatT(row.b0 + HEART) - beatT(row.b0 + HEART - 1), p = clamp(1 + dt / sp, 0, 1);
+            if (p > 0 && p < 1) { g.save(); g.globalAlpha = show * (0.4 + 0.6 * p); g.strokeStyle = '#fff2b8'; g.lineWidth = 1; g.beginPath(); g.arc(x, y - 13, 5 + 24 * (1 - p), 0, Math.PI * 2); g.stroke(); g.restore(); }
+          }
+          else if (tgk.judge === 'miss' && t - tgk.t < 1.2) { const f = clamp(1 - (t - tgk.t - 0.4) / 0.8, 0, 1); g.save(); g.globalAlpha = show * f; g.strokeStyle = '#ff5a5a'; g.lineWidth = 0.9; g.beginPath(); for (let i = -BEAT_W; i <= BEAT_W; i += 2) g.lineTo(x + i, y + (rnd(i, Math.floor(now / 50)) - 0.5) * 2.4); g.stroke(); g.restore(); }
+        }
+      }
+      // the pen point: a hot dot with a short flare and a halo
+      if (drawing) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(pen, y, 0, pen, y, 10); gr.addColorStop(0, 'rgba(210,255,190,.75)'); gr.addColorStop(0.4, 'rgba(140,255,120,.25)'); gr.addColorStop(1, 'rgba(140,255,120,0)'); g.fillStyle = gr; g.fillRect(pen - 10, y - 10, 20, 20); g.restore(); const py = y + (rowPts(row, AMP).reduce((acc, [px, dy], i, arr) => { if (i && arr[i - 1][0] <= pen && px >= pen) return arr[i - 1][1] + (dy - arr[i - 1][1]) * ((pen - arr[i - 1][0]) / Math.max(0.001, px - arr[i - 1][0])); return acc; }, 0)); g.fillStyle = '#ffffff'; g.beginPath(); g.arc(pen, py, 0.9, 0, Math.PI * 2); g.fill(); }
+    }
+    // a miss: the big X where the beat should have been, split red and cyan for a moment
+    if (tg && tg.judge === 'miss' && t - tg.t < 1.6) { const a = clamp(1 - (t - tg.t - 1.0) / 0.6, 0, 1), xx = COL + clamp(tg.d / WIN_M, -1, 1) * 10, jit = hurt * 1.5; g.save(); g.lineCap = 'round'; g.lineWidth = 2.4; for (const [dx, c, al] of [[-jit, 'rgba(80,220,255,.7)', hurt], [jit, 'rgba(255,60,60,.7)', hurt], [0, '#ff4a7a', 1]]) { if (al <= 0) continue; g.globalAlpha = show * a * al; g.strokeStyle = c; g.beginPath(); g.moveTo(xx - 7 + dx, y - 15); g.lineTo(xx + 7 + dx, y - 1); g.moveTo(xx + 7 + dx, y - 15); g.lineTo(xx - 7 + dx, y - 1); g.stroke(); } g.restore(); }
+    const hit = tg && tg.judge && tg.judge !== 'miss', since = hit ? t - tg.hitT : 9;
+    // the heart
+    const beatK = clamp(1 - (now - F.beatAt) / 220, 0, 1), hitK = hit && since < 0.35 ? 1 - since / 0.35 : 0, arrK = clamp(1 - (now - F.arriveAt) / 300, 0, 1), pump = 1 + 0.18 * beatK + 0.3 * hitK + 0.65 * arrK;
+    // a good press lights the whole row for a moment, brightest at the column
+    { const rf = clamp(1 - (now - F.hitAt) / 380, 0, 1); if (rf > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const lg = g.createLinearGradient(X0, 0, HXR, 0); lg.addColorStop(0, 'rgba(140,255,170,0)'); lg.addColorStop((COL - X0) / (HXR - X0), `rgba(200,255,230,${0.5 * rf})`); lg.addColorStop(1, 'rgba(200,255,230,0)'); g.fillStyle = lg; g.fillRect(X0, y - 34, HXR - X0, 48); g.restore(); } }
+    g.globalAlpha = show;
+    // the judgement over the column: it pops in large and settles
+    for (const p of FX.pops) { if (p.lane !== lane) continue; const age = (now - p.at) / 650, a = 1 - age; if (a <= 0) continue; const sc = 1 + 0.8 * clamp(1 - age / 0.15, 0, 1); g.save(); g.globalAlpha = show * a; g.translate(COL + BOX_HW + 32, y - 14 - age * 4); g.scale(sc, sc); glowTxt(p.text, 0, -7, p.c, 15, 'center', '"Black Han Sans", sans-serif', p.text === '놓침' ? 'rgba(255,60,60,.8)' : 'rgba(180,255,200,.8)'); if (p.sub) txt(p.sub, 0, 7, p.c, 5, 'center', '400'); g.restore(); }
+    g.restore();
+  }
+  const LOW = { on: false, text: [], cv: null, g: null }, BOX = { rgb: '242,196,58', a: 0.3, near: 0, fl: 0 };
+  // the yellow scan box, or the part of it between y0 and y1 (redrawn over each row's band so it stays solid)
+  function laneBand(y, show) {
+    // a slim dark band just around the trace (from the left edge to the end of the 4th peak), its ends fading
+    const BT = Math.round(y) - 32, BH = 44, x0 = X0 - 6, x1 = XE + 6, band = g.createLinearGradient(x0, 0, x1, 0); band.addColorStop(0, 'rgba(4,10,8,0)'); band.addColorStop(0.05, 'rgba(4,10,8,.4)'); band.addColorStop(0.95, 'rgba(4,10,8,.4)'); band.addColorStop(1, 'rgba(4,10,8,0)');
+    g.save(); g.globalAlpha = show; g.fillStyle = band; g.fillRect(x0, BT, x1 - x0, BH);
+    g.fillStyle = 'rgba(80,160,110,.08)'; for (let x = X0; x < XE; x += 6) g.fillRect(x, BT + 2, 1, BH - 4); for (let yy = BT + 3; yy < BT + BH - 2; yy += 6) g.fillRect(X0, yy, XE - X0, 1);
+    g.restore();
+  }
+  // the scan point: a soft column of warm light, brightest down the middle and fading out to both sides and toward the top, a
+  // thin brighter line down its centre; it swells as the beat comes and flares on a press
+  // the scan point: a yellow box over the 4th beat's spot (the press counts while the peak is inside it), filled faintly, its
+  // outline brighter as the beat comes and white on a press
+  function scanBox(y0, y1) {
+    const k = Math.max(BOX.near, BOX.fl), col = BOX.fl > 0.3 ? '255,244,200' : '242,196,58';
+    g.save(); g.fillStyle = `rgba(${col},${0.14 + 0.16 * k + 0.2 * BOX.fl})`; g.fillRect(COL - BOX_HW, y0, BOX_HW * 2 + 1, y1 - y0); g.restore();
+  }
+  function drawRows(t) {
+    if (!LOW.cv) { LOW.cv = document.createElement('canvas'); LOW.cv.width = W; LOW.cv.height = H; LOW.g = LOW.cv.getContext('2d'); }
+    const lg = LOW.g; lg.setTransform(1, 0, 0, 1, 0, 0); lg.globalAlpha = 1; lg.globalCompositeOperation = 'source-over'; lg.clearRect(0, 0, W, H);
+    LOW.on = true; LOW.text = []; g = lg;
+    try { drawRowsAt(t); } finally { g = G0; LOW.on = false; }
+    // step the alpha into a few levels so soft glows read as pixel bands
+    const im = lg.getImageData(0, 0, W, H), d = im.data; for (let i = 3; i < d.length; i += 4) { const a = d[i]; d[i] = a < 22 ? 0 : a > 200 ? 255 : Math.round(a / 56) * 56 + 31; } lg.putImageData(im, 0, 0);
+    g.save(); g.imageSmoothingEnabled = false; g.drawImage(LOW.cv, 0, 0, W, H); g.restore();
+    for (const q of LOW.text) { g.save(); g.transform(q.m.a, q.m.b, q.m.c, q.m.d, q.m.e, q.m.f); g.globalAlpha = q.a; g.shadowColor = q.sc; g.shadowBlur = q.sb; txt(q.s, q.x, q.y, q.c, q.size, q.align, q.weight, q.font); g.restore(); }
+  }
+  function drawRowsAt(t) {
+    // a soft shade over the lower part of the scene so the rows read
+    const two = 0, e2 = 0;   // one row only
+    // with the cinema bars in (the door), the bar and the row move down with the bottom bar (BAR_TOP 141 to LETTERBOX.bottom 148), so the picture's bottom edge stays put when the row fades
+    const lbk = letterK(t), barTop = Math.round(lerp(BAR_TOP, LETTERBOX.bottom, lbk)), dy = barTop - BAR_TOP;
+    const y0 = lerp(177, 162, e2) + dy, y1 = lerp(246, 204, e2) + dy; LANEY[0] = y0; LANEY[1] = y1;
+    // the 4th beat's column, across every row: a wide solid yellow box with a dark rim and a lit edge; it brightens as the beat
+    // comes and flashes white on a press
+    const near = Math.max(...[0, 1].map(l => { const r = laneRow(l, t); return r ? clamp(1 - Math.abs(t - r.tg.t) / 0.5, 0, 1) : 0; })), fl = clamp(1 - (performance.now() - FX.flashAt) / 220, 0, 1);
+    // a black bar across the bottom of the screen for the row to sit on, so the sides beside the narrow row are black too
+    g.fillStyle = '#000'; g.fillRect(0, barTop, W, H);
+    for (const [yy, sh2] of [[y0, 1], [y1, e2]]) if (sh2 > 0) laneBand(yy, sh2);
+    { const top = Math.round(lerp(158, 134, e2)); BOX.near = near; BOX.fl = fl; BOX.rgb = fl > 0.3 ? '255,236,150' : '242,196,58'; BOX.a = 0.32 + 0.16 * near + 0.3 * fl; scanBox(barTop, H);   // from the black bar's top edge to the bottom of the screen
+      if (fl > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fx = g.createRadialGradient(COL, y0 - 7, 0, COL, y0 - 7, 26); fx.addColorStop(0, `rgba(255,240,170,${0.4 * fl})`); fx.addColorStop(1, 'rgba(255,240,170,0)'); g.fillStyle = fx; g.fillRect(COL - 26, y0 - 33, 52, 52); g.restore(); } }
+    drawLane(0, y0, t, 1);
+    if (two > 0) drawLane(1, y1, t, e2);
+    const now = performance.now();
+    // the rings and sparks from good presses
+    for (let i = RINGS.length - 1; i >= 0; i--) { const r = RINGS[i], a = (now - r.at) / (r.big ? 600 : 450); if (a < 0) continue; if (a >= 1) { RINGS.splice(i, 1); continue; } const k = r.big ? 3.2 : 2; g.save(); g.globalAlpha = (1 - a) * (r.big ? 0.7 : 0.9); g.strokeStyle = r.big ? '#bfffe0' : '#d8fbff'; g.lineWidth = 2.4 * (1 - a) + 0.4; g.beginPath(); g.ellipse(r.x, r.y - 6, 6 + 26 * k * ease(a), 4 + 14 * k * ease(a), 0, 0, Math.PI * 2); g.stroke(); g.restore(); }
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (let i = SPARKS.length - 1; i >= 0; i--) { const p = SPARKS[i], a = (now - p.at) / p.life; if (a >= 1) { SPARKS.splice(i, 1); continue; } const tt = (now - p.at) / 1000; g.globalAlpha = (1 - a); g.fillStyle = p.c; if (p.plus) { const px = p.x + p.vx * tt * (1 - a * 0.5), py = p.y + p.vy * tt * (1 - a * 0.5) + 10 * tt * tt, z = p.s * (1 - a * 0.4); g.fillRect(px - z, py - z * 0.3, z * 2, z * 0.6); g.fillRect(px - z * 0.3, py - z, z * 0.6, z * 2); continue; } g.beginPath(); g.arc(p.x + p.vx * tt, p.y - 6 + p.vy * tt + 50 * tt * tt, p.s * (1 - a * 0.5), 0, Math.PI * 2); g.fill(); }
+    g.restore(); g.globalAlpha = 1;
+  }
+  function reset() {
+    compile(); Object.assign(stats, { perfect: 0, good: 0, miss: 0, combo: 0, best: 0 });
+    FX.pops = []; FX.milestone = null; for (const l of FX.lane) Object.assign(l, { beatAt: -9, hitAt: -9, missAt: -9, arriveAt: -9 }); SPARKS.length = 0; RINGS.length = 0;
+  }
+  // start (or carry on) at song time t: beats already past are not judged
+  function begin(t) {
+    audio(); if (ac.state === 'suspended') ac.resume();
+    startAt = ac.currentTime - t; evI = EV.findIndex(e => e.t >= t); if (evI < 0) evI = EV.length;
+    for (const e of EV) e.seen = e.t < t ? 1 : 0;
+    for (const tg of TARGETS) { if (tg.t < t - 0.05) { if (!tg.judge) { tg.judge = 'skip'; tg.hitT = tg.t; } } else { tg.judge = null; tg.d = 0; } }
+    playing = true;
+  }
+  function draw(t) {
+    const kick = clamp(1 - (performance.now() - FX.kickAt) / 180, 0, 1), z = 1 + 0.03 * kick * kick;
+    g = G0; G0.setTransform(SC * z, 0, 0, SC * z, W * SC * (1 - z) / 2, H * SC * (1 - z) / 2);
+    drawRows(t);
+    G0.setTransform(1, 0, 0, 1, 0, 0);
+  }
+  return {
+    reset, begin, draw, stats, targets: () => TARGETS, boxWin: tg => boxWin(tg),
+    halt() { playing = false; },
+    unlock() { audio(); if (ac.state === 'suspended') ac.resume(); },   // make its audio context inside a click, so it may sound later
+    clock() { return ac && playing ? ac.currentTime - startAt : null; },
+    update(t) { if (!playing) return; schedule(); tick(t); FX.pops = FX.pops.filter(p => performance.now() - p.at < 650); },
+    press(t) { press(t); },
+    mute(m) { muted = m; if (out) out.gain.setTargetAtTime(m ? 0 : 0.9, ac.currentTime, 0.05); }
+  };
+})();
+let tutEnd = null, tutDoneAt = null;
+function startTut() { mode = 'tut'; tutEnd = null; tutDoneAt = null; HB.reset(); HB.begin(0); }
+function tutFrame() {
+  const t = HB.clock(); if (t == null) return; HB.update(t);
+  const st = HB.stats, hits = st.perfect + st.good;
+  // once she has made enough 4th beats (or the rows run out), finish the row in hand and go dark
+  if (tutEnd == null && (hits >= TUT.need || t > beatT(NBEAT))) { const k = Math.floor(tBeat(t) / 4) + 1; tutEnd = Math.min(beatT(NBEAT), beatT(k * 4)) + 0.2; }
+  if (tutEnd != null && t > tutEnd + 1.6 && tutDoneAt == null) { tutDoneAt = t; HB.halt(); mode = 'end7'; $('tutres').textContent = `넷째 박 ${hits}번 · 딱 ${st.perfect} · 좋아 ${st.good} · 놓침 ${st.miss}`; $('end7').hidden = false; }
+}
+const tutFade = () => { const t = HB.clock(); return tutEnd != null && t != null ? seg(t, tutEnd, tutEnd + 1.4) : 0; };
+function tutCue() {
+  const t = HB.clock() ?? 0, b = tBeat(t), st = HB.stats, hits = st.perfect + st.good;
+  const text = b < 8 ? '보세요. 세 번은 저절로 뛰고, 넷째 박은 하은이 잇습니다.' : hits < TUT.need ? '이제 넷째 박에 · Space / J / 화면 누르기' : '좋아요.';
+  out.save(); out.globalAlpha = seg(t, 0.3, 1.0) * (1 - tutFade());
+  out.font = '600 22px "IBM Plex Sans KR", sans-serif'; out.textBaseline = 'middle'; out.textAlign = 'center';
+  const w = out.measureText(text).width + 40; out.fillStyle = 'rgba(10,8,7,.72)'; out.fillRect(cv.width / 2 - w / 2, 16, w, 42);
+  out.fillStyle = '#efe6d2'; out.fillText(text, cv.width / 2, 38);
+  if (b >= 8) { const dx = cv.width / 2 + w / 2 + 14; out.fillStyle = 'rgba(10,8,7,.72)'; out.fillRect(dx, 16, TUT.need * 24 + 16, 42); for (let k = 0; k < TUT.need; k++) { out.fillStyle = k < hits ? '#9cf58a' : 'rgba(239,230,210,.25)'; out.beginPath(); out.arc(dx + 20 + k * 24, 37, 7, 0, Math.PI * 2); out.fill(); } }
+  out.restore();
+}
+
+// ---------- sound: the line's own (motor, tubes, the gate's beep), steps, the voices' blips ----------
+let ac = null, sfxOut, NB, amb = null;
+function audio() {
+  if (ac) { if (ac.state === 'suspended') ac.resume(); return; }
+  ac = new (window.AudioContext || window.webkitAudioContext)();
+  sfxOut = ac.createGain(); sfxOut.gain.value = 0.8; sfxOut.connect(ac.destination);
+  NB = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate); const d = NB.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const loop = (f, type, q) => { const s = ac.createBufferSource(); s.buffer = NB; s.loop = true; const fl = ac.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q || 0.7; const gn = ac.createGain(); gn.gain.value = 0; s.connect(fl); fl.connect(gn); gn.connect(sfxOut); s.start(); return gn; };
+  const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 100; const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 240; const tg = ac.createGain(); tg.gain.value = 0; o.connect(lp); lp.connect(tg); tg.connect(sfxOut); o.start();
+  const m = ac.createOscillator(); m.type = 'triangle'; m.frequency.value = 52; const mg = ac.createGain(); mg.gain.value = 0; m.connect(mg); mg.connect(sfxOut); m.start();
+  amb = { room: loop(160, 'lowpass'), belt: loop(420, 'bandpass', 1.2), tubes: tg, motor: mg, birds: null };
+}
+function ambience(S) {
+  if (!amb) return; const at = ac.currentTime, set = (gn, v) => gn.gain.setTargetAtTime(v, at, 0.08);
+  set(amb.room, S ? 0.05 : 0); set(amb.belt, S && S.run ? 0.05 : 0); set(amb.motor, S && S.run ? 0.03 : 0);
+  set(amb.tubes, S ? 0.004 * (S.tubes[0] + S.tubes[1] + S.tubes[2]) : 0);
+}
+const thump = (w, f, amp, dec) => { const o = ac.createOscillator(), gn = ac.createGain(); o.frequency.setValueAtTime(f * 1.6, w); o.frequency.exponentialRampToValueAtTime(f, w + 0.04); gn.gain.setValueAtTime(0.0001, w); gn.gain.exponentialRampToValueAtTime(amp, w + 0.006); gn.gain.exponentialRampToValueAtTime(0.0001, w + dec); o.connect(gn); gn.connect(sfxOut); o.start(w); o.stop(w + dec + 0.05); };
+const noise = (w, dur, amp, type, f, q = 1) => { const s = ac.createBufferSource(); s.buffer = NB; const fl = ac.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const gn = ac.createGain(); gn.gain.setValueAtTime(amp, w); gn.gain.exponentialRampToValueAtTime(0.0001, w + dur); s.connect(fl); fl.connect(gn); gn.connect(sfxOut); s.start(w, Math.random() * 1.5); s.stop(w + dur + 0.02); };
+const tone = (w, type, f0, f1, amp, dur) => { const o = ac.createOscillator(), gn = ac.createGain(); o.type = type; o.frequency.setValueAtTime(f0, w); if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, w + dur); gn.gain.setValueAtTime(0.0001, w); gn.gain.exponentialRampToValueAtTime(amp, w + 0.005); gn.gain.exponentialRampToValueAtTime(0.0001, w + dur); o.connect(gn); gn.connect(sfxOut); o.start(w); o.stop(w + dur + 0.03); };
+const FX = {
+  scan: w => { tone(w, 'square', 1568, 1568, 0.03, 0.06); noise(w, 0.02, 0.08, 'highpass', 3000); },
+  buzz: w => { tone(w, 'sawtooth', 110, 104, 0.06, 0.32); thump(w, 90, 0.2, 0.15); },
+  step: w => { thump(w, 70, 0.12, 0.08); noise(w, 0.05, 0.05, 'lowpass', 1200); },
+  clock: w => { noise(w, 0.03, 0.35, 'highpass', 2400); thump(w + 0.01, 200, 0.25, 0.06); },
+  can: w => { tone(w, 'triangle', 2600, 2400, 0.05, 0.12); thump(w, 300, 0.1, 0.05); },
+  send: w => { tone(w, 'sine', 880, 1320, 0.05, 0.12); },
+  blip: w => { for (const d of [0, 0.08, 0.16]) tone(w + d, 'square', 640, 640, 0.022, 0.04); },
+  blipH: w => { for (const d of [0, 0.08, 0.16]) tone(w + d, 'square', 820, 820, 0.02, 0.04); },
+  blipL: w => { for (const d of [0, 0.09, 0.18]) tone(w + d, 'square', 330, 330, 0.028, 0.05); },
+  blipS: w => { for (const d of [0, 0.08, 0.16]) tone(w + d, 'square', 520, 520, 0.022, 0.04); }
+};
+function sfx(fn) { if (ac) FX[fn](ac.currentTime); }
+
+// ---------- input ----------
+function advance() {
+  if (mode !== 'talk' || afterAt || T < talkAt) return;
+  const [, text] = TALK[talkK]; if ((T - talkAt) / 0.04 < [...text].length) { talkAt = T - [...text].length * 0.04; return; }   // first click: show the whole line
+  talkK++; if (talkK >= TALK.length) { afterAt = T; return; } talkAt = T + 0.35;
+}
+const PRESS = new Set(['Space', 'KeyJ', 'KeyF', 'KeyK', 'KeyD', 'Enter']);
+addEventListener('keydown', e => {
+  if (!PRESS.has(e.code) || e.repeat) return;
+  if (mode === 'tut' && HB.clock() != null) { e.preventDefault(); HB.press(HB.clock() + (e.timeStamp - performance.now()) / 1000); }
+  else if (mode === 'talk') { e.preventDefault(); advance(); }
+});
+$('stage').addEventListener('pointerdown', e => {
+  if (e.target.closest('button, a')) return;
+  if (mode === 'tut' && HB.clock() != null) { e.preventDefault(); HB.press(HB.clock() + (e.timeStamp - performance.now()) / 1000); }
+  else if (mode === 'talk') { e.preventDefault(); advance(); }
+});
+$('start').addEventListener('click', e => { e.stopPropagation(); if (location.hash === '#1-7') start7(); else start6(); });
+$('to7').addEventListener('click', e => { e.stopPropagation(); start7(); });
+$('r6').onclick = () => { HB.halt(); start6(); };
+$('r7').onclick = () => start7();
+if (location.hash === '#1-7') { $('title').querySelector('h1').textContent = '1-7 하은의 새벽'; $('title').querySelector('.k').textContent = 'STAGE 1 · 1-7 · 오프닝'; $('title').querySelector('p').textContent = '명절 마지막 밤, 근무가 끝나 갈 무렵.'; }
+requestAnimationFrame(render);
+window.__days = { get mode() { return mode; }, get T() { return T; }, jump: s => { t0 = now() - s; }, advance, HB, start7, DAYS };
+})();
+</script>
+</body>
+</html>
