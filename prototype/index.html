@@ -402,6 +402,18 @@ const SOUL = {
   verse: [0, 1, 2, 3], chorus: [2, 4, 0, 3], half: Math.pow(2, 1 / 12)
 };
 SOUL.chords.push(...SOUL.chords.map(c => c.map(f => f * SOUL.half))); SOUL.roots.push(...SOUL.roots.map(f => f * SOUL.half));
+// 2-1 phase 2: 김 빅토르's post-punk in D minor. 0 Dm, 1 Bb, 2 F, 3 C, 4 A (the chords sit after SOUL's ten in the level's list)
+const PP = {
+  chords: [[146.83, 174.61, 220], [116.54, 146.83, 174.61], [174.61, 220, 261.63], [130.81, 164.81, 196], [110, 138.59, 164.81]],
+  roots: [73.42, 58.27, 87.31, 65.41, 55],
+  verse: [0, 1, 2, 3], chorus: [1, 3, 0, 4]
+};
+const PN = { A4: 440, Cs5: 554.37, C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880, Bb5: 932.33 };
+// his hook on a cold synth, 8 bars over Bb | C | Dm | A twice: [beat, note, length]
+const PP_HOOK = [[0, 'F5', 1.5], [1.5, 'D5', 0.5], [2, 'F5', 1], [3, 'G5', 1], [4, 'E5', 1.5], [5.5, 'C5', 0.5], [6, 'E5', 1], [7, 'G5', 1],
+  [8, 'A5', 2], [10, 'F5', 1], [11, 'D5', 1], [12, 'E5', 2], [14, 'Cs5', 1], [15, 'A4', 1],
+  [16, 'F5', 1.5], [17.5, 'D5', 0.5], [18, 'F5', 1], [19, 'Bb5', 1], [20, 'A5', 1.5], [21.5, 'G5', 0.5], [22, 'E5', 1], [23, 'C5', 1],
+  [24, 'D5', 3], [27, 'F5', 1], [28, 'E5', 2], [30, 'Cs5', 1], [31, 'A4', 1]];
 // the verse, sung, 8 bars over Dm7 | Gm7 | Bbmaj7 | A7 twice: [beat, note, length]
 const SMEL_A = [[0.5, 'A4', 0.5], [1, 'F4', 0.5], [1.5, 'D4', 1], [3, 'F4', 0.5], [3.5, 'G4', 0.5], [4, 'A4', 1.5], [5.5, 'Bb4', 0.5], [6, 'A4', 0.5], [6.5, 'G4', 1],
   [8.5, 'F4', 0.5], [9, 'D5', 1], [10, 'C5', 0.5], [10.5, 'A4', 1], [12, 'G4', 0.5], [12.5, 'A4', 0.5], [13, 'Cs5', 1.5], [14.5, 'E5', 0.5], [15, 'D5', 1],
@@ -729,22 +741,23 @@ const LEVELS = [
       { who:'반장', text:'내 허리 탓이다. 내일 또 하자.' }]
   }
   ,{
-    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'반장 → 김 빅토르 · 104 BPM · 분류 슈트 넷', tag:'소울 알앤비 · 축이 돈다 · 4라인', bpm:104, style:'soul21', fxTheme:'warm',
+    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'반장 → 김 빅토르 · 88→124 BPM · 분류 슈트 넷', tag:'소울 → 포스트펑크 · 축이 돈다 · 4라인', bpm:88, style:'ace21', fxTheme:'warm',
     // 2-1 (stage 2): 하은 is gone and line 3's numbers have dropped, so 김 빅토르, the ace of the next line (a sorting line), is sent
     // over. Phase 1 is line 3 as it was: 반장 loads one belt and you scan, the old way. In the break 빅토르 walks in and takes the
     // line, and the axis turns: the camera swings round to your end of the belt and the line becomes his four-way sort, four
     // chutes coming at you (a four-lane highway, D F J K or the four quarters of the screen). Phase 2 is played there.
-    tempo: [[0, 104]], clock:'02:40', title:'에이스', partners:['boss'], hints:false,
+    // 반장's line drags (88); with 빅토르 and the turn it picks up (124 from the drop)
+    tempo: [[0, 88], [120, 124]], clock:'02:40', title:'에이스', partners:['boss'], hints:false,
     cast: { first: 'boss', ids: ['boss', 'viktor'], seq: [[104, 'viktor']], offUntil: { viktor: 104 } },
     // the turn (beats), when the keys become the four chutes, and the four-lane chart from bar `from` (8 cells a bar; '1'-'4' =
     // the chute, '.' = nothing)
     quad: { turn: [113, 119], keys: 116, from: 30, bars: [
-      '1.2.3.4.', '4..3..2.', '1.2.1.3.', '4...3...', '1.3.2.4.', '2..3..1.', '1.2.3.4.', '4.3.2...',
-      '1.3.2.4.', '1..2.34.', '4.2.3.1.', '2.3.2.1.', '1.4.2.3.', '4..3.21.', '1.2.3.4.', '4.3.2.1.'
+      '1...2...', '3...4...', '1...3...', '2...4...', '1.2.3.4.', '4...3...', '2...1...', '1.2.3...',
+      '1.3.2.4.', '1...2.3.', '4.2.3.1.', '2...3...', '1.4.2.3.', '4...3.2.', '1.2.3.4.', '4.3.2.1.'
     ] },
     comfort: [],
-    chords: SOUL.chords, roots: SOUL.roots,
-    chordAt: bar => bar < 2 ? 0 : bar < 18 ? SOUL.verse[(bar - 2) % 4] : bar < 26 ? SOUL.chorus[(bar - 18) % 4] : bar < 30 ? 0 : bar < 38 ? SOUL.verse[(bar - 30) % 4] : bar < 46 ? 5 + SOUL.chorus[(bar - 38) % 4] : 5,
+    chords: SOUL.chords.concat(PP.chords), roots: SOUL.roots.concat(PP.roots),
+    chordAt: bar => bar < 2 ? 0 : bar < 18 ? SOUL.verse[(bar - 2) % 4] : bar < 26 ? SOUL.chorus[(bar - 18) % 4] : bar < 30 ? 0 : bar < 38 ? 10 + PP.verse[(bar - 30) % 4] : bar < 46 ? 10 + PP.chorus[(bar - 38) % 4] : 10,
     // wide windows: this is played on phones (딱 ±80 ms, 좋아 ±150 ms, past 220 ms a miss)
     win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 184,
     special:['분류한 상자', 'quad', '받아냄'],
@@ -3376,7 +3389,7 @@ function drawInspector(t, active, nowMs) {
 // In the break the camera swings round to your end of the line and the belt becomes 김 빅토르's four-way sort: four chutes
 // coming at you in perspective, a scanner on each, D F J K (or the four quarters of the screen). Boxes carry their chute's
 // colour on the label. 빅토르 stands at the far end on the sorter, sending them down.
-const QUAD = { HY: 16, JY: 176, W0: 300, D: 4, look: 2.6, cols: ['#e0574a', '#4a9be0', '#5fbf6a', '#f0c419'], colsRgb: [[224, 87, 74], [74, 155, 224], [95, 191, 106], [240, 196, 25]], keys: ['D', 'F', 'J', 'K'] };
+const QUAD = { HY: 16, JY: 176, W0: 300, D: 4, look: 3.2, cols: ['#e0574a', '#4a9be0', '#5fbf6a', '#f0c419'], colsRgb: [[224, 87, 74], [74, 155, 224], [95, 191, 106], [240, 196, 25]], keys: ['D', 'F', 'J', 'K'] };
 const QUADFX = { press: [-1e9, -1e9, -1e9, -1e9], parts: [] };
 const qS = z => 1 / (1 + z * (QUAD.D - 1));                    // scale at depth z (0 = your scanners, 1 = the far end)
 const qY = z => QUAD.HY + (QUAD.JY - QUAD.HY) * qS(z);
@@ -3480,13 +3493,13 @@ function drawQuadBox(n, z, t) {
 }
 function drawQuad(t, nowMs, active) {
   const beat = castBeatAt(t, active), now = nowMs, live = active || state === 'outro' || state === 'result';
-  const scroll = live ? (active ? t : timeAt(END_BEAT)) / (QUAD.look * SPB) : 0;
+  const scroll = live ? (active ? beatAt(t) : END_BEAT) / QUAD.look : 0;
   g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false;
   drawQuadRoom(beat, active);
   // the sorter at the far end: its housing, a lit mouth over the four chutes, 빅토르 on the platform behind it sending boxes down
   const yS = qY(1), xS0 = qX(-2.5, 1), xS1 = qX(2.5, 1);
   R(Math.round(xS0) - 6, Math.round(yS) - 40, Math.round(xS1 - xS0) + 12, 30, '#2a2d33'); R(Math.round(xS0) - 6, Math.round(yS) - 40, Math.round(xS1 - xS0) + 12, 2, '#4c5258');
-  const nxt = active ? notes.find(n => n.quad && n.state === 'pending' && n.arr - t < QUAD.look * SPB + 0.25 * SPB) : null;
+  const nxt = active ? notes.find(n => n.quad && n.state === 'pending' && n.beat - beat < QUAD.look + 0.25) : null;
   const ph = active ? beat - Math.floor(beat) : 0, vs = 0.42;
   g.save(); g.translate(W / 2 - BOSS_X * vs, yS - 46 - 87 * vs); g.scale(vs, vs);
   const hand = nxt ? { x: BOSS_X + 8 + (nxt.q - 1.5) * 7, y: 122 + Math.abs(nxt.q - 1.5) * 2 } : { x: BOSS_X + 13, y: 134 };
@@ -3500,7 +3513,7 @@ function drawQuad(t, nowMs, active) {
   // the boxes, far ones first; a scanned one rides on toward you, a missed one too, darkened
   const yJ = qY(0);
   if (live) {
-    const boxes = notes.filter(n => n.quad).map(n => ({ n, z: (n.arr - (active ? t : timeAt(END_BEAT))) / (QUAD.look * SPB) })).filter(o => o.z <= 1.0 && o.z >= -0.12).sort((a, b) => b.z - a.z);
+    const bNow = active ? beatAt(t) : END_BEAT, boxes = notes.filter(n => n.quad).map(n => ({ n, z: (n.beat - bNow) / QUAD.look })).filter(o => o.z <= 1.0 && o.z >= -0.12).sort((a, b) => b.z - a.z);
     for (const { n, z } of boxes) {
       const a = Math.max(0, Math.min(1, (1 - z) * 8)); g.globalAlpha = a;
       const r = drawQuadBox(n, z, t);
@@ -4722,6 +4735,25 @@ function pluck(t, f, d, v = 0.05) {
   gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(v, t + 0.005); gn.gain.exponentialRampToValueAtTime(0.0001, t + d);
   o.connect(fl); fl.connect(gn); gn.connect(mus); o.start(t); o.stop(t + d + 0.05);
 }
+// post-punk kit: a picked bass (bright saw, quick decay) with a sine under it; a chorused clean guitar (two detuned voices and a
+// dotted-eighth echo); a big gated snare; a cold two-oscillator synth lead
+function ppBass(t, f, d, v = 0.2) {
+  const o = ctx.createOscillator(), fl = ctx.createBiquadFilter(), gn = ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = f;
+  fl.type = 'lowpass'; fl.frequency.setValueAtTime(1600, t); fl.frequency.exponentialRampToValueAtTime(420, t + d); fl.Q.value = 2;
+  env(gn, t, 0.004, v, d); o.connect(fl); fl.connect(gn); gn.connect(mus); o.start(t); o.stop(t + d + 0.05);
+  osc('sine', f, t, 0.004, v * 0.7, d);
+}
+function ppGtr(t, f, d, v = 0.03, echo = 0) {
+  const fl = ctx.createBiquadFilter(); fl.type = 'bandpass'; fl.frequency.value = 2200; fl.Q.value = 0.7; fl.connect(mus);
+  for (const dt of [-9, 9]) { const o = osc('triangle', f, t, 0.003, v, d, fl); o.detune.value = dt; const o2 = osc('square', f, t, 0.003, v * 0.25, d * 0.6, fl); o2.detune.value = -dt; }
+  if (echo) ppGtr(t + echo, f, d, v * 0.35, 0);
+}
+const ppSnare = (t, v = 0.3) => { noise(t, 'bandpass', 1900, v, 0.16, 0.9); osc('triangle', 185, t, 0.002, v * 0.6, 0.09); noise(t + 0.01, 'lowpass', 3200, v * 0.35, 0.42, 0.7); };
+function ppLead(t, f, d, v = 0.04) {
+  const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 2600; fl.Q.value = 2; fl.connect(mus);
+  const a = osc('square', f, t, 0.012, v, d, fl), b = osc('sawtooth', f, t, 0.012, v * 0.7, d, fl); b.detune.value = 8;
+  const lf = ctx.createOscillator(), lg = ctx.createGain(); lf.frequency.value = 5.5; lg.gain.value = 6; lf.connect(lg); lg.connect(a.detune); lf.start(t + 0.2); lf.stop(t + d + 0.1);
+}
 function riser(t, d, v = 0.08) {
   const s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
   s.buffer = nbuf; s.loop = true; fl.type = 'bandpass'; fl.Q.value = 2; fl.frequency.setValueAtTime(400, t); fl.frequency.exponentialRampToValueAtTime(8000, t + d);
@@ -5453,7 +5485,7 @@ function buildEvents() {
         if (lift && bar >= 56 && inBar === 0) E(0, T => pad(T, chords[ci].map(f => f * 2), s * 4, 'triangle', 0.02));
         if (lift && bar === 58 && inBar === 0) E(0, T => riser(T, s * 8, 0.07));
       }
-    } else if (style === 'soul21') {
+    } else if (style === 'soul21' || (style === 'ace21' && b < 104)) {
       // 2-1 검수: soul R&B hip hop. A lazy kick (1, the 'and' of 2, a soft 3), the clap with a rim on 2 and 4, a ghost snare,
       // swung 8th hats with 16ths in the chorus, an 808 sliding under the root, Rhodes sevenths on 1 and the 'and' of 2, a clean
       // guitar on the off 'and's, the verse sung, the hook on a sax with horns and a choir pad; her finger snaps from the second verse.
@@ -5503,6 +5535,44 @@ function buildEvents() {
       const rel = (b - (sec === 'a1' ? 8 : sec === 'a2' ? 40 : sec === 'b1' ? 72 : sec === 'a3' ? 120 : 152)) % 32;
       if (chorus) { for (const [ob, nm, len, fall] of SMEL_B) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { sax(T, SN[nm] * up, len * s * 0.92, p2 ? 0.055 : 0.05, !!fall); if (len >= 1.5) voice(T, SN[nm] * up / 2, len * s * 0.9, 0.012); if (p2 && len >= 1.5) brassStab(T, [SN[nm] * up, SN[nm] * up * 1.26], len * s * 0.6, 0.016); }); }
       else for (const [ob, nm, len] of SMEL_A) if (Math.floor(ob) === rel) E((ob - rel) * s, T => { voice(T, SN[nm], len * s * 0.95, sec === 'a1' ? 0.026 : 0.03); ep(T, [SN[nm]], len * s * 0.8, p2 ? 0.018 : 0.012); if (p2) sax(T, SN[nm], len * s * 0.9, 0.028); });
+    } else if (style === 'ace21') {
+      // 2-1 from the break: 반장's line runs down (the Rhodes holding, the 808 breathing); 빅토르 walks in at 104 and at 112 his
+      // bass comes in alone, eighths on D, the hats build, a riser, a snare roll; the axis turns and at 120 the post-punk drops
+      // (124): drum machine, the driving bass, chorused guitar in eighths, and in the chorus his hook on a cold synth over a pad.
+      const bar = Math.floor(b / 4), sw = s / 4 * 0.3;
+      if (b < 112) {
+        if (b === 104) E(0, T => crash(T, 0.4));
+        if (inBar === 0) E(0, T => { rhodes(T, chords[ci], s * 4, 0.03); sub808(T, roots[ci], s * 2.4, 0.16); });
+        E(s / 2 + sw, T => hat(T, 0.03)); if (inBar === 1 || inBar === 3) E(0, T => rim(T, 0.12));
+        continue;
+      }
+      if (b < 120) {
+        for (let k = 0; k < 2; k++) E(k * s / 2, T => ppBass(T, PP.roots[0], s * 0.4, 0.16 + (b - 112) * 0.006));
+        if (b >= 116) for (let k = 0; k < 4; k++) E(k * s / 4, T => hat(T, 0.02 + (b - 116) * 0.01));
+        if (b === 112) E(0, T => riser(T, s * 8, 0.07));
+        if (b >= 118) for (let k = 0; k < 4; k++) E(k * s / 4, T => ppSnare(T, 0.08 + (b - 118) * 0.08 + k * 0.03));
+        if (b === 119) E(s / 2, T => whoosh(T, s * 0.5));
+        continue;
+      }
+      if (b >= 184) continue;
+      const chorus = bar >= 38, pc = PP.chords[(chorus ? PP.chorus : PP.verse)[(bar - (chorus ? 38 : 30)) % 4]], pr = PP.roots[(chorus ? PP.chorus : PP.verse)[(bar - (chorus ? 38 : 30)) % 4]];
+      if (b === 120) E(0, T => { crash(T); subDrop(T); });
+      if (b === 152) E(0, T => crash(T));
+      // the drum machine: kick on 1 and 3 (and the 'and' of 3 in the chorus), the big snare on 2 and 4, straight eighth hats, an
+      // open hat on the 'and' of 4, a tom fill at the end of every eight bars
+      if (inBar === 0 || inBar === 2) E(0, T => kick(T, 0.9)); if (chorus && inBar === 2) E(s / 2, T => kick(T, 0.6));
+      if (inBar === 1 || inBar === 3) E(0, T => ppSnare(T, chorus ? 0.34 : 0.28));
+      E(0, T => hat(T, 0.05)); if (inBar === 3) E(s / 2, T => openHat(T, 0.06)); else E(s / 2, T => hat(T, 0.035));
+      if (bar % 8 === 7 && inBar === 3) for (let k = 0; k < 4; k++) E(k * s / 4, T => tom(T, [220, 180, 150, 120][k], 0.32));
+      // the bass, driving eighths on the root, up the octave on the last 'and'
+      for (let k = 0; k < 2; k++) E(k * s / 2, T => ppBass(T, inBar === 3 && k ? pr * 2 : pr, s * 0.42));
+      // the chorused guitar: eighths up the chord, an octave above, with its echo
+      for (let k = 0; k < 2; k++) { const i8 = inBar * 2 + k, f = pc[[0, 1, 2, 1, 0, 2, 1, 2][i8]] * 2; E(k * s / 2, T => ppGtr(T, f, s * 0.45, chorus ? 0.022 : 0.028, s * 0.75)); }
+      // the chorus: a pad under it and his hook
+      if (chorus && inBar === 0) E(0, T => pad(T, pc.map(f => f * 2), s * 4, 'sawtooth', 0.012));
+      if (chorus) { const rel = (b - 152) % 32; for (const [ob, nm, len] of PP_HOOK) if (Math.floor(ob) === rel) E((ob - rel) * s, T => ppLead(T, PN[nm], len * s * 0.95)); }
+      // the verse: a thin echo of the hook, an octave down, every other bar
+      else if (bar % 2 === 1 && inBar === 0) E(0, T => ppLead(T, pc[2] * 2, s * 1.6, 0.02));
     } else if (style === 'disco22') {
       // 2-2 재검: disco funk. Four on the floor, the open hat on every 'and', closed 16ths, clap and snare on 2 and 4; a slap bass
       // and a clavinet riff on the chord's root; guitar chops on the 'e' and 'a'; strings and horns in the chorus; the verse and
@@ -5959,6 +6029,7 @@ function buildEvents() {
       else { noise(T + SPB * 2.5, 'bandpass', 700, 0.08, 0.12, 1.5, bus); noise(T + SPB * 3.4, 'lowpass', 500, 0.14, 0.09, 0.7, bus); }
       return;
     }
+    if (L.style === 'ace21') { kick(T, 0.9); crash(T); ppSnare(T, 0.3); ppBass(T, PP.roots[0], SPB * 3); PP.chords[0].forEach(f => ppGtr(T, f * 2, SPB * 4, 0.03, SPB * 0.75)); pad(T, PP.chords[0].map(f => f * 2), SPB * 5, 'sawtooth', 0.016); ppLead(T, PN.D5, SPB * 4); return; }
     if (L.style === 'soul21') { kick(T, 0.8); crash(T, 0.7); rhodes(T, chords[5], SPB * 6, 0.045); sub808(T, roots[5], SPB * 4, 0.22); brassStab(T, chords[5].slice(0, 3).map(f => f * 2), SPB * 1.2, 0.03); sax(T, SN.D5 * SOUL.half, SPB * 3.5, 0.05, true); chords[5].slice(0, 3).forEach(f => voice(T, f * 2, SPB * 5, 0.01)); stampSnd(T + SPB * 4, 0.4); return; }
     if (L.style === 'dembow23') { kick(T, 0.9); crash(T); sub808(T, roots[0], SPB * 4, 0.24); piano(T, chords[0].map(f => f * 2), SPB * 4, 0.05); brassStab(T, chords[0].slice(0, 3).map(f => f * 2), SPB * 1.5, 0.03); synthLead(T, DN.F5, SPB * 3, 0.03); voice(T, DN.F4, SPB * 4, 0.025); rim(T + SPB * 0.75, 0.3); rim(T + SPB * 1.5, 0.3); return; }
     if (L.style === 'finale26') { kick(T, 0.9); crash(T); [1, 1.5, 2].forEach((m, i) => gtrDist(T, roots[6] * 2 * m, SPB * 6, [0.07, 0.055, 0.04][i], i === 2)); slap(T, roots[6], SPB * 3); supersaw(T, chords[6].map(f => f * 2), SPB * 5, 0.012, 2400, true); brassStab(T, chords[6].slice(0, 3).map(f => f * 2), SPB * 1.5, 0.03); voice(T, FN.G4, SPB * 5, 0.03); voice(T + 0.02, FN.D5, SPB * 5, 0.02); tak(T + SPB * 4, 0.2); tak(T + SPB * 5, 0.2); tak(T + SPB * 5.25, 0.17); tak(T + SPB * 6, 0.2); truckHorn(T + SPB * 6.5); return; }
