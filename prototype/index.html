@@ -1066,13 +1066,14 @@ const LEVELS = [
     // from phase 3 the stage (drawStage15): the turn into it over beats 212.5-215.5, while he says "이 비트도 한번 받아봐요!",
     // so his slow beat drops (216) on a stage already lit. The final on two belts (from 288) opens with a cutscene over the
     // song's four-bar intro (dump): she piles boxes up at her end of both belts (288-296), shoves the whole pile down them at
-    // him (296-302), it flies off their ends in the song's breath of silence and comes down on him on the drop (304), a heap
-    // he stands in, knocked back a step, still holding the box he had picked up. Then she storms both belts at him (the upper
+    // him (296-302), it flies off their ends in the song's breath of silence and comes down on him on the drop (304): his
+    // feet go out from under him and he lands flat on his back in the heap, stars over his head, through her first chant;
+    // he scrambles up just before her verse (317.5-320) and stands in the heap from then on. Then she storms both belts at him (the upper
     // belt takes the upper lane's boxes, the lower the lower's); he stands at their far end trying to lift a box to throw back
     // and is knocked back a step every four bars as his light goes. After he stops it (432) the stage stays through the
     // outro's first lines, the two of them out of breath on it
-    stage: { from: 214, two: 288, fast: 288, push: [304, 432], hers: [[288, 433]], tilt: [[304, 0], [368, 0.02], [400, 0.045], [431.9, 0.08], [432, 0]],
-      dump: { stack: [288, 296], slide: [296, 302], hit: 304 },
+    stage: { from: 214, two: 288, fast: 288, push: [320, 432], hers: [[288, 433]], tilt: [[304, 0], [368, 0.02], [400, 0.045], [431.9, 0.08], [432, 0]],
+      dump: { stack: [288, 296], slide: [296, 302], hit: 304, up: [317.5, 320] },
       // round two, her verse and the hook: the words that land, on the LED wall as she says them ([beat, text, beats held,
       // the Korean under it]; timed off the recording, 75.5 BPM from beat 216, the song started at its bar 4)
       // the crowd's big moments in the final: the pile landing on him, "Why so cold", "the boxes never drop", the beat back
@@ -3162,11 +3163,26 @@ function drawStage15(t, nowMs, sv) {
     if (f >= 3 && f < 16) { const lift = Math.min(1, (f - 3) / 10); jp.hand = { x: BOSS_X + 10 - Math.round(4 * lift), y: Math.round(jA(FY - 6 - 56 * ease(lift))) + (lift >= 1 ? Math.round(Math.sin(nowMs / 40)) : 0) }; jp.reach = 50; jCarry = jp.hand; }
     if (J.k >= 1 && f < 1.2) jDrop = f / 1.2;
   }
+  // knocked flat by the pile (S.dump): his feet slide out towards her and he goes over backwards into the heap, about his
+  // feet; he lies there until he scrambles up (D.up)
+  let fall = 0;
+  if (D && D.up && b >= D.hit && b < D.up[1]) fall = b < D.up[0] ? 1 - Math.pow(1 - Math.min(1, (b - D.hit) / 0.35), 2) : 1 - ease((b - D.up[0]) / (D.up[1] - D.up[0]));
+  if (fall > 0) { jp.wince = true; jp.bob = 0; jp.hand = { x: BOSS_X + 18, y: Math.round(jA(FY - 34)) }; jp.reach = 50; }
   // their shadows on the floor, then them (him drawn smaller, his feet planted)
-  for (const [x, w] of [[hx, 11], [jx + Math.round(4 * jFlinch), 11]]) { g.fillStyle = 'rgba(0,0,0,.45)'; g.beginPath(); g.ellipse(x, FY + 1 + lift(x), w, 2.5, 0, 0, Math.PI * 2); g.fill(); }
+  for (const [x, w] of fall > 0.3 ? [[hx, 11]] : [[hx, 11], [jx + Math.round(4 * jFlinch), 11]]) { g.fillStyle = 'rgba(0,0,0,.45)'; g.beginPath(); g.ellipse(x, FY + 1 + lift(x), w, 2.5, 0, 0, Math.PI * 2); g.fill(); }
   g.save(); g.translate(0, hDy + lift(hx)); drawActor('haeun', hx, false, hp, nowMs, true, () => PARTNERS.haeun.arm(hp)); g.restore();
-  g.save(); g.translate(Math.round(4 * jFlinch), jDy + lift(jx)); drawActor('jiwoo', jx, true, jp, nowMs, true, top => { const ft = 84 + 64; R(BOSS_X - 6, ft, 5, 7, '#2f3440'); R(BOSS_X + 1, ft, 5, 7, '#2f3440'); R(BOSS_X - 7, ft + 7, 7, 3, '#e9e4da'); R(BOSS_X + 1, ft + 7, 7, 3, '#e9e4da'); PARTNERS.jiwoo.arm(jp); if (jCarry || swBox) { const hb = jCarry || swBox; drawBox(STG.box, hb.x, hb.y + 5, '', t); } });
+  // (knocked flat he is drawn after the heap, sprawled over it, and the boxes at his legs drawn over him again: drawDump)
+  const drawJ = () => {
+  g.save(); g.translate(Math.round(4 * jFlinch), jDy + lift(jx)); if (fall > 0) { g.translate(jx - Math.round(40 * fall), 158); g.rotate(1.15 * fall); g.translate(-jx, -158); }
+  drawActor('jiwoo', jx, true, jp, nowMs, true, top => { const ft = 84 + 64; R(BOSS_X - 6, ft, 5, 7, '#2f3440'); R(BOSS_X + 1, ft, 5, 7, '#2f3440'); R(BOSS_X - 7, ft + 7, 7, 3, '#e9e4da'); R(BOSS_X + 1, ft + 7, 7, 3, '#e9e4da'); PARTNERS.jiwoo.arm(jp); if (jCarry || swBox) { const hb = jCarry || swBox; drawBox(STG.box, hb.x, hb.y + 5, '', t); } });
   g.restore();
+  // stars going round his head while he is down
+  if (fall >= 1 && b >= D.hit + 0.5) {
+    const a = 1.15, fx = jx - 40 + Math.round(4 * jFlinch), hx0 = fx + Math.round(62 * Math.sin(a)), hy0 = FY + 1 - Math.round(62 * Math.cos(a)) - 10;
+    for (let k = 0; k < 3; k++) { const w = nowMs / 260 + k * Math.PI * 2 / 3, sx = Math.round(hx0 + Math.cos(w) * 9), sy = Math.round(hy0 + Math.sin(w) * 3); R(sx - 1, sy, 3, 1, '#ffe27a'); R(sx, sy - 1, 1, 3, '#ffe27a'); }
+  }
+  };
+  STG.lateJ = fall > 0 ? drawJ : null; if (!STG.lateJ) drawJ();
   if (jDrop != null) { const q = jDrop, x = jx - 8 + Math.round(18 * q), y = FY - 70 + Math.round(64 * q * q); g.save(); g.translate(x, y); g.rotate(q * 4); drawBox(STG.box, 0, 6, '', t); g.restore(); }
   STG.heads = { h: [hx + 2, 88 + hDy + lift(hx)], j: [jx - 2, 86 + jDy + lift(jx)] };
   // the belts and everything on them, about the scanner
@@ -3203,6 +3219,7 @@ function drawStage15(t, nowMs, sv) {
   g.restore();
   STG.jEnd = xR;
   if (S.dump && b >= S.dump.stack[0]) drawDump(b, nowMs, t, FY, xR);
+  if (STG.lateJ) { STG.lateJ(); STG.lateJ = null; DUMP_PILE.forEach(q => { if (q.hx < 318 && q.hb >= 141) { g.save(); g.translate(Math.round(q.hx), q.hb); g.rotate(q.rot); drawBox(STG.box, 0, 0, '', t); g.restore(); } }); }
   drawStageRest(t, nowMs, sv, b, sec, beatK, fin);
 }
 // 1-5, the start of the final (S.dump): the pile of boxes she dumps on him. Each box has a place in the pile at her end of
