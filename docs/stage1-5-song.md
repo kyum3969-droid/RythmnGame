@@ -463,3 +463,91 @@ Tick-tock on the line and I'm not done, I'm not
 **새 가사 뜻**: You wanted a beat? Then listen to mine — 비트 원했지? 그럼 내 거 들어 봐 / Every box on my line lands right on time — 내 라인 상자는 전부 제때 떨어져 / Your beat on my belt and I'm still not drowning — 네 비트가 내 벨트에 쏟아져도 난 안 잠겨 / Every second you waste is a second I got — 네가 버린 1초는 내가 버틴 1초야 / I was here before the night, I'll be here when it's done — 밤이 오기 전부터 여기 있었고, 끝나도 여기 있을 거야 / Tick-tock on the line and I'm not done, I'm not — 라인 위에 째깍째깍, 난 안 끝났어, 난 안— (지우가 끊음)
 
 **받으면 할 일**: 첫 다운비트(`lead`)와 BPM(146인지)을 재고, 마디 경계가 위 타임스탬프에 맞는지 확인. 맞으면 `songs`의 파일과 `lead`만 바꾼다. 줄이 들어가는 마디가 다르면 위 벨트(던져 올림) 자리만 고친다. 펀치라인 LED(`stage.cheers`)도 확인.
+
+### 결승 곡 v3: 막힌 v2 대신 (거절 피하기)
+
+v2는 제미나이가 막았다. 걸렸을 만한 것: "UK drill"(장르 자체가 폭력과 엮여 민감), "careless coworker"에 "answers"(사람 사이 다툼), "cold, aggressive", "pulled the cable", "out of breath", "drowning", "Sing ONLY … nothing added" 같은 명령조. v3은 **다툼 대신 자부심**으로 쓴다: 야간조가 자기 박을 지키는 스포츠 응원가 같은 곡. 장르는 "drill-style trap"으로 흐리고, 가사의 "you"는 그대로 두되 화자의 자신감으로 읽히게. 구조와 타임스탬프는 v2와 같아서 차트는 그대로 맞는다.
+
+**A. 노래(랩 포함)**
+
+```
+An intense, cinematic hip-hop anthem in a drill-style trap beat with one female rapper. The story: a young woman on the night shift in a warehouse, proud and focused, keeping perfect time while the boxes keep coming. Confident and determined, like a sports anthem before the final round. English rap, one female voice, no male vocals, no sung chorus. 146 BPM with a half-time feel (snare on beat 3), 4/4, A minor, about 1:05. Clean, positive lyrics.
+
+Sound: punchy trap drums with the snare and clap on beat 3, rolling hi-hats with triplet rolls, a deep gliding 808 bass walking down A, G#, F#, E, a dark piano melody, cinematic strings, a soft wordless choir pad, and a ticking clock all the way through.
+
+Vocal: a young woman of 23, calm, sharp and confident. Each line starts on the first beat of its bar, every word clear. In the last section she raps twice as fast and her voice gets more and more intense.
+
+Structure (one bar = 1.64 seconds):
+0:00 Intro, 4 bars, instrumental: the clock and piano, then strings, then hi-hats and a rising swell, a short silence before the drop.
+0:06.6 Chant, 6 bars: the drums and bass drop in. One chant line every two bars.
+0:16.4 Verse 1, 10 bars: one line per bar.
+0:32.9 Break, 2 bars: one big hit, then one bar with only the clock.
+0:36.2 Full beat, 6 bars: the drums at their fullest; she calls out "Tick!" and "Tock!" on the beats.
+0:46.0 Drop-out, 3 bars: drums out, only bass, clock and piano; the chant line twice, softly.
+0:51.0 Verse 2, 8 bars: drums back, double-time rap, one line per bar.
+1:04.1 The music ends abruptly on the downbeat, mid-phrase. No final hit, no fade.
+
+Lyrics:
+
+[Intro]
+
+[Chant]
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+
+[Verse 1]
+Why so cold, did the night shift steal my heart?
+That's what they say, so let me take it from the start
+Every time it starts, I'm the one who has to finish
+You play, I pay. That's the difference.
+You don't know what I need, you don't know what I've seen
+You stay up on the stage, I'll stay down at the machine
+You wanted a beat? Then listen to mine
+Every box on my line lands right on time
+Call me stiff, call me slow, say I live by the clock
+But the clock keeps the line moving, and the boxes never drop
+
+[Break]
+
+[Full beat]
+Tick! Tock! Tick! Tock! Tick! Tock! Tick! Tock!
+Tick! Tock! Tick! Tock! Tick! Tock! Tick! Tock!
+Tick! Tock! Tick! Tock! Tick! Tock! Tick! Tock!
+
+[Drop-out]
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+
+[Verse 2]
+Throw it, I catch it, I'm careful, I'm counting
+Your beat on my belt and I'm still keeping counting
+Can't keep up? Watch me, one more box on the top
+Every second on the clock is a second I've got
+Go on, send another, I'll catch every one
+I was here before the night, I'll be here when it's done
+Count it with me now, one, two, three, four
+Tick-tock on the line and I'm not done, I'm not
+```
+
+**B. 비트만 (A도 막히면)**: 가사 없이 비트부터 받는다. 구조는 같고, 보컬 자리는 리드 신스가 대신.
+
+```
+An intense, cinematic instrumental hip-hop anthem in a drill-style trap beat, no vocals. Proud and determined, like the final round of a competition. 146 BPM with a half-time feel (snare on beat 3), 4/4, A minor, about 1:05.
+
+Sound: punchy trap drums with the snare and clap on beat 3, rolling hi-hats with triplet rolls, a deep gliding 808 bass walking down A, G#, F#, E, a dark piano melody, cinematic strings, a soft wordless choir pad, and a ticking clock all the way through.
+
+Structure (one bar = 1.64 seconds):
+0:00 Intro, 4 bars: the clock and piano, then strings, then hi-hats and a rising swell, a short silence before the drop.
+0:06.6 Main theme, 6 bars: the drums and bass drop in; a bold piano and string melody, one phrase every two bars.
+0:16.4 Section A, 10 bars: the full beat, building bar by bar.
+0:32.9 Break, 2 bars: one big hit, then one bar with only the clock.
+0:36.2 Peak, 6 bars: the drums at their fullest, a short accent on every beat.
+0:46.0 Drop-out, 3 bars: drums out, only bass, clock and piano.
+0:51.0 Section B, 8 bars: drums back, hi-hats twice as busy, the most intense part.
+1:04.1 The music ends abruptly on the downbeat. No final hit, no fade.
+```
+
+**v2와 바뀐 가사**: 1절 첫 줄은 지우 대사를 따옴표로 인용하던 걸 "Why so cold, did the night shift steal my heart? / That's what they say"로(이름과 인용 빼기), "while you watch it drop" → "and the boxes never drop", 2절 "you're careless" → "I'm careful", "I'm still not drowning" → "I'm still keeping counting", "one more drop" → "one more box on the top", "Every second you waste" → "Every second on the clock". 91마디 상자는 "drop" 단어 자리 그대로라 차트는 같다.
+
+**그래도 막히면**: (1) 가사 블록의 1절 첫 두 줄을 빼 본다, (2) 맨 앞 문장에서 "drill-style"을 "dark trap"으로, (3) 그래도 안 되면 B로 비트를 받고 그 비트로 랩을 다시 요청한다.
