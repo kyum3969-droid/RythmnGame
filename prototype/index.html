@@ -41,6 +41,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   box-shadow:0 0 0 1px #000,0 0 40px rgba(0,0,0,.6);touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:pointer}
 
 .stage canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.stage canvas.hi{position:absolute;inset:0;pointer-events:none}
 
 /* touch feedback: a ring blooms where you touch */
 .ripple{position:absolute;width:11cqw;height:11cqw;margin:-5.5cqw 0 0 -5.5cqw;border-radius:50%;border:2px solid rgba(255,233,168,.75);pointer-events:none;
@@ -184,6 +185,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 <div class="page">
   <div class="stage" id="stage">
     <canvas id="cv" width="384" height="216" aria-label="컨베이어 벨트 작업 화면"></canvas>
+    <canvas id="cvhi" class="hi" width="384" height="216" hidden></canvas>
     <button class="tutskip" id="tutskip" type="button" hidden>튜토리얼 건너뛰기 ▸</button>
     <button class="devbtn" id="devbtn" type="button" hidden>DEV</button>
     <div class="guide" id="guide" hidden></div>
@@ -3406,8 +3408,10 @@ function drawInspector(t, active, nowMs) {
 // on to the end of its belt and drops into the cart between the lines; a missed one runs off the end.
 const MID = { ax: PLAYER_X, ww: 2 * PLAYER_X, wh: 432, oy: 108 };
 let midCv = null, midG = null;
-// (the far ends are trimmed a little and the view sits a touch lower, so the floor fills the screen)
-function midView(b) { const z = L.mid.zoom, e = b < z[0] ? 0 : b >= z[1] ? 1 : ease((b - z[0]) / (z[1] - z[0])); return { s: lerp(1, W / (MID.ww - 70), e), cx: lerp(W / 2, MID.ax, e), cy: lerp(H / 2, H / 2 - 12, e), e }; }
+// (the far ends are trimmed a little and the view sits a touch higher, so the floor fills the screen). sEnd: the pulled-back
+// scale, rounded so that at the screen's real resolution one dot of the floor is a whole number of device pixels
+function midView(b, sEnd) { const z = L.mid.zoom, e = b < z[0] ? 0 : b >= z[1] ? 1 : ease((b - z[0]) / (z[1] - z[0])); return { s: lerp(1, sEnd, e), cx: lerp(W / 2, MID.ax, e), cy: lerp(H / 2, H / 2 - 12, e), e }; }
+const cvHi = document.getElementById('cvhi'), gHi = cvHi.getContext('2d');
 function drawMid(t, nowMs, active) {
   const b = active ? beatAt(t) : END_BEAT, live = active || state === 'outro' || state === 'result', T = active ? t : timeAt(END_BEAT), AX = MID.ax;
   if (!midCv) { midCv = document.createElement('canvas'); midCv.width = MID.ww; midCv.height = MID.wh; midG = midCv.getContext('2d'); }
@@ -3462,10 +3466,19 @@ function drawMid(t, nowMs, active) {
   if (two) { thick(AX + 5, top + 20, MID.ww - 326 + pk(1) * 4, 120, 4, C.hoodie); g.save(); g.translate(MID.ww, 0); g.scale(-1, 1); drawGun(324 - pk(1) * 4, 117, pk(1)); g.restore(); }
   drawParticles(nowMs);
   g = g0;
-  // the camera
-  const V = midView(b), sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
-  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = V.e > 0; g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H);
-  g.drawImage(midCv, sx, sy, sw, sh, 0, 0, W, H); g.imageSmoothingEnabled = false; g.restore();
+  // the camera. Before it moves it draws into the game canvas like any frame; once it pulls back it draws into a canvas the size
+  // of the screen in device pixels laid over it, at a scale where each dot of the floor is a whole number of device pixels, so
+  // the far view stays crisp instead of being squeezed into 384 px
+  const dpr = window.devicePixelRatio || 1, hw = Math.max(W, Math.round(cv.clientWidth * dpr)), hh = Math.round(hw * H / W), k = hw / W;
+  // (a whole number of device pixels per dot where that keeps the framing; on a small screen the framing wins and the dots are
+  // sampled nearest, still sharp)
+  const want = W / (MID.ww - 70), mInt = Math.round(k * want), sEnd = mInt >= 2 && Math.abs(mInt / k - want) / want < 0.06 ? mInt / k : want, V = midView(b, sEnd), sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
+  if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx, sy, sw, sh, 0, 0, W, H); g.restore(); return; }
+  if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
+  cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#0c0a09'; gHi.fillRect(0, 0, hw, hh);
+  gHi.drawImage(midCv, sx, sy, sw, sh, 0, 0, hw, hh);
+  // the game canvas under it still gets the plain floor colour (nothing else shows through)
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
 }
 // ---------- 2-1 the turn: the four chutes ----------
 // In the break the camera swings round to your end of the line and the belt becomes 김 빅토르's four-way sort: four chutes
@@ -6916,9 +6929,10 @@ function frame(now) {
     else if (tReal > timeAt(END_BEAT)) finishPlay();
   }
   sceneTick(now);
+  if (!(L.mid && castBeatAt(t, active) >= L.mid.at && state !== 'select' && state !== 'title') && !cvHi.hidden) cvHi.hidden = true;
   if (SCENE.kind === 'office' && !active) { drawOffice(now); if (!hud.hidden) hud.hidden = true; }
   else if (SCENE.kind === 'wings' && !active) drawWings(now);
-  else if (L.mid && castBeatAt(t, active) >= L.mid.at) { drawMid(t, now, active); drawSceneFade(now); }
+  else if (L.mid && castBeatAt(t, active) >= L.mid.at && state !== 'select' && state !== 'title') { drawMid(t, now, active); drawSceneFade(now); }
   else if (L.quad && quadP(castBeatAt(t, active)) >= 1) { drawQuad(t, now, active); drawSceneFade(now); }
   else { drawScene(t, now / 1000, active, now); if (L.quad && quadP(castBeatAt(t, active)) > 0) drawQuadTurn(t, now, active); drawSceneFade(now); }
   FX.rumble = 0; if (active && L.show && !L.practiceOf) drawShow15(t, now);
