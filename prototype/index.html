@@ -58,9 +58,9 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .guide.no{animation:guideNo .25s}
 @keyframes guidePulse{from{transform:scale(1)}to{transform:scale(1.07)}}
 @keyframes guideNo{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-.devbtn{position:absolute;left:50%;top:1.2cqw;transform:translateX(-50%);z-index:7;font:inherit;font-size:max(10px,1.3cqw);padding:.2em .55em;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(10,8,8,.45);color:rgba(244,234,216,.6);cursor:pointer}
+.devbtn{position:absolute;left:2.2cqw;top:6.6cqw;z-index:7;font:inherit;font-size:max(10px,1.3cqw);padding:.2em .55em;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(10,8,8,.45);color:rgba(244,234,216,.6);cursor:pointer}
 .devbtn:hover,.devbtn.on{color:#f4ead8;background:rgba(40,30,26,.85)}
-.devpanel{position:absolute;left:50%;top:4.6cqw;transform:translateX(-50%);z-index:7;display:flex;flex-direction:column;gap:.3em;max-height:80%;overflow:auto;padding:.5em;border-radius:8px;background:rgba(10,8,8,.85);border:1px solid rgba(255,255,255,.2);font-size:max(10px,1.4cqw)}
+.devpanel{position:absolute;left:2.2cqw;top:10.4cqw;z-index:7;display:flex;flex-direction:column;gap:.3em;max-height:80%;overflow:auto;padding:.5em;border-radius:8px;background:rgba(10,8,8,.85);border:1px solid rgba(255,255,255,.2);font-size:max(10px,1.4cqw)}
 .devpanel button{font:inherit;text-align:left;padding:.3em .7em;border-radius:5px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#f4ead8;cursor:pointer;white-space:nowrap}
 .devpanel button:hover{background:rgba(255,255,255,.16)}
 .devpanel .end{border-color:rgba(143,214,148,.5)}.devpanel .end.bad{border-color:rgba(216,90,80,.5)}
@@ -741,37 +741,47 @@ const LEVELS = [
       { who:'반장', text:'내 허리 탓이다. 내일 또 하자.' }]
   }
   ,{
-    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'반장 → 김 빅토르 · 88→124 BPM · 분류 슈트 넷', tag:'소울 → 포스트펑크 · 축이 돈다 · 4라인', bpm:88, style:'ace21', fxTheme:'warm',
+    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'반장 → 김 빅토르 · 110 BPM · 분류 슈트 넷', tag:'펑크 · 축이 돈다 · 4라인', bpm:110.02, style:'funk21', fxTheme:'warm',
     // 2-1 (stage 2): 하은 is gone and line 3's numbers have dropped, so 김 빅토르, the ace of the next line (a sorting line), is sent
-    // over. Phase 1 is line 3 as it was: 반장 loads one belt and you scan, the old way. In the break 빅토르 walks in and takes the
-    // line, and the axis turns: the camera swings round to your end of the belt and the line becomes his four-way sort, four
-    // chutes coming at you (a four-lane highway, D F J K or the four quarters of the screen). Phase 2 is played there.
-    // 반장's line drags (88); with 빅토르 and the turn it picks up (124 from the drop)
-    tempo: [[0, 88], [120, 124]], clock:'02:40', title:'에이스', partners:['boss'], hints:false,
-    cast: { first: 'boss', ids: ['boss', 'viktor'], seq: [[104, 'viktor']], offUntil: { viktor: 104 } },
-    // the turn (beats), when the keys become the four chutes, and the four-lane chart from bar `from` (8 cells a bar; '1'-'4' =
-    // the chute, '.' = nothing)
-    quad: { turn: [113, 119], keys: 116, from: 30, bars: [
-      '1...2...', '3...4...', '1...3...', '2...4...', '1.2.3.4.', '4...3...', '2...1...', '1.2.3...',
-      '1.3.2.4.', '1...2.3.', '4.2.3.1.', '2...3...', '1.4.2.3.', '4...3.2.', '1.2.3.4.', '4.3.2.1.'
+    // over. The whole night is one recorded funk track, "Late Night Assembly" (audio/2-1-late-night-assembly.mp3, 110.02 BPM
+    // throughout, first downbeat 0.128 s in, 79 bars): a sluggish groove (bars 1-8), a build with the filter opening (9-16), the
+    // drop (17), the groove (17-33), the horns' chorus (34-46), the groove again (47-61), the chorus again (62-71), the last
+    // run (72-78), the last hit at the end of bar 78. Phase 1 is line 3 as it was: 반장 loads one belt and you scan, the old way,
+    // on the backbeat. In the build 빅토르 walks in and takes the line; the axis turns over its last two bars and the drop opens
+    // his four-way sort, four chutes coming at you (D F J K or the four quarters of the screen). Each chute is an instrument:
+    // D the kick (1 and 3), F the claps (2 and 4), J the bass and K the horns on the offbeats where they actually play.
+    tempo: [[0, 110.02]], clock:'02:40', title:'에이스', partners:['boss'], hints:false,
+    songs: [{ src: 'audio/2-1-late-night-assembly.mp3', at: 0, lead: 0.128, gain: 0.9 }], songStart: 0, noCount: true, bareBand: true, hitKit: 'ticktock',
+    cast: { first: 'boss', ids: ['boss', 'viktor'], seq: [[52, 'viktor']], offUntil: { viktor: 52 } },
+    // the turn over the build's last two bars, the keys become the chutes halfway through it, the four-lane chart from the drop
+    quad: { turn: [60, 67], keys: 64, from: 17, bars: [
+      '1.2.1.2.', '1.2.1.2.', '1.2.1.23', '1.2.132.', '142.1.2.', '1.2.1.2.', '1.2.142.', '1.231.2.',
+      '142.1.2.', '142.1.2.', '1.2.132.', '1.231.2.', '142.1.2.', '1.2.1.23', '1.2.1.23', '1.231.2.',
+      '142.1.2.', '....1...', '1.231.2.', '1.2.1.2.', '1.231.2.', '142.1.2.', '1.231.2.', '132.1.2.',
+      '1.231.2.', '1.241.2.', '1.231.2.', '132.1.2.', '1.231.2.', '132.1.2.', '1.2.1323', '1.23132.',
+      '14241.2.', '1.2.1.24', '1.2.1.2.', '1.23142.', '142.1.2.', '1.2.1.24', '1.2.1323', '1.2.1.24',
+      '1.2.1.2.', '142.1.2.', '1.2.1423', '1.23132.', '14241.2.', '....1...', '1.231.2.', '1.2.1.2.',
+      '1.2.132.', '142.1.2.', '1.23142.', '132.142.', '1.2.1.2.', '142.1.23', '1.231.23', '..2...2.',
+      '1.2.1.2.', '142.1.2.', '1.2.1323', '1.2.1.2.', '13231.2.', '1.2.142.', '........'
     ] },
     comfort: [],
-    chords: SOUL.chords.concat(PP.chords), roots: SOUL.roots.concat(PP.roots),
-    chordAt: bar => bar < 2 ? 0 : bar < 18 ? SOUL.verse[(bar - 2) % 4] : bar < 26 ? SOUL.chorus[(bar - 18) % 4] : bar < 30 ? 0 : bar < 38 ? 10 + PP.verse[(bar - 30) % 4] : bar < 46 ? 10 + PP.chorus[(bar - 38) % 4] : 10,
+    chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     // wide windows: this is played on phones (딱 ±80 ms, 좋아 ±150 ms, past 220 ms a miss)
-    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 184,
+    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 316,
     special:['분류한 상자', 'quad', '받아냄'],
-    sections: [[0, 'intro'], [2, 'a1'], [10, 'a2'], [18, 'b1'], [26, 'call'], [30, 'a3'], [38, 'b2'], [46, 'outro']],
-    // phase 1 on the one belt (8 cells a bar); from bar 30 the belt is empty and the chart is quad.bars
+    sections: [[0, 'intro'], [1, 'a1'], [9, 'build'], [17, 'groove'], [34, 'chorus'], [47, 'groove2'], [62, 'chorus2'], [72, 'last'], [79, 'outro']],
+    // phase 1 on the one belt (8 cells a bar): the backbeat, then 1 as well, then every beat as the build opens
     bars: [
-      '........', '........',
-      'x.......', 'x...x...', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.',
-      'x...x...', 'x.x.x...', 'x...x.x.', 'x.x.x...', 'x...x...', 'x.x.x.x.', 'x...x.x.', 'x.x.x...',
-      'x.x.x.x.', 'x.xx..x.', 'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'x.xx..x.', 'x.x.x.x.', 'x.x.x...',
-      'x.......', '........', '........', '........',
+      '........', '..x...x.', '..x...x.', '..x...x.', '..x...x.', 'x.x...x.', 'x.x...x.', 'x.x...x.',
+      'x.x...x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.xx..', '........',
       '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........', '........', '........', '........', '........', '........', '........',
-      '........', '........'
+      '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........'
     ],
     // the script is not written yet
     say: [],
@@ -4878,6 +4888,14 @@ function feverHit(t, beat, j) {
   noise(t, 'highpass', 3800, 0.05, 0.02, 0.7, bus);
 }
 const inFever = beat => !!L.fever && inRange(beat, L.fever);
+// 2-1's chutes play the band's percussion: D a kick, F claps, J a rim, K a cowbell (quieter on a 좋아)
+function quadHit(q, j) {
+  const t = ctx.currentTime, v = j === 'good' ? 0.7 : 1;
+  if (q === 0) { const o = osc('sine', 140, t, 0.002, 0.5 * v, 0.16, bus); o.frequency.exponentialRampToValueAtTime(50, t + 0.12); noise(t, 'lowpass', 900, 0.12 * v, 0.03, 0.7, bus); }
+  else if (q === 1) { noise(t, 'bandpass', 1300, 0.3 * v, 0.07, 1.4, bus); noise(t + 0.011, 'bandpass', 1500, 0.24 * v, 0.09, 1.4, bus); }
+  else if (q === 2) { noise(t, 'bandpass', 2700, 0.32 * v, 0.03, 4, bus); osc('triangle', 520, t, 0.001, 0.06 * v, 0.04, bus); }
+  else { const fl = ctx.createBiquadFilter(); fl.type = 'bandpass'; fl.frequency.value = 900; fl.Q.value = 1.5; fl.connect(bus); osc('square', 545, t, 0.001, 0.07 * v, 0.12, fl); osc('square', 815, t, 0.001, 0.05 * v, 0.1, fl); }
+}
 function hitSound(j, tones, beat, done, lane = -1) {
   const t = ctx.currentTime, th = fxTheme(beat), f = tones[(stats.combo + (done ? 1 : 0)) % Math.min(3, tones.length)], good = j === 'good';
   if (L.hitKit === 'ticktock' && lane >= 0) {
@@ -5128,7 +5146,8 @@ function buildEvents() {
     const t = timeAt(b), s = spbAt(t), ci = chordIdx(b), inBar = b % 4;
     const quiet = inRange(b, L.quiet), doze = inRange(b, L.doze), phone = inRange(b, L.phone), dark = blackout(b);
     const E = (dt, fn) => ev.push([t + dt, fn]);
-    if (b < 4) { E(0, T => rim(T, inBar === 0 ? 0.5 : 0.3)); continue; }
+    if (L.songStart === b) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(0)) startSong(T, 0, 0); });
+    if (b < 4 && !L.noCount) { E(0, T => rim(T, inBar === 0 ? 0.5 : 0.3)); continue; }
     if (b >= total - 4) continue;
     // combo layers shared by every track
     // (a level with bareBand has none: 1-5 plays recorded songs, and nothing of the engine's may sound under them)
@@ -6036,7 +6055,7 @@ function buildEvents() {
     if (L.style === 'disco22') { kick(T, 0.9); crash(T); clap(T, 0.25); supersaw(T, chords[0].map(f => f * 2), SPB * 5, 0.014, 2600, true); brassStab(T, chords[0].slice(0, 3).map(f => f * 2), SPB * 1.5, 0.03); slap(T, roots[0], SPB * 3); voice(T, FN.G4, SPB * 4, 0.03); voice(T + 0.02, FN.D5, SPB * 4, 0.02); tak(T + SPB * 3, 0.2); tak(T + SPB * 4, 0.2); tak(T + SPB * 4.25, 0.17); tak(T + SPB * 5, 0.2); return; }
     if (L.style === 'rock22') { kick(T, 0.9); crash(T); [1, 1.5, 2, 4].forEach((m, i) => gtrDist(T, roots[6] * 2 * m, SPB * 6, [0.07, 0.055, 0.04, 0.02][i], i === 3)); bass(T, roots[6], SPB * 4, 600); supersaw(T, chords[6].map(f => f * 2), SPB * 5, 0.012, 2600, true); truckHorn(T + SPB * 3); forklift(T + SPB * 5, 0.04); forklift(T + SPB * 5.5, 0.04); return; }
     if (L.style === 'edm1') { kick(T); crash(T); subDrop(T); supersaw(T, chords[4], SPB * 4, 0.016, 2400); anthem(T, N_.D5, SPB * 3, 2); return; }
-    if (L.style === 'duo15') return;   // the song has its own last hit
+    if (L.style === 'duo15' || L.style === 'funk21') return;   // the song has its own last hit
     if (L.style === 'duo14') { bbKick(T, 0.9); crash(T); organ(T, chords[0], SPB * 6, 0.035); sub808(T, roots[0], SPB * 4); gtrLead(T, N_.A4, SPB * 4, 0.05, true); forklift(T + SPB * 4.5, 0.02); return; }
     if (L.style === 'blues1') { kick(T); crash(T); organ(T, chords[0], SPB * 6, 0.04); bass(T, roots[0], SPB * 4, 380); bluesLead(T, N_.A4, SPB * 3, 0.05, true); return; }
     kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4);
@@ -6187,7 +6206,7 @@ function judgeNote(target, t) {
     const milestone = addCombo();
     const tones = CHORDS[chordIdx(target.beat)];
     const th = THEME[fxTheme(target.beat)];
-    if (target.gtr) gtrSample(j, target.beat); else if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false, target.lane);
+    if (target.quad) quadHit(target.q, j); else if (target.gtr) gtrSample(j, target.beat); else if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false, target.lane);
     const lightUp = phase3(target.beat);
     lastGood = now; FX.goodLane = target.lane; FX.glow = th.glow; ring(th.ring[(stats.combo + (j === 'good' ? 1 : 0)) % 2], target.lane);
     spawnBits(j === 'perfect' ? 14 : 6, th);
@@ -6544,7 +6563,10 @@ function beginShift(level) {
   ensureAudio(); loadLevel(level); loadSongs(level); resetRun(); handLabels();
   $('title').hidden = true; $('result').hidden = true; $('select').hidden = true; state = 'intro';
   sceneReset((level.intro[0] && level.intro[0].scene) || 'line');
-  runDialog(level.intro, level.practice ? () => startPractice(level) : startPlay);
+  const go = () => runDialog(level.intro, level.practice ? () => startPractice(level) : startPlay);
+  // a level whose recorded song starts on the first beat waits (up to 10 s) for it to load, or the shift would begin silent
+  if (level.songStart != null && level.songs) { const t0 = performance.now(); const wait = () => { if (state !== 'intro' || L !== level) return; if (level.songs.every(sp => SONG.bufs[sp.src] !== null && SONG.bufs[sp.src] !== undefined) || performance.now() - t0 > 10000) go(); else setTimeout(wait, 100); }; wait(); }
+  else go();
 }
 // the tutorial (level.practice), played on the running belts: a long empty stretch of the level with the tutorial music, lines
 // over heads that wait for a press, and practice boxes added as it goes. When the last run is done the shift proper starts.
@@ -6570,7 +6592,7 @@ $('tutskip').addEventListener('click', e => { e.stopPropagation(); skipPractice(
 // its music sections), or end it now with the good or the bad ending. Boxes before the jump count as perfect, so the jump
 // does not fail the run; a forced ending is not saved to progress.
 const DEV = { open: false };
-const SEC_KO = { intro: '인트로', outro: '아웃트로', end: '끝', finale: '마지막 한 방', lofi: '로파이', funk: '지우 음악', clash: '이어폰', silence: '정적', metal: '메탈' };
+const SEC_KO = { a1: '느린 라인', build: '빌드업 · 빅토르', groove: '그루브', chorus: '후렴', groove2: '그루브 2', chorus2: '후렴 2', last: '마지막', intro: '인트로', outro: '아웃트로', end: '끝', finale: '마지막 한 방', lofi: '로파이', funk: '지우 음악', clash: '이어폰', silence: '정적', metal: '메탈' };
 function devMarks() {
   if (L.devMarks) return L.devMarks;
   return (L.sections || []).map(([bar, name]) => [bar * 4, (SEC_KO[name] || name) + ' · ' + bar + '마디']).filter(([b], i, a) => i === 0 || b !== a[i - 1][0]);
