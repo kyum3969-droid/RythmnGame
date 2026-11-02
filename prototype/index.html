@@ -81,9 +81,6 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .bubble.obs{background:#d9d0bd}
 .bubble.tr::after{left:auto;right:1.6em}
 .bubble.mid::after{left:var(--tx,1.6em);right:auto}
-.bubble.wait{padding-right:1.7em}
-.bubble.wait::before{content:"▼";position:absolute;right:.55em;bottom:.3em;font-size:.62em;color:#8a6a3a;animation:waitBlink 1s steps(2,start) infinite}
-@keyframes waitBlink{to{visibility:hidden}}
 .bubble::after{content:"";position:absolute;left:1.6em;bottom:-.45em;border:.5em solid transparent;border-top-color:var(--paper);border-bottom:0}
 .bubble.loud{font-family:var(--display);font-weight:400;font-size:clamp(15px,3.1cqw,30px);letter-spacing:.02em;background:#fff4e8;color:#b3261e;
   border:2px solid #d8463b;box-shadow:0 3px 0 rgba(0,0,0,.5),0 0 18px rgba(216,70,59,.45);animation:shout .6s ease-out}
@@ -768,7 +765,8 @@ const LEVELS = [
     // right); the chart is in `bars` ('1' left lower = 반장's, '2' right lower, '3' left upper, '4' right upper, 'x' both lower;
     // 16 cells a bar; one hand's notes at least an 8th apart). 마르코 runs `route` ([beat, spot]: rl, ru, lu, ll, c beside you)
     // and throws the boxes he loads; he switches the radio off at `radio`; while he talks (`talk`) the camera comes in.
-    mid: { at: 0, zoom: [56.6, 60.9], keys: 70, from: 0, radio: 56, boombox: 62.6, talk: [146, 204], holds: [57.4, 61.6, 62.5], guide: [66, 100], tags: [72, 88, 100], upTags: [[124, 132, 140]],
+    mid: { at: 0, zoom: [56.6, 60.9], keys: 70, from: 0, radio: 56, boombox: 62.6, talk: [146, 204], holds: [[56.6, [{ who:'반장', text:'(라디오가 뚝 끊긴다) …어? 이게 뭐야?' }]],
+                                    [61.4, [{ who:'마르코', text:'헤이헤이헤이~! 3·4 통합 라인, 개통!' }, { who:'마르코', text:'그 노래 너무 졸려요! 음악부터 깔고, 뮤직 큐!' }]]], guide: [66, 100], tags: [72, 88, 100], upTags: [[124, 132, 140]],
       // the floor shouts (sound and ad-lib): a gang 'hey!' on the drop, in the band's stop and through the last run, 'yeah!'
       // when the horns come back, a brass fanfare (landing half a beat after its entry) on the second drop and the last hit
       shouts: [[76, 'hey', '헤이!'], [108, 'hey', '헤이!'], [142.5, 'hey', '헤이!'], [208, 'yeah', '예에~!'], [239.5, 'fanfare', '빠바밤~!'],
@@ -814,8 +812,7 @@ const LEVELS = [
     // 'b' 반장, 'v' 마르코 (no speaker: 반장 in phase 1, his bubble at the left)
     say: [[6, '…하나 빠지니까 티 나네.', 3.5], [22, '…오히려 적적하니 좋네.', 4],
           [38.5, '신입, 여유롭지?', 3.5], [50.5, '…왠지 오늘은 조용할 거 같구만.', 3.5],
-          [56.4, '(라디오가 뚝 끊긴다) …어? 이게 뭐야?', 1.5],
-          [61.05, '헤이헤이헤이~! 3·4 통합 라인, 개통!', 1.1, 0, 'v'], [62.2, '그 노래 너무 졸려요! 음악부터 깔고, 뮤직 큐!', 1.4, 0, 'v'], [64.5, '…저 양반이 4라인 에이스냐.', 2.5, 0, 'b'],
+ [64.5, '…저 양반이 4라인 에이스냐.', 2.5, 0, 'b'],
           [68, '신입! 왼손은 반장님 거, 오른손은 내 거!', 3.5, 0, 'v'], [80, '그렇지! 쿵, 짝! 쿵, 짝!', 3, 0, 'v'],
           [96, '…시끄러운 게 하나 붙었네.', 3, 0, 'b'], [104, '조금만 양념 칠게요~', 3, 0, 'v'],
           [120, '위 벨트도 우리 거예요! 위!', 3, 0, 'v'],
@@ -7068,7 +7065,7 @@ function devMarks() {
 }
 function devSeek(beat) {
   if (state !== 'play' || !ctx) return;
-  if (GUIDE.hold) { bubble.classList.remove('wait'); GUIDE.hold = false; guideResume(); }
+  holdCancel();
   if (TUT.on) { skipPractice(); if (state !== 'play') return; }
   const tB = timeAt(beat);
   stopHold(); CAM.to = null; SLOW.on = false;
@@ -7194,18 +7191,22 @@ function guidePress(ts, key, lane) {
 }
 // let the shift run on from exactly where it was held: move the song's start on by however long it was held, so the clock
 // picks up at the held time, and bring the music back
-// 2-1's entrance (mid.holds: beats): the shift holds on a line until you press (Enter, any key, a tap anywhere), a blinking
-// ▼ on the bubble; the clock and the scheduling stop like the guide's hold, so nothing slips. The lamps between run on time.
+// 2-1's entrance (mid.holds: [beat, lines]): the shift holds and the lines come up in the game's dialogue box (the panel along
+// the bottom, the name tag, typed out, a blinking ▼), as in 1-7; a press (Enter, any key, a tap) goes on, and after the last
+// line the shift runs on. The clock and the scheduling stop like the guide's hold, so nothing slips; the lamps between run on
+// their own timing.
 const HOLD = { done: new Set() };
 function holdTick(t) {
   const hs = L.mid && L.mid.holds; if (!hs || GUIDE.on) return;
-  const b = beatAt(t); if (b < hs[0] - 1) HOLD.done.clear();
-  for (const h of hs) if (!HOLD.done.has(h) && b >= h && b < h + 0.3) { HOLD.done.add(h); Object.assign(GUIDE, { on: true, t: timeAt(h), n: null, side: '', hold: true, at: performance.now() }); bubble.classList.add('wait'); break; }
+  const b = beatAt(t); if (b < hs[0][0] - 1) HOLD.done.clear();
+  for (const [h, lines] of hs) if (!HOLD.done.has(h) && b >= h && b < h + 0.3) {
+    HOLD.done.add(h); Object.assign(GUIDE, { on: true, t: timeAt(h), n: null, side: '', hold: true, at: performance.now() });
+    $('skip').hidden = true; runDialog(lines, holdEnd); break;
+  }
 }
-function holdAdvance() {
-  if (!GUIDE.hold || performance.now() - GUIDE.at < 300) return;   // not on a press that was already on its way
-  bubble.classList.remove('wait'); GUIDE.hold = false; guideResume();
-}
+function holdPress() { if (performance.now() - GUIDE.at < 300) return; advanceDialog(); }   // not on a press already on its way
+function holdEnd() { $('skip').hidden = false; GUIDE.hold = false; guideResume(); }
+function holdCancel() { if (!GUIDE.hold) return; clearInterval(typeTimer); dlg = null; dialogEl.hidden = true; holdEnd(); }
 function guideResume() {
   if (!GUIDE.on) return;
   if (ctx) { T0 += songRaw(performance.now()) - GUIDE.t; const T = ctx.currentTime; mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(0.0001, T); mus.gain.linearRampToValueAtTime(1, T + 0.05); }
@@ -7221,7 +7222,7 @@ function tutTick(t) {
   }
 }
 function startPlay() {
-  GUIDE.hold = false; GUIDE.on = false; HOLD.done.clear(); bubble.classList.remove('wait');
+  holdCancel(); GUIDE.hold = false; GUIDE.on = false; HOLD.done.clear();
   guideOff(); stopSong(); ensureAudio(); loadSongs(L); resetRun(); sceneReset();
   $('title').hidden = true; $('result').hidden = true; $('select').hidden = true;
   events = buildEvents(); evI = 0; T0 = ctx.currentTime + 0.8;
@@ -7268,7 +7269,7 @@ const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyD', 'KeyK']);
 function laneOf(side) { if (L.oneButton) return side; return L.lanes === 2 ? (L.autoLane != null ? 1 - L.autoLane : side === 'L' ? 0 : 1) : 0; }
 function handLabels() {}
 function press(ts, key, lane) {
-  if (state === 'play' && GUIDE.on && GUIDE.hold) holdAdvance();
+  if (state === 'play' && GUIDE.on && GUIDE.hold) holdPress();
   else if (state === 'play' && GUIDE.on) guidePress(ts, key, lane);
   else if (state === 'play' && TUT.on && TUT.phase === 'talk') tutAdvance();
   else if (state === 'play') onHit(ts, key, lane);
