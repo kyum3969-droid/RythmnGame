@@ -318,7 +318,7 @@ function jiwooFig(cx, top, o = {}) {
   R(cx - 9, top - 2, 18, 20, hood); R(cx - 9, top - 2, 18, 2, hoodD); R(cx + 5, top + 16, 4, 2, hoodD);
   R(cx - 6, top + 3 - up, 10, 12, skin); R(cx - 6, top + 3 - up, 10, 2 + down, '#1e1a1a');
   R(cx - 4, top + 8 + down - up, 2, down ? 1 : 2, ink); R(cx - 4, top + 12 + down - up, 2, 1, '#9a5a50');
-  for (let k = 0; k < 7; k++) R(cx - 5 + (k % 2), top + 13 + k, 1, 1, '#f4f1ea');   // the earbud's wire
+  if (!o.nobuds) for (let k = 0; k < 7; k++) R(cx - 5 + (k % 2), top + 13 + k, 1, 1, '#f4f1ea');   // the earbud's wire (none in 1-6: he has stopped listening)
   // the flowers in front of him, the near hand on the cone (or the far one, while the near hand knocks or reaches)
   const flowers = (bx, by) => { for (let r = 0; r < 18; r++) { const w = Math.round(12 - r * 0.55); R(bx - Math.floor(w / 2), by + 4 + r, w, 1, r % 5 === 0 ? '#cbbd9e' : '#e8dcc4'); } R(bx - 3, by + 13, 6, 2, '#d8463b');
     for (const [dx, dy, c] of [[4, 0, '#4a8a3a'], [-5, 1, '#4a8a3a'], [3, -2, '#f2a6c8'], [-1, -4, '#e86a6a'], [-4, -2, '#ffd27a'], [0, 0, '#f8f4ec'], [-3, 1, '#f2a6c8'], [2, 2, '#ffd27a']]) R(bx + dx - 1, by + dy, 3, 3, c); };
@@ -420,7 +420,9 @@ const lay = (d, f) => q => q - d * f + HX;
 const TUBE_Q = [-158, -38, 82];   // the three tubes in view at the start (x 64, 184, 304); their switch-off times are S1.tubesOff
 const tubeOn = (k, t) => 1 - seg(t, S1.tubesOff[k], S1.tubesOff[k] + 0.22);
 const sunAt = t => 0.22 + 0.78 * ease(seg(t, 4.4, 8.6));
-function beltRun(t) { const v0 = 150, T = S1.beltStop, p = Math.min(t, T); return v0 * (p - p * p / (2 * T)); }
+// (PRE: set while 1-7's opening draws this frame; BELT0: where the belt was when the opening handed over)
+let PRE = null, BELT0 = 0, FROM_PRE = false;
+function beltRun(t) { if (PRE) return PRE.run; const v0 = 150, T = S1.beltStop, p = Math.min(t, T); return BELT0 + v0 * (p - p * p / (2 * T)); }
 function interior(d, t) {
   const wl = lay(d, 0.7), sun = sunAt(t);
   R(0, 0, W, H, '#231b17');
@@ -485,6 +487,37 @@ function lineBelt(d, t, front) {
   GATES.forEach((q, i) => { const x = Math.round(bl(q)); if (x < -20 || x > W + 20) return; const on = laser && i === 0;
     if (on) { g.globalAlpha = 0.22; R(x - 2, 113, 5, 33, C.laser); g.globalAlpha = 1; }
     R(x + 8, 108, 4, 56, '#7b8288'); R(x + 8, 108, 4, 2, '#9aa1a6'); R(x, 113, 1, 33, on ? C.laser : '#3a2422'); R(x + 2, 103, 5, 2, on ? '#5a2b27' : '#2b2422'); });
+}
+// ---------- the far belt: 1-4/1-5's upper belt (지우's in 1-5), drawn as the game draws it, 36 px up and 0.82x about the scan line ----------
+// (the line has two belts, as in the game: she stands between them, the near one in front of her, the far one behind)
+const FAR_K = 0.82, FAR_DY = -36, FAR_END = -186;   // its loading end at the game's farBeltLeft (x 36 before scaling)
+function farXf() { g.translate(SCAN_X, BELT_Y + FAR_DY); g.scale(FAR_K, FAR_K); g.translate(-SCAN_X, -BELT_Y); }
+// laser: false, true (red) or a colour (a scan's green); onTop draws what rides on it (inside its transform, under the gate's front post)
+function farBelt(d, t, front, run = beltRun(t), laser = t < S1.laserOff, onTop = null) {
+  const bl = lay(d, 1.0), gx = Math.round(bl(GATES[0]));
+  g.save(); farXf();
+  if (!front) { R(gx - 11, 108, 4, 40, '#555a5f'); R(gx - 11, 105, 24, 5, C.metal); R(gx - 2, 110, 6, 3, '#2b2e31'); g.restore(); return; }
+  const x0 = Math.round(bl(FAR_END)), x1 = Math.ceil(SCAN_X + (W + 40 - SCAN_X) / FAR_K);
+  if (x0 < x1) {
+    // its legs down to the floor behind the near belt, a rail across them, the shade under it
+    const gr = g.createLinearGradient(0, BELT_Y + 16, 0, BELT_Y + 50); gr.addColorStop(0, 'rgba(6,5,8,.55)'); gr.addColorStop(1, 'rgba(6,5,8,0)'); g.fillStyle = gr; g.fillRect(x0 - 2, BELT_Y + 16, x1 - x0 + 2, 34);
+    for (let q = FAR_END + 30; q < FAR_END + 1400; q += 80) { const x = Math.round(bl(q)); if (x < x0 || x > x1) continue; R(x, BELT_Y + 16, 4, 52, '#2b2422'); R(x, BELT_Y + 16, 1, 52, '#3d3431'); }
+    R(x0 - 2, BELT_Y + 44, x1 - x0 + 2, 3, '#2b2422'); R(x0 - 2, BELT_Y + 44, x1 - x0 + 2, 1, '#3d3431');
+    // the belt: its top and the paint on it, the face and its rollers, the cap at the loading end
+    R(x0, BELT_Y, x1 - x0, 4, C.belt); R(x0, BELT_Y, x1 - x0, 1, '#4a403b');
+    const k0 = Math.floor((FAR_END - run) / MARK), k1 = Math.ceil((x1 - HX + d - run) / MARK);
+    for (let k = k0; k <= k1; k++) { const x = Math.round(bl(k * MARK + run)); if (x < x0 + 1 || x >= x1) continue; const q = ((k % 4) + 4) % 4;
+      if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); } else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44'); else R(x, BELT_Y + 1, 1, 3, C.slat); }
+    R(x0, BELT_Y + 4, x1 - x0, 12, C.face);
+    const ro = ((run % 14) + 14) % 14;
+    for (let q = Math.floor((FAR_END - 14) / 14) * 14; q < x1 - HX + d + 14; q += 14) { const x = Math.round(bl(q + ro)); if (x >= x0 + 2 && x < x1) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); } }
+    R(x0, BELT_Y + 15, x1 - x0, 1, '#0c0a09'); R(x0 - 4, BELT_Y - 1, 5, 17, '#3d3431');
+  }
+  if (onTop) onTop();
+  const lc = laser ? (typeof laser === 'string' ? laser : C.laser) : null;
+  if (lc) { g.globalAlpha = 0.22; R(gx - 2, 113, 5, 33, lc); g.globalAlpha = 1; }
+  R(gx + 8, 108, 4, 56, '#7b8288'); R(gx + 8, 108, 4, 2, '#9aa1a6'); R(gx, 113, 1, 33, lc || '#3a2422'); R(gx + 2, 103, 5, 2, lc ? (lc === C.laser ? '#5a2b27' : lc) : '#2b2422');
+  g.restore();
 }
 // chain-link: one 6x6 diamond tile, repeated
 let MESH = null;
@@ -595,7 +628,7 @@ function street(t) {
   const inside = fn => { if (bx <= 0) return; g.save(); g.beginPath(); g.rect(0, 0, bx, H); g.clip(); fn(); g.restore(); };
   const outside = fn => { if (bx >= W) return; g.save(); g.beginPath(); g.rect(bx, 0, W - bx, H); g.clip(); fn(); g.restore(); };
   let room = { wins: [], tubes: [] };
-  inside(() => { room = interior(d, t); lineBelt(d, t, false); });
+  inside(() => { room = interior(d, t); farBelt(d, t, false); if (PRE) PRE.far(); farBelt(d, t, true); lineBelt(d, t, false); if (PRE) PRE.near(); });
   outside(() => { exterior(d, t); if (WHO === 'jiwoo') pedestrians(d, t); });
   // the end wall: lintel over the door and the rolled-up shutter, the door's rails
   if (bx > -20 && bx < W + 20) {
@@ -607,11 +640,11 @@ function street(t) {
   if (WHO === 'jiwoo') inside(() => { const cx = Math.round(132 - d), tp = HTOP + 7; person(cx, tp, { hair: 'cap', hc: '#2c3b57', sk: SK[2], top: '#f07a2a', sh: '#6b7073', bot: '#3a3f45', act: 'hang', seated: true, m: true });
     R(cx - 7, tp + 26, 14, 2, '#ebe5c9'); R(cx + 9, tp + 22, 3, 8, '#3a3f45'); });   // the vest's reflective band; his hand at his back
   // her
-  const { o, top } = haeunPose(t, d);
+  const { o, top } = PRE ? PRE.her : haeunPose(t, d), HXX = PRE ? PRE.hx : HX;
   const outK = clamp((HX - bx + 6) / 12, 0, 1), spill = clamp(1 - (bx - HX) / 70, 0, 1);
   haeunSprite(o);
   if (outK > 0.5) tintSprite('#fff0e0');
-  putSprite(HX, top);
+  putSprite(HXX, top);
   // what hides her legs: the belt inside, the low wall outside; then the room's light: the tubes, the dawn over everything
   // inside, the sun's shafts, the door's spill, the dust
   const dark = 1 - TUBE_Q.reduce((a, _, k) => a + tubeOn(k, t), 0) / 3;
@@ -632,8 +665,8 @@ function street(t) {
     dust(t, shafts, sun, { x: 0, y: 30, w: W, h: 170, ox: d * 0.8 });
   });
   outside(() => { lowWall(d); g.globalCompositeOperation = 'lighter'; glow(SUN.x, SUN.y + 20, 160, '255,200,140', 0.12); });
-  let lightIn = 0; for (const s of shafts) lightIn = Math.max(lightIn, inShaft(HX, top + 8, s.x, s.y, s.w));
-  putRim(HX, top, 1, outK > 0.5 ? 0 : -1, outK > 0.5 ? '#ffe6b4' : '#ffd9a0', Math.max((0.12 + 0.45 * lightIn) * sun, 0.6 * spill, 0.7 * outK), BELT_Y - 2);
+  let lightIn = 0; for (const s of shafts) lightIn = Math.max(lightIn, inShaft(HXX, top + 8, s.x, s.y, s.w));
+  putRim(HXX, top, 1, outK > 0.5 ? 0 : -1, outK > 0.5 ? '#ffe6b4' : '#ffd9a0', Math.max((0.12 + 0.45 * lightIn) * sun, 0.6 * spill, 0.7 * outK), BELT_Y - 2);
   // a pillar passing close to the lens (inside only)
   inside(() => { for (const q of [200]) { const x = Math.round(q - d * 1.45 + HX); if (x < -20 || x > W) continue; R(x, 0, 14, H, '#0f0c0b'); R(x + 13, 0, 1, H, '#1d1714'); for (let y = 120; y < 128; y += 4) { R(x, y, 14, 2, '#c99a1e'); R(x, y + 2, 14, 2, '#15110e'); } } });
   // once she is out, the cutaway closes: B동's outside wall fades in over the inside (corrugated panels, the sign, the morning on
@@ -1462,7 +1495,7 @@ function render(t) {
   out.imageSmoothingEnabled = false; out.globalAlpha = 1;
   out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = "#000"; out.fillRect(0, 0, cv.width, cv.height);
   out.drawImage(wb, 0, CROP, W, H - CROP, 0, Math.round(LETTERBOX.shift * letterK(t)) * SC, cv.width, cv.height * (H - CROP) / H);
-  const fade = Math.max(1 - seg(t, 0.2, 1.8), seg(t, PIC_END - 2.2, PIC_END - 0.1));
+  const fade = Math.max(FROM_PRE ? 0 : 1 - seg(t, 0.2, 1.8), seg(t, PIC_END - 2.2, PIC_END - 0.1));
   if (fade > 0) { out.fillStyle = `rgba(0,0,0,${fade})`; out.fillRect(0, 0, cv.width, cv.height); }
 }
 // every scene of the cutscene at time t, drawn into the world canvas (her own part; the reprise replays it)
@@ -1494,7 +1527,8 @@ function drawWorld(t) {
 }
 // her part, as if she were the only one left: the world sinks toward a cold dark at the edges and the light stays on her
 function spotlight() {
-  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'multiply';
+  if (PRE && PRE.spot <= 0.01) return;
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'multiply'; if (PRE) g.globalAlpha = PRE.spot;
   const gr = g.createRadialGradient(HX, HTOP + 26, 14, HX, HTOP + 26, 250);
   gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.22, '#f2f0ec'); gr.addColorStop(0.55, '#8c8e9e'); gr.addColorStop(1, '#2e303e');
   g.fillStyle = gr; g.fillRect(0, 0, W, H); g.restore();
@@ -1869,15 +1903,16 @@ const HBCV = document.createElement('canvas'); HBCV.width = cv.width; HBCV.heigh
 // 1-6's rhythm game, Rhythm Doctor style: her mother's heartbeat runs along a row at the bottom, three beats by themselves and the
 // 4th yours to press; later 하은's own heart joins as a second row. The code is stage1-6.html's, kept as it is, with its own
 // drawing context and audio; the cutscene is its movie, played on the song's clock.
-const HB = (() => {
+// (a factory: the cutscene's rows on the songs' beats, and 1-7's tutorial rows on a steady 62 BPM)
+function makeHB(cfg) {
+  const { beatT, tBeat, LEAD, NBEAT } = cfg;
   const SC = 3, G0 = HBCV.getContext('2d'); let g = G0;
   const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
   const ROW = 4;   // beats from a row's start to its arrival: three heartbeats come in by themselves, the 4th is the player's
   const ROWS = [];
-  SEG.forEach((_, s) => { if (s * 8 >= SONG1_BEATS) return; for (const h of [0, 4]) { const b0 = s * 8 + h, first = h === 0; ROWS.push({ lane: 0, b0, demo: b0 === 0, skip: (first ? { 9: [1], 10: [0, 2], 11: [2] } : { 9: [2], 10: [1], 12: [1] })[s] || [], cue: first ? { 0: '보세요: 네 번째 박은 하은이 이어 줍니다', 1: '네 번째 박에!', 5: '빨라진다', 7: '느려진다', 9: '한 박이 빠져도, 세던 대로', 17: '괜찮아' }[s] : undefined }); } });
+  cfg.rows(ROWS);
   // (in the cutscene there is one row only, her mother's: 하은's second row is left out)
   // 지우's heart: a little uneven while he walks behind her (a beat missing here and there), steady once her beat comes in
-  for (let k = 0; k < (QREP.length - 1) / 4; k++) ROWS.push({ lane: 0, b0: REP_B0 + 4 * k, demo: false, skip: { 0: [1], 2: [0, 2], 3: [2] }[k] || [] });
   const TWO_AT = beatT(106) - 1.4;
   let EV = [], TARGETS = [], END_T = 0;
   function compile() {
@@ -1889,7 +1924,7 @@ const HB = (() => {
       const tg = { t: beatT(r.b0 + ROW - 1), row: ri, lane: r.lane, demo: !!r.demo, judge: null, d: 0 }; TARGETS.push(tg); r.tg = tg;
       if (r.demo) EV.push({ t: tg.t, type: 'demo', lane: 0 });
     });
-    EV.push({ t: LEAD - 1.2, type: 'click' }, { t: LEAD - 0.6, type: 'click' });
+    if (cfg.clicks !== false) EV.push({ t: LEAD - 1.2, type: 'click' }, { t: LEAD - 0.6, type: 'click' });
     END_T = beatT(NBEAT) + 1.2; EV.sort((a, b) => a.t - b.t);
   }
   compile();
@@ -2155,7 +2190,175 @@ const HB = (() => {
     press(t) { press(t); },
     mute(m) { muted = m; if (out) out.gain.setTargetAtTime(m ? 0 : 0.9, ac.currentTime, 0.05); }
   };
-})();
+}
+const HB = makeHB({ beatT, tBeat, LEAD, NBEAT, rows: ROWS => {
+  SEG.forEach((_, s) => { if (s * 8 >= SONG1_BEATS) return; for (const h of [0, 4]) { const b0 = s * 8 + h, first = h === 0; ROWS.push({ lane: 0, b0, demo: b0 === 0, skip: (first ? { 9: [1], 10: [0, 2], 11: [2] } : { 9: [2], 10: [1], 12: [1] })[s] || [], cue: first ? { 0: '보세요: 네 번째 박은 하은이 이어 줍니다', 1: '네 번째 박에!', 5: '빨라진다', 7: '느려진다', 9: '한 박이 빠져도, 세던 대로', 17: '괜찮아' }[s] : undefined }); } });
+  for (let k = 0; k < (QREP.length - 1) / 4; k++) ROWS.push({ lane: 0, b0: REP_B0 + 4 * k, demo: false, skip: { 0: [1], 2: [0, 2], 3: [2] }[k] || [] });
+} });
+
+// ---------- 1-7's opening, before the song: the end of her last shift, 05:50 ----------
+// The cutscene's own first frame (drawn by street() with PRE set): both belts running empty, the tubes and the lasers on. 반장
+// sends 지우 and the rookie home (지우 has to be told twice); she walks along her belt from its loading end to the middle and puts
+// her hands on it; 반장 gets up and comes to stand behind her shoulder, both looking down the line, not at each other. Four lines.
+// He taps the belt once, his habit, and goes. Then her heart: the line's scanner beep slows into a heartbeat and the tutorial
+// rows come up in the black bar (the cutscene's own row code, at 62 BPM); once she has made four 4th beats the cutscene runs on
+// from there without a cut: the belt winds down and she taps it twice.
+const OPEN = { on: false, t0: 0, k: 0, at: 0, tutAt: null, endAt: null, seen: new Set() };
+const OPEN_STEPS = [
+  { wait: 1.8 },
+  { line: ['boss', '…지우, 신입. 먼저 들어가.', '…Jiwoo. Rookie. Go on home.'] },
+  { line: ['boss', '…지우.', '…Jiwoo.'] },
+  { act: 'go', dur: 3.2 },
+  { act: 'walk', dur: 5.8 },
+  { line: ['boss', '…하은아.', '…Haeun.'] },
+  { line: ['boss', '이제 그만둘 거냐.', 'So you’re quitting.'] },
+  { line: ['haeun', '…네.', '…Yes.'] },
+  { line: ['boss', '…알겠다.', '…All right.'] },
+  { act: 'leave', dur: 4.8 },
+  { act: 'tut' }
+];
+const OPEN_I = n => OPEN_STEPS.findIndex(s => s.act === n);
+const OPEN_WHO = { boss: { ko: '반장', en: 'Foreman' }, haeun: { ko: '하은', en: 'Haeun' } };
+const TUT = { lead: 3.0, bp: 60 / 62, rows: 12, demo: 2, need: 4 };
+const TUT_HB = makeHB({ beatT: b => TUT.lead + b * TUT.bp, tBeat: t => (t - TUT.lead) / TUT.bp, LEAD: TUT.lead, NBEAT: TUT.rows * 4, clicks: false,
+  rows: ROWS => { for (let k = 0; k < TUT.rows; k++) ROWS.push({ lane: 0, b0: 4 * k, demo: k < TUT.demo, skip: [] }); } });
+const HER_SPOT = 52, BOSS_AT = 190, JIWOO_FAR = 61, PLAYER_X = 340;   // her belt's loading end; where 반장 comes to stand; 지우 behind the far belt (its own x)
+const ou = () => performance.now() / 1000 - OPEN.t0;
+// how far into an act (0 before it, 1 once it is over)
+function actK(name, u) { const i = OPEN_I(name); if (OPEN.k < i) return 0; if (OPEN.k > i) return 1; return clamp((u - OPEN.at) / OPEN_STEPS[i].dur, 0, 1); }
+function startOpen() {
+  if (playing) setPlaying(false);
+  OPEN.on = true; OPEN.t0 = performance.now() / 1000; OPEN.k = 0; OPEN.at = 0; OPEN.tutAt = null; OPEN.endAt = null; OPEN.seen = new Set();
+  started = true; $('big').hidden = true; T = 0; FROM_PRE = false; BELT0 = 0;
+  initAudio(); if (ac.state === 'suspended') ac.resume(); newBus(); HB.unlock(); TUT_HB.unlock(); openAmb(true);
+  playBtn.textContent = '오프닝';
+}
+function stopOpen() { if (!OPEN.on) return; OPEN.on = false; TUT_HB.halt(); openAmb(false); playBtn.textContent = playing ? '일시정지' : '재생'; }
+function openAmb(on) { if (!amb) return; const t = ac.currentTime; amb.room.gain.setTargetAtTime(on ? 0.05 : 0, t, 0.3); amb.rumble.gain.setTargetAtTime(on ? 0.05 : 0, t, 0.3); amb.buzz.gain.setTargetAtTime(on ? 0.008 : 0, t, 0.3); }
+// a click or Enter on a line: the whole line first, then the next
+function openAdvance() {
+  const s = OPEN_STEPS[OPEN.k]; if (!s || !s.line) return; const u = ou(); if (u < OPEN.at) return;
+  const n = [...s.line[subLang === 'ko' ? 1 : 2]].length; if ((u - OPEN.at) / 0.032 < n) { OPEN.at = u - n * 0.032; return; }
+  OPEN.k++; OPEN.at = u + 0.3;
+}
+function openStep(u) {
+  const s = OPEN_STEPS[OPEN.k];
+  if (s.wait != null) { if (u >= OPEN.at + s.wait) { OPEN.k++; OPEN.at = u; } }
+  else if (s.act && s.act !== 'tut') { if (u >= OPEN.at + s.dur) { OPEN.k++; OPEN.at = u; } }
+  else if (s.act === 'tut' && OPEN.tutAt == null) { OPEN.tutAt = u; TUT_HB.reset(); TUT_HB.begin(0); heartIn(); }
+}
+// the scanner's beep slowing into a heartbeat, the line's hum going down under it
+function heartIn() {
+  const t0 = ac.currentTime + 0.02, b = TUT.bp, L0 = TUT.lead;
+  tone(t0 + L0 - 3 * b, 'square', 1568, 1568, 0.03, 0.06);
+  tone(t0 + L0 - 2 * b, 'sine', 1046, 980, 0.03, 0.1); thump(t0 + L0 - 2 * b, 58, 0.18, 0.18);
+  thump(t0 + L0 - b, 58, 0.45, 0.22); thump(t0 + L0 - b + 0.14, 50, 0.28, 0.18);
+  amb.rumble.gain.setTargetAtTime(0.018, ac.currentTime, 1.0); amb.buzz.gain.setTargetAtTime(0.004, ac.currentTime, 1.0);
+}
+// the rookie (the player), off duty: hi-vis vest over the hoodie, arms down
+function rookie(cx, top, m) {
+  g.save(); if (m) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
+  R(cx - 9, top + 18, 18, 36, '#2f4f58'); R(cx - 9, top + 20, 18, 22, '#cfe04a'); R(cx - 9, top + 32, 18, 2, '#ebe5c9');
+  R(cx - 7, top + 14, 15, 5, '#264149'); R(cx - 6, top + 1, 12, 14, C.skin);
+  R(cx - 7, top - 1, 14, 5, '#1e1a1a'); R(cx + 1, top + 1, 6, 10, '#1e1a1a'); R(cx - 4, top + 7, 2, 2, C.ink);
+  thick(cx - 7, top + 22, cx - 8, top + 34, 4, '#2f4f58'); R(cx - 9, top + 34, 3, 3, C.skin);
+  g.restore();
+}
+const BOSS_LOOK = { hair: 'cap', hc: '#2c3b57', sk: SK[2], top: '#f07a2a', sh: '#6b7073', bot: '#3a3f45', act: 'hang' };
+function openPRE(u) {
+  const go = actK('go', u), walk = actK('walk', u), leave = actK('leave', u), wSec = walk * OPEN_STEPS[OPEN_I('walk')].dur;
+  const lineK = OPEN.k;   // which step (the lines tint her look)
+  // her: at her belt's loading end, hands on it; then along the belt to the middle (the cutscene's walk), hands on it again, head going down
+  let hx = HER_SPOT, her;
+  const p = seg(wSec, 0.5, 5.3), dist = HX - HER_SPOT, dpos = dist * ease(p);
+  if (p <= 0) her = { o: { mirror: true, look: lineK <= 2 ? -0.3 : 0, arms: 'belt', tap: 0, sway: 0 }, top: HTOP };
+  else if (p < 1) { hx = HER_SPOT + dpos; her = walking(dpos, Math.min(1, dpos / STRIDE, (dist - dpos) / STRIDE + 0.15), 0); }
+  else {
+    hx = HX; const i = OPEN.k, li = k => OPEN_STEPS.findIndex(s => s.line && s.line[1] === k);
+    const look = leave > 0 || OPEN.k >= OPEN_STEPS.length - 1 ? lerp(-0.9, -1, ease(leave)) : i >= li('…네.') ? -0.9 : i >= li('…하은아.') ? -0.6 : -0.4;
+    her = { o: { mirror: true, look, arms: 'belt', tap: 0, sway: 0 }, top: HTOP };
+  }
+  const run = 150 * u;
+  return {
+    run, hx, her, spot: OPEN.tutAt != null ? 1 : ease(seg(leave, 0.45, 1)),
+    far() {   // 지우 behind the far belt (in its perspective): facing 반장, head down at his name, then off to the left
+      if (go >= 1) return;
+      const jx = JIWOO_FAR + (go > 0.12 ? -130 * seg(go, 0.12, 1) : 0), walkingJ = go > 0.12;
+      const o = walkingJ ? (() => { const d = 130 * seg(go, 0.12, 1), k = Math.floor(d / 9), sp = (d / 9) % 1, sw = Math.sin(sp * Math.PI) * (k % 2 ? -1.5 : 1.5); return { mirror: false, look: 0, arms: 'walk', fN: sw, fF: -sw, stride: { leg: k % 2, p: sp } }; })()
+        : { mirror: OPEN.k < 2, look: OPEN.k >= 2 ? -0.6 : 0.1 };
+      g.save(); farXf(); jiwooFig(Math.round(jx), HTOP, o); g.restore();
+    },
+    near() {
+      // the rookie at the gate, then off to the right
+      if (go < 1) { const x = PLAYER_X + 80 * seg(go, 0.1, 1), bob = go > 0.1 && (go * 3.2 / 0.38) % 1 < 0.5 ? 1 : 0; rookie(Math.round(x), 100 + bob, go > 0.1); }
+      // 반장: on his chair, up, over to stand behind her shoulder; a tap on the belt; round and out to the left
+      if (leave >= 1) return;
+      if (walk < 0.45) { const cx = 132, tp = HTOP + 7; person(cx, tp, { ...BOSS_LOOK, seated: true, m: true }); R(cx - 7, tp + 26, 14, 2, '#ebe5c9'); R(cx + 9, tp + 22, 3, 8, '#3a3f45'); return; }
+      let x = BOSS_AT, m = true, top = HTOP, extra = {};
+      if (walk < 0.55) { x = 132; top = HTOP + 2; }
+      else if (walk < 1) { const q = seg(walk, 0.55, 0.95); x = lerp(132, BOSS_AT, ease(q)); top = HTOP + (q > 0 && q < 1 && (q * 2.3 / 0.38) % 1 < 0.5 ? 1 : 0); }
+      if (leave > 0) {
+        const r = ease(seg(leave, 0.02, 0.1)) * (1 - ease(seg(leave, 0.14, 0.22)));
+        if (r > 0.02) extra = { act: 'reach', rx: Math.round(lerp(x - 8, x - 16, r)), ry: Math.round(lerp(HTOP + 31, BELT_Y - 1, r)) };
+        if (leave > 0.24) { m = false; const q = seg(leave, 0.28, 1); x = lerp(BOSS_AT, -20, q); top = HTOP + (q > 0 && q < 1 && (q * 3.5 / 0.38) % 1 < 0.5 ? 1 : 0); }
+      }
+      person(Math.round(x), top, { ...BOSS_LOOK, m, ...extra }); R(Math.round(x) - 7, top + 26, 14, 2, '#ebe5c9');
+    }
+  };
+}
+// the line under the picture, in the game's dialogue box (as drawSubs draws the cutscene's)
+function drawOpenLine(who, line, u) {
+  const lang = subLang === 'ko' ? 'ko' : 'en', full = line[lang === 'ko' ? 1 : 2], name = OPEN_WHO[who][lang], n = Math.min([...full].length, Math.floor(u / 0.032) + 1), a = clamp(u / 0.12, 0, 1);
+  const k = cv.width / 100, bx = 4 * k, bw = cv.width - 8 * k, bh = 16 * k, by = cv.height - 3 * k - bh, ws = 2.5 * k, px = bx + 3 * k, py = by + 2 * k, th = ws * 1.4;
+  out.save(); out.setTransform(1, 0, 0, 1, 0, 0); out.globalAlpha = a;
+  out.beginPath(); out.roundRect(bx, by, bw, bh, 6); out.fillStyle = 'rgba(17,13,11,.95)'; out.fill(); out.lineWidth = 1.5; out.strokeStyle = '#3a2f28'; out.stroke();
+  out.font = `${Math.round(ws)}px "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; const tw = out.measureText(name).width;
+  out.beginPath(); out.roundRect(px, py, tw + 1.1 * ws, th, 3); out.fillStyle = '#f07a2a'; out.fill();
+  out.fillStyle = '#1b120c'; out.textAlign = 'left'; out.textBaseline = 'middle'; out.fillText(name, px + 0.55 * ws, py + th / 2 + 1);
+  out.font = `500 ${Math.round(3.3 * k)}px "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; out.fillStyle = '#efe6d2'; out.textBaseline = 'top';
+  out.fillText([...full].slice(0, n).join(''), px, py + th + 0.5 * ws);
+  if (n >= [...full].length && Math.floor(performance.now() / 500) % 2 === 0) { out.font = `${Math.round(1.8 * k)}px "IBM Plex Mono", monospace`; out.fillStyle = '#a6978a'; out.textAlign = 'right'; out.textBaseline = 'bottom'; out.fillText('▼', bx + bw - 2.2 * k, by + bh - 1.4 * k); }
+  out.restore();
+}
+function openFrame() {
+  const u = ou(); openStep(u);
+  const P = openPRE(u);
+  PAGE_T = 0; g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false; g.clearRect(0, 0, W, H);
+  PRE = P; try { drawWorld(0); } finally { PRE = null; }
+  out.imageSmoothingEnabled = false; out.globalAlpha = 1; out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = '#000'; out.fillRect(0, 0, cv.width, cv.height);
+  out.drawImage(wb, 0, CROP, W, H - CROP, 0, 0, cv.width, cv.height * (H - CROP) / H);
+  out.fillStyle = '#000'; out.fillRect(0, BAR_TOP * SC, cv.width, cv.height);
+  // sounds: a blip as each line starts, his tap on the belt
+  const s = OPEN_STEPS[OPEN.k];
+  if (s.line && u >= OPEN.at && !OPEN.seen.has(OPEN.k)) { OPEN.seen.add(OPEN.k); const fn = s.line[0] === 'boss' ? 'blipLow' : 'blip'; for (const d of [0, 0.09, 0.18]) SFX[fn](ac.currentTime + d); }
+  if (actK('leave', u) > 0.08 && !OPEN.seen.has('tap')) { OPEN.seen.add('tap'); SFX.tap(ac.currentTime); }
+  // her heart: the tutorial rows
+  if (OPEN.tutAt != null) {
+    const t = TUT_HB.clock();
+    if (t != null) {
+      TUT_HB.update(t);
+      const HG = HBCV.getContext('2d'); HG.setTransform(1, 0, 0, 1, 0, 0); HG.clearRect(0, 0, HBCV.width, HBCV.height); TUT_HB.draw(t); out.drawImage(HBCV, 0, 0);
+      const st = TUT_HB.stats, hits = st.perfect + st.good, b = (t - TUT.lead) / TUT.bp;
+      if (OPEN.endAt == null && (hits >= TUT.need || b > TUT.rows * 4 + 0.5)) OPEN.endAt = t + 0.55;
+      // a quiet cue over the picture: listen first, then the 4th beat; the dots fill as she makes them
+      const text = b < TUT.demo * 4 ? (subLang === 'ko' ? '들어 보세요.' : 'Listen.') : (subLang === 'ko' ? '네 번째 박에 · Space / J / 화면' : 'On the fourth beat · Space / J / tap');
+      out.save(); out.globalAlpha = seg(t, 0.4, 1.2) * (OPEN.endAt != null ? 1 - seg(t, OPEN.endAt - 0.55, OPEN.endAt) : 1);
+      out.font = '600 22px "IBM Plex Sans KR", sans-serif'; out.textBaseline = 'middle'; out.textAlign = 'center';
+      const w = out.measureText(text).width + 40, dotsW = b >= TUT.demo * 4 ? TUT.need * 24 + 16 : 0, x0 = cv.width / 2 - (w + (dotsW ? dotsW + 10 : 0)) / 2;
+      out.fillStyle = 'rgba(10,8,7,.72)'; out.fillRect(x0, 16, w, 42); out.fillStyle = '#efe6d2'; out.fillText(text, x0 + w / 2, 38);
+      if (dotsW) { const dx = x0 + w + 10; out.fillStyle = 'rgba(10,8,7,.72)'; out.fillRect(dx, 16, dotsW, 42); for (let i = 0; i < TUT.need; i++) { out.fillStyle = i < hits ? '#9cf58a' : 'rgba(239,230,210,.25)'; out.beginPath(); out.arc(dx + 20 + i * 24, 37, 7, 0, Math.PI * 2); out.fill(); } }
+      out.restore();
+      if (OPEN.endAt != null && t >= OPEN.endAt) { handoff(u); return; }
+    }
+  }
+  const fade = 1 - seg(u, 0.2, 1.6);
+  if (fade > 0) { out.fillStyle = `rgba(0,0,0,${fade})`; out.fillRect(0, 0, cv.width, cv.height); }
+  if (s.line && u >= OPEN.at) drawOpenLine(s.line[0], s.line, u - OPEN.at);
+}
+// on into the cutscene from this very frame: the belt where it is, no fade from black
+function handoff(u) {
+  stopOpen(); BELT0 = 150 * u; FROM_PRE = true; T = 0; resetLines(0); HB.reset(); setPlaying(true);
+}
 
 // ---------- playback ----------
 let T = 10.2, playing = false, last = performance.now(), started = false;
@@ -2173,31 +2376,33 @@ function setPlaying(p) {
   if (p) { started = true; $('big').hidden = true; initAudio(); audioStart(T); if (hbOn && inRows(T)) { if (T < 0.05) HB.reset(); HB.begin(T); } } else { audioStop(); HB.halt(); }
 }
 function jump(t) { T = clamp(t, 0, END); resetLines(T); if (playing) { audioStart(T); if (hbOn && inRows(T)) HB.begin(T); else HB.halt(); } }
-playBtn.onclick = () => { if (!started) T = 0; setPlaying(!playing); };   // the first play starts from the top
+playBtn.onclick = () => { if (OPEN.on) return; if (!started) { startOpen(); return; } setPlaying(!playing); };   // the first play starts with 1-7's opening   // the first play starts from the top
 const pressNow = e => HB.press(HB.clock() + (e.timeStamp - performance.now()) / 1000);
 // the picture: while playing with the rows on, a touch is a press on the beat; otherwise it plays or pauses
-$('stage').addEventListener('pointerdown', e => { if (playing && dismissLine()) { e.preventDefault(); return; } if (playing && hbOn && inRows(T) && HB.clock() != null) { e.preventDefault(); pressNow(e); return; } if (!started) T = 0; setPlaying(!playing); });
-$('restart').onclick = () => { HB.reset(); jump(0); if (!playing) setPlaying(true); };
+$('stage').addEventListener('pointerdown', e => { if (OPEN.on) { e.preventDefault(); if (OPEN.tutAt != null && TUT_HB.clock() != null) TUT_HB.press(TUT_HB.clock() + (e.timeStamp - performance.now()) / 1000); else openAdvance(); return; } if (playing && dismissLine()) { e.preventDefault(); return; } if (playing && hbOn && inRows(T) && HB.clock() != null) { e.preventDefault(); pressNow(e); return; } if (!started) { startOpen(); return; } setPlaying(!playing); });
+$('restart').onclick = () => startOpen();   // from 1-7's opening
 $('hb').onclick = () => { hbOn = !hbOn; $('hb').setAttribute('aria-pressed', hbOn); if (!hbOn) HB.halt(); else if (playing && inRows(T)) HB.begin(T); };
 let dragging = false;
 seek.addEventListener('pointerdown', () => { dragging = true; });
 addEventListener('pointerup', () => { dragging = false; });
-seek.oninput = () => { started = true; $('big').hidden = true; jump(+seek.value); };
+seek.oninput = () => { stopOpen(); started = true; $('big').hidden = true; jump(+seek.value); };
 $('snd').onclick = () => { soundOn = !soundOn; $('snd').setAttribute('aria-pressed', soundOn); if (master) master.gain.setTargetAtTime(soundOn ? 0.6 : 0, ac.currentTime, 0.05); HB.mute(!soundOn); };
 $('sub').onclick = () => { subLang = { en: 'ko', ko: 'off', off: 'en' }[subLang]; $('sub').textContent = { en: '자막 EN', ko: '자막 한국어', off: '자막 끔' }[subLang]; };
 const PRESS_KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyK', 'KeyD']);
 addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' && e.code !== 'Space') return;
+  if (OPEN.on) { if (PRESS_KEYS.has(e.code)) { e.preventDefault(); if (e.repeat) return; if (OPEN.tutAt != null && TUT_HB.clock() != null) TUT_HB.press(TUT_HB.clock() + (e.timeStamp - performance.now()) / 1000); else openAdvance(); } return; }
   if ((e.code === 'Space' || e.code === 'Enter') && playing && waiting) { e.preventDefault(); if (!e.repeat) dismissLine(); return; }
   if (PRESS_KEYS.has(e.code) && playing && hbOn && inRows(T) && HB.clock() != null) { e.preventDefault(); if (!e.repeat) pressNow(e); return; }
-  if (e.code === 'Space' || e.code === 'KeyP') { e.preventDefault(); if (!started) T = 0; setPlaying(!playing); }
+  if (e.code === 'Space' || e.code === 'KeyP') { e.preventDefault(); if (!started) { startOpen(); return; } setPlaying(!playing); }
   else if (e.code === 'ArrowLeft') jump(T - 1); else if (e.code === 'ArrowRight') jump(T + 1);
 });
 const shotsEl = $('shots');
+{ const b = document.createElement('button'); b.type = 'button'; b.className = 'shot'; b.title = '1-7 오프닝: 반장과 하은, 심박 튜토리얼, 그리고 컷씬으로'; b.innerHTML = '<b>0. 오프닝</b><span class="t">반장과 하은 · 튜토리얼</span>'; b.onclick = () => startOpen(); shotsEl.appendChild(b); }
 SHOTS.forEach((s, i) => {
   const b = document.createElement('button'); b.type = 'button'; b.className = 'shot';
   b.title = s.note; b.innerHTML = `<b>${i + 1}. ${s.name}</b><span class="t">${s.t0.toFixed(1)}–${s.t1.toFixed(1)}초</span>`;
-  b.onclick = () => { started = true; $('big').hidden = true; jump(s.t0); if (!playing) setPlaying(true); };
+  b.onclick = () => { stopOpen(); started = true; $('big').hidden = true; jump(s.t0); if (!playing) setPlaying(true); };
   shotsEl.appendChild(b);
 });
 function showResult() {
@@ -2206,6 +2411,7 @@ function showResult() {
 }
 function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  if (OPEN.on) { openFrame(); requestAnimationFrame(frame); return; }
   if (playing) { const hc = hbOn ? HB.clock() : null, T0 = T; T = hc != null ? hc : T + dt;
     if (!waiting) { const l = LINES.find(l => !l.timed && !l.done && T0 <= l.hold && T >= l.hold); if (l) { waiting = l; T = l.hold; } } else T = waiting.hold; if (hc != null && !inRows(T)) { HB.halt(); showResult(); } if (hc == null && hbOn && inRows(T) && T > ROWS_END) HB.begin(T); if (T >= END) { T = END; setPlaying(false); } }
   const rows = hbOn && inRows(T);   // her row through her song, his through the reprise
@@ -2226,11 +2432,11 @@ function frame(now) {
   drawSubs(T);
   if (!dragging) seek.value = T;
   $('time').textContent = `${T.toFixed(1).padStart(4, '0')} / ${END.toFixed(1)}`;
-  const si = SHOTS.reduce((a, sh, i) => T >= sh.t0 ? i : a, 0); [...shotsEl.children].forEach((c, i) => c.classList.toggle('on', i === si));
+  const si = SHOTS.reduce((a, sh, i) => T >= sh.t0 ? i : a, 0); [...shotsEl.children].forEach((c, i) => c.classList.toggle('on', i === si + 1));   // (chip 0 is the opening)
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
-window.__HB = HB;   // for testing
+window.__HB = HB; window.__TUT = TUT_HB;   // for testing
 window.__song = () => TRACKS.map(tr => ({ decoded: !!tr.buf, playing: !!tr.node, pos: ac && tr.node ? +(tr.from + ac.currentTime - tr.startAt).toFixed(3) : null, fallback: !!tr.el })).concat([{ starts: songStarts }]);   // for testing
 })();
 </script>
