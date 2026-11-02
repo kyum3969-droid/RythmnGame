@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>1-6 빈자리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* 1-6 빈자리 (a cutscene, no play): the nights 하은 doesn't come. 3번 라인 with its two belts as in 1-4/1-5 (her near belt, 지우's
+   far one), drawn with the 1-7 cutscene's own room, belts and light; the camera never moves, only the nights change. */
+:root{
+  --night:#15110e; --panel:#1f1915; --line:#3a2f28; --ink:#efe6d2; --muted:#a6978a; --accent:#d9a520; --vest:#f07a2a; --vest-dark:#9c4512;
+  --display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--night:#15110e}}
+:root[data-theme="dark"]{--night:#15110e}
+[hidden]{display:none!important}
+html,body{min-height:100%} body{box-sizing:border-box;margin:0}
+body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding:10px 16px;
+  display:flex;flex-direction:column;align-items:center;min-height:100dvh}
+.page{width:min(100%,calc((100dvh - 110px) * 16 / 9));max-width:100%;display:flex;flex-direction:column;gap:8px;margin-block:auto}
+.stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:#000;
+  box-shadow:0 0 0 1px #000,0 0 40px rgba(0,0,0,.6);user-select:none;-webkit-user-select:none}
+.stage canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:16px;
+  background:radial-gradient(ellipse at 50% 30%,rgba(255,233,168,.08),transparent 60%),rgba(8,6,5,.9)}
+.cover .k{font:500 clamp(11px,1.6vw,13px) var(--mono);letter-spacing:.14em;color:var(--muted)}
+.cover h1{margin:0;font:400 clamp(30px,6.4vw,60px)/1 var(--display);letter-spacing:.01em}
+.cover p{margin:0;max-width:34em;color:#cfc3b4;font-size:clamp(12px,1.7vw,15px)}
+.go{font:400 clamp(16px,2.4vw,20px)/1 var(--display);background:var(--vest);color:#1b120c;border:0;border-radius:3px;padding:.6em 1.2em;
+  box-shadow:0 3px 0 var(--vest-dark);cursor:pointer;text-decoration:none;display:inline-block}
+.go:active{transform:translateY(2px);box-shadow:0 1px 0 var(--vest-dark)}
+.go:focus-visible,.btn:focus-visible{outline:3px solid #ffe9a8;outline-offset:3px}
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{font:600 14px var(--body);min-height:36px;padding:0 14px;border-radius:3px;border:0;background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.help{margin:0;font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="stage" id="stage">
+    <canvas id="cv" width="1152" height="648" aria-label="1-6 빈자리: 하은이 나오지 않는 며칠 밤, 3번 라인의 빈자리"></canvas>
+    <div class="cover" id="title">
+      <div class="k">STAGE 1 · 1-6 · 컷씬</div>
+      <h1>빈자리</h1>
+      <p>1-5 다음 날부터. 하은이 나오지 않는다.</p>
+      <button class="go" id="start" type="button">▶ 재생</button>
+    </div>
+    <div class="cover" id="end6" hidden>
+      <div class="k">1-6 끝</div>
+      <h1>1-7 하은의 새벽</h1>
+      <p>마지막 근무가 끝나는 새벽. 반장과 하은, 심박 튜토리얼, 그리고 컷씬.</p>
+      <a class="go" href="cutscene-1-6.html">1-7 시작 ▸</a>
+    </div>
+  </div>
+  <div class="bar">
+    <button class="btn" id="r6" type="button">처음부터</button>
+    <a class="btn" href="cutscene-1-6.html">1-7 바로 열기</a>
+    <p class="help">플레이 없는 컷씬입니다. 약 1분.</p>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const W = 384, H = 216, SC = 3;
+// the 1-7 cutscene's frame: the picture 20 px higher than the game's screen, a black bar along the bottom from y 141
+const CROP = 20, BAR_TOP = 141;
+const cv = $('cv'), out = cv.getContext('2d');
+const wb = document.createElement('canvas'); wb.width = W; wb.height = H; const wctx = wb.getContext('2d');
+const SPR_W = 64, SPR_H = 96, SPR_CX = 32, SPR_TOP = 24;
+const sb = document.createElement('canvas'); sb.width = SPR_W; sb.height = SPR_H; const sctx = sb.getContext('2d');
+const rb = document.createElement('canvas'); rb.width = SPR_W; rb.height = SPR_H; const rctx = rb.getContext('2d');
+let g = wctx;
+const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+const lerp = (a, b, p) => a + (b - a) * p;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease = p => p <= 0 ? 0 : p >= 1 ? 1 : p * p * (3 - 2 * p);
+const seg = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+const rnd = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
+const thick = (x1, y1, x2, y2, s, c) => { const d = Math.max(1, Math.hypot(x2 - x1, y2 - y1)); for (let k = 0; k <= d; k++) { const p = k / d; R(lerp(x1, x2, p) - s / 2, lerp(y1, y2, p) - s / 2, s, s, c); } };
+const hex = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+const mix = (a, b, p) => { const A = hex(a), B = hex(b); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], p))).join(',')})`; };
+const C = {
+  kraft:'#c48b52', kraftTop:'#d9a468', kraftDark:'#8f6236', tape:'#e6c88f', ink:'#1b1716', skin:'#d9a27a', skinDark:'#b98260',
+  laser:'#ff4a3d', ok:'#8fd694', belt:'#38302c', slat:'#2a2320', face:'#171312', metal:'#6a7075',
+  hoodie:'#2f4f58', vest2:'#cfe04a', reflect:'#ebe5c9', hairDark:'#1e1a1a', label:'#efe6d2'
+};
+const SCAN_X = 300, BELT_Y = 146, HX = 222, HTOP = 106, PLAYER_X = 340, BOSS_X = 132;
+const HER = 52, JF = 61, PLACE = 66, FAR_PLACE = 70;   // her spot (the near belt's loading end); 지우 behind the far belt (its own x); where boxes go down
+const SK = ['#d9a27a', '#e3b48f', '#c99470', '#b8825e'];
+let FACE_LINE = null, JFLOWERS = false, WHO = 'haeun', JPOSE = null;
+
+// ---------- the room and the belts as the cutscene draws them (its own code), with the hour, tubes, belts and lasers set per shot ----------
+const MARK = 29.25, SLOPE = 0.5;
+const lay = (d, f) => q => q - d * f + HX;
+const TUBE_Q = [-158, -38, 82];
+const S1 = { tubesOff: [-99, -99, -99], laserOff: 1e9 };
+let SUNK = 0, TUBEK = [1, 1, 1], RUN = 0;
+const sunAt = () => SUNK, tubeOn = k => TUBEK[k], beltRun = () => RUN;
+const GATES = [78, 338], BELT_END = -174;
+const inShaft = (px, py, x, y, w) => { if (py < y) return 0; const s = (py - y) * SLOPE, a = x - s, b = x + w - s; return px < a || px > b ? 0 : Math.min(1, (px - a) / 6, (b - px) / 6); };
+const FAR_K = 0.82, FAR_DY = -36, FAR_END = -186;   // its loading end at the game's farBeltLeft (x 36 before scaling)
+function farXf() { g.translate(SCAN_X, BELT_Y + FAR_DY); g.scale(FAR_K, FAR_K); g.translate(-SCAN_X, -BELT_Y); }
+function glow(x, y, r, rgb, a) { if (a <= 0.005) return; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(1, `rgba(${rgb},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
+function drawWindow(x, y, w, h, k) {
+  R(x - 2, y - 2, w + 4, h + 4, '#3a2f28');
+  const hh = h >> 1;
+  R(x, y, w, hh, mix('#2b3550', '#fff0c4', k)); R(x, y + hh, w, h - hh, mix('#232b44', '#ffd690', k));
+  for (let mx = x + 15; mx < x + w - 4; mx += 16) R(mx, y, 2, h, '#3a2f28');
+  R(x, y + hh - 1, w, 2, '#3a2f28');
+  for (let i = 0; i < 5; i++) R(x + 2 + Math.floor(rnd(x + i, 7) * (w - 4)), y + 1 + Math.floor(rnd(x + i, 8) * (h - 2)), 1, 1, mix('#1c2238', '#e8c27a', k));
+}
+function shaft(x, y, w, yEnd, a) {
+  if (a <= 0.005) return;
+  const dx = (yEnd - y) * SLOPE;
+  const gr = g.createLinearGradient(0, y, 0, yEnd); gr.addColorStop(0, `rgba(255,206,140,${a})`); gr.addColorStop(1, `rgba(255,190,120,${a * 0.18})`);
+  g.fillStyle = gr; g.beginPath(); g.moveTo(x, y); g.lineTo(x + w, y); g.lineTo(x + w - dx, yEnd); g.lineTo(x - dx, yEnd); g.closePath(); g.fill();
+  // a softer, wider halo around it
+  const gr2 = g.createLinearGradient(0, y, 0, yEnd); gr2.addColorStop(0, `rgba(255,190,130,${a * 0.35})`); gr2.addColorStop(1, 'rgba(255,190,130,0)');
+  g.fillStyle = gr2; g.beginPath(); g.moveTo(x - 6, y); g.lineTo(x + w + 6, y); g.lineTo(x + w + 14 - dx, yEnd); g.lineTo(x - 14 - dx, yEnd); g.closePath(); g.fill();
+}
+function dust(t, shafts, a, area) {
+  if (a <= 0.01) return;
+  for (let i = 0; i < 90; i++) {
+    const x = area.x + ((rnd(i, 1) * area.w + t * (2 + rnd(i, 2) * 3) * (rnd(i, 5) < 0.5 ? -1 : 1) - (area.ox || 0)) % area.w + area.w) % area.w;
+    const y = area.y + rnd(i, 3) * area.h + Math.sin(t * (0.4 + rnd(i, 4) * 0.5) + i) * 3 - t * 0.8;
+    let m = 0; for (const s of shafts) m = Math.max(m, inShaft(x, y, s.x, s.y, s.w));
+    if (m <= 0) continue;
+    const tw = 0.5 + 0.5 * Math.sin(t * (1.5 + rnd(i, 6) * 2) + i * 3);
+    g.globalAlpha = a * m * (0.35 + 0.65 * tw); R(x, y, 1, 1, '#fff1c8');
+  }
+  g.globalAlpha = 1;
+}
+function ambient(color, holes = []) {
+  if (color === '#ffffff') return;
+  g.save(); g.globalCompositeOperation = 'multiply'; g.fillStyle = color; g.beginPath(); g.rect(0, 0, W, H);
+  for (const [x, y, w, h] of holes) g.rect(x + w, y, -w, h);
+  g.fill('evenodd'); g.restore();
+}
+function interior(d, t) {
+  const wl = lay(d, 0.7), sun = sunAt(t);
+  R(0, 0, W, H, '#231b17');
+  // ceiling band with its trusses, the high windows, the tubes (the first three lit until they click off)
+  R(0, 0, W, 34, '#191311');
+  for (let q = -240; q < 900; q += 48) { const x = Math.round(wl(q)); if (x > -4 && x < W) R(x, 0, 3, 34, '#211915'); }
+  R(0, 34, W, 2, '#2e241f');
+  const wins = [], tubes = [];
+  for (let q = -342; q < 900; q += 120) {
+    const x = Math.round(wl(q)); if (x > -60 && x < W + 10) { drawWindow(x, 5, 50, 22, sun); wins.push([x, 5, 50, 22]); }
+    const tq = q + 64, tx = Math.round(wl(tq)), k = TUBE_Q.indexOf(tq), on = k >= 0 ? tubeOn(k, t) : 0;
+    if (tx > -50 && tx < W) {
+      const fl = k >= 0 && t > S1.tubesOff[k] - 0.18 && t < S1.tubesOff[k] && Math.sin(t * 90 + k) > 0.2;
+      R(tx + 4, 0, 1, 13, '#3a332c'); R(tx + 41, 0, 1, 13, '#3a332c'); R(tx - 2, 13, 50, 2, '#3a332c'); R(tx, 15, 46, 3, on > 0.5 && !fl ? '#fff3c8' : '#5d5446');
+      if (on > 0) tubes.push([tx, on]);
+    }
+  }
+  // the wall's seams and the racks of boxes
+  for (let q = -198; q < 900; q += 64) { const x = Math.round(wl(q)); if (x >= 0 && x < W) R(x, 36, 1, 132, '#2a211c'); }
+  for (let q = -156; q < 900; q += 180) {
+    const x0 = Math.round(wl(q)); if (x0 > W || x0 + 150 < 0) continue;
+    R(x0, 44, 3, 124, '#41332a'); R(x0 + 147, 44, 3, 124, '#41332a');
+    for (const y of [64, 100, 136]) {
+      let x = x0 + 5, sd = q * 7 + y + 1000;
+      while (x < x0 + 134) { const bw = 9 + Math.floor(rnd(sd, 3) * 12), bh = 8 + Math.floor(rnd(sd, 4) * 16), c = ['#5b4330', '#4f3a2a', '#66503a'][Math.floor(rnd(sd, 5) * 3)];
+        R(x, y - bh, bw, bh, c); R(x, y - bh, bw, 1, '#76604a'); R(x + (bw >> 1), y - bh, 1, bh, '#6e5a42'); x += bw + 2 + Math.floor(rnd(sd, 6) * 5); sd++; }
+      R(x0, y, 150, 3, '#4a3a2f'); R(x0, y + 3, 150, 1, '#1d1714');
+    }
+  }
+  // the 3라인 sign
+  const sg = Math.round(wl(-42)); R(sg + 6, 36, 1, 8, '#4a4038'); R(sg + 20, 36, 1, 8, '#4a4038'); R(sg, 44, 27, 15, '#d9a520'); R(sg, 58, 27, 1, '#8a6a12');
+  ['111', '001', '111', '001', '111'].forEach((row, y) => [...row].forEach((v, x) => { if (v === '1') R(sg + 10 + x * 2, 46 + y * 2, 2, 2, '#1d1815'); }));
+  // the floor and its painted walkway; the boxes stacked at the loading end
+  R(0, 168, W, 48, '#18120f'); R(0, 168, W, 1, '#2e241f');
+  const fl = lay(d, 1.15); for (let q = -238; q < 900; q += 14) { const x = Math.round(fl(q)); if (x > -8 && x < W) R(x, 200, 8, 3, '#c99a1e'); }
+  const st = lay(d, 1.0), sx0 = Math.round(st(-222));
+  if (sx0 > -40) {
+    R(sx0, 158, 34, 4, '#6b4a2e'); R(sx0, 162, 34, 2, '#4a3220'); R(sx0 + 2, 164, 4, 4, '#4a3220'); R(sx0 + 28, 164, 4, 4, '#4a3220');
+    const sbx = (x, y) => { R(x, y, 15, 13, C.kraft); R(x, y, 15, 2, C.kraftTop); R(x + 13, y + 2, 2, 11, C.kraftDark); R(x + 6, y, 3, 13, C.tape); };
+    sbx(sx0 + 1, 145); sbx(sx0 + 17, 145); sbx(sx0 + 1, 132); sbx(sx0 + 17, 132); sbx(sx0 + 9, 119);
+  }
+  return { wins, tubes };
+}
+function lineBelt(d, t, front) {
+  const bl = lay(d, 1.0), run = beltRun(t), laser = t < S1.laserOff;
+  if (!front) { for (const q of GATES) { const x = Math.round(bl(q)); if (x > -20 && x < W + 20) { R(x - 11, 108, 4, 40, '#555a5f'); R(x - 11, 105, 24, 5, C.metal); R(x - 2, 110, 6, 3, '#2b2e31'); } } return; }
+  const x0 = Math.max(0, Math.round(bl(BELT_END)));
+  if (x0 < W) {
+    R(x0, BELT_Y, W - x0, 4, C.belt); R(x0, BELT_Y, W - x0, 1, '#4a403b');
+    const k0 = Math.floor((BELT_END - run) / MARK), k1 = Math.ceil((W - HX + d - run) / MARK);
+    for (let k = k0; k <= k1; k++) { const x = Math.round(bl(k * MARK + run)); if (x < x0 + 1 || x >= W) continue; const q = ((k % 4) + 4) % 4;
+      if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); } else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44'); else R(x, BELT_Y + 1, 1, 3, C.slat); }
+    R(x0, BELT_Y + 4, W - x0, 12, C.face);
+    for (let q = Math.floor((BELT_END - run % 14) / 14) * 14; q < W - HX + d + 14; q += 14) { const x = Math.round(bl(q + run % 14)); if (x >= x0 + 2 && x < W) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); } }
+    R(x0, BELT_Y + 15, W - x0, 1, '#0c0a09');
+    for (let q = BELT_END + 22; q < 1000; q += 80) { const x = Math.round(bl(q)); if (x > -4 && x < W) R(x, BELT_Y + 16, 4, 10, '#2b2422'); }
+    const ex = Math.round(bl(BELT_END - 4)); if (ex > -6) R(ex, BELT_Y - 1, 5, 17, '#3d3431');
+  }
+  GATES.forEach((q, i) => { const x = Math.round(bl(q)); if (x < -20 || x > W + 20) return; const on = laser && i === 0;
+    if (on) { g.globalAlpha = 0.22; R(x - 2, 113, 5, 33, C.laser); g.globalAlpha = 1; }
+    R(x + 8, 108, 4, 56, '#7b8288'); R(x + 8, 108, 4, 2, '#9aa1a6'); R(x, 113, 1, 33, on ? C.laser : '#3a2422'); R(x + 2, 103, 5, 2, on ? '#5a2b27' : '#2b2422'); });
+}
+function farBelt(d, t, front, run = beltRun(t), laser = t < S1.laserOff, onTop = null) {
+  const bl = lay(d, 1.0), gx = Math.round(bl(GATES[0]));
+  g.save(); farXf();
+  if (!front) { R(gx - 11, 108, 4, 40, '#555a5f'); R(gx - 11, 105, 24, 5, C.metal); R(gx - 2, 110, 6, 3, '#2b2e31'); g.restore(); return; }
+  const x0 = Math.round(bl(FAR_END)), x1 = Math.ceil(SCAN_X + (W + 40 - SCAN_X) / FAR_K);
+  if (x0 < x1) {
+    // its legs down to the floor behind the near belt, a rail across them, the shade under it
+    const gr = g.createLinearGradient(0, BELT_Y + 16, 0, BELT_Y + 50); gr.addColorStop(0, 'rgba(6,5,8,.55)'); gr.addColorStop(1, 'rgba(6,5,8,0)'); g.fillStyle = gr; g.fillRect(x0 - 2, BELT_Y + 16, x1 - x0 + 2, 34);
+    for (let q = FAR_END + 30; q < FAR_END + 1400; q += 80) { const x = Math.round(bl(q)); if (x < x0 || x > x1) continue; R(x, BELT_Y + 16, 4, 52, '#2b2422'); R(x, BELT_Y + 16, 1, 52, '#3d3431'); }
+    R(x0 - 2, BELT_Y + 44, x1 - x0 + 2, 3, '#2b2422'); R(x0 - 2, BELT_Y + 44, x1 - x0 + 2, 1, '#3d3431');
+    // the belt: its top and the paint on it, the face and its rollers, the cap at the loading end
+    R(x0, BELT_Y, x1 - x0, 4, C.belt); R(x0, BELT_Y, x1 - x0, 1, '#4a403b');
+    const k0 = Math.floor((FAR_END - run) / MARK), k1 = Math.ceil((x1 - HX + d - run) / MARK);
+    for (let k = k0; k <= k1; k++) { const x = Math.round(bl(k * MARK + run)); if (x < x0 + 1 || x >= x1) continue; const q = ((k % 4) + 4) % 4;
+      if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); } else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44'); else R(x, BELT_Y + 1, 1, 3, C.slat); }
+    R(x0, BELT_Y + 4, x1 - x0, 12, C.face);
+    const ro = ((run % 14) + 14) % 14;
+    for (let q = Math.floor((FAR_END - 14) / 14) * 14; q < x1 - HX + d + 14; q += 14) { const x = Math.round(bl(q + ro)); if (x >= x0 + 2 && x < x1) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); } }
+    R(x0, BELT_Y + 15, x1 - x0, 1, '#0c0a09'); R(x0 - 4, BELT_Y - 1, 5, 17, '#3d3431');
+  }
+  if (onTop) onTop();
+  const lc = laser ? (typeof laser === 'string' ? laser : C.laser) : null;
+  if (lc) { g.globalAlpha = 0.22; R(gx - 2, 113, 5, 33, lc); g.globalAlpha = 1; }
+  R(gx + 8, 108, 4, 56, '#7b8288'); R(gx + 8, 108, 4, 2, '#9aa1a6'); R(gx, 113, 1, 33, lc || '#3a2422'); R(gx + 2, 103, 5, 2, lc ? (lc === C.laser ? '#5a2b27' : lc) : '#2b2422');
+  g.restore();
+}
+function haeun(cx, top, o = {}) {
+  const hair = '#17121a', hairL = '#2e2630', shirt = '#1e1a1a', shirtD = '#121010', cap = '#d8463b', capD = '#a83328', brim = '#c43d33', sky = '#86c3e8', tee = '#e9f3f7', leg = '#3a3f45', shoe = '#1e1a1a';
+  const look = o.look || 0, sw = o.sway || 0;
+  const hx = look < -0.5 ? -1 : 0, hy = look < -0.25 ? Math.round(-look * 2) : look > 0.5 ? -1 : 0, tilt = look < -0.5 ? 1 : look > 0.5 ? -1 : 0;
+  g.save(); if (o.mirror) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
+  // legs: sitting (the lap on a chair, shins down), standing, or walking one leg at a time (o.stride = { leg: 0 near / 1 far, p: 0..1 through the step }): the moving
+  // leg lifts and swings forward in an arc and sets down, the other stays planted; the next step it's the other leg's turn
+  const sw_ = o.stride ? Math.sin(Math.PI * o.stride.p) : 0, fwd = Math.round(3 * sw_), lift = Math.round(2 * sw_);
+  const nx = o.stride && o.stride.leg === 0 ? -fwd : 0, ny = o.stride && o.stride.leg === 0 ? -lift : 0;
+  const fx_ = o.stride && o.stride.leg === 1 ? -fwd : 0, fy_ = o.stride && o.stride.leg === 1 ? -lift : 0;
+  if (o.seated) { R(cx - 8, top + 36, 15, 6, leg); R(cx - 9, top + 42, 4, 11, leg); R(cx - 3, top + 42, 4, 11, leg); R(cx - 11, top + 52, 6, 3, shoe); R(cx - 4, top + 52, 6, 3, shoe); }
+  else {
+    R(cx + 2 + fx_, top + 38, 5, 15 + fy_, leg); R(cx + 2 + fx_, top + 52 + fy_, 6, 3, shoe);
+    R(cx - 5 + nx, top + 38, 5, 16 + ny, leg); R(cx - 6 + nx, top + 53 + ny, 6, 3, shoe);
+  }
+  // only the back hair: long and straight, falling down her back past the shoulders (nothing in front of the face)
+  R(cx + 6 + sw, top + 14, 4, 18, hair); R(cx + 8 + sw, top + 16, 1, 12, hairL);
+  // sky-blue tee with the white stripe over black sleeves, black bottoms
+  R(cx - 7, top + 16, 14, 23, shirt); R(cx - 7, top + 15, 14, 16, sky); R(cx - 7, top + 27, 14, 2, tee); R(cx - 7, top + 30, 14, 9, shirtD);
+  // the head, smaller than the rest of the cast (a 10x12 face under a 12-wide cap, chin where theirs is). Tipped down it sinks
+  // two pixels into the collar and leans one forward.
+  const fx = cx + hx, ft = top + hy;
+  if (o.headFront) {
+    // the head turned to us, halfway through turning round: the cap square on, its brim straight across, the shadow under it,
+    // nose and mouth in the middle (no face line: that is her profile's edge)
+    R(fx - 5, ft + 3, 10, 12, C.skin);
+    R(fx - 6, ft, 12, 6, cap); R(fx - 5, ft - 1, 10, 1, cap); R(fx - 6, ft + 5, 12, 1, capD); R(fx - 1, ft - 2, 2, 1, capD); R(fx - 2, ft + 1, 4, 2, '#f4e6e0');
+    R(fx - 8, ft + 5, 16, 2, brim); R(fx - 8, ft + 5, 16, 1, cap); R(fx - 8, ft + 7, 16, 1, capD);
+    R(fx - 5, ft + 8, 10, 2, '#3a2622'); R(fx - 5, ft + 10, 10, 1, '#8a5a44');
+    R(fx - 1, ft + 11, 2, 1, '#b07a58'); R(fx - 1, ft + 13, 2, 1, '#b2565a');
+    FACE_LINE = null;
+  } else {
+    R(fx + 3, ft + 3, 4, 12, hair);   // the back of her head under the cap, running into the hair down her back
+    R(fx - 5, ft + 3, 10, 12, C.skin);
+    R(fx - 6, ft, 12, 6, cap); R(fx - 5, ft - 1, 10, 1, cap); R(fx - 6, ft + 5, 12, 1, capD); R(fx - 2, ft - 1, 1, 7, capD); R(fx - 1, ft - 2, 2, 1, capD);
+    R(fx - 5, ft + 1, 3, 2, '#f4e6e0');
+    // the brim: its tip dips with the head or tilts up with it
+    R(fx - 9, ft + 4, 3, 2, brim); R(fx - 9, ft + 4, 3, 1, cap); R(fx - 9, ft + 6, 3, 1, capD);
+    R(fx - 13, ft + 4 + tilt, 4, 2, brim); R(fx - 13, ft + 4 + tilt, 4, 1, cap); R(fx - 13, ft + 6 + tilt, 4, 1, capD);
+    // the cap's shadow over the eyes, always: deep under the brim, softening down to the cheeks
+    R(fx - 5, ft + 6, 10, 3, '#3a2622'); R(fx - 5, ft + 9, 10, 1, '#8a5a44');
+    // a thin dark line down the front of her face, from under the brim to the chin
+    R(fx - 6, ft + 6, 1, 9, '#1b1716');
+    FACE_LINE = { x: o.mirror ? 2 * cx - (fx - 6) - 1 : fx - 6, y: ft + 6, h: 9 };   // where it lands on the sheet, so the rim light leaves it dark
+    R(fx - 3, ft + 10, 2, 1, '#b07a58'); R(fx - 3, ft + 12, 2, 1, '#b2565a');
+  }
+  // arms, hung from the shoulders at the sides of her body (3 px sleeves, 3 px hands)
+  const arm = (sx, hx, hy) => { thick(sx, top + 17, hx, hy, 3, shirt); R(hx - 1, hy - 1, 3, 3, C.skin); };
+  if (o.arms === 'belt') {
+    const ly = Math.round((o.tap || 0) * 9);
+    arm(cx - 8, cx - 12, top + 38 - ly); arm(cx + 8, cx + 10, top + 38);
+  } else if (o.arms === 'walk') {
+    // both arms swing a little, opposite each other: fN = how far the near hand is forward (toward where she faces), fF = how
+    // far the far hand is back. The hand that is two pixels out lifts one.
+    const fN = Math.round(o.fN || 0), fF = Math.round(o.fF || 0);
+    arm(cx + 8, cx + 8 + fF, top + 31 - (fF <= -2 ? 1 : 0));
+    arm(cx - 8, cx - 8 - fN, top + 31 - (fN >= 2 ? 1 : 0));
+  } else if (o.arms === 'reach') {
+    // the near hand out to a point (o.reach: how far from her own centre and top, before any mirroring), the other in her lap
+    arm(cx + 8, cx + 6, top + 33); arm(cx - 8, cx + o.reach.dx, top + o.reach.dy);
+  } else if (o.arms === 'strap') {
+    // the near hand goes up to a strap (o.strap 0..1 on the way up)
+    const k = ease(o.strap || 0);
+    arm(cx + 8, cx + 8, top + 31); arm(cx - 8, Math.round(lerp(cx - 8, cx - 10, k)), Math.round(lerp(top + 31, top - 2, k)));
+  } else if (o.arms === 'watch') {
+    // the near wrist brought up in front of her to read the watch (o.watch 0..1 on the way up)
+    const k = ease(o.watch || 0), hx = Math.round(lerp(cx - 8, cx - 4, k)), hy = Math.round(lerp(top + 31, top + 25, k));
+    arm(cx + 8, cx + 8, top + 31); arm(cx - 8, hx, hy); if (k > 0.5) R(hx - 1, hy - 3, 3, 2, '#d8dde0');
+  } else {
+    arm(cx + 8, cx + 8, top + 31); arm(cx - 8, cx - 8, top + 31);
+  }
+  g.restore();
+}
+function jiwooFig(cx, top, o = {}) {
+  const hood = '#6b2f3f', hoodD = '#4a2030', skin = '#d9a27a', jean = '#3c4a66', shoe = '#e8e4dc', ink = '#1b1716';
+  const look = o.look || 0, down = look < -0.2 ? 1 : 0, up = look > 0.5 ? 1 : 0;
+  g.save(); if (o.mirror) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
+  const sw_ = o.stride ? Math.sin(Math.PI * o.stride.p) : 0, fwd = Math.round(3 * sw_), lift = Math.round(2 * sw_);
+  const nx = o.stride && o.stride.leg === 0 ? -fwd : 0, ny = o.stride && o.stride.leg === 0 ? -lift : 0, fx_ = o.stride && o.stride.leg === 1 ? -fwd : 0, fy_ = o.stride && o.stride.leg === 1 ? -lift : 0;
+  R(cx + 1 + fx_, top + 38, 5, 15 + fy_, jean); R(cx + 1 + fx_, top + 52 + fy_, 7, 3, shoe);
+  R(cx - 5 + nx, top + 38, 5, 16 + ny, jean); R(cx - 7 + nx, top + 53 + ny, 7, 3, shoe);
+  const arm = (sx, hx, hy) => { thick(sx, top + 18, hx, hy, 3, hood); R(hx - 1, hy - 1, 3, 3, skin); };
+  const fl = o.flowers || JFLOWERS;
+  if (!fl && o.arms !== 'reach' && o.arms !== 'strap') { if (o.arms === 'walk') arm(cx + 7, cx + 7 + Math.round(o.fF || 0), top + 31); else arm(cx + 7, cx + 7, top + 31); }   // the far arm
+  R(cx - 7, top + 16, 14, 24, hood); R(cx - 7, top + 37, 14, 3, hoodD); R(cx - 3, top + 18, 1, 7, '#e8e4dc');
+  R(cx - 9, top - 2, 18, 20, hood); R(cx - 9, top - 2, 18, 2, hoodD); R(cx + 5, top + 16, 4, 2, hoodD);
+  R(cx - 6, top + 3 - up, 10, 12, skin); R(cx - 6, top + 3 - up, 10, 2 + down, '#1e1a1a');
+  R(cx - 4, top + 8 + down - up, 2, down ? 1 : 2, ink); R(cx - 4, top + 12 + down - up, 2, 1, '#9a5a50');
+  if (!o.nobuds) for (let k = 0; k < 7; k++) R(cx - 5 + (k % 2), top + 13 + k, 1, 1, '#f4f1ea');   // the earbud's wire (none in 1-6: he has stopped listening)
+  // the flowers in front of him, the near hand on the cone (or the far one, while the near hand knocks or reaches)
+  const flowers = (bx, by) => { for (let r = 0; r < 18; r++) { const w = Math.round(12 - r * 0.55); R(bx - Math.floor(w / 2), by + 4 + r, w, 1, r % 5 === 0 ? '#cbbd9e' : '#e8dcc4'); } R(bx - 3, by + 13, 6, 2, '#d8463b');
+    for (const [dx, dy, c] of [[4, 0, '#4a8a3a'], [-5, 1, '#4a8a3a'], [3, -2, '#f2a6c8'], [-1, -4, '#e86a6a'], [-4, -2, '#ffd27a'], [0, 0, '#f8f4ec'], [-3, 1, '#f2a6c8'], [2, 2, '#ffd27a']]) R(bx + dx - 1, by + dy, 3, 3, c); };
+  if (o.arms === 'reach') { if (fl) { flowers(cx - 11, top + 18); arm(cx + 7, cx - 9, top + 30); } arm(cx - 7, cx + o.reach.dx, top + o.reach.dy); }
+  else if (o.arms === 'strap') { const k = ease(o.strap || 0); if (fl) { flowers(cx - 11, top + 18); arm(cx + 7, cx - 9, top + 30); } else arm(cx + 7, cx + 7, top + 31); arm(cx - 7, Math.round(lerp(cx - 7, cx - 10, k)), Math.round(lerp(top + 31, top - 2, k))); }
+  else if (fl) { flowers(cx - 13, top + 14); arm(cx + 6, cx - 11, top + 30); arm(cx - 6, cx - 13, top + 31); }
+  else if (o.arms === 'walk') arm(cx - 7, cx - 7 - Math.round(o.fN || 0), top + 31);
+  else arm(cx - 7, cx - 7, top + 31);
+  g.restore();
+}
+function person(cx, top, p) {
+  const ink = '#1b1716', shoe = '#1e1a1a', sleeve = p.top;
+  g.save(); if (p.m) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
+  if (p.pack) { R(cx + 5, top + 17, 6, 17, p.pack); R(cx + 5, top + 17, 6, 1, 'rgba(255,255,255,.15)'); }
+  if (p.hair === 'long') R(cx + 1, top + 1, 7, 22, p.hc);
+  // legs: standing, or seated (the lap on the cushion, shins down to the floor)
+  if (p.seated) { R(cx - 7, top + 36, 14, 6, p.bot); R(cx - 5, top + 42, 4, 11, p.bot); R(cx + 1, top + 42, 4, 11, p.bot); R(cx - 6, top + 52, 6, 3, shoe); R(cx + 1, top + 52, 6, 3, shoe); }
+  else { R(cx - 5, top + 38, 5, 16, p.bot); R(cx + 1, top + 38, 5, 15, p.bot); R(cx - 6, top + 53, 6, 3, shoe); R(cx + 1, top + 52, 6, 3, shoe); }
+  R(cx - 7, top + 16, 14, p.seated ? 21 : 23, p.top);
+  if (p.sh) { R(cx - 2, top + 16, 4, 7, p.sh); if (p.tie) R(cx - 1, top + 17, 2, 7, p.tie); }
+  // the head (asleep, it drops forward)
+  const hy = p.sleep ? 2 : 0, hx = p.sleep ? -1 : 0, fx = cx + hx, ft = top + hy;
+  R(fx - 6, ft + 1, 12, 14, p.sk);
+  const hc = p.hc;
+  if (p.hair === 'cap') { R(fx + 2, ft + 2, 4, 7, '#1a1618'); R(fx - 7, ft - 1, 14, 5, hc); R(fx - 12, ft + 3, 6, 2, hc); }
+  else {
+    R(fx - 7, ft - 1, 14, 5, hc); R(fx + 2, ft + 1, 5, p.hair === 'bob' ? 12 : p.hair === 'long' ? 14 : 8, hc);
+    if (p.hair === 'bob' || p.hair === 'long') R(fx - 7, ft + 3, 2, p.hair === 'long' ? 12 : 8, hc);
+    if (p.hair === 'bun') R(fx + 3, ft - 4, 5, 5, hc);
+    if (p.hair === 'grey') R(fx - 7, ft - 1, 14, 2, '#b8b6b0');
+  }
+  if (p.sleep) R(fx - 5, ft + 8, 3, 1, ink); else R(fx - 4, ft + 7, 2, 2, ink);
+  if (p.glasses) { R(fx - 6, ft + 6, 7, 1, '#2a2a2a'); R(fx - 6, ft + 6, 1, 3, '#2a2a2a'); R(fx - 1, ft + 6, 1, 3, '#2a2a2a'); }
+  if (p.mask) { R(fx - 6, ft + 9, 9, 5, '#eef0f2'); R(fx + 3, ft + 9, 3, 1, '#d8dce0'); } else R(fx - 3, ft + 11, 2, 1, '#9a5a50');
+  if (p.buds) R(fx + 3, ft + 8, 2, 2, '#f4f4f0');
+  // arms (3 px sleeves from the shoulders, like 하은)
+  const arm = (sx, hx2, hy2) => { thick(sx, top + 17, hx2, hy2, 3, sleeve); R(hx2 - 1, hy2 - 1, 3, 3, p.sk); };
+  arm(cx + 8, cx + 8, top + (p.seated ? 30 : 31));
+  if (p.act === 'strap') arm(cx - 8, cx - 10, top - 2);
+  else if (p.act === 'phone') { arm(cx - 8, cx - 4, top + 26); R(cx - 6, top + 22, 3, 5, '#1b1d1e'); R(cx - 6, top + 22, 3, 1, '#9fd0ff'); }
+  else if (p.act === 'book') { arm(cx - 8, cx - 3, top + 28); R(cx - 9, top + 24, 9, 6, '#a8443a'); R(cx - 8, top + 25, 7, 4, '#f2eee2'); }
+  else if (p.act === 'reach') arm(cx - 8, p.rx, p.ry);
+  else if (p.act === 'bag') { arm(cx - 8, cx - 8, top + 31); thick(cx - 6, top + 17, cx + 5, top + 31, 1, '#3a2a22'); R(cx + 3, top + 29, 9, 8, p.bag); }
+  else arm(cx - 8, cx - 8, top + (p.seated ? 30 : 31));
+  g.restore();
+}
+function haeunSprite(o) {
+  sctx.clearRect(0, 0, SPR_W, SPR_H); const keep = g; g = sctx;
+  if (WHO === 'jiwoo') { FACE_LINE = null; jiwooFig(SPR_CX, SPR_TOP, JPOSE ? JPOSE(o) : o); } else haeun(SPR_CX, SPR_TOP, o);
+  g = keep;
+}
+function tintSprite(color) {
+  if (color === '#ffffff') return;
+  rctx.globalCompositeOperation = 'source-over'; rctx.clearRect(0, 0, SPR_W, SPR_H); rctx.drawImage(sb, 0, 0);
+  sctx.globalCompositeOperation = 'multiply'; sctx.fillStyle = color; sctx.fillRect(0, 0, SPR_W, SPR_H);
+  sctx.globalCompositeOperation = 'destination-in'; sctx.drawImage(rb, 0, 0); sctx.globalCompositeOperation = 'source-over';
+}
+function putSprite(x, top) { g.drawImage(sb, Math.round(x) - SPR_CX, Math.round(top) - SPR_TOP); }
+function putRim(x, top, dx, dy, color, a, clipY = H) {
+  if (a <= 0.01) return;
+  rctx.globalCompositeOperation = 'source-over'; rctx.clearRect(0, 0, SPR_W, SPR_H); rctx.drawImage(sb, 0, 0);
+  rctx.globalCompositeOperation = 'source-in'; rctx.fillStyle = color; rctx.fillRect(0, 0, SPR_W, SPR_H);
+  rctx.globalCompositeOperation = 'destination-out'; rctx.drawImage(sb, -dx, -dy); rctx.globalCompositeOperation = 'source-over';
+  if (FACE_LINE) rctx.clearRect(FACE_LINE.x, FACE_LINE.y, 1, FACE_LINE.h);   // (null while her head faces us)
+  g.save(); g.beginPath(); g.rect(0, 0, W, clipY); g.clip(); g.globalAlpha = a; g.drawImage(rb, Math.round(x) - SPR_CX, Math.round(top) - SPR_TOP); g.restore();
+}
+
+// ---------- the people and the things on the line ----------
+const BOSS = { hair: 'cap', hc: '#2c3b57', sk: SK[2], top: '#f07a2a', sh: '#6b7073', bot: '#3a3f45', act: 'hang' };
+function bossSeated(asleep) { const cx = BOSS_X, tp = HTOP + 7; person(cx, tp, { ...BOSS, seated: true, m: true, sleep: asleep }); R(cx - 7, tp + 26, 14, 2, '#ebe5c9'); R(cx + 9, tp + 22, 3, 8, '#3a3f45'); }
+const SUB = { hair: 'short', hc: '#2a2220', sk: SK[3], top: '#56603e', bot: '#3a3f45', act: 'hang' };   // the stand-in
+// the rookie at the gate with both scanners, as in 1-4/1-5 (upper hand on the far gate, lower on the near one)
+function player(kN, kF) {
+  const top = 100 + (Math.max(kN, kF) > 0.5 ? 1 : 0), cx = PLAYER_X;
+  R(cx - 9, top + 18, 18, 36, C.hoodie); R(cx - 9, top + 20, 18, 22, C.vest2); R(cx - 9, top + 32, 18, 2, C.reflect);
+  R(cx - 7, top + 14, 15, 5, '#264149'); R(cx - 6, top + 1, 12, 14, C.skin);
+  R(cx - 7, top - 1, 14, 5, C.hairDark); R(cx + 1, top + 1, 6, 10, C.hairDark); R(cx - 4, top + 7, 2, 2, C.ink);
+  const gun = (gx, gy, k) => { R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33'); R(gx - 10, gy - 2, 2, 3, k > 0.2 ? C.ok : C.laser); R(gx, gy + 2, 3, 3, C.skin); };
+  const ux = 320 - kF * 4, uy = 86; thick(cx - 5, top + 20, ux + 2, uy + 3, 4, C.hoodie); gun(ux, uy, kF);
+  const gx = 324 - kN * 4, gy = 117; thick(cx - 6, top + 22, gx + 2, gy + 3, 4, C.hoodie); gun(gx, gy, kN);
+}
+const STR = 10;
+function walkPose(d, mirror, look = 0.1, extra = {}) { const k = Math.floor(d / STR), sp = (d / STR) % 1, sw = Math.sin(sp * Math.PI) * (k % 2 ? -1.6 : 1.6); return { mirror, look, arms: 'walk', fN: sw, fF: -sw, stride: { leg: k % 2, p: sp }, ...extra }; }
+function box(x, y, tint) {
+  const w = 14, h = 12, bx = Math.round(x - w / 2), by = Math.round(y - h);
+  R(bx + 1, Math.round(y), w, 1, 'rgba(0,0,0,.45)');
+  R(bx, by, w, h, C.kraft); R(bx, by, w, 2, C.kraftTop); R(bx + w - 2, by + 2, 2, h - 2, C.kraftDark); R(bx + 6, by, 3, h, C.tape);
+  R(bx + 2, by + h - 6, 6, 4, C.label); for (let k = 0; k < 2; k++) R(bx + 3 + k * 2, by + h - 5, 1, 2, C.ink);
+  if (tint) { g.globalAlpha = 0.35; R(bx, by, w, h, tint); g.globalAlpha = 1; }
+}
+// her cotton work gloves (red-dipped palms) left over the near belt's end cap, and the can 지우 leaves beside them
+function gloves() { for (const [x, y] of [[41, 147], [45, 149]]) { R(x, y, 4, 6, '#ece6d6'); R(x, y + 3, 4, 3, '#c8463a'); R(x + 1, y + 6, 1, 1, '#ece6d6'); R(x + 3, y + 6, 1, 1, '#ece6d6'); } }
+function can(x, y) { R(x, y - 6, 4, 6, '#b8432f'); R(x, y - 6, 4, 1, '#d8d4c8'); R(x, y - 4, 4, 2, '#efe6d2'); R(x + 3, y - 5, 1, 4, '#8a2f22'); }
+const CAN_AT = [44, 145];
+
+// one shot of the line. S: { sun, tubes, run, runF, laser, near: [boxes], far: [boxes], who: fn (the near-layer people), far fn (지乌),
+// haeun: {x, top, o}, gloves, can (true | {x, y} in a hand), flashN, flashF, missN, kick }
+function shot(t, S) {
+  g = wctx; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  SUNK = S.sun; TUBEK = S.tubes; S1.laserOff = S.laser ? 1e9 : -1e9;
+  const room = interior(0, t);
+  RUN = S.runF || 0;
+  farBelt(0, t, false, RUN, false);
+  if (S.jiwooFar) { g.save(); farXf(); jiwooFig(S.jiwooFar.x, HTOP, { nobuds: true, ...S.jiwooFar.o }); g.restore(); }
+  farBelt(0, t, true, RUN, S.laser ? (S.flashF > 0 ? C.ok : true) : false, () => { for (const b of S.far || []) box(b.x, b.y ?? BELT_Y, b.tint); });
+  RUN = S.run || 0;
+  lineBelt(0, t, false);
+  if (S.who) S.who();
+  if (S.player) player(S.flashN || 0, S.flashF || 0);
+  let her = null; if (S.haeun) { haeunSprite(S.haeun.o); putSprite(S.haeun.x, S.haeun.top || HTOP); her = S.haeun; }
+  if (S.front) S.front();
+  lineBelt(0, t, true);
+  if (S.gloves) gloves();
+  if (S.can === true) can(...CAN_AT); else if (S.can) can(S.can.x, S.can.y);
+  for (const b of S.near || []) box(b.x, b.y ?? BELT_Y, b.tint);
+  { const x = SCAN_X, sc = S.flashN || 0, ms = S.missN || 0;
+    if (S.laser) { g.globalAlpha = 0.22; R(x - 2, 113, 5, 33, ms > 0 ? '#ff2a1a' : sc > 0 ? C.ok : C.laser); g.globalAlpha = 1; }
+    R(x + 8, 108, 4, 56, '#7b8288'); R(x + 8, 108, 4, 2, '#9aa1a6'); R(x, 113, 1, 33, S.laser ? (ms > 0 ? '#ffd0c8' : sc > 0 ? C.ok : C.laser) : '#3a2422'); R(x + 2, 103, 5, 2, S.laser ? (sc > 0 ? C.ok : '#5a2b27') : '#2b2422'); }
+  // the room's light (the cutscene's pass, standing still)
+  const dark = 1 - (S.tubes[0] + S.tubes[1] + S.tubes[2]) / 3, sun = S.sun;
+  const shafts = room.wins.map(([x, y, w, h]) => ({ x: x + 1, y: y + h, w: w - 2 }));
+  g.globalCompositeOperation = 'lighter';
+  for (const [x, on] of room.tubes) { const gr = g.createLinearGradient(0, 18, 0, 170); gr.addColorStop(0, `rgba(255,236,170,${0.15 * on})`); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, 19); g.lineTo(x + 46, 19); g.lineTo(x + 88, 170); g.lineTo(x - 42, 170); g.closePath(); g.fill(); }
+  if (S.laser) { glow(SCAN_X, 130, 18, '255,74,61', 0.12); glow(SCAN_X, 97, 12, '255,74,61', 0.08); }
+  g.globalCompositeOperation = 'source-over';
+  ambient(mix('#ffffff', '#7685b0', 0.25 + 0.6 * dark), room.wins);
+  g.globalCompositeOperation = 'lighter';
+  for (const s of shafts) shaft(s.x, s.y, s.w, 216, 0.2 * sun);
+  for (const s of shafts) { const y0 = 170, d0 = (y0 - s.y) * SLOPE; g.fillStyle = `rgba(255,200,130,${0.08 * sun})`; g.beginPath(); g.moveTo(s.x - d0, y0); g.lineTo(s.x + s.w - d0, y0); g.lineTo(s.x + s.w - d0 - 23, 216); g.lineTo(s.x - d0 - 23, 216); g.closePath(); g.fill(); }
+  for (const [x, y, w, h] of room.wins) glow(x + w / 2, y + h / 2, w * 0.9, '255,214,150', 0.18 * sun);
+  // the morning finds the can (and the gloves) at her spot
+  if (S.can === true && sun > 0.3) { glow(CAN_AT[0] + 2, CAN_AT[1] - 3, 16, '255,214,150', 0.55 * sun); }
+  g.globalCompositeOperation = 'source-over';
+  if (S.can === true && sun > 0.3) R(CAN_AT[0], CAN_AT[1] - 6, 1, 3, '#fff3d6');
+  dust(t, shafts, sun, { x: 0, y: 30, w: W, h: 170, ox: 0 });
+  if (her) { let li = 0; for (const s of shafts) li = Math.max(li, inShaft(her.x, (her.top || HTOP) + 8, s.x, s.y, s.w)); putRim(her.x, her.top || HTOP, her.o.mirror ? 1 : -1, -1, '#ffd9a0', Math.max(0.1, (0.12 + 0.45 * li) * sun), BELT_Y - 2); }
+}
+
+// ---------- the nights ----------
+const V = 112;   // the belts' speed (px/s; the far one in its own scale)
+const nearX = (u, tIn) => PLACE + (u - tIn) * V, farX = (u, tIn) => FAR_PLACE + (u - tIn) * V;
+const nearScan = tIn => tIn + (SCAN_X - PLACE) / V, farScan = tIn => tIn + (SCAN_X - FAR_PLACE) / V;
+const regular = (from, to, gap, phase = 0) => { const a = []; for (let t = phase; t < to; t += gap) if (t >= from) a.push(+t.toFixed(3)); return a; };
+// boxes on a belt at time u: put down at tIn (in the loader's hands a moment before), riding to the gate and on
+function onBelt(list, u, xOf, scanOf, kind) {
+  const out = []; list.forEach((tIn, i) => { if (u < tIn - 0.2) return; const x = xOf(u, tIn); if (x > (kind === 'far' ? 420 : W) + 10) return;
+    const b = { x: u < tIn ? xOf(tIn, tIn) + 8 : x, y: u < tIn ? BELT_Y - 4 : BELT_Y, tIn, i, kind, ts: scanOf(tIn) }; out.push(b); }); return out; }
+// the loader's reach as each box goes down (0..1)
+const reachK = (list, u) => list.reduce((m, tIn) => Math.max(m, ease(seg(u, tIn - 0.25, tIn - 0.05)) * (1 - ease(seg(u, tIn + 0.05, tIn + 0.3)))), 0);
+// a near-layer loader at her spot, facing down the line, reaching to where the boxes go down
+const loaderReach = (cx, k) => k > 0.02 ? { act: 'reach', rx: Math.round(lerp(cx - 8, 2 * cx - PLACE, k)), ry: Math.round(lerp(HTOP + 31, BELT_Y - 3, k)) } : {};
+const jiwooLoads = (u, list, mirror, look) => { const k = reachK(list, u); return { x: JF, o: k > 0.02 ? { mirror: true, look, arms: 'reach', reach: { dx: Math.round(lerp(-6, -12, k)), dy: Math.round(lerp(31, 37, k)) } } : { mirror, look } }; };
+
+const THU = { near: [0.4, 1.7, 3.3, 4.3, 6.9, 8.2, 9.2, 10.9, 12.1], far: regular(0, 13, 1.6, 0.2) };   // 반장 on her belt, out of practice and holding his back
+const SAT = { near: [6.6, 7.4, 7.65, 9.0, 10.1, 10.3, 11.9, 13.0, 13.25, 14.4], far: regular(0, 15, 1.6, 0.6) };   // the stand-in, after the can; boxes land on top of each other
+const SUN_BEAT = 60 / 62, SUN = { near: regular(5.85, 15, SUN_BEAT, 5.9 - SUN_BEAT * 6), far: regular(0, 15, SUN_BEAT * 2, 5.9 - SUN_BEAT * 6) };   // once she's back: her beat, and his on every other one of hers
+const DAYS = [
+  { id: 'thu', day: '목요일 밤', hour: '03:10', dur: 12.8,
+    lines: [[2.0, 'j', '…누나 오늘 안 와요?', 2.6], [5.4, 'b', '…일해.', 1.8]],
+    at(u) {
+      const kN = reachK(THU.near, u), back = u > 7.4;   // after '…일해.' he presses a hand into the small of his back
+      const turned = u > 1.2 && u < 7.4;
+      return { sun: 0, tubes: [1, 1, 1], laser: true, run: u * V, runF: u * V, player: true, gloves: true,
+        near: onBelt(THU.near, u, nearX, nearScan, 'near'), far: onBelt(THU.far, u, farX, farScan, 'far'),
+        jiwooFar: turned ? { x: JF, o: { mirror: false, look: u > 6.6 ? -0.6 : 0.1 } } : jiwooLoads(u, THU.far, true, u > 7.4 ? -0.4 : 0.1),
+        who() { person(HER, HTOP, { ...BOSS, m: true, ...loaderReach(HER, kN) }); R(HER - 7, HTOP + 26, 14, 2, '#ebe5c9');
+          if (back && kN < 0.02) { thick(HER - 8, HTOP + 18, HER - 11, HTOP + 31, 3, '#f07a2a'); R(HER - 12, HTOP + 30, 3, 3, SK[2]); } } };
+    } },
+  { id: 'fri', day: '금요일 밤', hour: '03:00 · 쉬는 시간', dur: 16.8, cut: 10.6,
+    phone: { at: 5.6, text: '누나, 괜찮아요?', sent: 7.6 },
+    at(u) {
+      if (u >= this.cut) return { sun: 0.65, tubes: [0, 0, 0], laser: false, gloves: true, can: true, caption: { day: '금요일', hour: '06:00 · 퇴근' } };
+      // the belts stand; he comes back from the break room with two cans, leaves one at her spot, steps back, and writes to her
+      const x = u < 0.6 ? -16 : u < 2.8 ? lerp(-16, HER + 12, ease(seg(u, 0.6, 2.8))) : u < 4.2 ? HER + 12 : lerp(HER + 12, HER + 30, ease(seg(u, 4.2, 4.9)));
+      let o = { mirror: false, look: 0.1, nobuds: true };
+      if (u > 0.6 && u < 2.8) o = walkPose((u - 0.6) * 33, true, 0.1, { nobuds: true });
+      else if (u > 4.2 && u < 4.9) o = walkPose((u - 4.2) * 26, true, 0, { nobuds: true });
+      const pk = ease(seg(u, 3.0, 3.35)) * (1 - ease(seg(u, 3.6, 4.0)));
+      if (pk > 0) o = { mirror: false, look: -0.6, nobuds: true, arms: 'reach', reach: { dx: Math.round(lerp(-6, -14, pk)), dy: Math.round(lerp(31, 33, pk)) } };
+      if (u > 4.9) { const ph = ease(seg(u, 5.0, 5.4)); o = { mirror: false, look: -0.6, nobuds: true, arms: 'reach', reach: { dx: Math.round(lerp(-6, -4, ph)), dy: Math.round(lerp(31, 25, ph)) } }; }
+      return { sun: 0, tubes: [1, 1, 1], laser: true, gloves: true, can: u > 3.45 ? true : null, jx: Math.round(x),
+        who() { if (x > -14) jiwooFig(Math.round(x), HTOP, o); } };
+    } },
+  { id: 'sat', day: '토요일 밤', hour: '03:20', dur: 15.2,
+    lines: [[1.5, 's', '이거 누구 거예요?', 2.4], [4.3, 'j', '…놔두세요.', 1.8], [8.8, 'b', '…하아.', 1.4], [11.2, 'j', '…누나는 안 밀렸는데.', 2.8]],
+    at(u) {
+      const near = onBelt(SAT.near, u, nearX, nearScan, 'near');
+      // a box that reaches the gate on top of the one before is missed: red, and it tips off the belt
+      for (const b of near) { const prev = near.find(o => o.i === b.i - 1); b.miss = !!prev && b.ts - prev.ts < 0.45; if (b.miss && u > b.ts) { b.tint = '#7a1f18'; b.y = BELT_Y + Math.min(40, ((u - b.ts) * 7) ** 2); } }
+      // the can: he picks it up off the cap (0.8), holds it while he asks, puts it back (6.0)
+      const holding = u > 0.95 && u < 6.0, pick = ease(seg(u, 0.7, 0.95)) * (1 - ease(seg(u, 1.0, 1.3))) + ease(seg(u, 5.7, 5.95)) * (1 - ease(seg(u, 6.0, 6.3)));
+      const kN = reachK(SAT.near, u);
+      const turned = u > 3.9 && u < 6.2 || u > 10.8;
+      return { sun: 0, tubes: [1, 1, 1], laser: true, run: u * V, runF: u * V, player: true, gloves: true, near, far: onBelt(SAT.far, u, farX, farScan, 'far'),
+        can: holding ? { x: HER + 9, y: HTOP + 30 } : true,
+        jiwooFar: turned ? { x: JF, o: { mirror: false, look: u > 10.8 ? -0.6 : 0 } } : jiwooLoads(u, SAT.far, true, 0.1),
+        who() { bossSeated(false);
+          const p = pick > 0.02 ? { act: 'reach', rx: Math.round(lerp(HER - 8, 2 * HER - 46, pick)), ry: Math.round(lerp(HTOP + 31, 141, pick)) } : holding ? { act: 'reach', rx: HER - 8, ry: HTOP + 30 } : loaderReach(HER, kN);
+          person(HER, HTOP, { ...SUB, m: true, ...p }); } };
+    } },
+  { id: 'sun', day: '일요일 · 명절 마지막 밤', hour: '21:58', dur: 15.0,
+    lines: [[6.7, 'j', '…누나!', 1.8]],
+    at(u) {
+      // she comes in from the left in her work clothes, to her spot; takes her gloves off the cap; looks at the can a moment; and
+      // puts boxes down on her beat, and the line's beep comes back steady. 지우 calls her; she doesn't answer. 반장 lifts his head.
+      let haeun = null;
+      if (u > 1.4) {
+        if (u < 3.6) haeun = { x: Math.round(lerp(-14, HER, ease(seg(u, 1.4, 3.6)))), o: walkPose((u - 1.4) * 30, true, 0) };
+        else { const gk = ease(seg(u, 3.9, 4.2)) * (1 - ease(seg(u, 4.3, 4.6))), kN = reachK(SUN.near, u);
+          const o = u > 3.75 && u < 4.75 ? { mirror: false, look: -0.5, sway: 0, ...(gk > 0.02 ? { arms: 'reach', reach: { dx: Math.round(lerp(-6, -9, gk)), dy: Math.round(lerp(31, 41, gk)) } } : {}) }   // she turns to the cap and takes her gloves
+            : kN > 0.02 ? { mirror: true, look: -0.3, sway: 0, arms: 'reach', reach: { dx: Math.round(lerp(-6, -12, kN)), dy: Math.round(lerp(31, 38, kN)) } }
+            : { mirror: true, look: u > 4.5 && u < 5.6 ? -0.7 : -0.2, sway: 0 };
+          haeun = { x: HER, o }; }
+      }
+      const farList = u < 5.9 ? regular(0, 15, 1.6, 0.4).filter(t => t < 5.9) : SUN.far;
+      const turned = u > 6.4;
+      return { sun: 0, tubes: [1, 1, 1], laser: true, run: u * V, runF: u * V, player: true, gloves: u < 4.3, can: true, haeun,
+        near: onBelt(SUN.near, u, nearX, nearScan, 'near'), far: onBelt([...regular(0, 5.9, 1.6, 0.4), ...SUN.far.filter(t => t >= 5.9)], u, farX, farScan, 'far'),
+        jiwooFar: turned ? { x: JF, o: { mirror: false, look: 0.2 } } : jiwooLoads(u, farList, true, 0.1),
+        who() { bossSeated(u < 7.2); } };
+    } }
+];
+const DAY0 = 1.2;
+{ let at = DAY0; for (const d of DAYS) { d.t0 = at; at += d.dur; } }
+const DAYS_END = DAYS[DAYS.length - 1].t0 + DAYS[DAYS.length - 1].dur;
+const WHO_KO = { j: '지우', b: '반장', h: '하은', s: '대타' };
+
+// ---------- the frame ----------
+let mode = 'title', t0 = 0, T = 0, lastN = -9, lastF = -9, lastMiss = -9, seen = new Set();
+const now = () => performance.now() / 1000;
+function start() { $('title').hidden = true; $('end6').hidden = true; mode = 'days'; t0 = now(); seen = new Set(); audio(); }
+function dayAt(t) { for (const d of DAYS) if (t >= d.t0 && t < d.t0 + d.dur) return d; return null; }
+const once = (k, fn) => { if (!seen.has(k)) { seen.add(k); fn(); } };
+function render() {
+  T = now() - t0;
+  out.setTransform(1, 0, 0, 1, 0, 0); out.globalAlpha = 1; out.fillStyle = '#000'; out.fillRect(0, 0, cv.width, cv.height);
+  let fade = 1, line = null, caption = null, phone = null, S = null;
+  if (mode === 'days') {
+    const d = dayAt(T);
+    if (d) {
+      const u = T - d.t0; S = d.at(u);
+      // the gates: a beep as each box reaches one (the far one a little higher); a buzz and red for one that comes in on top of another
+      for (const b of [...(S.near || []), ...(S.far || [])]) if (u >= b.ts && u - b.ts < 0.2) once(d.id + b.kind + b.i, () => { if (b.miss) { lastMiss = T; sfx('buzz'); } else if (b.kind === 'far') { lastF = T; sfx('scanF'); } else { lastN = T; sfx('scan'); } });
+      S.flashN = 1 - seg(T, lastN, lastN + 0.14); S.flashF = 1 - seg(T, lastF, lastF + 0.14); S.missN = 1 - seg(T, lastMiss, lastMiss + 0.3);
+      shot(u, S);
+      fade = Math.max(1 - seg(u, 0, 0.7), seg(u, d.dur - 0.6, d.dur));
+      if (d.cut) fade = Math.max(fade, 1 - Math.abs(u - d.cut) / 0.5);
+      caption = S.caption ? (u - d.cut < 3.0 ? S.caption : null) : (u < 2.6 ? { day: d.day, hour: d.hour } : null);
+      once(d.id + 'in', () => sfx('clock')); if (S.caption) once(d.id + 'cut', () => sfx('clock'));
+      for (const [at, who, text, dur] of d.lines || []) if (u >= at && u < at + dur) { line = { who, text, u: u - at, dur }; once(d.id + at, () => sfx(who === 'b' ? 'blipL' : who === 's' ? 'blipS' : 'blip')); }
+      if (line) caption = null;
+      if (d.phone && u >= d.phone.at && u < d.cut - 0.4) phone = { ...d.phone, u: u - d.phone.at, x: S.jx + 6 };
+      if (d.phone && u >= d.phone.sent) once('sent', () => sfx('send'));
+      if (d.id === 'fri' && u > 3.45) once('can', () => sfx('can'));
+      if (d.id === 'sat') { if (u > 0.95) once('canUp', () => sfx('can')); if (u > 6.0) once('canDown', () => sfx('can')); }
+      if (d.id === 'sun' && u > 4.3) once('gloves', () => sfx('cloth'));
+      steps(d, u);
+    }
+    if (T >= DAYS_END + 0.4) { mode = 'end'; $('end6').hidden = false; }
+  }
+  ambience(S);
+  out.imageSmoothingEnabled = false;
+  if (S) out.drawImage(wb, 0, CROP, W, H - CROP, 0, 0, cv.width, cv.height * (H - CROP) / H);
+  out.fillStyle = '#000'; out.fillRect(0, BAR_TOP * SC, cv.width, cv.height);
+  if (fade > 0) { out.fillStyle = `rgba(0,0,0,${fade})`; out.fillRect(0, 0, cv.width, cv.height); }
+  if (caption) drawCaption(caption);
+  if (phone) drawPhone(phone);
+  if (line) drawLine(line);
+  requestAnimationFrame(render);
+}
+function steps(d, u) {
+  const walks = d.id === 'fri' ? [[0.6, 2.8, 0.36], [4.2, 4.9, 0.36]] : d.id === 'sun' ? [[1.4, 3.6, 0.42]] : [];
+  for (const [a, b, per] of walks) for (let s = a + 0.15; s < b; s += per) if (u >= s && u < s + 0.12) once(d.id + 's' + s.toFixed(2), () => sfx('step'));
+}
+
+// ---------- words: the game's dialogue box (as the cutscene draws it), the night in the bar, his phone ----------
+function drawLine(ln) {
+  const full = ln.text, who = WHO_KO[ln.who], n = Math.min([...full].length, Math.floor(ln.u / 0.04) + 1), a = clamp(Math.min(ln.u / 0.12, (ln.dur - ln.u) / 0.3), 0, 1);
+  const u = cv.width / 100, bx = 4 * u, bw = cv.width - 8 * u, bh = 16 * u, by = cv.height - 3 * u - bh, ws = 2.5 * u, px = bx + 3 * u, py = by + 2 * u, th = ws * 1.4;
+  out.save(); out.globalAlpha = a;
+  out.beginPath(); out.roundRect(bx, by, bw, bh, 6); out.fillStyle = 'rgba(17,13,11,.95)'; out.fill(); out.lineWidth = 1.5; out.strokeStyle = '#3a2f28'; out.stroke();
+  out.font = `${Math.round(ws)}px "Black Han Sans", "Apple SD Gothic Neo", sans-serif`; const tw = out.measureText(who).width;
+  out.beginPath(); out.roundRect(px, py, tw + 1.1 * ws, th, 3); out.fillStyle = '#f07a2a'; out.fill();
+  out.fillStyle = '#1b120c'; out.textAlign = 'left'; out.textBaseline = 'middle'; out.fillText(who, px + 0.55 * ws, py + th / 2 + 1);
+  out.font = `500 ${Math.round(3.3 * u)}px "IBM Plex Sans KR", "Apple SD Gothic Neo", sans-serif`; out.fillStyle = '#efe6d2'; out.textBaseline = 'top';
+  out.fillText([...full].slice(0, n).join(''), px, py + th + 0.5 * ws);
+  out.restore();
+}
+function drawCaption(c) {
+  out.save(); out.textBaseline = 'middle'; out.textAlign = 'left';
+  out.fillStyle = '#d9a520'; out.fillRect(40, 500, 4, 40);
+  out.fillStyle = '#efe6d2'; out.font = '400 34px "Black Han Sans", sans-serif'; out.fillText(c.day, 56, 520);
+  const w = out.measureText(c.day).width; out.font = '500 22px "IBM Plex Mono", monospace'; out.fillStyle = '#a6978a'; out.fillText(c.hour, 56 + w + 20, 522);
+  out.restore();
+}
+function drawPhone(p) {
+  // his message to her over his head: typed, sent, and the little '1' that stays (she doesn't read it)
+  const a = clamp(p.u / 0.25, 0, 1), typed = Math.min([...p.text].length, Math.floor(Math.max(0, p.u - 0.4) / 0.11)), sent = p.u >= p.sent - p.at;
+  const x = p.x * SC, y = 66 * SC;
+  out.save(); out.globalAlpha = a; out.font = '500 24px "IBM Plex Sans KR", sans-serif'; out.textBaseline = 'middle';
+  const w = Math.max(240, out.measureText(p.text).width + 48), bx = clamp(x - w / 2, 16, cv.width - w - 16), by = y - 92;
+  out.fillStyle = 'rgba(17,13,11,.92)'; out.beginPath(); out.roundRect(bx, by, w, 112, 10); out.fill(); out.strokeStyle = '#3a2f28'; out.lineWidth = 1.5; out.stroke();
+  out.fillStyle = '#a6978a'; out.font = '600 17px "IBM Plex Sans KR", sans-serif'; out.fillText('하은 누나', bx + 18, by + 22);
+  out.font = '500 24px "IBM Plex Sans KR", sans-serif';
+  const tw = out.measureText(p.text).width;
+  if (sent) { const mx = bx + w - 18 - tw - 24; out.fillStyle = '#ffe9a8'; out.beginPath(); out.roundRect(mx, by + 46, tw + 24, 44, 14); out.fill(); out.fillStyle = '#1b120c'; out.fillText(p.text, mx + 12, by + 69);
+    out.font = '600 16px "IBM Plex Mono", monospace'; out.fillStyle = '#e8b830'; out.textAlign = 'right'; out.fillText('1', mx - 8, by + 80); out.textAlign = 'left'; }
+  else { out.fillStyle = '#2a2420'; out.beginPath(); out.roundRect(bx + 14, by + 48, w - 28, 40, 6); out.fill(); out.fillStyle = '#efe6d2'; out.fillText([...p.text].slice(0, typed).join('') + (Math.floor(performance.now() / 400) % 2 ? '|' : ''), bx + 26, by + 69); }
+  out.restore();
+}
+
+// ---------- sound: the line's own (motors, tubes, the gates' beeps), steps, the voices' blips ----------
+let ac = null, sfxOut, NB, amb = null;
+function audio() {
+  if (ac) { if (ac.state === 'suspended') ac.resume(); return; }
+  ac = new (window.AudioContext || window.webkitAudioContext)();
+  sfxOut = ac.createGain(); sfxOut.gain.value = 0.8; sfxOut.connect(ac.destination);
+  NB = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate); const d = NB.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const loop = (f, type, q) => { const s = ac.createBufferSource(); s.buffer = NB; s.loop = true; const fl = ac.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q || 0.7; const gn = ac.createGain(); gn.gain.value = 0; s.connect(fl); fl.connect(gn); gn.connect(sfxOut); s.start(); return gn; };
+  const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 100; const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 240; const tg = ac.createGain(); tg.gain.value = 0; o.connect(lp); lp.connect(tg); tg.connect(sfxOut); o.start();
+  const m = ac.createOscillator(); m.type = 'triangle'; m.frequency.value = 52; const mg = ac.createGain(); mg.gain.value = 0; m.connect(mg); mg.connect(sfxOut); m.start();
+  amb = { room: loop(160, 'lowpass'), belt: loop(420, 'bandpass', 1.2), tubes: tg, motor: mg };
+}
+function ambience(S) {
+  if (!amb) return; const at = ac.currentTime, set = (gn, v) => gn.gain.setTargetAtTime(v, at, 0.08);
+  set(amb.room, S ? 0.05 : 0); set(amb.belt, S && S.run ? 0.05 : 0); set(amb.motor, S && S.run ? 0.03 : 0);
+  set(amb.tubes, S ? 0.004 * (S.tubes[0] + S.tubes[1] + S.tubes[2]) : 0);
+}
+const thump = (w, f, amp, dec) => { const o = ac.createOscillator(), gn = ac.createGain(); o.frequency.setValueAtTime(f * 1.6, w); o.frequency.exponentialRampToValueAtTime(f, w + 0.04); gn.gain.setValueAtTime(0.0001, w); gn.gain.exponentialRampToValueAtTime(amp, w + 0.006); gn.gain.exponentialRampToValueAtTime(0.0001, w + dec); o.connect(gn); gn.connect(sfxOut); o.start(w); o.stop(w + dec + 0.05); };
+const noise = (w, dur, amp, type, f, q = 1) => { const s = ac.createBufferSource(); s.buffer = NB; const fl = ac.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const gn = ac.createGain(); gn.gain.setValueAtTime(amp, w); gn.gain.exponentialRampToValueAtTime(0.0001, w + dur); s.connect(fl); fl.connect(gn); gn.connect(sfxOut); s.start(w, Math.random() * 1.5); s.stop(w + dur + 0.02); };
+const tone = (w, type, f0, f1, amp, dur) => { const o = ac.createOscillator(), gn = ac.createGain(); o.type = type; o.frequency.setValueAtTime(f0, w); if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, w + dur); gn.gain.setValueAtTime(0.0001, w); gn.gain.exponentialRampToValueAtTime(amp, w + 0.005); gn.gain.exponentialRampToValueAtTime(0.0001, w + dur); o.connect(gn); gn.connect(sfxOut); o.start(w); o.stop(w + dur + 0.03); };
+const FX = {
+  scan: w => { tone(w, 'square', 1568, 1568, 0.03, 0.06); noise(w, 0.02, 0.08, 'highpass', 3000); },
+  scanF: w => { tone(w, 'square', 2093, 2093, 0.022, 0.05); noise(w, 0.02, 0.05, 'highpass', 3600); },
+  buzz: w => { tone(w, 'sawtooth', 110, 104, 0.06, 0.32); thump(w, 90, 0.2, 0.15); },
+  step: w => { thump(w, 70, 0.12, 0.08); noise(w, 0.05, 0.05, 'lowpass', 1200); },
+  clock: w => { noise(w, 0.03, 0.35, 'highpass', 2400); thump(w + 0.01, 200, 0.25, 0.06); },
+  can: w => { tone(w, 'triangle', 2600, 2400, 0.05, 0.12); thump(w, 300, 0.1, 0.05); },
+  cloth: w => { noise(w, 0.18, 0.06, 'bandpass', 1800, 0.8); },
+  send: w => { tone(w, 'sine', 880, 1320, 0.05, 0.12); },
+  blip: w => { for (const d of [0, 0.08, 0.16]) tone(w + d, 'square', 640, 640, 0.022, 0.04); },
+  blipL: w => { for (const d of [0, 0.09, 0.18]) tone(w + d, 'square', 330, 330, 0.028, 0.05); },
+  blipS: w => { for (const d of [0, 0.08, 0.16]) tone(w + d, 'square', 520, 520, 0.022, 0.04); }
+};
+function sfx(fn) { if (ac) FX[fn](ac.currentTime); }
+
+$('start').addEventListener('click', start);
+$('r6').onclick = start;
+requestAnimationFrame(render);
+window.__days = { get mode() { return mode; }, get T() { return T; }, jump: s => { t0 = now() - s; }, DAYS };
+})();
+</script>
+</body>
+</html>
