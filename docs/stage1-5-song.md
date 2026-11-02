@@ -594,3 +594,49 @@ Tick-tock on the line and I'm not done, I'm not
 ```
 
 비트만: 첫 문단과 `Bars:` 줄만 쓰고 "one confident female rapper, English, clean"을 "instrumental, no vocals"로.
+
+### 결승 곡 v5: 길이·마디 구조 안 정함
+
+곡 길이와 마디 수를 정하지 않고 제미나이에 맡긴다(제약을 줄여 거절·이상한 결과를 피함). 대신 받으면 차트(게임 72마디부터)를 곡에 다시 맞춰야 한다.
+
+```
+A cinematic, dark trap anthem with one confident female rapper, in English, with clean lyrics. A young woman on the night shift in a warehouse, proud and focused, keeping perfect time while the boxes keep coming, like the last round of a competition. 146 BPM with a half-time feel, the snare on beat 3. A minor.
+
+The sound: punchy trap drums, rolling hi-hats with triplet rolls, a deep gliding 808 walking down A, G#, F#, E, a dark piano melody, cinematic strings, a soft wordless choir, and a ticking clock running through the whole song.
+
+Her voice: calm, sharp and confident, every word clear and on the beat. It opens with a short instrumental build-up. Near the end the drums drop out for a moment, then come back and she raps twice as fast, more and more intense. The song ends abruptly, cut off mid-line, with no fade out.
+
+[Chant]
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+
+[Verse]
+Why so cold, did the night shift steal my heart?
+That's what they say, so let me take it from the start
+Every time it starts, I'm the one who has to finish
+You play, I pay. That's the difference.
+You don't know what I need, you don't know what I've seen
+You stay up on the stage, I'll stay down at the machine
+You wanted a beat? Then listen to mine
+Every box on my line lands right on time
+Call me stiff, call me slow, say I live by the clock
+But the clock keeps the line moving, and the boxes never drop
+
+[Hook]
+Tick! Tock! Tick! Tock! Tick! Tock! Tick! Tock!
+
+[Drop-out, softly]
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+
+[Fast verse]
+Throw it, I catch it, I'm careful, I'm counting
+Your beat on my belt and I keep on counting
+Can't keep up? Watch me, one more box on the top
+Every second on the clock is a second I've got
+Go on, send another, I'll catch every one
+I was here before the night, I'll be here when it's done
+Count it with me now, one, two, three, four
+Tick-tock on the line and I'm not done, I'm not
+```
