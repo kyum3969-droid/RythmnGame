@@ -521,7 +521,7 @@ Tick-tock on the line, and nobody's gonna stop
 
 [Verse 2]
 Throw it, I catch it, I'm careful, I'm counting
-Your beat on my belt and I'm still keeping counting
+Your beat on my belt and I keep on counting
 Can't keep up? Watch me, one more box on the top
 Every second on the clock is a second I've got
 Go on, send another, I'll catch every one
@@ -548,6 +548,6 @@ Structure (one bar = 1.64 seconds):
 1:04.1 The music ends abruptly on the downbeat. No final hit, no fade.
 ```
 
-**v2와 바뀐 가사**: 1절 첫 줄은 지우 대사를 따옴표로 인용하던 걸 "Why so cold, did the night shift steal my heart? / That's what they say"로(이름과 인용 빼기), "while you watch it drop" → "and the boxes never drop", 2절 "you're careless" → "I'm careful", "I'm still not drowning" → "I'm still keeping counting", "one more drop" → "one more box on the top", "Every second you waste" → "Every second on the clock". 91마디 상자는 "drop" 단어 자리 그대로라 차트는 같다.
+**v2와 바뀐 가사**: 1절 첫 줄은 지우 대사를 따옴표로 인용하던 걸 "Why so cold, did the night shift steal my heart? / That's what they say"로(이름과 인용 빼기), "while you watch it drop" → "and the boxes never drop", 2절 "you're careless" → "I'm careful", "I'm still not drowning" → "I keep on counting", "one more drop" → "one more box on the top", "Every second you waste" → "Every second on the clock". 91마디 상자는 "drop" 단어 자리 그대로라 차트는 같다.
 
 **그래도 막히면**: (1) 가사 블록의 1절 첫 두 줄을 빼 본다, (2) 맨 앞 문장에서 "drill-style"을 "dark trap"으로, (3) 그래도 안 되면 B로 비트를 받고 그 비트로 랩을 다시 요청한다.
