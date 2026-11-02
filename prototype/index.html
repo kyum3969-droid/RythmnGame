@@ -798,9 +798,10 @@ const LEVELS = [
     // the phases on screen: line 3's lamps broken until the drop (broken, gloom), line 4's lamps clicking on as it is revealed
     // (lineOn), a flash and a jolt on both drops, the second drop's run in amber, the last hit frozen and the lamps going out
     broken: [[0, 76]],
-    phaseFx: { gloom: [0, 76], lineOn: [57.5, 58.5, 59.5], drop: 76, drop2: 240, amber: [[240, 312]], last: 319, out: [320.4, 321.1, 321.8] },
-    // phase 1 is quiet (반장 thinks the night will be): only the lamps clicking on with the reveal and going out at the end
-    sfx: [[57.5, 'lamp'], [58.5, 'lamp'], [59.5, 'lamp'], [320.4, 'lampOff'], [321.1, 'lampOff'], [321.8, 'lampOff']],
+    phaseFx: { gloom: [0, 76], blackout: [56, 58], lineOn: [59, 60, 61.5], drop: 76, drop2: 240, amber: [[240, 312]], last: 319, out: [320.4, 321.1, 321.8] },
+    // phase 1 is quiet (반장 thinks the night will be). 마르코's entrance: the radio cut with a breaker and the floor black
+    // (blackout), then three breakers, 탁 탁 탁, his line's lamps flickering on one by one (lineOn); the lamps going out at the end
+    sfx: [[56, 'switchOff'], [58, 'switchOn'], [59, 'switchOn'], [60, 'switchOn'], [61.5, 'switchOn'], [320.4, 'lampOff'], [321.1, 'lampOff'], [321.8, 'lampOff']],
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     // wide windows: this is played on phones (딱 ±80 ms, 좋아 ±150 ms, past 220 ms a miss)
     win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 319,
@@ -3643,7 +3644,18 @@ function drawMid(t, nowMs, active) {
     const dark = (x0, x1, a) => { const l = x0 <= 0 ? 0 : soft, r = x1 >= WW ? 0 : soft, gr = g.createLinearGradient(x0 - l, 0, x1 + r, 0), w = x1 - x0 + l + r;
       gr.addColorStop(0, `rgba(4,3,5,${l ? 0 : a})`); gr.addColorStop(Math.min(0.5, (2 * l) / w), `rgba(4,3,5,${a})`); gr.addColorStop(Math.max(0.5, 1 - (2 * r) / w), `rgba(4,3,5,${a})`); gr.addColorStop(1, `rgba(4,3,5,${r ? 0 : a})`);
       g.fillStyle = gr; g.fillRect(x0 - l, -MID.oy, w, MID.wh); };
-    slices.forEach(([x0, x1], i) => { if (bReal < F.lineOn[i]) dark(x0, x1, 0.82); });
+    // a lamp catching: a warm flash over its stretch of floor, soft at the sides like the dark
+    const flash = (x0, x1, a) => { const l = x0 <= 0 ? 0 : soft * 2, r = x1 >= WW ? 0 : soft * 2, w = x1 - x0 + l + r, gr = g.createLinearGradient(x0 - l, 0, x1 + r, 0);
+      gr.addColorStop(0, `rgba(255,244,210,${l ? 0 : a})`); gr.addColorStop(Math.min(0.5, (2 * l) / w), `rgba(255,244,210,${a})`); gr.addColorStop(Math.max(0.5, 1 - (2 * r) / w), `rgba(255,244,210,${a})`); gr.addColorStop(1, `rgba(255,244,210,${r ? 0 : a})`);
+      g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = gr; g.fillRect(x0 - l, -MID.oy, w, MID.wh); g.restore(); };
+    slices.forEach(([x0, x1], i) => {
+      const on = F.lineOn[i], k = bReal - on;
+      if (k < 0 || (k < 0.16 && k > 0.07)) dark(x0, x1, k < 0 ? 0.82 : 0.6);   // dark, then a fluorescent flicker as it catches
+      else if (k < 0.7 && !reduce) flash(x0, x1, 0.28 * (1 - k / 0.7));
+    });
+    // the radio cut: the whole floor goes black with a breaker, line 3 comes back with the first of line 4's lamps
+    if (F.blackout && bReal >= F.blackout[0] && bReal < F.blackout[1]) dark(0, AX, 0.86);
+    if (F.blackout && bReal >= F.blackout[1] && bReal < F.blackout[1] + 0.7 && !reduce) flash(0, AX, 0.2 * (1 - (bReal - F.blackout[1]) / 0.7));
     const outs = [[[0, AX - 226], [AX + 226, WW]], [[AX - 226, AX - 113], [AX + 113, AX + 226]], [[AX - 113, AX - 40], [AX + 40, AX + 113]]];
     outs.forEach((pair, i) => { if (bReal >= F.out[i] || !active && state !== 'play' && live) for (const [x0, x1] of pair) dark(x0, x1, 0.8); });
   }
@@ -5235,6 +5247,15 @@ function levelSfx(t, kind) {
   if (kind === 'hey' || kind === 'yeah') return shout21(t, kind);
   if (kind === 'fanfare') return fanfare21(t);
   if (kind === 'clank') { osc('square', 760, t, 0.001, 0.05, 0.12, bus); osc('square', 1130, t, 0.001, 0.035, 0.09, bus); noise(t, 'bandpass', 3200, 0.16, 0.06, 3, bus); noise(t, 'lowpass', 500, 0.12, 0.05, 0.7, bus); }
+  // the big switches for 마르코's entrance: a breaker thrown ("탁!": a low thump and a hard click), on: the tube's flicker
+  // ticking and its hum coming up; off: the hum dying
+  if (kind === 'switchOn' || kind === 'switchOff') {
+    const o = osc('sine', 95, t, 0.001, 0.4, 0.12, bus); o.frequency.exponentialRampToValueAtTime(48, t + 0.1);
+    noise(t, 'bandpass', 2600, 0.42, 0.025, 2.5, bus); osc('square', 1700, t, 0.0005, 0.07, 0.015, bus); noise(t, 'lowpass', 700, 0.25, 0.06, 0.8, bus);
+    if (kind === 'switchOn') { noise(t + 0.07, 'bandpass', 4800, 0.1, 0.012, 5, bus); noise(t + 0.12, 'bandpass', 4800, 0.14, 0.012, 5, bus); const h = osc('sawtooth', 120, t + 0.12, 0.05, 0.018, 0.5, bus); h.frequency.value = 120; }
+    else { const h = osc('sawtooth', 120, t, 0.001, 0.02, 0.35, bus); h.frequency.exponentialRampToValueAtTime(60, t + 0.35); }
+    return;
+  }
   if (kind === 'lamp') { osc('square', 1900, t, 0.001, 0.05, 0.02, bus); noise(t, 'bandpass', 4200, 0.18, 0.02, 4, bus); noise(t + 0.03, 'highpass', 6000, 0.04, 0.25, 0.7, bus); }
   if (kind === 'lampOff') { osc('square', 1500, t, 0.001, 0.05, 0.02, bus); noise(t, 'bandpass', 3600, 0.16, 0.02, 4, bus); osc('sine', 120, t, 0.003, 0.05, 0.25, bus); }
   if (kind === 'drill') { const o = osc('sawtooth', 140, t, 0.02, 0.05, 0.7, bus); o.frequency.setValueAtTime(140, t); o.frequency.linearRampToValueAtTime(230, t + 0.25); o.frequency.linearRampToValueAtTime(190, t + 0.7); noise(t, 'bandpass', 2400, 0.05, 0.7, 2, bus); }
