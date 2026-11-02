@@ -381,3 +381,85 @@ BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
 ```
 
 **받은 드릴 곡**: `prototype/audio/1-5-this-is-a-beat.mp3`(받은 이름 you_play_i_pay_1, 67.13초, 실측 146.0 BPM 하프타임 — 스네어가 3박, 첫 다운비트 0.483초, 39마디, 64.6초에 뚝 끊김). 실제 구조(곡 마디, 받아쓰기는 드릴이라 일부만 잡힘): 0–3 도입, 4–9 Tick-tock ×3(두 마디에 한 줄), 10–19 벌스("Haeun, why so cold…"부터 "…watch it drop"까지, 줄 간격이 고르지 않음), 20–21 끊김, 22–27 풀 비트(스네어·하이햇 빽빽), 28–30 드럼 빠지고 Tick-tock ×2, 31–38 벌스 다시 더블타임, 39 끊김. 게임 72–111마디(`docs/stage1.md` 4페이즈 표).
+
+### 결승 곡 다시 뽑기 (v2): 지금 차트 구조 그대로
+
+받은 드릴 곡(`1-5-this-is-a-beat.mp3`)의 마디 구조를 그대로 지켜서, 새로 받아도 차트(게임 72–111마디)는 손대지 않고 `lead`(첫 다운비트)만 다시 재면 되게 한다. 고친 점:
+- **줄 간격을 고르게**: 받은 곡은 벌스 줄 간격이 들쭉날쭉하고 발음이 뭉개져 받아쓰기가 일부만 잡혔다. 한 마디에 한 줄, 첫 박에 들어가게, 또렷하게.
+- **가사를 정확히**: 받은 곡은 1라운드 브레이크다운·3절 가사를 제미나이가 섞어 넣었다. 가사 밖의 말은 넣지 말라고 적는다.
+- **끝은 뚝 끊김**: 게임에서 지우가 끊는 자리. 마지막 한 방 없이 줄 중간에서 케이블을 뽑은 듯이.
+- **마지막 벌스에서 하은도 지친다**: 끝에 하은이 숨을 고르는 컷과 이어지게, 빠른 벌스로 갈수록 목소리가 거칠어지고 숨이 찬다.
+- "diss", "battle", "menacing"은 빼고 "final round", "cold, dark"로.
+
+```
+A dark, cold, hard-hitting UK drill track with ONE solo female rapper: the last round on a night shift, where a young woman finally answers a careless coworker with her own beat. English rap vocals, one female voice only, no male vocals, no singing, no backing choir singing words. 146 BPM with a half-time feel (the snare on beat 3 of every bar), 4/4, A minor. About 1:05 long. Clean lyrics. Sing ONLY the lyrics below, exactly as written, nothing added.
+
+The sound:
+- Drill drums: a heavy kick, a hard snare and clap on beat 3 of every bar, skippy sliding hi-hats with triplet rolls.
+- A huge, distorted sliding 808 walking down by half steps: A, G#, F#, E.
+- A cold, eerie piano melody and dark strings on top, a low choir pad underneath (no words).
+- A ticking clock running through the whole track, like time running out.
+- Mixed loud, wide and aggressive.
+
+The rapper: a young woman of 23. Cold, sharp, controlled. Every line starts exactly on the first beat of its bar and every word is clear and easy to understand. Her voice is doubled on the ends of lines. In the last verse she gets faster and rawer, out of breath by the end.
+
+Structure (one bar = 1.64 seconds; every change lands exactly on the bar line):
+0:00-0:06.6 Intro (4 bars), NO vocals: bar 1 only the clock and the cold piano; bar 2 the strings and choir pad come in, the clock ticks twice as fast; bar 3 the hi-hats start, a rising swell; bar 4 a hi-hat roll, and on the last half beat everything cuts to silence for a breath.
+0:06.6-0:16.4 Chant (6 bars): the drums and the 808 slam in on the downbeat. The chant line three times, ONE LINE EVERY TWO BARS, slow and heavy.
+0:16.4-0:32.9 Verse 1 (10 bars): ten lines, ONE LINE PER BAR, harder and harder.
+0:32.9-0:36.2 Break (2 bars): one huge 808 and snare hit on the downbeat, then a full bar of silence with only the clock ticking.
+0:36.2-0:46.0 Full beat (6 bars): everything back at full power, the busiest drums of the song. Her doubled voice shouts "Tick!" and "Tock!" in turn, one word on every beat.
+0:46.0-0:51.0 Drop-out (3 bars): the drums cut out, only the 808, the clock and the piano. She half-whispers the chant line twice.
+0:51.0-1:04.1 Verse 2, double time (8 bars): the drums slam back in, she raps twice as fast, ONE LINE PER BAR, breathless and raw by the end.
+1:04.1 The track stops dead on the downbeat, in the middle of her last word, as if someone pulled the cable. No final hit, no fade out, just silence.
+
+Lyrics:
+
+[Intro - no vocals]
+
+[Chant - one line every two bars]
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+
+[Verse 1 - one line per bar]
+"Haeun, why so cold, did the night shift steal your heart?"
+That's what you said, so let me take it from the start
+Every time you start, I'm the one who has to finish
+You play, I pay. That's the difference.
+You don't know what I need, you don't know what I've seen
+Stay up on your stage, I'll stay down at the machine
+You wanted a beat? Then listen to mine
+Every box on my line lands right on time
+Call me stiff, call me slow, say I live by the clock
+But the clock keeps the line moving while you watch it drop
+
+[Break - one hit, then only the clock]
+
+[Full beat - shouted, one word per beat]
+Tick! Tock! Tick! Tock! Tick! Tock! Tick! Tock!
+Tick! Tock! Tick! Tock! Tick! Tock! Tick! Tock!
+Tick! Tock! Tick! Tock! Tick! Tock! Tick! Tock!
+
+[Drop-out - half-whispered]
+Tick-tock on the line, and nobody's gonna stop
+Tick-tock on the line, and nobody's gonna stop
+
+[Verse 2 - double time, one line per bar, out of breath by the end]
+You throw it, I catch it, you're careless, I'm counting
+Your beat on my belt and I'm still not drowning
+Can't keep up? Watch me, one more box, one more drop
+Every second you waste is a second I got
+Go on, throw another, I'll catch every one
+I was here before the night, I'll be here when it's done
+Count it with me now, one, two, three, four
+Tick-tock on the line and I'm not done, I'm not
+
+[Cut - stops dead mid-word, silence]
+```
+
+**막히면**: 가사를 빼고 비트만 먼저 받은 뒤, 같은 프롬프트에 "Use the same beat as before"로 다시. 풀 비트의 "Tick! Tock!"이 이상하게 나오면 그 6마디를 "NO vocals, the beat at full power"로 바꿔도 차트는 그대로 맞는다.
+
+**새 가사 뜻**: You wanted a beat? Then listen to mine — 비트 원했지? 그럼 내 거 들어 봐 / Every box on my line lands right on time — 내 라인 상자는 전부 제때 떨어져 / Your beat on my belt and I'm still not drowning — 네 비트가 내 벨트에 쏟아져도 난 안 잠겨 / Every second you waste is a second I got — 네가 버린 1초는 내가 버틴 1초야 / I was here before the night, I'll be here when it's done — 밤이 오기 전부터 여기 있었고, 끝나도 여기 있을 거야 / Tick-tock on the line and I'm not done, I'm not — 라인 위에 째깍째깍, 난 안 끝났어, 난 안— (지우가 끊음)
+
+**받으면 할 일**: 첫 다운비트(`lead`)와 BPM(146인지)을 재고, 마디 경계가 위 타임스탬프에 맞는지 확인. 맞으면 `songs`의 파일과 `lead`만 바꾼다. 줄이 들어가는 마디가 다르면 위 벨트(던져 올림) 자리만 고친다. 펀치라인 LED(`stage.cheers`)도 확인.
