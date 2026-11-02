@@ -80,6 +80,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
   font-size:clamp(11px,1.9cqw,18px);line-height:1.35;padding:.45em .75em;border-radius:6px;pointer-events:none;box-shadow:0 2px 0 rgba(0,0,0,.45)}
 .bubble.obs{background:#d9d0bd}
 .bubble.tr::after{left:auto;right:1.6em}
+.bubble.mid::after{left:var(--tx,1.6em);right:auto}
 .bubble::after{content:"";position:absolute;left:1.6em;bottom:-.45em;border:.5em solid transparent;border-top-color:var(--paper);border-bottom:0}
 .bubble.loud{font-family:var(--display);font-weight:400;font-size:clamp(15px,3.1cqw,30px);letter-spacing:.02em;background:#fff4e8;color:#b3261e;
   border:2px solid #d8463b;box-shadow:0 3px 0 rgba(0,0,0,.5),0 0 18px rgba(216,70,59,.45);animation:shout .6s ease-out}
@@ -757,7 +758,7 @@ const LEVELS = [
     // corner to corner, two bars each and then one, on the horn riff, 반장 on 1 and 3 throughout; the last hit at 319.
     tempo: [[0, 110.01], [56, 120]], clock:'02:40', title:'에이스', partners:['boss'], hints:false,
     songs: [{ src: 'audio/2-1-across-the-empty-floor.mp3', at: 0, lead: 1.0707, gain: 0.9, until: 56 },
-            { src: 'audio/2-1-the-copper-stomp.mp3', at: 62, lead: 0.116, gain: 0.85 }],
+            { src: 'audio/2-1-the-copper-stomp.mp3', at: 62, lead: 0.116, gain: 0.78 }],
     songStart: 0, songCues: [[56, 'tape'], [62, 1]], songDuck: [144, 208, 420, 0.7], noCount: true, bareBand: true, hitKit: 'ticktock',
     // the whole night is drawn on the floor renderer (at 0): the upper belt of line 3 (하은's) stands idle in phase 1. Over
     // `zoom` the camera pulls back on all four belts; the keys split at `keys` (left hand: both left belts, right hand: both
@@ -3460,26 +3461,29 @@ function phaseLook(c, w, h, b, active) {
   // the choruses: amber, breathing with the beat
   const am = F.amber.find(([x, y]) => b >= x - 1 && b < y + 1);
   if (am) { const k = Math.min(1, b - (am[0] - 1), am[1] + 1 - b), ph = b - Math.floor(b); c.globalCompositeOperation = 'overlay'; c.fillStyle = `rgba(255,160,50,${(0.22 + 0.12 * Math.max(0, 1 - ph * 3)) * k})`; c.fillRect(0, 0, w, h); }
+  // your presses: a warm wash on 마르코's horn stabs, a dimmer one on 반장's kicks
+  const sa = performance.now() - (FX.stabAt || -1e9), ka = performance.now() - (FX.thumpAt || -1e9);
+  if (sa < 140 || ka < 110) { c.globalCompositeOperation = 'lighter'; c.fillStyle = sa < 140 ? `rgba(255,190,90,${0.07 * (1 - sa / 140)})` : `rgba(255,230,190,${0.04 * (1 - ka / 110)})`; c.fillRect(0, 0, w, h); }
   // the drop, and the last hit: a white flash
   for (const [at, v] of [[F.drop, 0.7], [F.drop2, 0.7], [F.last, 0.45]]) { const d = b - at; if (d >= 0 && d < 1.5) { c.globalCompositeOperation = 'lighter'; c.fillStyle = `rgba(255,250,235,${v * (1 - d / 1.5) ** 2})`; c.fillRect(0, 0, w, h); } }
   c.restore();
 }
 // the jolt on the drop: a few pixels, shrinking (in game pixels)
-function phaseJolt(b) { const F = L.phaseFx; if (!F || reduce) return [0, 0]; const d = F.drop2 != null && b >= F.drop2 ? b - F.drop2 : b - F.drop; if (d < 0 || d > 0.6) return [0, 0]; const k = 3 * (1 - d / 0.6); return [Math.round((Math.random() * 2 - 1) * k), Math.round((Math.random() * 2 - 1) * k)]; }
+function phaseJolt(b) { const F = L.phaseFx; if (!F || reduce) return [0, 0]; if (performance.now() - (FX.thumpAt || -1e9) < 70) return [0, 1]; const d = F.drop2 != null && b >= F.drop2 ? b - F.drop2 : b - F.drop; if (d < 0 || d > 0.6) return [0, 0]; const k = 3 * (1 - d / 0.6); return [Math.round((Math.random() * 2 - 1) * k), Math.round((Math.random() * 2 - 1) * k)]; }
 // ---------- 2-1 the two lines ----------
 // From mid.at the whole floor is drawn into a wider canvas and the camera looks at part of it. Line 3 (the screen you know:
 // 반장, the belt, the scanner) is the left half; the right half is its mirror about where you stand: line 4, 마르코 loading it,
 // its own scanner facing yours. Over mid.zoom the camera pulls back from the old view to the whole floor. A scanned box rides
 // on to the end of its belt and drops into the cart between the lines; a missed one runs off the end.
 const MID = { ax: PLAYER_X, ww: 2 * PLAYER_X, wh: 432, oy: 108 };
-let midCv = null, midG = null;
+let midCv = null, midG = null, MIDCAM = null;
 // (the far ends are trimmed a little and the view sits a touch higher, so the floor fills the screen). sEnd: the pulled-back
 // scale, rounded so that at the screen's real resolution one dot of the floor is a whole number of device pixels
 function midView(b, sEnd) {
   const z = L.mid.zoom, e = b < z[0] ? 0 : b >= z[1] ? 1 : ease((b - z[0]) / (z[1] - z[0]));
   let s = lerp(1, sEnd, e), cx = lerp(W / 2, MID.ax, e), cy = lerp(H / 2, H / 2 - 12, e);
   // while 마르코 introduces himself beside you the camera comes in on the two of you, and goes back out after
-  const tk = L.mid.talk; if (tk && b >= tk[0] && b < tk[1] + 2) { const f = ease(Math.min(1, (b - tk[0]) / 2, (tk[1] + 2 - b) / 2)); s = lerp(s, 0.95, f); cx = lerp(cx, MID.ax + 20, f); cy = lerp(cy, H / 2 + 6, f); }
+  // (no zoom while 마르코 talks: the whole floor stays in view)
   return { s, cx, cy, e };
 }
 const cvHi = document.getElementById('cvhi'), gHi = cvHi.getContext('2d');
@@ -3492,7 +3496,7 @@ function midMarco(b) {
   const R0 = L.mid.route, S = MARCO_SPOTS(); let i = 0; for (let k = 0; k < R0.length; k++) if (b >= R0[k][0]) i = k;
   const cur = S[R0[i][1]], prev = S[R0[Math.max(0, i - 1)][1]], p = i === 0 ? 1 : Math.min(1, (b - R0[i][0]) / 1.5), e = ease(p);
   const up = (cur.dy < -10 && p > 0.6) || (prev.dy < -10 && p < 0.4);
-  return { x: lerp(prev.x, cur.x, e), dy: lerp(prev.dy, cur.dy, e), mir: p < 0.5 ? prev.x > cur.x || (prev.x === cur.x && prev.mir) : cur.mir, walking: p < 1, up, spot: R0[i][1] };
+  return { x: lerp(prev.x, cur.x, e), dy: lerp(prev.dy, cur.dy, e), mir: p < 0.5 ? prev.x > cur.x || (prev.x === cur.x && prev.mir) : cur.mir, walking: p < 1, p, up, spot: R0[i][1] };
 }
 function drawMid(t, nowMs, active) {
   const F = L.phaseFx, M = L.mid, bReal = active ? beatAt(t) : castBeatAt(t, active), live = active || state === 'outro' || state === 'result';
@@ -3555,14 +3559,47 @@ function drawMid(t, nowMs, active) {
   };
   // 마르코, where the route has him: walking between corners, throwing the boxes he loads
   const toss = live ? notes.find(n => n.quad && !bossLoads(n) && T >= n.place - 0.3 && T < n.place + 0.05) : null;
+  // 마르코 hams it up. Standing at a belt and not throwing, he dances on the beat, a move a bar: a fist pumped on the beat,
+  // finger guns at you, a lasso over his head; while he talks beside you his hand waves about, between lines he plays air bass.
+  // He skips from corner to corner (after the second drop he spins as he goes), jumps on both drops and ends arms up.
+  const beatI = Math.floor(b), bph = b - beatI, sayV = L.say.find(([sb, , d, , sp]) => sp === 'v' && b >= sb && b < sb + d);
   const drawMarco = () => {
     const pose = { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: active && (marco.walking ? ph < 0.5 : ph < 0.18) ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
+    let sway = 0, lift = 0, mir = marco.mir;
+    const on = active && M.boombox != null && b >= M.boombox + 0.5;
     if (toss) pose.hand = { x: BOSS_X + 16, y: 104 };
-    if (marco.spot === 'c' && !marco.walking && active) pose.hand = { x: BOSS_X + 14, y: 100 + Math.round(Math.sin(nowMs / 160) * 3) };   // waving it about as he talks
+    else if (on && marco.walking) {
+      lift = Math.round(Math.sin(Math.PI * Math.min(1, marco.p * 1.4)) * 7); pose.hand = { x: BOSS_X + 10, y: 80 };
+      if (F && F.drop2 != null && b >= F.drop2 && marco.p < 0.72) mir = Math.floor(marco.p * 9) % 2 ? !mir : mir;
+    } else if (on && marco.spot === 'c') {
+      if (sayV) pose.hand = { x: BOSS_X + 14, y: 100 + Math.round(Math.sin(nowMs / 160) * 3) };
+      else { pose.hand = { x: BOSS_X + 9 + (bph < 0.2 ? 1 : 0), y: 124 + (bph < 0.2 ? 3 : 0) }; sway = beatI % 2 ? 1 : 0; }
+    } else if (on) {
+      const move = ['pump', 'point', 'lasso', 'pump'][Math.floor(b / 4) % 4];
+      sway = beatI % 2 ? 1 : -1;
+      if (move === 'pump') pose.hand = { x: BOSS_X + 12, y: bph < 0.3 ? 76 : 90 };
+      else if (move === 'point') pose.hand = { x: BOSS_X + 24, y: 102 - (bph < 0.2 ? 3 : 0) };
+      else { const an = b * Math.PI * 2; pose.hand = { x: BOSS_X + 7 + Math.round(Math.cos(an) * 6), y: 74 + Math.round(Math.sin(an) * 3) }; }
+    }
+    if (F) for (const d of [F.drop, F.drop2]) if (d != null && b >= d - 0.3 && b < d + 0.9) { lift = Math.max(lift, Math.round(Math.sin(Math.PI * (b - d + 0.3) / 1.2) * 11)); pose.hand = { x: BOSS_X + 10, y: 72 }; }
+    if (F && b >= F.last) { pose.hand = { x: BOSS_X + 11, y: 70 }; if (b < F.last + 1) lift = Math.max(lift, Math.round(Math.sin(Math.PI * (b - F.last)) * 9)); }
     FX.react[2] = FX.react[2] || { type: '', at: nowMs };
     g.save(); if (marco.up) { g.beginPath(); g.rect(0, -MID.oy, WW, farY(BELT_Y) + 2 + MID.oy); g.clip(); }
-    g.translate(0, Math.round(marco.dy)); drawActor('marco', Math.round(marco.x), marco.mir, pose, nowMs, active, () => PARTNERS.marco.arm(pose)); g.restore();
+    g.translate(sway, Math.round(marco.dy) - lift); drawActor('marco', Math.round(marco.x), mir, pose, nowMs, active, () => PARTNERS.marco.arm(pose)); g.restore();
   };
+  // his ad-libs (drawn crisp over the floor, in midAdlib) and the sparks off his hands when you hit one of his boxes
+  if (!FX.adlibs || b < 57) { FX.adlibs = []; FX.adOnce = {}; FX.adWalk = false; FX.adCombo = 0; FX.adStab = FX.stabAt || 0; FX.adMiss = FX.lastMiss; }
+  if (active && b >= 62) {
+    const ad = (text) => FX.adlibs.push({ text, at: nowMs, x: marco.x, y: 86 + marco.dy - 14 });
+    const pick = xs => xs[Math.floor(Math.random() * xs.length)];
+    if (F) for (const [d, text] of [[F.drop, '예에~!'], [F.drop2, '가즈아~!'], [F.last, '대박!!']]) if (d != null && b >= d && b < d + 1 && !FX.adOnce[d]) { FX.adOnce[d] = 1; ad(text); }
+    if (FX.adWalk && !marco.walking && marco.spot !== 'c' && F && F.drop2 != null && b >= F.drop2) ad(pick(['여기!', '헤이!', '후!', '오우!', '펑키~!', '짠!']));
+    FX.adWalk = marco.walking;
+    if (stats.combo >= 30 && stats.combo % 30 === 0 && FX.adCombo !== stats.combo && !sayV) { FX.adCombo = stats.combo; ad(pick(['나이스 신입!', '그루브 좋아!', '손 좋다~!', '오~ 리듬 탔어!'])); }
+    if (FX.lastMiss !== FX.adMiss) { FX.adMiss = FX.lastMiss; if (!sayV && Math.random() < 0.35) ad(pick(['괜찮아~ 괜찮아~', '노 프라블럼!'])); }
+    if ((FX.stabAt || 0) !== FX.adStab) { FX.adStab = FX.stabAt; if (!reduce) spawn(marco.x + (marco.mir ? -12 : 12), 100 + marco.dy, 5, ['#ffd84a', '#fff3c8', '#d8463b'], -40, 40, -60, -10, 260, 380, [1, 1]); }
+    FX.adlibs = FX.adlibs.filter(a => nowMs - a.at < 900);
+  }
   mirror(0, () => back(0)); mirror(1, () => back(1));
   if (marco.up) drawMarco();
   mirror(0, () => belt(0, true)); mirror(1, () => belt(1, true));
@@ -3615,18 +3652,31 @@ function drawMid(t, nowMs, active) {
   const dpr = window.devicePixelRatio || 1, hw = Math.max(W, Math.round(cv.clientWidth * dpr)), hh = Math.round(hw * H / W), k = hw / W;
   const want = W / (MID.ww - 70), mInt = Math.round(k * want), sEnd = mInt >= 2 && Math.abs(mInt / k - want) / want < 0.06 ? mInt / k : want, V = midView(b, sEnd), sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
   const [jx, jy] = phaseJolt(bReal);
+  MIDCAM = { sx, sy, sw, sh };
   if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx + jx, sy + jy, sw, sh, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); return; }
   if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
   cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#0c0a09'; gHi.fillRect(0, 0, hw, hh);
   gHi.drawImage(midCv, sx + jx / V.s, sy + jy / V.s, sw, sh, 0, 0, hw, hh);
   phaseLook(gHi, hw, hh, bReal, active);
-  if (active) midGuide(b, T, nowMs, { sx, sy, sw, sh, hw, hh, k });
+  if (active) { midGuide(b, T, nowMs, { sx, sy, sw, sh, hw, hh, k }); midAdlib(nowMs, { sx, sy, sw, sh, hw, hh }); }
   // the game canvas under it still gets the plain floor colour (nothing else shows through)
   g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
 }
 // 2-1's lesson, drawn on the device-resolution canvas: as the camera pulls back, a big hand label on each side (the left in
 // 반장's orange, the right in 마르코's teal, lit while that hand is pressed), and over the first bars' boxes a small arrow tag
 // saying which hand, fading out (L.mid.guide: when the labels show; L.mid.tags: [from, fade from, gone by])
+// 마르코's ad-libs: a short shout that pops out over his head, rises and fades
+function midAdlib(nowMs, v) {
+  if (!FX.adlibs || !FX.adlibs.length) return;
+  const u = v.hw / W; gHi.save(); gHi.textAlign = 'center'; gHi.textBaseline = 'bottom'; gHi.font = `900 ${Math.round(u * 9)}px "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; gHi.lineJoin = 'round';
+  for (const a of FX.adlibs) {
+    const k = (nowMs - a.at) / 900, pop = k < 0.12 ? 0.6 + k / 0.12 * 0.5 : k < 0.2 ? 1.1 - (k - 0.12) / 0.08 * 0.1 : 1;
+    const tw = gHi.measureText(a.text).width / 2 + u * 4, x = Math.max(tw, Math.min(v.hw - tw, (a.x - v.sx) * v.hw / v.sw)), y = Math.max(u * 30, (a.y - 8 * k + MID.oy - v.sy) * v.hh / v.sh);
+    gHi.globalAlpha = Math.min(1, (1 - k) * 3); gHi.save(); gHi.translate(x, y); gHi.rotate(-0.08); gHi.scale(pop, pop);
+    gHi.lineWidth = u * 2.4; gHi.strokeStyle = '#2a1408'; gHi.strokeText(a.text, 0, 0); gHi.fillStyle = '#ffd84a'; gHi.fillText(a.text, 0, 0); gHi.restore();
+  }
+  gHi.restore();
+}
 function midGuide(b, T, nowMs, v) {
   const M = L.mid, G = M.guide, TG = M.tags, toX = wx => (wx - v.sx) * v.hw / v.sw, toY = wy => (wy + MID.oy - v.sy) * v.hh / v.sh, u = v.hw / W;
   const cols = ['240,122,42', '90,215,232'];
@@ -5153,8 +5203,29 @@ function levelSfx(t, kind) {
   if (kind === 'drill') { const o = osc('sawtooth', 140, t, 0.02, 0.05, 0.7, bus); o.frequency.setValueAtTime(140, t); o.frequency.linearRampToValueAtTime(230, t + 0.25); o.frequency.linearRampToValueAtTime(190, t + 0.7); noise(t, 'bandpass', 2400, 0.05, 0.7, 2, bus); }
 }
 // 2-1's chutes play the band's percussion: D a kick, F claps, J a rim, K a cowbell (quieter on a 좋아)
-function quadHit(q, j) {
+// 2-1's keysounds: your press plays a part of the band. 반장's boxes are the drums: in the blues the half-time kick on 1 and
+// the snare on 3, then the kick (a low tom off the beat); 마르코's are the horns: a C minor 7 stab (the funk is in C minor),
+// with a clap under it on 2 and 4. Each also gives the picture a small thump or a warm flash.
+function kick21(t, v) { const o = osc('sine', 165, t, 0.001, 0.62 * v, 0.2, bus); o.frequency.exponentialRampToValueAtTime(44, t + 0.13); osc('triangle', 1800, t, 0.0005, 0.05 * v, 0.012, bus); noise(t, 'lowpass', 1200, 0.1 * v, 0.02, 0.7, bus); }
+function tom21(t, v) { const o = osc('sine', 120, t, 0.001, 0.38 * v, 0.16, bus); o.frequency.exponentialRampToValueAtTime(70, t + 0.12); noise(t, 'bandpass', 900, 0.08 * v, 0.03, 1.2, bus); }
+function snare21(t, v) { noise(t, 'bandpass', 1900, 0.34 * v, 0.12, 0.9, bus); const o = osc('triangle', 210, t, 0.001, 0.16 * v, 0.07, bus); o.frequency.exponentialRampToValueAtTime(150, t + 0.06); }
+function clap21(t, v) { for (const [d, a] of [[0, 0.22], [0.009, 0.18], [0.019, 0.26]]) noise(t + d, 'bandpass', 1500, a * v, d === 0.019 ? 0.1 : 0.012, 1.6, bus); }
+function stab21(t, v, hi) {
+  const fl = ctx.createBiquadFilter(), gn = ctx.createGain(); fl.type = 'lowpass'; fl.Q.value = 2.5;
+  fl.frequency.setValueAtTime(900, t); fl.frequency.exponentialRampToValueAtTime(4200, t + 0.025); fl.frequency.exponentialRampToValueAtTime(1100, t + 0.17);
+  gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(0.11 * v, t + 0.012); gn.gain.setValueAtTime(0.11 * v, t + 0.09); gn.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+  fl.connect(gn); gn.connect(bus);
+  const r = hi ? 392 : 261.63, ch = [r, r * 1.189, r * 1.498, r * 1.782];
+  for (const f of ch) for (const det of [-6, 7]) { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = det; o.connect(fl); o.start(t); o.stop(t + 0.22); }
+}
+function quadHit(q, j, n) {
   const t = ctx.currentTime, v = j === 'good' ? 0.7 : 1;
+  if (L.mid && n) {
+    const b = n.beat, ph = ((b % 4) + 4) % 4, boss = n.q === 0 && !n.up && midSpotAt(n.place != null ? beatAt(n.place) : b) !== 'll';
+    if (b < L.mid.radio) { if (ph === 0) kick21(t, v); else if (ph === 2) snare21(t, v); else tom21(t, v * 0.8); FX.thumpAt = performance.now(); return; }
+    if (boss) { if (Math.abs(b - Math.round(b)) < 0.01) kick21(t, v); else tom21(t, v); FX.thumpAt = performance.now(); return; }
+    stab21(t, v, n.up); if (ph === 1 || ph === 3) clap21(t, v * 0.9); FX.stabAt = performance.now(); return;
+  }
   if (L.mid) { if (q === 0) { osc('sine', 820, t, 0.001, 0.12 * v, 0.05, bus); noise(t, 'bandpass', 1300, 0.2 * v, 0.04, 2.2, bus); noise(t, 'lowpass', 400, 0.12 * v, 0.03, 0.7, bus); } else { osc('square', 2300, t, 0.001, 0.05 * v, 0.02, bus); noise(t, 'bandpass', 3400, 0.22 * v, 0.03, 3, bus); } return; }
   if (q === 0) { const o = osc('sine', 140, t, 0.002, 0.5 * v, 0.16, bus); o.frequency.exponentialRampToValueAtTime(50, t + 0.12); noise(t, 'lowpass', 900, 0.12 * v, 0.03, 0.7, bus); }
   else if (q === 1) { noise(t, 'bandpass', 1300, 0.3 * v, 0.07, 1.4, bus); noise(t + 0.011, 'bandpass', 1500, 0.24 * v, 0.09, 1.4, bus); }
@@ -6434,8 +6505,8 @@ function failFx(kind, judgeKind, sub, d, lane = 0) {
   FX.lastMiss = now; FX.missKind = kind; FX.missLane = lane; FX.react[lane] = { type: 'glance', at: now }; FX.flinch = now;
   if (d != null) FX.marks.push({ d, at: now, c: C.laser });
   if (ctx) {
+    // (a miss no longer muffles the music: the song keeps going at full level, only the miss sound and the picture say so)
     if (kind === 'pass') errBeep(ctx.currentTime); else if (kind === 'broken') glass(ctx.currentTime); else buzz(ctx.currentTime);
-    muffle();
     if (lost >= 10) comboBreak(ctx.currentTime + 0.06);
   }
   if (lost >= 10) { comboEl.classList.remove('pulse', 'broke'); void comboEl.offsetWidth; comboEl.classList.add('broke'); }
@@ -6474,7 +6545,7 @@ function judgeNote(target, t) {
     const milestone = addCombo();
     const tones = CHORDS[chordIdx(target.beat)];
     const th = THEME[fxTheme(target.beat)];
-    if (target.quad) quadHit(target.q, j); else if (target.gtr) gtrSample(j, target.beat); else if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false, target.lane);
+    if (target.quad) quadHit(target.q, j, target); else if (target.gtr) gtrSample(j, target.beat); else if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false, target.lane);
     const lightUp = phase3(target.beat);
     lastGood = now; FX.goodLane = target.lane; FX.glow = th.glow; ring(th.ring[(stats.combo + (j === 'good' ? 1 : 0)) % 2], target.lane);
     spawnBits(j === 'perfect' ? 14 : 6, th);
@@ -6639,6 +6710,19 @@ function judgeTick(t) {
 
 // ---------- overlays ----------
 function placeHaeunBubble(beat) { placeHeadBubble(haeunHead(beat)); }
+// 2-1's floor: the bubble follows whoever talks (마르코 wherever he has run to, 반장 at his end of line 3) through the camera,
+// its tail pointing at the head, the bubble itself kept inside the screen
+function placeMidBubble(spk, beat) {
+  const C0 = MIDCAM, st = bubble.parentElement, sw = st.clientWidth, sh = st.clientHeight; if (!C0 || !sw || bubble.hidden) return;
+  let hx, hy;
+  if (spk === 'v') { const m = midMarco(beat); hx = m.x; hy = 86 + m.dy - 6; } else { hx = BOSS_X + 2; hy = 84; }
+  const x = (hx - C0.sx) / C0.sw * sw, y = (hy + MID.oy - C0.sy) / C0.sh * sh;
+  const bw = bubble.offsetWidth, bh = bubble.offsetHeight, fs = parseFloat(getComputedStyle(bubble).fontSize) || 14, mg = sw * 0.02;
+  const left = Math.max(mg, Math.min(sw - bw - mg, x - fs * 2.1)), tail = Math.max(fs * 0.5, Math.min(bw - fs * 1.5, x - left - fs * 0.5));
+  bubble.classList.add('mid'); bubble.classList.remove('tr');
+  bubble.style.left = left + 'px'; bubble.style.right = 'auto'; bubble.style.setProperty('--tx', tail + 'px');
+  bubble.style.bottom = Math.min(sh - bh - mg, Math.max(mg, sh - y + fs * 0.7)) + 'px';
+}
 function placeHeadBubble({ x, y }) {
   x = (x - CAM.sx) * CAM.k; y = (y - CAM.sy) * CAM.k;   // through the camera, when it is in close
   const right = x > W * 0.6;
@@ -6681,6 +6765,7 @@ function updateHud(t) {
     bubble.classList.remove('loud');
     if (line && line[5] === 'loud') { void bubble.offsetWidth; bubble.classList.add('loud'); FX.shakeUntil = performance.now() + 240; FX.shakeAmp = 2; }
   }
+  if (L.mid) { const sp = line ? line[4] || 'b' : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.spk || 'b' : null; if (sp === 'v' || sp === 'b') placeMidBubble(sp, beat); else bubble.classList.remove('mid'); }
   if (line && line[4] === 'h' && L.coScanner) placeHaeunBubble(beat);
   if (line && line[4] === 'd' && L.driver) placeHeadBubble(driverHead(beat));
   const spkNow = line ? line[4] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.spk : null;
