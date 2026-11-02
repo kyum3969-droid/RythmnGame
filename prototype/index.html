@@ -743,62 +743,77 @@ const LEVELS = [
       { who:'반장', text:'내 허리 탓이다. 내일 또 하자.' }]
   }
   ,{
-    id:'s2-1', stageNo:'2-1', who:'마르코', role:'반장 · 마르코 · 110 BPM · 라인 둘', tag:'펑크 · 카메라가 물러난다 · 왼손 오른손', bpm:110.02, style:'funk21', fxTheme:'warm',
-    // 2-1 (stage 2): 하은 is gone and line 3's numbers have dropped, so 마르코, the ace of the next line, is put on the line
-    // that meets yours. The whole night is one recorded funk track, "Late Night Assembly" (audio/2-1-late-night-assembly.mp3,
-    // 110.02 BPM throughout, first downbeat 0.128 s in, 79 bars): a sluggish groove (bars 1-8), a build (9-16), the drop (17),
-    // the groove (17-33), the horns' chorus (34-46), the groove (47-61), the chorus (62-71), the last run (72-78). Phase 1 is
-    // line 3 as it always looks: 반장 loads the belt and you scan at its end, any key. At the end of the build the camera pulls
-    // back: behind you there is a second line coming the other way into a second scanner, line 4, and 마르코 is loading it.
-    // From the drop both lines run: 반장's boxes on the left (the left hand: F/D or the left half of the screen) on 1 and 3,
-    // 마르코's on the right (J/K or the right half) on 2 and 4 and on the horns' offbeats.
-    tempo: [[0, 110.02]], clock:'02:40', title:'에이스', partners:['boss'], hints:false,
-    songs: [{ src: 'audio/2-1-late-night-assembly.mp3', at: 0, lead: 0.128, gain: 0.9 }], songStart: 0, noCount: true, bareBand: true, hitKit: 'ticktock',
-    // from `at` the scene is drawn as the whole floor; over `zoom` the camera pulls back and shows the line on the other side
-    // of you (마르코's), the keys become left and right at `keys`, and the two-sided chart starts at bar `from` ('1' = 반장's
-    // line on the left, '2' = 마르코's on the right, 'x' both; 16 cells a bar). Charted from the stems: the left hand on the
-    // kick (1 and 3, all four beats in the last run) and in the grooves the bass's strongest push; the right on the claps
-    // (2 and 4) and the horns' strongest offbeats (more of them in the choruses). Bars 17-24 are the lesson.
-    mid: { at: 58, zoom: [60, 66], keys: 64, from: 17, guide: [63, 80], tags: [68, 92, 100], bars: [
+    id:'s2-1', stageNo:'2-1', who:'마르코', role:'반장 · 마르코 · 110 → 124 BPM · 라인 둘', tag:'블루스 → 펑크 · 카메라가 물러난다 · 왼손 오른손', bpm:110.01, style:'funk21', fxTheme:'warm',
+    // 2-1 (stage 2): 하은 is gone, line 3 drags, and 4라인's scanner hand has just quit. Two recorded songs. Phase 1 is line 3
+    // as it always looks, its lamps half broken, a tired half-time blues on the old radio ("Across the Empty Floor", 110.01 BPM,
+    // the game's beat 0 at 1.0707 s into the file; only its first 14 bars are used: the generated take drifts after bar 16). 반장
+    // loads, you scan, any key. Behind your back 마르코 is bolting the end of his line onto your station; at beat 56 his drill
+    // catches the radio's cable and the blues dies (a tape stop). The camera pulls back: line 4 lights up behind you lamp by
+    // lamp and 마르코 introduces himself, then puts his own speaker on: "The Late Shift" (124 BPM, its bar 0 at game beat 64,
+    // 0.072 s into the file), a party funk. Its drop (its bar 2, game beat 72) brings line 3's lamps back on and both lines
+    // run: 반장's on the left (F/D, the left half of the screen) on 1 and 3, 마르코's on the right (J/K, the right half) on 2
+    // and 4 and the horns' offbeats. The song's last hit (its bar 90, game beat 424) freezes the picture and the lamps go out.
+    tempo: [[0, 110.01], [56, 124]], clock:'02:40', title:'에이스', partners:['boss'], hints:false,
+    songs: [{ src: 'audio/2-1-across-the-empty-floor.mp3', at: 0, lead: 1.0707, gain: 0.9, until: 56 },
+            { src: 'audio/2-1-the-late-shift.mp3', at: 64, lead: 0.072, gain: 0.85 }],
+    songStart: 0, songCues: [[56, 'tape'], [64, 1]], noCount: true, bareBand: true, hitKit: 'ticktock',
+    // from `at` the scene is drawn as the whole floor; over `zoom` the camera pulls back and shows line 4 behind you, the keys
+    // become left and right at `keys`, and the two-sided chart starts at bar `from` (game bar 18 = the drop; '1' = 반장's line
+    // on the left, '2' = 마르코's on the right, 'x' both; 16 cells a bar). Charted from the stems (Demucs): the left hand on
+    // the kick on 1 and 3 (every beat in the finale) and the bass's strongest push; the right on the claps on 2 and 4 and the
+    // horns' strongest offbeats (two in the choruses); stops and the bass-less breakdown thinned. B bars 2-9 are the lesson.
+    mid: { at: 56, zoom: [57, 62], keys: 68, from: 18, guide: [64, 88], tags: [72, 96, 104], boombox: 63.5, bars: [
       '1.......1.......', '1.......1.......', '....2.......2...', '....2.......2...',
       '1...2...1...2...', '1...2...1...2...', 'x.......1...2...', 'x...2...x...2...',
-      '1...2...1...2...', '1.2.2...1...2..2', '1...2.x.1...2...', '1...2...1.1.2...',
-      '1..12.2.1...2...', '1...2...1...2...', '1...2.2.1.x.2...', '1...2.2.12..21..',
-      '1.212.2.....2...', '....2...1...2...', '1.....2.1...2..2', '1.2.2...1...2...',
-      '1...2...1...2...', '1...2...1...2.2.', '1...2.2.1.2.2...', '1.2.2...1...2...',
-      '1...2...1...2...', '..2.2.......2...', '1...2...1...2...', '1...2...1...2...',
-      '1...2...1...2...', '1.2...2.....2...', '1...2...1...2...', '1...2...1...21..',
-      '1...2...1...2..1', '1.2.2...1...2...', '1..12...1...2...', '1..12...1...2...',
-      '1...2...1...2..1', '1.x.2...1...2...', '1...2.x.1.2.2...', '1.2.2...1.12....',
-      '1...2.2.1...2...', '1.......1...2.2.', '1...2...1.2.2...', '1.2.2.x.1...2...',
-      '1.2.2.x.1...2...', '....2...1...2...', '1.......1...2..2', '1.2.2...1...2...',
-      '1...2...1...2...', '1...2...1.2.2.2.', '1...2...1...2...', '1.2.2..21...2...',
-      '1...2...1...2..2', '....2.2.....2...', '1...2.2.1.......', '....2.......2...',
-      '....x...1...x...', '1...x...1...x...', '1...x...1...x...', '....2...........',
-      '1...1...........', '....x...1...x...', '................'
+      '12..2.1.1...2...', '1...2..21.1.2...', '1.2.2.1.1...2...', '1...2.1.1...2...',
+      '1.2.2...1...2...', '1.2.2.1.1...2...', '12..2.1.1...2...', '1...2..21.1.2...',
+      '1.2.2...1...2...', '1...2...1...2...', '1...2...1...2...', '1.2.2...1...2...',
+      '1...2...1...2...', '1.2.2...1...2...', '1...2...1...2...', '1.......1.......',
+      '....2...1...2.1.', '1.2.2..21...2.1.', '1...2...1.1.2.2.', '12..2...1...2.1.',
+      '1.2.2...1...2.2.', '12..2...1...2.1.', '1...2..21...2..2', '1...2...1.1.2...',
+      '..2.2...1...2.2.', '1.2.2.2.1...2.1.', '1.2.2.1.1...2..2', '1.2.2.1.1.2.2...',
+      '1...2...1.1.2.2.', '1.2.2...1...2...', '....2...1.......', '........1...2...',
+      '1...2...1...2.1.', '1...2...1...2.1.', '12..2...1...2...', '1...2..21.1.2...',
+      '1...2...1...2...', '1...2...1...2.1.', '1.2.2...1...2...', '1...2...1...2...',
+      '1.2.2...1...2...', '12..2...1...2...', '1...2...1.1.2...', '1...2.1.1...2...',
+      '1.2.2.1.1...2...', '12..2.1.1...2...', '1...2...1...2...', '1...........2...',
+      '1...2...1...2...', '1...2...1...2...', '1...2...1...2...', '1...2.......2...',
+      '1...2...1...2...', '1...2...1...2...', '1...2...1...2...', '1...2...1...2...',
+      '....2.......2...', '1...2.......2...', '....2.......2...', '1...2.......2...',
+      '1...2.......2...', '1...2...1...2...', '1...2...1...2...', '1...2.......2...',
+      '....2...1.1.2...', '1.1.2...1...2...', '1...2...1.1.2...', '1...2.2.1.1.2...',
+      '1...2...1.1.2...', '1.1.2...1...2...', '1...2...1...2...', '1...2...1...2...',
+      '1...............', '............2...', '1...........2...', '............2...',
+      '1...x...1...x...', '1...x...1...x...', '1...x...1...x...', '12..x...1...x...',
+      '................'
     ] },
     comfort: ['…다음 거.', '손 봐, 손.'],
-    // the phases on screen (phaseFx): line 3's lamps broken (one dead, one flickering, one dim) and the room a little dark until
-    // the drop, when they all come on at once (broken); line 4's
-    // lights clicking on one by one as the camera pulls back (lineOn: beats, nearest first); a white flash and a jolt on the
-    // drop; the choruses in amber, breathing with the beat; the last hit frozen, then the lights going out from the far ends in
-    broken: [[0, 68]],
-    phaseFx: { gloom: [0, 68], lineOn: [60.5, 61.5, 62.5], drop: 68, amber: [[136, 188], [248, 288]], last: 316, out: [317.4, 318.1, 318.8] },
-    // behind your back in the build: 마르코 bolting his line on (a clank, the drill, a clank)
-    sfx: [[50, 'clank'], [50.75, 'clank'], [52, 'drill'], [54.5, 'clank'], [55, 'clank'], [56, 'drill'], [58.5, 'clank'], [60.5, 'lamp'], [61.5, 'lamp'], [62.5, 'lamp'], [317.4, 'lampOff'], [318.1, 'lampOff'], [318.8, 'lampOff']],
+    // the phases on screen: line 3's lamps broken until the drop (broken, gloom), line 4's lamps clicking on as it is revealed
+    // (lineOn), a flash and a jolt on the drop, the two horn choruses in amber, the last hit frozen and the lamps going out
+    broken: [[0, 72]],
+    phaseFx: { gloom: [0, 72], lineOn: [57.5, 58.5, 59.5], drop: 72, amber: [[168, 224], [360, 392]], last: 424, out: [425.4, 426.1, 426.8] },
+    // behind your back in phase 1: 마르코 bolting his line on (clanks, the drill), the drill that kills the radio; the lamps
+    sfx: [[38, 'clank'], [38.75, 'clank'], [40, 'drill'], [44.5, 'clank'], [45, 'clank'], [46, 'drill'], [50.5, 'clank'], [55, 'drill'],
+          [57.5, 'lamp'], [58.5, 'lamp'], [59.5, 'lamp'], [425.4, 'lampOff'], [426.1, 'lampOff'], [426.8, 'lampOff']],
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     // wide windows: this is played on phones (딱 ±80 ms, 좋아 ±150 ms, past 220 ms a miss)
-    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 316,
+    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 424,
     special:['마르코가 보낸 상자', 'right', '받아냄'],
-    sections: [[0, 'intro'], [1, 'a1'], [9, 'build'], [17, 'groove'], [34, 'chorus'], [47, 'groove2'], [62, 'chorus2'], [72, 'last'], [79, 'outro']],
-    // charted from the stems (Demucs: drums, bass, the rest), every note on an onset the stems really have, 16 cells a bar.
-    // Phase 1 on the one belt: the claps on 2 and 4 (bars 1-8, the bass's strongest push joining from bar 5), then the build's
-    // kick figure (1, 2, the 'and' of 2, 3) and its clap on 4 (bars 9-13)
+    sections: [[0, 'intro'], [1, 'a1'], [14, 'build'], [18, 'groove'], [42, 'chorus'], [58, 'groove2'], [82, 'breakdown'], [98, 'build2'], [106, 'outro']],
+    // phase 1 on the one belt (16 cells a bar), from the blues' stems: the slow pulse on 1 and 3, the bass's push from bar 5,
+    // a guitar lick from bar 9; bars 14-17 (the radio dying, the reveal, 마르코's intro) and everything after on the two lines
     bars: [
-      '................', '....x.......x...', '....x.......x...', '....x.......x...',
-      '....x.......x...', '....x.......x...', '....x.......x...', '....x.x.....x...',
-      '....x.......x...', 'x...x.x.x.......', 'x...x.x.x...x...', 'x.....x.x...x...',
-      'x...x.x.x.......', 'x...x.x.x.......', '................', '................',
+      '................', 'x.......x.......', 'x.......x.......', 'x.......x.......',
+      'x.......x.......', 'x.......x.......', 'x.......x.......', 'x.......x.......',
+      'x.......x.......', 'x...x...x.......', 'x.......x.......', 'x.....x.x.......',
+      'x.x.....x.......', '................', '................', '................',
+      '................', '................', '................', '................',
+      '................', '................', '................', '................',
+      '................', '................', '................', '................',
+      '................', '................', '................', '................',
+      '................', '................', '................', '................',
+      '................', '................', '................', '................',
+      '................', '................', '................', '................',
       '................', '................', '................', '................',
       '................', '................', '................', '................',
       '................', '................', '................', '................',
@@ -816,27 +831,27 @@ const LEVELS = [
       '................', '................', '................', '................',
       '................', '................', '................', '................'
     ],
-    // The story (C): 4라인's scanner hand has quit, and 마르코 has been watching yours. Through the build he bolts the end of his
-    // line onto your station behind your back without asking anyone (the clanks and the drill), and when the camera pulls back
-    // 반장 wants to know what this is. 마르코: we both do better this way, isn't that the point - and he'll tell 소장 after.
-    // His lines carry the lesson too. 'b' 반장, 'v' 마르코 (no speaker: 반장 on line 3 in phase 1, his bubble at the left).
-    say: [[6, '…하나 빠지니까 티 나네.', 3.5], [26, '(시계를 본다) …오늘도 트럭 기다리게 하겠다.', 4],
-          [50.5, '(뒤에서 쾅, 쾅) …뭐야, 뒤에서.', 3.5],
-          [60.5, '헤이, 신입! 뒤도 좀 봐!', 3.5, 0, 'v'], [64, '…마르코. 이게 뭐야.', 3, 0, 'b'],
-          [67, '우리 쪽 스캔하던 친구가 관뒀어요. 왼손은 반장님 거!', 4.5, 0, 'v'], [72, '…남의 라인에 볼트를 박아?', 3.5, 0, 'b'],
-          [76, '같이 잘되면 좋잖아요~ 오른손은 내 거!', 4.5, 0, 'v'], [84, '번갈아! 왼, 오, 왼, 오!', 4, 0, 'v'],
-          [88.5, '…소장한텐 말했고?', 3, 0, 'b'], [92, '같이 오면 양손! …소장님한텐 끝나고 말할게요.', 4.5, 0, 'v'],
-          [101, '오~ 대박. 내가 본 대로야!', 3.5, 0, 'v'], [142, '…빠르긴 하네.', 3, 0, 'b'],
-          [250, '반장님, 내일은 볼트 하나 더 박을게요!', 4, 0, 'v'], [255, '…박지 마.', 2.5, 0, 'b'],
-          [292, '라스트! 신입, 가즈아!', 3, 0, 'v']],
+    // 'b' 반장, 'v' 마르코 (no speaker: 반장 on line 3 in phase 1, his bubble at the left)
+    say: [[6, '…하나 빠지니까 티 나네.', 3.5], [22, '(시계를 본다) …오늘도 트럭 기다리게 하겠다.', 4],
+          [38.5, '(뒤에서 쾅, 쾅) …뭐야, 뒤에서.', 3.5], [50.5, '(또 쾅) …저 소리 뭐냐니까.', 3],
+          [56, '(드릴 소리에 라디오가 죽는다) …라디오까지.', 2],
+          [57, '헤이헤이헤이~! 3라인 여러분, 굿 이브닝!', 3, 0, 'v'], [60, '4라인 에이스! 볼트의 마법사! 마르코 등장!', 3.5, 0, 'v'],
+          [63.5, '일할 땐 음악부터 깔아야죠~ 뮤직, 큐!', 2.5, 0, 'v'], [66, '…마르코. 이게 뭐야.', 2.5, 0, 'b'],
+          [68.5, '우리 쪽 스캔하던 친구가 관뒀어요. 그래서 붙였죠!', 3.5, 0, 'v'],
+          [73, '왼손은 반장님 거!', 3.5, 0, 'v'], [77, '…남의 라인에 볼트를 박아?', 3.5, 0, 'b'],
+          [81, '같이 잘되면 좋잖아요~ 오른손은 내 거!', 4, 0, 'v'], [89, '번갈아! 왼, 오, 왼, 오!', 3.5, 0, 'v'],
+          [93, '…소장한텐 말했고?', 3, 0, 'b'], [97, '같이 오면 양손! …소장님한텐 끝나고 말할게요.', 4.5, 0, 'v'],
+          [105, '오~ 대박. 내가 본 대로야!', 3.5, 0, 'v'], [176, '…빠르긴 하네.', 3, 0, 'b'],
+          [300, '반장님, 내일은 볼트 하나 더 박을게요!', 4, 0, 'v'], [305, '…박지 마.', 2.5, 0, 'b'],
+          [408, '라스트! 신입, 가즈아!', 3, 0, 'v']],
     intro: [
-      { who:'', text:'하은이 그만둔 뒤로 3라인은 늘 늦다. 새벽 2시 40분.' },
+      { who:'', text:'하은이 그만둔 뒤로 3라인은 늘 늦다. 형광등도 반은 나갔다. 새벽 2시 40분.' },
       { who:'반장', text:'…오늘도 둘이서 간다. 아무 손이나 편한 걸로.' }],
     outro: good => good ? [
       { who:'', text:'새벽 5시. 두 라인이 같이 멈췄다.' },
       { who:'반장', text:'…소장한테 혼나는 건 너다.' },
       { who:'마르코', text:'대박. 같이 잘됐잖아요!' },
-      { who:'', text:'4라인 끝에는 볼트 네 개가 삐뚤게 박혀 있었다.' }] : [
+      { who:'', text:'4라인 끝에는 볼트 네 개가 삐뚤게 박혀 있었다. 라디오는 그날 이후로 켜지지 않았다.' }] : [
       { who:'마르코', text:'어… 볼트를 덜 박았나? 내일 다시 가자, 신입!' }],
   }
   ,{
@@ -3512,6 +3527,13 @@ function drawMid(t, nowMs, active) {
     if (c) { const f = { x: 16, y: 112 }, x = lerp(f.x, PLACE_X, c.k), y = lerp(f.y, BELT_Y - c.n.h / 2, ease(c.k)) - Math.sin(Math.PI * c.k) * 14; held = { n: c.n, x, y }; pose.hand = { x: x - c.n.w / 2 + 1, y: y + 2 }; }
     FX.react[2] = FX.react[2] || { type: '', at: nowMs };
     drawActor(who, BOSS_X, false, pose, nowMs, active, () => PARTNERS[who].arm(pose));
+    if (q === 1 && L.mid.boombox != null && bReal >= L.mid.boombox) {
+      const x = 4, y = 106, pump = bReal >= L.mid.boombox + 0.5 ? Math.max(0, 1 - (bReal % 1) * 3) : 0;
+      R(x + 6, y - 4, 12, 1, '#2a2d33'); R(x + 6, y - 4, 1, 4, '#2a2d33'); R(x + 17, y - 4, 1, 4, '#2a2d33');
+      R(x, y, 24, 12, '#1b1b1f'); R(x, y, 24, 1, '#3a3d45');
+      for (const sx of [x + 2, x + 16]) { R(sx, y + 3, 6, 6, '#2a2d33'); R(sx + 1 - (pump > 0.5 ? 1 : 0), y + 4 - (pump > 0.5 ? 1 : 0), 4 + (pump > 0.5 ? 2 : 0), 4 + (pump > 0.5 ? 2 : 0), '#4a4d55'); R(sx + 2, y + 5, 2, 2, '#14151a'); }
+      R(x + 10, y + 3, 4, 2, pump > 0.3 ? '#8fe3f0' : '#3d6b78'); R(x + 10, y + 7, 4, 1, '#d8463b');
+    }
     held_[q] = held;
   };
   const held_ = [null, null];
@@ -5360,6 +5382,7 @@ function buildEvents() {
     const quiet = inRange(b, L.quiet), doze = inRange(b, L.doze), phone = inRange(b, L.phone), dark = blackout(b);
     const E = (dt, fn) => ev.push([t + dt, fn]);
     if (L.sfx) for (const [sb, kind] of L.sfx) if (Math.floor(sb) === b) E((sb - b) * s, T => levelSfx(T, kind));
+    if (L.songCues) for (const [cb, cue] of L.songCues) if (Math.floor(cb) === b) E((cb - b) * s, cue === 'tape' ? T => tapeStop(T) : T => { if (songReady(cue)) startSong(T, 0, cue); });
     if (L.songStart === b) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(0)) startSong(T, 0, 0); });
     if (b < 4 && !L.noCount) { E(0, T => rim(T, inBar === 0 ? 0.5 : 0.3)); continue; }
     if (b >= total - 4) continue;
@@ -6772,7 +6795,15 @@ function startSong(T, into = 0, i = 0) {
   stopSong(); const sp = L.songs && L.songs[i], buf = sp && SONG.bufs[sp.src]; if (!buf || !ctx) return;
   const off = sp.lead + into; if (off >= buf.duration) return;
   const s = ctx.createBufferSource(), gn = ctx.createGain(); s.buffer = buf; gn.gain.value = sp.gain || 0.9;
-  s.connect(gn); gn.connect(mus); s.start(Math.max(T, ctx.currentTime), off); SONG.src = s;
+  s.connect(gn); gn.connect(mus); s.start(Math.max(T, ctx.currentTime), off); SONG.src = s; SONG.gn = gn;
+}
+// the song on the radio dies: the tape slows to a groan and stops
+function tapeStop(T) {
+  const s = SONG.src, gn = SONG.gn; if (!s) return;
+  s.playbackRate.setValueAtTime(1, T); s.playbackRate.linearRampToValueAtTime(0.12, T + 0.75);
+  gn.gain.setValueAtTime(gn.gain.value, T); gn.gain.linearRampToValueAtTime(0.0001, T + 0.8);
+  try { s.stop(T + 0.85); } catch (e) {}
+  SONG.src = null;
 }
 function beginShift(level) {
   TUT.on = false; TUT.line = null; CAM.to = null; SLOW.on = false;
@@ -6808,7 +6839,7 @@ $('tutskip').addEventListener('click', e => { e.stopPropagation(); skipPractice(
 // its music sections), or end it now with the good or the bad ending. Boxes before the jump count as perfect, so the jump
 // does not fail the run; a forced ending is not saved to progress.
 const DEV = { open: false };
-const SEC_KO = { a1: '느린 라인', build: '빌드업 · 마르코', groove: '그루브', chorus: '후렴', groove2: '그루브 2', chorus2: '후렴 2', last: '마지막', intro: '인트로', outro: '아웃트로', end: '끝', finale: '마지막 한 방', lofi: '로파이', funk: '지우 음악', clash: '이어폰', silence: '정적', metal: '메탈' };
+const SEC_KO = { breakdown: '브레이크다운', build2: '빌드업 2', a1: '느린 라인', build: '라디오가 죽는다 · 마르코', groove: '그루브', chorus: '후렴', groove2: '그루브 2', chorus2: '후렴 2', last: '마지막', intro: '인트로', outro: '아웃트로', end: '끝', finale: '마지막 한 방', lofi: '로파이', funk: '지우 음악', clash: '이어폰', silence: '정적', metal: '메탈' };
 function devMarks() {
   if (L.devMarks) return L.devMarks;
   return (L.sections || []).map(([bar, name]) => [bar * 4, (SEC_KO[name] || name) + ' · ' + bar + '마디']).filter(([b], i, a) => i === 0 || b !== a[i - 1][0]);
@@ -6828,7 +6859,7 @@ function devSeek(beat) {
   musHP.frequency.cancelScheduledValues(now); musHP.frequency.setValueAtTime(20, now);
   mus.gain.cancelScheduledValues(now); mus.gain.setValueAtTime(1, now);
   if (L.visit) { FX.yankFx = L.visit.yank != null && beat > L.visit.yank; FX.shoveFx = L.visit.shove != null && beat > L.visit.shove; }
-  stopSong(); if (L.songs) { let i = -1; L.songs.forEach((sp, k) => { if (beat > sp.at) i = k; }); if (i >= 0 && songReady(i)) startSong(T0 + tB, tB - timeAt(L.songs[i].at), i); }
+  stopSong(); if (L.songs) { let i = -1; L.songs.forEach((sp, k) => { if (beat > sp.at) i = sp.until != null && beat >= sp.until ? -1 : k; }); if (i >= 0 && songReady(i)) startSong(T0 + tB, tB - timeAt(L.songs[i].at), i); }
   DEV.open = false; devSync();
 }
 function devEnd(good) {
