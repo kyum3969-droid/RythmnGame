@@ -729,46 +729,54 @@ const LEVELS = [
       { who:'반장', text:'내 허리 탓이다. 내일 또 하자.' }]
   }
   ,{
-    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'반장 → 빅토르 · 순자 이모 · 92 BPM', tag:'소울 알앤비 · 검수 도장', bpm:92, style:'soul21', fxTheme:'warm', inspector: true,
-    // 2-1 (stage 2 「인수인계」): 반장 brings 김 빅토르, his first 신입 fifteen years ago, over from the day shift. The new rule is
-    // 순자 이모's pass stamp: her post sits one bar up the belt from the gate (the belt is slowed to six beats to make room), so
-    // every stamp falls exactly a bar before its box lands and what she stamps is what you play next bar. Here it is only a
-    // sound; nothing says so (the X-ray that hides the boxes comes in 2-2). 반장 loads the first half; in the break his phone
-    // rings (소장), he hands the line and his radio to 빅토르 and watches from behind the belt, and 빅토르 loads phase 2.
-    tempo: [[0, 92]], travel: 6, stampBar: 1, clock:'02:40', title:'검수', partners:['boss'], hints:false,
+    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'순자 이모 · 반장 → 빅토르 · 92 BPM · 벨트 둘', tag:'소울 알앤비 · 검수 도장 · 버튼 하나', bpm:92, style:'soul21', fxTheme:'warm',
+    // 2-1 (stage 2 「인수인계」): two belts, one button. The upper belt is 순자 이모's inspection line: she stamps each box (her
+    // pass stamp) as she sets it down, and the belts are a bar long (travel 4), so every stamp is exactly one bar ahead of its
+    // box and what she stamps is what you play next bar. Here it is only a sound; nothing says so (the X-ray that hides her
+    // boxes comes in 2-2). The lower belt is the ordinary line: 반장 loads it, brings 김 빅토르 over from the day shift (his first
+    // 신입, fifteen years ago), and in the break, on the phone to 소장, hands him the line and his radio and watches from behind.
+    lanes: 2, partners: ['sunja', 'boss'], oneButton: true, farLoaderDy: 14, farLoaderDx: 22,
+    tempo: [[0, 92]], travel: 4, stampBar: 1, stampLane: 0, clock:'02:40', title:'검수', hints:false,
     cast: { first: 'boss', ids: ['boss', 'viktor'], seq: [[106, 'viktor']], obsX: 238, phone: [[107, 121]], tired: [[150, 156]] },
     comfort: ['…다음 거.', '손 봐, 손.'], comfortBy: { boss: ['…다음 거.', '손 봐, 손.'], viktor: ['일없다, 다음 거!', '어이, 신입! 정신!'] },
     chords: SOUL.chords, roots: SOUL.roots,
     chordAt: bar => bar < 2 ? 0 : bar < 18 ? SOUL.verse[(bar - 2) % 4] : bar < 26 ? SOUL.chorus[(bar - 18) % 4] : bar < 30 ? 0 : bar < 38 ? SOUL.verse[(bar - 30) % 4] : bar < 46 ? 5 + SOUL.chorus[(bar - 38) % 4] : 5,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 184,
-    special:['빅토르가 실은 상자', 'range', '받아냄', [120, 184]],
+    special:['도장 찍힌 상자', 'stamp', '받아냄'],
     sections: [[0, 'intro'], [2, 'a1'], [10, 'a2'], [18, 'b1'], [26, 'call'], [30, 'a3'], [38, 'b2'], [46, 'outro']],
-    // 8 cells per bar (half beats). The belt is slow (39 px a beat), so no two boxes in neighbouring cells.
+    // 8 cells per bar (half beats). bars = 이모's upper belt, bars2 = the lower belt (반장, then 빅토르). The lower belt keeps 1 and 3;
+    // 이모 answers in between, her 탁, 탁탁, 탁 (2, the 'and' of 2, 4). One button: a box on each belt on the same beat is one press,
+    // and nothing lands on her belt while a long crate is held below.
     bars: [
       '........', '........',
-      // verse 1 (반장): on the beat, the stamps just ahead of it
-      'x.......', 'x...x...', 'x.......', 'x...x...', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x...',
-      // verse 2: the first 'and's, heard in the stamp a bar before they come
-      'x...x...', 'x.x.x...', 'x...x.x.', 'x..x....', 'x.x.x...', 'x..x..x.', 'x...x.x.', 'x.x.x...',
-      // chorus
-      'x.x.x.x.', 'x..x..x.', 'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'x..x..x.', 'x.x..x..', 'x.x.x...',
-      // the break: 반장's phone, the line changes hands
+      '........', '........', '........', '........', '..x.....', '..x...x.', '..x.....', '..x...x.',
+      '..xx....', '..x...x.', '..xx....', '..x..x..', '..xx....', '..x...x.', '..xx..x.', '..x.x...',
+      '..xx..x.', '..x..x..', '..xx..x.', '......x.', '..xx..x.', '..x..x..', '..xx..x.', '..x.x.x.',
+      '..x.....', '........', '........', '........',
+      '..xx..x.', '.x.x..x.', '..xx..x.', '......x.', '..xx.x..', '.x.x..x.', '..xx..x.', '..x.x...',
+      '..xx..xx', '.x.x..x.', '..xx..xx', '......x.', '..xx.x.x', '.x.x..x.', '..xx..xx', '..x.x.x.',
+      '........', '........'
+    ],
+    bars2: [
+      '........', '........',
+      'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x.x.',
+      'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...',
+      'x...x...', 'x...x...', 'x...x...', 'h===....', 'x...x...', 'x...x...', 'x...x...', 'x...x...',
       'x.......', '........', '........', '........',
-      // phase 2 (빅토르): livelier, more of the 'and's
-      'x.x.x.x.', 'x..x..x.', 'x.x.x.x.', 'h===..x.', 'x..x.x..', 'x..x..x.', 'x.x.x.x.', 'x.x.x...',
-      'x.x.x.x.', 'x..x.x..', 'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'x..x..x.', 'x.x.x.x.', 'x.x.x.x.',
+      'x...x...', 'x.x.x...', 'x...x...', 'h===....', 'x...x.x.', 'x.x.x...', 'x...x...', 'x.x.x...',
+      'x...x...', 'x.x.x...', 'x...x...', 'h===....', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.',
       '........', '........'
     ],
     // [beat, line, beats on screen, lane, speaker]: 'b' 반장, 'v' 빅토르, 's' 이모
-    say: [[4, '…시작한다.', 2.5, 0, 'b'], [12, '이모님, 도장 소리 좋네요. 쾅, 쾅.', 3.5, 0, 'v'],
-          [20, '주간 사람이 밤에 와서. 괜찮아요?', 3.5, 0, 's'], [24, '일없슴다.', 2.5, 0, 'v'], [27, '일이 없긴, 산더미구만.', 3, 0, 's'], [31, '이게 원래 한국말이에요. 여기서 바꾼 거지.', 4, 0, 'v'],
-          [48, '반장님, 허리는 좀 어때요?', 3, 0, 'v'], [52, '…일 해라.', 2.5, 0, 'b'], [62, '(신입에게) 이 양반 원래 이래. 십오 년째.', 4, 0, 'v'],
+    say: [[4, '…시작한다.', 2.5, 1, 'b'], [12, '이모님, 도장 소리 좋네요. 쾅, 쾅.', 3.5, 1, 'v'],
+          [20, '주간 사람이 밤에 와서. 괜찮아요?', 3.5, 0, 's'], [24, '일없슴다.', 2.5, 1, 'v'], [27, '일이 없긴, 산더미구만.', 3, 0, 's'], [31, '이게 원래 한국말이에요. 여기서 바꾼 거지.', 4, 1, 'v'],
+          [48, '반장님, 허리는 좀 어때요?', 3, 1, 'v'], [52, '…일 해라.', 2.5, 1, 'b'], [62, '(신입에게) 이 양반 원래 이래. 십오 년째.', 4, 1, 'v'],
           [92, '총각, 손 좀 보네.', 3, 0, 's'],
-          [107, '(전화) …네, 소장님.', 3, 0, 'b'], [111, '(무전기를 내민다) 받아.', 2.5, 0, 'b'], [114, '…제가요? 네, 네.', 3, 0, 'v'],
-          [122, '자, 갑니다!', 2.5, 0, 'v'], [136, '주간 양반이 손은 빠르네.', 3, 0, 's'], [148, '이모님, 저 주간 양반 아니고 빅토르예요.', 4, 0, 'v'],
-          [153, '빅… 뭐?', 2.5, 0, 's'], [156, '빅토르. 그냥 빅 씨 해요.', 3.5, 0, 'v'], [176, '마지막!', 2, 0, 'v']],
+          [107, '(전화) …네, 소장님.', 3, 1, 'b'], [111, '(무전기를 내민다) 받아.', 2.5, 1, 'b'], [114, '…제가요? 네, 네.', 3, 1, 'v'],
+          [122, '자, 갑니다!', 2.5, 1, 'v'], [136, '주간 양반이 손은 빠르네.', 3, 0, 's'], [148, '이모님, 저 주간 양반 아니고 빅토르예요.', 4, 1, 'v'],
+          [153, '빅… 뭐?', 2.5, 0, 's'], [156, '빅토르. 그냥 빅 씨 해요.', 3.5, 1, 'v'], [176, '마지막!', 2, 1, 'v']],
     intro: [
-      { who:'', text:'12월, 새벽 2시 40분. 오배송 클레임이 쌓여서 소장이 라인 가운데에 검수대를 붙였다.' },
+      { who:'', text:'12월, 새벽 2시 40분. 오배송 클레임이 쌓여서 소장이 위 벨트를 검수 라인으로 돌렸다.' },
       { who:'순자 이모', text:'검수 순자예요. 오늘부터 여기서 보고 넘겨요.' },
       { who:'반장', text:'…그리고 이쪽. 주간에서 왔다. 오래 같이 일했어.' },
       { who:'빅토르', text:'오래가 아니라 15년이요. 반장님 머리 까맸을 때부터.' },
@@ -1339,6 +1347,7 @@ function loadLevel(level) {
 // when a box lands, when it is set down, its size, and how long the hand that loads it takes
 function prepNote(n, i, level) {
   n.i = i; n.arr = timeAt(n.beat); n.place = n.arr - TRAVEL * SPB; n.end = timeAt(n.beat + n.len);
+  n.stamp = !!level.stampBar && !n.top && (level.stampLane == null || n.lane === level.stampLane);
   // a belt that stops or swings runs on its own clock (n.bb = the belt beat it arrives at); she sets each box down two belt
   // beats ahead of that
   if (level.beltStop || level.beltSwing) { n.bb = beltBeat(n.beat, n.lane); n.place = timeAt(realBeat(n.bb - TRAVEL, n.lane)); }
@@ -2091,7 +2100,11 @@ function drawObserver(t, nowMs, active) {
 }
 function drawPartnerArmOf(id, pose, lane = 0) {
   if (SCENE.walk) return;
-  if (L.cast) { if (CAST.hideArm) return; g.save(); g.translate(CAST.dx, 0); PARTNERS[id].arm(pose); g.restore(); return; }
+  if (L.cast && (L.lanes !== 2 || lane === 1)) {
+    if (CAST.hideArm) return; g.save();
+    if (L.lanes === 2) { const o = placerOff(lane), sy = o.dy - LANE_DY[lane]; g.translate(CAST.dx + o.dx, sy); pose = { ...pose, hand: { x: pose.hand.x - o.dx, y: pose.hand.y - sy } }; } else g.translate(CAST.dx, 0);
+    PARTNERS[id].arm(pose); g.restore(); return;
+  }
   if (L.lanes === 2 && L.oneSpot && DUO.mode !== 'two') pose = { ...pose, left: true, reach: 26 };
   if (L.lanes === 2) { const o = placerOff(lane), sx = o.dx, sy = o.dy - LANE_DY[lane]; g.save(); g.translate(sx, sy); PARTNERS[id].arm({ ...pose, hand: { x: pose.hand.x - sx, y: pose.hand.y - sy } }); g.restore(); return; }
   PARTNERS[id].arm(pose);
@@ -2691,7 +2704,7 @@ function drawBox(n, cx, bottom, mark, t, sq = 0) {
   R(x + (w >> 1) - 1, y, 3, h, n.off && L.offTilt ? '#d8463b' : L.lanes === 2 ? (n.lane === 0 ? C.vest : C.vest2) : C.tape);
   if (n.pair && L.oneButton) R(x, y, w, 2, '#ffe9a8');
   if (n.grab && t >= n.tRel) { R(x + 2, y + 2, 5, 4, '#d8463b'); R(x + 3, y + 3, 3, 2, '#f08a7a'); }
-  if (L.stampBar && t >= passAt(n)) { const sx = x + 2, sy = y + 2; R(sx + 1, sy, 3, 1, '#c8352a'); R(sx + 1, sy + 4, 3, 1, '#c8352a'); R(sx, sy + 1, 1, 3, '#c8352a'); R(sx + 4, sy + 1, 1, 3, '#c8352a'); R(sx + 2, sy + 2, 1, 1, '#c8352a'); }
+  if (n.stamp && t >= passAt(n)) { const sx = x + 2, sy = y + 2; R(sx + 1, sy, 3, 1, '#c8352a'); R(sx + 1, sy + 4, 3, 1, '#c8352a'); R(sx, sy + 1, 1, 3, '#c8352a'); R(sx + 4, sy + 1, 1, 3, '#c8352a'); R(sx + 2, sy + 2, 1, 1, '#c8352a'); }
   const lw = Math.min(7, w - 4);
   if (lw >= 3) { R(x + 2, y + h - 6, lw, 4, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink); }
   if (n.heavy) { R(x + 2, y + 3, w - 4, 4, '#1b1716'); for (let k = 2; k < w - 5; k += 4) R(x + k + 1, y + 4, 2, 2, '#f0b429'); }
@@ -4079,7 +4092,8 @@ function drawScene(t, bt, active, nowMs) {
     if (active) drawDriver(mb, nowMs);
   }
   const lo = L.lanes === 2 ? 1 : 0;
-  if (L.cast) { L.partners[0] = castPlacer(castBeatAt(t, active)); drawCast(t, nowMs, active, poses[lo]); }
+  // the cast changes hands on the one belt, or on the lower belt when there are two (2-1: 이모 keeps the upper one)
+  if (L.cast) { L.partners[lo] = castPlacer(castBeatAt(t, active)); if (L.lanes === 2) { const o = placerOff(1); g.save(); g.translate(o.dx, o.dy); drawCast(t, nowMs, active, poses[lo]); g.restore(); } else drawCast(t, nowMs, active, poses[lo]); }
   else if (SCENE.walk && !active) drawWalkingBoss(nowMs);
   else if (!(L.lanes === 2 && DUO.mode !== 'two') && !(active && visitAt(castBeatAt(t, active)))) { const o = L.lanes === 2 ? placerOff(1) : { dx: 0, dy: 0 }; g.save(); g.translate(laneSlide(lo, t, active) + o.dx, o.dy); drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); g.restore(); drawObserver(t, nowMs, active); }
   if (L.daw) drawLaptop(t, active, nowMs);
@@ -5711,8 +5725,10 @@ function buildEvents() {
     kick(T); crash(T); pad(T, chords[0], SPB * 6); bass(T, roots[0], SPB * 4);
   }]);
   // with the stamp a bar ahead the set-down would be a third, off-grid echo of the chart: keep it to a soft touch
-  notes.forEach(n => ev.push([n.place, T => thud(T, (n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1) * (L.stampBar ? 0.25 : 1))]));
-  if (L.stampBar) for (const n of notes) { if (!n.top) ev.push([passAt(n), T => stampSnd(T)]); }
+  // a stamped box's set-down is the stamp itself; with the stamp a bar ahead on a slow belt the set-down would be an off-grid
+  // echo of the chart, so it is kept to a soft touch there
+  notes.forEach(n => { if (!n.stamp || passAt(n) - n.place > 0.05) ev.push([n.place, T => thud(T, (n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1) * (L.stampBar && L.travel > 4 ? 0.25 : 1))]); });
+  if (L.stampBar) for (const n of notes) { if (n.stamp) ev.push([passAt(n), T => stampSnd(T)]); }
   else if (L.inspector) for (const n of notes) { if (n.top || inRange(n.beat0, L.phone)) continue; if (n.grab) { ev.push([passAt(n), T => { rim(T, 0.4); rim(T + 0.11, 0.4); }]); ev.push([n.tRel, T => roller(T, 0.06)]); } else ev.push([passAt(n), n.push ? T => { tak(T, 0.3); shoop(T); } : T => tak(T, 0.3)]); }
   return ev.sort((a, b) => a[0] - b[0]);
 }
@@ -6044,8 +6060,8 @@ function updateHud(t) {
     const lane = line ? (line[3] || 0) : 0, spk = line && line[4];
     bubble.style.bottom = L.lanes === 2 ? (lane === 0 ? '78%' : '58%') : '61%';
     let bx = null;
-    if (L.cast && L.cast.seq && spk) { const id = { b: 'boss', v: 'viktor' }[spk], xs = castXs(beat); bx = spk === 's' ? INSPECT_X - 24 : id && xs[id] != null ? xs[id] : 0; } else if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X; else if (spk === 'h' && !L.coScanner && !L.heads) { if (duoMode(beat) === 'one') { bx = HAEUN_X - 70; bubble.style.bottom = '84%'; } else { bx = 0; bubble.style.bottom = '78%'; } } else if (spk === 'h' || spk === 'd') bx = null;
-    if (spk === 's') { bx = INSPECT_X - 24; bubble.style.bottom = '66%'; }
+    if (L.cast && L.cast.seq && spk) { const id = { b: 'boss', v: 'viktor' }[spk], xs = castXs(beat); bx = spk === 's' ? INSPECT_X - 24 : id && xs[id] != null ? xs[id] + (L.lanes === 2 ? LANE_DX[1] : 0) : 0; } else if (L.cast && spk) bx = castX(spk === 'b' ? 'boss' : 'jiwoo', beat); else if (spk === 'b') bx = OBS_X; else if (spk === 'h' && !L.coScanner && !L.heads) { if (duoMode(beat) === 'one') { bx = HAEUN_X - 70; bubble.style.bottom = '84%'; } else { bx = 0; bubble.style.bottom = '78%'; } } else if (spk === 'h' || spk === 'd') bx = null;
+    if (spk === 's') { if (L.inspector) { bx = INSPECT_X - 24; bubble.style.bottom = '66%'; } else { bx = haeunHome().x - 14; bubble.style.bottom = '84%'; } }
     if (L.daw) { if (spk === 'b') { bx = 0; bubble.style.bottom = '32%'; } else if (spk === 'h') { bx = 34; bubble.style.bottom = '32%'; } else if (spk === 'd') { bx = 200; bubble.style.bottom = '19%'; } }
     bubble.style.left = bx == null || bx < 60 ? '3cqw' : (bx / W * 100 - 5).toFixed(1) + '%'; bubble.style.right = 'auto'; bubble.classList.remove('tr');
     bubble.classList.toggle('obs', !!(spk && (L.cast ? spk === 's' || (spk === 'b') !== (castPlacer(beat) === 'boss') : spk === 'b' || spk === 's' || (L.daw && spk !== 'j'))));
