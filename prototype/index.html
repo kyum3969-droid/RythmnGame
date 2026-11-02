@@ -765,7 +765,7 @@ const LEVELS = [
     // right); the chart is in `bars` ('1' left lower = 반장's, '2' right lower, '3' left upper, '4' right upper, 'x' both lower;
     // 16 cells a bar; one hand's notes at least an 8th apart). 마르코 runs `route` ([beat, spot]: rl, ru, lu, ll, c beside you)
     // and throws the boxes he loads; he switches the radio off at `radio`; while he talks (`talk`) the camera comes in.
-    mid: { at: 0, zoom: [57, 62], keys: 70, from: 0, radio: 56, boombox: 61.5, talk: [146, 204], guide: [66, 100], tags: [72, 88, 100], upTags: [[124, 132, 140], [248, 252, 258]],
+    mid: { at: 0, zoom: [57, 62], keys: 70, from: 0, radio: 56, boombox: 61.5, talk: [146, 204], decoFrom: 76, guide: [66, 100], tags: [72, 88, 100], upTags: [[124, 132, 140]],
       // the floor shouts (sound and ad-lib): a gang 'hey!' on the drop, in the band's stop and through the last run, 'yeah!'
       // when the horns come back, a brass fanfare (landing half a beat after its entry) on the second drop and the last hit
       shouts: [[76, 'hey', '헤이!'], [108, 'hey', '헤이!'], [142.5, 'hey', '헤이!'], [208, 'yeah', '예에~!'], [239.5, 'fanfare', '빠바밤~!'],
@@ -2808,6 +2808,18 @@ function drawBox(n, cx, bottom, mark, t, sq = 0) {
   const lw = Math.min(7, w - 4);
   if (lw >= 3) { R(x + 2, y + h - 6, lw, 4, C.label); for (let k = 0; k < Math.floor((lw - 1) / 2); k++) R(x + 3 + k * 2, y + h - 5, 1, 2, C.ink); }
   if (n.heavy) { R(x + 2, y + 3, w - 4, 4, '#1b1716'); for (let k = 2; k < w - 5; k += 4) R(x + k + 1, y + 4, 2, 2, '#f0b429'); }
+  // 2-1 from the drop: every box gets a dark outline (it reads against the warm lamps), 반장's an orange tape, 마르코's gift
+  // wrapping: a teal ribbon crossed over it, a bow on top and a flower sticker like his shirt
+  if (n.deco) {
+    g.fillStyle = '#1e120b'; g.fillRect(x - 1, y - 1, w + 2, 1); g.fillRect(x - 1, y + h, w + 2, 1); g.fillRect(x - 1, y, 1, h); g.fillRect(x + w, y, 1, h);
+    if (n.deco === 'boss') R(x + (w >> 1) - 1, y, 3, h, '#f07a2a');
+    else {
+      const cx = x + (w >> 1), cy = y + (h >> 1);
+      R(cx - 1, y, 3, h, '#3fd0c9'); R(x, cy - 1, w, 3, '#3fd0c9'); R(cx, y, 1, h, '#a8f4ee'); R(x, cy - 1, w, 1, '#a8f4ee');
+      R(cx - 5, y - 3, 4, 3, '#3fd0c9'); R(cx + 2, y - 3, 4, 3, '#3fd0c9'); R(cx - 4, y - 2, 2, 1, '#1e8f8a'); R(cx + 3, y - 2, 2, 1, '#1e8f8a'); R(cx - 1, y - 2, 3, 2, '#2bb5ae');
+      R(x + 2, y + 3, 3, 3, '#d8463b'); R(x + 3, y + 4, 1, 1, '#ffe08a');
+    }
+  }
   if (mark === 'miss') { g.globalAlpha = 0.35; R(x, y, w, h, '#7a1f18'); g.globalAlpha = 1; cross(x + w - 7, y + 3); }
 }
 function drawCrate(n, headX, bottom, t) {
@@ -3464,7 +3476,7 @@ function phaseLook(c, w, h, b, active) {
   if (gl > 0) { c.globalCompositeOperation = 'multiply'; c.fillStyle = `rgba(120,115,130,${0.35 * gl})`; c.fillRect(0, 0, w, h); }
   // the choruses: amber, breathing with the beat
   const am = F.amber.find(([x, y]) => b >= x - 1 && b < y + 1);
-  if (am) { const k = Math.min(1, b - (am[0] - 1), am[1] + 1 - b), ph = b - Math.floor(b); c.globalCompositeOperation = 'overlay'; c.fillStyle = `rgba(255,160,50,${(0.22 + 0.12 * Math.max(0, 1 - ph * 3)) * k})`; c.fillRect(0, 0, w, h); }
+  if (am) { const k = Math.min(1, b - (am[0] - 1), am[1] + 1 - b), ph = b - Math.floor(b); c.globalCompositeOperation = 'overlay'; c.fillStyle = `rgba(255,160,50,${(0.15 + 0.08 * Math.max(0, 1 - ph * 3)) * k})`; c.fillRect(0, 0, w, h); }
   // the drop, and the last hit: a white flash
   for (const [at, v] of [[F.drop, 0.7], [F.drop2, 0.7], [F.last, 0.45]]) { const d = b - at; if (d >= 0 && d < 1.5) { c.globalCompositeOperation = 'lighter'; c.fillStyle = `rgba(255,250,235,${v * (1 - d / 1.5) ** 2})`; c.fillRect(0, 0, w, h); } }
   c.restore();
@@ -3513,6 +3525,8 @@ function drawMid(t, nowMs, active) {
   // who loads a box: 반장 the left lower line's, unless 마르코 has squeezed in there; 마르코 throws all the rest from wherever he is
   const bossLoads = n => n.q === 0 && !n.up && midSpotAt(n.place ? beatAt(n.place) : n.beat) !== 'll';
   let held = null;
+  const dFrom = M.decoFrom != null ? M.decoFrom : 1e9;
+  if (live) for (const n of notes) if (n.quad) n.deco = n.beat >= dFrom ? (bossLoads(n) ? 'boss' : 'marco') : null;
   if (live) for (const n of notes) { if (!n.quad || !bossLoads(n)) continue; const k = (T - (n.place - n.carry)) / n.carry; if (k >= 0 && k < 1) { const f = { x: 16, y: 112 }, x = lerp(f.x, PLACE_X, k), y = lerp(f.y, BELT_Y - n.h / 2, ease(k)) - Math.sin(Math.PI * k) * 14; held = { n, x, y }; break; } }
   const mirror = (q, fn) => { g.save(); if (q) { g.translate(WW, 0); g.scale(-1, 1); } g.beginPath(); g.rect(0, -MID.oy, AX, MID.wh); g.clip(); fn(); g.restore(); };
   // the back of each side: the room, its lamps (line 3's broken until the drop), the radio on line 3's stack, 마르코's boombox
@@ -3692,17 +3706,17 @@ function midGuide(b, T, nowMs, v) {
       gHi.fillText(q ? '마르코 라인 · J' : 'F · 반장 라인', x, y + 6.5 * u);
     }
   }
-  // the hand tags over the boxes: [from, fading from, gone by]; `upTags` windows tag only the upper belts' boxes, the first
-  // time boxes come along them, the first of them also saying it in words (the same hand as the belt under it)
+  // the hand tags over the boxes: [from, fading from, gone by]; `upTags` windows tag only the upper belts' boxes (the next one),
+  // the first time boxes come along them
   const tagWin = (TG, upOnly) => {
     if (!(b >= TG[0] - 2 && b < TG[2])) return;
     const a = b < TG[1] ? 1 : Math.max(0, (TG[2] - b) / (TG[2] - TG[1]));
     let first = upOnly;
     for (const n of notes) {
       if (!n.quad || n.state !== 'pending' || n.beat < TG[0] || n.beat >= TG[2] || T < n.place || (upOnly && !n.up)) continue;
-      if (upOnly && !first) break;   // on the upper belts only the next box gets a tag, in words
+      if (upOnly && !first) break;   // on the upper belts only the next box gets a tag
       const lx = noteX(n, T), fx = n.up ? farX(lx) : lx, wx = n.q ? MID.ww - fx : fx, x = toX(wx), y = toY(n.up ? farY(BELT_Y - n.h - 9) : BELT_Y - n.h - 9);
-      const text = first ? (n.q ? '위도 오른손 ▶' : '◀ 위도 왼손') : n.q ? '▶' : '◀', w = (first ? 46 : 15) * u, h = 10 * u; first = false;
+      const text = n.q ? '▶' : '◀', w = 15 * u, h = 10 * u; first = false;
       pill(x, y, w, h, cols[n.q], a); gHi.globalAlpha = a; gHi.fillStyle = `rgb(${cols[n.q]})`; gHi.font = `700 ${Math.round(7 * u)}px "IBM Plex Sans KR", sans-serif`; gHi.textAlign = 'center'; gHi.textBaseline = 'middle'; gHi.fillText(text, x, y + 0.5 * u);
     }
   };
