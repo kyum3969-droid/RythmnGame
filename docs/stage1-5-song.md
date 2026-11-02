@@ -640,3 +640,5 @@ I was here before the night, I'll be here when it's done
 Count it with me now, one, two, three, four
 Tick-tock on the line and I'm not done, I'm not
 ```
+
+**받은 곡 (v5)**: `prototype/audio/1-5-every-box-on-the-line.mp3`(66.46초). 실측 **138.0 BPM**(146이 아님) 하프타임, 킥 1박·스네어 3박, 첫 다운비트 0.105초, 36마디 + 62.7초에 뚝 끊김. 실제 구조(곡 마디): 0–3 도입(드럼 없음, 6초쯤 숨 한 번 정적), 4 드롭, 5–7 Tick-tock ×3(한 마디에 한 줄, 넷째 박 Tick으로 들어옴), 8–19 벌스(한 마디 한 줄, "Every box on my line" 16마디, "the boxes never drop" 19마디), 20–23 완전한 정적(약 7초), 24–27 킥과 808만, "Tick!" 외침(박의 1.5·3.5 언저리), 28–29 Tick-tock ×2, 30–35 빠른 벌스(가사는 일부 바뀌어 불림), 36 "…I'm not done, I'm not"에서 끊김. 게임 72–108마디(`docs/stage1.md` 4페이즈 표). 예전 드릴(`1-5-this-is-a-beat.mp3`)은 안 쓴다.
