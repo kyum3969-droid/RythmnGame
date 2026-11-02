@@ -1352,6 +1352,8 @@ function loadLevel(level) {
     notes.forEach(n => { if (!n.jam) return; if (grp.length && n.beat - grp[grp.length - 1].beat > 0.51) flush(); grp.push(n); }); flush(); }
   notes.forEach(n => { n.pair = !isAuto(n) && notes.some(m => m !== n && m.lane !== n.lane && !isAuto(m) && Math.abs(m.beat - n.beat) < 1e-6); n.pair2 = n.pair && n.lane === 1; });
   notes.forEach((n, i) => prepNote(n, i, level));
+  // 2-1's two lines are seen from further back: their boxes are made bigger so they still read
+  if (level.mid) notes.forEach(n => { if (n.quad) { n.w = Math.round(n.w * 1.4); n.h = Math.round(n.h * 1.4); } });
   // an X-ray box goes down whole: when its last item is at the loading end, the first is a span further on. Every item shares
   // the box's size and set-down; the hand carries it to the middle of that span.
   for (const gp of new Set(notes.filter(n => n.grp).map(n => n.grp))) {
@@ -3405,7 +3407,7 @@ function drawInspector(t, active, nowMs) {
 const MID = { ax: PLAYER_X, ww: 2 * PLAYER_X, wh: 432, oy: 108 };
 let midCv = null, midG = null;
 // (the far ends are trimmed a little and the view sits a touch lower, so the floor fills the screen)
-function midView(b) { const z = L.mid.zoom, e = b < z[0] ? 0 : b >= z[1] ? 1 : ease((b - z[0]) / (z[1] - z[0])); return { s: lerp(1, W / (MID.ww - 44), e), cx: lerp(W / 2, MID.ax, e), cy: lerp(H / 2, H / 2 - 12, e), e }; }
+function midView(b) { const z = L.mid.zoom, e = b < z[0] ? 0 : b >= z[1] ? 1 : ease((b - z[0]) / (z[1] - z[0])); return { s: lerp(1, W / (MID.ww - 70), e), cx: lerp(W / 2, MID.ax, e), cy: lerp(H / 2, H / 2 - 12, e), e }; }
 function drawMid(t, nowMs, active) {
   const b = active ? beatAt(t) : END_BEAT, live = active || state === 'outro' || state === 'result', T = active ? t : timeAt(END_BEAT), AX = MID.ax;
   if (!midCv) { midCv = document.createElement('canvas'); midCv.width = MID.ww; midCv.height = MID.wh; midG = midCv.getContext('2d'); }
