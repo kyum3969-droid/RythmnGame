@@ -745,7 +745,8 @@ const LEVELS = [
     comfort: [],
     chords: SOUL.chords, roots: SOUL.roots,
     chordAt: bar => bar < 2 ? 0 : bar < 18 ? SOUL.verse[(bar - 2) % 4] : bar < 26 ? SOUL.chorus[(bar - 18) % 4] : bar < 30 ? 0 : bar < 38 ? SOUL.verse[(bar - 30) % 4] : bar < 46 ? 5 + SOUL.chorus[(bar - 38) % 4] : 5,
-    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 184,
+    // wide windows: this is played on phones (딱 ±80 ms, 좋아 ±150 ms, past 220 ms a miss)
+    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 184,
     special:['분류한 상자', 'quad', '받아냄'],
     sections: [[0, 'intro'], [2, 'a1'], [10, 'a2'], [18, 'b1'], [26, 'call'], [30, 'a3'], [38, 'b2'], [46, 'outro']],
     // phase 1 on the one belt (8 cells a bar); from bar 30 the belt is empty and the chart is quad.bars
@@ -3375,8 +3376,8 @@ function drawInspector(t, active, nowMs) {
 // In the break the camera swings round to your end of the line and the belt becomes 김 빅토르's four-way sort: four chutes
 // coming at you in perspective, a scanner on each, D F J K (or the four quarters of the screen). Boxes carry their chute's
 // colour on the label. 빅토르 stands at the far end on the sorter, sending them down.
-const QUAD = { HY: 20, JY: 184, W0: 296, D: 4, look: 2.6, cols: ['#e0574a', '#4a9be0', '#5fbf6a', '#f0c419'], keys: ['D', 'F', 'J', 'K'] };
-const QUADFX = { press: [-1e9, -1e9, -1e9, -1e9] };
+const QUAD = { HY: 16, JY: 176, W0: 300, D: 4, look: 2.6, cols: ['#e0574a', '#4a9be0', '#5fbf6a', '#f0c419'], colsRgb: [[224, 87, 74], [74, 155, 224], [95, 191, 106], [240, 196, 25]], keys: ['D', 'F', 'J', 'K'] };
+const QUADFX = { press: [-1e9, -1e9, -1e9, -1e9], parts: [] };
 const qS = z => 1 / (1 + z * (QUAD.D - 1));                    // scale at depth z (0 = your scanners, 1 = the far end)
 const qY = z => QUAD.HY + (QUAD.JY - QUAD.HY) * qS(z);
 const qX = (pos, z) => W / 2 + pos * (QUAD.W0 / 4) * qS(z);   // pos: -2..2 across the four chutes
@@ -3394,63 +3395,151 @@ function drawQuadTurn(t, nowMs, active) {
   // a white streak through the middle of the turn
   const fl = Math.max(0, 1 - Math.abs(p - 0.5) * 4); if (fl > 0 && !reduce) { g.fillStyle = `rgba(255,250,235,${fl * 0.35})`; g.fillRect(0, 0, W, H); }
 }
+// shade an [r,g,b] by k (and an optional warm tint), as a css colour
+const qc = (c, k, w = 0) => `rgb(${Math.min(255, Math.round(c[0] * k + w * 18))},${Math.min(255, Math.round(c[1] * k + w * 10))},${Math.min(255, Math.round(c[2] * k))})`;
+// light along the line: the three lamps over the belt leave pools, and the far end sinks into the dark
+const qLight = z => (0.62 + 0.42 * Math.exp(-(((z - 0.12) / 0.1) ** 2)) + 0.3 * Math.exp(-(((z - 0.45) / 0.09) ** 2)) + 0.22 * Math.exp(-(((z - 0.78) / 0.08) ** 2))) * (1 - 0.4 * Math.max(0, z));
+const zAtY = y => { const s = (y - QUAD.HY) / (QUAD.JY - QUAD.HY); return (1 / s - 1) / (QUAD.D - 1); };
+function drawQuadRoom(beat, active) {
+  // the dark of the building, a warm haze toward the far end
+  const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#120e13'); bg.addColorStop(0.3, '#1c1619'); bg.addColorStop(0.5, '#151113'); bg.addColorStop(1, '#0c0a0b'); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+  const hz = g.createRadialGradient(W / 2, qY(1) - 10, 4, W / 2, qY(1) - 10, 150); hz.addColorStop(0, 'rgba(255,214,150,.16)'); hz.addColorStop(1, 'rgba(255,214,150,0)'); g.fillStyle = hz; g.fillRect(0, 0, W, H);
+  // the floor either side of the line, row by row: concrete, a yellow safety line along each side
+  for (let y = Math.round(qY(1)); y < H; y++) {
+    const z = zAtY(y), s = qS(z), f = qLight(z) * 0.55;
+    g.fillStyle = qc([58, 52, 50], f); g.fillRect(0, y, W, 1);
+    const ys = Math.max(1, Math.round(2 * s));
+    if (y % ys === 0 || s < 0.5) { for (const side of [-1, 1]) { const x = Math.round(qX(side * 2.75, z)); g.fillStyle = qc([200, 160, 40], f * 1.1); g.fillRect(side < 0 ? x - Math.max(1, Math.round(3 * s)) : x, y, Math.max(1, Math.round(3 * s)), 1); } }
+  }
+  // racks down both sides in perspective: uprights, three beams, boxes on them
+  const racks = [1, 0.74, 0.52, 0.34, 0.19, 0.06];
+  for (const side of [-1, 1]) for (let k = 0; k < racks.length - 1; k++) {
+    const za = racks[k], zb = racks[k + 1], sa = qS(za), sb = qS(zb), xa = qX(side * 3.3, za), xb = qX(side * 3.3, zb), ya = qY(za), yb = qY(zb), f = qLight((za + zb) / 2) * 0.5;
+    for (let lv = 1; lv <= 3; lv++) {
+      const h0a = ya - 34 * sa * lv, h0b = yb - 34 * sb * lv;
+      // a row of boxes on the beam below this level
+      g.fillStyle = qc([150, 112, 72], f * 0.8); g.beginPath(); g.moveTo(xa, h0a + 34 * sa - 2 * sa); g.lineTo(xb, h0b + 34 * sb - 2 * sb); g.lineTo(xb, h0b + 14 * sb); g.lineTo(xa, h0a + 14 * sa); g.closePath(); g.fill();
+      g.fillStyle = qc([90, 96, 104], f); g.beginPath(); g.moveTo(xa, h0a + 34 * sa - 2 * sa); g.lineTo(xb, h0b + 34 * sb - 2 * sb); g.lineTo(xb, h0b + 34 * sb); g.lineTo(xa, h0a + 34 * sa); g.closePath(); g.fill();
+    }
+    g.fillStyle = qc([70, 76, 84], f * 1.1); g.fillRect(Math.round(xa - 2 * sa), Math.round(ya - 104 * sa), Math.max(1, Math.round(4 * sa)), Math.round(104 * sa));
+  }
+  // the lamps hanging over the line (where the pools on the belt come from): a tube, its housing, a cone of light down to the belt
+  for (const z of [0.78, 0.45, 0.12]) {
+    const sc = qS(z), yb = qY(z), yl = yb - 118 * sc, hw = 40 * sc, cx = W / 2;
+    const cone = g.createLinearGradient(0, yl, 0, yb); cone.addColorStop(0, 'rgba(255,240,200,.16)'); cone.addColorStop(1, 'rgba(255,240,200,0)');
+    g.fillStyle = cone; g.beginPath(); g.moveTo(cx - hw, yl); g.lineTo(cx + hw, yl); g.lineTo(cx + hw * 2.6, yb); g.lineTo(cx - hw * 2.6, yb); g.closePath(); g.fill();
+    R(Math.round(cx - hw - 2 * sc), Math.round(yl - 3 * sc), Math.round(hw * 2 + 4 * sc), Math.max(1, Math.round(3 * sc)), '#3a3d45');
+    R(Math.round(cx - hw), Math.round(yl), Math.round(hw * 2), Math.max(1, Math.round(2 * sc)), '#fff4d6');
+    R(Math.round(cx), Math.round(yl - 30 * sc), 1, Math.round(27 * sc), '#2a2d33');
+  }
+}
+function drawQuadBelt(scroll, beat, active, combo) {
+  const yF = Math.round(qY(1)), warm = combo >= 10 ? Math.min(1, (combo - 10) / 20 + 0.4) : 0, ph = active ? beat - Math.floor(beat) : 0;
+  for (let y = yF; y < H; y++) {
+    const z = zAtY(y), s = qS(z), f = qLight(z), xl = Math.round(qX(-2, z)), xr = Math.round(qX(2, z));
+    // the belt: rubber slats riding toward you (they move with the boxes), a dark seam between each
+    const u = (z + scroll) * 26, fr = u - Math.floor(u), slat = Math.floor(u) & 1, seam = fr < Math.max(0.08, 0.6 / (s * 20));
+    g.fillStyle = seam ? qc([20, 16, 14], f) : qc(slat ? [46, 40, 37] : [40, 35, 32], f, warm * 0.25); g.fillRect(xl, y, xr - xl, 1);
+    // the guides between the chutes: low steel strips, lit on top
+    for (let b = -1; b <= 1; b++) { const x = Math.round(qX(b, z)), w = Math.max(1, Math.round(3 * s)); g.fillStyle = qc([96, 102, 110], f); g.fillRect(x - (w >> 1), y, w, 1); g.fillStyle = qc([150, 156, 164], f); g.fillRect(x - (w >> 1), y, 1, 1); }
+    // the side rails: a steel channel, a strip of LEDs inside it (warm once the line is going well, a pulse on the beat)
+    const rw = Math.max(2, Math.round(8 * s));
+    for (const [x0, dir] of [[xl - rw, 1], [xr, -1]]) {
+      g.fillStyle = qc([84, 90, 98], f); g.fillRect(x0, y, rw, 1);
+      g.fillStyle = qc([140, 146, 154], f); g.fillRect(dir > 0 ? x0 + rw - 1 : x0, y, 1, 1);
+      const led = warm ? `rgba(255,${Math.round(190 - 40 * warm)},90,${0.35 + 0.4 * warm * (1 - ph)})` : 'rgba(110,200,220,.22)';
+      g.fillStyle = led; g.fillRect(dir > 0 ? x0 + rw - 2 : x0 + 1, y, 1, 1);
+      // bolts on the rail every so often (fixed: the belt moves, the frame doesn't)
+      const ub = z * 12, fb = ub - Math.floor(ub); if (fb < 0.12 && s > 0.35) { g.fillStyle = qc([40, 44, 48], f); g.fillRect(x0 + (rw >> 1), y, 1, 1); }
+    }
+  }
+}
+// a box on the line in perspective: its front, its lid (seen from above), the side facing the middle, the tape, its chute's label
+function drawQuadBox(n, z, t) {
+  const dz = 0.055, s1 = qS(z), s2 = qS(z + dz), lw = (QUAD.W0 / 4) * s1, w = Math.max(3, Math.round(lw * 0.64)), h = Math.max(2, Math.round(w * 0.6));
+  const cx = qX(n.q - 1.5, z), by = qY(z), x0 = cx - w / 2, x1 = cx + w / 2, yt = by - h;
+  const k2 = s2 / s1, cx2 = qX(n.q - 1.5, z + dz), w2 = w * k2, h2 = h * k2, by2 = qY(z + dz), bx0 = cx2 - w2 / 2, bx1 = cx2 + w2 / 2, byt = by2 - h2;
+  const f = qLight(z), base = [196, 139, 82];
+  const poly = (pts, col) => { g.fillStyle = col; g.beginPath(); g.moveTo(Math.round(pts[0][0]), Math.round(pts[0][1])); for (const p of pts.slice(1)) g.lineTo(Math.round(p[0]), Math.round(p[1])); g.closePath(); g.fill(); };
+  // its shadow on the belt
+  g.fillStyle = 'rgba(0,0,0,.45)'; g.fillRect(Math.round(x0) + 1, Math.round(by), Math.round(w), Math.max(1, Math.round(2 * s1)));
+  // the side toward the middle of the line
+  if (bx1 > x1 + 0.5) poly([[x1, yt], [bx1, byt], [bx1, by2], [x1, by]], qc(base, f * 0.62));
+  if (bx0 < x0 - 0.5) poly([[x0, yt], [bx0, byt], [bx0, by2], [x0, by]], qc(base, f * 0.62));
+  // the lid, lit from the lamps above, with the tape down its middle
+  poly([[x0, yt], [x1, yt], [bx1, byt], [bx0, byt]], qc([217, 164, 104], f * 1.05));
+  const tw = Math.max(1, w * 0.12), tw2 = tw * k2; poly([[cx - tw / 2, yt], [cx + tw / 2, yt], [cx2 + tw2 / 2, byt], [cx2 - tw2 / 2, byt]], qc([230, 200, 143], f));
+  // the front, a darker band at its foot, the tape over the edge, the label in the chute's colour
+  g.fillStyle = qc(base, f * 0.86); g.fillRect(Math.round(x0), Math.round(yt), Math.round(w), Math.round(h));
+  g.fillStyle = qc(base, f * 0.66); g.fillRect(Math.round(x0), Math.round(by) - Math.max(1, Math.round(h * 0.12)), Math.round(w), Math.max(1, Math.round(h * 0.12)));
+  g.fillStyle = qc([230, 200, 143], f * 0.95); g.fillRect(Math.round(cx - tw / 2), Math.round(yt), Math.max(1, Math.round(tw)), Math.max(1, Math.round(h * 0.4)));
+  const lc = QUAD.colsRgb[n.q], lx = Math.round(x0 + w * 0.12), ly = Math.round(yt + h * 0.42), lww = Math.max(2, Math.round(w * 0.3)), lhh = Math.max(2, Math.round(h * 0.38));
+  g.fillStyle = qc([236, 230, 214], f); g.fillRect(lx, ly, lww, lhh); g.fillStyle = qc(lc, f * 1.1); g.fillRect(lx, ly, lww, Math.max(1, Math.round(lhh * 0.45)));
+  if (lww >= 6) { g.fillStyle = qc([27, 23, 22], f); for (let k = 0; k < lww - 2; k += 2) g.fillRect(lx + 1 + k, ly + lhh - Math.max(1, Math.round(lhh * 0.35)), 1, Math.max(1, Math.round(lhh * 0.3))); }
+  return { x0, x1, yt, by, w, h };
+}
 function drawQuad(t, nowMs, active) {
-  const beat = castBeatAt(t, active), now = nowMs;
-  g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
-  // the room: dark, the far wall, three lamps over the sorter
-  const bgr = g.createLinearGradient(0, 0, 0, H); bgr.addColorStop(0, '#1b1620'); bgr.addColorStop(0.45, '#120e12'); bgr.addColorStop(1, '#0b090a'); g.fillStyle = bgr; g.fillRect(0, 0, W, H);
-  for (let k = 0; k < 3; k++) { const lx = 112 + k * 80; R(lx - 14, 4, 28, 2, '#efe6d2'); g.fillStyle = 'rgba(255,233,168,.06)'; g.beginPath(); g.moveTo(lx - 14, 6); g.lineTo(lx + 14, 6); g.lineTo(lx + 40, 70); g.lineTo(lx - 40, 70); g.closePath(); g.fill(); }
-  for (let x = 0; x < W; x += 24) R(x, 30, 1, 44, '#221c22');
-  // 빅토르 on the sorter at the far end, small; his hand goes toward the chute of the next box he sends
+  const beat = castBeatAt(t, active), now = nowMs, live = active || state === 'outro' || state === 'result';
+  const scroll = live ? (active ? t : timeAt(END_BEAT)) / (QUAD.look * SPB) : 0;
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false;
+  drawQuadRoom(beat, active);
+  // the sorter at the far end: its housing, a lit mouth over the four chutes, 빅토르 on the platform behind it sending boxes down
+  const yS = qY(1), xS0 = qX(-2.5, 1), xS1 = qX(2.5, 1);
+  R(Math.round(xS0) - 6, Math.round(yS) - 40, Math.round(xS1 - xS0) + 12, 30, '#2a2d33'); R(Math.round(xS0) - 6, Math.round(yS) - 40, Math.round(xS1 - xS0) + 12, 2, '#4c5258');
   const nxt = active ? notes.find(n => n.quad && n.state === 'pending' && n.arr - t < QUAD.look * SPB + 0.25 * SPB) : null;
-  const ph = active ? beat - Math.floor(beat) : 0, vs = 0.5;
-  g.save(); g.translate(W / 2 - BOSS_X * vs, 26 - 87 * vs); g.scale(vs, vs);
-  const hand = nxt ? { x: BOSS_X + (nxt.q - 1.5) * 26, y: 118 } : { x: BOSS_X + 13, y: 134 };
+  const ph = active ? beat - Math.floor(beat) : 0, vs = 0.42;
+  g.save(); g.translate(W / 2 - BOSS_X * vs, yS - 46 - 87 * vs); g.scale(vs, vs);
+  const hand = nxt ? { x: BOSS_X + 8 + (nxt.q - 1.5) * 7, y: 122 + Math.abs(nxt.q - 1.5) * 2 } : { x: BOSS_X + 13, y: 134 };
   const vp = { hand, carry: null, wince: false, dip: 0, bob: active && ph < 0.18 ? 1 : 0, nod: 0, doze: false, phone: false, vibe: false, unplug: false, lane: 2 };
-  FX.react[2] = { type: '', at: now };
-  PARTNERS.viktor.draw(vp, now, active); PARTNERS.viktor.arm(vp);
+  FX.react[2] = { type: '', at: now }; PARTNERS.viktor.draw(vp, now, active); PARTNERS.viktor.arm(vp);
   g.restore();
-  // the sorter's counter in front of his legs, and the four mouths of the chutes
-  R(qX(-2.3, 1), qY(1) - 10, qX(2.3, 1) - qX(-2.3, 1), 10, '#3e444a'); R(qX(-2.3, 1), qY(1) - 10, qX(2.3, 1) - qX(-2.3, 1), 1, '#6a7178');
-  // the highway: the belt surface from the far end to past your scanners
-  const zN = -0.18, zF = 1;
-  g.fillStyle = '#2a2320'; g.beginPath(); g.moveTo(qX(-2, zF), qY(zF)); g.lineTo(qX(2, zF), qY(zF)); g.lineTo(qX(2, zN), qY(zN)); g.lineTo(qX(-2, zN), qY(zN)); g.closePath(); g.fill();
-  // each chute's colour, faint along its length and stronger near you
-  for (let i = 0; i < 4; i++) {
-    const gr = g.createLinearGradient(0, qY(zF), 0, qY(0)); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, QUAD.cols[i] + '33');
-    g.fillStyle = gr; g.beginPath(); g.moveTo(qX(i - 2, zF), qY(zF)); g.lineTo(qX(i - 1, zF), qY(zF)); g.lineTo(qX(i - 1, zN), qY(zN)); g.lineTo(qX(i - 2, zN), qY(zN)); g.closePath(); g.fill();
-  }
-  // rollers coming at you, eight a look-ahead
-  const roll = active || state === 'outro' || state === 'result' ? (beat / QUAD.look * 8) % 1 : 0;
-  for (let k = -1; k <= 8; k++) { const z = (k + 1 - roll) / 8; if (z < zN || z > zF) continue; g.fillStyle = '#3a302b'; g.fillRect(Math.round(qX(-2, z)), Math.round(qY(z)), Math.round(qX(2, z) - qX(-2, z)), Math.max(1, Math.round(2 * qS(z)))); }
-  // the dividers between the chutes and the rails at the sides
-  for (let b = -2; b <= 2; b++) { g.strokeStyle = Math.abs(b) === 2 ? '#80878e' : '#4c5258'; g.lineWidth = Math.abs(b) === 2 ? 3 : 1.5; g.beginPath(); g.moveTo(qX(b, zF), qY(zF)); g.lineTo(qX(b, zN), qY(zN)); g.stroke(); }
-  // the boxes
-  const boxes = notes.filter(n => n.quad).map(n => ({ n, z: (n.arr - t) / (QUAD.look * SPB) })).filter(o => o.z <= 1.02 && o.z >= -0.3).sort((a, b) => b.z - a.z);
-  if (active) for (const { n, z } of boxes) {
-    if (n.state === 'hit' && t - n.hitAt > 0.1) continue;
-    const zz = n.state === 'hit' ? (n.arr - n.hitAt) / (QUAD.look * SPB) : z, sc = qS(zz), lw = (QUAD.W0 / 4) * sc, w = Math.round(lw * 0.62), h = Math.round(w * 0.62);
-    const cx = qX(n.q - 1.5, zz), by = qY(zz), x0 = Math.round(cx - w / 2), y0 = Math.round(by - h);
-    g.globalAlpha = Math.max(0, Math.min(1, (1.02 - zz) * 6)) * (n.state === 'miss' ? Math.max(0, 1 + zz * 4) : 1) * (n.state === 'hit' ? 1 - (t - n.hitAt) / 0.1 : 1);
-    R(x0 + 1, Math.round(by), w, Math.max(1, Math.round(2 * sc)), 'rgba(0,0,0,.5)');
-    R(x0, y0, w, h, C.kraft); R(x0, y0, w, Math.max(1, Math.round(3 * sc)), C.kraftTop); R(x0 + w - Math.max(1, Math.round(3 * sc)), y0, Math.max(1, Math.round(3 * sc)), h, C.kraftDark);
-    R(Math.round(cx - 2 * sc), y0, Math.max(1, Math.round(4 * sc)), h, C.tape);
-    R(x0 + Math.round(3 * sc), y0 + Math.round(h * 0.45), Math.max(2, Math.round(w * 0.32)), Math.max(2, Math.round(h * 0.35)), QUAD.cols[n.q]);
-    if (n.state === 'miss') { g.globalAlpha *= 0.5; R(x0, y0, w, h, '#7a1f18'); }
-    g.globalAlpha = 1;
-  }
-  // your four scanners across the line: a pad per chute (lit by a press, flashing on a hit), the laser, the key under each
+  R(Math.round(xS0) - 6, Math.round(yS) - 14, Math.round(xS1 - xS0) + 12, 14, '#34383f'); R(Math.round(xS0) - 6, Math.round(yS) - 14, Math.round(xS1 - xS0) + 12, 1, '#6a7178');
+  for (let i = 0; i < 4; i++) { const xa = Math.round(qX(i - 2 + 0.1, 1)), xb = Math.round(qX(i - 1 - 0.1, 1)); R(xa, Math.round(yS) - 9, xb - xa, 9, '#0c0b0d'); R(xa, Math.round(yS) - 11, xb - xa, 2, QUAD.cols[i]); }
+  // the belt
+  drawQuadBelt(scroll, beat, active, stats ? stats.combo : 0);
+  // the boxes, far ones first; a scanned one rides on toward you, a missed one too, darkened
   const yJ = qY(0);
-  for (let i = 0; i < 4; i++) {
-    const xa = Math.round(qX(i - 2 + 0.06, 0)), xb = Math.round(qX(i - 1 - 0.06, 0)), pr = Math.max(0, 1 - (now - QUADFX.press[i]) / 140);
-    const hitN = active ? notes.find(n => n.quad && n.q === i && n.state === 'hit' && t - n.hitAt < 0.18) : null, missN = active ? notes.find(n => n.quad && n.q === i && n.state === 'miss' && t - n.hitAt < 0.3) : null;
-    R(xa, yJ - 2, xb - xa, 9, '#1b1716'); R(xa, yJ - 2, xb - xa, 1, QUAD.cols[i]); R(xa, yJ + 6, xb - xa, 1, QUAD.cols[i]);
-    if (pr > 0) { g.globalAlpha = pr * 0.6; R(xa, yJ - 2, xb - xa, 9, QUAD.cols[i]); g.globalAlpha = 1; }
-    if (hitN) { const k = 1 - (t - hitN.hitAt) / 0.18; g.globalAlpha = k; R(xa - 2, yJ - 14, xb - xa + 4, 22, hitN.judge === 'perfect' ? '#fff6d8' : QUAD.cols[i]); g.globalAlpha = k * 0.5; R(xa - 6, yJ - 30, xb - xa + 12, 40, QUAD.cols[i]); g.globalAlpha = 1; }
-    if (missN) { const k = 1 - (t - missN.hitAt) / 0.3; g.globalAlpha = k; R(xa, yJ - 2, xb - xa, 9, '#ff3a2a'); g.globalAlpha = 1; }
-    g.fillStyle = '#8a8a86'; g.font = '7px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.fillText(QUAD.keys[i], (xa + xb) / 2, yJ + 16);
+  if (live) {
+    const boxes = notes.filter(n => n.quad).map(n => ({ n, z: (n.arr - (active ? t : timeAt(END_BEAT))) / (QUAD.look * SPB) })).filter(o => o.z <= 1.0 && o.z >= -0.12).sort((a, b) => b.z - a.z);
+    for (const { n, z } of boxes) {
+      const a = Math.max(0, Math.min(1, (1 - z) * 8)); g.globalAlpha = a;
+      const r = drawQuadBox(n, z, t);
+      // just scanned: a green sheen across the front; missed: red, and a cross
+      if (n.state === 'hit' && t - n.hitAt < 0.22) { g.globalAlpha = a * (1 - (t - n.hitAt) / 0.22) * 0.7; g.fillStyle = n.judge === 'perfect' ? '#d8ffd0' : '#8fd694'; g.fillRect(Math.round(r.x0), Math.round(r.yt), Math.round(r.w), Math.round(r.h)); }
+      if (n.state === 'hit') { g.globalAlpha = a * 0.25; g.fillStyle = '#8fd694'; g.fillRect(Math.round(r.x0), Math.round(r.yt), Math.round(r.w), Math.round(r.h)); }
+      if (n.state === 'miss') { g.globalAlpha = a * 0.45; g.fillStyle = '#7a1f18'; g.fillRect(Math.round(r.x0), Math.round(r.yt), Math.round(r.w), Math.round(r.h)); g.globalAlpha = a; const c = Math.round(r.x0 + r.w / 2), m = Math.round(r.yt + r.h / 2), d = Math.max(2, Math.round(r.h * 0.3)); for (let k = -d; k <= d; k++) { R(c + k, m + k, 2, 2, '#ff5a4a'); R(c + k, m - k, 2, 2, '#ff5a4a'); } }
+      g.globalAlpha = 1;
+      // a box scanned this frame throws up receipt bits and sparks from its gate
+      if (n.state === 'hit' && !n.qfx) { n.qfx = true; const cx = qX(n.q - 1.5, 0); for (let k = 0; k < (n.judge === 'perfect' ? 16 : 8); k++) QUADFX.parts.push({ x: cx + (Math.random() - 0.5) * 30, y: yJ - 20, vx: (Math.random() - 0.5) * 120, vy: -60 - Math.random() * 120, at: now, life: 380 + Math.random() * 400, c: Math.random() < 0.45 ? '#efe6d2' : k % 2 ? QUAD.cols[n.q] : '#8fd694' }); }
+    }
   }
-  R(Math.round(qX(-2, 0)), Math.round(yJ) + 2, Math.round(qX(2, 0) - qX(-2, 0)), 1, C.laser);
+  // the scanner gates at your end, one arch per chute: posts on the guides, a top bar in the chute's colour with its scan
+  // head; the laser fan down to the line (brighter while pressed, green on a scan, red on a miss)
+  const gh = 34, gTop = yJ - gh;
+  for (let i = 0; i < 4; i++) {
+    const xa = qX(i - 2, 0), xb = qX(i - 1, 0), cx = (xa + xb) / 2, pr = Math.max(0, 1 - (now - QUADFX.press[i]) / 160);
+    const hitN = live ? notes.find(n => n.quad && n.q === i && n.state === 'hit' && t - n.hitAt < 0.2) : null, missN = live ? notes.find(n => n.quad && n.q === i && n.state === 'miss' && t - n.hitAt < 0.3) : null;
+    const fan = hitN ? '#8fd694' : missN ? '#ff3a2a' : '#ff4a3d', fa = hitN ? 0.55 * (1 - (t - hitN.hitAt) / 0.2) : missN ? 0.4 : 0.07 + pr * 0.25;
+    g.globalAlpha = fa; g.fillStyle = fan; g.beginPath(); g.moveTo(cx - 3, gTop + 6); g.lineTo(cx + 3, gTop + 6); g.lineTo(xb - 4, yJ); g.lineTo(xa + 4, yJ); g.closePath(); g.fill(); g.globalAlpha = 1;
+    if (hitN) { const k = 1 - (t - hitN.hitAt) / 0.2; g.globalAlpha = k * 0.6; R(Math.round(xa + 3), Math.round(gTop + 4), Math.round(xb - xa - 6), Math.round(gh - 4), hitN.judge === 'perfect' ? '#fff6d8' : '#cfeec8'); g.globalAlpha = 1; }
+  }
+  for (let b = -2; b <= 2; b++) { const x = Math.round(qX(b, 0)); R(x - 2, Math.round(gTop), 4, Math.round(gh) + 2, '#5d646b'); R(x - 2, Math.round(gTop), 1, Math.round(gh) + 2, '#8a9198'); R(x + 1, Math.round(gTop), 1, Math.round(gh) + 2, '#3e444a'); }
+  for (let i = 0; i < 4; i++) {
+    const xa = Math.round(qX(i - 2, 0)) + 2, xb = Math.round(qX(i - 1, 0)) - 2, cx = Math.round((xa + xb) / 2), pr = Math.max(0, 1 - (now - QUADFX.press[i]) / 160);
+    R(xa, Math.round(gTop), xb - xa, 6, '#3e444a'); R(xa, Math.round(gTop), xb - xa, 2, QUAD.cols[i]); R(xa, Math.round(gTop) + 5, xb - xa, 1, '#23262b');
+    if (pr > 0) { g.globalAlpha = pr; R(xa, Math.round(gTop), xb - xa, 6, QUAD.cols[i]); g.globalAlpha = 1; }
+    R(cx - 4, Math.round(gTop) + 6, 8, 3, '#2a2d33'); R(cx - 1, Math.round(gTop) + 8, 2, 1, '#ff4a3d');
+  }
+  // the laser across the line, and under each chute its key on a floor plate
+  R(Math.round(qX(-2, 0)), Math.round(yJ), Math.round(qX(2, 0) - qX(-2, 0)), 1, '#ff4a3d'); g.globalAlpha = 0.35; R(Math.round(qX(-2, 0)), Math.round(yJ) - 1, Math.round(qX(2, 0) - qX(-2, 0)), 3, '#ff4a3d'); g.globalAlpha = 1;
+  g.font = '600 8px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  for (let i = 0; i < 4; i++) { const cx = Math.round(qX(i - 1.5, 0)), y = Math.round(yJ) + 18, pr = Math.max(0, 1 - (now - QUADFX.press[i]) / 160); R(cx - 9, y - 6, 18, 12, pr > 0 ? QUAD.cols[i] : '#1b1716'); R(cx - 9, y - 6, 18, 1, QUAD.cols[i]); g.fillStyle = pr > 0 ? '#1b1716' : '#a8a49c'; g.fillText(QUAD.keys[i], cx, y + 1); }
+  // receipt bits and sparks
+  QUADFX.parts = QUADFX.parts.filter(p => now - p.at < p.life);
+  for (const p of QUADFX.parts) { const a = (now - p.at) / 1000; g.globalAlpha = 1 - (now - p.at) / p.life; R(Math.round(p.x + p.vx * a), Math.round(p.y + p.vy * a + 260 * a * a), 2, 2, p.c); }
+  g.globalAlpha = 1;
+  // the edges of the picture sink into the dark
+  const vg = g.createRadialGradient(W / 2, H * 0.55, H * 0.35, W / 2, H * 0.55, W * 0.62); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.55)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
   g.restore();
 }
 // ---------- 2-1 X-ray pilot line ----------
