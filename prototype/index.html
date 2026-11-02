@@ -2800,7 +2800,9 @@ function drawBox(n, cx, bottom, mark, t, sq = 0) {
   if (L.daw) return drawClip(n, cx, bottom, mark, t, sq);
   const w = n.w + Math.round(sq * 2), h = n.h - Math.round(sq * 2), x = Math.round(cx - w / 2), y = Math.round(bottom - h);
   R(x + 1, bottom, w, 1, 'rgba(0,0,0,.45)');
-  R(x, y, w, h, C.kraft); R(x, y, w, 2, C.kraftTop); R(x + w - 2, y + 2, 2, h - 2, C.kraftDark);
+  // 2-1's floor: the boxes a shade lighter, so they don't sink into the warm lamps
+  const kr = L.mid ? ['#d6a06a', '#e9bb83', '#a0703f'] : [C.kraft, C.kraftTop, C.kraftDark];
+  R(x, y, w, h, kr[0]); R(x, y, w, 2, kr[1]); R(x + w - 2, y + 2, 2, h - 2, kr[2]);
   R(x + (w >> 1) - 1, y, 3, h, n.off && L.offTilt ? '#d8463b' : L.lanes === 2 ? (n.lane === 0 ? C.vest : C.vest2) : C.tape);
   if (n.pair && L.oneButton) R(x, y, w, 2, '#ffe9a8');
   if (n.grab && t >= n.tRel) { R(x + 2, y + 2, 5, 4, '#d8463b'); R(x + 3, y + 3, 3, 2, '#f08a7a'); }
