@@ -743,89 +743,78 @@ const LEVELS = [
       { who:'반장', text:'내 허리 탓이다. 내일 또 하자.' }]
   }
   ,{
-    id:'s2-1', stageNo:'2-1', who:'마르코', role:'반장 · 마르코 · 110 → 124 BPM · 라인 둘', tag:'블루스 → 펑크 · 카메라가 물러난다 · 왼손 오른손', bpm:110.01, style:'funk21', fxTheme:'warm',
+    id:'s2-1', stageNo:'2-1', who:'마르코', role:'반장 · 마르코 · 110 → 120 BPM · 라인 넷', tag:'블루스 → 펑크 · 카메라가 물러난다 · 왼손 오른손', bpm:110.01, style:'funk21', fxTheme:'warm',
     // 2-1 (stage 2): 하은 is gone, line 3 drags, and 4라인's scanner hand has just quit. Two recorded songs. Phase 1 is line 3
     // as it always looks, its lamps half broken, a tired half-time blues on the old radio ("Across the Empty Floor", 110.01 BPM,
-    // the game's beat 0 at 1.0707 s into the file; only its first 14 bars are used: the generated take drifts after bar 16). 반장
-    // loads, you scan, any key. Behind your back 마르코 is bolting the end of his line onto your station; at beat 56 his drill
-    // catches the radio's cable and the blues dies (a tape stop). The camera pulls back: line 4 lights up behind you lamp by
-    // lamp and 마르코 introduces himself, then puts his own speaker on: "The Late Shift" (124 BPM, its bar 0 at game beat 64,
-    // 0.072 s into the file), a party funk. Its drop (its bar 2, game beat 72) brings line 3's lamps back on and both lines
-    // run: 반장's on the left (F/D, the left half of the screen) on 1 and 3, 마르코's on the right (J/K, the right half) on 2
-    // and 4 and the horns' offbeats. The song's last hit (its bar 90, game beat 424) freezes the picture and the lamps go out.
-    tempo: [[0, 110.01], [56, 124]], clock:'02:40', title:'에이스', partners:['boss'], hints:false,
+    // the game's beat 0 at 1.0707 s into the file; only its first 14 bars are used). 반장 loads, you scan, any key. Behind your
+    // back 마르코 is bolting the end of his line onto your station; at beat 56 his drill kills the radio (a tape stop), the camera
+    // pulls back on all four belts and he puts his boombox on: "The Copper Stomp" (120 BPM; its first downbeat 1.116 s into the
+    // file = game beat 64, so its bar R is game bar 16 + R). Its drums alone for three bars; the band at game beat 76 (the drop:
+    // the lamps come back) and 마르코, alone, hops from corner to corner throwing boxes, faster and faster; the band stops on
+    // 142 and the bass time (144-208, drums and bass only, pushed back further by `songDuck`) is his introduction, beside you,
+    // with 반장 alone and lightly on his belt; the horns come back at 208, a dead stop at 233, the second drop at 240 (all four
+    // belts: 반장 on the left lower, 마르코 on the horn riff, moving every two bars); the last hit at 319.
+    tempo: [[0, 110.01], [56, 120]], clock:'02:40', title:'에이스', partners:['boss'], hints:false,
     songs: [{ src: 'audio/2-1-across-the-empty-floor.mp3', at: 0, lead: 1.0707, gain: 0.9, until: 56 },
-            { src: 'audio/2-1-the-late-shift.mp3', at: 64, lead: 0.072, gain: 0.85 }],
-    songStart: 0, songCues: [[56, 'tape'], [64, 1]], noCount: true, bareBand: true, hitKit: 'ticktock',
-    // from `at` the scene is drawn as the whole floor; over `zoom` the camera pulls back and shows line 4 behind you, the keys
-    // become left and right at `keys`, and the two-sided chart starts at bar `from` (game bar 18 = the drop; '1' = 반장's line
-    // on the left, '2' = 마르코's on the right, 'x' both; 16 cells a bar). Charted from the stems (Demucs): the left hand on
-    // the kick on 1 and 3 (every beat in the finale) and the bass's strongest push; the right on the claps on 2 and 4 and the
-    // horns' strongest offbeats (two in the choruses); stops and the bass-less breakdown thinned. B bars 2-9 are the lesson.
+            { src: 'audio/2-1-the-copper-stomp.mp3', at: 62, lead: 0.116, gain: 0.85 }],
+    songStart: 0, songCues: [[56, 'tape'], [62, 1]], songDuck: [144, 208, 420, 0.7], noCount: true, bareBand: true, hitKit: 'ticktock',
     // the whole night is drawn on the floor renderer (at 0): the upper belt of line 3 (하은's) stands idle in phase 1. Over
-    // `zoom` the camera pulls back on all four lines; the keys split at `keys`; the chart is from bar 0 ('1' left lower =
-    // 반장's, '2' right lower, '3' left upper, '4' right upper; 16 cells a bar). 마르코 runs the route (rl, ru, lu, ll, c
-    // beside you) and throws the boxes he loads; the radio dies at `radio`; while he talks (`talk`) the camera comes in.
-    // A STAND-IN CHART on the current songs, to be redone on the new funk.
-    mid: { at: 0, zoom: [57, 62], keys: 68, from: 0, radio: 56, boombox: 63.5, talk: [298, 356], guide: [64, 84], tags: [72, 80, 88],
-      route: [[56, 'rl'], [69, 'rl'], [85, 'ru'], [101, 'lu'], [117, 'll'], [133, 'rl'], [149, 'ru'], [165, 'lu'], [181, 'rl'], [197, 'ru'], [213, 'lu'], [229, 'rl'], [245, 'ru'], [261, 'lu'], [277, 'rl'], [294, 'c'], [357, 'rl'], [365, 'ru'], [373, 'lu'], [381, 'rl'], [389, 'ru'], [397, 'lu'], [405, 'rl'], [413, 'ru']],
+    // `zoom` the camera pulls back on all four belts; the keys split at `keys` (left hand: both left belts, right hand: both
+    // right); the chart is in `bars` ('1' left lower = 반장's, '2' right lower, '3' left upper, '4' right upper, 'x' both lower;
+    // 16 cells a bar; one hand's notes at least an 8th apart). 마르코 runs `route` ([beat, spot]: rl, ru, lu, ll, c beside you)
+    // and throws the boxes he loads; the radio dies at `radio`; while he talks (`talk`) the camera comes in.
+    mid: { at: 0, zoom: [57, 62], keys: 70, from: 0, radio: 56, boombox: 61.5, talk: [146, 204], guide: [66, 100], tags: [72, 92, 108, 124],
+      route: [[56,  'rl'],  [89,  'ru'],  [105,  'lu'],  [121,  'll'],  [129,  'rl'],  [133,  'ru'],  [137,  'lu'],  [142,  'c'],  [204,  'rl'],  [234,  'ru'],  [237,  'ru'],  [245,  'lu'],  [253,  'rl'],  [261,  'ru'],  [269,  'lu'],  [277,  'rl'],  [285,  'ru'],  [293,  'lu'],  [301,  'rl'],  [309,  'rl']],
       bars: [
-      '................', '1.......1.......', '1.......1.......', '1.......1.......',
-      '1.......1.......', '1.......1.......', '1.......1.......', '1.......1.......',
-      '1.......1.......', '1...1...1.......', '1.......1.......', '1.....1.1.......',
-      '1.1.....1.......', '................', '................', '................',
-      '................', '................', '....2.......2...', '2...2...2...2...',
-      '2...2...2...2...', '2...2...2...2...', '....4.......4...', '4...4...4...4...',
-      '4...4...4...4...', '4...4...4...4...', '....3.......3...', '3...3...3...3...',
-      '3...3...3...3...', '3...3...3...3...', '....1.......1...', '1...1...1...1...',
-      '1...1...1...1...', '1...1...1...1...', '1.2.2...1...2...', '1...2...1...21..',
-      '1.2.2...1...2...', '1.2.2...1...2...', '1...4...1...4...', '1.4.4...1...4...',
-      '1...4...1...4...', '1...4.......4...', '....3...1...3.1.', '1...3..31...3.1.',
-      '1...31..1...3...', '131.3...1...3...', '1...2...1..12...', '12..2...1...2.1.',
-      '1...2...1..12...', '1...2...1.1.2...', '..4.4...1...4...', '1...4...1..14...',
-      '1.4.4...1...41..', '1.4.4.1.1...4...', '1...3...1...313.', '1.3.3...1...3...',
-      '1...3...1...3...', '....3.......3...', '1...2...1...2.1.', '1...2...1...2.1.',
-      '12..2...1...2...', '1...2..21.1.2...', '1...4...1...41..', '1...4...1...4.1.',
-      '1.4.4...1...4...', '1...4...1...4...', '1.3.3...1...3...', '13..3...1...3...',
-      '1...3...1.1.3...', '1...3.1.1...3...', '1.2.2.1.1...2...', '12..2.1.1...2...',
-      '1.2.2...1...2...', '12..2...1...2...', '1...............', '1.......1.....1.',
-      '1...............', '1.......1.1.....', '1...............', '1.......1....1..',
-      '1...............', '1.......1.......', '1..1............', '1.......1.......',
-      '1...............', '1.......1.....1.', '1...............', '1.......1.......',
-      '1...............', '1.......1.......', '....2...1..12...', '1.1.2...1...2...',
-      '1...4...1.1.4...', '1...4.4.1.1.4...', '1...3...1...31..', '1.1.3...1...3...',
-      '1...2...1...2...', '1...2...1...2...', '1...4.......4...', '....4.......4.4.',
-      '1...3.......3...', '....3.....3.3...', '1...2...1...2...', '1...2...1...21..',
-      '1...4...1...4...', '14..4...1...4...', '................', '................'
+        '................', '1.......1.......', '1.......1.......', '1.......1.......',
+        '1.......1.......', '1.......1.......', '1.......1.......', '1.......1.......',
+        '1.......1.......', '1...1...1.......', '1.......1.......', '1.....1.1.......',
+        '1.1.....1.......', '................', '................', '................',
+        '................', '................', '2...2...2...2...', '2...2....2..2...',
+        '2...2...2...2.2.', '2...2...2...2...', '2...2...2...2...', '4....4.4....4.4.',
+        '4..4..4.4....4..', '4.4.4..4.4......', '4..4..4.4....4..', '3...3....3..3.3.',
+        '3.3.3.3......3..', '3.3....3.3..3...', '3...3.3......3..', '1...1..1....1.1.',
+        '1..1..1.1...1...', '2....2..2...2.2.', '4..4.4..4....4..', '3....3..........',
+        '1....1..........', '1..1....1.......', '1..1............', '1..1....1.......',
+        '1....1..........', '1..1....1.......', '1..1............', '1.....1.1.......',
+        '1.....1.........', '1..1....1.......', '1..1............', '1..1....1.......',
+        '1..1............', '1..1....1.......', '1..1............', '1.......1.......',
+        '1.............2.', '1...2.....2.2...', '1.............2.', '1...2...1.2.2.2.',
+        '1...2...1...2...', '1.2.1.2.1.2.1.2.', 'x...............', '1..4....14..4.4.',
+        '1..4.4..1..4.4..', '1.4....414..4...', '1..3.3..1....3..', '1...3...1...3.3.',
+        '1..2..2.1....2..', '1.2.2..21...2...', '1..4.4.41....4..', '1...4...1...4..4',
+        '1...3...1..3.3..', '1...3...1..3.3..', '1...2...1....2.2', '1...2...12..2..2',
+        '4...4...1..4.4..', '1...4...1...4...', '1...3...1...3...', '1...3...1...3...',
+        '1......21....2..', '1....2..1...2...', '1.2.1.2.1.2.1.2.', '1...2...1...x...',
+        '................'
     ] },
     comfort: ['…다음 거.', '손 봐, 손.'],
     // the phases on screen: line 3's lamps broken until the drop (broken, gloom), line 4's lamps clicking on as it is revealed
-    // (lineOn), a flash and a jolt on the drop, the two horn choruses in amber, the last hit frozen and the lamps going out
-    broken: [[0, 72]],
-    phaseFx: { gloom: [0, 72], lineOn: [57.5, 58.5, 59.5], drop: 72, amber: [[168, 224], [360, 392]], last: 424, out: [425.4, 426.1, 426.8] },
+    // (lineOn), a flash and a jolt on both drops, the second drop's run in amber, the last hit frozen and the lamps going out
+    broken: [[0, 76]],
+    phaseFx: { gloom: [0, 76], lineOn: [57.5, 58.5, 59.5], drop: 76, drop2: 240, amber: [[240, 312]], last: 319, out: [320.4, 321.1, 321.8] },
     // behind your back in phase 1: 마르코 bolting his line on (clanks, the drill), the drill that kills the radio; the lamps
     sfx: [[38, 'clank'], [38.75, 'clank'], [40, 'drill'], [44.5, 'clank'], [45, 'clank'], [46, 'drill'], [50.5, 'clank'], [55, 'drill'],
-          [57.5, 'lamp'], [58.5, 'lamp'], [59.5, 'lamp'], [425.4, 'lampOff'], [426.1, 'lampOff'], [426.8, 'lampOff']],
+          [57.5, 'lamp'], [58.5, 'lamp'], [59.5, 'lamp'], [320.4, 'lampOff'], [321.1, 'lampOff'], [321.8, 'lampOff']],
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     // wide windows: this is played on phones (딱 ±80 ms, 좋아 ±150 ms, past 220 ms a miss)
-    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 424,
+    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 319,
     special:['마르코가 보낸 상자', 'right', '받아냄'],
-    sections: [[0, 'intro'], [1, 'a1'], [14, 'build'], [18, 'groove'], [42, 'chorus'], [58, 'groove2'], [82, 'breakdown'], [98, 'build2'], [106, 'outro']],
-    // phase 1 on the one belt (16 cells a bar), from the blues' stems: the slow pulse on 1 and 3, the bass's push from bar 5,
-    // a guitar lick from bar 9; bars 14-17 (the radio dying, the reveal, 마르코's intro) and everything after on the two lines
-    bars: Array(108).fill('................'),
-    // 'b' 반장, 'v' 마르코 (no speaker: 반장 on line 3 in phase 1, his bubble at the left)
-    // 'b' 반장, 'v' 마르코 (no speaker: 반장 in phase 1, his bubble at the left). Stand-in timings on the current songs.
+    sections: [[0, 'intro'], [1, 'a1'], [14, 'build'], [19, 'groove'], [36, 'breakdown'], [52, 'build2'], [60, 'chorus'], [78, 'last']],
+    bars: Array(81).fill('................'),
+    // 'b' 반장, 'v' 마르코 (no speaker: 반장 in phase 1, his bubble at the left)
     say: [[6, '…하나 빠지니까 티 나네.', 3.5], [22, '(시계를 본다) …오늘도 트럭 기다리게 하겠다.', 4],
           [38.5, '(뒤에서 쾅, 쾅) …뭐야, 뒤에서.', 3.5], [50.5, '(또 쾅) …저 소리 뭐냐니까.', 3],
           [56, '(드릴 불꽃에 라디오가 죽는다) …라디오까지.', 2],
-          [57, '헤이헤이헤이~! 비켜요 비켜!', 3, 0, 'v'], [61, '음악부터 깔고! 뮤직, 큐!', 2.5, 0, 'v'], [66, '…저 양반 뭐야.', 2.5, 0, 'b'],
-          [74, '오른쪽 아래!', 2.5, 0, 'v'], [90, '이번엔 위!', 2.5, 0, 'v'], [106, '여기 비었네? 내가 할게요!', 3, 0, 'v'],
-          [122, '반장님, 옆에 좀 낄게요~', 3, 0, 'v'], [126, '…좁다.', 2.5, 0, 'b'],
-          [300, '(옆으로 와서) 자, 정식으로 인사할게요.', 4, 0, 'v'], [306, '4라인 에이스, 마르코! 취미는 볼트, 특기는 리듬!', 5, 0, 'v'],
-          [314, '우리 쪽 스캔하던 친구가 관뒀거든요. 그래서 라인을 이쪽에 붙였어요.', 5.5, 0, 'v'], [322, '…허락은 받았고?', 3, 0, 'b'],
-          [326, '같이 잘되면 좋잖아요~ 허락은 끝나고!', 4.5, 0, 'v'], [334, '신입, 손 좋던데? 내가 며칠 봤거든.', 4.5, 0, 'v'],
-          [346, '자, 이제 진짜 간다!', 3, 0, 'v'], [380, '…빠르긴 하네.', 3, 0, 'b'], [408, '라스트! 신입, 가즈아!', 3, 0, 'v']],
+          [57, '헤이헤이헤이~! 비켜요 비켜!', 2.5, 0, 'v'], [60, '음악부터 깔고! 뮤직, 큐!', 2.5, 0, 'v'], [64.5, '…저 양반 뭐야.', 2.5, 0, 'b'],
+          [68, '신입! 오른손! 내 상자 받아요!', 3, 0, 'v'],
+          [88, '이번엔 위!', 2.5, 0, 'v'], [104, '저쪽도 내가!', 2.5, 0, 'v'], [119, '여기 비었네? 내가 할게요!', 3, 0, 'v'],
+          [123, '…거긴 내 자리다.', 2.5, 0, 'b'], [128.5, '여기! 저기! 거기!', 3, 0, 'v'],
+          [146, '(옆으로 와서) 자, 정식으로 인사할게요.', 4, 0, 'v'], [153, '4라인 에이스, 마르코! 취미는 볼트, 특기는 리듬!', 5, 0, 'v'],
+          [162, '우리 쪽 스캔하던 친구가 관뒀거든요. 그래서 라인을 이쪽에 붙였어요.', 5.5, 0, 'v'], [172, '…허락은 받았고?', 3, 0, 'b'],
+          [177, '같이 잘되면 좋잖아요~ 허락은 끝나고!', 4.5, 0, 'v'], [186, '신입, 손 좋던데? 내가 며칠 봤거든.', 4.5, 0, 'v'],
+          [195, '반장님, 볼륨 올립니다!', 3, 0, 'v'], [233, '(쉿) …하나, 둘—', 3, 0, 'v'], [262, '…빠르긴 하네.', 3, 0, 'b'],
+          [302, '라스트! 신입, 가즈아!', 3, 0, 'v']],
     intro: [
       { who:'', text:'하은이 그만둔 뒤로 3라인은 늘 늦다. 형광등도 반은 나갔다. 새벽 2시 40분.' },
       { who:'반장', text:'…오늘도 둘이서 간다. 아무 손이나 편한 걸로.' }],
@@ -3467,11 +3456,11 @@ function phaseLook(c, w, h, b, active) {
   const am = F.amber.find(([x, y]) => b >= x - 1 && b < y + 1);
   if (am) { const k = Math.min(1, b - (am[0] - 1), am[1] + 1 - b), ph = b - Math.floor(b); c.globalCompositeOperation = 'overlay'; c.fillStyle = `rgba(255,160,50,${(0.22 + 0.12 * Math.max(0, 1 - ph * 3)) * k})`; c.fillRect(0, 0, w, h); }
   // the drop, and the last hit: a white flash
-  for (const [at, v] of [[F.drop, 0.7], [F.last, 0.45]]) { const d = b - at; if (d >= 0 && d < 1.5) { c.globalCompositeOperation = 'lighter'; c.fillStyle = `rgba(255,250,235,${v * (1 - d / 1.5) ** 2})`; c.fillRect(0, 0, w, h); } }
+  for (const [at, v] of [[F.drop, 0.7], [F.drop2, 0.7], [F.last, 0.45]]) { const d = b - at; if (d >= 0 && d < 1.5) { c.globalCompositeOperation = 'lighter'; c.fillStyle = `rgba(255,250,235,${v * (1 - d / 1.5) ** 2})`; c.fillRect(0, 0, w, h); } }
   c.restore();
 }
 // the jolt on the drop: a few pixels, shrinking (in game pixels)
-function phaseJolt(b) { const F = L.phaseFx; if (!F || reduce) return [0, 0]; const d = b - F.drop; if (d < 0 || d > 0.6) return [0, 0]; const k = 3 * (1 - d / 0.6); return [Math.round((Math.random() * 2 - 1) * k), Math.round((Math.random() * 2 - 1) * k)]; }
+function phaseJolt(b) { const F = L.phaseFx; if (!F || reduce) return [0, 0]; const d = F.drop2 != null && b >= F.drop2 ? b - F.drop2 : b - F.drop; if (d < 0 || d > 0.6) return [0, 0]; const k = 3 * (1 - d / 0.6); return [Math.round((Math.random() * 2 - 1) * k), Math.round((Math.random() * 2 - 1) * k)]; }
 // ---------- 2-1 the two lines ----------
 // From mid.at the whole floor is drawn into a wider canvas and the camera looks at part of it. Line 3 (the screen you know:
 // 반장, the belt, the scanner) is the left half; the right half is its mirror about where you stand: line 4, 마르코 loading it,
@@ -3492,7 +3481,7 @@ const cvHi = document.getElementById('cvhi'), gHi = cvHi.getContext('2d');
 // 마르코's corners in the floor's coordinates: the lower ends of the two lines (rl, and ll squeezed in beside 반장), the upper
 // belts' loading ends behind them (ru, lu; he stands lower there, the upper belt hides his legs), and c, beside you
 const MARCO_SPOTS = () => ({ rl: { x: MID.ww - BOSS_X, dy: 0, mir: true }, ru: { x: MID.ww - (BOSS_X + LANE_DX[0] + 22), dy: -22, mir: true },
-  lu: { x: BOSS_X + LANE_DX[0] + 22, dy: -22, mir: false }, ll: { x: 22, dy: 0, mir: false }, c: { x: MID.ax + 64, dy: -2, mir: true } });
+  lu: { x: BOSS_X + LANE_DX[0] + 22, dy: -22, mir: false }, ll: { x: BOSS_X + 24, dy: 0, mir: false }, c: { x: MID.ax + 64, dy: -2, mir: true } });
 const midSpotAt = bb => { let sp = L.mid.route[0][1]; for (const [rb, s] of L.mid.route) if (bb >= rb) sp = s; return sp; };
 function midMarco(b) {
   const R0 = L.mid.route, S = MARCO_SPOTS(); let i = 0; for (let k = 0; k < R0.length; k++) if (b >= R0[k][0]) i = k;
@@ -5419,6 +5408,7 @@ function buildEvents() {
     const E = (dt, fn) => ev.push([t + dt, fn]);
     if (L.sfx) for (const [sb, kind] of L.sfx) if (Math.floor(sb) === b) E((sb - b) * s, T => levelSfx(T, kind));
     if (L.songCues) for (const [cb, cue] of L.songCues) if (Math.floor(cb) === b) E((cb - b) * s, cue === 'tape' ? T => tapeStop(T) : T => { if (songReady(cue)) startSong(T, 0, cue); });
+    if (L.songDuck) { if (b === L.songDuck[0]) E(0, T => duckSong(T, true, 2 * s)); if (b === L.songDuck[1] - 1) E(0, T => duckSong(T, false, s)); }
     if (L.songStart === b) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(0)) startSong(T, 0, 0); });
     if (b < 4 && !L.noCount) { E(0, T => rim(T, inBar === 0 ? 0.5 : 0.3)); continue; }
     if (b >= total - 4) continue;
@@ -6833,8 +6823,19 @@ function stopSong() { if (SONG.src) { try { SONG.src.stop(); } catch (e) {} SONG
 function startSong(T, into = 0, i = 0) {
   stopSong(); const sp = L.songs && L.songs[i], buf = sp && SONG.bufs[sp.src]; if (!buf || !ctx) return;
   const off = sp.lead + into; if (off >= buf.duration) return;
-  const s = ctx.createBufferSource(), gn = ctx.createGain(); s.buffer = buf; gn.gain.value = sp.gain || 0.9;
-  s.connect(gn); gn.connect(mus); s.start(Math.max(T, ctx.currentTime), off); SONG.src = s; SONG.gn = gn;
+  const s = ctx.createBufferSource(), gn = ctx.createGain(), lp = ctx.createBiquadFilter(); s.buffer = buf; gn.gain.value = sp.gain || 0.9;
+  lp.type = 'lowpass'; lp.frequency.value = 20000; lp.Q.value = 0.8;
+  s.connect(lp); lp.connect(gn); gn.connect(mus); s.start(Math.max(T, ctx.currentTime), off); SONG.src = s; SONG.gn = gn; SONG.lp = lp; SONG.g0 = gn.gain.value;
+  // started (or sought) inside the muffled stretch: start muffled
+  const d = L.songDuck, bb = beatAt(timeAt(sp.at) + into); if (d && bb >= d[0] && bb < d[1]) { lp.frequency.value = d[2] || 420; gn.gain.value = SONG.g0 * (d[3] || 0.7); }
+}
+// a stretch of the song pushed back (`songDuck: [from, to, cutoff, gain]`): low-passed and quieter, so only the bass and the
+// kick come through, as if the speaker were turned away while somebody talks; it opens back up over a beat
+function duckSong(T, on, dur) {
+  const lp = SONG.lp, gn = SONG.gn, d = L.songDuck; if (!lp || !d) return;
+  const f = on ? (d[2] || 420) : 20000, g = SONG.g0 * (on ? (d[3] || 0.7) : 1);
+  lp.frequency.cancelScheduledValues(T); lp.frequency.setValueAtTime(lp.frequency.value, T); lp.frequency.exponentialRampToValueAtTime(f, T + dur);
+  gn.gain.cancelScheduledValues(T); gn.gain.setValueAtTime(gn.gain.value, T); gn.gain.linearRampToValueAtTime(g, T + dur);
 }
 // the song on the radio dies: the tape slows to a groan and stops
 function tapeStop(T) {
