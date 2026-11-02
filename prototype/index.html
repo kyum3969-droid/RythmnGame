@@ -729,45 +729,37 @@ const LEVELS = [
       { who:'반장', text:'내 허리 탓이다. 내일 또 하자.' }]
   }
   ,{
-    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'반장 → 빅토르 · 파일럿 라인 · 104 BPM · 벨트 둘', tag:'소울 알앤비 · 엑스레이 · 버튼 하나', bpm:104, style:'soul21', fxTheme:'warm',
-    // 2-1 (stage 2 「인수인계」): two belts, one button. The near belt is a pilot line from a new investment: an industrial arm
-    // loads it, and an X-ray window in front of the gate shows what is in each box. A box holds one to three items and every
-    // item is a note, scanned as it crosses the line: the rhythm comes packed in the box. Nothing on screen says so. The far belt
-    // is the ordinary line: 반장 loads it, and in the break, on the phone to 소장, hands it to 김 빅토르 (his first 신입, fifteen
-    // years ago) and watches from behind it.
-    lanes: 2, partners: ['boss', 'robot'], oneButton: true, xray: { lane: 1, x0: 176, x1: 296 }, farLoaderDy: 14, farLoaderDx: 22,
-    tempo: [[0, 104]], travel: 4, clock:'02:40', title:'파일럿 라인', hints:false,
-    cast: { lane: 0, first: 'boss', ids: ['boss', 'viktor'], seq: [[106, 'viktor']], obsX: 176, phone: [[107, 121]], tired: [[150, 156]] },
+    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'반장 → 김 빅토르 · 104 BPM · 분류 슈트 넷', tag:'소울 알앤비 · 축이 돈다 · 4라인', bpm:104, style:'soul21', fxTheme:'warm',
+    // 2-1 (stage 2): 하은 is gone and line 3's numbers have dropped, so 김 빅토르, the ace of the next line (a sorting line), is sent
+    // over. Phase 1 is line 3 as it was: 반장 loads one belt and you scan, the old way. In the break 빅토르 walks in and takes the
+    // line, and the axis turns: the camera swings round to your end of the belt and the line becomes his four-way sort, four
+    // chutes coming at you (a four-lane highway, D F J K or the four quarters of the screen). Phase 2 is played there.
+    tempo: [[0, 104]], clock:'02:40', title:'에이스', partners:['boss'], hints:false,
+    cast: { first: 'boss', ids: ['boss', 'viktor'], seq: [[104, 'viktor']], offUntil: { viktor: 104 } },
+    // the turn (beats), when the keys become the four chutes, and the four-lane chart from bar `from` (8 cells a bar; '1'-'4' =
+    // the chute, '.' = nothing)
+    quad: { turn: [113, 119], keys: 116, from: 30, bars: [
+      '1.2.3.4.', '4..3..2.', '1.2.1.3.', '4...3...', '1.3.2.4.', '2..3..1.', '1.2.3.4.', '4.3.2...',
+      '1.3.2.4.', '1..2.34.', '4.2.3.1.', '2.3.2.1.', '1.4.2.3.', '4..3.21.', '1.2.3.4.', '4.3.2.1.'
+    ] },
     comfort: [],
     chords: SOUL.chords, roots: SOUL.roots,
     chordAt: bar => bar < 2 ? 0 : bar < 18 ? SOUL.verse[(bar - 2) % 4] : bar < 26 ? SOUL.chorus[(bar - 18) % 4] : bar < 30 ? 0 : bar < 38 ? SOUL.verse[(bar - 30) % 4] : bar < 46 ? 5 + SOUL.chorus[(bar - 38) % 4] : 5,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 184,
-    special:['엑스레이로 본 물건', 'grp', '스캔'],
+    special:['분류한 상자', 'quad', '받아냄'],
     sections: [[0, 'intro'], [2, 'a1'], [10, 'a2'], [18, 'b1'], [26, 'call'], [30, 'a3'], [38, 'b2'], [46, 'outro']],
-    // 8 cells per bar (half beats). bars = the far belt (반장, then 빅토르), keeping 1 and 3. bars2 = the X-ray line: 'b' opens a
-    // box with its first item, 'i' adds an item to it; the items fill in between the far belt's beats. One button: a box on each
-    // belt on the same beat is one press, and nothing crosses the line on the X-ray belt while a long crate is held on the far one.
+    // phase 1 on the one belt (8 cells a bar); from bar 30 the belt is empty and the chart is quad.bars
     bars: [
       '........', '........',
-      'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x.x.',
-      'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...',
-      'x...x...', 'x...x...', 'x...x...', 'h===....', 'x...x...', 'x...x...', 'x...x...', 'x...x...',
+      'x.......', 'x...x...', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.',
+      'x...x...', 'x.x.x...', 'x...x.x.', 'x.x.x...', 'x...x...', 'x.x.x.x.', 'x...x.x.', 'x.x.x...',
+      'x.x.x.x.', 'x.xx..x.', 'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'x.xx..x.', 'x.x.x.x.', 'x.x.x...',
       'x.......', '........', '........', '........',
-      'x...x...', 'x.x.x...', 'x...x...', 'h===....', 'x...x.x.', 'x.x.x...', 'x...x...', 'x.x.x...',
-      'x...x...', 'x.x.x...', 'x...x...', 'h===....', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.',
+      '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........'
     ],
-    bars2: [
-      '........', '........',
-      '........', '........', '........', '........', '..b.....', '..b...b.', '..b.....', '..b...b.',
-      '..bi....', '..b...b.', '..bi....', '..b..b..', '..bi....', '..b...b.', '..bi..b.', '..b.b...',
-      '..bi..b.', '..b..i..', '..bi..b.', '......b.', '..bi..b.', '..b..i..', '..bi..b.', '..bii.b.',
-      '..b.....', '........', '........', '........',
-      '..bi..b.', '.bi...b.', '..bi..b.', '......b.', '..bii.b.', '.bi..bi.', '..bi..b.', '..b.b...',
-      '..bi..bi', '.bi...b.', '..bii.bi', '......b.', '..bi.bii', '.bi..bi.', '..bi..bi', '..bii.b.',
-      '........', '........'
-    ],
-    // the script is cleared for a rewrite
+    // the script is not written yet
     say: [],
     intro: [],
     outro: () => [],
@@ -1326,6 +1318,8 @@ function loadLevel(level) {
   if (level.beltSwing) notes.forEach(n => { n.beat = realBeat(n.beat, n.lane); if (n.off && swingOn(n.lane, n.beat)) n.swung = true; });
   // boxes she throws onto the lower belt (1-5's phase 2): his hand doesn't carry them
   if (level.toss) notes.forEach(n => { if (n.lane === 1 && inRange(n.beat, level.toss)) n.toss = true; });
+  // the four-lane part (L.quad): one note per cell, n.q = the chute (0-3); they are on no belt (lane 0 only for the effects)
+  if (level.quad) level.quad.bars.forEach((bar, k) => { const div = bar.length / 4; for (let c = 0; c < bar.length; c++) { const d = '1234'.indexOf(bar[c]); if (d < 0) continue; const beat = (level.quad.from + k) * 4 + c / div; notes.push({ beat, beat0: beat, q: d, quad: true, len: 0, lane: 0 }); } });
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
   // jams: a run of 'j' boxes (half a beat apart or closer) piles up behind the stuck roller and is let go one by one
   if (level.jam) { let grp = []; const flush = () => { grp.forEach((n, k) => { n.jk = k; n.jg = grp; }); grp = []; };
@@ -1821,7 +1815,7 @@ function basePose(t, bt, active, lane = 0) {
   if (pose.doze) pose.bob = 0;
   let cur = null;
   for (const n of notes) {
-    if (loadLane(n) !== lane || n.toss) continue;
+    if (loadLane(n) !== lane || n.toss || n.quad) continue;
     if (n.late && t > n.place - SPB && t < n.place + 0.4 * SPB) { pose.wince = !pose.doze && !pose.vibe; pose.dip = pose.vibe ? 0 : 2; }
     if (n.place - n.carry <= t) cur = n;
   }
@@ -2977,7 +2971,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
     for (const n of notes) {
       const vl = n.drop || n.up ? (t < n.tFall ? loadLane(n) : t < n.tFall + n.fallDur ? -1 : n.lane) : n.lane;
       if (vl === -1 && lane === 1) { laneFx.dropping = laneFx.dropping || []; laneFx.dropping.push(n); continue; }
-      if (vl !== lane) continue;
+      if (vl !== lane || n.quad) continue;
       if (n.grp) { if (t >= n.place && n === n.grp.items[0]) drawXrayBox(n.grp, t, laneFx); continue; }
       if (t < n.place) break;
       let cx = n.jam && L.jam ? jamX(n, t) : n.bb != null ? SCAN_X + (beltBeat(beatAt(t), lane) - n.bb) * SPEED * SPB : noteX(n, t);
@@ -3376,6 +3370,88 @@ function drawInspector(t, active, nowMs) {
     const pose2 = { hand: { x: BOSS_X + 9, y: 138 }, carry: null, wince: false, dip: 0, bob: walking && Math.floor(nowMs / 190) % 2 === 0 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
     drawActor('park', x, true, pose2, nowMs, active, top => { R(BOSS_X - 9, top + 25, 18, 5, '#6e4a33'); R(BOSS_X + 4, top + 2, 2, 2, '#f4f1ea'); for (let k = 0; k < 6; k++) R(BOSS_X + 5, top + 4 + k, 1, 1, '#f4f1ea'); });
   }
+}
+// ---------- 2-1 the turn: the four chutes ----------
+// In the break the camera swings round to your end of the line and the belt becomes 김 빅토르's four-way sort: four chutes
+// coming at you in perspective, a scanner on each, D F J K (or the four quarters of the screen). Boxes carry their chute's
+// colour on the label. 빅토르 stands at the far end on the sorter, sending them down.
+const QUAD = { HY: 20, JY: 184, W0: 296, D: 4, look: 2.6, cols: ['#e0574a', '#4a9be0', '#5fbf6a', '#f0c419'], keys: ['D', 'F', 'J', 'K'] };
+const QUADFX = { press: [-1e9, -1e9, -1e9, -1e9] };
+const qS = z => 1 / (1 + z * (QUAD.D - 1));                    // scale at depth z (0 = your scanners, 1 = the far end)
+const qY = z => QUAD.HY + (QUAD.JY - QUAD.HY) * qS(z);
+const qX = (pos, z) => W / 2 + pos * (QUAD.W0 / 4) * qS(z);   // pos: -2..2 across the four chutes
+function quadP(beat) { const q = L.quad; if (!q) return 0; return beat < q.turn[0] ? 0 : beat >= q.turn[1] ? 1 : ease((beat - q.turn[0]) / (q.turn[1] - q.turn[0])); }
+let quadBuf = null;
+// the turn: the side view spins a quarter turn away, clockwise (the belt's left-to-right becomes far-to-near), over the chutes
+function drawQuadTurn(t, nowMs, active) {
+  const p = quadP(castBeatAt(t, active));
+  if (!quadBuf) { quadBuf = document.createElement('canvas'); quadBuf.width = W; quadBuf.height = H; }
+  const c = quadBuf.getContext('2d'); c.clearRect(0, 0, W, H); c.drawImage(cv, 0, 0);
+  drawQuad(t, nowMs, active);
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = Math.max(0, 1 - p * 1.15);
+  g.translate(W / 2, H / 2); g.rotate(p * Math.PI / 2); g.scale(1 + p * 0.8, 1 + p * 0.8); g.translate(-W / 2, -H / 2);
+  g.drawImage(quadBuf, 0, 0); g.restore();
+  // a white streak through the middle of the turn
+  const fl = Math.max(0, 1 - Math.abs(p - 0.5) * 4); if (fl > 0 && !reduce) { g.fillStyle = `rgba(255,250,235,${fl * 0.35})`; g.fillRect(0, 0, W, H); }
+}
+function drawQuad(t, nowMs, active) {
+  const beat = castBeatAt(t, active), now = nowMs;
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
+  // the room: dark, the far wall, three lamps over the sorter
+  const bgr = g.createLinearGradient(0, 0, 0, H); bgr.addColorStop(0, '#1b1620'); bgr.addColorStop(0.45, '#120e12'); bgr.addColorStop(1, '#0b090a'); g.fillStyle = bgr; g.fillRect(0, 0, W, H);
+  for (let k = 0; k < 3; k++) { const lx = 112 + k * 80; R(lx - 14, 4, 28, 2, '#efe6d2'); g.fillStyle = 'rgba(255,233,168,.06)'; g.beginPath(); g.moveTo(lx - 14, 6); g.lineTo(lx + 14, 6); g.lineTo(lx + 40, 70); g.lineTo(lx - 40, 70); g.closePath(); g.fill(); }
+  for (let x = 0; x < W; x += 24) R(x, 30, 1, 44, '#221c22');
+  // 빅토르 on the sorter at the far end, small; his hand goes toward the chute of the next box he sends
+  const nxt = active ? notes.find(n => n.quad && n.state === 'pending' && n.arr - t < QUAD.look * SPB + 0.25 * SPB) : null;
+  const ph = active ? beat - Math.floor(beat) : 0, vs = 0.5;
+  g.save(); g.translate(W / 2 - BOSS_X * vs, 26 - 87 * vs); g.scale(vs, vs);
+  const hand = nxt ? { x: BOSS_X + (nxt.q - 1.5) * 26, y: 118 } : { x: BOSS_X + 13, y: 134 };
+  const vp = { hand, carry: null, wince: false, dip: 0, bob: active && ph < 0.18 ? 1 : 0, nod: 0, doze: false, phone: false, vibe: false, unplug: false, lane: 2 };
+  FX.react[2] = { type: '', at: now };
+  PARTNERS.viktor.draw(vp, now, active); PARTNERS.viktor.arm(vp);
+  g.restore();
+  // the sorter's counter in front of his legs, and the four mouths of the chutes
+  R(qX(-2.3, 1), qY(1) - 10, qX(2.3, 1) - qX(-2.3, 1), 10, '#3e444a'); R(qX(-2.3, 1), qY(1) - 10, qX(2.3, 1) - qX(-2.3, 1), 1, '#6a7178');
+  // the highway: the belt surface from the far end to past your scanners
+  const zN = -0.18, zF = 1;
+  g.fillStyle = '#2a2320'; g.beginPath(); g.moveTo(qX(-2, zF), qY(zF)); g.lineTo(qX(2, zF), qY(zF)); g.lineTo(qX(2, zN), qY(zN)); g.lineTo(qX(-2, zN), qY(zN)); g.closePath(); g.fill();
+  // each chute's colour, faint along its length and stronger near you
+  for (let i = 0; i < 4; i++) {
+    const gr = g.createLinearGradient(0, qY(zF), 0, qY(0)); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, QUAD.cols[i] + '33');
+    g.fillStyle = gr; g.beginPath(); g.moveTo(qX(i - 2, zF), qY(zF)); g.lineTo(qX(i - 1, zF), qY(zF)); g.lineTo(qX(i - 1, zN), qY(zN)); g.lineTo(qX(i - 2, zN), qY(zN)); g.closePath(); g.fill();
+  }
+  // rollers coming at you, eight a look-ahead
+  const roll = active || state === 'outro' || state === 'result' ? (beat / QUAD.look * 8) % 1 : 0;
+  for (let k = -1; k <= 8; k++) { const z = (k + 1 - roll) / 8; if (z < zN || z > zF) continue; g.fillStyle = '#3a302b'; g.fillRect(Math.round(qX(-2, z)), Math.round(qY(z)), Math.round(qX(2, z) - qX(-2, z)), Math.max(1, Math.round(2 * qS(z)))); }
+  // the dividers between the chutes and the rails at the sides
+  for (let b = -2; b <= 2; b++) { g.strokeStyle = Math.abs(b) === 2 ? '#80878e' : '#4c5258'; g.lineWidth = Math.abs(b) === 2 ? 3 : 1.5; g.beginPath(); g.moveTo(qX(b, zF), qY(zF)); g.lineTo(qX(b, zN), qY(zN)); g.stroke(); }
+  // the boxes
+  const boxes = notes.filter(n => n.quad).map(n => ({ n, z: (n.arr - t) / (QUAD.look * SPB) })).filter(o => o.z <= 1.02 && o.z >= -0.3).sort((a, b) => b.z - a.z);
+  if (active) for (const { n, z } of boxes) {
+    if (n.state === 'hit' && t - n.hitAt > 0.1) continue;
+    const zz = n.state === 'hit' ? (n.arr - n.hitAt) / (QUAD.look * SPB) : z, sc = qS(zz), lw = (QUAD.W0 / 4) * sc, w = Math.round(lw * 0.62), h = Math.round(w * 0.62);
+    const cx = qX(n.q - 1.5, zz), by = qY(zz), x0 = Math.round(cx - w / 2), y0 = Math.round(by - h);
+    g.globalAlpha = Math.max(0, Math.min(1, (1.02 - zz) * 6)) * (n.state === 'miss' ? Math.max(0, 1 + zz * 4) : 1) * (n.state === 'hit' ? 1 - (t - n.hitAt) / 0.1 : 1);
+    R(x0 + 1, Math.round(by), w, Math.max(1, Math.round(2 * sc)), 'rgba(0,0,0,.5)');
+    R(x0, y0, w, h, C.kraft); R(x0, y0, w, Math.max(1, Math.round(3 * sc)), C.kraftTop); R(x0 + w - Math.max(1, Math.round(3 * sc)), y0, Math.max(1, Math.round(3 * sc)), h, C.kraftDark);
+    R(Math.round(cx - 2 * sc), y0, Math.max(1, Math.round(4 * sc)), h, C.tape);
+    R(x0 + Math.round(3 * sc), y0 + Math.round(h * 0.45), Math.max(2, Math.round(w * 0.32)), Math.max(2, Math.round(h * 0.35)), QUAD.cols[n.q]);
+    if (n.state === 'miss') { g.globalAlpha *= 0.5; R(x0, y0, w, h, '#7a1f18'); }
+    g.globalAlpha = 1;
+  }
+  // your four scanners across the line: a pad per chute (lit by a press, flashing on a hit), the laser, the key under each
+  const yJ = qY(0);
+  for (let i = 0; i < 4; i++) {
+    const xa = Math.round(qX(i - 2 + 0.06, 0)), xb = Math.round(qX(i - 1 - 0.06, 0)), pr = Math.max(0, 1 - (now - QUADFX.press[i]) / 140);
+    const hitN = active ? notes.find(n => n.quad && n.q === i && n.state === 'hit' && t - n.hitAt < 0.18) : null, missN = active ? notes.find(n => n.quad && n.q === i && n.state === 'miss' && t - n.hitAt < 0.3) : null;
+    R(xa, yJ - 2, xb - xa, 9, '#1b1716'); R(xa, yJ - 2, xb - xa, 1, QUAD.cols[i]); R(xa, yJ + 6, xb - xa, 1, QUAD.cols[i]);
+    if (pr > 0) { g.globalAlpha = pr * 0.6; R(xa, yJ - 2, xb - xa, 9, QUAD.cols[i]); g.globalAlpha = 1; }
+    if (hitN) { const k = 1 - (t - hitN.hitAt) / 0.18; g.globalAlpha = k; R(xa - 2, yJ - 14, xb - xa + 4, 22, hitN.judge === 'perfect' ? '#fff6d8' : QUAD.cols[i]); g.globalAlpha = k * 0.5; R(xa - 6, yJ - 30, xb - xa + 12, 40, QUAD.cols[i]); g.globalAlpha = 1; }
+    if (missN) { const k = 1 - (t - missN.hitAt) / 0.3; g.globalAlpha = k; R(xa, yJ - 2, xb - xa, 9, '#ff3a2a'); g.globalAlpha = 1; }
+    g.fillStyle = '#8a8a86'; g.font = '7px "IBM Plex Mono", monospace'; g.textAlign = 'center'; g.fillText(QUAD.keys[i], (xa + xb) / 2, yJ + 16);
+  }
+  R(Math.round(qX(-2, 0)), Math.round(yJ) + 2, Math.round(qX(2, 0) - qX(-2, 0)), 1, C.laser);
+  g.restore();
 }
 // ---------- 2-1 X-ray pilot line ----------
 // The near belt is a new pilot line: an industrial arm loads it and an X-ray window in front of the gate shows what is inside
@@ -5808,7 +5884,7 @@ function buildEvents() {
   // with the stamp a bar ahead the set-down would be a third, off-grid echo of the chart: keep it to a soft touch
   // a stamped box's set-down is the stamp itself; with the stamp a bar ahead on a slow belt the set-down would be an off-grid
   // echo of the chart, so it is kept to a soft touch there
-  notes.forEach(n => { if (n.grp && n !== n.grp.items[0]) return; if (!n.stamp || passAt(n) - n.place > 0.05) ev.push([n.place, T => thud(T, (n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1) * (L.stampBar && L.travel > 4 ? 0.25 : 1))]); });
+  notes.forEach(n => { if (n.quad || (n.grp && n !== n.grp.items[0])) return; if (!n.stamp || passAt(n) - n.place > 0.05) ev.push([n.place, T => thud(T, (n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1) * (L.stampBar && L.travel > 4 ? 0.25 : 1))]); });
   if (L.stampBar) for (const n of notes) { if (n.stamp) ev.push([passAt(n), T => stampSnd(T)]); }
   else if (L.inspector) for (const n of notes) { if (n.top || inRange(n.beat0, L.phone)) continue; if (n.grab) { ev.push([passAt(n), T => { rim(T, 0.4); rim(T + 0.11, 0.4); }]); ev.push([n.tRel, T => roller(T, 0.06)]); } else ev.push([passAt(n), n.push ? T => { tak(T, 0.3); shoop(T); } : T => tak(T, 0.3)]); }
   return ev.sort((a, b) => a[0] - b[0]);
@@ -5886,6 +5962,8 @@ function popJudge(kind, sub = '', lane = 0) {
   const [txt, cls] = map[kind];
   judgeEl.className = 'judge ' + cls;
   judgeEl.style.top = kind === 'both' ? '19%' : L.lanes === 2 && lane === 0 ? '12%' : '29%';
+  // on the four chutes the word comes up over the middle of the highway
+  const qd = L.quad && quadP(castBeatAt(songAt(performance.now()), state === 'play')) > 0.5; judgeEl.style.left = qd ? '50%' : ''; if (qd) judgeEl.style.top = '44%';
   judgeEl.innerHTML = '';
   judgeEl.append(txt);
   if (sub) { const s = document.createElement('small'); s.textContent = sub; judgeEl.append(s); }
@@ -5928,10 +6006,10 @@ function isSpecial(n) {
 function specialTotal() { return notes.filter(isSpecial).length; }
 
 // closest pending note inside the window, so dense 16th charts never hand a press to the wrong box
-function findTarget(t, lane) {
+function findTarget(t, lane, q) {
   let best = null, bd = Infinity;
   for (const n of notes) {
-    if (n.state !== 'pending' || n.lane !== lane) continue;
+    if (n.state !== 'pending' || n.lane !== lane || (q != null ? n.q !== q : n.quad)) continue;
     const d = t - n.arr;
     if (d > WIN_M * winK(n)) continue;
     if (d < -WIN_M * WIN_OFF) break;
@@ -6020,6 +6098,8 @@ function pairFx(a, b) {
 let PRESS_SIDE = null;   // which hand pressed (one-button mode), so a long crate is held and let go by that hand
 function onHit(ts, key, lane = 0) {
   const t = songAt(ts) - offsetMs / 1000;
+  // a chute (2-1's four lanes): lane 100 + chute
+  if (lane >= 100) { const q = lane - 100, now = performance.now(); lastPress = now; QUADFX.press[q] = now; const tg = findTarget(t, 0, q); if (!tg) { click(ctx.currentTime); return; } judgeNote(tg, t); return; }
   if (L.oneButton) {
     PRESS_SIDE = lane === 'L' || lane === 'R' ? lane : null;
     const now = performance.now(); lastPress = now;
@@ -6541,12 +6621,15 @@ function ripple(x, y, side) {
   el.addEventListener('animationend', () => el.remove());
   stage.append(el);
 }
+const QUAD_KEYS = { KeyD: 0, KeyF: 1, KeyJ: 2, KeyK: 3 };
+const quadKeys = () => state === 'play' && L.quad && !TUT.on && beatAt(songAt(performance.now())) >= L.quad.keys;
 addEventListener('keydown', e => {
   if (!KEYS.has(e.code)) return;
   const onButton = e.target instanceof Element && e.target.closest('button');
   if (state !== 'play' && onButton) return;
   e.preventDefault();
   if (e.repeat) return;
+  if (quadKeys()) { const q = QUAD_KEYS[e.code]; if (q == null) return; held.set(e.code, 100 + q); press(e.timeStamp, e.code, 100 + q); return; }
   const side = LEFT_KEYS.has(e.code) ? 'L' : 'R', lane = laneOf(side);
   held.set(e.code, lane); press(e.timeStamp, e.code, lane);
 });
@@ -6555,7 +6638,7 @@ const stage = $('stage');
 stage.addEventListener('pointerdown', e => {
   if (e.target instanceof Element && e.target.closest('button, .label, .board')) return;
   e.preventDefault();
-  const r = stage.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, side = x < r.width / 2 ? 'L' : 'R', lane = laneOf(side);
+  const r = stage.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, side = x < r.width / 2 ? 'L' : 'R', lane = quadKeys() ? 100 + Math.max(0, Math.min(3, Math.floor(x / r.width * 4))) : laneOf(side);
   ripple(x, y, side);
   held.set('p' + e.pointerId, lane); press(e.timeStamp, 'p' + e.pointerId, lane);
 });
@@ -6579,7 +6662,8 @@ function frame(now) {
   sceneTick(now);
   if (SCENE.kind === 'office' && !active) { drawOffice(now); if (!hud.hidden) hud.hidden = true; }
   else if (SCENE.kind === 'wings' && !active) drawWings(now);
-  else { drawScene(t, now / 1000, active, now); drawSceneFade(now); }
+  else if (L.quad && quadP(castBeatAt(t, active)) >= 1) { drawQuad(t, now, active); drawSceneFade(now); }
+  else { drawScene(t, now / 1000, active, now); if (L.quad && quadP(castBeatAt(t, active)) > 0) drawQuadTurn(t, now, active); drawSceneFade(now); }
   FX.rumble = 0; if (active && L.show && !L.practiceOf) drawShow15(t, now);
   drawCamera(now);
   if (!active) CAM.lbTo = 0;
