@@ -729,24 +729,24 @@ const LEVELS = [
       { who:'반장', text:'내 허리 탓이다. 내일 또 하자.' }]
   }
   ,{
-    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'반장 → 빅토르 · 순자 이모 · 104 BPM · 벨트 둘', tag:'소울 알앤비 · 검수 도장 · 버튼 하나', bpm:104, style:'soul21', fxTheme:'warm',
-    // 2-1 (stage 2 「인수인계」): two belts, one button. The near belt is 순자 이모's inspection line: she stamps each box (her
-    // pass stamp) as she sets it down, and the belts are a bar long (travel 4), so every stamp is exactly one bar ahead of its
-    // box and what she stamps is what you play next bar. Here it is only a sound; nothing says so (the X-ray that hides her
-    // boxes comes in 2-2). The far belt is the ordinary line: 반장 loads it, and in the break, on the phone to 소장, hands it to
-    // 김 빅토르 (his first 신입, fifteen years ago) and watches from behind it.
-    lanes: 2, partners: ['boss', 'sunja'], oneButton: true, farLoaderDy: 14, farLoaderDx: 22,
-    tempo: [[0, 104]], travel: 4, stampBar: 1, stampLane: 1, clock:'02:40', title:'검수', hints:false,
+    id:'s2-1', stageNo:'2-1', who:'김 빅토르', role:'반장 → 빅토르 · 파일럿 라인 · 104 BPM · 벨트 둘', tag:'소울 알앤비 · 엑스레이 · 버튼 하나', bpm:104, style:'soul21', fxTheme:'warm',
+    // 2-1 (stage 2 「인수인계」): two belts, one button. The near belt is a pilot line from a new investment: an industrial arm
+    // loads it, and an X-ray window in front of the gate shows what is in each box. A box holds one to three items and every
+    // item is a note, scanned as it crosses the line: the rhythm comes packed in the box. Nothing on screen says so. The far belt
+    // is the ordinary line: 반장 loads it, and in the break, on the phone to 소장, hands it to 김 빅토르 (his first 신입, fifteen
+    // years ago) and watches from behind it.
+    lanes: 2, partners: ['boss', 'robot'], oneButton: true, xray: { lane: 1, x0: 176, x1: 296 }, farLoaderDy: 14, farLoaderDx: 22,
+    tempo: [[0, 104]], travel: 4, clock:'02:40', title:'파일럿 라인', hints:false,
     cast: { lane: 0, first: 'boss', ids: ['boss', 'viktor'], seq: [[106, 'viktor']], obsX: 176, phone: [[107, 121]], tired: [[150, 156]] },
     comfort: [],
     chords: SOUL.chords, roots: SOUL.roots,
     chordAt: bar => bar < 2 ? 0 : bar < 18 ? SOUL.verse[(bar - 2) % 4] : bar < 26 ? SOUL.chorus[(bar - 18) % 4] : bar < 30 ? 0 : bar < 38 ? SOUL.verse[(bar - 30) % 4] : bar < 46 ? 5 + SOUL.chorus[(bar - 38) % 4] : 5,
     win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 184,
-    special:['도장 찍힌 상자', 'stamp', '받아냄'],
+    special:['엑스레이로 본 물건', 'grp', '스캔'],
     sections: [[0, 'intro'], [2, 'a1'], [10, 'a2'], [18, 'b1'], [26, 'call'], [30, 'a3'], [38, 'b2'], [46, 'outro']],
-    // 8 cells per bar (half beats). bars = the far belt (반장, then 빅토르), bars2 = 이모's belt in front. The far belt keeps 1 and 3;
-    // 이모 answers in between, her 탁, 탁탁, 탁 (2, the 'and' of 2, 4). One button: a box on each belt on the same beat is one press,
-    // and nothing lands on her belt while a long crate is held on the far one.
+    // 8 cells per bar (half beats). bars = the far belt (반장, then 빅토르), keeping 1 and 3. bars2 = the X-ray line: 'b' opens a
+    // box with its first item, 'i' adds an item to it; the items fill in between the far belt's beats. One button: a box on each
+    // belt on the same beat is one press, and nothing crosses the line on the X-ray belt while a long crate is held on the far one.
     bars: [
       '........', '........',
       'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x.x.',
@@ -759,12 +759,12 @@ const LEVELS = [
     ],
     bars2: [
       '........', '........',
-      '........', '........', '........', '........', '..x.....', '..x...x.', '..x.....', '..x...x.',
-      '..xx....', '..x...x.', '..xx....', '..x..x..', '..xx....', '..x...x.', '..xx..x.', '..x.x...',
-      '..xx..x.', '..x..x..', '..xx..x.', '......x.', '..xx..x.', '..x..x..', '..xx..x.', '..x.x.x.',
-      '..x.....', '........', '........', '........',
-      '..xx..x.', '.x.x..x.', '..xx..x.', '......x.', '..xx.x..', '.x.x..x.', '..xx..x.', '..x.x...',
-      '..xx..xx', '.x.x..x.', '..xx..xx', '......x.', '..xx.x.x', '.x.x..x.', '..xx..xx', '..x.x.x.',
+      '........', '........', '........', '........', '..b.....', '..b...b.', '..b.....', '..b...b.',
+      '..bi....', '..b...b.', '..bi....', '..b..b..', '..bi....', '..b...b.', '..bi..b.', '..b.b...',
+      '..bi..b.', '..b..i..', '..bi..b.', '......b.', '..bi..b.', '..b..i..', '..bi..b.', '..bii.b.',
+      '..b.....', '........', '........', '........',
+      '..bi..b.', '.bi...b.', '..bi..b.', '......b.', '..bii.b.', '.bi..bi.', '..bi..b.', '..b.b...',
+      '..bi..bi', '.bi...b.', '..bii.bi', '......b.', '..bi.bii', '.bi..bi.', '..bi..bi', '..bii.b.',
       '........', '........'
     ],
     // the script is cleared for a rewrite
@@ -1308,15 +1308,20 @@ function loadLevel(level) {
   L = level; TRAVEL = level.travel || 2; setTempo(level); SPB = 60 / level.bpm; SPEED = (SCAN_X - PLACE_X) / (TRAVEL * SPB); CHORDS = level.chords;
   INSPECT_X = level.stampBar ? Math.round(SCAN_X - level.stampBar * 4 * SPB * SPEED) : 184;
   notes = [];
-  [level.bars, level.bars2 || []].forEach((bars, lane) => bars.forEach((bar, bi) => {
+  // 'b' / 'i' (2-1's X-ray line): 'b' starts a box and is its first item, each 'i' after it on that belt is one more item in
+  // the same box; every item is a note of its own, scanned as it crosses the line
+  [level.bars, level.bars2 || []].forEach((bars, lane) => { let grp = null; bars.forEach((bar, bi) => {
     const div = bar.length / 4;
     for (let c = 0; c < bar.length; c++) {
       const ch = bar[c]; if (ch === '.' || ch === '=') continue;
       let len = 0;
       if (ch === 'h') { let k = c + 1, cnt = 1; while (bar[k] === '=' || bar[k] === 'o') { cnt++; k++; } len = cnt / div; }
-      notes.push({ beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : ch === 'P' ? -0.5 : ch === 'R' ? 0.5 : 0), beat0: bi * 4 + c / div + (ch === 'Q' ? 0.5 : 0), push: ch === 'P' || ch === 'Q', grab: ch === 'R', len, late: ch === 'L' || ch === 'Q', heavy: ch === 'H', gtr: ch === 'G', jam: ch === 'j', drop: ch === 'd', up: ch === 'u', shuffle: div === 3 && c % 3 === 2, off: ch === 'P' || ch === 'R' || (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane });
+      if (ch === 'b') grp = { items: [] };
+      const note = { beat: bi * 4 + c / div + (ch === 'L' ? 0.5 : ch === 'P' ? -0.5 : ch === 'R' ? 0.5 : 0), beat0: bi * 4 + c / div + (ch === 'Q' ? 0.5 : 0), push: ch === 'P' || ch === 'Q', grab: ch === 'R', len, late: ch === 'L' || ch === 'Q', heavy: ch === 'H', gtr: ch === 'G', jam: ch === 'j', drop: ch === 'd', up: ch === 'u', shuffle: div === 3 && c % 3 === 2, off: ch === 'P' || ch === 'R' || (div === 3 && c % 3 === 2) || (div === 2 && c % 2 === 1) || (div === 4 && c % 4 === 2), top: ch === 'o', lane };
+      if ((ch === 'b' || ch === 'i') && grp) { note.grp = grp; grp.items.push(note); }
+      notes.push(note);
     }
-  }));
+  }); });
   // a swung belt: a box written on the 'and' lands two thirds into the beat
   if (level.beltSwing) notes.forEach(n => { n.beat = realBeat(n.beat, n.lane); if (n.off && swingOn(n.lane, n.beat)) n.swung = true; });
   // boxes she throws onto the lower belt (1-5's phase 2): his hand doesn't carry them
@@ -1327,6 +1332,14 @@ function loadLevel(level) {
     notes.forEach(n => { if (!n.jam) return; if (grp.length && n.beat - grp[grp.length - 1].beat > 0.51) flush(); grp.push(n); }); flush(); }
   notes.forEach(n => { n.pair = !isAuto(n) && notes.some(m => m !== n && m.lane !== n.lane && !isAuto(m) && Math.abs(m.beat - n.beat) < 1e-6); n.pair2 = n.pair && n.lane === 1; });
   notes.forEach((n, i) => prepNote(n, i, level));
+  // an X-ray box goes down whole: when its last item is at the loading end, the first is a span further on. Every item shares
+  // the box's size and set-down; the hand carries it to the middle of that span.
+  for (const gp of new Set(notes.filter(n => n.grp).map(n => n.grp))) {
+    gp.items.sort((a, b) => a.beat - b.beat);
+    const f = gp.items[0], l = gp.items[gp.items.length - 1], span = (l.arr - f.arr) * SPEED, w = Math.round(span) + 18, h = 13 + Math.floor(rnd(f.i, 2) * 4);
+    gp.place = l.place; gp.w = w; gp.h = h;
+    gp.items.forEach((n, k) => { n.place = l.place; n.carry = l.carry; n.w = w; n.h = h; n.cxOff = span / 2; n.kind = Math.floor(rnd(n.i, 5) * XRAY_ITEMS.length); });
+  }
   END_BEAT = level.bars.length * 4;
 }
 // when a box lands, when it is set down, its size, and how long the hand that loads it takes
@@ -1845,7 +1858,7 @@ function carryFrom(n) {
 }
 function carryPos(n, p) {
   const q = Math.max(0, Math.min(1, p)), f = carryFrom(n);
-  return { x: lerp(f.x, PLACE_X, q), y: lerp(f.y, BELT_Y - n.h / 2, ease(q)) - Math.sin(Math.PI * q) * f.arc };
+  return { x: lerp(f.x, PLACE_X + (n.cxOff || 0), q), y: lerp(f.y, BELT_Y - n.h / 2, ease(q)) - Math.sin(Math.PI * q) * f.arc };
 }
 const loadLane = n => n.drop ? 0 : n.up ? 1 : n.lane;   // a dropped box is loaded by the upper belt's loader, a hurled one by the lower's
 const bodyTop = (base, pose) => base + pose.dip + pose.bob + pose.nod;
@@ -2012,6 +2025,30 @@ const PARTNERS = {
       const top = bodyTop(88, pose);
       thick(BOSS_X + 7, top + 22, pose.hand.x, pose.hand.y, 4, '#d8d4cc'); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
       R(pose.hand.x - 3, pose.hand.y - 7, 6, 6, '#c3c9cd'); R(pose.hand.x - 2, pose.hand.y - 6, 4, 4, '#efe6d2'); R(pose.hand.x, pose.hand.y - 9, 1, 2, '#c3c9cd');
+    }
+  },
+  // 2-1's pilot line: an industrial arm bolted at the loading end of the near belt. It does not bob or blink; its lamp is green
+  // while it runs. Its arm bends with the elbow up and ends in a two-finger gripper.
+  robot: {
+    base: 92,
+    draw(pose, nowMs, active) {
+      const cx = BOSS_X, top = 92 + pose.dip, body = '#d9a520', bodyD = '#a87a14', steel = '#4a5057';
+      R(cx - 11, top + 52, 22, 10, steel); for (let k = 0; k < 4; k++) R(cx - 10 + k * 6, top + 52, 3, 10, '#f0c419');
+      R(cx - 7, top + 34, 14, 18, '#5d646b'); R(cx - 7, top + 34, 2, 18, '#80878e');
+      R(cx - 9, top + 26, 18, 9, body); R(cx - 9, top + 26, 18, 2, '#f0c84a'); R(cx - 9, top + 33, 18, 2, bodyD);
+      R(cx + 4, top + 28, 3, 3, active ? '#8fd694' : '#3e5a40');
+    },
+    arm(pose) {
+      const top = 92 + pose.dip, sx = BOSS_X, sy = top + 28, seg = 20;
+      let dx = pose.hand.x - sx, dy = pose.hand.y - sy, d = Math.hypot(dx, dy) || 1;
+      if (d > seg * 2 - 1) { const k = (seg * 2 - 1) / d; dx *= k; dy *= k; d = seg * 2 - 1; }
+      const hh = Math.sqrt(Math.max(0, seg * seg - d * d / 4));
+      let px = -dy / d, py = dx / d; if (py > 0) { px = -px; py = -py; }   // the elbow goes up
+      const ex = Math.round(sx + dx / 2 + px * hh), ey = Math.round(sy + dy / 2 + py * hh), hx = Math.round(sx + dx), hy = Math.round(sy + dy);
+      thick(sx, sy, ex, ey, 6, '#a87a14'); thick(sx, sy, ex, ey, 4, '#d9a520');
+      thick(ex, ey, hx, hy, 5, '#a87a14'); thick(ex, ey, hx, hy, 3, '#d9a520');
+      R(sx - 3, sy - 3, 6, 6, '#3e444a'); R(ex - 2, ey - 2, 5, 5, '#3e444a');
+      R(hx - 4, hy - 3, 8, 2, '#5d646b'); R(hx - 4, hy - 1, 2, 4, '#80878e'); R(hx + 2, hy - 1, 2, 4, '#80878e');
     }
   },
   // 김 빅토르 (stage 2): 반장's first 신입, fifteen years on. Broad, a knit beanie for the winter nights, a dark fleece under
@@ -2928,6 +2965,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   BELT_L = far && L.farBeltLeft != null ? L.farBeltLeft : 48;
   drawScannerBack(0);
   (L.daw ? drawDawTop : drawBeltTop)(beltT, active);
+  if (L.xray && L.xray.lane === lane) drawXrayPanel(t, active);
   if (L.jam) drawJamRoller(t, nowMs, active);
   if (L.beltStop) drawStopLamp(t, active);
   let holding = false;
@@ -2940,6 +2978,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
       const vl = n.drop || n.up ? (t < n.tFall ? loadLane(n) : t < n.tFall + n.fallDur ? -1 : n.lane) : n.lane;
       if (vl === -1 && lane === 1) { laneFx.dropping = laneFx.dropping || []; laneFx.dropping.push(n); continue; }
       if (vl !== lane) continue;
+      if (n.grp) { if (t >= n.place && n === n.grp.items[0]) drawXrayBox(n.grp, t, laneFx); continue; }
       if (t < n.place) break;
       let cx = n.jam && L.jam ? jamX(n, t) : n.bb != null ? SCAN_X + (beltBeat(beatAt(t), lane) - n.bb) * SPEED * SPB : noteX(n, t);
       if (n.jam && L.jam && active && !n.jamFx && t >= n.leave) { n.jamFx = true; jamSfx(n.jk === 0); }
@@ -2999,6 +3038,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   }
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160);
   const mAge = nowMs - FX.lastMiss, missF = FX.missLane === lane && (FX.missKind === 'pass' ? mAge < 420 && mAge % 210 < 120 : mAge < 220);
+  if (L.xray && L.xray.lane === lane) drawXrayHood(t, active);
   drawScannerFront(mine ? flash : 0, holding, missF, 0);
   (L.daw ? drawDawFront : drawBeltFront)(beltT); if (far) drawBeltLegs();
   BELT_L = 48;
@@ -3336,6 +3376,55 @@ function drawInspector(t, active, nowMs) {
     const pose2 = { hand: { x: BOSS_X + 9, y: 138 }, carry: null, wince: false, dip: 0, bob: walking && Math.floor(nowMs / 190) % 2 === 0 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
     drawActor('park', x, true, pose2, nowMs, active, top => { R(BOSS_X - 9, top + 25, 18, 5, '#6e4a33'); R(BOSS_X + 4, top + 2, 2, 2, '#f4f1ea'); for (let k = 0; k < 6; k++) R(BOSS_X + 5, top + 4 + k, 1, 1, '#f4f1ea'); });
   }
+}
+// ---------- 2-1 X-ray pilot line ----------
+// The near belt is a new pilot line: an industrial arm loads it and an X-ray window in front of the gate shows what is inside
+// each box. A box can hold one to three items; each item is a note, scanned as it crosses the line. Outside the window a box
+// is just a box.
+const XRAY_ITEMS = [
+  (x, y, c) => { R(x - 1, y - 5, 3, 2, c); R(x - 2, y - 3, 5, 8, c); },                               // bottle
+  (x, y, c) => { R(x - 3, y - 3, 6, 7, c); R(x - 3, y - 2, 6, 1, '#0d1d33'); },                       // can
+  (x, y, c) => { R(x - 4, y, 9, 3, c); R(x - 4, y - 3, 4, 3, c); },                                   // shoe
+  (x, y, c) => { R(x - 2, y - 4, 5, 9, c); R(x - 1, y - 3, 3, 6, '#0d1d33'); },                       // phone
+  (x, y, c) => { R(x - 3, y - 2, 5, 6, c); R(x + 2, y - 1, 2, 1, c); R(x + 3, y, 1, 2, c); R(x + 2, y + 2, 2, 1, c); },   // mug
+  (x, y, c) => { R(x - 4, y - 2, 8, 6, c); R(x - 3, y - 1, 6, 1, '#0d1d33'); R(x - 3, y + 1, 6, 1, '#0d1d33'); }          // books
+];
+function drawXrayPanel(t, active) {
+  const X = L.xray, top = BELT_Y - 21;
+  g.fillStyle = 'rgba(18,48,96,.42)'; g.fillRect(X.x0, top, X.x1 - X.x0, 21);
+  // the scan sweep: a faint line crossing the window once a beat
+  if (active && !reduce) { const ph = (beatAt(t) % 1 + 1) % 1, x = Math.round(lerp(X.x0, X.x1, ph)); g.globalAlpha = 0.25; R(x, top, 1, 21, '#8fe3f0'); g.globalAlpha = 1; }
+}
+function drawXrayHood(t, active) {
+  const X = L.xray, top = BELT_Y - 29;
+  R(X.x0 - 6, top, X.x1 - X.x0 + 6, 8, '#5d646b'); R(X.x0 - 6, top + 6, X.x1 - X.x0 + 6, 2, '#3e444a'); R(X.x0 - 6, top, X.x1 - X.x0 + 6, 1, '#80878e');
+  R(X.x0 - 6, top, 5, 29, '#4c5258'); R(X.x0 - 6, top, 1, 29, '#6a7178');
+  // a trefoil warning plate and a lamp that is on while the line runs
+  R(X.x0 + 4, top + 1, 6, 5, '#f0c419'); R(X.x0 + 6, top + 3, 2, 1, '#1b1716'); R(X.x0 + 5, top + 4, 1, 1, '#1b1716'); R(X.x0 + 8, top + 4, 1, 1, '#1b1716');
+  R(X.x0 + 14, top + 2, 3, 3, active && Math.floor(beatAt(t) * 2) % 2 === 0 ? '#8fe3f0' : '#3d6b78');
+  for (let x = X.x0 + 22; x < X.x1 - 6; x += 6) R(x, top + 3, 3, 1, '#3e444a');
+}
+function drawXrayBox(gp, t, laneFx) {
+  const f = gp.items[0], l = gp.items[gp.items.length - 1], xf = noteX(f, t), xl = noteX(l, t), x0 = Math.round(xl - 9), w = gp.w, h = gp.h, y = BELT_Y - h;
+  if (x0 > W) { if (gp.items.every(n => n.state === 'hit')) laneFx.delivered++; else laneFx.binned++; return; }
+  R(x0 + 1, BELT_Y, w, 1, 'rgba(0,0,0,.45)');
+  R(x0, y, w, h, C.kraft); R(x0, y, w, 2, C.kraftTop); R(x0 + w - 2, y + 2, 2, h - 2, C.kraftDark);
+  for (let x = x0 + 6; x < x0 + w - 4; x += 22) R(x, y, 3, h, C.tape);
+  R(x0 + w - 10, y + h - 6, 7, 4, C.label);
+  const missed = gp.items.some(n => n.state === 'miss');
+  if (missed) { g.globalAlpha = 0.3; R(x0, y, w, h, '#7a1f18'); g.globalAlpha = 1; }
+  // inside the window: the box goes dark and its items glow
+  const X = L.xray; if (!X) return;
+  const a = Math.max(x0, X.x0), b = Math.min(x0 + w, X.x1);
+  if (b <= a) return;
+  g.save(); g.beginPath(); g.rect(a, y, b - a, h); g.clip();
+  R(x0, y, w, h, '#0d1d33'); R(x0, y, w, 1, '#3d6b78'); R(x0, y + h - 1, w, 1, '#3d6b78'); R(x0, y, 1, h, '#3d6b78'); R(x0 + w - 1, y, 1, h, '#3d6b78');
+  for (const n of gp.items) {
+    const ix = Math.round(noteX(n, t)), iy = Math.round(y + h / 2), c = n.state === 'hit' ? '#5f9e66' : n.state === 'miss' ? '#ff5a4a' : '#bff3fb';
+    if (n.state === 'pending') { g.globalAlpha = 0.3; R(ix - 6, iy - 7, 13, 14, '#8fe3f0'); g.globalAlpha = 0.5; R(ix - 4, iy - 5, 9, 10, '#8fe3f0'); g.globalAlpha = 1; }
+    XRAY_ITEMS[n.kind || 0](ix, iy, c);
+  }
+  g.restore();
 }
 // ---------- 2-1 stage (the audition hall) ----------
 const LAPTOP = { x: 54, y: 112, kx: 64, ky: 121 }, PAD = { x: 314, y: 126 };
@@ -5719,7 +5808,7 @@ function buildEvents() {
   // with the stamp a bar ahead the set-down would be a third, off-grid echo of the chart: keep it to a soft touch
   // a stamped box's set-down is the stamp itself; with the stamp a bar ahead on a slow belt the set-down would be an off-grid
   // echo of the chart, so it is kept to a soft touch there
-  notes.forEach(n => { if (!n.stamp || passAt(n) - n.place > 0.05) ev.push([n.place, T => thud(T, (n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1) * (L.stampBar && L.travel > 4 ? 0.25 : 1))]); });
+  notes.forEach(n => { if (n.grp && n !== n.grp.items[0]) return; if (!n.stamp || passAt(n) - n.place > 0.05) ev.push([n.place, T => thud(T, (n.len ? 1.25 : n.heavy ? 1.5 : L.small ? 0.7 : 1) * (L.stampBar && L.travel > 4 ? 0.25 : 1))]); });
   if (L.stampBar) for (const n of notes) { if (n.stamp) ev.push([passAt(n), T => stampSnd(T)]); }
   else if (L.inspector) for (const n of notes) { if (n.top || inRange(n.beat0, L.phone)) continue; if (n.grab) { ev.push([passAt(n), T => { rim(T, 0.4); rim(T + 0.11, 0.4); }]); ev.push([n.tRel, T => roller(T, 0.06)]); } else ev.push([passAt(n), n.push ? T => { tak(T, 0.3); shoop(T); } : T => tak(T, 0.3)]); }
   return ev.sort((a, b) => a[0] - b[0]);
