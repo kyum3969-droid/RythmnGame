@@ -3863,14 +3863,8 @@ function rbCine(c, w, h, b, active) {
 function rbFront(b, bReal, nowMs, active, live) {
   if (!live) return;
   const D = L.rb, WW = MID.ww, AX = MID.ax, h = rbHeat(bReal), boom = bReal - D.boom;
-  // the motor's temperature gauge over your head: a dial, its needle climbing into the red; a beacon on top for the alarm
-  const gx = AX - 14, gy = 40;
-  R(gx - 1, gy - 1, 30, 22, '#2b2f36'); R(gx, gy, 28, 20, '#e9e2cf'); R(gx + 13, gy + 20, 2, 10, '#2b2f36');
-  for (let k = 0; k <= 10; k++) { const a = Math.PI * (1 - k / 10), r = 10; R(gx + 14 + Math.cos(a) * r - 0.5, gy + 16 - Math.sin(a) * r - 0.5, 2, 2, k >= 7 ? '#d8463b' : k >= 5 ? '#e0a43a' : '#4a7a4a'); }
-  const jit = h > 0.8 && boom < 0 ? (Math.random() - 0.5) * 0.08 : 0, na = Math.PI * (1 - Math.min(1, h + jit));
-  g.strokeStyle = '#1b1b1f'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(gx + 14, gy + 16); g.lineTo(gx + 14 + Math.cos(na) * 9, gy + 16 - Math.sin(na) * 9); g.stroke(); R(gx + 13, gy + 15, 3, 3, '#1b1b1f');
+  // (the temperature gauge over your head is gone: the heat shows in the steam, the sparks and the flicker)
   const alarm = boom >= 0.6 && bReal < D.boom + 12;
-  R(gx + 11, gy - 6, 6, 5, alarm && (bReal * 2) % 1 < 0.5 ? '#ff7a2a' : '#6a3a2a');
   // steam off the two belt motors as it heats, sparks near the top, smoke after the boom
   const motors = [AX - 44, AX + 44];
   const puffs = (x, y, n, col, a0, rise) => { for (let k = 0; k < n; k++) { const p = ((nowMs / 1100) + k / n + x * 0.013) % 1, sz = 3 + p * 7; g.fillStyle = `rgba(${col},${a0 * (1 - p)})`; g.fillRect(Math.round(x + Math.sin(p * 5 + k) * 5 - sz / 2), Math.round(y - p * rise - sz / 2), Math.round(sz), Math.round(sz)); } };
