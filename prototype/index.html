@@ -3812,11 +3812,15 @@ function drawMid(t, nowMs, active) {
       const x = noteX(n, T);
       if (n.state === 'hit') { if (x < end) drawBox(n, x, BELT_Y, '', T, T - n.hitAt < 0.1 ? 0.8 : 0); else { const dt = (x - end) / SPEED; if (dt < 0.5) { g.globalAlpha = 1 - dt / 0.5; drawBox(n, end, BELT_Y + 0.5 * 900 * dt * dt, '', T); g.globalAlpha = 1; } } continue; }
       if (n.state === 'miss') { if (x < end) drawBox(n, x, BELT_Y, 'miss', T); else { const dt = (x - end) / SPEED; if (dt < 0.6) { g.save(); g.globalAlpha = 1 - dt / 0.6; g.translate(end, BELT_Y + 0.5 * 700 * dt * dt - n.h / 2); g.rotate(dt * 5); drawBox(n, 0, n.h / 2, 'miss', T); g.restore(); } } continue; }
+      // a box with a mate on the other side (both hands at once): the two glow softly together, breathing on the beat, and a
+      // gloss runs across both at the same moment, so the pair reads by its twin; no badge on it
+      if (n.mate) { const w = n.w, h = n.h, cy = BELT_Y - h / 2, pulse = 0.6 + 0.4 * Math.max(0, 1 - (b - Math.floor(b)) * 2.5), r = w * 1.1;
+        const gl = g.createRadialGradient(x, cy, 2, x, cy, r); gl.addColorStop(0, `rgba(255,238,180,${0.62 * pulse})`); gl.addColorStop(0.55, `rgba(255,232,170,${0.25 * pulse})`); gl.addColorStop(1, 'rgba(255,232,170,0)'); g.fillStyle = gl; g.fillRect(x - r, cy - r, r * 2, r * 2); }
       drawBox(n, x, BELT_Y, '', T);
-      // a box with a mate on the other side: a bright edge and a little ◀▶ over it, bobbing on the beat
-      if (n.mate) { const w = n.w, h = n.h, x0 = Math.round(x - w / 2), y0 = BELT_Y - h, bob = Math.max(0, 1 - (b - Math.floor(b)) * 4) > 0.5 ? 1 : 0, ty = y0 - 7 - bob, cx = Math.round(x);
-        g.strokeStyle = '#fff3a8'; g.lineWidth = 1; g.strokeRect(x0 - 0.5, y0 - 0.5, w + 1, h + 1);
-        R(cx - 7, ty, 1, 1, '#fff3a8'); R(cx - 6, ty - 1, 1, 3, '#fff3a8'); R(cx - 5, ty - 2, 1, 5, '#fff3a8'); R(cx + 4, ty - 2, 1, 5, '#fff3a8'); R(cx + 5, ty - 1, 1, 3, '#fff3a8'); R(cx + 6, ty, 1, 1, '#fff3a8'); }
+      if (n.mate) { const w = n.w, h = n.h, x0 = Math.round(x - w / 2), y0 = BELT_Y - h, ph = b - Math.floor(b);
+        R(x0, y0, w, 1, '#fff4d0'); R(x0, y0 + h - 1, w, 1, 'rgba(255,244,208,.5)');
+        if (ph < 0.6) { const sx = x0 - 6 + (ph / 0.6) * (w + 12); g.save(); g.beginPath(); g.rect(x0, y0, w, h); g.clip(); g.globalAlpha = 0.55 * Math.sin(Math.PI * ph / 0.6);
+          g.fillStyle = '#fffbe8'; g.beginPath(); g.moveTo(sx, y0); g.lineTo(sx + 4, y0); g.lineTo(sx - 2, y0 + h); g.lineTo(sx - 6, y0 + h); g.closePath(); g.fill(); g.restore(); } }
     }
     if (!up && q === 0 && held) drawBox(held.n, held.x, held.y + held.n.h / 2, '', T);
     drawBeltFront(L.rb ? rbBeltT(T) : T, live); if (up) drawBeltLegs();
