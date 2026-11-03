@@ -3605,25 +3605,28 @@ function drawPlayer(kick, nowMs, showLegs = true) {
 }
 function drawGun(gx, gy, kick) { RookieArt.drawTool(g, gx, gy, kick); }
 function drawPlayerSleeve(sx, sy, hx, hy) { RookieArt.drawSleeve(g, sx, sy, hx, hy); }
-// two belts: the arm up to the upper belt's scanner is the far arm, drawn before the body so it rises from behind the torso
-// (both from the near shoulder it read as a third arm)
-function drawPlayerUpperArm(kick, nowMs) {
-  if (L.daw || L.lanes !== 2 || (L.coScanner && DUO.mode === 'one')) return;
-  const top = playerTop(kick, nowMs), fl = nowMs - FX.flinch;
-  const upperMotion = rookieScan(1, lastPressUpper, nowMs, notes.some(n => n.lane === 0 && n.state === 'holding'));
-  RookieArt.drawUpperArm(g, PLAYER_X, top, fl, upperMotion, true);
-}
+// one arm. On two belts it goes up to the upper belt's scanner for an upper box (already on its way as the box comes) and
+// back down for a lower one
 function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
   const top = playerTop(kick, nowMs), fl = nowMs - FX.flinch, cx = PLAYER_X + (fl < 160 ? 1 : 0);
   if (L.daw) { drawPadArm(kick, nowMs, top, twoHands); return; }
   const lowerLane = L.lanes === 2 ? 1 : 0;
   const motion = rookieScan(0, lastPress, nowMs, notes.some(n => n.lane === lowerLane && n.state === 'holding'));
+  const upperMotion = rookieScan(1, lastPressUpper, nowMs, L.lanes === 2 && notes.some(n => n.lane === 0 && n.state === 'holding'));
   const upper = L.lanes === 2 && (!L.coScanner || DUO.mode !== 'one');
+  let up = 0;
+  if (upper) {
+    const T = state === 'play' ? songAt(nowMs) : -1;
+    const nx = T > 0 ? notes.find(n => n.state === 'pending' && n.arr > T - 0.05 && n.arr - T < 0.32) : null;
+    const want = nx ? (nx.lane === 0 ? 1 : 0) : (lastPressUpper > lastPress ? 1 : 0);
+    const dt = Math.min(0.1, Math.max(0, (nowMs - (FX.upAt || nowMs)) / 1000)); FX.upAt = nowMs;
+    FX.upK = (FX.upK || 0) + (want - (FX.upK || 0)) * Math.min(1, dt * 16); up = FX.upK;
+  }
   if (twoHands && !upper) {
     const grip = RookieArt.gripPosition(PLAYER_X, top, kick, fl, motion);
     if (grip) drawPlayerSleeve(cx - 4, top + 24, grip.x + 1, grip.y + 1.5);
   }
-  RookieArt.drawMainArm(g, PLAYER_X, top, kick, fl, motion);
+  RookieArt.drawArm(g, PLAYER_X, top, fl, upper && lastPressUpper > lastPress ? upperMotion : motion, up);
 }
 
 // belt top doubles as a beat grid: bright paint = beat, mid = 8th, dim = 16th
@@ -5082,8 +5085,10 @@ function drawMid(t, nowMs, active) {
   if (!marco.up) drawMarco();
   // you face the side you last scanned: the right line's box, and you turn your head (the whole of you, mirrored about your
   // spot) to the right; a box on the left turns you back. Both at once keeps you as you were
-  const pr0 = QUADFX.press[0], pr1 = QUADFX.press[1];
-  if (Math.abs(pr1 - pr0) > 30) FX.faceR = pr1 > pr0;
+  // (you turn as the box comes, so the turn is done by the time you scan it)
+  const pr0 = QUADFX.press[0], pr1 = QUADFX.press[1], nxq = live && M.zoom && b >= M.zoom[0] ? notes.find(n => n.quad && n.state === 'pending' && n.arr > T - 0.05 && n.arr - T < 0.3) : null;
+  if (nxq && !(nxq.mate && nxq.mate.state === 'pending')) FX.faceR = nxq.q === 1;
+  else if (!nxq && Math.abs(pr1 - pr0) > 30) FX.faceR = pr1 > pr0;
   if (!live) FX.faceR = false;
   if (FX.faceR) { g.save(); g.translate(2 * AX, 0); g.scale(-1, 1); drawPlayer(Math.max(pk(0), pk(1)), nowMs); g.restore(); }
   else drawPlayer(Math.max(pk(0), pk(1)), nowMs);
@@ -5111,15 +5116,16 @@ function drawMid(t, nowMs, active) {
   for (let k = 0; k < Math.min(8, Math.floor(done / 16)); k++) R(AX - 16 + (k % 4) * 8, 170 - Math.floor(k / 4) * 6, 7, 6, C.kraft);
   // your guns: each hand at its side's lower scanner, or up at the upper one when the next box on that side is up there
   const top = playerTop(0, nowMs), open = b >= M.zoom[0];
-  for (const q of [0, 1]) {
-    if (q === 1 && !open) continue;
-    const nx = live ? notes.find(n => n.quad && n.q === q && n.state === 'pending' && n.arr > T - 0.15) : null, upAim = nx && nx.up && nx.arr - T < 0.6;
+  // one arm, on the side you face: up to that side's upper scanner when its next box is up there, swinging between
+  { const q = FX.faceR && open ? 1 : 0;
+    const nx = live ? notes.find(n => n.quad && n.q === q && n.state === 'pending' && n.arr > T - 0.15) : null, want = nx && nx.up && nx.arr - T < 0.6 ? 1 : 0;
+    const dt = Math.min(0.1, Math.max(0, (nowMs - (FX.midUpAt || nowMs)) / 1000)); FX.midUpAt = nowMs;
+    if (FX.midUpQ !== q) { FX.midUpQ = q; FX.midUpK = want; }
+    FX.midUpK = (FX.midUpK || 0) + (want - (FX.midUpK || 0)) * Math.min(1, dt * 16);
     g.save(); if (q) { g.translate(WW, 0); g.scale(-1, 1); }
     const motion = rookieScan(2 + q, QUADFX.press[q], nowMs, notes.some(n => n.quad && n.q === q && n.state === 'holding'));
-    if (upAim) RookieArt.drawUpperArm(g, AX, top, nowMs - FX.flinch, motion);
-    else RookieArt.drawMainArm(g, AX, top, pk(q), nowMs - FX.flinch, motion);
-    g.restore();
-  }
+    RookieArt.drawArm(g, AX, top, nowMs - FX.flinch, motion, FX.midUpK);
+    g.restore(); }
   drawParticles(nowMs);
   if (L.rb) rbFront(b, bReal, nowMs, active, live);
   if (L.ht) htFront(b, bReal, nowMs, active, live);
@@ -6421,7 +6427,6 @@ function drawScene(t, bt, active, nowMs) {
   if (L.inspector) drawInspector(t, active, nowMs);
   if (L.bossSeat && L.lanes !== 2) drawBossSeat(castBeatAt(t, active), nowMs, active);
   if (L.visit && active) drawVisit(beatAt(t), nowMs);
-  drawPlayerUpperArm(kick, nowMs);
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
   if (L.toss && active) drawTosses(t);

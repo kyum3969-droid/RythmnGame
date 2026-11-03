@@ -87,21 +87,20 @@
     drawLayer(g, frame, frame.body, x, top, flinchAge);
     g.restore();
   }
-  function rigPose(x, top, flinchAge, motion, upper = false) {
+  // up: 0 the lower belt's scanner, 1 the upper one's, anything between while the one arm swings from one to the other
+  function rigPose(x, top, flinchAge, motion, up = 0) {
+    up = Math.max(0, Math.min(1, +up));
     const frame = definitions[1], sy = (80 - (top - 94)) / 679;
     const point = ([px, py]) => ({ x: x + (flinchAge < 160 ? 1 : 0) + (px - frame.anchor) * SCALE, y: FLOOR - (704 - py) * sy });
     const shoulder = point(joints.shoulder), reach = motion.reach;
-    // The upper belt's arm is the far one: it rises from the far shoulder, behind the torso.
-    if (upper) { shoulder.x += 5; shoulder.y -= 1; }
-    // The lower belt's box passes the gate below the chest: the hand drops and the scanner tips down-left onto it.
-    const target = upper ? point([998 - 64 * reach, 274 - 8 * reach]) : { x: shoulder.x - 8 - 5 * reach, y: shoulder.y + 9 + 2 * reach };
-    // The far conveyor is higher; its second arm keeps a fixed, longer reach.
-    // Bone lengths remain constant through each lane's animation.
-    const stretch = upper ? 1.75 : 1;
-    if (upper) { target.x = x - 18 - reach * 4; target.y = top - 5; }
+    // Lower: the box passes the gate below the chest, so the hand drops and the scanner tips down-left onto it.
+    // Upper: the far conveyor is higher; the arm rises and reaches further (longer bones, constant through the scan).
+    const lo = { x: shoulder.x - 8 - 5 * reach, y: shoulder.y + 9 + 2 * reach }, hi = { x: x - 18 - reach * 4, y: top - 5 };
+    const target = { x: lo.x + (hi.x - lo.x) * up, y: lo.y + (hi.y - lo.y) * up };
+    const stretch = 1 + 0.75 * up;
     const boneLength = (a, b) => Math.hypot((b[0] - a[0]) * SCALE, (b[1] - a[1]) * sy) * stretch;
-    const solved = RookieRig.solveTwoBone(shoulder, target, boneLength(joints.shoulder, joints.elbow), boneLength(joints.elbow, joints.wrist), upper ? 1 : -1);
-    const angle = upper ? (motion.tilt || 0) : -0.12 - 0.32 * reach;
+    const solved = RookieRig.solveTwoBone(shoulder, target, boneLength(joints.shoulder, joints.elbow), boneLength(joints.elbow, joints.wrist), -1);
+    const angle = (-0.12 - 0.32 * reach) * (1 - up) + (motion.tilt || 0) * up;
     const mx = (846 - joints.wrist[0]) * SCALE, my = (228 - joints.wrist[1]) * sy;
     const muzzle = { x: solved.wrist.x + mx * Math.cos(angle) - my * Math.sin(angle), y: solved.wrist.y + mx * Math.sin(angle) + my * Math.cos(angle) };
     return { ...solved, angle, muzzle, pulse: motion.pulse || 0, sy };
@@ -143,11 +142,12 @@
   function drawMainArm(g, x, top, kick, flinchAge, motion = staticMotion(kick)) {
     drawRig(g, rigPose(x, top, flinchAge, motion));
   }
-  function drawUpperArm(g, x, top, flinchAge, motion, far = false) {
-    // Drawn behind the body as the far arm, a shade darker.
-    if (far) { g.save(); g.filter = 'brightness(0.78)'; }
-    drawRig(g, rigPose(x, top, flinchAge, motion, true));
-    if (far) g.restore();
+  function drawUpperArm(g, x, top, flinchAge, motion) {
+    drawRig(g, rigPose(x, top, flinchAge, motion, 1));
+  }
+  // the one arm, anywhere between the lower scanner (0) and the upper one (1)
+  function drawArm(g, x, top, flinchAge, motion, up) {
+    drawRig(g, rigPose(x, top, flinchAge, motion, up));
   }
   function gripPosition(x, top, kick, flinchAge, motion = staticMotion(kick)) {
     return rigPose(x, top, flinchAge, motion).wrist;
@@ -173,5 +173,5 @@
     if (kick <= 0.2) { g.fillStyle = '#ff4a3d'; g.fillRect(gx - 9.5, gy - 1.5, 1.5, 2.5); }
     g.restore();
   }
-  window.RookieArt = { ready, drawBody, drawMainArm, drawUpperArm, drawSleeve, drawTool, gripPosition, rigPose };
+  window.RookieArt = { ready, drawBody, drawMainArm, drawUpperArm, drawArm, drawSleeve, drawTool, gripPosition, rigPose };
 })();
