@@ -1012,10 +1012,10 @@ const LEVELS = [
       fuse: [136, 168], dawn: [136, 380], sun: [340, 384], left: [10, 1240, 352] },
     mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 136, guide: [-9, -8], tags: [-9, -8, -7],
       shouts: [[136, 'hey', '헤이!'], [284, 'hey', '가즈아~!'], [352, 'none', '마지막!']],
-      route: [[0, "rl"], [6.5, "ru"], [14.5, "rl"], [22.5, "ru"], [26.5, "rl"], [38.5, "ru"], [42.5, "rl"], [62.5, "ru"], [72.5, "lk"], [83, "lu"], [87, "ru"], [91, "rl"], [95, "ll"], [101, "bx"], [108.5, "lk"], [118.5, "rl"], [134.5, "rl"], [150.5, "ru"], [166.5, "rl"], [182.5, "ru"], [198.5, "rl"], [202.5, "lu"], [206.5, "rl"], [210.5, "lu"], [214.5, "rl"], [218.5, "lu"], [222.5, "rl"], [226.5, "lu"], [230.5, "rl"], [234.5, "lu"], [238.5, "rl"], [242.5, "lu"], [246.5, "rl"], [250.5, "lu"], [254.5, "rl"], [258.5, "lu"], [262.5, "rl"], [266.5, "lu"], [270.5, "rl"], [274.5, "lu"], [278.5, "rl"]],
+      route: [[0, "rl"], [10.5, "ru"], [14.5, "rl"], [22.5, "ru"], [26.5, "rl"], [38.5, "ru"], [42.5, "rl"], [62.5, "ru"], [72.5, "lk"], [83, "lu"], [87, "ru"], [91, "rl"], [95, "ll"], [101, "bx"], [108.5, "lk"], [118.5, "rl"], [134.5, "rl"], [150.5, "ru"], [166.5, "rl"], [182.5, "ru"], [198.5, "rl"], [202.5, "lu"], [206.5, "rl"], [210.5, "lu"], [214.5, "rl"], [218.5, "lu"], [222.5, "rl"], [226.5, "lu"], [230.5, "rl"], [234.5, "lu"], [238.5, "rl"], [242.5, "lu"], [246.5, "rl"], [250.5, "lu"], [254.5, "rl"], [258.5, "lu"], [262.5, "rl"], [266.5, "lu"], [270.5, "rl"], [274.5, "lu"], [278.5, "rl"]],
       bars: [
-        '1.......................1.......................', '1...........2...........1...........2...........',
-        '1...........4...................................', '........................1...........4...........',
+        '................................................', '................................................',
+        '................................................', '........................1...........4...........',
         '1...........2...........1...........2...........', '1...........2...........1...........2...........',
         '1...........4...........1...........4...........', 'x...........4...........1...........4...........',
         '1...........2...........1...........2...........', '1...........2...........1...........2...........',
@@ -1087,7 +1087,8 @@ const LEVELS = [
       { who:'반장', text:'(돌아보지 않는다) 너 다른 라인으로 전환 요청했다. 그렇게 알아라.', scene:'office' },
       { who:'마르코', text:'……', scene:'office' },
       { who:'마르코', text:'…알겠어요.', scene:'office' },
-      { who:'', text:'마르코는 캔 하나를 라디오 옆에 두고 자리로 갔다.', scene:'office', office: { b: 150, bm: true, m: 246, cans: 1 } }],
+      { who:'', text:'마르코는 캔 하나를 라디오 옆에 두고 자리로 갔다.', scene:'office', office: { b: 150, bm: true, m: 246, cans: 1 } },
+      { who:'', text:'3라인. 둘은 말없이 각자 자리에 섰다.', scene:'line' }],
     outro: good => good ? [
       { who:'', text:'새벽 5시 52분. 잔량 0.' },
       { who:'', text:'반장이 일어나 게시판으로 갔다. 종이를 떼어, 반으로 접고, 한 번 더 접어 주머니에 넣었다. 아무도 말하지 않았다.' },
@@ -4867,7 +4868,7 @@ function htLake(nowMs, dn, sunY) {
 // notice board with the request on it, 마르코's boombox (unplugged until he plugs it back in), the backlog on its board
 function htBack(b, bReal, nowMs, active, live) {
   const D = L.ht, WW = MID.ww, bb = live ? bReal : 0, t = nowMs / 1000;
-  const cold = !live ? 0 : bb < D.song ? 1 : htClamp(1 - (bb - D.song) / (D.fuse[0] - D.song));
+  const cold = !live || bb < D.song ? 1 : htClamp(1 - (bb - D.song) / (D.fuse[0] - D.song));
   if (cold > 0) { g.fillStyle = `rgba(26,52,110,${0.18 * cold})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
   const fw = live ? WW / 2 * htFuse(bb) : 0;
   if (fw > 0) {
@@ -9193,7 +9194,7 @@ addEventListener('keydown', e => {
   if (state !== 'play' && onButton) return;
   e.preventDefault();
   if (e.repeat) return;
-  if (quadKeys()) { const q = (L.mid ? MID_KEYS : QUAD_KEYS)[e.code]; if (q == null) return; held.set(e.code, 100 + q); press(e.timeStamp, e.code, 100 + q); return; }
+  if (quadKeys() && !HOLD.on && !(state === 'play' && dlg)) { const q = (L.mid ? MID_KEYS : QUAD_KEYS)[e.code]; if (q == null) return; held.set(e.code, 100 + q); press(e.timeStamp, e.code, 100 + q); return; }
   const side = LEFT_KEYS.has(e.code) ? 'L' : 'R', lane = laneOf(side);
   held.set(e.code, lane); press(e.timeStamp, e.code, lane);
 });
