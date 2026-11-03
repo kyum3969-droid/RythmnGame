@@ -91,6 +91,8 @@
     const frame = definitions[1], sy = (80 - (top - 94)) / 679;
     const point = ([px, py]) => ({ x: x + (flinchAge < 160 ? 1 : 0) + (px - frame.anchor) * SCALE, y: FLOOR - (704 - py) * sy });
     const shoulder = point(joints.shoulder), reach = motion.reach;
+    // The upper belt's arm is the far one: it rises from the far shoulder, behind the torso.
+    if (upper) { shoulder.x += 5; shoulder.y -= 1; }
     // The lower belt's box passes the gate below the chest: the hand drops and the scanner tips down-left onto it.
     const target = upper ? point([998 - 64 * reach, 274 - 8 * reach]) : { x: shoulder.x - 8 - 5 * reach, y: shoulder.y + 9 + 2 * reach };
     // The far conveyor is higher; its second arm keeps a fixed, longer reach.
@@ -141,8 +143,11 @@
   function drawMainArm(g, x, top, kick, flinchAge, motion = staticMotion(kick)) {
     drawRig(g, rigPose(x, top, flinchAge, motion));
   }
-  function drawUpperArm(g, x, top, flinchAge, motion) {
+  function drawUpperArm(g, x, top, flinchAge, motion, far = false) {
+    // Drawn behind the body as the far arm, a shade darker.
+    if (far) { g.save(); g.filter = 'brightness(0.78)'; }
     drawRig(g, rigPose(x, top, flinchAge, motion, true));
+    if (far) g.restore();
   }
   function gripPosition(x, top, kick, flinchAge, motion = staticMotion(kick)) {
     return rigPose(x, top, flinchAge, motion).wrist;
