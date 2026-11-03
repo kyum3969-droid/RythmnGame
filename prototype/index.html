@@ -3599,12 +3599,144 @@ function rookieScan(slot, pressAt, nowMs, holding) {
   scan.motion.setHolding(holding, nowMs);
   return scan.motion.sample(nowMs);
 }
+// ---------- the rookie at the game's own dot size (after the approved artwork: messy black hair, the hood bunched behind the
+// neck, a lime vest with the reflective band, the ID badge and the pocket, dark trousers with knee patches, brown boots), in
+// the same palette as everyone else. Facing left; drawn from rows of letters, one per dot. The hi-res artwork stays reachable
+// with ?art=hires (RookieArt). The arm is a two-bone limb on RookieArt's rig (same joints and aim), drawn as thick dots.
+const ROOKIE_ROWS = [
+  '..........K...K....K......',
+  '..........KK.KKK..KKK.....',
+  '.........KKKKKKKKKKKKK....',
+  '........KKKKKKKKKKKKKKK...',
+  '.....K.KKKKKkkkKKKKKKKK...',
+  '.....KKKKKkkKKKKKKKKKKKK..',
+  '......KKKKKKKKKKKKKKKKKKK.',
+  '.....KKKKKKKKKKKKKKKKKKKK.',
+  '....KKKKKKKKKKKKKKKKKKKKKK',
+  '......KKSKSSKKKKKKKKKKKKKK',
+  '......KKSSSSSSKKKKKKKKKKK.',
+  '.......KSSSSSSSKKKKKKKKKK.',
+  '........KKKSSSSSKKKKKKKK..',
+  '........SEwSSSSSKKSSsKKK..',
+  '........SEESSSSSSSSssSKK..',
+  '.......SSEESSSSSSSSsSK....',
+  '.......SSSSSSSSSSSSsSK....',
+  '........SSSSSSSSSSSSK.....',
+  '........SSSssSSSSSSS......',
+  '.........SSSSSSSssHHHHh...',
+  '..........sssssHHHHHHHHh..',
+  '..........hjjjhHHHHHHHHHh.',
+  '.........HHHHHHHHHHHHhHHHh',
+  '.........HHHHHHHHHHHHhHHHh',
+  '.........HVVVVVVVVVvHHhhHh',
+  '.........HVVVVVVVVVvHHHhhh',
+  '.........HVVVVVVVVVvHHHhhh',
+  '.........VVVVVVVVVVvHHHhhh',
+  '.........VVVVVIIIIVvHHHhh.',
+  '.........VVVVVIiIIVvHHhhh.',
+  '.........VVVVVIiIIVvhhhhh.',
+  '.........VVVVVIIIIVvhhhhh.',
+  '.........VVVVVVVVVVvHhhhh.',
+  '.........VVVVVVVVVVvHhhhh.',
+  '.........VVVVVVVVVVvHhhhh.',
+  '.........VVVVVVVVVVvHHhhh.',
+  '.........WWWWWWWWWWWHHhhh.',
+  '.........WWWWWWWWWWWHHHhh.',
+  '.........VVVVVVVVVVvHHHhh.',
+  '........VVVVVVVVVVVvhHHhh.',
+  '........VVVVhhhhhhhvhHHhh.',
+  '........VVVVvvvvvvvvhHHhh.',
+  '........VVVVvvvhvvvvhHHhh.',
+  '........VVVVvvvhvvvvhHHhh.',
+  '........VVVVvvvvvvvvhHHHh.',
+  '........VVVVVVVVVVVVhHHHh.',
+  '........hhhhhhhhhhhhhhhh..',
+  '........HHHHHHHHHHHHHHHh..',
+  '........hhhhhhhhhhhhhhhh..',
+  '.........PPPPPPPPPPPPPPP..',
+  '.........PPPPPPPPPPPPPPP..',
+  '.........PPPPPPPPPPPPPPP..',
+  '.........PPPPPPPPPPPPPPP..',
+  '.........PPPPPPPPPPPPPPP..',
+  '.........PPPPPPPPPPPPPPP..',
+  '........PPPPhh..PPPPPPh...',
+  '........PPPPhh..PPPPPPh...',
+  '........PPPPhh..PPPPPPh...',
+  '........PPPPhh..PPPPPPh...',
+  '........PPPPhh..PPPPPPh...',
+  '........pppphh..PPPPPPh...',
+  '........pppphh..PPPPPPh...',
+  '........pppphh..PPpppph...',
+  '........PPPPhh..PPpppph...',
+  '........PPPPhh..PPpppph...',
+  '........PPPPhh..PPpppph...',
+  '........PPPPhh..PPPPPPh...',
+  '.......PPPPh....PPPPPPh...',
+  '.......PPPPh....PPPPPPh...',
+  '.......PPPPh....PPPPPPh...',
+  '.......PPPPh....PPPPPPh...',
+  '.......PPPPh....PPPPPPh...',
+  '.......PPPPh....PPPPPPh...',
+  '.......PPPPh....PPPPPPh...',
+  '.......PPPPh....PPPPPPh...',
+  '.......PPPPh....PPPPPPh...',
+  '.......PPPPh....PPPPPPh...',
+  '.bbbbbbbbbbb...bbbbbbbbbb.',
+  '.BBBBBBBBbbb...BBBBBBBbbb.',
+  '.BBBBBBBBbbb...BBBBBBBbbb.',
+  '.BBBBBBBBbbb...BBBBBBBbbb.',
+  'BBBBBBBBBbbb...BBBBBBBbbb.',
+  'BBBBBBBBBbbb...BBBBBBBbbb.',
+  'OOOOOOOOOOOO...OOOOOOOOOO.'];
+const ROOKIE_Y0 = -8, ROOKIE_X0 = -17;   // the first row's offset from `top` (its soles on the floor), the first column's from your spot
+const ROOKIE_PAL = { K: C.hairDark, k: '#3d3846', S: C.skin, s: C.skinDark, E: C.ink, w: '#ffffff', H: C.hoodie, h: '#223a41', j: '#3e6672',
+  V: C.vest2, v: '#a9bb34', W: C.reflect, I: '#f4f4ee', i: '#4a4a52', P: '#26262c', p: '#3c3c46', B: '#71492e', b: '#4c301d', O: '#1c1816' };
+const ROOKIE_CV = {};
+function rookieCanvas(kind) {
+  if (ROOKIE_CV[kind]) return ROOKIE_CV[kind];
+  const w = ROOKIE_ROWS[0].length, h = ROOKIE_ROWS.length, cv = document.createElement('canvas'); cv.width = w; cv.height = h; const c = cv.getContext('2d');
+  ROOKIE_ROWS.forEach((row, y) => [...row].forEach((ch, x) => { if (ch === '.') return; c.fillStyle = ROOKIE_PAL[ch]; c.fillRect(x, y, 1, 1); }));
+  if (kind === 'flinch') {   // a miss: the eye squeezed shut under a worried brow, a drop of sweat
+    const ex = 9, ey = 13; c.fillStyle = C.skin; c.fillRect(ex, ey, 2, 3); c.fillStyle = C.ink; c.fillRect(ex, ey + 1, 2, 1);
+    c.fillStyle = C.hairDark; c.fillRect(ex, ey - 1, 1, 1); c.fillRect(ex + 1, ey - 2, 2, 1); c.fillStyle = C.sweat; c.fillRect(ex + 12, ey - 4, 2, 3); }
+  return (ROOKIE_CV[kind] = cv);
+}
+const RookieDots = {
+  ready: RookieArt.ready,
+  drawBody(g, x, top, kick, flinchAge, showLegs = true) {
+    const cv = rookieCanvas(flinchAge < 500 ? 'flinch' : 'body'), dx = Math.round(x + ROOKIE_X0 + (flinchAge < 160 ? 1 : 0)), dy = Math.round(top + ROOKIE_Y0);
+    const hh = showLegs ? cv.height : 51;
+    g.save(); g.imageSmoothingEnabled = false; g.drawImage(cv, 0, 0, cv.width, hh, dx, dy, cv.width, hh); g.restore();
+  },
+  // the scanner in the hand: a dark body and grip, its light red until it fires (green), tipped by the aim
+  drawToolAt(g, wx, wy, angle, lit) {
+    g.save(); g.translate(Math.round(wx), Math.round(wy)); g.rotate(Math.round(angle / 0.13) * 0.13);
+    g.fillStyle = '#2d2f33'; g.fillRect(-9, -4, 10, 4); g.fillRect(-2, 0, 3, 4); g.fillStyle = '#45484e'; g.fillRect(-9, -4, 10, 1);
+    g.fillStyle = lit ? C.ok : C.laser; g.fillRect(-10, -3, 2, 2);
+    g.fillStyle = C.skin; g.fillRect(-1, -1, 4, 4); g.fillStyle = C.skinDark; g.fillRect(-1, 2, 4, 1);
+    g.restore();
+  },
+  drawArmPose(g, p) {
+    thick(p.shoulder.x, p.shoulder.y, p.elbow.x, p.elbow.y, 5, C.hoodie); thick(p.elbow.x, p.elbow.y, p.wrist.x, p.wrist.y, 4, C.hoodie);
+    R(p.wrist.x - 1, p.wrist.y - 2, 3, 4, '#223a41');
+    RookieDots.drawToolAt(g, p.wrist.x - 1, p.wrist.y, p.angle, p.pulse > 0.1);
+    if (p.pulse > 0.01) { g.save(); g.translate(p.muzzle.x, p.muzzle.y); g.rotate(p.angle); g.globalAlpha = p.pulse * 0.5; g.fillStyle = '#b5ed77';
+      g.beginPath(); g.moveTo(-2, -1); g.lineTo(-13, 1); g.lineTo(-13, 7); g.closePath(); g.fill(); g.globalAlpha = p.pulse; g.fillRect(-13, 1, 1, 6); g.restore(); }
+  },
+  drawArm(g, x, top, flinchAge, motion, up) { RookieDots.drawArmPose(g, RookieArt.rigPose(x, top, flinchAge, motion, up)); },
+  drawMainArm(g, x, top, kick, flinchAge, motion) { RookieDots.drawArm(g, x, top, flinchAge, motion || { reach: Math.max(0, Math.min(1, kick)), pulse: kick > 0.2 ? 1 : 0, tilt: 0 }, 0); },
+  drawUpperArm(g, x, top, flinchAge, motion) { RookieDots.drawArm(g, x, top, flinchAge, motion, 1); },
+  gripPosition(x, top, kick, flinchAge, motion) { return RookieArt.rigPose(x, top, flinchAge, motion || { reach: kick, pulse: 0, tilt: 0 }, 0).wrist; },
+  drawSleeve(g, sx, sy, hx, hy) { thick(sx, sy, hx, hy, 4, C.hoodie); },
+  drawTool(g, gx, gy, kick) { RookieDots.drawToolAt(g, gx + 1, gy + 1, 0, kick > 0.2); },
+};
+const ROOKIE = /[?&]art=hires/.test(location.search) ? RookieArt : RookieDots;
 const playerTop = (kick, nowMs) => 94 + (nowMs - FX.playerNod < 160 ? 2 : 0);
 function drawPlayer(kick, nowMs, showLegs = true) {
-  RookieArt.drawBody(g, PLAYER_X, playerTop(kick, nowMs), kick, nowMs - FX.flinch, showLegs);
+  ROOKIE.drawBody(g, PLAYER_X, playerTop(kick, nowMs), kick, nowMs - FX.flinch, showLegs);
 }
-function drawGun(gx, gy, kick) { RookieArt.drawTool(g, gx, gy, kick); }
-function drawPlayerSleeve(sx, sy, hx, hy) { RookieArt.drawSleeve(g, sx, sy, hx, hy); }
+function drawGun(gx, gy, kick) { ROOKIE.drawTool(g, gx, gy, kick); }
+function drawPlayerSleeve(sx, sy, hx, hy) { ROOKIE.drawSleeve(g, sx, sy, hx, hy); }
 // one arm. On two belts it goes up to the upper belt's scanner for an upper box (already on its way as the box comes) and
 // back down for a lower one
 function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
@@ -3623,10 +3755,10 @@ function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
     FX.upK = (FX.upK || 0) + (want - (FX.upK || 0)) * Math.min(1, dt * 16); up = FX.upK;
   }
   if (twoHands && !upper) {
-    const grip = RookieArt.gripPosition(PLAYER_X, top, kick, fl, motion);
+    const grip = ROOKIE.gripPosition(PLAYER_X, top, kick, fl, motion);
     if (grip) drawPlayerSleeve(cx - 4, top + 24, grip.x + 1, grip.y + 1.5);
   }
-  RookieArt.drawArm(g, PLAYER_X, top, fl, upper && lastPressUpper > lastPress ? upperMotion : motion, up);
+  ROOKIE.drawArm(g, PLAYER_X, top, fl, upper && lastPressUpper > lastPress ? upperMotion : motion, up);
 }
 
 // belt top doubles as a beat grid: bright paint = beat, mid = 8th, dim = 16th
@@ -5124,7 +5256,7 @@ function drawMid(t, nowMs, active) {
     FX.midUpK = (FX.midUpK || 0) + (want - (FX.midUpK || 0)) * Math.min(1, dt * 16);
     g.save(); if (q) { g.translate(WW, 0); g.scale(-1, 1); }
     const motion = rookieScan(2 + q, QUADFX.press[q], nowMs, notes.some(n => n.quad && n.q === q && n.state === 'holding'));
-    RookieArt.drawArm(g, AX, top, nowMs - FX.flinch, motion, FX.midUpK);
+    ROOKIE.drawArm(g, AX, top, nowMs - FX.flinch, motion, FX.midUpK);
     g.restore(); }
   drawParticles(nowMs);
   if (L.rb) rbFront(b, bReal, nowMs, active, live);
