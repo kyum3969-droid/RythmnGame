@@ -4760,14 +4760,14 @@ function epiPress() { const now = performance.now(); if (now - EPI.skipAt < 2000
 // a value along keyframes [[t, ...values]], eased between them
 function keyAt(K, t) { if (t <= K[0][0]) return K[0].slice(1); for (let i = 1; i < K.length; i++) if (t < K[i][0]) { const a = K[i - 1], b = K[i], e = ease((t - a[0]) / (b[0] - a[0])); return a.slice(1).map((v, j) => lerp(v, b[j + 1], e)); } return K[K.length - 1].slice(1); }
 const mixC = (a, b, k) => { const p = x => [parseInt(x.slice(1, 3), 16), parseInt(x.slice(3, 5), 16), parseInt(x.slice(5, 7), 16)], A = p(a), B = p(b); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], k))).join(',')})`; };
-// the 포장마차 at dawn, small, in the middle of a nightlife street: blocks hung with shop signs (HOF, PC, BAR, 24, KTV,
-// vertical banners) whose neon goes out one by one as the day comes, a utility pole and sagging wires, the night's rubbish
+// the 포장마차 at dawn, small, on the near pavement of a nightlife street: across the road, blocks hung with shop signs (HOF,
+// PC, BAR, 24, a vertical banner) whose neon goes out one by one as the day comes, a utility pole and sagging wires, the night's rubbish
 // bags at the curb, a corner convenience store, a wet road. The still parts are drawn once (the street in a night and a dawn
 // palette, crossfaded as it gets light; the tent), the signs, lights, steam, the taxi and the two of them every frame.
 const POCHA_CV = {};
 // the shop signs: [x, y, text, rgb, vertical, the dawn at which it goes out]
 const POCHA_SIGNS = [[8, 66, 'HOF', '255,150,60', false, 0.35], [44, 34, 'BAR', '255,80,140', true, 0.6], [64, 58, 'PC', '90,220,255', false, 0.25], [82, 82, '24', '120,255,140', false, 0.95],
-  [280, 40, 'KTV', '200,120,255', true, 0.5], [300, 60, 'BAR', '255,80,140', false, 0.7], [338, 50, 'HOF', '255,190,80', false, 0.4]];
+  [300, 60, 'BAR', '255,80,140', false, 0.7], [338, 50, 'HOF', '255,190,80', false, 0.4]];
 function pochaLayer(kind) {
   if (POCHA_CV[kind]) return POCHA_CV[kind];
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g0 = g; g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
@@ -4789,6 +4789,9 @@ function pochaLayer(kind) {
     for (let x = 104; x < 280; x += 11) { R(x, 62, 11, 5, '#e0662a'); R(x + 1, 67, 9, 2, '#e0662a'); R(x + 3, 69, 5, 1, '#e0662a'); R(x, 62, 11, 1, '#f4f1ea'); }
     R(104, 61, 176, 1, '#a8401a');
     R(128, 72, 128, 4, '#c8b8a0'); R(128, 72, 128, 1, '#e8dcc8'); for (const x of [142, 186, 240]) R(x, 70, 3, 8, '#5a3a22');
+    // plastic stools stacked on the pavement outside the tent
+    for (let k = 0; k < 4; k++) { const y = 162 - k * 5; R(282, y, 14, 3, k % 2 ? '#2d7fd0' : '#c8302a'); R(282, y, 14, 1, k % 2 ? '#5a9ae0' : '#f05a4a'); R(283, y + 3, 2, 2, k % 2 ? '#1f5a98' : '#8a2420'); R(293, y + 3, 2, 2, k % 2 ? '#1f5a98' : '#8a2420'); }
+    R(283, 167, 2, 5, '#8a2420'); R(293, 167, 2, 5, '#8a2420');
   } else {
     const day = kind === 'day', P = day ? { b: ['#3e3e58', '#46465e', '#504a64'], win: '#5a5a78', lit: 0.03, road: '#34343e', walk: '#5a5862', pole: '#2a2a30', wire: '#2a2a34', board: '#3a3644' }
       : { b: ['#161a2c', '#1c1a30', '#221a2e'], win: '#262a40', lit: 0.18, road: '#1c1d24', walk: '#2e2e38', pole: '#0e0e14', wire: '#0c0c12', board: '#141018' };
@@ -4804,14 +4807,15 @@ function pochaLayer(kind) {
     // the utility pole with its crossarm and transformer, the wires sagging across the street
     R(94, 10, 5, 114, P.pole); R(84, 20, 26, 3, P.pole); R(100, 32, 7, 11, P.pole);
     g.strokeStyle = P.wire; g.lineWidth = 1; for (const [y0, y1, sag] of [[21, 18, 16], [21, 30, 20], [24, 40, 12]]) { g.beginPath(); g.moveTo(-10, y0 + 6); g.quadraticCurveTo(40, y0 + sag, 86, y0); g.moveTo(108, y0); g.quadraticCurveTo(250, y0 + sag + 14, 400, y1); g.stroke(); }
-    // the pavement, the curb, the night's rubbish bags piled by the pole, the wet road with a faded line, puddles, a manhole
-    R(0, 122, W, 9, P.walk); for (let x = 0; x < W; x += 13) R(x, 122, 1, 9, day ? '#4a4852' : '#24242c');
-    R(0, 131, W, 3, day ? '#7a7882' : '#3a3a44'); R(0, 134, W, 82, P.road); for (let x = 6; x < W; x += 40) R(x, 196, 20, 2, 'rgba(200,170,80,.25)');
+    // the far pavement and curb, the wet road behind the tent (a faded centre line, a manhole), the near curb and the paving
+    // the tent stands on (puddles), the night's rubbish bags piled by the pole
+    R(0, 122, W, 6, P.walk); for (let x = 0; x < W; x += 13) R(x, 122, 1, 6, day ? '#4a4852' : '#24242c');
+    R(0, 128, W, 2, day ? '#7a7882' : '#3a3a44'); R(0, 130, W, 20, P.road); for (let x = 6; x < W; x += 40) R(x, 139, 20, 1, 'rgba(200,170,80,.3)');
+    g.fillStyle = day ? '#44444e' : '#22222a'; g.beginPath(); g.ellipse(330, 145, 10, 2, 0, 0, Math.PI * 2); g.fill();
+    R(0, 150, W, 3, day ? '#8a8892' : '#44444e'); R(0, 150, W, 1, day ? '#a8a6b0' : '#5a5a66');
+    R(0, 153, W, 63, day ? '#56545e' : '#26262e'); for (let y = 153; y < H; y += 9) R(0, y, W, 1, day ? '#4a4852' : '#202028'); for (let y = 153, r = 0; y < H; y += 9, r++) for (let x = (r % 2) * 9; x < W; x += 18) R(x, y, 1, 9, day ? '#4a4852' : '#202028');
     for (const [x, y, c] of [[70, 116, '#1a1a1e'], [80, 114, '#e8e8e0'], [88, 117, '#1a1a1e'], [76, 119, '#2a2a30'], [62, 119, '#d8d0c0']]) { g.fillStyle = day ? c : c === '#e8e8e0' || c === '#d8d0c0' ? '#6a6a70' : c; g.beginPath(); g.ellipse(x, y, 6, 5, 0, 0, Math.PI * 2); g.fill(); }
-    g.fillStyle = day ? '#44444e' : '#22222a'; g.beginPath(); g.ellipse(330, 188, 14, 4, 0, 0, Math.PI * 2); g.fill();
-    for (const [x, y, w] of [[40, 180, 50], [150, 206, 70], [300, 210, 60]]) { g.fillStyle = day ? 'rgba(160,170,200,.25)' : 'rgba(60,60,90,.35)'; g.beginPath(); g.ellipse(x, y, w / 2, 4, 0, 0, Math.PI * 2); g.fill(); }
-    // plastic stools stacked outside the tent
-    for (let k = 0; k < 3; k++) { R(282, 150 - k * 6, 14, 3, k % 2 ? '#2d7fd0' : '#c8302a'); R(283, 153 - k * 6, 2, 4, k % 2 ? '#1f5a98' : '#8a2420'); R(293, 153 - k * 6, 2, 4, k % 2 ? '#1f5a98' : '#8a2420'); }
+    for (const [x, y, w] of [[40, 186, 50], [150, 206, 70], [320, 196, 60]]) { g.fillStyle = day ? 'rgba(160,170,200,.25)' : 'rgba(60,60,90,.35)'; g.beginPath(); g.ellipse(x, y, w / 2, 4, 0, 0, Math.PI * 2); g.fill(); }
   }
   g = g0; POCHA_CV[kind] = cv; return cv;
 }
@@ -4823,8 +4827,12 @@ function drawPocha(nowMs) {
   const inR = rs => rs && rs.find(([a, z]) => et >= a && et < z), in1 = r => r && et >= r[0] && et < r[1] ? r : null;
   const dawn = TL && TL.dawn ? Math.max(0, Math.min(1, (et - TL.dawn[0]) / (TL.dawn[1] - TL.dawn[0]))) : 0;
   const [cz, ccx, ccy] = TL && TL.cam ? keyAt(TL.cam, et) : [1, W / 2, H / 2];
-  const hw = W / (2 * cz), hh = H / (2 * cz), cx = Math.max(hw, Math.min(W - hw, ccx)), cy = Math.max(hh, Math.min(H - hh, ccy));
-  g.save(); g.translate(W / 2, H / 2); g.scale(cz, cz); g.translate(-cx, -cy);
+  const vw = W / Math.max(1, cz), vh = H / Math.max(1, cz), cx = Math.max(vw / 2, Math.min(W - vw / 2, ccx)), cy = Math.max(vh / 2, Math.min(H - vh / 2, ccy));
+  // the street is drawn at its own size into a buffer, then the camera's crop of it is blown up onto the hi-res canvas pixel for
+  // pixel (no smoothing), so a close-up shows big clean dots instead of half-drawn ones
+  if (!POCHA_CV.buf) { for (const k of ['buf', 'over']) { POCHA_CV[k] = document.createElement('canvas'); POCHA_CV[k].width = W; POCHA_CV[k].height = H; } }
+  const g0 = g; g = POCHA_CV.buf.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.clearRect(0, 0, W, H);
+  g.save();
   // the sky lightening from night into dawn, the stars going, the sun coming up between the blocks
   const sky = g.createLinearGradient(0, 0, 0, 120); sky.addColorStop(0, mixC('#141c3a', '#4a6aa8', dawn)); sky.addColorStop(0.6, mixC('#3a4672', '#e2a27e', dawn)); sky.addColorStop(1, mixC('#c4876a', '#ffd8a0', dawn)); g.fillStyle = sky; g.fillRect(0, 0, W, 122);
   g.globalAlpha = 1 - dawn; for (let i = 0; i < 18; i++) R(rnd(i, 81) * W, rnd(i, 82) * 40, 1, 1, '#9aa4cc'); g.globalAlpha = 1;
@@ -4834,14 +4842,28 @@ function drawPocha(nowMs) {
   POCHA_SIGNS.forEach(([x, y, txt, col, vert, off], i) => {
     const d = dawn - off, on = d < 0 ? Math.floor(t * 8 + i * 3) % 29 !== 0 : d < 0.04 ? Math.floor(t * 14 + i) % 2 === 0 : false;
     if (vert) [...txt].forEach((ch, k) => rbNeon(ch, x, y + k * 12, 2, col, on)); else rbNeon(txt, x, y, 2, col, on);
-    if (on) for (let k = 0; k < 8; k++) { g.fillStyle = `rgba(${col},${0.1 * (1 - k / 8)})`; g.fillRect(x + Math.round(Math.sin(t * 2 + k + i) * 2), 138 + k * 8, vert ? 6 : txt.length * 8 - 2, 3); }
+    if (on) for (let k = 0; k < 6; k++) { g.fillStyle = `rgba(${col},${0.14 * (1 - k / 6)})`; g.fillRect(x + Math.round(Math.sin(t * 2 + k + i) * 2), 131 + k * 3, vert ? 6 : txt.length * 8 - 2, 2); }
   });
-  { const gl = g.createRadialGradient(192, 178, 10, 192, 178, 110); gl.addColorStop(0, `rgba(255,150,70,${0.28 * (1 - 0.5 * dawn)})`); gl.addColorStop(1, 'rgba(255,150,70,0)'); g.fillStyle = gl; g.fillRect(80, 134, 224, 82); }
-  // a taxi going by in the street, its roof sign lit, its headlights sweeping over the tent
+  { const gl = g.createRadialGradient(192, 182, 10, 192, 182, 110); gl.addColorStop(0, `rgba(255,150,70,${0.28 * (1 - 0.5 * dawn)})`); gl.addColorStop(1, 'rgba(255,150,70,0)'); g.fillStyle = gl; g.fillRect(80, 153, 224, 63); }
+  // a taxi going by on the road behind the tent (right to left, slowing a little as it passes): an orange Korean cab, its
+  // roof sign lit, headlights throwing a cone ahead on the wet road, red tail-lights, wheels turning. The tent's back wall hides
+  // it in the middle; the clear plastic sides show it through. Its lights brush over the tent as it goes behind.
   const tr = in1(TL && TL.truck); let sweep = 0;
-  if (tr) { const k = (et - tr[0]) / (tr[1] - tr[0]), x = lerp(W + 50, -100, k); g.fillStyle = 'rgba(255,240,190,.18)'; g.beginPath(); g.moveTo(x, 170); g.lineTo(x - 110, 158); g.lineTo(x - 110, 192); g.closePath(); g.fill();
-    R(x, 160, 46, 12, '#e8963a'); R(x + 6, 152, 30, 9, '#e8963a'); R(x + 8, 154, 12, 6, '#2a3a5a'); R(x + 22, 154, 12, 6, '#2a3a5a'); R(x, 168, 46, 4, '#b86a2a'); R(x + 14, 148, 14, 4, '#fff2b0'); R(x - 1, 163, 2, 3, '#fff6d0'); R(x + 6, 172, 8, 5, '#0e0f14'); R(x + 32, 172, 8, 5, '#0e0f14');
-    sweep = Math.max(0, 1 - Math.abs(x - 192) / 90); }
+  if (tr) { const k = (et - tr[0]) / (tr[1] - tr[0]), x = Math.round(lerp(W + 70, -90, k * 0.85 + ease(k) * 0.15)), y = 131, day = dawn;
+    const beam = g.createLinearGradient(x, 0, x - 90, 0); beam.addColorStop(0, `rgba(255,244,200,${0.32 * (1 - 0.6 * day)})`); beam.addColorStop(1, 'rgba(255,244,200,0)');
+    g.fillStyle = beam; g.beginPath(); g.moveTo(x + 1, y + 10); g.lineTo(x - 90, y + 6); g.lineTo(x - 90, y + 19); g.lineTo(x + 1, y + 14); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(x + 1, y + 16, 40, 2);
+    const body = mixC('#e07a24', '#f08a2e', day), dark = mixC('#a8541a', '#c0662a', day), glass = mixC('#1a2440', '#5a6a88', day);
+    R(x + 2, y + 7, 38, 8, body); R(x, y + 9, 42, 5, body); R(x, y + 13, 42, 2, dark);                 // the body, the bumpers
+    R(x + 9, y + 2, 21, 5, body); R(x + 7, y + 4, 2, 3, body); R(x + 30, y + 4, 3, 3, body);           // the cabin, sloped front and back
+    R(x + 10, y + 3, 9, 4, glass); R(x + 20, y + 3, 9, 4, glass); R(x + 8, y + 5, 2, 2, glass); R(x + 30, y + 5, 2, 2, glass);
+    R(x + 10, y + 3, 3, 1, 'rgba(255,255,255,.35)'); R(x + 19, y + 3, 1, 4, dark);                      // a glint, the pillar
+    R(x + 2, y + 9, 38, 1, mixC('#f8b060', '#ffc070', day)); R(x + 19, y + 8, 1, 6, dark); R(x + 14, y + 10, 3, 1, dark); R(x + 24, y + 10, 3, 1, dark);
+    R(x + 14, y, 11, 2, '#fff2b0'); R(x + 15, y + 2, 9, 1, '#c8a040'); g.fillStyle = 'rgba(255,240,160,.35)'; g.fillRect(x + 13, y - 1, 13, 4);   // the roof sign
+    R(x, y + 9, 2, 2, '#fff6d0'); R(x + 40, y + 9, 2, 2, '#ff3a2a'); g.fillStyle = 'rgba(255,60,40,.3)'; g.fillRect(x + 40, y + 8, 5, 4);
+    const sp = Math.floor(et * 12) % 2;
+    for (const wx of [x + 6, x + 30]) { R(wx, y + 13, 7, 5, '#0e0f14'); R(wx + 2, y + 14, 3, 3, '#6a7078'); R(wx + 3 + (sp ? 0 : 1), y + 15, 1, 1, '#2a2a30'); }
+    sweep = Math.max(0, 1 - Math.abs(x + 20 - 192) / 110); }
   // the tent and the warm light inside: the bulb (less needed as day comes), a string of little lights, the pot's steam
   const bulb = 1 - 0.65 * dawn;
   g.drawImage(pochaLayer('tent'), 0, 0);
@@ -4877,12 +4899,19 @@ function drawPocha(nowMs) {
   R(200, 143, 12, 1, '#c8a070'); R(164, 137, 10, 3, '#1b1b1f'); R(165, 137, 8, 2, `rgba(140,200,255,${0.6 + 0.2 * Math.sin(t * 3)})`);
   if (POCHA.src) for (let k = 0; k < 2; k++) { const p = ((t / 2.4) + k / 2) % 1; g.globalAlpha = 1 - p; eighthNote(169 + Math.sin(p * 6 + k) * 3, 130 - p * 16, '#bfe6ff'); g.globalAlpha = 1; }
   g.restore();
-  // his memory, the subtitles, the fades
+  // his memory and the fades go over the crop, at the screen's scale
+  g = POCHA_CV.over.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.clearRect(0, 0, W, H);
   const fb = TL && TL.flash; if (fb && et > fb[0] && et < fb[1]) drawMemory(et, Math.min(1, (et - fb[0]) / 2.5, (fb[1] - et) / 2.5), TL.vanish || [], nowMs);
   if (EPI.on && TL) { const ln = TL.lines.find(([a, , , d]) => et >= a && et < a + d), key = ln ? ln[0] + ln[2] : '';
     if (key !== EPI.key) { EPI.key = key; subEl.innerHTML = ''; subEl.hidden = !ln; if (ln) { const nm = { v: ['마르코', '#6fdcec'], b: ['반장', '#f0a050'] }[ln[1]]; if (nm) { const k = document.createElement('b'); k.textContent = nm[0]; k.style.color = nm[1]; subEl.append(k); } subEl.append(ln[2]); } } }
   if (TL && (EPI.on || EPI.done)) { const a = Math.max(et < 1.5 ? 1 - et / 1.5 : 0, et > TL.len - 7 ? Math.min(1, (et - (TL.len - 7)) / 6) : 0); if (a > 0) { g.fillStyle = `rgba(0,0,0,${a})`; g.fillRect(0, 0, W, H); } }
   drawSceneFade(nowMs);
+  g = g0;
+  const dpr = window.devicePixelRatio || 1, hw = Math.max(W, Math.round(cv.clientWidth * dpr)), hh = Math.round(hw * H / W);
+  if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
+  cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#000'; gHi.fillRect(0, 0, hw, hh);
+  gHi.drawImage(POCHA_CV.buf, cx - vw / 2, cy - vh / 2, vw, vh, 0, 0, hw, hh); gHi.drawImage(POCHA_CV.over, 0, 0, hw, hh);
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.restore();
 }
 function drawMemory(et, a, vanish, nowMs) {
   const TL = L.epilogue && (EPI.good ? L.epilogue : L.epilogue.fail), fast = TL.fast != null && et >= TL.fast, turned = TL.turn != null && et >= TL.turn;
