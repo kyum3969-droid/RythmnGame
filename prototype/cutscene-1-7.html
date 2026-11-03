@@ -21,10 +21,12 @@
 :root[data-theme="dark"]{--night:#15110e}
 [hidden]{display:none!important}
 html,body{min-height:100%} body{box-sizing:border-box;margin:0}
-body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding:10px 16px;
+body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding:0;
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100dvh}
 /* the picture is sized to fit the window with the controls under it (auto margins centre it without ever pushing it off the top) */
-.page{width:min(100%,calc((100dvh - 140px) * 16 / 9));max-width:100%;display:flex;flex-direction:column;gap:8px;margin-block:auto}
+.page{width:min(100%,calc(100dvh * 16 / 9));max-width:100%;display:flex;flex-direction:column;gap:8px;margin-block:auto}
+/* played as part of the game: no player controls (the bar, the scene list and the help are kept in the page for the script, hidden) */
+.bar,.shots,.help{display:none!important}
 .stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:4px;background:#000;
   box-shadow:0 0 0 1px #000,0 0 40px rgba(0,0,0,.6);cursor:pointer;user-select:none;-webkit-user-select:none}
 .stage canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
@@ -51,7 +53,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 <div class="page">
   <div class="stage" id="stage">
     <canvas id="cv" width="1152" height="648" aria-label="1-7 컷씬: 빈 벨트 앞에서 하은이 고개를 들고, 공장 밖으로 걸어 나간다"></canvas>
-    <div class="big" id="big"><span>▶ 재생</span></div>
+    <div class="big" id="big"><span id="bigText">터치해서 시작</span></div>
   </div>
   <div class="bar">
     <a class="btn ghost" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none">← 출근부</a>
@@ -1803,7 +1805,7 @@ const LOOK2 = [
   { x: 14, y: 64, al: 'l', w: 200, p: LOOK.warm, s: 1.05 },
 ];
 SUBS.push(...[{"t0": 10.36, "t1": 14.58, "en": "I asked you what you dream of", "ko": "네 꿈이 뭐냐고 물었지"}, {"t0": 14.58, "t1": 18.12, "en": "You didn't say a word", "ko": "너는 아무 말 없었어"}, {"t0": 18.12, "t1": 23.0, "en": "Now I walk the way you walked", "ko": "이제 네가 걷던 길을 걸어"}, {"t0": 23.0, "t1": 25.68, "en": "And hear what you have heard", "ko": "네가 듣던 걸 들어"}, {"t0": 25.68, "t1": 30.36, "en": "There's a beat inside your hands", "ko": "네 손 안에 박자가 있어"}, {"t0": 30.36, "t1": 34.46, "en": "You never let me hear", "ko": "한 번도 들려주지 않던"}, {"t0": 34.46, "t1": 37.58, "en": "Three steps behind you", "ko": "세 걸음 뒤에서"}, {"t0": 37.58, "t1": 41.68, "en": "I'm counting too", "ko": "나도 같이 세"}, {"t0": 41.68, "t1": 44.82, "en": "Every step you took", "ko": "네가 걸은 걸음마다"}, {"t0": 44.82, "t1": 49.5, "en": "Is leading me to you", "ko": "나를 너에게 데려가"}, {"t0": 56.72, "t1": 60.54, "en": "The city's waking up now", "ko": "도시가 깨어나"}, {"t0": 60.54, "t1": 64.68, "en": "A thousand hurried feet", "ko": "수많은 바쁜 발소리"}, {"t0": 64.68, "t1": 69.08, "en": "But in the noise I only hear", "ko": "그 소음 속에서 내게 들리는 건"}, {"t0": 69.08, "t1": 72.68, "en": "The count you never speak", "ko": "네가 말하지 않던 셈"}, {"t0": 72.68, "t1": 76.58, "en": "I don't have the words to say", "ko": "할 말을 못 찾아서"}, {"t0": 76.58, "t1": 80.02, "en": "So I'm bringing flowers instead", "ko": "대신 꽃을 들고 가"}, {"t0": 80.02, "t1": 84.5, "en": "Three steps behind you", "ko": "세 걸음 뒤에서"}, {"t0": 84.5, "t1": 87.36, "en": "I'm counting too", "ko": "나도 같이 세"}, {"t0": 87.36, "t1": 91.76, "en": "Every light you left on", "ko": "네가 켜 두고 간 불들이"}, {"t0": 91.76, "t1": 95.38, "en": "Is leading me to you", "ko": "나를 너에게 데려가"}, {"t0": 95.38, "t1": 99.66, "en": "Down the hall the monitors", "ko": "복도 끝 모니터들이"}, {"t0": 99.66, "t1": 104.3, "en": "Are keeping someone's time", "ko": "누군가의 박을 세고 있어"}, {"t0": 104.3, "t1": 107.68, "en": "Every heart in here is counting", "ko": "여기 모든 심장이 세고 있어"}, {"t0": 107.68, "t1": 111.0, "en": "Yours, and hers, and mine", "ko": "너의 것도, 그분의 것도, 나의 것도"}].map(c => ({ ...c, t0: c.t0 + REP.t0, t1: c.t1 + REP.t0 }))); LYRIC_LOOK.push(...LOOK2);
-let subLang = 'en';
+let subLang = 'ko';
 // the lines through the door, in the game's dialogue box: each is typed out, then the cutscene waits on it (a blinking ▼) until a
 // click, a tap or Space/Enter, as dialogue does in the game; after it, a knock again, then the next call
 const LINES = [{ t0: WARD.voice, who: '???', en: 'Haeun!', ko: '누나!' }, { t0: WARD.voice2, who: '???', en: 'Haeun?', ko: '누나?' }, { t0: WARD.voice3, who: '???', en: 'Haeun!!', ko: '누나!!' }];
@@ -2369,6 +2371,10 @@ let hbOn = true;
 // song has arrived; the audio is unlocked inside the click, and the play happens when the song is ready
 let songWait = false;
 function songReady() { if (songWait) { songWait = false; setPlaying(true); } }
+// the end: after a breath, '출근부로' over the last picture; a touch (or Space, Enter, Esc) takes you back to the game's board
+const FIN = { done: false, timer: 0 };
+function toBoard() { location.href = 'index.html'; }
+function finish() { if (FIN.timer) return; FIN.timer = setTimeout(() => { FIN.done = true; $('bigText').textContent = '출근부로 ▸'; $('big').hidden = false; }, 2500); }
 function setPlaying(p) {
   if (p && !TRACKS[0].buf && !TRACKS[0].el) { songWait = true; started = true; $('big').hidden = true; initAudio(); HB.unlock(); playBtn.textContent = '불러오는 중…'; return; }
   if (!p) songWait = false;
@@ -2380,7 +2386,7 @@ function jump(t) { T = clamp(t, 0, END); resetLines(T); if (playing) { audioStar
 playBtn.onclick = () => { if (OPEN.on) return; if (!started) { startOpen(); return; } setPlaying(!playing); };   // the first play starts with 1-7's opening   // the first play starts from the top
 const pressNow = e => HB.press(HB.clock() + (e.timeStamp - performance.now()) / 1000);
 // the picture: while playing with the rows on, a touch is a press on the beat; otherwise it plays or pauses
-$('stage').addEventListener('pointerdown', e => { if (OPEN.on) { e.preventDefault(); if (OPEN.tutAt != null && TUT_HB.clock() != null) TUT_HB.press(TUT_HB.clock() + (e.timeStamp - performance.now()) / 1000); else openAdvance(); return; } if (playing && dismissLine()) { e.preventDefault(); return; } if (playing && hbOn && inRows(T) && HB.clock() != null) { e.preventDefault(); pressNow(e); return; } if (!started) { startOpen(); return; } setPlaying(!playing); });
+$('stage').addEventListener('pointerdown', e => { if (FIN.done) { e.preventDefault(); toBoard(); return; } if (OPEN.on) { e.preventDefault(); if (OPEN.tutAt != null && TUT_HB.clock() != null) TUT_HB.press(TUT_HB.clock() + (e.timeStamp - performance.now()) / 1000); else openAdvance(); return; } if (playing && dismissLine()) { e.preventDefault(); return; } if (playing && hbOn && inRows(T) && HB.clock() != null) { e.preventDefault(); pressNow(e); return; } if (!started) { startOpen(); return; } if (!playing) setPlaying(true); });
 $('restart').onclick = () => startOpen();   // from 1-7's opening
 $('hb').onclick = () => { hbOn = !hbOn; $('hb').setAttribute('aria-pressed', hbOn); if (!hbOn) HB.halt(); else if (playing && inRows(T)) HB.begin(T); };
 let dragging = false;
@@ -2391,6 +2397,8 @@ $('snd').onclick = () => { soundOn = !soundOn; $('snd').setAttribute('aria-press
 $('sub').onclick = () => { subLang = { en: 'ko', ko: 'off', off: 'en' }[subLang]; $('sub').textContent = { en: '자막 EN', ko: '자막 한국어', off: '자막 끔' }[subLang]; };
 const PRESS_KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyK', 'KeyD']);
 addEventListener('keydown', e => {
+  if (e.code === 'Escape') { toBoard(); return; }
+  if (FIN.done && (e.code === 'Space' || e.code === 'Enter')) { e.preventDefault(); toBoard(); return; }
   if (e.target.tagName === 'INPUT' && e.code !== 'Space') return;
   if (OPEN.on) { if (PRESS_KEYS.has(e.code)) { e.preventDefault(); if (e.repeat) return; if (OPEN.tutAt != null && TUT_HB.clock() != null) TUT_HB.press(TUT_HB.clock() + (e.timeStamp - performance.now()) / 1000); else openAdvance(); } return; }
   if ((e.code === 'Space' || e.code === 'Enter') && playing && waiting) { e.preventDefault(); if (!e.repeat) dismissLine(); return; }
@@ -2414,7 +2422,7 @@ function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
   if (OPEN.on) { openFrame(); requestAnimationFrame(frame); return; }
   if (playing) { const hc = hbOn ? HB.clock() : null, T0 = T; T = hc != null ? hc : T + dt;
-    if (!waiting) { const l = LINES.find(l => !l.timed && !l.done && T0 <= l.hold && T >= l.hold); if (l) { waiting = l; T = l.hold; } } else T = waiting.hold; if (hc != null && !inRows(T)) { HB.halt(); showResult(); } if (hc == null && hbOn && inRows(T) && T > ROWS_END) HB.begin(T); if (T >= END) { T = END; setPlaying(false); } }
+    if (!waiting) { const l = LINES.find(l => !l.timed && !l.done && T0 <= l.hold && T >= l.hold); if (l) { waiting = l; T = l.hold; } } else T = waiting.hold; if (hc != null && !inRows(T)) { HB.halt(); showResult(); } if (hc == null && hbOn && inRows(T) && T > ROWS_END) HB.begin(T); if (T >= END) { T = END; setPlaying(false); finish(); } }
   const rows = hbOn && inRows(T);   // her row through her song, his through the reprise
   if (rows) HB.update(T);
   render(T); audioTick(T); songSync(T);
