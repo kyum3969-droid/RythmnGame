@@ -950,16 +950,19 @@ const LEVELS = [
     // it goes); truck (the first one by); raise2 (you raise your glass); clink; dawn (the sky from night to morning); sun
     epilogue: { len: 170,
       lines: [[2, '', '새벽 5시 반. 센터 앞 포장마차. 둘 말고는 아무도 없다.', 6], [12, 'v', '(잔을 채운다) …신입은 한 잔만.', 5], [20, 'v', '(원샷) 크으…', 4],
-              [31, 'v', '우리 동네 바닷가에 통조림 공장이 있었거든요.', 5], [37, 'v', '다들 라디오 틀고 일했어요.', 4.5],
-              [44, 'v', '내가 제일 빨랐어. 노래 크게 틀고, 다들 따라오라고.', 6], [54, 'v', '그렇게 빨라지니까… 위에서 사람을 줄이더라고요.', 6],
-              [61.8, 'v', '하나, 둘.', 4], [69, '', '마르코는 한참 잔만 돌렸다.', 5], [77, 'v', '…마지막엔 내 친구들 자리까지.', 5],
-              [84, 'v', '나 혼자 남았어요. 에이스라고.', 5], [96, 'v', '오늘 반장님 얼굴 보니까… 그때 생각이 나더라.', 6],
+              [28, 'v', '나 여기 처음 왔을 때요.', 4], [34, 'v', '아무도 나랑 말을 안 했어요.', 4.5], [40, 'v', "이름 대신 '어이, 외국인'.", 4.5],
+              [47, 'v', '그래서 생각했죠. 제일 빨리 하면, 그럼 나 봐 주겠지.', 6], [56, 'v', "진짜 제일 빨라지니까… 그제야 다들 '에이스'라고 불러 주더라고요.", 6.5],
+              [64, 'v', '…그게 좋았어요.', 4], [70, '', '마르코는 한참 잔만 돌렸다.', 5], [77, 'v', '…근데 그렇게 빨라지니까, 위에서 사람을 줄이더라고요.', 6],
+              [84, 'v', '우리 라인 스캔하던 친구도… 나 때문인가 싶고.', 6], [100, 'v', '오늘 반장님 얼굴 보니까… 또 내가 망쳤구나 싶더라고요.', 6],
               [108, 'v', '(잔을 내려놓는다) 그래도요, 신입.', 5], [114, 'v', '나 여기선 도움이 되고 싶어요.', 5], [122, 'v', '진짜 에이스.', 4],
               [127, 'v', '…그게 뭔지는 아직 모르겠지만.', 5], [135, 'v', '(잔을 든다) 짠.', 4], [141, 'v', '내일 또 봐요, 신입.', 5]],
-      cam: [[0, 1, 192, 108], [8, 1, 192, 108], [22, 1.35, 196, 112], [30, 1.35, 196, 112], [35, 1.75, 150, 112], [51, 1.75, 150, 112], [92, 1.12, 192, 110], [101, 1.12, 192, 110],
-            [107, 1.5, 192, 114], [132, 1.5, 192, 114], [136, 1.75, 192, 116], [145, 1.75, 192, 116], [160, 1, 192, 96], [170, 1, 192, 96]],
-      poses: [[12, 17.5, 'pour'], [20, 24.5, 'drink'], [26, 30, 'spin'], [54, 68, 'down'], [69, 75, 'spin'], [77, 90, 'down'], [96, 102, 'spin'], [135, 147, 'raise']],
-      smile: [[44, 50], [127, 132]], flash: [52, 91], vanish: [57, 59.2, 62.4, 63.6, 78.6, 80.4], truck: [92, 98], raise2: [136, 147], clink: 138.4,
+      cam: [[0, 1, 192, 108], [8, 1, 192, 108], [20, 1.35, 196, 112], [25, 1.35, 196, 112], [29, 1.75, 150, 112], [33, 1.75, 150, 112], [93, 1.12, 192, 110], [99, 1.12, 192, 110],
+            [104, 1.5, 192, 114], [132, 1.5, 192, 114], [136, 1.75, 192, 116], [145, 1.75, 192, 116], [160, 1, 192, 96], [170, 1, 192, 96]],
+      poses: [[12, 17.5, 'pour'], [20, 24.5, 'drink'], [25, 28, 'spin'], [70, 76, 'spin'], [77, 92, 'down'], [100, 106, 'down'], [135, 147, 'raise']],
+      // the memory (flash): his first days here, in sepia: the others in a knot at the far end with their backs to him, him alone
+      // loading his belt; from `fast` his boxes fly; at `turn` they turn round to him (a cheer); then they go one by one (vanish),
+      // the friend at his scanner last
+      smile: [[64, 68], [127, 132]], flash: [31, 92], fast: 47, turn: 56, vanish: [78, 79.3, 80.6, 81.9, 86.5], truck: [93, 99], raise2: [136, 147], clink: 138.4,
       dawn: [100, 160], sun: [140, 166],
       fail: { len: 42,
         lines: [[2, '', '새벽 5시 반. 센터 앞 포장마차.', 5], [9, 'v', '(잔을 채운다) …오늘은 다 엉망이었네요.', 5], [17, 'v', '…또 내가 망쳤어. 늘 이래.', 5],
@@ -4822,25 +4825,34 @@ function drawPocha(nowMs) {
   drawSceneFade(nowMs);
 }
 function drawMemory(et, a, vanish, nowMs) {
+  const TL = L.epilogue && (EPI.good ? L.epilogue : L.epilogue.fail), fast = TL.fast != null && et >= TL.fast, turned = TL.turn != null && et >= TL.turn;
+  const gone = k => vanish[k] != null && et > vanish[k] + 0.9, fadeK = k => vanish[k] == null ? 1 : Math.max(0, 1 - (et - vanish[k]) / 0.9);
   g.save(); g.globalAlpha = a;
-  const sk = g.createLinearGradient(0, 0, 0, 110); sk.addColorStop(0, '#d8b88a'); sk.addColorStop(1, '#f0d6a8'); g.fillStyle = sk; g.fillRect(0, 0, W, 110);
-  g.fillStyle = 'rgba(255,244,214,.8)'; g.beginPath(); g.arc(300, 78, 14, 0, Math.PI * 2); g.fill();
-  R(0, 104, W, 30, '#a8845e'); for (let i = 0; i < 16; i++) R((i * 37 + et * 6) % (W + 20) - 10, 108 + (i % 4) * 6, 8, 1, '#c8a47a');
-  R(0, 134, W, 82, '#7a5a3e'); R(0, 134, W, 2, '#8a6a4a');
-  R(14, 46, 120, 90, '#5e4230'); R(14, 46, 120, 4, '#6e5038'); for (let y = 58; y < 120; y += 16) for (let x = 22; x < 126; x += 18) R(x, y, 10, 8, '#7a5a40'); R(104, 16, 12, 30, '#4e3626');
-  for (let k = 0; k < 5; k++) { const p = ((et / 3) + k / 5) % 1; g.fillStyle = `rgba(230,210,180,${0.5 * (1 - p)})`; g.fillRect(Math.round(108 + p * 18 - p * 6), Math.round(12 - p * 26), Math.round(4 + p * 10), Math.round(4 + p * 10)); }
-  R(150, 152, 220, 6, '#4e3626'); R(152, 158, 4, 24, '#3e2a1c'); R(362, 158, 4, 24, '#3e2a1c');
-  R(352, 136, 16, 10, '#5e4230'); R(354, 138, 7, 5, '#3e2a1c'); for (let k = 0; k < 3; k++) { const p = ((et / 1.6) + k / 3) % 1; g.globalAlpha = a * (1 - p); eighthNote(358 + Math.sin(p * 6 + k) * 4, 128 - p * 20, '#3e2a1c'); g.globalAlpha = a; }
-  // the line of them: six coworkers and, fourth from the left, 마르코 in his yellow shirt (the only colour in it)
-  const xs = [168, 194, 220, 246, 272, 298, 324];
-  xs.forEach((x, i) => {
-    const mar = i === 3, vi = mar ? null : vanish[[0, 1, 2, 4, 5, 6].indexOf(i)], fade = vi == null ? 1 : Math.max(0, 1 - (et - vi) / 0.9); if (fade <= 0) return;
-    g.globalAlpha = a * fade; const top = 116 + (i % 2), bob = Math.floor(nowMs / 400 + i) % 2;
-    R(x - 5, top + 10 + bob, 10, 18, mar ? '#e8c23a' : '#5a3e2a'); R(x - 3, top + bob, 7, 8, mar ? '#efc7a6' : '#c8a07a'); R(x - 4, top - 2 + bob, 9, 3, mar ? '#6b3f22' : '#4a3020');
-    if (mar) { R(x - 3, top + 5 + bob, 7, 3, '#6b3f22'); R(x - 3, top + 14 + bob, 2, 2, '#d8463b'); R(x + 1, top + 20 + bob, 2, 2, '#d8463b'); }
-    if (vi != null && et > vi && et < vi + 0.9) for (let k = 0; k < 6; k++) R(x - 6 + rnd(k, i) * 12, top + 4 + rnd(k, i + 9) * 22 - (et - vi) * 12, 1, 1, '#f0d6a8');
-  });
-  g.globalAlpha = a;
+  // the floor of this centre, years back, in sepia: shelves, the lamps, the belt with its scanner
+  R(0, 0, W, H, '#cdb08a'); for (let y = 20; y < 120; y += 24) { R(0, y + 18, W, 2, '#9a7a56'); for (let x = 4; x < W; x += 14) { const h = 6 + Math.floor(rnd(x + y, 3) * 10); R(x, y + 18 - h, 11, h, rnd(x, y) < 0.5 ? '#b08e66' : '#a6845c'); } }
+  for (const lx of [60, 190, 320]) { R(lx - 14, 6, 28, 3, '#f3e2c4'); g.fillStyle = 'rgba(255,240,210,.18)'; g.beginPath(); g.moveTo(lx - 14, 9); g.lineTo(lx + 14, 9); g.lineTo(lx + 40, 150); g.lineTo(lx - 40, 150); g.closePath(); g.fill(); }
+  R(0, 150, W, 66, '#8a6a4a'); R(0, 150, W, 2, '#9a7a5a');
+  R(150, 142, 200, 5, '#4e3626'); R(150, 147, 200, 8, '#5e4230'); for (const x of [160, 230, 300]) R(x, 155, 4, 20, '#3e2a1c');
+  R(338, 112, 4, 36, '#5a4a3a'); R(338, 110, 18, 4, '#6a5a48'); R(352, 112, 2, 30, 'rgba(255,120,90,.5)');
+  // his boxes riding the belt, slowly at first, then flying
+  const sp = fast ? 120 : 34, gap = fast ? 26 : 46, off = (et * sp) % gap;
+  for (let x = 160 + off; x < 336; x += gap) { R(x - 7, 132, 14, 10, '#b88a5a'); R(x - 7, 132, 14, 2, '#c89a6a'); R(x - 1, 132, 2, 10, '#8a6a42'); }
+  // a figure in sepia (마르코 in colour): facing left or right, a bob
+  const fig = (x, right, col, head, hair, al, bob, mar) => { g.globalAlpha = a * al; const top = 112 + bob;
+    R(x - 5, top + 10, 10, 20, col); R(x - 3, top, 7, 8, head); R(x - 4, top - 2, 9, 3, hair); R(x + (right ? 1 : -3), top + 3, 2, 2, '#2a1a10');
+    if (mar) { R(x - 3, top + 5, 7, 3, '#6b3f22'); R(x - 3, top + 14, 2, 2, '#d8463b'); R(x + 1, top + 21, 2, 2, '#d8463b'); }
+    R(x - 4, top + 30, 3, 8, '#3e2a1c'); R(x + 1, top + 30, 3, 8, '#3e2a1c'); g.globalAlpha = a; };
+  // the others: a knot of four at the far left, their backs to him, talking among themselves; turned to him and cheering later
+  [[30, 0], [46, 1], [62, 2], [78, 3]].forEach(([x, k]) => { const al = fadeK(k); if (al <= 0) return;
+    const face = turned ? true : k % 2 === 0, b_ = turned && et < TL.turn + 3 ? (Math.floor(nowMs / 160 + k) % 2) : 0;
+    fig(x, face, '#5a3e2a', '#c8a07a', '#4a3020', al, -b_, false);
+    if (vanish[k] != null && et > vanish[k] && et < vanish[k] + 0.9) for (let i = 0; i < 6; i++) R(x - 6 + rnd(i, k) * 12, 120 + rnd(i, k + 9) * 22 - (et - vanish[k]) * 12, 1, 1, '#f0d6a8'); });
+  if (!turned) { g.globalAlpha = a * 0.9; R(44, 92, 22, 9, '#e8d8b8'); R(48, 101, 4, 3, '#e8d8b8'); for (let i = 0; i < 3; i++) R(49 + i * 6, 95, 2, 2, '#6a5a48'); g.globalAlpha = a; }
+  if (turned && et < TL.turn + 4) { const k = (et - TL.turn) / 4; g.globalAlpha = a * (1 - k); for (const x of [30, 46, 62, 78]) { R(x - 1, 96 - k * 8, 2, 6, '#fff2c8'); R(x - 1, 104 - k * 8, 2, 2, '#fff2c8'); } g.globalAlpha = a; }
+  // the friend at his scanner (the last to go)
+  { const al = fadeK(4); if (al > 0) fig(360, false, '#5a3e2a', '#c8a07a', '#4a3020', al, 0, false); if (vanish[4] != null && et > vanish[4] && et < vanish[4] + 0.9) for (let i = 0; i < 6; i++) R(354 + rnd(i, 4) * 12, 120 + rnd(i, 13) * 22 - (et - vanish[4]) * 12, 1, 1, '#f0d6a8'); }
+  // 마르코 at his belt's loading end, alone, in his yellow shirt (the only colour in it), working faster and faster
+  fig(140, true, '#e8c23a', '#efc7a6', '#6b3f22', 1, fast ? (Math.floor(nowMs / 110) % 2) : (Math.floor(nowMs / 420) % 2), true);
   // the edges dark like an old photo, a little grain
   const vg = g.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, 230); vg.addColorStop(0, 'rgba(40,24,12,0)'); vg.addColorStop(1, 'rgba(40,24,12,.75)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
   for (let i = 0; i < 60; i++) R(Math.random() * W, Math.random() * H, 1, 1, 'rgba(60,40,20,.25)');
