@@ -1,4 +1,5 @@
-# 1-5 phase 2: 지우's bedroom beat, 4 a.m. — a cozy lo-fi loop that builds one layer at a time.
+# 1-5 phase 2: 지우's bedroom beat, 4 a.m. — a cozy lo-fi loop that builds one instrument at a time, a new one every
+# four bars: clock, electric piano, kick, snare + hats, bass, guitar, glockenspiel, and last a high glockenspiel and a pad.
 # 90 BPM, 4/4, C# major (I - vi - IV - V7: C#maj7, A#m7, F#maj7, G#7), 32 bars, then a clean stop.
 # Writes the wav/mp3 and a JSON of every note it played (for the chart).
 import json, sys
@@ -111,56 +112,102 @@ def glock(m, v=1.0):
     s[: int(0.002 * SR)] *= np.linspace(0, 1, int(0.002 * SR))
     return s * v
 
+def epiano(m, dur, v=1.0):
+    """a soft electric piano (two-operator FM, a tine on top, a slow tremolo)"""
+    n = int((dur + 0.6) * SR); t = np.arange(n) / SR; f = mfreq(m)
+    idx = 1.6 * np.exp(-t / 0.35) + 0.25
+    s = np.sin(2 * np.pi * f * t + idx * np.sin(2 * np.pi * f * t))
+    tine = np.sin(2 * np.pi * f * 7.0 * t) * np.exp(-t / 0.03) * 0.12
+    e = env(n, 0.004, 1.2); rel = int(0.25 * SR); k = int(dur * SR)
+    if k < n: e[k:] *= np.exp(-np.arange(n - k) / (0.12 * SR))
+    trem = 1 + 0.12 * np.sin(2 * np.pi * 4.2 * t)
+    return lp((s + tine) * e * trem, 3800) * v
+
+def pad(midis, dur, v=1.0):
+    """a soft, slow pad: detuned saws, low-passed, swelling in"""
+    n = int(dur * SR); t = np.arange(n) / SR; out = np.zeros(n)
+    for m in midis:
+        for dt in (-0.12, 0.12):
+            out += signal.sawtooth(2 * np.pi * mfreq(m + dt) * t) * 0.25
+    e = np.minimum(1, t / (dur * 0.45)); e[-int(0.3 * SR):] *= np.linspace(1, 0, int(0.3 * SR))
+    return lp(out * e, 1400) * v
+
+def riser(dur):
+    """a soft reversed-cymbal swell into the next bar (a new instrument coming)"""
+    n = int(dur * SR); t = np.arange(n) / SR
+    return hp(rng.standard_normal(n), 4500) * (t / dur) ** 3 * 0.5
+
 # ---------- the song ----------
 CH = [  # C#maj7, A#m7, F#maj7, G#7 (guitar voicings, midi)
     [49, 56, 60, 65], [46, 53, 56, 61], [42, 49, 53, 58], [44, 51, 54, 60]]
+EP = [  # electric piano voicings, an octave up
+    [61, 65, 68, 72], [58, 61, 65, 68], [54, 58, 61, 65], [56, 60, 63, 66]]
+PAD = [[68, 72, 77], [65, 68, 73], [65, 70, 73], [63, 68, 72]]
 ROOT = [37, 34, 30, 32]           # C#2, A#1, F#1, G#1 (bass an octave up below)
 STRUM = [(0, True, 1.0), (1.5, False, 0.75), (2.5, True, 0.8), (3.0, True, 0.6)]   # (beat, down, vel); muted chops
 MEL = [  # two bars of glockenspiel, (beat, midi)
     [(0, 80), (1, 77), (1.5, 75), (2, 73), (3, 75)],
     [(0, 77), (1, 80), (2, 82), (2.5, 80), (3.5, 77)]]
+HIGH = [  # the last layer: a high glockenspiel answering the melody, off it
+    [(0.5, 89), (2.5, 87), (3, 85)],
+    [(0.5, 85), (1.5, 87), (3, 92)]]
+# when each instrument comes in (bar)
+AT = {'clock': 0, 'epiano': 4, 'kick': 8, 'snare': 12, 'bass': 16, 'guitar': 20, 'glock': 24, 'high': 28}
 
 for bar in range(BARS):
     c = bar % 4
-    # 1. the clock, all the way: tick on the beat, tock on the off-beat beats (2 and 4)
+    on = lambda k: bar >= AT[k]
+    # 1. the clock, all the way: tick on the beat, tock on the off-beat beats (2 and 4); louder while it is alone
     for beat in range(4):
-        add(clock(beat % 2 == 0), t_of(bar, beat), 0.8 if bar < 4 else 0.22, 0.2)
+        add(clock(beat % 2 == 0), t_of(bar, beat), 1.5 if bar < 4 else 0.4 if bar < 8 else 0.22, 0.2)
         notes.append(('clock', bar, beat, 'tick' if beat % 2 == 0 else 'tock'))
-    # 2. guitar from bar 4
-    if bar >= 4:
-        for beat, down, vel in STRUM:
-            sw = 0.04 * SPB if beat % 1 else 0
-            add(strum(CH[c], 0.5 if beat else 0.9, muted=beat != 0, down=down, vel=vel), t_of(bar, beat) + sw, 0.62, -0.15)
-            notes.append(('guitar', bar, beat, 'strum'))
-    # 3. drums from bar 8: ba-dum kick on 1 (and a quarter beat after), kick on 3, brushed snare on 2 and 4, 8th hats swung
-    if bar >= 8:
-        add(kick(1.0), t_of(bar, 0), 0.42); add(kick(0.6), t_of(bar, 0.25), 0.42)
-        add(kick(0.85), t_of(bar, 2), 0.42)
-        if bar % 2 == 1: add(kick(0.5), t_of(bar, 3.5), 0.42)
-        for beat in (1, 3): add(snare(1.0), t_of(bar, beat), 0.34, 0.05)
+    # 2. the electric piano from bar 4: the chord on 1, held, and two soft stabs (2&, 3&)
+    if on('epiano'):
+        for beat, d, v in ((0, 1.4, 1.0), (1.5, 0.5, 0.55), (2.5, 1.2, 0.7)):
+            for k, m in enumerate(EP[c]):
+                add(epiano(m, d, v), t_of(bar, beat) + 0.006 * k, 0.12, -0.25 + 0.15 * k)
+            notes.append(('epiano', bar, beat, 'chord'))
+    # 3. the kick from bar 8: ba-dum on 1 (and a quarter beat after), on 3, and a pickup on 4& every other bar
+    if on('kick'):
+        add(kick(1.0), t_of(bar, 0), 0.44); add(kick(0.6), t_of(bar, 0.25), 0.44)
+        add(kick(0.85), t_of(bar, 2), 0.44)
+        notes.append(('kick', bar, 0, 'kick')); notes.append(('kick', bar, 0.25, 'kick2')); notes.append(('kick', bar, 2, 'kick'))
+        if bar % 2 == 1: add(kick(0.5), t_of(bar, 3.5), 0.44); notes.append(('kick', bar, 3.5, 'kick'))
+    # 4. the brushed snare on 2 and 4 and swung 8th hats from bar 12
+    if on('snare'):
+        for beat in (1, 3): add(snare(1.0), t_of(bar, beat), 0.46, 0.05); notes.append(('snare', bar, beat, 'snare'))
         for k in range(8):
             sw = 0.06 * SPB if k % 2 else 0
-            add(hat(0.9 if k % 2 == 0 else 0.6, open_=(k == 7 and bar % 4 == 3)), t_of(bar, k / 2) + sw, 0.16, 0.25)
-        notes.append(('drums', bar, 0, 'kick')); notes.append(('drums', bar, 0.25, 'kick2')); notes.append(('drums', bar, 1, 'snare'))
-        notes.append(('drums', bar, 2, 'kick')); notes.append(('drums', bar, 3, 'snare'))
-        if bar % 2 == 1: notes.append(('drums', bar, 3.5, 'kick'))
-    # 4. bass from bar 12
-    if bar >= 12:
+            add(hat(0.9 if k % 2 == 0 else 0.6, open_=(k == 7 and bar % 4 == 3)), t_of(bar, k / 2) + sw, 0.22, 0.25)
+    # 5. the bass from bar 16
+    if on('bass'):
         r = ROOT[c] + 12
         for beat, m, d in ((0, r, 1.3), (2, r, 0.9), (3.5, r + 7 if c % 2 == 0 else r + 5, 0.4)):
-            add(bass(m, d), t_of(bar, beat), 0.3)
+            add(bass(m, d), t_of(bar, beat), 0.32)
             notes.append(('bass', bar, beat, 'note'))
-    # 5. the glockenspiel melody from bar 16 (an octave up from bar 28)
-    if bar >= 16:
-        up = 12 if bar >= 28 else 0
+    # 6. the muted guitar chops from bar 20
+    if on('guitar'):
+        for beat, down, vel in STRUM:
+            sw = 0.04 * SPB if beat % 1 else 0
+            add(strum(CH[c], 0.5 if beat else 0.9, muted=beat != 0, down=down, vel=vel), t_of(bar, beat) + sw, 0.66, 0.3)
+            notes.append(('guitar', bar, beat, 'strum'))
+    # 7. the glockenspiel melody from bar 24
+    if on('glock'):
         for beat, m in MEL[bar % 2]:
-            add(glock(m + up, 1.0), t_of(bar, beat), 0.24 if up == 0 else 0.18, 0.3)
+            add(glock(m, 1.0), t_of(bar, beat), 0.24, -0.1)
             notes.append(('glock', bar, beat, 'note'))
-    # a soft cymbal swell into the full section and into the last four bars
-    if bar in (19, 27):
-        n = int(BAR * SR); t = np.arange(n) / SR
-        sw = hp(rng.standard_normal(n), 5000) * (t / (BAR)) ** 2 * 0.25
-        add(sw, t_of(bar, 0), 0.5)
+    # 8. the last four bars: a high glockenspiel answering it, and a pad under everything
+    if on('high'):
+        for beat, m in HIGH[bar % 2]:
+            add(glock(m, 0.9), t_of(bar, beat), 0.2, 0.35)
+            notes.append(('high', bar, beat, 'note'))
+        add(pad(PAD[c], BAR + 0.2), t_of(bar, 0), 0.08)
+    # each new instrument is announced by a soft swell on the bar before it
+    if bar + 1 in AT.values() and bar + 1 < BARS:
+        add(riser(SPB * 2), t_of(bar, 2), 0.5 if bar + 1 == AT['high'] else 0.28)
+    if bar == AT['high']:
+        n = int(1.8 * SR); t = np.arange(n) / SR
+        add(hp(rng.standard_normal(n), 5000) * np.exp(-t / 0.6) * 0.25, t_of(bar, 0), 0.6)
 
 # the vinyl under everything: hiss and crackle
 n = int(END * SR)

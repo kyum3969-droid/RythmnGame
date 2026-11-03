@@ -56,12 +56,12 @@ Song form: intro, verse 1, pre-chorus, chorus, instrumental interlude, verse 2, 
 
 ## 2페이즈 곡: "새 비트" (직접 합성)
 
-제미나이 한도가 차서 엔진 쪽에서 만들었다: `prototype/ref/beat15/render.py`(파이썬, numpy/scipy) → `prototype/audio/1-5-new-beat.mp3`. 90 BPM, 4/4, C# major(I–vi–IV–V7: C#maj7, A#m7, F#maj7, G#7), 첫 다운비트 0.10초, 32마디(85.4초) + 정지. 한 겹씩: 시계(0) → 뮤트 기타 코드, 카플러스-스트롱 현 합성(4) → 킥(1박에 두근 겹킥)·브러시 스네어·스윙 하이햇(8) → 베이스(12) → 글로켄슈필 멜로디, 두 마디 반복(16) → 전부(20, 28부터 멜로디 옥타브 위) → 32마디 첫 박에 뚝(스위치 딸깍). 밑에 바이닐 잡음, 테이프처럼 부드러운 로우패스와 포화. 평균 음량 약 -15 dB(Pink Belt -13 dB에 맞춤). 스크립트가 친 음표 목록(JSON)을 함께 내보내서 차트가 곡과 정확히 맞는다.
+제미나이 한도가 차서 엔진 쪽에서 만들었다: `prototype/ref/beat15/render.py`(파이썬, numpy/scipy) → `prototype/audio/1-5-new-beat.mp3`. 90 BPM, 4/4, C# major(I–vi–IV–V7: C#maj7, A#m7, F#maj7, G#7), 첫 다운비트 0.10초, 32마디(85.4초) + 정지. **네 마디마다 악기가 하나씩** 들어온다: 시계(0, 혼자일 땐 크게) → 일렉트릭 피아노 코드, 2-오퍼레이터 FM + 틴 + 트레몰로(4) → 킥, 1박에 두근 겹킥(8) → 브러시 스네어·스윙 하이햇(12) → 베이스(16) → 뮤트 기타 코드, 카플러스-스트롱 현 합성(20) → 글로켄슈필 멜로디, 두 마디 반복(24) → 높은 글로켄슈필 대답 + 부드러운 패드 + 심벌(28) → 32마디 첫 박에 뚝(스위치 딸깍). 새 악기 앞 마디 끝 두 박에 작은 스웰. 밑에 바이닐 잡음, 테이프처럼 부드러운 로우패스와 포화. 4마디씩 음량 -27.5 → -12.8 dB로 차오름, 전체 평균 약 -16 dB. 스크립트가 친 음표 목록(JSON)을 함께 내보내서 차트가 곡과 정확히 맞는다.
 
 제미나이로 다시 받으려면(같은 구조):
 
 ```
-A cozy, sweet lo-fi bedroom beat, instrumental, no vocals at all: a young producer alone in his room at 4 a.m., making a beat about a girl he just met. The track builds up one layer at a time, as if he is adding them one by one, and every new layer starts exactly on a bar line. 90 BPM, 4/4, C# major.
-The layers, in order: a single soft ticking clock; then a warm, muted electric guitar chord loop; then a soft, dusty kick with a heartbeat-like double kick (ba-dum) and a gentle brushed snare; then a round, warm bass; then a twinkling glockenspiel melody; then everything together, warm, hopeful and a little shy.
+A cozy, sweet lo-fi bedroom beat, instrumental, no vocals at all: a young producer alone in his room at 4 a.m., making a beat about a girl he just met. The track builds up one instrument at a time, a new one every four bars, each starting exactly on a bar line, so the sound slowly fills up. 90 BPM, 4/4, C# major.
+The instruments, in order: a single soft ticking clock, alone; then a warm electric piano playing the chords; then a soft, dusty kick with a heartbeat-like double kick (ba-dum); then a gentle brushed snare and soft hi-hats; then a round, warm bass; then a muted electric guitar chord loop; then a twinkling glockenspiel melody; then a high glockenspiel answering it and a soft pad under everything, warm, hopeful and a little shy.
 Cozy and intimate, soft vinyl crackle, warm tape saturation. Ends as if he pressed stop: the loop cuts off cleanly. No fade out.
 ```

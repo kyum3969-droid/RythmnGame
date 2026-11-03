@@ -78,6 +78,8 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .bubble{position:absolute;left:3cqw;bottom:61%;max-width:38cqw;background:var(--paper);color:var(--paper-ink);font-weight:600;
   font-size:clamp(11px,1.9cqw,18px);line-height:1.35;padding:.45em .75em;border-radius:6px;pointer-events:none;box-shadow:0 2px 0 rgba(0,0,0,.45)}
 .bubble.obs{background:#d9d0bd}
+.bubble.room{max-width:12.5cqw;word-break:keep-all}
+.bubble.room::after{left:auto;right:1em}
 .bubble.tr::after{left:auto;right:1.6em}
 .bubble::after{content:"";position:absolute;left:1.6em;bottom:-.45em;border:.5em solid transparent;border-top-color:var(--paper);border-bottom:0}
 .bubble.loud{font-family:var(--display);font-weight:400;font-size:clamp(15px,3.1cqw,30px);letter-spacing:.02em;background:#fff4e8;color:#b3261e;
@@ -1056,8 +1058,8 @@ const LEVELS = [
     // heartbeat kick, bass, glockenspiel). The clips slide along his laptop's timeline to the playhead and you set each one
     // down; every new layer brings back something from the night. It ends when he presses stop and saves it.
     lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
-    hitKit: 'ticktock', bareBand: true, observer: 'boss', observerIntro: true, noCount: true, observerAt: [[21.5, 28.6]], obsCue: { enter: [21.5, 23.5], leave: [26.6, 28.6] },   // 반장 by the line for the intro only
-    heads: { j: [104, 58], h: [52, 90], r: [60, 116], b: [168, 84] },
+    hitKit: 'ticktock', bareBand: true, observer: 'boss', observerIntro: true, noCount: true, observerAt: [[21, 31]], obsCue: { enter: [21, 23], leave: [28.3, 31] },   // 반장 by the line for the intro only
+    heads: { j: [104, 58], h: [52, 90], r: [24, 118], b: [168, 84] },
     clock:'02:50', title:'첫눈에', hints: false, special:['떨어진 상자', 'drop', '받아냄'],
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 344,
     chords: [[277.18, 349.23, 415.3], [233.08, 277.18, 349.23], [185, 233.08, 277.18], [207.65, 261.63, 311.13]], roots: [69.3, 58.27, 92.5, 103.83], chordAt: bar => bar % 4,
@@ -1073,51 +1075,51 @@ const LEVELS = [
     // (to 13.5); as she looks up with it her cap tips back and her face comes out of its shadow (8.5-14; her eyes are dots):
     // the camera close on her, a glockenspiel rising, a warm swell, his heart; then him, red to the ears (13.6)
     // and after his thanks, before the song, a moment that is his (linger, 15.5-24): his hand on his chest, the camera slowly
-    // pulling back, his heart beating and quietening, one thought; then 반장 walks in and snaps him out of it (23.6) and goes
-    meet: { rummage: [4, 7], lift: [7, 10.5], hold: [10.5, 13.5], reveal: [8.5, 14], linger: [15.5, 24] },
+    // pulling back, his heart beating and quietening, one thought; then 반장 walks in and snaps him out of it (23.1), and goes
+    // off again muttering (27.5, the bubble going with him)
+    meet: { rummage: [4, 7], lift: [7, 10.5], hold: [10.5, 13.5], reveal: [8.5, 14], linger: [15.5, 23.6] },
     love: { fumble: 80, catch: 83, hold: [83, 87], moment: [79.5, 92], glow: [[92, 124], [156, 189]], smit: [[13, 208]], heart: [[92, 124], [156, 188]] },
-    // the room (drawRoom15): from 208, the walk out fading to black before it (204-208); the stop at 336. Each layer that goes
-    // in lights its name on the timeline, and a moment of the night comes back in the laptop's corner
-    room: { from: 208, stop: 336, layers: [[212, '시계'], [224, '기타'], [240, '드럼'], [256, '베이스'], [272, '멜로디']],
-      memories: [[224, 'face'], [240, 'catch'], [256, 'cap'], [272, 'watch'], [320, 'face']] },
-    act: { lookUp: [[44, 47], [84, 87], [150, 153]], upAtDrops: true, alarmAt: [[80, 81.5], [152.6, 154], [13.4, 15], [24.2, 26]] },
-    camPlay: [[0.3, 4, { x: 80, y: 96, k: 1.5 }], [4, 13.2, { x: 58, y: 104, k: 2.6 }], [13.2, 18, { x: 104, y: 80, k: 2.6 }], [18, 21, { x: 102, y: 82, k: 2.2 }], [21, 27, { x: 122, y: 90, k: 1.6 }],
+    // the room (drawRoom15): from 208, the walk out fading to black before it (204-208); the stop at 336. He builds the beat an
+    // instrument at a time, a new one every four bars (tracks: [beat it comes in, name, its pattern in 16ths, lane]): its row
+    // appears on his timeline, you play it in for four bars (its clips), and from then on it loops on its row while the next
+    // one goes in. Each new one brings back a moment of the night, a thought over his head
+    room: { from: 208, stop: 336,
+      tracks: [[208, '시계', 'x...x...x...x...', 0], [224, '피아노', 'x.....x...x.....', 0], [240, '킥', 'xx......x.......xx......x.....x.', 1], [256, '스네어', '....x...x...x.x.', 1],
+               [272, '베이스', 'x.......x.....x.', 1], [288, '기타', 'x.....x...x.x...', 0], [304, '멜로디', 'x...x.x.x...x...x...x...x.x...x.', 0], [320, '반짝이', '..x.......x.x.....x...x.....x...', 0]],
+      memories: [[224, 'face'], [240, 'catch'], [256, 'cap'], [272, 'watch'], [288, 'look'], [320, 'face']] },
+    act: { lookUp: [[44, 47], [84, 87], [150, 153]], upAtDrops: true, alarmAt: [[80, 81.5], [152.6, 154], [13.4, 15], [23.7, 25.5]] },
+    camPlay: [[0.3, 4, { x: 80, y: 96, k: 1.5 }], [4, 13.2, { x: 58, y: 104, k: 2.6 }], [13.2, 18, { x: 104, y: 80, k: 2.6 }], [18, 21, { x: 102, y: 82, k: 2.2 }], [21, 28.5, { x: 122, y: 90, k: 1.6 }],
       [79.5, 83, { x: 84, y: 100, k: 1.4 }], [83, 86.5, { x: 58, y: 104, k: 2.4 }], [86.5, 90, { x: 104, y: 84, k: 2.4 }]],
-    cutscene: [[0, 27], [79.5, 90], [190, 210], [336, 344]],
-    devMarks: [[0, '처음 · 만남'], [15, '여운'], [28, 'Pink Belt'], [68, '자랑'], [80, '받아내기'], [92, '후렴 1'], [124, '2절'], [148, '빌드업'], [156, '마지막 후렴'], [190, '퇴근길'], [208, '지우의 방'], [240, '드럼'], [272, '멜로디'], [320, '마지막 네 마디']],
+    cutscene: [[0, 28.5], [79.5, 90], [190, 210], [336, 344]],
+    devMarks: [[0, '처음 · 만남'], [15, '여운'], [28, 'Pink Belt'], [68, '자랑'], [80, '받아내기'], [92, '후렴 1'], [124, '2절'], [148, '빌드업'], [156, '마지막 후렴'], [190, '퇴근길'], [208, '지우의 방'], [224, '피아노'], [240, '킥'], [256, '스네어'], [272, '베이스'], [288, '기타'], [304, '멜로디'], [320, '반짝이']],
     // phase 1 (8 cells a bar): upper 지우 (in the choruses his heartbeat: a beat and its 'and'), lower 하은 and his boxes
-    // that fall onto her belt while he stares at her ('d'); phase 2 (16 cells a bar): the clips on his timeline, the top
-    // tracks (clock, guitar, melody) and the rhythm tracks (drums with the ba-dum kick, bass), the stop at the end
+    // that fall onto her belt while he stares at her ('d'); phase 2 (16 cells a bar): the clips on his timeline, four bars of
+    // each new instrument as it goes in (upper: clock, piano, guitar, melody, the high glockenspiel; lower: the ba-dum kick,
+    // snare, bass; under the last one his heartbeat), the stop at the end
     bars: [
-      '........', '........',
-      '........', '........', '........', '........',
-      '........', '........', 'x...x...', 'x...x...', 'x.x.x...', '........', '..x.....', '..x...x.',
-      '..x.....', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.', 'x.x.x...', '........', '........',
-      '........', 'xx..xx..', 'xx......', 'xx..xx..', 'xx..xx..', 'xx......', 'xx..xx..', 'xx..xx..',
-      'xx..x...', 'x...x...', 'x.x.x...', 'x...x...', '........', '........', '........', 'x...x...',
-      'x.x.x.x.', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'x.x.x.x.',
-      'x.x.x.x.', 'x.......', '........', '........', '........', '........', '................', 'x.......x.......',
-      'x.......x.......', 'x.......x.......', 'x.....x...x.....', 'x.....x...x.....', 'x.....x...x.....', 'x.....x...x.....', 'x.........x.....', 'x.........x.....',
-      'x.........x.....', 'x.........x.....', 'x.....x.........', 'x.....x.........', 'x.....x.........', 'x.....x.........', 'x...x.x.x...x...', 'x...x...x.x...x.',
-      'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.',
-      'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.', 'x...............', '................'
+      '........', '........', '........', '........', '........', '........', '........', '........', 'x...x...', 'x...x...',
+      'x.x.x...', '........', '..x.....', '..x...x.', '..x.....', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.', 'x.x.x...',
+      '........', '........', '........', 'xx..xx..', 'xx......', 'xx..xx..', 'xx..xx..', 'xx......', 'xx..xx..', 'xx..xx..',
+      'xx..x...', 'x...x...', 'x.x.x...', 'x...x...', '........', '........', '........', 'x...x...', 'x.x.x.x.', 'xx..xx..',
+      'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'x.x.x.x.', 'x.x.x.x.', 'x.......', '........', '........',
+      '........', '........', '................', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x.....x...x.....', 'x.....x...x.....', 'x.....x...x.....', 'x.....x...x.....',
+      '................', '................', '................', '................', '................', '................', '................', '................', '................', '................',
+      '................', '................', 'x.....x...x.x...', 'x.....x...x.x...', 'x.....x...x.x...', 'x.....x...x.x...', 'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.',
+      '..x.......x.x...', '..x...x.....x...', '..x.......x.x...', '..x...x.....x...', 'x...............', '................'
     ],
     bars2: [
-      '........', '........',
-      '........', '........', '........', '........',
-      '........', '........', '..x...x.', '..x...x.', '..x...x.', '....x...', 'x...x...', 'x...x...',
-      'x...x.x.', '..x...x.', '..x.....', 'x...x...', '..x.....', '........', '........', '........',
-      '........', '..x...x.', '..x.x.x.', '..x...x.', '..x...d.', '..x...x.', '..x.x.x.', '..d...x.',
-      '..x...x.', '..x...x.', '......x.', '..x.d...', '....x...', 'x.......', '........', '..x...x.',
-      '..x...x.', '..x...x.', 'x.x.x.x.', '..x...x.', 'x.x.x.x.', '..x...x.', 'x.x.x.x.', 'x.x.x.x.',
-      'x.x.x.x.', 'x.......', '........', '........', '........', '........', '................', '................',
-      '................', '................', '............x...', '............x...', '............x...', '............x...', 'xx..x...x...x...', 'xx..x...x...x...',
-      'xx..x...x...x...', 'xx..x...x...x...', 'x...x...x...x.x.', 'x...x...x...x.x.', 'x...x...x...x.x.', 'x...x...x...x.x.', '....x.......x...', '....x.......x...',
-      '....x.......x...', '....x.......x...', 'xx..x...x...x...', 'xx..x...x...x...', 'xx..x...x...x...', 'xx..x...x...x...', 'xx..x...x...x...', 'xx..x...x...x...',
-      'xx..x...x...x...', 'xx..x...x...x...', 'xx..x...x...x.x.', 'xx..x...x...x.x.', 'xx..x...x...x.x.', 'xx..x...x...x.x.', 'x...............', '................'
+      '........', '........', '........', '........', '........', '........', '........', '........', '..x...x.', '..x...x.',
+      '..x...x.', '....x...', 'x...x...', 'x...x...', 'x...x.x.', '..x...x.', '..x.....', 'x...x...', '..x.....', '........',
+      '........', '........', '........', '..x...x.', '..x.x.x.', '..x...x.', '..x...d.', '..x...x.', '..x.x.x.', '..d...x.',
+      '..x...x.', '..x...x.', '......x.', '..x.d...', '....x...', 'x.......', '........', '..x...x.', '..x...x.', '..x...x.',
+      'x.x.x.x.', '..x...x.', 'x.x.x.x.', '..x...x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.......', '........', '........',
+      '........', '........', '................', '................', '................', '................', '................', '................', '................', '................',
+      'xx......x.......', 'xx......x.....x.', 'xx......x.......', 'xx......x.....x.', '....x...x...x.x.', '....x...x...x.x.', '....x...x...x.x.', '....x...x...x.x.', 'x.......x.....x.', 'x.......x.....x.',
+      'x.......x.....x.', 'x.......x.....x.', '................', '................', '................', '................', '................', '................', '................', '................',
+      'xx..............', 'xx..............', 'xx..............', 'xx..............', '................', '................'
     ],
     // [beat, text, beats shown, lane, speaker] ('r': 지우 in his room)
-    say: [[0.5, '누나, 혹시 박스 좀 올려줄래요?', 2.7, 0, 'j'], [3.4, '박스? 그래.', 1.8, 1, 'h'], [13.6, '어… 어, 고… 고마워요.', 3.4, 0, 'j'], [18.3, '(…큰일났다.)', 3.2, 0, 'j'], [23.6, '야 지우, 뭐해. 멍해빠져가지고는.', 3.2, 0, 'b'], [26.2, '넵! 넵!', 1.6, 0, 'j'],
+    say: [[0.5, '누나, 혹시 박스 좀 올려줄래요?', 2.7, 0, 'j'], [3.4, '박스? 그래.', 1.8, 1, 'h'], [13.6, '어… 어, 고… 고마워요.', 3.4, 0, 'j'], [18.3, '(…큰일났다.)', 3.2, 0, 'j'], [23.1, '야 지우, 뭐해. 멍해빠져가지고는.', 3, 0, 'b'], [26.1, '넵! 넵!', 1.3, 0, 'j'], [27.5, '저놈 오늘따라 왜 저래?', 2.8, 0, 'b'],
           [37, '형… 하은 누나요. 원래 2라인이에요?', 3, 0, 'j'], [44.5, '…일해.', 1.8, 1, 'h'], [48, '아, 넵! 일해요, 일!', 2.5, 0, 'j'],
           [56, '(와… 손 진짜 빠르다…)', 3, 0, 'j'], [68.5, '형, 봐요. 저도 빨라요—', 3, 0, 'j'],
           // the moment
@@ -1135,7 +1137,7 @@ const LEVELS = [
           [201, '저 오늘 집에 가서 비트 만들 거예요. 처음부터 다.', 3.4, 0, 'j'],
           // 4 a.m., his room: thoughts as the layers go in
           [210, '(…잠이 안 와.)', 3, 0, 'r'], [225, '(그 손… 하나도 안 보고.)', 3, 0, 'r'], [241, '(두근, 두근.)', 2.5, 0, 'r'],
-          [257, '(일해. 상자. 시끄러.)', 3, 0, 'r'], [273, '(…박자는 맞네.)', 3, 0, 'r'], [288, '…됐다.', 2.5, 0, 'r'], [321, '(하은 누나.)', 2.5, 0, 'r'],
+          [257, '(일해. 상자. 시끄러.)', 3, 0, 'r'], [273, '(…박자는 맞네.)', 3, 0, 'r'], [289, '(내일도 지원 오려나.)', 3, 0, 'r'], [305, '…됐다.', 2.5, 0, 'r'], [321, '(하은 누나.)', 2.5, 0, 'r'],
           [337, '…내일 들려줘야지.', 4, 0, 'r']],
     comfort: [],
     intro: [
@@ -2223,6 +2225,13 @@ function reachArm(sx, sy, hx, hy, col, reach, w = 4) {
 }
 function drawPartnerBody(id, pose, nowMs, active) { PARTNERS[id].draw(pose, nowMs, active); }
 const OBS_X = 168;
+// where 반장 is (L.obsCue): walking in from off-screen right, standing by the line, walking back out
+function obsX(beat) {
+  const cue = L.obsCue || {};
+  if (cue.leave && beat >= cue.leave[0]) return lerp(OBS_X, W + 20, ease(Math.min(1, (beat - cue.leave[0]) / (cue.leave[1] - cue.leave[0]))));
+  if (cue.enter && beat < cue.enter[1]) return lerp(W + 20, OBS_X, ease(Math.max(0, (beat - cue.enter[0]) / (cue.enter[1] - cue.enter[0]))));
+  return OBS_X;
+}
 function drawObserver(t, nowMs, active) {
   if (!L.observer) return;
   // (1-5: he is only there to introduce her, and to snap 지우 out of it before the song: L.observerAt)
@@ -2236,10 +2245,11 @@ function drawObserver(t, nowMs, active) {
   const leaving = active && cue.leave && beat >= cue.leave[0], walking = (active && cue.enter && beat < cue.enter[1]) || leaving;
   // through the drop 반장 goes from covering his ears (step 1) to a grudging nod on 1 and 3 (step 2) to the foot tap (soft)
   const hy = active && L.hype && inRange(beat, L.hype) ? hypeStage(beat) : 0, ears = hy === 1, nodding = hy === 2 && Math.floor(beat) % 2 === 0 && ph < 0.2;
-  const ox = leaving ? lerp(OBS_X, W + 20, ease(Math.min(1, (beat - cue.leave[0]) / (cue.leave[1] - cue.leave[0])))) : walking ? lerp(W + 20, OBS_X, ease((beat - cue.enter[0]) / (cue.enter[1] - cue.enter[0]))) : OBS_X;
+  const ox = active ? obsX(beat) : OBS_X;
   FX.react[2] = { type: frown ? 'glance' : '', at: nowMs };
   const pose = { hand: { x: BOSS_X + 22, y: 108 }, carry: null, wince: false, dip: 0, bob: walking ? (ph < 0.5 ? 1 : 0) : (softened && ph < 0.2) || nodding ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
-  g.save(); g.translate(ox, -2); g.scale(-1, 1); g.translate(-BOSS_X, 0);
+  // (facing the line; turned the way he goes when he walks back out)
+  g.save(); g.translate(ox, -2); if (!leaving) g.scale(-1, 1); g.translate(-BOSS_X, 0);
   PARTNERS[L.observer].draw(pose, nowMs, active);
   const top = bodyTop(90, pose);
   if (point) { thick(BOSS_X + 7, top + 22, BOSS_X + 24, top + 14, 4, C.shirt); R(BOSS_X + 22, top + 12, 4, 4, C.skin); R(BOSS_X + 25, top + 13, 3, 1, C.skin); }
@@ -2493,11 +2503,12 @@ function drawLove15(t, nowMs) {
   }
 }
 // 1-5 phase 2: 4 a.m., 지우's room (L.room). We look over his shoulder at his laptop: the timeline of the beat he is making,
-// two tracks (the top ones: clock, guitar, melody; the rhythm ones: drums, bass), the playhead near the left. The clips
-// slide in from the right and you set each one down as it reaches the playhead (the same one button); each new layer lights
-// its name, and something from the night comes back in the screen's corner. A window with the city turning blue behind the
-// laptop; the screen's light on him; his head nodding on the beat. At the stop he saves it: '하은', deleted, '새 비트'.
-const ROOM = { x0: 70, x1: 292, y0: 22, y1: 142, ph: 112, tr: [70, 106] };
+// a row for each instrument (L.room.tracks), the playhead near the left. A new instrument every four bars: its row appears,
+// its clips slide in from the right and you set each one down as it reaches the playhead (the same one button), and from
+// then on it loops on its row while the next one goes in; with each, something from the night comes back over his head.
+// A window with the city turning blue behind the laptop; the screen's light on him; his head nodding on the beat. At the
+// stop he saves it: '하은', deleted, '새 비트'.
+const ROOM = { x0: 70, x1: 292, y0: 22, y1: 142, ph: 112 };
 function drawRoomMemory(kind, a, x, y, nowMs) {
   // a small pink-tinted picture of the night: her at her belt
   g.save(); g.globalAlpha = a;
@@ -2533,36 +2544,63 @@ function drawRoom15(t, nowMs, b, post) {
   R(x0 - 4, y0 - 4, x1 - x0 + 8, y1 - y0 + 8, '#0a0c12'); R(x0, y0, x1 - x0, y1 - y0, '#121a2c');
   R(x0 - 18, 168 - 22, x1 - x0 + 36, 22, '#1a1d26'); R(x0 - 18, 168 - 22, x1 - x0 + 36, 2, '#2c3040');   // the keyboard deck
   g.save(); g.font = '700 7px sans-serif'; g.fillStyle = '#9aa6c8'; g.fillText(stopped ? '■ 정지' : '● 녹음  새 비트.prj', x0 + 4, y0 + 9); g.restore();
-  // the layers' names, lit as each goes in
-  g.save(); g.font = '700 7px sans-serif';
-  Rm.layers.forEach(([lb, name], k) => { const on = b >= lb, x = x0 + 4 + k * 34; g.fillStyle = on ? (k % 2 ? '#6fd8ff' : '#ff9cc2') : '#2e3650'; g.fillRect(x, y0 + 14, 30, 10); g.fillStyle = on ? '#121a2c' : '#55607e'; g.fillText(name, x + 3, y0 + 22);
-    if (on && b < lb + 1 && !post) { g.globalAlpha = 1 - (b - lb); g.fillStyle = '#ffffff'; g.fillRect(x - 1, y0 + 13, 32, 12); g.globalAlpha = 1; } });
+  // the tracks: a row for each instrument, appearing as its first clips come in (TRAVEL beats ahead); while it is being
+  // recorded (its four bars) the row is lit with a red dot and its clips are the ones you set down; after that it loops on
+  // its row, its pattern going by, its name blinking on its hits: the screen filling up a row at a time
+  const tk = Rm.tracks, rh = 11, ry = y0 + 28, lx = x0 + 32, v = (x1 - 6 - ph) / (TRAVEL * spb), bpx = spb * v;
+  const recK = tk.reduce((m, tr, k) => (b >= tr[0] ? k : m), -1), shown = tk.filter(tr => b >= tr[0] - TRAVEL).length;
+  const rowOf = beat => { let k = 0; tk.forEach((tr, i) => { if (beat >= tr[0]) k = i; }); return k; };
+  const colOf = lane => (lane ? '#6fd8ff' : '#ff9cc2');
+  g.save(); g.font = '700 7px sans-serif'; g.fillStyle = '#55607e'; g.fillText(`트랙 ${Math.max(0, recK + 1)}/${tk.length}`, x1 - 36, y0 + 9);
+  g.font = '700 6px sans-serif';
+  for (let k = 0; k < tk.length; k++) {
+    const [at, name, pat, lane] = tk[k], y = ry + k * rh, rec = !stopped && k === recK && b < at + 16;
+    if (k >= shown) { if (k === shown && !stopped) { g.fillStyle = '#2e3650'; g.fillText('+', x0 + 6, y + 8); } continue; }
+    const live = b >= at, cell = Math.floor((b - at) * 4), hitNow = live && !rec && !stopped && pat[((cell % pat.length) + pat.length) % pat.length] === 'x' && ((b - at) * 4) % 1 < 0.8;
+    R(x0 + 2, y, x1 - x0 - 4, rh - 1, rec ? '#1e2c48' : '#172033');
+    R(x0 + 4, y + 1, 26, rh - 3, live ? colOf(lane) : '#2e3650'); g.globalAlpha = live ? (hitNow ? 1 : 0.55) : 0.6;
+    g.fillStyle = '#121a2c'; g.fillText(name, x0 + 6, y + 7); g.globalAlpha = 1;
+    if (hitNow) R(x0 + 4, y + 1, 26, 1, '#ffffff');
+    if (rec && Math.floor(nowMs / 350) % 2) R(x0 + 27, y + 3, 2, 2, '#ff5040');
+    if (live && b < at + 1 && !post) { g.globalAlpha = (1 - (b - at)) * 0.6; R(x0 + 2, y, x1 - x0 - 4, rh - 1, '#ffffff'); g.globalAlpha = 1; }
+  }
   g.restore();
-  // the tracks
-  const ty = [ROOM.tr[0], ROOM.tr[1]];
-  for (const [k, y] of ty.entries()) { R(x0 + 2, y, x1 - x0 - 4, 26, '#182238'); R(x0 + 2, y + 26, x1 - x0 - 4, 1, '#253150'); g.save(); g.font = '700 6px sans-serif'; g.fillStyle = '#55607e'; g.fillText(k ? '리듬' : '멜로디', x0 + 4, y + 7); g.restore(); }
   // the bar lines going by
-  for (let bb = Math.floor(b) - 4; bb < b + 8; bb++) { if (bb < Rm.from || bb % 4) continue; const x = ph + (bb - b) * spb * ((x1 - 4 - ph) / (TRAVEL * spb)); if (x > x0 + 2 && x < x1 - 2) R(Math.round(x), ty[0], 1, ty[1] + 26 - ty[0], '#253150'); }
-  // the clips
-  const v = (x1 - 6 - ph) / (TRAVEL * spb), flash = Math.max(0, 1 - (nowMs - lastGood) / 160), miss = nowMs - FX.lastMiss < 260;
-  g.save(); g.beginPath(); g.rect(x0 + 2, y0 + 30, x1 - x0 - 4, y1 - y0 - 30); g.clip();
+  g.save(); g.beginPath(); g.rect(lx, ry, x1 - 2 - lx, tk.length * rh); g.clip();
+  for (let bb = Math.floor(b) - 4; bb < b + 8; bb++) { if (bb < Rm.from || bb % 4) continue; const x = ph + (bb - b) * bpx; R(Math.round(x), ry, 1, Math.max(0, shown) * rh, '#253150'); }
+  // the recorded loops: each row's pattern after its four bars, up to the stop
+  for (let k = 0; k < Math.min(tk.length, shown); k++) {
+    const [at, , pat, lane] = tk[k], y = ry + k * rh;
+    for (let c = Math.floor((b - 2) * 4); c <= Math.ceil((b + TRAVEL + 0.5) * 4); c++) {
+      const bb = c / 4; if (bb < at + 16 || bb >= Rm.stop) continue;
+      const pc = ((Math.round((bb - at) * 4) % pat.length) + pat.length) % pat.length; if (pat[pc] !== 'x') continue;
+      const x = Math.round(ph + (bb - b) * bpx), past = bb <= b;
+      g.globalAlpha = past ? 0.55 : 0.32; R(x - 3, y + 2, 6, rh - 5, colOf(lane)); g.globalAlpha = 1;
+    }
+  }
+  // the clips you set down: on the row of the instrument going in
+  const flash = Math.max(0, 1 - (nowMs - lastGood) / 160), miss = nowMs - FX.lastMiss < 260;
   for (const n of notes) {
     if (n.beat < Rm.from) continue; if (!post && t < n.place) break;
-    const x = ph + (n.arr - t) * v; if (x < x0 - 10) continue;
-    const y = ty[n.lane] + 4, col = n.state === 'miss' ? '#d8463b' : n.lane ? '#6fd8ff' : '#ff9cc2';
+    const x = ph + (n.arr - t) * v; if (x < lx - 10) continue;
+    const y = ry + rowOf(n.beat) * rh + 1, col = n.state === 'miss' ? '#d8463b' : colOf(n.lane);
     const done = n.state === 'hit', ha = done ? t - n.hitAt : 9;
-    g.globalAlpha = done ? Math.max(0.35, 1 - ha * 1.2) : n.state === 'miss' ? 0.6 : 1;
-    R(Math.round(x - 5), y, 10, 18, col); R(Math.round(x - 5), y, 10, 2, '#ffffff'); for (let k = 0; k < 4; k++) R(Math.round(x - 3 + k * 2), y + 6 + ((k * 5 + n.i) % 7), 1, 5 - (k % 2) * 2, '#121a2c');
-    if (done && ha < 0.12) { g.globalAlpha = 1 - ha / 0.12; R(Math.round(x - 7), y - 2, 14, 22, '#ffffff'); }
+    g.globalAlpha = done ? Math.max(0.55, 1 - ha * 1.2) : n.state === 'miss' ? 0.6 : 1;
+    R(Math.round(x - 4), y, 8, rh - 3, col); R(Math.round(x - 4), y, 8, 1, '#ffffff');
+    if (done && ha < 0.12) { g.globalAlpha = 1 - ha / 0.12; R(Math.round(x - 6), y - 2, 12, rh + 1, '#ffffff'); }
     g.globalAlpha = 1;
   }
   g.restore();
   // the playhead
-  R(ph - 1, y0 + 30, 2, y1 - y0 - 32, miss ? '#ff5040' : flash > 0 ? '#ffffff' : '#ffe27a'); R(ph - 4, y0 + 28, 8, 3, miss ? '#ff5040' : '#ffe27a');
-  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(ph - 6, y0 + 30, 12, y1 - y0 - 32, '#fff2b0'); g.restore(); }
-  // the night coming back in the corner of the screen
+  R(ph - 1, ry - 2, 2, tk.length * rh + 2, miss ? '#ff5040' : flash > 0 ? '#ffffff' : '#ffe27a'); R(ph - 4, ry - 4, 8, 3, miss ? '#ff5040' : '#ffe27a');
+  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(ph - 6, ry, 12, tk.length * rh, '#fff2b0'); g.restore(); }
+  // the night coming back: a thought over his head
   const mem = Rm.memories.find(([mb]) => b >= mb && b < mb + 7);
-  if (mem && !stopped) drawRoomMemory(mem[1], Math.min(1, (b - mem[0]) / 0.6) * Math.min(1, (mem[0] + 7 - b) / 1), x1 - 62, y0 + 30, nowMs);
+  if (mem && !stopped) {
+    const ma = Math.min(1, (b - mem[0]) / 0.6) * Math.min(1, (mem[0] + 7 - b) / 1);
+    g.save(); g.globalAlpha = ma; for (const [dx, dy, r] of [[44, 68, 3], [49, 79, 2], [53, 89, 2]]) R(dx, dy, r, r, '#c8a0b8'); g.restore();
+    drawRoomMemory(mem[1], ma, 4, 28, nowMs);
+  }
   // at the stop: saving it
   if (stopped) {
     const q = b - Rm.stop, name = q < 1.5 ? '하은'.slice(0, Math.min(2, Math.floor(q * 3) + 1)) : q < 2.6 ? (q < 2.1 ? '하' : '') : q < 4.5 ? '새 비트'.slice(0, Math.min(4, Math.floor((q - 2.6) * 4) + 1)) : '새 비트';
@@ -6493,7 +6531,7 @@ function placeHeadBubble({ x, y }) {
   const right = x > W * 0.6;
   bubble.style.bottom = ((H - y + 6) / H * 100).toFixed(1) + '%';
   bubble.classList.toggle('tr', right);
-  if (right) { bubble.style.left = 'auto'; bubble.style.right = ((W - x) / W * 100 - 4).toFixed(1) + '%'; }
+  if (right) { bubble.style.left = 'auto'; bubble.style.right = Math.max(1, (W - x) / W * 100 - 4).toFixed(1) + '%'; }
   else { bubble.style.right = 'auto'; bubble.style.left = x < 30 ? '3cqw' : (x / W * 100 - 4).toFixed(1) + '%'; }
 }
 const hud = $('hud'), clockEl = $('clock'), comboEl = $('combo'), bubble = $('bubble'), hint = $('hint');
@@ -6526,13 +6564,14 @@ function updateHud(t) {
     if (L.daw) { if (spk === 'b') { bx = 0; bubble.style.bottom = '32%'; } else if (spk === 'h') { bx = 34; bubble.style.bottom = '32%'; } else if (spk === 'd') { bx = 200; bubble.style.bottom = '19%'; } }
     bubble.style.left = bx == null || bx < 60 ? '3cqw' : (bx / W * 100 - 5).toFixed(1) + '%'; bubble.style.right = 'auto'; bubble.classList.remove('tr');
     bubble.classList.toggle('obs', !!(spk && (L.cast ? (spk === 'b') !== (castPlacer(beat) === 'boss') : spk === 'b' || spk === 's' || (L.daw && spk !== 'j'))));
+    bubble.classList.toggle('room', spk === 'r');   // (1-5's room: narrow, clear of his timeline's track names)
     bubble.classList.remove('loud');
     if (line && line[5] === 'loud') { void bubble.offsetWidth; bubble.classList.add('loud'); FX.shakeUntil = performance.now() + 240; FX.shakeAmp = 2; }
   }
   if (line && line[4] === 'h' && L.coScanner) placeHaeunBubble(beat);
   if (line && line[4] === 'd' && L.driver) placeHeadBubble(driverHead(beat));
   const spkNow = line ? line[4] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.spk : null;
-  if (spkNow && L.heads && L.heads[spkNow]) { const [hx, hy] = STG.on && STG.heads && STG.heads[spkNow] ? STG.heads[spkNow] : L.heads[spkNow], up = spkNow === 'b' && L.bossSeat && (inRange(beat, L.bossSeat.stand) || (TUT.on && TUT.stand)) ? 14 : 0; placeHeadBubble({ x: hx + (up ? 6 : 0), y: hy - up }); }
+  if (spkNow && L.heads && L.heads[spkNow]) { const [hx, hy] = STG.on && STG.heads && STG.heads[spkNow] ? STG.heads[spkNow] : L.heads[spkNow], up = spkNow === 'b' && L.bossSeat && (inRange(beat, L.bossSeat.stand) || (TUT.on && TUT.stand)) ? 14 : 0, walk = spkNow === 'b' && L.obsCue ? obsX(beat) - OBS_X : 0; placeHeadBubble({ x: hx + (up ? 6 : 0) + walk, y: hy - up }); }
   let h = '';
   if (L.tutorial) for (let i = 0; i < 3; i++) { const n = notes[i]; if (n && n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 터치'; break; } }
   const hintFor = (key, text, holdText) => {
