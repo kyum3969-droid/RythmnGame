@@ -258,9 +258,6 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 
 </div>
 
-<script src="rookie-rig.js"></script>
-<script src="rookie-art.js"></script>
-<script src="shared/character-rig.js"></script>
 <script>
 (() => {
 'use strict';
@@ -992,58 +989,115 @@ const LEVELS = [
       { who:'마르코', text:'그래도 도움이 되고 싶은데. …내일 다시 해요, 신입.', scene:'pocha', mpose:'raise' }],
   }
   ,{
-    id:'s2-3', stageNo:'2-3', who:'반장 + 지우', role:'반장 · 지우 · 순자 이모 · 96 BPM · 벨트 둘', tag:'레게톤 · 버튼 둘 · 본선 사흘 전', bpm:96, style:'dembow23', fxTheme:'neon', inspector: true,
-    // 2-3 두 벨트: peak season opens a second belt; 지우 loads the upper one, three nights before her final, while 반장 loads
-    // the lower one. Two buttons again (left hand the upper gate, right hand the lower). 순자 이모 stands between the belts and
-    // pushes or grabs on either. Halfway through 지우 stops to stare at her phone (the final's notice): her belt goes quiet, and
-    // her hands are late for a while after.
-    lanes: 2, partners: ['jiwoo', 'boss'], tempo: [[0, 96]], clock:'02:10', title:'두 벨트', hints:true,
-    chords: DEM.chords, roots: DEM.roots,
-    chordAt: bar => bar < 2 ? 0 : bar < 10 ? DEM.verse[(bar - 2) % 4] : bar < 14 ? DEM.pre[(bar - 10) % 4] : bar < 22 ? DEM.chorus[(bar - 14) % 4] : bar < 30 ? DEM.verse[(bar - 22) % 4] : bar < 34 ? DEM.pre[(bar - 30) % 4] : bar < 42 ? DEM.chorus[(bar - 34) % 4] : bar < 46 ? DEM.verse[(bar - 42) % 4] : bar < 54 ? DEM.chorus[(bar - 46) % 4] : 0,
-    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 216,
-    phone: [[88, 104]], phoneLane: 0, lateHint: '지우가 본선 생각에… 손이 늦어요. 손을 봐요',
-    special:['밀리거나 붙잡힌 상자', 'off', '받아냄'],
-    sections: [[0, 'intro'], [2, 'v1'], [10, 'pre1'], [14, 'ch1'], [22, 'v2'], [30, 'pre2'], [34, 'ch2'], [42, 'bridge'], [46, 'ch3'], [54, 'outro']],
-    // lower belt (반장, right hand) and upper belt (지우, left hand). 'P' pushed, 'R' grabbed, 'L' late (지우 after the phone)
-    bars: [
-      '........', '........',
-      'x...x...', 'x.x.x...', 'x...P...', 'x.x.x...', 'x...x.x.', 'R...x...', 'x.x.x...', 'x...P...',
-      'x...x...', 'x.x.x...', 'x...R...', 'x.x.x.x.',
-      'x.x.x...', 'P...x.x.', 'x...R...', 'x.x.x...', 'x.x.x.x.', 'R...P...', 'x.x.x...', 'x...x.P.',
-      'x...x...', 'x.x.x...', 'x...P...', 'x...x.x.', 'x.x.x...', 'R...x...', 'x...P.x.', 'x.x.x...',
-      'x...x...', 'x.x.x...', 'x...R...', 'x.x.x.x.',
-      'x.x.x...', 'P...x.x.', 'x...R...', 'x.x.x...', 'x.x.x.x.', 'R...P...', 'x.x.x...', 'x...x.P.',
-      'x.......', 'x...x...', 'x.......', 'x.x.x.x.',
-      'x.x.x.x.', 'P...x.x.', 'x...R.x.', 'x.x.x...', 'x.x.x.x.', 'R...P...', 'x.x.x.x.', 'P...x.R.',
-      '........', '........'
-    ],
-    bars2: [
-      '........', '........',
-      '....x...', 'x.......', '....x...', 'x.......', '....x...', 'x.......', '....R...', 'x.......',
-      'x...x...', 'x.......', 'x...x...', 'x.......',
-      'x...x...', 'x.P.....', 'x...x...', '....R...', 'x...x...', 'P.......', 'x...x...', '....x...',
-      '........', '........', '........', '........', 'L.......', '....L...', 'L...x...', '....x...',
-      'x...x...', 'x.......', 'x...x...', 'x.......',
-      'x...x...', 'x.P.....', 'x...x...', '....R...', 'x...x...', 'P.......', 'x...x...', '....x...',
-      '........', '....x...', '........', 'x...x...',
-      'x...x...', 'x.P.x...', 'x...x...', 'R...x...', 'x.x.x...', 'P...x...', 'x...x...', 'x.R.....',
-      '........', '........'
-    ],
-    say: [[8, '왼손 위, 오른손 아래.', 3, 1], [40, '(지게차 소리) …어, 저 양반 오늘은 반듯하네.', 3.5, 0, 's'], [60, '둘 다 본다. 손 봐.', 2.5, 0, 's'],
-          [86, '(폰을 본다) …본선 공지 떴다. 사흘 뒤.', 4, 0, 'j'], [96, '형, 나 손 떨려.', 2.5, 0, 'j'], [104, '…미안해요. 다시 할게요.', 3, 0, 'j'], [112, '(작게) …붙으면 뭐 하지.', 3.5, 0, 'j'],
-          [168, '위에 늦는다! 신입, 손 봐.', 3, 1], [200, '…됐다. 고마워요, 형.', 2.5, 0, 'j']],
-    comfort: ['괜찮아. 다음 거 봐.', '신입! 위도 봐!'],
+    id:'s2-3', stageNo:'2-3', who:'반장 + 마르코', role:'반장 · 마르코 · 106 BPM · 라인 넷', tag:'곡 없는 냉전 · 허리 · 블루스 펑크 합주', bpm:105.99, style:'funk21', fxTheme:'warm',
+    // 2-3 합주: the night after 천천히. 마르코 comes with two cans of coffee to say sorry and finds a transfer request on the board
+    // (마르코 → line 7, asked for by 반장). No radio, no boombox: the cold war plays to the line's own sounds (the motor's clunk,
+    // each belt's scanner beeping its own note). The announcement wants yesterday's backlog cleared by six; 반장, of all people,
+    // rushes (his boxes on every eighth), lifts a heavy one and his back goes (the same back as 1-4) and he sits down on it.
+    // 마르코 crosses to the left for the first time: "반장님, 천천히 해요." Alone on all four belts he goes fast and it jams. In
+    // the silence 반장 pats the box beside him (하나… 둘…), 마르코 plugs the boombox back in, and the pats are the first sound of
+    // the song (a blues funk, "First Light on the Sand", 105.99 BPM): the two of them in one groove at last, the floor a lake
+    // beach at dawn under a city's skyline (his Chicago and the beach in one picture), the backlog counted down to nothing.
+    tempo: [[0, 105.99]], clock:'01:00', title:'합주', partners:['boss'], hints:false,
+    songs: [{ src: 'audio/2-3-first-light-on-the-sand.mp3', at: 108, lead: 0.365, gain: 0.9 }],
+    songStart: -1, songCues: [[108, 0]], noCount: true, bareBand: true, hitKit: 'ticktock', subs: true,
+    // ht: the cold war (each scanner its own note until `song`); cuts [from, to] (letterboxed, no boxes) and the camera's shots
+    // in them ('b' 반장, 'v' 마르코, 'mid'); rush (반장 hurrying), lift (the heavy box), back (his back goes, he sits on it);
+    // jam (마르코's four belts jam: the belts stop, boxes spill, until the song); plug (the boombox back in); taps (his pats on a
+    // box: the two before the song, then the song's own, then every half bar as he keeps time); fuse (the lake beach coming
+    // in from both ends of the floor); dawn and sun; left: the backlog on the board [shown from, the count, at zero by]
+    ht: { song: 108, cuts: [[72, 84], [100, 113]],
+      zoom: [[72, 76, 'b', 1.9], [76, 84, 'b', 1.6], [100, 104, 'v', 1.8], [104, 107, 'b', 1.9], [107, 110, 'v', 1.7], [110, 113, 'b', 1.4]],
+      rush: [54, 72], lift: [69.5, 72], back: 72, jam: 100, plug: 107, taps: [104, 106, 108, 110, 111.5, 114, 116, 118, 119.5], tapFrom: 120,
+      fuse: [136, 168], dawn: [136, 380], sun: [340, 384], left: [48, 1240, 352] },
+    mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 136, guide: [-9, -8], tags: [-9, -8, -7],
+      shouts: [[136, 'hey', '헤이!'], [284, 'hey', '가즈아~!'], [352, 'none', '마지막!']],
+      route: [[0, "rl"], [6.5, "ru"], [10.5, "rl"], [22.5, "ru"], [26.5, "rl"], [38.5, "ru"], [42.5, "rl"], [62.5, "ru"], [72.5, "lk"], [83, "lu"], [87, "ru"], [91, "rl"], [95, "ll"], [101, "bx"], [108.5, "lk"], [118.5, "rl"], [134.5, "rl"], [150.5, "ru"], [166.5, "rl"], [182.5, "ru"], [198.5, "rl"], [202.5, "lu"], [206.5, "rl"], [210.5, "lu"], [214.5, "rl"], [218.5, "lu"], [222.5, "rl"], [226.5, "lu"], [230.5, "rl"], [234.5, "lu"], [238.5, "rl"], [242.5, "lu"], [246.5, "rl"], [250.5, "lu"], [254.5, "rl"], [258.5, "lu"], [262.5, "rl"], [266.5, "lu"], [270.5, "rl"], [274.5, "lu"], [278.5, "rl"]],
+      bars: [
+        '1.......................1.......................', '1...........2...........1...........2...........',
+        '1...........4...........1...........4...........', 'x...........4...........1...........4...........',
+        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
+        '1...........4...........1...........4...........', 'x...........4...........1...........4...........',
+        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
+        '1...........4...........1...........4...........', 'x...........4...........1...........4...........',
+        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
+        '1...........x...........1...........x...........', '1.....1.....x.....1.....1.....1.....x.....1.....',
+        '1.....1.....y.....1.....1.....1.....y.....1.....', '1.....1.....y.....1.....1.....1.....y.....1.....',
+        '................................................', '................................................',
+        '................................................', '3.....2.....1.....4.....3.....4.....3.....2.....',
+        '1.....4.....3.....2.....1.....4.....1.....2.....', '1.....4.....3.....2.....3.....4.....1.....2.....',
+        '1.....4.....1.....2.....3.....4.....3.....4.....', '................................................',
+        '................................................', '................................................',
+        '........................1.......................', '1.......................1.................1.....',
+        '..................2.....1.......................', '2.......................1.....2.................',
+        '............1...........2...........2...........', '2.......................1.......................',
+        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
+        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
+        '1...........4...........1...........4.....4.....', '1...........4...........1...........4.....4.....',
+        '1...........4.....4.....1...........4...........', '1...........4...........1...........4.....4.....',
+        '1...........2...........1...........2.....2.....', '1...........2...........1...........2.....2.....',
+        '1...........2.....2.....1...........2...........', '1...........2...........1...........2.....2.....',
+        '1...........4.....4.....1...........4...........', '1...........4...........1...........4.....4.....',
+        '1...........4...........1.....4.....4...........', '1...........4...........1...........4.....4.....',
+        '1.....2.....2...........1...........2...........', '1.......................1...........3.....3.....',
+        '1...........2.......................2.....4.....', '1...........3...........1.....3.................',
+        '1...........2...........2.................4.....', '1.......................1.....3...........3.....',
+        '1...........2.....4.................2...........', '1...........3...........1.................3.....',
+        '1...........2...........2...........2...........', '1.......................1.....3...........3.....',
+        '1...........2.......................2.....4.....', '1.......................1.....3.....3.....3.....',
+        '1...........2.....4.....2...........2...........', '1...........3...........1.....3...........3.....',
+        '1...........2.....4.................2.....4.....', '1...........3...........1.....3...........3.....',
+        '1...........2.....4.....2.....4.................', '............3...........1.....3...........3.....',
+        '............2.....4...........4...........4.....', '............3.....3...........3.................',
+        '............2...........2.....4...........4.....', 'x...........2.....4.....1.................4.....',
+        'x.......................1.....2.....4.....2.....', 'x...........2.....4.....1.....4.................',
+        'x...........4.....2.....1.....2.................', 'x...........2...........1.....4...........4.....',
+        'x...........4...........1.....2...........2.....', 'x...........2.....4.....1.....4.................',
+        'x.................2.....1.....2...........2.....', 'x.................4.....1.....4...........4.....',
+        'x.....2.....4.....2.....1.......................', '1.......................1.......................',
+        '1.......................1.......................', '1.......................1.......................',
+        '1.......................1.......................', '1...........2...........1...........2...........',
+        '1...........2...........1...........2...........', '1...........2...........1.....4.....2.....4.....',
+        'x.....4.................x.....4.....2...........', 'x...........2...........x.....4...........3.....',
+        'x...........2...........x.....4.....2...........', 'x...........2.....3.....x.....4.................',
+        '........x.......................2...............', '................1...............................',
+        '..............2......1.....4....................', '......x.........................................',
+        '................................................'
+    ] },
+    comfort: ['…다음 거.'],
+    phaseFx: { amber: [], lineOn: [-9, -9, -9], drop: 136, drop2: null, last: 380.5, out: [383.5, 384.2, 1e9] },
+    sfx: [...Array(100).keys()].map(b => [b, 'motor']).concat([[47, 'pa'], [69.5, 'heave'], [72, 'thud'], [100, 'jam'], [104, 'thump'], [106, 'thump'], [107, 'plug']], [108, 110, 111.5, 114, 116, 118, 119.5].map(b => [b, 'thump'])),
+    chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
+    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 386,
+    special:['마르코가 보낸 상자', 'right', '받아냄'],
+    sections: [[0, 'cold'], [12, 'pa'], [14, 'rush'], [18, 'back'], [21, 'alone'], [25, 'jam'], [27, 'song'], [34, 'band'], [51, 'trade'], [71, 'drop'], [81, 'down'], [88, 'last']],
+    bars: Array(97).fill('................'),
+    // 'b' 반장, 'v' 마르코, 'p' the announcement, 'n' nobody (a stage direction)
+    say: [[48.2, '3라인, 어제 잔량 포함해서 06시까지 정리 바랍니다.', 5, 0, 'p'], [54.2, '…내가 뺀다.', 2.5, 0, 'b'], [60, '반장님?', 2, 0, 'v'],
+          [72.1, '윽—!', 1.6, 0, 'b'], [73.8, '반장님!', 1.8, 0, 'v'], [75.8, '(허리를 짚고) …또 이러네.', 2.8, 0, 'b'],
+          [78.7, '(무릎을 꿇고) 반장님, 천천히 해요.', 3, 0, 'v'], [81.8, '…내가 할게요.', 2.2, 0, 'v'],
+          [100.4, '어, 어… 왜 안 돼…', 3, 0, 'v'], [104, '…하나.', 1.8, 0, 'b'], [106, '…둘.', 1.6, 0, 'b'], [107.2, '(붐박스 플러그를 다시 꽂는다)', 1.6, 0, 'n'],
+          [140, '…그래. 그거.', 2.5, 0, 'b'], [230, '반장님, 이 노래 괜찮죠?', 3, 0, 'v'], [234, '…시끄러.', 2.5, 0, 'b']],
     intro: [
-      { who:'', text:'셋째 밤, 새벽 2시 10분. 성수기라 벨트를 하나 더 열었다. 위는 지우.' },
-      { who:'반장', text:'위는 지우가 싣는다. 왼손 위, 오른손 아래.' },
-      { who:'지우', text:'본선 사흘 전인데 야간이라니…' },
-      { who:'순자 이모', text:'노래하는 애? 둘 다 내가 본다. 손 봐.' }],
-    outro: (good, sp) => good ? [
-      { who:'지우', text:'…고마워요, 형. 위에.' },
-      { who:'반장', text:'…잘 받았다.' },
-      { who:'순자 이모', text:'노래하는 애가 손은 빠르네.' },
-      { who:'', text:'지게차가 둘째 벨트 자리에 팔레트를 딱 맞춰 놓고 갔다.' }] : [
-      { who:'지우', text:'…내일은 더 빨리 실을게요.' }]
+      { who:'', text:'셋째 밤. 새벽 1시.' },
+      { who:'마르코', text:'(캔커피 둘을 들고) 반장님, 저기… 어제는…' },
+      { who:'', text:'게시판에 종이가 한 장 붙어 있다. 「3라인 마르코 → 7라인 전환 요청. 요청: 3라인 반장」' },
+      { who:'마르코', text:'……' },
+      { who:'반장', text:'(돌아보지 않는다) 위에서 답 오면, 가면 돼.' },
+      { who:'마르코', text:'…알겠어요.' },
+      { who:'', text:'마르코는 캔 하나를 라디오 옆에 두고 자리로 갔다. 그날 밤, 라디오도 붐박스도 켜지지 않았다.' }],
+    outro: good => good ? [
+      { who:'', text:'새벽 5시 52분. 잔량 0.' },
+      { who:'', text:'반장이 일어나 게시판으로 갔다. 종이를 떼어, 반으로 접고, 한 번 더 접어 주머니에 넣었다. 아무도 말하지 않았다.' },
+      { who:'', text:'마르코가 라디오 옆의 캔을 집어 내밀었다.' },
+      { who:'반장', text:'…식었네.' },
+      { who:'마르코', text:'데워 올까요?' },
+      { who:'반장', text:'(캔을 딴다) …됐어. 천천히 마시지 뭐.' },
+      { who:'마르코', text:'(웃는다) 헤헤.' }] : [
+      { who:'', text:'새벽 6시. 잔량이 남았다.' },
+      { who:'반장', text:'…나머진 내일.' },
+      { who:'', text:'반장은 게시판 앞에 한참 서 있다가, 종이를 떼어 주머니에 넣었다.' },
+      { who:'반장', text:'(캔을 집는다) …식었네.' }],
   }
   ,{
     id:'s2-4', stageNo:'2-4', who:'박씨', role:'박씨 · 순자 이모 · 84→96→104 BPM', tag:'하드 록 · 중량물 두 손 · 템포 상승', bpm:84, style:'rock22', fxTheme:'rock', inspector: true,
@@ -1664,7 +1718,7 @@ function loadLevel(level) {
   // the four-lane part (L.quad): one note per cell, n.q = the chute (0-3); they are on no belt (lane 0 only for the effects).
   // The two-line part (L.mid) the same with '1' = the left line, '2' = the right, 'x' = both at once
   const QD = level.quad || level.mid;
-  if (QD) QD.bars.forEach((bar, k) => { const div = bar.length / 4; for (let c = 0; c < bar.length; c++) { const beat = (QD.from + k) * 4 + c / div; const ds = level.mid && bar[c] === 'x' ? [0, 1] : ['1234'.indexOf(bar[c])]; for (const d of ds) { if (d < 0) continue; const q = level.mid ? d % 2 : d; notes.push({ beat, beat0: beat, q, up: !!level.mid && d >= 2, quad: true, right: !!level.mid && q === 1, len: 0, lane: 0 }); } } });
+  if (QD) QD.bars.forEach((bar, k) => { const div = bar.length / 4; for (let c = 0; c < bar.length; c++) { const beat = (QD.from + k) * 4 + c / div; const ds = level.mid && 'xyzw'.includes(bar[c]) ? { x: [0, 1], y: [0, 3], z: [2, 1], w: [2, 3] }[bar[c]] : ['1234'.indexOf(bar[c])]; for (const d of ds) { if (d < 0) continue; const q = level.mid ? d % 2 : d; notes.push({ beat, beat0: beat, q, up: !!level.mid && d >= 2, quad: true, right: !!level.mid && q === 1, len: 0, lane: 0 }); } } });
   // his boxes in 1-5's choruses carry a heart
   if (level.love && level.love.heart) notes.forEach(n => { if (n.lane === 0 && inRange(n.beat, level.love.heart)) n.heart = true; });
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
@@ -2322,19 +2376,8 @@ const NEON_GTR = ['....x', '...x.', '..x..', '..x..', '.xxx.', 'x...x', 'x...x',
 const NOTE_PIX = ['..xx..', '..x.x.', '..x..x', '..x...', '..x...', 'xxx...', 'xxx...'];
 
 // ---------- drawing helpers ----------
-const RENDER_SCALE = 4, canvasScales = new WeakMap();
-function sizeRenderCanvas(canvas, w, h) {
-  canvas.width = w * RENDER_SCALE; canvas.height = h * RENDER_SCALE;
-  canvasScales.set(canvas, RENDER_SCALE); return canvas;
-}
-function setContextTransform(context, a, b, c, d, e, f) {
-  const s = canvasScales.get(context.canvas) || 1;
-  context.setTransform(a * s, b * s, c * s, d * s, e * s, f * s);
-}
-const cv = sizeRenderCanvas($('cv'), W, H);
+const cv = $('cv');
 let g = cv.getContext('2d');
-const setDrawTransform = (...matrix) => setContextTransform(g, ...matrix);
-setDrawTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false;
 const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
 const thick = (x1, y1, x2, y2, s, c) => {
   const d = Math.max(1, Math.hypot(x2 - x1, y2 - y1));
@@ -2595,45 +2638,7 @@ function drawLiftDrop(beat, t) {
   g.save(); g.translate(top.x + p * 6, lerp(top.y + LIFT_BOX.h / 2, 190, p * p)); g.rotate(p * 0.7); drawBox(LIFT_BOX, 0, 0, '', t); g.restore();
 }
 function basePose(t, bt, active, lane = 0) {
-  const pose = basePoseLegacy(t, bt, active, lane);
-  const actor = L.cast ? castPlacer(pose.beat) : L.partners[lane];
-  const profile = WORK_RIG_PROFILES[actor];
-  // Opt in standard belt work. Dual-belt throws and stage choreography retain
-  // their authored targets; other cast members can opt in with their own profile.
-  if (!profile || L.lanes === 2 || L.daw || L.stage || pose.phone) return pose;
-  pose.workRig = true;
-  pose.armBend = profile.bendSide;
-  if (!active) return pose;
-  const laneNotes = notes.filter(n => loadLane(n) === lane && !n.toss && !n.quad);
-  for (let i = 0; i < laneNotes.length; i++) {
-    const n = laneNotes[i]; if (n.len || n.drop || n.up || n.slam) continue;
-    const pickTime = n.place - n.carry, previous = laneNotes[i - 1], next = laneNotes[i + 1];
-    const prepare = Math.min(profile.prepare, previous ? Math.max(0, (pickTime - previous.place) / 2) : profile.prepare);
-    const recover = Math.min(profile.recover, next ? Math.max(0, (next.place - next.carry - n.place) / 2) : profile.recover);
-    if (t < pickTime - prepare || t > n.place + recover) continue;
-    const motion = CharacterRig.sampleCarryCycle(profile, {
-      time: t, pickTime, placeTime: n.place, prepare, recover,
-      from: carryFrom(n), to: { x: PLACE_X + (n.cxOff || 0), y: BELT_Y - n.h / 2 },
-      grip: { x: -n.w / 2 + 1, y: 2 }, origin: { x: BOSS_X, y: PARTNERS[actor].base }
-    });
-    pose.carryMotion = motion; pose.hand = motion.hand;
-    pose.carry = motion.box ? { n, ...motion.box } : null;
-    pose.bob = 0; pose.nod = 0; pose.dip = 0;
-    return pose;
-  }
-  // A shortened recovery can finish before the old chart pose's return timer.
-  // Keep its settled rest pose until the next action, including long crates.
-  const last = laneNotes.findLast(n => n.place - n.carry <= t);
-  if (last && !last.len && !last.drop && !last.up && !last.slam && t >= last.place) {
-    pose.hand = { x: BOSS_X + profile.restHand.x, y: PARTNERS[actor].base + profile.restHand.y };
-  }
-  return pose;
-}
-function basePoseLegacy(t, bt, active, lane = 0) {
-  const actor = L.cast ? castPlacer(active ? beatAt(t) : 0) : L.partners[lane];
-  const profile = L.lanes !== 2 && !L.daw && !L.stage ? WORK_RIG_PROFILES[actor] : null;
-  const IDLE_HAND = profile ? { x: BOSS_X + profile.restHand.x, y: PARTNERS[actor].base + profile.restHand.y } : idleHand(lane);
-  const pose = { hand: IDLE_HAND, carry: null, wince: false, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: false, beat: 0, lane };
+  const IDLE_HAND = idleHand(lane), pose = { hand: IDLE_HAND, carry: null, wince: false, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: false, beat: 0, lane };
   if (!active) { pose.bob = Math.sin(bt * 1.7 + lane) > 0.85 ? 1 : 0; return pose; }
   const beat = beatAt(t), ph = beat - Math.floor(beat);
   pose.beat = beat;
@@ -2697,17 +2702,9 @@ function zzz(x, y, nowMs) {
   }
 }
 // eye, brow, sweat and breath for a human partner. ex/ey is the eye's top-left; faces right.
-function faceFx(cx, top, ex, ey, pose, nowMs, hairColor, active, eyeStyle = null) {
+function faceFx(cx, top, ex, ey, pose, nowMs, hairColor, active) {
   const r = FX.react[pose.lane], age = nowMs - r.at;
-  if (eyeStyle === 'jiwoo-a') {
-    // A's connected upper lid and vertical pupil stay recognizable in reactions.
-    const x = ex - (r.type === 'glance' && age < 700 ? 1 : 0);
-    if (pose.doze || pose.wince) R(x, ey + 1, 2, 1, '#2d1d21');
-    else { R(x, ey, 2, 1, '#2d1d21'); R(x + 1, ey + 1, 1, 1, '#2d1d21'); }
-    if (pose.doze) zzz(cx + 10, top + 2, nowMs);
-    if (pose.wince) R(cx - 9, top + 5, 2, 3, C.sweat);
-  }
-  else if (pose.doze) { R(ex - 1, ey + 1, 4, 1, C.ink); zzz(cx + 10, top + 2, nowMs); }
+  if (pose.doze) { R(ex - 1, ey + 1, 4, 1, C.ink); zzz(cx + 10, top + 2, nowMs); }
   else if (pose.wince) { R(ex - 1, ey + 1, 4, 1, C.ink); R(cx - 9, top + 5, 2, 3, C.sweat); }
   else if (r.type === 'glance' && age < 700) { R(ex - 2, ey - 1, 5, 1, hairColor); R(ex - 1, ey + 1, 3, 1, C.ink); }
   else R(ex, ey, 2, 2, C.ink);
@@ -2715,7 +2712,7 @@ function faceFx(cx, top, ex, ey, pose, nowMs, hairColor, active, eyeStyle = null
     const p = age / 900, x = cx + 9 + p * 10, y = top + 10 - p * 6;
     g.globalAlpha = 1 - p; R(x, y, 3, 2, '#e9e4da'); R(x + 2, y - 1, 3, 2, '#e9e4da'); R(x + 4, y, 2, 2, '#e9e4da'); g.globalAlpha = 1;
   }
-  if (active && stats.combo >= 16 && !pose.doze) {
+  if (active && stats.combo >= 16 && !pose.doze && !pose.mute) {
     for (let k = 0; k < 2; k++) {
       const p = ((nowMs / 1000) / (SPB * 2) + k * 0.5) % 1;
       g.globalAlpha = Math.sin(Math.PI * p); eighthNote(cx + 8 + p * 10, top - 6 - p * 16, '#ffe9a8'); g.globalAlpha = 1;
@@ -2724,101 +2721,6 @@ function faceFx(cx, top, ex, ey, pose, nowMs, hairColor, active, eyeStyle = null
 }
 
 // each partner: draw(pose, nowMs, active) and arm(pose). Same 4-head silhouette as the first mockup, different build and props.
-function drawJiwooPhone(hand) {
-  R(hand.x - 1, hand.y - 6, 4, 7, '#1e1a1a'); R(hand.x, hand.y - 5, 2, 4, '#8fe3f0');
-}
-// A reference head, traced on its native pixel grid. Eyes, mouth and earbud
-// remain separate so expressions and the unplug action share this silhouette.
-const JIWOO_A_HEAD = [
-  '.....HHHHHHH......',
-  '...HHLLLLHHHHH....',
-  '..HHLLLHHHHKllk...',
-  '.HHLLHHHHHKKlKKk..',
-  '.HLLHHHHHKKKKKKk..',
-  'HLLHHHHHHKKKKKKKk.',
-  'HLHHHHHHKKkKKSKKk.',
-  'HHHHHHHKKKkKKKKKK.',
-  'hHHHHHHKKKKSSSSK..',
-  'hHHHHHKKKKSSSSS...',
-  'hHHHHHKKSKSSSSS...',
-  'hhHHHHKKSSSSSSSS..',
-  '.hHHHHhKSSSSSSS...',
-  '.hhHHHHhsSSSSSS...',
-  '..hhHHHHhsSSSSS...',
-  '..hhhhHHHhhsh.....',
-  '...hhhhHHhHH......',
-].flatMap((row, y) => {
-  const runs = [];
-  for (let x = 0; x < row.length;) {
-    const color = row[x], start = x;
-    while (x < row.length && row[x] === color) x++;
-    if (color !== '.') runs.push({ x: start, y, w: x - start, color });
-  }
-  return runs;
-});
-// Same broad light/shadow planes and workwear details as main's RookieArt;
-// Jiwoo keeps his own burgundy hoodie, A face geometry, and warm skin palette.
-const JIWOO_CLOTH = Object.freeze({ hood: '#6b2f3f', shadow: '#4a2030', light: '#8b4658',
-  seam: '#39212d', vest: '#cfe04a', vestLight: '#dfe978', vestShadow: '#8eaa32',
-  vestDeep: '#647c30', reflect: '#eee8c4', pants: '#2f3440', pantsShadow: '#20232d', pantsLight: '#424650' });
-const JIWOO_A_COLORS = { H: JIWOO_CLOTH.hood, h: JIWOO_CLOTH.shadow, L: JIWOO_CLOTH.light,
-  K: '#2d1d21', k: '#44302a', l: '#5b4140', S: '#d99d6f', s: '#ba805d' };
-const JIWOO_RIG_PROFILE = CharacterRig.createProfile({
-  pivot: { x: 0, y: 56 }, shoulder: { x: -5, y: 25 }, restHand: { x: 8, y: 56 },
-  upper: 18, fore: 18, bendSide: 1, carryArc: 0, prepareArc: 0, prepare: 0.24, recover: 0.28,
-  // A short waist-level reach spawns the box at the hand on the pickup beat.
-  headFollow: false, pickupHand: { x: 2, y: 48 },
-  pickup: { lean: 0, shiftX: 0, shiftY: 1 }, place: { lean: 0.16, shiftX: 3, shiftY: 2 }
-});
-const WORK_RIG_PROFILES = Object.freeze({ jiwoo: JIWOO_RIG_PROFILE });
-// Rasterize the original pixels before leaning them, so individual rectangles
-// do not acquire blurred edges. Feet and the arm are drawn in world space.
-const jiwooBodyLayer = document.createElement('canvas');
-jiwooBodyLayer.width = 128; jiwooBodyLayer.height = 192;
-const jiwooHeadLayer = document.createElement('canvas');
-jiwooHeadLayer.width = 128; jiwooHeadLayer.height = 192;
-function drawRigBody(rig, draw) {
-  const m = rig.transform;
-  if (m.a === 1 && m.b === 0 && m.c === 0 && m.d === 1 && m.e === 0 && m.f === 0) { draw(); return; }
-  const target = g, layer = jiwooBodyLayer.getContext('2d');
-  layer.clearRect(0, 0, jiwooBodyLayer.width, jiwooBodyLayer.height);
-  try { g = layer; draw(); } finally { g = target; }
-  g.save(); g.imageSmoothingEnabled = false;
-  g.transform(m.a, m.b, m.c, m.d, m.e, m.f); g.drawImage(jiwooBodyLayer, 0, 0); g.restore();
-}
-function drawRigHead(rig, draw) {
-  const m = rig.headTransform;
-  if (m.a === 1 && m.b === 0 && m.c === 0 && m.d === 1 && m.e === 0 && m.f === 0) { draw(); return; }
-  const target = g, layer = jiwooHeadLayer.getContext('2d');
-  layer.clearRect(0, 0, jiwooHeadLayer.width, jiwooHeadLayer.height);
-  try { g = layer; draw(); } finally { g = target; }
-  g.save(); g.imageSmoothingEnabled = false;
-  g.transform(m.a, m.b, m.c, m.d, m.e, m.f); g.drawImage(jiwooHeadLayer, 0, 0); g.restore();
-}
-// The head, sleeves and props share a pose origin; only the feet stay planted.
-function jiwooRig(pose) {
-  const top = pose.carryMotion ? 84 : bodyTop(84, pose) + (pose.doze ? 3 : 0), cx = BOSS_X, neckX = cx + 4.5;
-  const transform = CharacterRig.torsoTransform({ x: cx, y: top }, JIWOO_RIG_PROFILE, pose.carryMotion?.body || {});
-  const world = point => CharacterRig.transformPoint(transform, point);
-  const head = pose.carryMotion?.head || { turn: pose.headLeft ? -1 : 1, nod: 0 };
-  const direction = head.turn < 0 ? -1 : 1, width = 0.8 + 0.2 * Math.abs(head.turn);
-  const scale = direction * width, headCenter = cx + 1.5, neckY = top + 17;
-  // Move the head's center continuously around the neck. A brief hood-back
-  // pose bridges the two profiles without squeezing the face to zero width.
-  const yawOffset = neckX + (headCenter - neckX) * head.turn - scale * headCenter;
-  const angle = head.nod * direction, cos = Math.cos(angle), sin = Math.sin(angle);
-  const headTransform = { a: cos * scale, b: sin * scale, c: -sin, d: cos,
-    e: neckX + cos * (yawOffset - neckX) + sin * neckY,
-    f: neckY + sin * (yawOffset - neckX) - cos * neckY };
-  const headPoint = point => CharacterRig.transformPoint(headTransform, point);
-  return { top, hx: cx - 7, hy: top + 1, neckX, transform, headTransform, headBack: !!pose.away || Math.abs(head.turn) < 0.45,
-    hip: world({ x: cx, y: top + 56 }), shoulder: world({ x: cx - 5, y: top + 25 }),
-    ear: world(headPoint({ x: cx + 1.5, y: top + 12 })),
-    cord: headPoint({ x: cx + 2.5, y: top + 13 }),
-    chest: { x: cx + 3.5, y: top + 22 },
-    chin: world(headPoint({ x: cx + 6.5, y: top + 18 })),
-    phone: pose.phoneHand || world({ x: cx + 14, y: top + 11 }) };
-}
 const PARTNERS = {
   boss: {
     base: 90,
@@ -2846,107 +2748,35 @@ const PARTNERS = {
   jiwoo: {
     base: 84,
     draw(pose, nowMs, active) {
-      const cx = BOSS_X, rig = jiwooRig(pose), top = rig.top;
-      const cloth = JIWOO_CLOTH, hood = cloth.hood, hoodD = cloth.shadow, hoodL = cloth.light;
-      // Weight shifts at the hips while the knees still meet the planted legs.
-      for (const offset of [-3.5, 3.5]) {
-        thick(rig.hip.x + offset, rig.hip.y + 2.5, cx + offset, top + 61.5, 5, cloth.pants);
-        thick(rig.hip.x + offset + 1.5, rig.hip.y + 3, cx + offset + 1.5, top + 61.5, 1, cloth.pantsShadow);
-      }
-      drawRigBody(rig, () => {
-      R(cx - 7, top + 23, 14, 33, hood);
-      R(cx - 6, top + 19, 12, 3, hood); R(cx - 8, top + 22, 16, 27, hood);
-      R(cx - 8, top + 28, 2, 21, hoodD); R(cx - 6, top + 53, 12, 3, hoodD);
-      // Raised collar, two vest panels, and the recessed zip follow the same
-      // workwear construction as the rookie, at Jiwoo's native sprite scale.
-      R(cx - 5, top + 19, 4, 4, cloth.vestLight); R(cx - 6, top + 23, 14, 27, cloth.vest);
-      R(cx - 6, top + 26, 2, 24, cloth.vestShadow); R(cx - 5, top + 28, 1, 8, cloth.vestDeep);
-      R(cx - 3, top + 23, 2, 12, cloth.vestLight); R(cx + 5, top + 23, 2, 2, cloth.vestLight);
-      R(cx + 7, top + 25, 1, 25, cloth.vestShadow);
-      R(cx + 3, top + 22, 2, 30, cloth.seam); R(cx + 3, top + 26, 1, 2, '#ac9090');
-      R(cx - 6, top + 37, 14, 3, cloth.reflect); R(cx - 6, top + 39, 2, 1, '#b6bd7b');
-      R(cx - 6, top + 40, 14, 1, cloth.vestShadow); R(cx + 3, top + 37, 2, 4, cloth.seam);
-      // The small ID and pocket are readable blocks, not miniature text.
-      R(cx + 4, top + 27, 4, 5, cloth.seam); R(cx + 5, top + 26, 1, 1, '#aeb9b0');
-      R(cx + 5, top + 28, 2, 3, '#e2e5d7'); R(cx + 5, top + 28, 1, 1, '#74858b');
-      R(cx + 5, top + 30, 2, 1, '#a4b3af');
-      R(cx + 4, top + 43, 4, 4, cloth.vestDeep); R(cx + 5, top + 44, 2, 2, cloth.vest);
-      R(cx + 4, top + 42, 4, 1, cloth.vestLight);
-      R(cx - 6, top + 50, 14, 2, cloth.seam); R(cx - 5, top + 50, 7, 1, hoodL);
-      R(cx - 5, top + 53, 1, 2, hoodL); R(cx + 3, top + 53, 2, 2, cloth.seam);
-      // The near shoulder is stepped into the sleeve, instead of a square vest corner.
-      R(cx - 8, top + 23, 5, 5, hood); R(cx - 8, top + 23, 4, 1, hoodL); R(cx - 9, top + 27, 5, 7, hood);
-      R(cx - 5, top + 17, 11, 2, cloth.seam); R(cx - 4, top + 18, 5, 1, hoodL);
-      drawRigHead(rig, () => {
-      // The study's roughly 18px square head replaces the old 20x23 head.
-      const { hx, hy } = rig, hair = JIWOO_A_COLORS.K;
-      for (const pixel of JIWOO_A_HEAD) R(hx + pixel.x, hy + pixel.y, pixel.w, 1,
-        rig.headBack ? (pixel.y > 13 ? hoodD : hood) : JIWOO_A_COLORS[pixel.color]);
-      if (rig.headBack) {
-        R(hx + 7, hy + 3, 1, 10, hoodD); R(hx + 8, hy + 2, 1, 11, hoodL);
-        return;
-      }
-      const eyeY = hy + 9 + (pose.lookDown ? 1 : 0);
-      if (pose.surprised) {
-        R(hx + 12, eyeY - 1, 2, 1, hair); R(hx + 13, eyeY + 1, 1, 2, hair);
-        R(hx + 13, hy + 13, 1, 2, '#3c2825');
-      } else {
-        faceFx(cx, top, hx + 12, eyeY, pose, nowMs, hair, active && !pose.vibe, 'jiwoo-a');
-        R(hx + 13, hy + 13, 1, 1, '#3c2825');
-      }
+      const cx = BOSS_X, top = bodyTop(84, pose) + (pose.bob ? 1 : 0) + (pose.doze ? 3 : 0), hood = '#6b2f3f', hoodD = '#4a2030';
+      R(cx - 7, top + 18, 14, 46, hood);
+      R(cx - 7, top + 20, 14, 20, C.vest2); R(cx - 7, top + 30, 14, 2, C.reflect);
+      R(cx - 7, top + 40, 14, 2, hoodD);
+      R(cx - 9, top - 2, 18, 20, hood); R(cx - 9, top - 2, 18, 2, hoodD);
+      R(cx - 5, top + 3, 10, 12, C.skin);
+      R(cx - 5, top + 3, 10, 2, C.hairDark);
       if (pose.vibe) {
-        R(hx + 14, hy + 12, 1, 1, '#3c2825');
-        for (let k = 0; k < 2; k++) { const p = ((nowMs / 1000) / (SPB * 2) + k * 0.5) % 1; g.globalAlpha = Math.sin(Math.PI * p); eighthNote(cx + 10 + p * 12, top - 4 - p * 16, '#f2a6c8'); g.globalAlpha = 1; }
-      }
-      if (pose.smit) R(hx + 10, hy + 12, 2, 1, '#ff8fb0');
-      if (!pose.nobuds && !pose.unplug) R(hx + 8, hy + 10, 1, 2, '#f4f1ea');
-      });
-      if (!pose.nobuds) {
-        // Turning the head moves the ear, while the cord stays attached at the chest.
-        for (let y = rig.cord.y; !rig.headBack && y < rig.chest.y; y++) {
-          const p = (y - rig.cord.y) / (rig.chest.y - rig.cord.y - 1);
-          R(lerp(rig.cord.x, rig.chest.x, p) - 0.5, y, 1, 1, '#f4f1ea');
-        }
-        if (pose.unplug) R(rig.chest.x - 0.5, rig.chest.y, 2, 2, '#f4f1ea');
-      }
-      });
-      if (pose.alarm) { const at = CharacterRig.transformPoint(rig.transform, { x: cx + 11, y: top - 12 }); R(at.x, at.y, 2, 6, '#ffe27a'); R(at.x, at.y + 8, 2, 2, '#ffe27a'); }
-      if (pose.phone && !pose.phoneHand) drawJiwooPhone(rig.phone);
+        R(cx, top + 9, 3, 1, C.ink); R(cx + 1, top + 12, 2, 1, '#b2565a');
+        for (let k = 0; k < 2; k++) { const p = ((nowMs / 1000) / (SPB * 2) + k * 0.5) % 1; g.globalAlpha = Math.sin(Math.PI * p); eighthNote(cx + 8 + p * 12, top - 4 - p * 16, '#f2a6c8'); g.globalAlpha = 1; }
+      } else faceFx(cx, top, cx + 1, top + 8, pose, nowMs, C.hairDark, active);
+      // earbuds: in both ears, or one out and dangling once 반장 makes her pull them
+      if (pose.unplug) { R(cx + 5, top + 18, 2, 2, '#f4f1ea'); for (let k = 0; k < 8; k++) R(cx + 6 + (k % 2), top + 10 + k, 1, 1, '#f4f1ea'); }
+      else { R(cx + 5, top + 8, 2, 2, '#f4f1ea'); for (let k = 0; k < 10; k++) R(cx + 6 + (k % 2), top + 10 + k, 1, 1, '#f4f1ea'); }
+      R(cx - 8, top + 8, 2, 2, '#f4f1ea');
+      if (pose.phone) { R(cx + 8, top + 5, 4, 7, '#1e1a1a'); R(cx + 9, top + 6, 2, 4, '#8fe3f0'); }
+      if (!pose.doze && active && pose.bob) R(cx - 9, top + 6, 2, 1, hoodD);
+      // his face turned away (the side of his hood towards us), and the '!' of waking with a start
+      if (pose.away) { R(cx - 5, top + 3, 8, 12, hood); R(cx - 5, top + 3, 8, 2, hoodD); R(cx + 3, top + 6, 2, 8, C.skin); }
+      if (pose.alarm) { R(cx + 11, top - 12, 2, 6, '#ffe27a'); R(cx + 11, top - 4, 2, 2, '#ffe27a'); }
+      // smitten (1-5): pink cheeks
+      if (pose.smit) { R(cx - 4, top + 11, 2, 1, '#ff8fb0'); R(cx + 3, top + 11, 2, 1, '#ff8fb0'); }
     },
     arm(pose) {
-      const rig = jiwooRig(pose), top = rig.top, { x: sx, y: sy } = rig.shoulder;
-      const sleeve = (hand, bendSide = pose.phone ? 1 : (pose.armBend ?? JIWOO_RIG_PROFILE.bendSide)) => {
-        const { upper, fore } = JIWOO_RIG_PROFILE;
-        // Standard carrying uses fixed lengths and one bend direction throughout.
-        // Older stage/dual-belt gestures keep their existing farther prop targets.
-        const stretch = pose.carryMotion ? 1 : Math.max(1, Math.hypot(hand.x - sx, hand.y - sy) / (upper + fore));
-        const arm = CharacterRig.solveArm(rig.shoulder, hand, { upper, fore, stretch, bendSide });
-        const e = arm.elbow, h = arm.wrist;
-        const cloth = JIWOO_CLOTH;
-        thick(sx, sy, e.x, e.y, 5, cloth.shadow); thick(e.x, e.y, h.x, h.y, 5, cloth.shadow);
-        thick(sx, sy, e.x, e.y, 4, cloth.hood); thick(e.x, e.y, h.x, h.y, 4, cloth.hood);
-        // Short lit planes follow each bone, so elbow folds and cuffs stay on
-        // the sleeve in every pose without changing the solved hand contact.
-        for (const [a, b] of [[rig.shoulder, e], [e, h]]) {
-          const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
-          if (len < 1) continue;
-          const side = dx > 0 ? -1 : 1, nx = -dy / len * side, ny = dx / len * side;
-          thick(lerp(a.x, b.x, 0.18) + nx, lerp(a.y, b.y, 0.18) + ny,
-            lerp(a.x, b.x, 0.7) + nx, lerp(a.y, b.y, 0.7) + ny, 1, cloth.light);
-        }
-        thick(lerp(e.x, h.x, 0.8), lerp(e.y, h.y, 0.8), lerp(e.x, h.x, 0.94), lerp(e.y, h.y, 0.94), 4, cloth.shadow);
-        return h;
-      };
-      if (pose.phone) {
-        const h = sleeve(rig.phone);
-        if (pose.phoneHand) drawJiwooPhone(h);
-        R(h.x - 2, h.y - 2, 4, 4, C.skin); return;
-      }
-      const atRest = Math.hypot(pose.hand.x - (BOSS_X + 13), pose.hand.y - 134) < 2 ||
-        Math.hypot(pose.hand.x - (BOSS_X + JIWOO_RIG_PROFILE.restHand.x), pose.hand.y - (84 + JIWOO_RIG_PROFILE.restHand.y)) < 2;
-      const free = pose.hype && !pose.workRig && !pose.carryMotion && !pose.carry && atRest;
-      if (free) { const up = pose.bob < 0 ? -6 : 0, h = sleeve({ x: BOSS_X + 13, y: top + 4 + up }, 1); R(h.x - 2, h.y - 3, 5, 5, C.skin); return; }
-      const hand = sleeve(pose.hand); R(hand.x - 2, hand.y - 2, 4, 4, C.skin);
+      const top = bodyTop(84, pose);
+      if (pose.phone) { thick(BOSS_X + 5, top + 23, BOSS_X + 9, top + 11, 4, '#6b2f3f'); R(BOSS_X + 7, top + 9, 4, 4, C.skin); return; }
+      const free = pose.hype && !pose.carry && Math.abs(pose.hand.x - (BOSS_X + 13)) < 2 && Math.abs(pose.hand.y - 134) < 2;
+      if (free) { const up = pose.bob < 0 ? -6 : 0; thick(BOSS_X + 5, top + 23, BOSS_X + 8, top + 4 + up, 4, '#6b2f3f'); R(BOSS_X + 6, top + 1 + up, 5, 5, C.skin); return; }
+      thick(BOSS_X + 5, top + 23, pose.hand.x, pose.hand.y, 4, '#6b2f3f'); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
     }
   },
   haeun: {
@@ -3201,7 +3031,7 @@ function drawActor(id, x, mirrored, pose, nowMs, active, extra) {
   g.save();
   if (mirrored) { g.translate(x, 0); g.scale(-1, 1); g.translate(-BOSS_X, 0); } else g.translate(x - BOSS_X, 0);
   PARTNERS[id].draw(pose, nowMs, active);
-  if (extra) extra(id === 'jiwoo' ? jiwooRig(pose).top : bodyTop(PARTNERS[id].base, pose));
+  if (extra) extra(bodyTop(PARTNERS[id].base, pose));
   g.restore();
 }
 // after the shift the cast stays where the song left them (반장 on the line, 지우 behind the belt) through the outro and result
@@ -3231,7 +3061,7 @@ function drawCast(t, nowMs, active, placerPose) {
     else if (!(rel >= 8)) { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); }
   });
   // the earbud cord stretched between them while he listens
-  if (listening) { const ear = jiwooRig(jPose).ear, ax = jx + ear.x - BOSS_X, ay = ear.y, bxe = bx - 3, bye = 99; for (let k = 0; k <= 20; k++) { const p = k / 20; R(lerp(ax, bxe, p), lerp(ay, bye, p) + Math.sin(p * Math.PI) * 6, 1, 1, '#f4f1ea'); } }
+  if (listening) { const ax = jx + 6, ay = 92, bxe = bx - 3, bye = 99; for (let k = 0; k <= 20; k++) { const p = k / 20; R(lerp(ax, bxe, p), lerp(ay, bye, p) + Math.sin(p * Math.PI) * 6, 1, 1, '#f4f1ea'); } }
 }
 
 // 하은, the co-scanner on the upper belt. A smaller head than the rest of the cast (a 10x12 face under a 12-wide cap). She stands at the
@@ -3424,7 +3254,7 @@ function drawLove15(t, nowMs) {
   const V = L.love, b = beatAt(t), ph = b - Math.floor(b);
   const away = L.commute ? L.commute.from : L.room ? L.room.from : 1e9, fadeL = L.commute ? 1.5 : 4;
   if (b >= away) return;
-  if (b >= away - fadeL) { g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${Math.min(1, (b - (away - fadeL)) / (fadeL - 0.3))})`; g.fillRect(0, 0, W, H); g.restore(); return; }
+  if (b >= away - fadeL) { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${Math.min(1, (b - (away - fadeL)) / (fadeL - 0.3))})`; g.fillRect(0, 0, W, H); g.restore(); return; }
   if (b < LOVE.lastB - 0.5) LOVE.fx.clear(); LOVE.lastB = b;
   const beatK = Math.max(0, 1 - ph * 3), dub = Math.max(0, 1 - Math.abs(ph - 0.28) * 6);
   let k = 0;
@@ -3717,7 +3547,7 @@ function drawRoom15(t, nowMs, b, post) {
   }
   // fading in from black
   const fin = post ? 0 : Math.max(0, 1 - (b - Rm.from) / 1.5);
-  if (fin > 0) { setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${fin})`; g.fillRect(0, 0, W, H); }
+  if (fin > 0) { g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${fin})`; g.fillRect(0, 0, W, H); }
   g.restore();
 }
 function drawShow15(t, nowMs) {
@@ -3894,18 +3724,16 @@ function drawShoved(b, nowMs) {
   // the streaks he leaves
   if (d < 0.5) { const a = 1 - d / 0.5; g.fillStyle = `rgba(255,255,255,${0.7 * a})`; for (let k = 0; k < 5; k++) { const len = Math.round((x - x0) + 14 - k * 3); g.fillRect(Math.round(x - 10 - len), 70 + k * 8 + (k % 2) * 3, Math.max(0, len), 1); } }
   const stare = d >= 0.9 && back === 0, talk = inRange(b, [[V.shove + 4.2, V.shove + 7]]);
-  const pose = { hand: talk ? { x: BOSS_X + 11, y: 114 } : { x: BOSS_X + 4, y: 128 }, carry: null, wince: d < 0.9, surprised: stare, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: true, lane: 0, beat: b };
+  const pose = { hand: talk ? { x: BOSS_X + 11, y: 114 } : { x: BOSS_X + 4, y: 128 }, carry: null, wince: d < 0.9, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: true, lane: 0, beat: b };
   const feet = 148;
-  const applyPoseTransform = () => {
-    g.translate(Math.round(x - BOSS_X), o.dy + hop);
-    g.translate(BOSS_X, feet); g.rotate(lean); g.translate(-BOSS_X, -feet);
-    if (back > 0 && back < 1) { g.translate(BOSS_X, 0); g.scale(-1, 1); g.translate(-BOSS_X, 0); }
-  };
-  g.save(); clipBehindUpper(); applyPoseTransform();
+  g.save(); clipBehindUpper(); g.translate(Math.round(x - BOSS_X), o.dy + hop); g.translate(BOSS_X, feet); g.rotate(lean); g.translate(-BOSS_X, -feet);
+  if (back > 0 && back < 1) { g.translate(BOSS_X, 0); g.scale(-1, 1); g.translate(-BOSS_X, 0); }   // facing the way he walks back
   PARTNERS.jiwoo.draw(pose, nowMs, true);
   if (stare) {
-    // The shared A face draws the reaction; only the floating cues go here.
-    const cx = BOSS_X, top = jiwooRig(pose).top;
+    // the face gone blank: brows up, wide eyes, mouth open
+    const cx = BOSS_X, top = bodyTop(84, pose), ink = C.ink;
+    R(cx - 5, top + 6, 10, 9, C.skin); R(cx - 3, top + 6, 2, 1, C.hairDark); R(cx + 2, top + 6, 2, 1, C.hairDark);
+    R(cx - 3, top + 8, 1, 2, ink); R(cx + 2, top + 8, 1, 2, ink); R(cx - 1, top + 11, 2, 2, '#5a2a2a');
     // the '?' over his head, blinking in, and a bead of sweat once he speaks
     if (b < V.shove + 4.2 || talk) { const on = (b - V.shove) % 1 < 0.75 || b > V.shove + 2.2, qx = cx + 7, qy = top - 12;
       if (on) { R(qx, qy, 3, 1, '#ffffff'); R(qx + 2, qy + 1, 1, 1, '#ffffff'); R(qx + 1, qy + 2, 2, 1, '#ffffff'); R(qx + 1, qy + 4, 1, 1, '#ffffff'); } }
@@ -3913,7 +3741,7 @@ function drawShoved(b, nowMs) {
   }
   g.restore();
   // his arms above the belt (screen space, like his loading arm): hanging, or up when he speaks
-  g.save(); applyPoseTransform(); PARTNERS.jiwoo.arm(pose); g.restore();
+  g.save(); g.translate(Math.round(x - BOSS_X), o.dy + hop); PARTNERS.jiwoo.arm(pose); g.restore();
   return true;
 }
 // 하은 on her visit, drawn in front of the lower belt
@@ -4045,32 +3873,35 @@ function haeunHead(beat) {
   if (spot === 'cross') { const w = haeunWalkPos((beat - L.haeunCross[0]) / (L.haeunCross[1] - L.haeunCross[0])); return { x: w.x, y: w.top - 4 }; }
   return { x: haeunHome().x, y: haeunHome().top - 4 };
 }
-const rookieScans = [0, 1, 2, 3].map(() => ({ motion: RookieRig.createMotion(), last: -1e9 }));
-function rookieScan(slot, pressAt, nowMs, holding) {
-  const scan = rookieScans[slot];
-  if (pressAt !== scan.last) { scan.motion.trigger(pressAt); scan.last = pressAt; }
-  scan.motion.setHolding(holding, nowMs);
-  return scan.motion.sample(nowMs);
+const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
+function drawPlayer(kick, nowMs) {
+  const fl = nowMs - FX.flinch, cx = PLAYER_X + (fl < 160 ? 1 : 0), top = playerTop(kick, nowMs);
+  R(cx - 9, top + 18, 18, 36, C.hoodie);
+  R(cx - 9, top + 20, 18, 22, C.vest2); R(cx - 9, top + 32, 18, 2, C.reflect);
+  R(cx - 7, top + 14, 15, 5, '#264149');
+  R(cx - 6, top + 1, 12, 14, C.skin);
+  R(cx - 7, top - 1, 14, 5, C.hairDark); R(cx + 1, top + 1, 6, 10, C.hairDark);
+  if (fl < 500) { R(cx - 4, top + 6, 2, 3, C.ink); R(cx - 5, top + 5, 3, 1, C.hairDark); R(cx + 6, top + 2 + Math.floor(fl / 120), 2, 3, C.sweat); }
+  else R(cx - 4, top + 7, 2, 2, C.ink);
 }
-const playerTop = (kick, nowMs) => 94 + (nowMs - FX.playerNod < 160 ? 2 : 0);
-function drawPlayer(kick, nowMs, showLegs = true) {
-  RookieArt.drawBody(g, PLAYER_X, playerTop(kick, nowMs), kick, nowMs - FX.flinch, showLegs);
+function drawGun(gx, gy, kick) {
+  R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33');
+  R(gx - 10, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser);
+  R(gx, gy + 2, 3, 3, C.skin);
 }
-function drawGun(gx, gy, kick) { RookieArt.drawTool(g, gx, gy, kick); }
-function drawPlayerSleeve(sx, sy, hx, hy) { RookieArt.drawSleeve(g, sx, sy, hx, hy); }
 function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
-  const top = playerTop(kick, nowMs), fl = nowMs - FX.flinch, cx = PLAYER_X + (fl < 160 ? 1 : 0);
+  const top = playerTop(kick, nowMs);
   if (L.daw) { drawPadArm(kick, nowMs, top, twoHands); return; }
-  const lowerLane = L.lanes === 2 ? 1 : 0;
-  const motion = rookieScan(0, lastPress, nowMs, notes.some(n => n.lane === lowerLane && n.state === 'holding'));
-  const upperMotion = rookieScan(1, lastPressUpper, nowMs, L.lanes === 2 && notes.some(n => n.lane === 0 && n.state === 'holding'));
-  const upper = L.lanes === 2 && (!L.coScanner || DUO.mode !== 'one');
-  if (upper) RookieArt.drawUpperArm(g, PLAYER_X, top, fl, upperMotion);
-  if (twoHands && !upper) {
-    const grip = RookieArt.gripPosition(PLAYER_X, top, kick, fl, motion);
-    if (grip) drawPlayerSleeve(cx - 4, top + 24, grip.x + 1, grip.y + 1.5);
+  const gx = 324 - kick * 4, gy = 117;
+  if (L.lanes === 2 && (!L.coScanner || DUO.mode !== 'one')) {
+    // the left hand works the upper (far) gate, the right hand the lower one
+    const ux = 320 - upperKick * 4, uy = 86;
+    thick(PLAYER_X - 5, top + 20, ux + 2, uy + 3, 4, C.hoodie); drawGun(ux, uy, upperKick);
   }
-  RookieArt.drawMainArm(g, PLAYER_X, top, kick, fl, motion);
+  thick(PLAYER_X - 6, top + 22, gx + 2, gy + 3, 4, C.hoodie);
+  if (twoHands) thick(PLAYER_X - 4, top + 24, gx + 6, gy + 7, 4, C.hoodie);
+  drawGun(gx, gy, kick);
+  if (twoHands) R(gx + 4, gy + 6, 3, 3, C.skin);
 }
 
 // belt top doubles as a beat grid: bright paint = beat, mid = 8th, dim = 16th
@@ -4887,9 +4718,9 @@ function drawStageRest(t, nowMs, sv, b, sec, beatK, fin) {
     [[70, 0], [196, 0.15], [318, 0.3]].forEach(([x, d], i) => { const q = P.q - d; if (q < 0) return; const y = 168 - Math.round(q * 10), sx = x + ((P.b0 * 7 + i * 31) % 40) - 20; g.globalAlpha = Math.max(0, a); g.fillStyle = '#1b1716'; g.fillText(words[i], sx + 1, y + 1); g.fillStyle = '#ffe9a8'; g.fillText(words[i], sx, y); });
     g.restore();
   }
-  if (sv.dark) { setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${sv.dark})`; g.fillRect(0, 0, W, H); }
+  if (sv.dark) { g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${sv.dark})`; g.fillRect(0, 0, W, H); }
   const mA = nowMs - FX.lastMiss;
-  if (mA < 320) { const a = (1 - mA / 320) * 0.4; setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(210,30,20,${a})`; g.fillRect(0, 0, W, 5); g.fillRect(0, H - 5, W, 5); g.fillRect(0, 5, 5, H - 10); g.fillRect(W - 5, 5, 5, H - 10); }
+  if (mA < 320) { const a = (1 - mA / 320) * 0.4; g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(210,30,20,${a})`; g.fillRect(0, 0, W, 5); g.fillRect(0, H - 5, W, 5); g.fillRect(0, 5, 5, H - 10); g.fillRect(W - 5, 5, 5, H - 10); }
   g.restore();
 }
 // 1-6: metal stairs from her deck behind the upper belt down to the floor at its left end: a landing at the deck's height,
@@ -4968,7 +4799,7 @@ function drawInspector(t, active, nowMs) {
 function phaseGloom(b) { const G = L.phaseFx && L.phaseFx.gloom; return G && b >= G[0] && b < G[1] ? 1 : 0; }
 function phaseLook(c, w, h, b, active) {
   const F = L.phaseFx; if (!F || !active) return;
-  c.save(); setContextTransform(c, 1, 0, 0, 1, 0, 0);
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
   // grey and tired: the colour drained, the room a little darker
   const gl = phaseGloom(b);
   if (gl > 0) { c.globalCompositeOperation = 'multiply'; c.fillStyle = `rgba(120,115,130,${0.35 * gl})`; c.fillRect(0, 0, w, h); }
@@ -5003,7 +4834,7 @@ const cvHi = document.getElementById('cvhi'), gHi = cvHi.getContext('2d');
 // 마르코's corners in the floor's coordinates: the lower ends of the two lines (rl, and ll squeezed in beside 반장), the upper
 // belts' loading ends behind them (ru, lu; he stands lower there, the upper belt hides his legs), and c, beside you
 const MARCO_SPOTS = () => ({ bx: { x: MID.ww - 90, dy: 0, mir: true }, rl: { x: MID.ww - BOSS_X, dy: 0, mir: true }, ru: { x: MID.ww - (BOSS_X + LANE_DX[0] + 22), dy: -22, mir: true },
-  lu: { x: BOSS_X + LANE_DX[0] + 22, dy: -22, mir: false }, ll: { x: BOSS_X + 24, dy: 0, mir: false }, c: { x: MID.ax + 64, dy: -2, mir: true } });
+  lu: { x: BOSS_X + LANE_DX[0] + 22, dy: -22, mir: false }, ll: { x: BOSS_X + 24, dy: 0, mir: false }, lk: { x: BOSS_X + 42, dy: 0, mir: true }, c: { x: MID.ax + 64, dy: -2, mir: true } });
 const midSpotAt = bb => { let sp = L.mid.route[0][1]; for (const [rb, s] of L.mid.route) if (bb >= rb) sp = s; return sp; };
 function midMarco(b) {
   const R0 = L.mid.route, S = MARCO_SPOTS(); let i = 0; for (let k = 0; k < R0.length; k++) if (b >= R0[k][0]) i = k;
@@ -5076,7 +4907,7 @@ let RB_CHI = null;
 function rbChiStatic() {
   if (RB_CHI) return RB_CHI;
   const WW = MID.ww, cv = document.createElement('canvas'); cv.width = WW; cv.height = MID.wh;
-  const g0 = g; g = cv.getContext('2d'); setDrawTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
+  const g0 = g; g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
   // the sky: deep blue into the city's warm glow; stars; a crescent moon
   const sky = g.createLinearGradient(0, -MID.oy, 0, 40); sky.addColorStop(0, '#070a1e'); sky.addColorStop(0.55, '#19173e'); sky.addColorStop(0.85, '#3a2348'); sky.addColorStop(1, '#5e3248');
   g.fillStyle = sky; g.fillRect(0, -MID.oy, WW, MID.oy + 40);
@@ -5212,7 +5043,7 @@ function rbCine(c, w, h, b, active) {
   if (hud.classList.contains('cine') !== on) { hud.classList.toggle('cine', on); judgeEl.classList.toggle('cine', on); $('devbtn').classList.toggle('cine', on); }
   if (!C || !live) return;
   const k = ease(Math.min((b - C[0] + 1) / 1.5, (C[1] - b) / 1)); if (k <= 0) return;
-  c.save(); setContextTransform(c, 1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, w, Math.round(h * 0.14 * k)); c.fillRect(0, Math.round(h - h * 0.14 * k), w, Math.ceil(h * 0.14 * k)); c.restore();
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, w, Math.round(h * 0.14 * k)); c.fillRect(0, Math.round(h - h * 0.14 * k), w, Math.ceil(h * 0.14 * k)); c.restore();
 }
 function rbFront(b, bReal, nowMs, active, live) {
   if (!live) return;
@@ -5240,19 +5071,155 @@ function rbFront(b, bReal, nowMs, active, live) {
   else if (boom >= 0.28 && boom < 1.1) { g.fillStyle = `rgba(4,3,5,${boom < 0.75 || (boom > 0.85 && boom < 0.95) ? 0.86 : 0.25})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
   if (alarm) { const k = 0.5 + 0.5 * Math.sin(bReal * Math.PI * 2); g.fillStyle = `rgba(255,110,25,${0.12 * k * Math.min(1, (D.boom + 12 - bReal) / 2)})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
 }
+// ---------- 2-3 합주 (L.ht) ----------
+// The cold war is the warehouse under a chill; once the song is in, a lake beach at dawn under a city's skyline (반장's Chicago
+// and 마르코's beach in one picture) comes in from both ends of the floor at once and meets in the middle.
+const htClamp = x => x < 0 ? 0 : x > 1 ? 1 : x;
+const htIn = (b, r) => !!r && b >= r[0] && b < r[1];
+const htCutAt = b => (L.ht.cuts || []).find(c => b >= c[0] - 0.5 && b < c[1]);
+// the belts stand still from the jam until the song (and run on from where they stopped)
+function htBeltT(T) { const D = L.ht, tj = timeAt(D.jam), ts = timeAt(D.song); return T < tj ? T : T < ts ? tj : T - (ts - tj); }
+// 반장's last pat on the box at or before b: the two before the song, the song's own, then one every half bar
+function htTap(b) { const D = L.ht; let last = null; for (const x of D.taps) if (b >= x) last = x; if (b >= D.tapFrom) last = D.tapFrom + Math.floor((b - D.tapFrom) / 2) * 2; return last; }
+const htDawn = b => htClamp((b - L.ht.dawn[0]) / (L.ht.dawn[1] - L.ht.dawn[0]));
+const htFuse = b => ease((b - L.ht.fuse[0]) / (L.ht.fuse[1] - L.ht.fuse[0]));
+// the still parts drawn once, at night and in daylight (crossfaded by the dawn): sky, stars, skyline and its windows, the lake,
+// the sand, the lifeguard's chair, the parasol, the pier and its lamp
+const HT_CV = {};
+function htLakeStatic(kind) {
+  if (HT_CV[kind]) return HT_CV[kind];
+  const WW = MID.ww, cv = document.createElement('canvas'); cv.width = WW; cv.height = MID.wh;
+  const g0 = g; g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
+  const dn = kind === 'day' ? 1 : 0, top = -MID.oy, HZ = 62;
+  const sky = g.createLinearGradient(0, top, 0, HZ);
+  sky.addColorStop(0, mixC('#10163a', '#5c7cbc', dn)); sky.addColorStop(0.6, mixC('#36305e', '#e8a08a', dn)); sky.addColorStop(1, mixC('#8a5266', '#ffd8a4', dn));
+  g.fillStyle = sky; g.fillRect(0, top, WW, HZ - top);
+  if (!dn) for (let i = 0; i < 34; i++) R(rnd(i, 91) * WW, top + rnd(i, 92) * 130, 1, 1, '#c8d0f0');
+  // the skyline across the water: towers (one tall pair of antennas), windows lit at night
+  const bc = mixC('#0c1030', '#3e3e68', dn), bc2 = mixC('#141a40', '#4e4a74', dn);
+  for (let i = 0, x = 6; x < WW - 6; i++) {
+    const tall = i === 9 || i === 14, w = tall ? 22 : 14 + Math.floor(rnd(i, 93) * 22), h = tall ? 58 : 12 + Math.floor(rnd(i, 94) * 34), y0 = HZ - h;
+    R(x, y0, w, h, i % 2 ? bc : bc2); R(x, y0, w, 1, mixC('#2a2e58', '#8a7a96', dn));
+    if (i === 9) { R(x + 5, y0 - 12, 1, 12, bc); R(x + 15, y0 - 12, 1, 12, bc); HT_CV.ant = [x + 5, x + 15, y0 - 13]; }
+    if (!dn) for (let wy = y0 + 3; wy < HZ - 3; wy += 4) for (let wx = x + 2; wx < x + w - 2; wx += 3) if (rnd(wx * 7 + wy, 95) < 0.32) R(wx, wy, 1, 2, '#ffd890');
+    x += w + 1 + Math.floor(rnd(i, 96) * 6);
+  }
+  // the lake, deep enough to sit behind both belts (the boxes stand out on it)
+  const lake = g.createLinearGradient(0, HZ, 0, 178); lake.addColorStop(0, mixC('#28305a', '#e0a890', dn)); lake.addColorStop(0.12, mixC('#1a2650', '#6a8cc0', dn)); lake.addColorStop(1, mixC('#121c3c', '#2e5a96', dn));
+  g.fillStyle = lake; g.fillRect(0, HZ, WW, 178 - HZ);
+  // the beach (from just under the foam line)
+  const sand = g.createLinearGradient(0, 176, 0, 372); sand.addColorStop(0, mixC('#4a4252', '#b89a80', dn)); sand.addColorStop(1, mixC('#2a2430', '#8a6e5a', dn));
+  g.fillStyle = sand; g.fillRect(0, 176, WW, 372 - 176);
+  for (let k = 0; k < 40; k++) R(rnd(k, 98) * WW, 186 + rnd(k, 99) * 160, 2, 1, mixC('#3a3440', '#a08670', dn));
+  // a lifeguard's chair and a closed parasol on the sand, a pier with a lamp on the left (lit at night)
+  const wd = mixC('#3a2e30', '#c8a070', dn);
+  R(612, 150, 2, 30, wd); R(628, 150, 2, 30, wd); R(610, 148, 22, 3, wd); R(612, 140, 18, 2, mixC('#5a2a2a', '#e04a3a', dn)); R(616, 162, 10, 1, wd);
+  R(96, 140, 1, 40, mixC('#3a3440', '#7a6a6a', dn)); g.fillStyle = mixC('#3a2a4a', '#2d8ab0', dn); g.beginPath(); g.moveTo(92, 142); g.lineTo(96, 132); g.lineTo(100, 142); g.closePath(); g.fill();
+  R(0, 118, 46, 3, mixC('#2a2430', '#6a5048', dn)); for (const x of [6, 22, 38]) R(x, 121, 2, 56, mixC('#221c26', '#5a4038', dn)); R(40, 104, 1, 14, mixC('#221c26', '#5a4038', dn));
+  if (!dn) { g.fillStyle = 'rgba(255,220,150,.45)'; g.beginPath(); g.arc(40, 104, 7, 0, Math.PI * 2); g.fill(); R(39, 103, 3, 2, '#ffe6a8'); } else R(39, 103, 3, 2, '#8a7a6a');
+  g = g0; HT_CV[kind] = cv; return cv;
+}
+function htLake(nowMs, dn, sunY) {
+  const WW = MID.ww, t = nowMs / 1000, HZ = 62;
+  g.drawImage(htLakeStatic('night'), 0, -MID.oy); if (dn > 0) { g.globalAlpha = dn; g.drawImage(htLakeStatic('day'), 0, -MID.oy); g.globalAlpha = 1; }
+  // the sun over the far shore, its glow on the sky
+  if (sunY != null) { const sg = g.createRadialGradient(560, sunY, 6, 560, sunY, 90); sg.addColorStop(0, 'rgba(255,236,190,.7)'); sg.addColorStop(1, 'rgba(255,200,150,0)'); g.fillStyle = sg; g.fillRect(470, sunY - 90, 180, 180); g.fillStyle = '#fff1c6'; g.beginPath(); g.arc(560, sunY, 13, 0, Math.PI * 2); g.fill(); }
+  // the tower's red lights blinking, a gull or two
+  if (HT_CV.ant && Math.floor(t * 1.2) % 2) { R(HT_CV.ant[0], HT_CV.ant[2], 1, 1, '#ff5040'); R(HT_CV.ant[1], HT_CV.ant[2], 1, 1, '#ff5040'); }
+  for (let k = 0; k < 3; k++) { const x = (k * 230 + t * (14 + k * 4)) % (WW + 40) - 20, y = 6 + k * 14 + Math.round(Math.sin(t * 1.3 + k) * 3), up = Math.floor(t * 3 + k) % 2; const c = mixC('#2a2a44', '#5a4a5a', dn); R(x - 4, y + (up ? 0 : 1), 3, 1, c); R(x - 1, y + 1, 2, 1, c); R(x + 1, y + (up ? 0 : 1), 3, 1, c); }
+  // slow ripples, the sun's path on the water, the foam coming in and going out
+  const rc = mixC('#3a4a7a', '#a8c4e8', dn);
+  for (let k = 0; k < 22; k++) { const y = HZ + 3 + k * 5, w = 6 + (k % 4) * 5, x = (rnd(k, 97) * WW + t * (4 + k % 3)) % WW; R(x, y, w, 1, rc); }
+  if (sunY != null) for (let k = 0; k < 16; k++) { const y = HZ + 2 + k * 6, w = 18 - k * 0.7 + Math.sin(t * 3 + k) * 4; g.fillStyle = `rgba(255,226,170,${0.55 - k * 0.03})`; g.fillRect(Math.round(560 - w / 2 + Math.sin(t * 2 + k * 1.7) * 3), y, Math.round(w), 2); }
+  const fo = Math.round(Math.sin(t * 0.9) * 3); R(0, 176 + fo, WW, 3, mixC('#8aa0c8', '#f4f0e6', dn)); if (fo < 0) R(0, 179 + fo, WW, -fo, mixC('#4a4252', '#b89a80', dn));
+}
+// the back of the floor: the chill, the beach coming in, 반장's radio (switched off) with the can 마르코 left beside it, the
+// notice board with the request on it, 마르코's boombox (unplugged until he plugs it back in), the backlog on its board
+function htBack(b, bReal, nowMs, active, live) {
+  const D = L.ht, WW = MID.ww, bb = live ? bReal : 0, t = nowMs / 1000;
+  const cold = !live ? 0 : bb < D.song ? 1 : htClamp(1 - (bb - D.song) / (D.fuse[0] - D.song));
+  if (cold > 0) { g.fillStyle = `rgba(26,52,110,${0.18 * cold})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
+  const fw = live ? WW / 2 * htFuse(bb) : 0;
+  if (fw > 0) {
+    const dn = htDawn(bb), sunY = bb >= D.sun[0] ? lerp(70, 16, ease(htClamp((bb - D.sun[0]) / (D.sun[1] - D.sun[0])))) : null;
+    g.save(); g.beginPath(); g.rect(0, -MID.oy, Math.ceil(fw), MID.wh); g.rect(Math.floor(WW - fw), -MID.oy, Math.ceil(fw), MID.wh); g.clip();
+    htLake(nowMs, dn, sunY); g.fillStyle = `rgba(14,22,46,${0.3 - 0.14 * dn})`; g.fillRect(0, -MID.oy, WW, MID.wh); g.restore();
+    if (fw < WW / 2) for (const [x, d] of [[fw, 1], [WW - fw, -1]]) { const gr = g.createLinearGradient(x - 14 * d, 0, x, 0); gr.addColorStop(0, 'rgba(255,214,160,0)'); gr.addColorStop(1, 'rgba(255,214,160,.5)'); g.fillStyle = gr; g.fillRect(Math.min(x, x - 14 * d), -MID.oy, 14, MID.wh); R(x - 1, -MID.oy, 2, MID.wh, 'rgba(255,236,200,.8)'); }
+  }
+  // 반장's radio, off all night, and the can of coffee 마르코 left by it
+  { const { x, y } = RB_RADIO; R(x + 18, y - 9, 1, 9, '#3a332c'); R(x, y, 24, 12, '#6b4a2e'); R(x, y, 24, 1, '#8a6a42'); R(x + 2, y + 3, 9, 5, '#2a1a10'); for (let k = 0; k < 3; k++) R(x + 14 + k * 3, y + 3, 2, 6, '#3a2a1c');
+    R(x + 27, y + 4, 5, 8, '#c8302a'); R(x + 27, y + 4, 5, 1, '#d8dde2'); R(x + 27, y + 7, 5, 2, '#f4efe2'); R(x + 27, y + 11, 5, 1, '#8a2420'); }
+  // the notice board on its stand by the line's end, the request pinned to it (white, a red stamp)
+  { const x = 30, y = 46; R(x + 14, y + 26, 2, 30, '#4a4038'); R(x, y, 30, 26, '#6a4a2e'); R(x + 1, y + 1, 28, 24, '#8a6440'); R(x + 3, y + 3, 9, 7, '#e8dcc0');
+    R(x + 14, y + 3, 13, 18, '#f4f1ea'); for (let k = 0; k < 5; k++) R(x + 16, y + 6 + k * 3, 9 - (k % 2) * 3, 1, '#7a7470'); R(x + 21, y + 16, 5, 4, 'rgba(200,40,40,.8)'); R(x + 20, y + 3, 1, 1, '#c8302a'); }
+  // 마르코's boombox: unplugged until he plugs it back in; then the song comes out of it
+  { const { x, y } = RB_BOX, plugged = live && bb >= D.plug, on = plugged && bb >= D.song, pump = on ? Math.max(0, 1 - (bb % 1) * 3) : 0;
+    R(x + 6, y - 4, 12, 1, '#2a2d33'); R(x + 6, y - 4, 1, 4, '#2a2d33'); R(x + 17, y - 4, 1, 4, '#2a2d33'); R(x, y, 24, 12, '#1b1b1f'); R(x, y, 24, 1, '#3a3d45');
+    for (const sx of [x + 2, x + 16]) { const o = pump > 0.5 ? 1 : 0; R(sx, y + 3, 6, 6, '#2a2d33'); R(sx + 1 - o, y + 4 - o, 4 + 2 * o, 4 + 2 * o, '#4a4d55'); R(sx + 2, y + 5, 2, 2, '#14151a'); }
+    R(x + 10, y + 3, 4, 2, on ? (pump > 0.3 ? '#8fe3f0' : '#5fb0c0') : '#3d6b78'); R(x + 10, y + 7, 4, 1, plugged ? '#d8463b' : '#3a2020');
+    if (!plugged) { R(x + 24, y + 10, 10, 1, '#222'); R(x + 34, y + 10, 2, 2, '#555'); }
+    if (on) for (let k = 0; k < 3; k++) { const p = ((nowMs / 1400) + k * 0.37) % 1, nx = x + 6 + k * 6 + Math.sin(p * 6 + k) * 4, ny = y - 4 - p * 26; g.globalAlpha = Math.min(1, (1 - p) * 1.6); R(nx, ny, 2, 2, '#9ff0ff'); R(nx + 1, ny - 5, 1, 5, '#9ff0ff'); R(nx + 2, ny - 5, 2, 1, '#9ff0ff'); g.globalAlpha = 1; } }
+  // the backlog on its board over the cart: red while there is some, green at nothing
+  if (live && bb >= D.left[0]) {
+    if (D._tot == null) D._tot = notes.filter(n => n.quad && n.beat < D.left[2]).length;
+    const done = notes.filter(n => n.quad && n.beat < D.left[2] && n.state === 'hit').length, n0 = D.left[1], left = Math.max(0, Math.round(n0 * (1 - done / Math.max(1, D._tot))));
+    const show = bb >= D.left[2] && done >= D._tot - 2 ? 0 : left, str = String(show), x0 = MID.ax - 30, y0 = 28, a = htClamp((bb - D.left[0]) / 1.5);
+    g.globalAlpha = a; R(x0, y0, 60, 22, '#141012'); R(x0, y0, 60, 1, '#3a3238'); R(x0 + 4, y0 + 6, 9, 9, '#d6a06a'); R(x0 + 4, y0 + 6, 9, 2, '#e9bb83'); R(x0 + 8, y0 + 6, 1, 9, '#a0703f');
+    g.save(); g.translate(x0 + 18, y0 + 6); g.scale(2, 2); const col = show === 0 ? '#5aff8a' : bb >= D.rush[0] && bb < D.song && Math.floor(t * 3) % 2 ? '#ff8a6a' : '#ff4a3a'; pixText(str, 0, 0, col); g.restore(); g.globalAlpha = 1;
+  }
+}
+// the cuts' letterbox: black bars close in over a beat and open again at the end of each cut
+function htCine(c, w, h, b, active) {
+  const live = active || state === 'outro', C = live ? htCutAt(b) : null, on = !!C;
+  if (hud.classList.contains('cine') !== on) { hud.classList.toggle('cine', on); judgeEl.classList.toggle('cine', on); $('devbtn').classList.toggle('cine', on); }
+  if (!C) return;
+  const k = ease(Math.min((b - C[0] + 1) / 1.5, (C[1] - b) / 1)); if (k <= 0) return;
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, w, Math.round(h * 0.14 * k)); c.fillRect(0, Math.round(h - h * 0.14 * k), w, Math.ceil(h * 0.14 * k)); c.restore();
+}
+// 반장: hurrying (a quicker bob), heaving the heavy box up, his back going (a hand to it, sinking down onto the box), then sitting,
+// his other hand patting the box at his belt's end in time
+function htBossPose(b, pose, held) {
+  const D = L.ht; if (b < D.fuse[0]) pose.mute = true;
+  if (htIn(b, D.rush) && b < D.lift[0]) pose.bob = Math.floor(b * 4) % 2;
+  if (htIn(b, D.lift)) { const k = htClamp((b - D.lift[0]) / (D.lift[1] - D.lift[0])); pose.hand = { x: BOSS_X + 16, y: Math.round(lerp(140, 96, ease(k * 1.4))) }; pose.dip = Math.round(lerp(8, 0, ease(k * 1.4))); pose.bob = 0; }
+  if (b >= D.back) {
+    const k = b - D.back; pose.wince = k < 12; pose.bob = 0;
+    if (k < 4) { pose.dip = Math.round(lerp(2, 14, ease(k / 4))); if (!held) pose.hand = { x: BOSS_X - 2, y: 126 }; }
+    else { pose.dip = 14; if (!held) { const tp = htTap(b), d = tp == null ? 9 : b - tp; pose.hand = { x: BOSS_X + 20, y: d >= 0 && d < 0.2 ? 135 : 127 }; } }
+  }
+}
+function htBossExtra(b, pose) {
+  const D = L.ht, hb = (x, y) => { R(x, y, 18, 14, '#2a2a2e'); for (let k = 0; k < 4; k++) R(x + 1 + k * 5, y + 5, 3, 4, '#f0c020'); R(x, y, 18, 1, '#4a4a52'); };
+  if (htIn(b, D.lift)) hb(pose.hand.x - 9, pose.hand.y - 15);
+  if (b >= D.back && b < D.back + 0.6) { const k = (b - D.back) / 0.6; hb(BOSS_X + 6 - 9, Math.round(lerp(96, 150, k * k))); }
+  // the box he pats, at his belt's end: it gives a little under his hand, a puff of dust
+  if (b >= D.back + 3) { const tp = htTap(b), d = tp == null ? 9 : b - tp, sq = d >= 0 && d < 0.15 ? 1 : 0, x = BOSS_X + 13, y = 134 + sq;
+    R(x, y, 15, 12 - sq, '#d6a06a'); R(x, y, 15, 2, '#e9bb83'); R(x + 7, y, 1, 12 - sq, '#a0703f');
+    if (d >= 0 && d < 0.3) { g.globalAlpha = 1 - d / 0.3; R(x - 2 - d * 10, y + 8, 2, 2, '#c8b8a0'); R(x + 15 + d * 10, y + 8, 2, 2, '#c8b8a0'); g.globalAlpha = 1; } }
+}
+// over the floor: the boxes spilled round the cart when it jams, lying there until the band comes in
+function htFront(b, bReal, nowMs, active, live) {
+  if (!live) return;
+  const D = L.ht, AX = MID.ax, j = bReal - D.jam;
+  if (j >= 0 && j < 0.25) { g.fillStyle = `rgba(255,250,235,${0.35 * (1 - j / 0.25)})`; g.fillRect(0, -MID.oy, MID.ww, MID.wh); }
+  if (j >= 0 && bReal < D.fuse[0] + 4) { const fade = htClamp((D.fuse[0] + 4 - bReal) / 4);
+    [[-58, 186, -0.5], [-36, 196, 0.4], [-14, 182, 0.1], [10, 198, -0.6], [30, 186, 0.3], [52, 196, 0.2], [-70, 200, 0.7], [70, 200, -0.3], [0, 205, -0.2], [-24, 206, 0.5]].forEach(([dx, y, r], k) => {
+      const fall = htClamp((j - k * 0.04) / 0.45); g.save(); g.globalAlpha = fade; g.translate(AX + dx, y - (1 - fall) * 40); g.rotate(r * fall);
+      g.fillStyle = '#d6a06a'; g.fillRect(-7, -6, 14, 11); g.fillStyle = '#e9bb83'; g.fillRect(-7, -6, 14, 3); g.fillStyle = '#a0703f'; g.fillRect(-1, -6, 2, 11); g.restore(); }); }
+}
 function drawMid(t, nowMs, active) {
   const F = L.phaseFx, M = L.mid, bReal = active ? beatAt(t) : castBeatAt(t, active), live = active || state === 'outro' || state === 'result';
   // the last hit holds the picture still for a moment (a hitstop) before the lights start going out
   const frozen = F && active && bReal >= F.last && bReal < F.last + 1.2, b = frozen ? F.last : bReal, T = frozen ? timeAt(F.last) : active ? t : live ? timeAt(END_BEAT) : 0, AX = MID.ax, WW = MID.ww;
-  if (!midCv) { midCv = sizeRenderCanvas(document.createElement('canvas'), MID.ww, MID.wh); midG = midCv.getContext('2d'); }
-  const g0 = g; g = midG; setDrawTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
+  if (!midCv) { midCv = document.createElement('canvas'); midCv.width = MID.ww; midCv.height = MID.wh; midG = midCv.getContext('2d'); }
+  const g0 = g; g = midG; g.setTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
   // above and below the 216 px the screen used to show: the dark of the roof and the floor going on
   g.fillStyle = '#120d0c'; g.fillRect(0, -MID.oy, WW, MID.oy); g.fillStyle = '#18120f'; g.fillRect(0, H, WW, MID.wh - MID.oy - H);
   for (let x = 0; x < WW; x += 14) R(x, 200, 8, 3, '#c99a1e');
   const ph = b - Math.floor(b), pk = i => Math.max(0, 1 - (nowMs - QUADFX.press[i]) / 140);
   const marco = midMarco(b);
   // who loads a box: 반장 the left lower line's, unless 마르코 has squeezed in there; 마르코 throws all the rest from wherever he is
-  const bossLoads = n => n.q === 0 && !n.up && midSpotAt(n.place ? beatAt(n.place) : n.beat) !== 'll';
+  const bossLoads = n => n.q === 0 && !n.up && !['ll', 'lk'].includes(midSpotAt(n.place ? beatAt(n.place) : n.beat));
   let held = null;
   if (live) for (const n of notes) { if (!n.quad || !bossLoads(n)) continue; const k = (T - (n.place - n.carry)) / n.carry; if (k >= 0 && k < 1) { const f = { x: 16, y: 112 }, x = lerp(f.x, PLACE_X, k), y = lerp(f.y, BELT_Y - n.h / 2, ease(k)) - Math.sin(Math.PI * k) * 14; held = { n, x, y }; break; } }
   const mirror = (q, fn) => { g.save(); if (q) { g.translate(WW, 0); g.scale(-1, 1); } g.beginPath(); g.rect(0, -MID.oy, AX, MID.wh); g.clip(); fn(); g.restore(); };
@@ -5284,7 +5251,7 @@ function drawMid(t, nowMs, active) {
   const hitRings = [];
   const belt = (q, up) => {
     BELT_L = up ? 14 : 48; g.save(); if (up) { g.translate(0, LANE_DY[0]); farXform(); }
-    drawScannerBack(0); drawBeltTop(L.rb ? rbBeltT(T) : T, live);
+    drawScannerBack(0); drawBeltTop(L.rb ? rbBeltT(T) : L.ht ? htBeltT(T) : T, live);
     if (live) drawLaserGlow(flashOf(q, up) * 0.6);
     // the square rings that go out from the scanner on a hit (as on the one-belt screen) are drawn after the belts, unclipped
     if (live) for (const n of notes) if (n.quad && n.q === q && !!n.up === up && n.state === 'hit' && n.hitAt != null && n.judge != null && T - n.hitAt < 0.42 && T >= n.hitAt) hitRings.push(n);
@@ -5304,7 +5271,7 @@ function drawMid(t, nowMs, active) {
       else if (T >= f.ta) { if (T - f.ta < 0.42) hitRings.push({ q, up, hitAt: f.ta, judge: 'perfect', beat: f.sb }); x = SCAN_X + (T - f.ta) * f.v; if (x > end) continue; }
       drawBox(f, x, BELT_Y + dy, '', T, !f.jam && T >= f.ta && T - f.ta < 0.1 ? 0.8 : 0);
     }
-    drawBeltFront(L.rb ? rbBeltT(T) : T, live); if (up) drawBeltLegs();
+    drawBeltFront(L.rb ? rbBeltT(T) : L.ht ? htBeltT(T) : T, live); if (up) drawBeltLegs();
     drawScannerFront(flashOf(q, up), false, missOf(q, up), 0);
     g.restore(); BELT_L = 48;
   };
@@ -5317,7 +5284,7 @@ function drawMid(t, nowMs, active) {
   const drawMarco = () => {
     const pose = { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: active && (marco.walking ? ph < 0.5 : ph < 0.18) ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
     let sway = 0, lift = 0, mir = marco.mir;
-    const on = L.rb ? active && rbFunkOn(b) : active && M.boombox != null && b >= M.boombox + 0.5;
+    const on = L.rb ? active && rbFunkOn(b) : L.ht ? active && b >= L.ht.fuse[0] : active && M.boombox != null && b >= M.boombox + 0.5;
     if (toss) pose.hand = { x: BOSS_X + 16, y: 104 };
     else if (on && marco.walking) {
       lift = Math.round(Math.sin(Math.PI * Math.min(1, marco.p * 1.4)) * 7); pose.hand = { x: BOSS_X + 10, y: 80 };
@@ -5346,6 +5313,16 @@ function drawMid(t, nowMs, active) {
     if (L.rb && active) { const tn = rbTurn(b); if (tn && tn[1] === 'v' && L.rb.cut && b >= L.rb.cut[0] && b - tn[0] < 0.7 && !marco.walking) { pose.hand = { x: BOSS_X + 16, y: 98 + (b - tn[0] < 0.2 ? 4 : 0) }; lift = Math.max(lift, 2); } }
     if (L.rb && active && b >= L.rb.boom + 1) { pose.sad = true; if (!marco.walking) pose.hand = { x: BOSS_X + 10, y: 138 }; }
     if (F && b >= F.last) { pose.hand = { x: BOSS_X + 11, y: 70 }; if (b < F.last + 1) lift = Math.max(lift, Math.round(Math.sin(Math.PI * (b - F.last)) * 9)); }
+    // 2-3: no grin until the song; kneeling by 반장 in the first cut; hands to his head at the jam; down at the boombox's plug;
+    // turned to 반장 while he follows his pats
+    if (L.ht && active) { const D = L.ht;
+      if (b < D.song) pose.sad = true;
+      if (marco.spot === 'lk' && !marco.walking && b >= D.back && b < D.cuts[0][1]) { pose.dip = 10; pose.hand = { x: BOSS_X + 22, y: 116 }; mir = true; sway = 0; }
+      if (b >= D.jam && b < D.jam + 3.5 && !marco.walking && !toss) { pose.hand = { x: BOSS_X + 6, y: 76 + (Math.floor(b * 3) % 2) * 2 }; sway = 0; }
+      if (marco.spot === 'bx' && !marco.walking && b >= D.plug - 1.2 && b < D.plug + 0.8) { pose.dip = 6; pose.hand = { x: BOSS_X + 22, y: 144 }; }
+      if (marco.spot === 'lk' && !marco.walking && b >= D.song && b < D.tapFrom) mir = true;
+      if (b < D.song) pose.mute = true;
+    }
     FX.react[2] = FX.react[2] || { type: '', at: nowMs };
     g.save(); if (marco.up) { g.beginPath(); g.rect(0, -MID.oy, WW, farY(BELT_Y) + 2 + MID.oy); g.clip(); }
     g.translate(sway, Math.round(marco.dy) - lift); drawActor('marco', Math.round(marco.x), mir, pose, nowMs, active, () => PARTNERS.marco.arm(pose)); g.restore();
@@ -5366,6 +5343,7 @@ function drawMid(t, nowMs, active) {
   }
   mirror(0, () => back(0)); mirror(1, () => back(1));
   if (L.rb) rbBack(b, bReal, nowMs, active, live);
+  if (L.ht) htBack(b, bReal, nowMs, active, live);
   if (marco.up) drawMarco();
   mirror(0, () => belt(0, true)); mirror(1, () => belt(1, true));
   // 반장 at line 3's lower end, carrying his boxes
@@ -5375,6 +5353,7 @@ function drawMid(t, nowMs, active) {
     const bx0 = L.rb && live ? rbBossX(bReal) : BOSS_X, stepping = L.rb && L.rb.step && live && bReal >= L.rb.step && bReal < L.rb.step + 1.5;
     if (stepping) pose.bob = Math.floor(bReal * 2.5) % 2;
     if (L.rb && live) { const tn = rbTurn(bReal); if (tn && tn[1] === 'b' && L.rb.cut && bReal >= L.rb.cut[0] && bReal - tn[0] < 0.7) pose.hand = { x: BOSS_X + 12, y: 102 }; }
+    if (L.ht && live) { htBossPose(bReal, pose, held); drawActor('boss', BOSS_X, false, pose, nowMs, active, () => { PARTNERS.boss.arm(pose); htBossExtra(bReal, pose); }); return; }
     // 2-2: after the boom he calls it a night and walks out to the left, unhurried, gone off the floor
     const lv = L.rb && L.rb.leave, lp = lv && live ? (bReal - lv[0]) / (lv[1] - lv[0]) : -1;
     if (lp >= 1) return;
@@ -5382,7 +5361,13 @@ function drawMid(t, nowMs, active) {
     drawActor('boss', Math.round(bx0), false, pose, nowMs, active, () => PARTNERS.boss.arm(pose));
   });
   if (!marco.up) drawMarco();
-  drawPlayer(Math.max(pk(0), pk(1)), nowMs);
+  // you face the side you last scanned: the right line's box, and you turn your head (the whole of you, mirrored about your
+  // spot) to the right; a box on the left turns you back. Both at once keeps you as you were
+  const pr0 = QUADFX.press[0], pr1 = QUADFX.press[1];
+  if (Math.abs(pr1 - pr0) > 30) FX.faceR = pr1 > pr0;
+  if (!live) FX.faceR = false;
+  if (FX.faceR) { g.save(); g.translate(2 * AX, 0); g.scale(-1, 1); drawPlayer(Math.max(pk(0), pk(1)), nowMs); g.restore(); }
+  else drawPlayer(Math.max(pk(0), pk(1)), nowMs);
   mirror(0, () => belt(0, false)); mirror(1, () => belt(1, false));
   // each hit's square rings out of its own scanner, over the floor (not cut at the middle); a pair's white and bigger, with a
   // white flash in the scanner, so both hands at once show two
@@ -5411,13 +5396,13 @@ function drawMid(t, nowMs, active) {
     if (q === 1 && !open) continue;
     const nx = live ? notes.find(n => n.quad && n.q === q && n.state === 'pending' && n.arr > T - 0.15) : null, upAim = nx && nx.up && nx.arr - T < 0.6;
     g.save(); if (q) { g.translate(WW, 0); g.scale(-1, 1); }
-    const motion = rookieScan(2 + q, QUADFX.press[q], nowMs, notes.some(n => n.quad && n.q === q && n.state === 'holding'));
-    if (upAim) RookieArt.drawUpperArm(g, AX, top, nowMs - FX.flinch, motion);
-    else RookieArt.drawMainArm(g, AX, top, pk(q), nowMs - FX.flinch, motion);
+    if (upAim) { thick(AX - 5, top + 20, 320 - pk(q) * 4 + 2, 89, 4, C.hoodie); drawGun(320 - pk(q) * 4, 86, pk(q)); }
+    else { thick(AX - 5, top + 20, 326 - pk(q) * 4, 120, 4, C.hoodie); drawGun(324 - pk(q) * 4, 117, pk(q)); }
     g.restore();
   }
   drawParticles(nowMs);
   if (L.rb) rbFront(b, bReal, nowMs, active, live);
+  if (L.ht) htFront(b, bReal, nowMs, active, live);
   // the lamps: line 4 dark until its three lamps click on (nearest you first); at the end every lamp goes out from the far
   // ends in, both lines at once, and only the one over you is left
   if (F) {
@@ -5439,7 +5424,8 @@ function drawMid(t, nowMs, active) {
     if (F.blackout && bReal >= F.blackout[0] && bReal < F.blackout[1]) dark(0, AX, 0.86);
     if (F.blackout && bReal >= F.blackout[1] && bReal < F.blackout[1] + 0.7 && !reduce) flash(0, AX, 0.2 * (1 - (bReal - F.blackout[1]) / 0.7));
     const outs = [[[0, AX - 226], [AX + 226, WW]], [[AX - 226, AX - 113], [AX + 113, AX + 226]], [[AX - 113, AX - 40], [AX + 40, AX + 113]]];
-    outs.forEach((pair, i) => { if (bReal >= F.out[i] || !active && state !== 'play' && live) for (const [x0, x1] of pair) dark(x0, x1, 0.8); });
+    // (2-3 ends at sunrise on the beach: no lamps going out)
+    if (!L.ht) outs.forEach((pair, i) => { if (bReal >= F.out[i] || !active && state !== 'play' && live) for (const [x0, x1] of pair) dark(x0, x1, 0.8); });
   }
   g = g0;
   // the camera. Before it moves it draws into the game canvas like any frame; once it pulls back it draws into a canvas the size
@@ -5449,10 +5435,11 @@ function drawMid(t, nowMs, active) {
   let sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
   // 2-2: the cutscene's camera (rb.zoom): close on whoever speaks, panning between shots that touch, easing in from the wide
   // view and back out to it, never past the floor's ends
-  if (L.rb && L.rb.zoom && (active || state === 'outro')) {
-    const Z = L.rb.zoom, wide = { s: V.s, cx: V.cx, cy: V.cy }, mc = midMarco(b), lv = L.rb.leave, lp = lv ? Math.max(0, Math.min(1, (bReal - lv[0]) / (lv[1] - lv[0]))) : 0;
+  const ZD = L.rb || L.ht;
+  if (ZD && ZD.zoom && (active || state === 'outro')) {
+    const Z = ZD.zoom, wide = { s: V.s, cx: V.cx, cy: V.cy }, mc = midMarco(b), lv = ZD.leave, lp = lv ? Math.max(0, Math.min(1, (bReal - lv[0]) / (lv[1] - lv[0]))) : 0;
     const at = w => { if (!w) return wide; const zs = V.s * w[3];
-      if (w[2] === 'b') return { s: zs, cx: rbBossX(bReal) + 60, cy: 114 };
+      if (w[2] === 'b') return { s: zs, cx: (L.rb ? rbBossX(bReal) : BOSS_X) + 60, cy: 114 };
       if (w[2] === 'v') return { s: zs, cx: mc.x + (mc.mir ? -48 : 48), cy: 112 + mc.dy };
       if (w[2] === 'two') return { s: zs, cx: (mc.x + MID.ax) / 2, cy: 112 };
       return { s: zs, cx: MID.ax, cy: 122 }; };
@@ -5466,14 +5453,14 @@ function drawMid(t, nowMs, active) {
   let [jx, jy] = phaseJolt(bReal);
   if (FX.midPair && nowMs - FX.midPair.at < 170 && !reduce) { const k = FX.midPair.both ? 2 : 1; jx += Math.round((Math.random() * 2 - 1) * k); jy += Math.round((Math.random() * 2 - 1) * k); }
   MIDCAM = { sx, sy, sw, sh };
-  if (V.e <= 0) { cvHi.hidden = true; g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, (sx + jx) * RENDER_SCALE, (sy + jy) * RENDER_SCALE, sw * RENDER_SCALE, sh * RENDER_SCALE, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); if (L.rb) rbCine(g, W, H, bReal, active); return; }
+  if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx + jx, sy + jy, sw, sh, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); if (L.rb) rbCine(g, W, H, bReal, active); if (L.ht) htCine(g, W, H, active ? bReal : END_BEAT, active); return; }
   if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
   cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#0c0a09'; gHi.fillRect(0, 0, hw, hh);
-  gHi.drawImage(midCv, (sx + jx / V.s) * RENDER_SCALE, (sy + jy / V.s) * RENDER_SCALE, sw * RENDER_SCALE, sh * RENDER_SCALE, 0, 0, hw, hh);
-  phaseLook(gHi, hw, hh, bReal, active); if (L.rb) rbCine(gHi, hw, hh, active ? bReal : END_BEAT, active);
+  gHi.drawImage(midCv, sx + jx / V.s, sy + jy / V.s, sw, sh, 0, 0, hw, hh);
+  phaseLook(gHi, hw, hh, bReal, active); if (L.rb) rbCine(gHi, hw, hh, active ? bReal : END_BEAT, active); if (L.ht) htCine(gHi, hw, hh, active ? bReal : END_BEAT, active);
   if (active) { midGuide(b, T, nowMs, { sx, sy, sw, sh, hw, hh, k }); midAdlib(nowMs, { sx, sy, sw, sh, hw, hh }); }
   // the game canvas under it still gets the plain floor colour (nothing else shows through)
-  g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
 }
 // 2-1's lesson, drawn on the device-resolution canvas: as the camera pulls back, a big hand label on each side (the left in
 // 반장's orange, the right in 마르코's teal, lit while that hand is pressed), and over the first bars' boxes a small arrow tag
@@ -5537,12 +5524,12 @@ let quadBuf = null;
 // the turn: the side view spins a quarter turn away, clockwise (the belt's left-to-right becomes far-to-near), over the chutes
 function drawQuadTurn(t, nowMs, active) {
   const p = quadP(castBeatAt(t, active));
-  if (!quadBuf) { quadBuf = sizeRenderCanvas(document.createElement('canvas'), W, H); }
-  const c = quadBuf.getContext('2d'); c.clearRect(0, 0, quadBuf.width, quadBuf.height); c.drawImage(cv, 0, 0);
+  if (!quadBuf) { quadBuf = document.createElement('canvas'); quadBuf.width = W; quadBuf.height = H; }
+  const c = quadBuf.getContext('2d'); c.clearRect(0, 0, W, H); c.drawImage(cv, 0, 0);
   drawQuad(t, nowMs, active);
-  g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = Math.max(0, 1 - p * 1.15);
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = Math.max(0, 1 - p * 1.15);
   g.translate(W / 2, H / 2); g.rotate(p * Math.PI / 2); g.scale(1 + p * 0.8, 1 + p * 0.8); g.translate(-W / 2, -H / 2);
-  g.drawImage(quadBuf, 0, 0, W, H); g.restore();
+  g.drawImage(quadBuf, 0, 0); g.restore();
   // a white streak through the middle of the turn
   const fl = Math.max(0, 1 - Math.abs(p - 0.5) * 4); if (fl > 0 && !reduce) { g.fillStyle = `rgba(255,250,235,${fl * 0.35})`; g.fillRect(0, 0, W, H); }
 }
@@ -5632,7 +5619,7 @@ function drawQuadBox(n, z, t) {
 function drawQuad(t, nowMs, active) {
   const beat = castBeatAt(t, active), now = nowMs, live = active || state === 'outro' || state === 'result';
   const scroll = live ? (active ? beatAt(t) : END_BEAT) / QUAD.look : 0;
-  g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false;
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false;
   drawQuadRoom(beat, active);
   // the sorter at the far end: its housing, a lit mouth over the four chutes, 마르코 on the platform behind it sending boxes down
   const yS = qY(1), xS0 = qX(-2.5, 1), xS1 = qX(2.5, 1);
@@ -5854,13 +5841,12 @@ function drawLaptop(t, active, nowMs) {
 // your launchpad on its stand: a 4x2 grid of pads, one lighting with each press; the right hand on it, the left hand holding a crate
 function drawPadArm(kick, nowMs, top, twoHands) {
   const { x, y } = PAD;
-  const cx = PLAYER_X + (nowMs - FX.flinch < 160 ? 1 : 0);
   R(x + 10, y + 10, 2, 10, '#3a3d45'); R(x + 5, y + 19, 12, 2, '#2a2d33');
   R(x, y, 22, 10, '#1e2024'); R(x, y, 22, 1, '#3a3d45');
   for (let k = 0; k < 8; k++) { const lit = kick > 0.3 && k === stats.combo % 8; R(x + 2 + (k % 4) * 5, y + 2 + (k >> 2) * 4, 4, 3, lit ? '#8fe3ff' : '#2b2f36'); }
   const hx = x + 12, hy = y - 2 + (kick > 0.5 ? 2 : 0);
-  drawPlayerSleeve(cx - 6, top + 22, hx, hy);
-  if (twoHands) drawPlayerSleeve(cx - 4, top + 24, hx + 6, hy + 2);
+  thick(PLAYER_X - 6, top + 22, hx, hy, 4, C.hoodie); R(hx - 2, hy - 1, 5, 4, C.skin);
+  if (twoHands) { thick(PLAYER_X - 4, top + 24, hx + 6, hy + 2, 4, C.hoodie); R(hx + 4, hy + 1, 4, 3, C.skin); }
 }
 // the three judges, from behind: heads and shoulders against the stage light, leaning in once the set gets going
 function drawJudges(t, active, nowMs) {
@@ -6183,8 +6169,8 @@ function drawPocha(nowMs) {
   const vw = W / Math.max(1, cz), vh = H / Math.max(1, cz), cx = Math.max(vw / 2, Math.min(W - vw / 2, ccx)), cy = Math.max(vh / 2, Math.min(H - vh / 2, ccy));
   // the street is drawn at its own size into a buffer, then the camera's crop of it is blown up onto the hi-res canvas pixel for
   // pixel (no smoothing), so a close-up shows big clean dots instead of half-drawn ones
-  if (!POCHA_CV.buf) { for (const k of ['buf', 'over']) { POCHA_CV[k] = sizeRenderCanvas(document.createElement('canvas'), W, H); } }
-  const g0 = g; g = POCHA_CV.buf.getContext('2d'); setDrawTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.clearRect(0, 0, W, H);
+  if (!POCHA_CV.buf) { for (const k of ['buf', 'over']) { POCHA_CV[k] = document.createElement('canvas'); POCHA_CV[k].width = W; POCHA_CV[k].height = H; } }
+  const g0 = g; g = POCHA_CV.buf.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.clearRect(0, 0, W, H);
   g.save();
   // the sky lightening from night into dawn, the stars going, the sun coming up between the blocks
   const sky = g.createLinearGradient(0, 0, 0, 120); sky.addColorStop(0, mixC('#141c3a', '#4a6aa8', dawn)); sky.addColorStop(0.6, mixC('#3a4672', '#e2a27e', dawn)); sky.addColorStop(1, mixC('#c4876a', '#ffd8a0', dawn)); g.fillStyle = sky; g.fillRect(0, 0, W, 122);
@@ -6238,9 +6224,9 @@ function drawPocha(nowMs) {
   g.save(); g.translate(0, 22); drawActor('marco', 150, false, pose, nowMs, false, () => { PARTNERS.marco.arm(pose);
     if (mp === 'pour') { g.save(); g.translate(pose.hand.x + 2, pose.hand.y - 2); g.rotate(1.1); R(-3, -12, 6, 18, '#2e8a4a'); R(-2, -16, 4, 4, '#2e8a4a'); R(-3, -5, 6, 5, '#e9f0e0'); g.restore(); R(pose.hand.x + 10, pose.hand.y + 6, 1, 7, 'rgba(220,240,230,.7)'); }
     else { R(pose.hand.x - 1, pose.hand.y - 6, 4, 6, '#e9eef0'); R(pose.hand.x, pose.hand.y - 4, 2, 3, '#cfe8d8'); } }); g.restore();
-  g.save(); g.translate(236 - PLAYER_X, 26); drawPlayer(0, nowMs, false); g.restore();
+  g.save(); g.translate(236 - PLAYER_X, 26); drawPlayer(0, nowMs); g.restore();
   const r2 = in1(TL && TL.raise2);
-  if (r2) { const gx = 214 - Math.round(cl * 6), gy = 114; drawPlayerSleeve(232, 148, gx + 3, gy + 4); R(gx + 1, gy + 2, 4, 4, C.skin); R(gx, gy - 4, 4, 6, '#e9eef0'); R(gx + 1, gy - 2, 2, 3, '#cfe8d8'); }
+  if (r2) { const gx = 214 - Math.round(cl * 6), gy = 114; thick(232, 148, gx + 3, gy + 4, 4, C.hoodie); R(gx + 1, gy + 2, 4, 4, C.skin); R(gx, gy - 4, 4, 6, '#e9eef0'); R(gx + 1, gy - 2, 2, 3, '#cfe8d8'); }
   if (clk >= 0 && clk < 0.45) { const k = clk / 0.45; g.globalAlpha = 1 - k; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, r = 3 + k * 11; R(198 + Math.cos(a) * r, 106 + Math.sin(a) * r, 2, 2, '#fff6c8'); } g.globalAlpha = 1; }
   // the little steel table between them: a lip and a cross-bar, the bottles (one lying empty), glasses, rolled egg, chopsticks,
   // and his phone face up with the song coming out of it
@@ -6253,7 +6239,7 @@ function drawPocha(nowMs) {
   if (POCHA.src) for (let k = 0; k < 2; k++) { const p = ((t / 2.4) + k / 2) % 1; g.globalAlpha = 1 - p; eighthNote(169 + Math.sin(p * 6 + k) * 3, 130 - p * 16, '#bfe6ff'); g.globalAlpha = 1; }
   g.restore();
   // his memory and the fades go over the crop, at the screen's scale
-  g = POCHA_CV.over.getContext('2d'); setDrawTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.clearRect(0, 0, W, H);
+  g = POCHA_CV.over.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.clearRect(0, 0, W, H);
   const fb = TL && TL.flash; if (fb && et > fb[0] && et < fb[1]) drawMemory(et, Math.min(1, (et - fb[0]) / 2.5, (fb[1] - et) / 2.5), TL.vanish || [], nowMs);
   if (EPI.on && TL) { const ln = TL.lines.find(([a, , , d]) => et >= a && et < a + d), key = ln ? ln[0] + ln[2] : '';
     if (key !== EPI.key) { EPI.key = key; subEl.innerHTML = ''; subEl.hidden = !ln; if (ln) { const nm = { v: ['마르코', '#6fdcec'], b: ['반장', '#f0a050'] }[ln[1]]; if (nm) { const k = document.createElement('b'); k.textContent = nm[0]; k.style.color = nm[1]; subEl.append(k); } subEl.append(ln[2]); } } }
@@ -6263,8 +6249,8 @@ function drawPocha(nowMs) {
   const dpr = window.devicePixelRatio || 1, hw = Math.max(W, Math.round(cv.clientWidth * dpr)), hh = Math.round(hw * H / W);
   if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
   cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#000'; gHi.fillRect(0, 0, hw, hh);
-  gHi.drawImage(POCHA_CV.buf, (cx - vw / 2) * RENDER_SCALE, (cy - vh / 2) * RENDER_SCALE, vw * RENDER_SCALE, vh * RENDER_SCALE, 0, 0, hw, hh); gHi.drawImage(POCHA_CV.over, 0, 0, hw, hh);
-  g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.restore();
+  gHi.drawImage(POCHA_CV.buf, cx - vw / 2, cy - vh / 2, vw, vh, 0, 0, hw, hh); gHi.drawImage(POCHA_CV.over, 0, 0, hw, hh);
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.restore();
 }
 function drawMemory(et, a, vanish, nowMs) {
   const TL = L.epilogue && (EPI.good ? L.epilogue : L.epilogue.fail), fast = TL.fast != null && et >= TL.fast, turned = TL.turn != null && et >= TL.turn;
@@ -6302,29 +6288,17 @@ function drawMemory(et, a, vanish, nowMs) {
 }
 // 지우 standing in the office, one earbud hanging: head down, a hand at his chin, or flustered (a hand up, sweating); he turns
 // to 반장 once 반장 is in the room
-function drawStandingJiwoo(x, nowMs, how, toBoss, options = {}) {
+function drawStandingJiwoo(x, nowMs, how, toBoss) {
   const pose = { hand: { x: BOSS_X + 8, y: 130 }, carry: null, wince: how === 'fluster', dip: how === 'down' ? 2 : 0, bob: Math.sin(nowMs / 1000 * 1.5 + 1) > 0.88 ? 1 : 0, nod: 0, doze: false, phone: false, vibe: false, unplug: true, lane: 1, beat: 0 };
-  pose.nobuds = !!options.nobuds;
-  pose.lookDown = how === 'down' || how === 'think';
-  if (Number.isFinite(options.bob)) pose.bob = options.bob;
-  if (how === 'think') pose.hand = jiwooRig(pose).chin;
+  if (how === 'think') pose.hand = { x: BOSS_X + 2, y: 100 };
   if (how === 'fluster') pose.hand = { x: BOSS_X + 12, y: 108 + (Math.floor(nowMs / 160) % 2) };
   g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(x, 169, 14, 3, 0, 0, Math.PI * 2); g.fill();
-  drawActor('jiwoo', x, options.facing === 'left', pose, nowMs, false, top => {
-    const ankleY = 165, legY = top + 64, kneeY = Math.round((legY + ankleY) / 2), cloth = JIWOO_CLOTH;
-    for (const lx of [BOSS_X - 6, BOSS_X + 1]) {
-      R(lx, legY, 5, ankleY - legY, cloth.pants); R(lx + 4, legY, 1, ankleY - legY, cloth.pantsShadow);
-      R(lx + 1, legY + 2, 2, Math.max(1, kneeY - legY - 3), cloth.pantsLight);
-      R(lx, kneeY, 3, 1, cloth.pantsShadow); R(lx + 1, kneeY + 1, 3, 1, cloth.pantsLight);
-      R(lx + 1, kneeY + 3, 1, Math.max(1, ankleY - kneeY - 5), cloth.pantsLight);
-      R(lx, ankleY - 2, 5, 2, cloth.pantsShadow); R(lx + 1, ankleY - 2, 3, 1, cloth.pantsLight);
-    }
-    for (const sx of [BOSS_X - 7, BOSS_X + 1]) {
-      R(sx, ankleY, 7, 4, '#e9e4da'); R(sx, ankleY, 2, 3, '#9d9b98');
-      R(sx + 2, ankleY, 3, 1, '#b9b5ad'); R(sx, ankleY + 3, 7, 1, '#6f7273');
-    }
+  drawActor('jiwoo', x, false, pose, nowMs, false, top => {
+    R(BOSS_X - 6, top + 64, 5, 17, '#2f3440'); R(BOSS_X + 1, top + 64, 5, 17, '#2f3440');
+    R(BOSS_X - 7, top + 81, 7, 4, '#e9e4da'); R(BOSS_X + 1, top + 81, 7, 4, '#e9e4da');
     PARTNERS.jiwoo.arm(pose);
-    // The shared profile renderer handles the lowered gaze without painting over its fringe.
+    // head down: eyes on the floor
+    if (how === 'down' || how === 'think') { R(BOSS_X - 5, top + 7, 10, 3, C.skin); R(BOSS_X - 2, top + 9, 2, 1, C.ink); R(BOSS_X + 2, top + 9, 2, 1, C.ink); }
   });
 }
 // on the line, during the walk: 반장 crosses behind the belt from the middle to his place, facing the way he walks
@@ -6575,7 +6549,7 @@ function drawPuddleMirror(al, t, nowMs) {
   const top = BELT_Y + 18, rows = H - top, m = mirrorBuf.getContext('2d');
   // the reflection only needs a fresh copy of the picture every third frame
   FX.mirrorTick = (FX.mirrorTick || 0) + 1;
-  if (FX.mirrorTick % 3 === 1) { m.clearRect(0, 0, W, BELT_Y); m.drawImage(cv, 0, 0, cv.width, BELT_Y * RENDER_SCALE, 0, 0, W, BELT_Y); }
+  if (FX.mirrorTick % 3 === 1) { m.clearRect(0, 0, W, BELT_Y); m.drawImage(cv, 0, 0, W, BELT_Y, 0, 0, W, BELT_Y); }
   g.save(); g.globalAlpha = 0.3 * fade;
   for (let k = 0; k < rows; k += 2) {
     const sy = Math.round(BELT_Y + 14 - k * 2.2); if (sy < 20) break;
@@ -6778,7 +6752,7 @@ function drawScene(t, bt, active, nowMs) {
   const sh = (nowMs - (FX.hypeAt || -1e9)) / 1000;
   if (active && !reduce && sh < 0.14) { g.fillStyle = `rgba(255,255,255,${(0.14 - sh) / 0.14 * (FX.hypeBig ? 0.55 : 0.38)})`; g.fillRect(0, 0, W, H); }
   if (al) drawAlleyFront(al, t);
-  if (sv && sv.dark) { g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${sv.dark})`; g.fillRect(0, 0, W, H); g.restore(); }
+  if (sv && sv.dark) { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${sv.dark})`; g.fillRect(0, 0, W, H); g.restore(); }
   const mAge = nowMs - FX.lastMiss;
   if (mAge < 320) {
     const a = (1 - mAge / 320) * 0.4;
@@ -7278,6 +7252,16 @@ function fanfare21(t) {
   for (const f of [311.13, 392, 466.16, 622.25]) brass(f, t + 0.25, 0.7, 0.035);
 }
 function levelSfx(t, kind) {
+  // 2-3: the belt motor's clunk (the only clock in the cold war); the announcement's chime and its speaker's hiss; 반장 heaving
+  // the heavy box up and it landing; four belts jamming (boxes crashing into each other and down); a palm on a cardboard box;
+  // the boombox's plug going back in (a click and a hum)
+  if (kind === 'motor') { osc('sine', 58, t, 0.004, 0.08, 0.14, bus); noise(t, 'lowpass', 260, 0.06, 0.05, 0.8, bus); return; }
+  if (kind === 'pa') { noise(t, 'bandpass', 1800, 0.025, 4.2, 0.6, bus); osc('sine', 659.3, t + 0.05, 0.01, 0.1, 0.7, bus); osc('sine', 523.3, t + 0.55, 0.01, 0.1, 1, bus); return; }
+  if (kind === 'heave') { noise(t, 'lowpass', 500, 0.08, 0.3, 0.8, bus); return; }
+  if (kind === 'thud') { const o = osc('sine', 110, t, 0.002, 0.4, 0.3, bus); o.frequency.exponentialRampToValueAtTime(42, t + 0.25); noise(t, 'lowpass', 700, 0.25, 0.12, 0.7, bus); return; }
+  if (kind === 'jam') { for (let k = 0; k < 7; k++) { const tk = t + k * 0.07 + Math.random() * 0.03, o = osc('sine', 90 + Math.random() * 60, tk, 0.002, 0.25, 0.18, bus); o.frequency.exponentialRampToValueAtTime(40, tk + 0.16); noise(tk, 'lowpass', 900 + Math.random() * 900, 0.18, 0.08, 0.7, bus); } osc('square', 160, t, 0.005, 0.03, 0.5, bus); return; }
+  if (kind === 'thump') { const o = osc('sine', 120, t, 0.002, 0.32, 0.12, bus); o.frequency.exponentialRampToValueAtTime(55, t + 0.1); noise(t, 'bandpass', 420, 0.22, 0.05, 1.2, bus); return; }
+  if (kind === 'plug') { osc('square', 1700, t, 0.0005, 0.06, 0.012, bus); noise(t, 'bandpass', 2500, 0.1, 0.02, 3, bus); osc('sine', 60, t + 0.02, 0.05, 0.05, 0.6, bus); osc('sine', 120, t + 0.02, 0.05, 0.02, 0.5, bus); return; }
   // 2-2: the radio's volume knob turned up (a click and a breath of static); the motor blowing (a crack, a deep thump and a
   // hiss of steam); the line's alarm (a two-tone buzzer); the radio being switched back on (a crackle tuning in)
   if (kind === 'step') { noise(t, 'lowpass', 420, 0.2, 0.07, 0.7, bus); osc('sine', 70, t, 0.003, 0.08, 0.08, bus); return; }
@@ -7308,8 +7292,10 @@ function levelSfx(t, kind) {
   if (kind === 'drill') { const o = osc('sawtooth', 140, t, 0.02, 0.05, 0.7, bus); o.frequency.setValueAtTime(140, t); o.frequency.linearRampToValueAtTime(230, t + 0.25); o.frequency.linearRampToValueAtTime(190, t + 0.7); noise(t, 'bandpass', 2400, 0.05, 0.7, 2, bus); }
 }
 // 2-1's chutes play the band's percussion: D a kick, F claps, J a rim, K a cowbell (quieter on a 좋아)
-function quadHit(q, j) {
+function quadHit(q, j, n) {
   const t = ctx.currentTime, v = j === 'good' ? 0.7 : 1;
+  // 2-3's cold war (no song yet): each scanner beeps its own note, so what you scan is the only tune on the floor
+  if (L.ht && n && n.beat < L.ht.song) { const f = [[415.3, 523.25], [622.25, 698.46]][q][n.up ? 1 : 0]; osc('sine', f, t, 0.002, 0.12 * v, 0.18, bus); osc('sine', f * 2, t, 0.002, 0.025 * v, 0.08, bus); return; }
   if (L.mid) { if (q === 0) { osc('sine', 820, t, 0.001, 0.12 * v, 0.05, bus); noise(t, 'bandpass', 1300, 0.2 * v, 0.04, 2.2, bus); noise(t, 'lowpass', 400, 0.12 * v, 0.03, 0.7, bus); } else { osc('square', 2300, t, 0.001, 0.05 * v, 0.02, bus); noise(t, 'bandpass', 3400, 0.22 * v, 0.03, 3, bus); } return; }
   if (q === 0) { const o = osc('sine', 140, t, 0.002, 0.5 * v, 0.16, bus); o.frequency.exponentialRampToValueAtTime(50, t + 0.12); noise(t, 'lowpass', 900, 0.12 * v, 0.03, 0.7, bus); }
   else if (q === 1) { noise(t, 'bandpass', 1300, 0.3 * v, 0.07, 1.4, bus); noise(t + 0.011, 'bandpass', 1500, 0.24 * v, 0.09, 1.4, bus); }
@@ -8611,7 +8597,6 @@ let progress = {};
 try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}; } catch (e) {}
 
 function resetRun() {
-  rookieScans.forEach((scan, i) => { scan.motion.reset(); scan.last = i >= 2 ? QUADFX.press[i - 2] : i ? lastPressUpper : lastPress; });
   notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.jamFx = false; n.tossFx = false; n.dropFx = false; n.slipFx = false; n.slamFx = false; }); BANG.done = false; FX.yankFx = false;
   FX.particles = []; FX.marks = []; FX.yankFx = false; FX.shoveFx = false; FX.knockFx = 0; FX.tapsFx = {}; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.splashes = []; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9; FX.goodBoth = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
@@ -8699,7 +8684,7 @@ function judgeNote(target, t) {
     const milestone = addCombo();
     const tones = CHORDS[chordIdx(target.beat)];
     const th = THEME[fxTheme(target.beat)];
-    if (target.quad) quadHit(target.q, j); else if (target.gtr) gtrSample(j, target.beat); else if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false, target.lane);
+    if (target.quad) quadHit(target.q, j, target); else if (target.gtr) gtrSample(j, target.beat); else if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false, target.lane);
     const lightUp = phase3(target.beat);
     lastGood = now; FX.goodLane = target.lane; FX.glow = th.glow; ring(th.ring[(stats.combo + (j === 'good' ? 1 : 0)) % 2], target.lane);
     spawnBits(j === 'perfect' ? 14 : 6, th);
@@ -8919,7 +8904,7 @@ function updateHud(t) {
   if (s !== lastSay) {
     bubble.textContent = s; bubble.hidden = !s; lastSay = s;
     // 2-2: the line as a subtitle in the middle, where your eyes are; over the speaker's head only a small "…"
-    if (L.subs) { const sp = line && (line[4] || (L.mid ? 'b' : null)), nm = { b: ['반장', '#f0a050'], v: ['마르코', '#6fdcec'] }[sp];
+    if (L.subs) { const sp = line && (line[4] || (L.mid ? 'b' : null)), nm = { b: ['반장', '#f0a050'], v: ['마르코', '#6fdcec'], p: ['방송', '#a8bccc'] }[sp];
       subEl.hidden = !s; subEl.innerHTML = ''; if (s) { if (nm) { const k = document.createElement('b'); k.textContent = nm[0]; k.style.color = nm[1]; subEl.append(k); } subEl.append(s); }
       bubble.classList.toggle('dots', !!s); if (s) bubble.textContent = '…'; }
     const lane = line ? (line[3] || 0) : 0, spk = line && line[4];
@@ -8988,17 +8973,17 @@ function drawCamera(now) {
   const to = CAM.to || { x: W / 2, y: H / 2, k: 1 }, e = Math.min(1, dt * 5);
   CAM.k += (to.k - CAM.k) * e; CAM.x += (to.x - CAM.x) * e; CAM.y += (to.y - CAM.y) * e;
   if (CAM.k < 1.002) { CAM.k = 1; CAM.sx = CAM.sy = 0; return; }
-  if (!camBuf) { camBuf = sizeRenderCanvas(document.createElement('canvas'), W, H); }
-  const c = camBuf.getContext('2d'); c.clearRect(0, 0, camBuf.width, camBuf.height); c.drawImage(cv, 0, 0);
+  if (!camBuf) { camBuf = document.createElement('canvas'); camBuf.width = W; camBuf.height = H; }
+  const c = camBuf.getContext('2d'); c.clearRect(0, 0, W, H); c.drawImage(cv, 0, 0);
   const vw = W / CAM.k, vh = H / CAM.k, sx = Math.max(0, Math.min(W - vw, CAM.x - vw / 2)), sy = Math.max(0, Math.min(H - vh, CAM.y - vh / 2)); CAM.sx = sx; CAM.sy = sy;
-  g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.drawImage(camBuf, sx * RENDER_SCALE, sy * RENDER_SCALE, vw * RENDER_SCALE, vh * RENDER_SCALE, 0, 0, W, H); g.restore();
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.drawImage(camBuf, sx, sy, vw, vh, 0, 0, W, H); g.restore();
 }
 // a scene played out in the middle of the shift (1-6's doze and row): black bars slide in top and bottom while it lasts
 function drawLetterbox(now) {
   const dt = Math.min(0.1, (now - (CAM.lbLast || now)) / 1000); CAM.lbLast = now;
   CAM.lb = (CAM.lb || 0) + ((CAM.lbTo || 0) - (CAM.lb || 0)) * Math.min(1, dt * 4);
   if (CAM.lb < 0.01) { CAM.lb = 0; return; }
-  const h = Math.round(20 * ease(CAM.lb)); g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, h); g.fillRect(0, H - h, W, h); g.restore();
+  const h = Math.round(20 * ease(CAM.lb)); g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, h); g.fillRect(0, H - h, W, h); g.restore();
 }
 function runDialog(lines, done) { if (!lines || !lines.length) { dlg = null; dialogEl.hidden = true; if (done) done(); return; } dlg = { lines, i: 0, done, n: 0, full: '' }; dialogEl.hidden = false; showLine(); }
 function showLine() {
@@ -9413,10 +9398,6 @@ function showResult() {
   $('result').hidden = false;
   $('retry').focus({ preventScroll: true });
 }
-$('start').disabled = true;
-RookieArt.ready.then(() => { $('start').disabled = false; }).catch(() => {
-  $('title').querySelector('p').textContent = '캐릭터 이미지를 불러오지 못했습니다. 페이지를 새로고침해 주세요.';
-});
 $('start').addEventListener('click', e => { e.stopPropagation(); openBoard(); });
 $('retry').addEventListener('click', e => { e.stopPropagation(); startPlay(); });
 $('again').addEventListener('click', e => { e.stopPropagation(); beginShift(L); });
