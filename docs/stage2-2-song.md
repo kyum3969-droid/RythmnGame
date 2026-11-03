@@ -97,3 +97,30 @@ Ending: a slow blues turnaround and one last chord. No fade-out.
 ## 받으면 할 일
 - 펑크의 실제 템포, 첫 다운비트, 구간(드롭 자리들) 시각을 이 문서에 기록(블루스는 기록함).
 - 기싸움 차례를 곡 구간에 맞춰 정하고(마르코 차례 = 펑크 드롭으로 들어감), 차트를 짬.
+
+## 포장마차: 마르코 휴대폰의 밤 바닷가 노래 (2026-11-03, 뽑을 것)
+2-2 엔딩 대화(포장마차) 밑에 깔 곡. 마르코가 휴대폰 작은 스피커로 트는 노래. 낮의 해변 펑크("The Solstice Parade")의 **밤 버전**: 느리고 쓸쓸한 바닷가, 고향 생각. 대사를 덮지 않게 연주곡. 게임이 휴대폰 스피커처럼 좁은 대역으로 깔고(고음·저음 조금 깎음), 장면이 뜨면 1.5초에 걸쳐 들어옴. 파일: `prototype/audio/2-2-pocha.mp3`(넣기만 하면 됨; 없으면 조용히 넘어감). 대화는 누르는 대로 넘어가서 곡 길이에 안 맞춰도 됨.
+
+```
+An instrumental slow bossa nova ballad, instrumental only, no vocals, no humming. Around 72 BPM, 4/4, a minor key. Steady tempo. Ends with one soft final chord, no fade-out.
+
+The mood: 5 a.m. after a long night shift, a tired man far from his seaside hometown, drinking quietly with a young coworker at a street stall. Quiet, warm, nostalgic and a little sad, but not hopeless: a small hope underneath, like the first light of dawn over the sea.
+
+Mix: intimate, soft and close, like a small band playing quietly in a corner. Lots of space for talking over it.
+
+Instruments: a nylon-string classical guitar playing gentle bossa nova chords, a soft upright bass, very quiet brushed drums, a muted trumpet (or a soft flugelhorn) playing a simple, lonely melody, a little Rhodes piano. No synths, no strings, no vocals.
+
+Structure:
+
+Intro: the guitar alone, slow and gentle.
+
+Verse: the bass and brushes come in softly, the trumpet plays a simple, lonely melody with long gaps between phrases.
+
+Second verse: the same melody a little warmer, the Rhodes joining.
+
+Bridge: a brief lift, a touch brighter and more hopeful, the melody rising.
+
+Last verse: back to quiet, the melody once more, softer.
+
+Ending: the guitar alone again and one soft final chord. No fade-out.
+```

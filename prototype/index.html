@@ -942,16 +942,26 @@ const LEVELS = [
       { who:'', text:'둘째 밤, 새벽 1시 40분. 실적표 목표 수량 옆에 빨간 펜으로 고친 숫자. 반장은 집에서 낡은 라디오를 하나 들고 왔다.' },
       { who:'마르코', text:'반장님! 우리 어제 1등이래요!' },
       { who:'반장', text:'…목표도 올랐네.' }],
+    // the 포장마차 (scene 'pocha'): 마르코's song on his phone under it (`pocha`, played small, once the scene is up);
+    // mpose: what 마르코's hands do on the line (pour, drink, spin the glass, head down, raise it)
+    pocha: { src: 'audio/2-2-pocha.mp3', gain: 0.55 },
     outro: good => good ? [
       { who:'', text:'새벽 5시 반. 센터 앞 포장마차. 둘 말고는 아무도 없다.', scene:'pocha' },
-      { who:'마르코', text:'(잔을 채운다) …신입은 한 잔만.', scene:'pocha' },
-      { who:'마르코', text:'우리 동네에선 다들 음악 틀고 일했거든요. 시끄러울수록 잘되는 줄 알았지.', scene:'pocha' },
-      { who:'', text:'마르코는 한참 잔만 돌렸다.', scene:'pocha' },
-      { who:'마르코', text:'…반장님 그 노래, 사실 나쁘지 않더라.', scene:'pocha' },
-      { who:'마르코', text:'(잔을 든다) 짠. …내일 또 봐요, 신입.', scene:'pocha' }] : [
+      { who:'마르코', text:'(잔을 채운다) …신입은 한 잔만.', scene:'pocha', mpose:'pour' },
+      { who:'마르코', text:'(원샷) 크으…', scene:'pocha', mpose:'drink' },
+      { who:'마르코', text:'우리 동네 바닷가에 통조림 공장이 있었거든요. 다들 라디오 틀고 일했어요.', scene:'pocha' },
+      { who:'마르코', text:'내가 제일 빨랐어. 노래 크게 틀고, 다들 따라오라고.', scene:'pocha' },
+      { who:'마르코', text:'그렇게 빨라지니까… 위에서 사람을 줄이더라고요. 하나, 둘.', scene:'pocha', mpose:'down' },
+      { who:'', text:'마르코는 한참 잔만 돌렸다.', scene:'pocha', mpose:'spin' },
+      { who:'마르코', text:'…마지막엔 내 친구들 자리까지. 나 혼자 남았어요. 에이스라고.', scene:'pocha', mpose:'down' },
+      { who:'마르코', text:'오늘 반장님 얼굴 보니까… 그때 생각이 나더라.', scene:'pocha', mpose:'spin' },
+      { who:'마르코', text:'(잔을 내려놓는다) 그래도요, 신입. 나 여기선 도움이 되고 싶어요.', scene:'pocha' },
+      { who:'마르코', text:'진짜 에이스. …그게 뭔지는 아직 모르겠지만.', scene:'pocha' },
+      { who:'마르코', text:'(잔을 든다) 짠. 내일 또 봐요, 신입.', scene:'pocha', mpose:'raise' }] : [
       { who:'', text:'새벽 5시 반. 센터 앞 포장마차.', scene:'pocha' },
-      { who:'마르코', text:'(잔을 채운다) …오늘은 다 엉망이었네요.', scene:'pocha' },
-      { who:'마르코', text:'…내일 다시 해요, 신입.', scene:'pocha' }],
+      { who:'마르코', text:'(잔을 채운다) …오늘은 다 엉망이었네요.', scene:'pocha', mpose:'pour' },
+      { who:'마르코', text:'…또 내가 망쳤어. 늘 이래.', scene:'pocha', mpose:'down' },
+      { who:'마르코', text:'그래도 도움이 되고 싶은데. …내일 다시 해요, 신입.', scene:'pocha', mpose:'raise' }],
   }
   ,{
     id:'s2-3', stageNo:'2-3', who:'반장 + 지우', role:'반장 · 지우 · 순자 이모 · 96 BPM · 벨트 둘', tag:'레게톤 · 버튼 둘 · 본선 사흘 전', bpm:96, style:'dembow23', fxTheme:'neon', inspector: true,
@@ -4726,9 +4736,17 @@ function drawPocha(nowMs) {
   // stools, then the two of them sitting (the table in front hides their legs)
   for (const sx of [112, 272]) { R(sx - 9, 150, 18, 4, '#c8302a'); R(sx - 8, 154, 3, 16, '#a02420'); R(sx + 5, 154, 3, 16, '#a02420'); }
   const bobM = Math.sin(t * 1.3) > 0.9 ? 1 : 0;
-  const pose = { hand: { x: BOSS_X + 18, y: 122 }, carry: null, wince: false, dip: 2, bob: bobM, nod: 0, doze: false, phone: false, lane: 2, sad: true };
+  pochaSong();
+  const mp = SCENE.mpose, pose = { hand: { x: BOSS_X + 18, y: 122 }, carry: null, wince: false, dip: 2, bob: bobM, nod: 0, doze: false, phone: false, lane: 2, sad: true };
+  if (mp === 'pour') pose.hand = { x: BOSS_X + 30, y: 112 };
+  else if (mp === 'drink') { pose.hand = { x: BOSS_X + 8, y: 96 }; pose.dip = 0; }
+  else if (mp === 'spin') pose.hand = { x: BOSS_X + 22 + Math.round(Math.sin(t * 3) * 2), y: 128 + Math.round(Math.cos(t * 3)) };
+  else if (mp === 'down') { pose.dip = 4; pose.hand = { x: BOSS_X + 16, y: 130 }; }
+  else if (mp === 'raise') { pose.hand = { x: BOSS_X + 22, y: 92 }; pose.dip = 0; }
   FX.react[2] = FX.react[2] || { type: '', at: nowMs };
-  g.save(); g.translate(0, 22); drawActor('marco', 118, false, pose, nowMs, false, () => { PARTNERS.marco.arm(pose); R(pose.hand.x - 1, pose.hand.y - 6, 4, 6, '#e9eef0'); R(pose.hand.x, pose.hand.y - 4, 2, 3, '#cfe8d8'); }); g.restore();
+  g.save(); g.translate(0, 22); drawActor('marco', 118, false, pose, nowMs, false, () => { PARTNERS.marco.arm(pose);
+    if (mp === 'pour') { g.save(); g.translate(pose.hand.x + 2, pose.hand.y - 2); g.rotate(1.1); R(-3, -12, 6, 18, '#2e8a4a'); R(-2, -16, 4, 4, '#2e8a4a'); R(-3, -5, 6, 5, '#e9f0e0'); g.restore(); R(pose.hand.x + 10, pose.hand.y + 6, 1, 8, 'rgba(220,240,230,.7)'); }
+    else { R(pose.hand.x - 1, pose.hand.y - 6, 4, 6, '#e9eef0'); R(pose.hand.x, pose.hand.y - 4, 2, 3, '#cfe8d8'); } }); g.restore();
   g.save(); g.translate(266 - PLAYER_X, 26); drawPlayer(0, nowMs); g.restore();
   // the table: a steel top, two green bottles, two glasses, a plate
   R(140, 140, 104, 6, '#a8aeb6'); R(140, 146, 104, 2, '#6a7078'); R(150, 148, 4, 24, '#5a6068'); R(230, 148, 4, 24, '#5a6068');
@@ -7345,6 +7363,7 @@ function showLine() {
   // who stands in the office (an outro can put 지우 there and bring 반장 in through the door) and how 지우 holds himself
   if (ln.office) SCENE.office = { ...ln.office };
   if (sc === 'office') SCENE.jpose = ln.jpose || null;
+  if (sc === 'pocha') SCENE.mpose = ln.mpose || null;
   if (sc !== SCENE.kind) { dialogEl.hidden = true; sceneCut(sc, () => { if (dlg) { dialogEl.hidden = false; showLine(); } }); return; }
   const L_ = dlg.lines[dlg.i], robot = L_.who === 'AS-7';
   CAM.to = L_.cam || null;
@@ -7417,9 +7436,15 @@ function loadSong(sp) {
   fetch(sp.src).then(r => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(a => ctx.decodeAudioData(a))
     .then(buf => { SONG.bufs[sp.src] = buf; }).catch(() => { SONG.bufs[sp.src] = false; });
 }
-const loadSongs = level => (level.songs || []).forEach(loadSong);
+const loadSongs = level => { (level.songs || []).forEach(loadSong); if (level.pocha) loadSong(level.pocha); };
 const songReady = (i = 0) => !!(L.songs && L.songs[i] && SONG.bufs[L.songs[i].src]);
-function stopSong() { if (SONG.src) { try { SONG.src.stop(); } catch (e) {} SONG.src = null; } if (typeof rbStop === 'function') rbStop(); }
+function stopSong() { if (SONG.src) { try { SONG.src.stop(); } catch (e) {} SONG.src = null; } if (typeof rbStop === 'function') rbStop(); if (POCHA.src) { try { POCHA.src.stop(); } catch (e) {} POCHA.src = null; } POCHA.started = false; }
+const POCHA = { src: null, started: false };
+function pochaSong() {
+  const sp = L.pocha; if (!sp || POCHA.started || !ctx) return; const buf = SONG.bufs[sp.src]; if (buf === null || buf === undefined) return; POCHA.started = true; if (!buf) return;
+  const s_ = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(), g_ = ctx.createGain(); s_.buffer = buf; hp.type = 'highpass'; hp.frequency.value = 220; lp.type = 'lowpass'; lp.frequency.value = 5200;
+  s_.connect(hp); hp.connect(lp); lp.connect(g_); g_.connect(mus); const T = ctx.currentTime; g_.gain.setValueAtTime(0.0001, T); g_.gain.linearRampToValueAtTime(sp.gain || 0.55, T + 1.5); s_.start(T); POCHA.src = s_;
+}
 // start song i at audio time T, `into` seconds past its first downbeat
 function startSong(T, into = 0, i = 0) {
   stopSong(); const sp = L.songs && L.songs[i], buf = sp && SONG.bufs[sp.src]; if (!buf || !ctx) return;
