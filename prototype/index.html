@@ -1962,6 +1962,146 @@ function drawBoot15(b, nowMs) {
   g.restore();
   const fo = Math.max(0, Math.min(1, (b - (L.room.from - 0.6)) / 0.6)); if (fo > 0) { g.fillStyle = `rgba(0,0,0,${fo})`; g.fillRect(0, 0, W, H); }
 }
+// ---------- 1-7's cast in the approved designs (docs/art/*-concept.png): 지우 and 하은 as rigs, 반장 as two stills ----------
+// Only 1-7 (a cutscene) uses these; every other stage keeps the simple dots. assets/cast17.png holds the parts, cut from the
+// design references by ref/cast17/build.py at 4x the game's dot size; a pose is put together at that size, shrunk to the
+// game's dots with a hard edge, and kept (by its quantised angles) so a walk cycle is drawn once. Angles are the canvas's
+// own (radians, absolute, every rig facing right); a limb at 0 hangs as it does in the reference.
+const CAST17_META = {"jiwoo":{"scale":4,"parts":{"torso":{"r":[0,0,94,195],"pivot":[43.39,187.31],"nearSh":[21.7,101.97],"farSh":[69.43,99.8],"head":[52.43,3.62],"ear":[44.12,54.96],"hipN":[28.93,187.31],"hipF":[58.58,187.31],"cap":["#393740",23.1,[44,187]]},"shinN":{"r":[203,0,34,88],"pivot":[18.08,4.34],"sole":[19.53,86.06],"toe":[31.1,81.36],"cap":["#34333c",10.9,[18,4]]},"shinF":{"r":[239,0,42,88],"pivot":[15.55,4.34],"sole":[18.44,86.06],"toe":[38.69,81.36],"cap":["#34343c",10.5,[13,4]]},"farmN":{"r":[438,0,35,77],"pivot":[18.8,5.06],"hand":[20.97,64.37],"cap":["#7c3b4d",10.1,[15,5]]},"farmF":{"r":[0,197,39,77],"pivot":[15.19,5.06],"hand":[15.91,64.37],"cap":["#47222d",10.5,[23,5]]},"thighN":{"r":[105,197,33,70],"pivot":[18.08,9.4],"knee":[18.08,65.09],"cap":["#35343d",10.9,[19,9]]},"thighF":{"r":[140,197,32,70],"pivot":[15.55,9.4],"knee":[15.55,65.09],"cap":["#27262d",12.2,[14,9]]},"uarmN":{"r":[174,197,35,67],"pivot":[18.8,15.19],"elbow":[18.8,62.2],"cap":["#7d3a4d",11.8,[20,15]]},"uarmF":{"r":[211,197,39,67],"pivot":[15.19,15.19],"elbow":[15.19,62.2],"cap":["#632e3e",12.2,[16,15]]}}},"haeun":{"scale":4,"parts":{"torso":{"r":[96,0,105,166],"pivot":[49.33,161.16],"nearSh":[27.54,107.71],"farSh":[76.88,107.71],"head":[51.39,4.11],"ear":[43.17,53.44],"hipN":[36.18,161.16],"hipF":[62.9,161.16],"cap":["#393a3f",17.6,[48,161]]},"shinN":{"r":[350,0,40,80],"pivot":[25.49,6.99],"sole":[20.56,78.52],"toe":[33.71,76.06],"cap":["#2e2e35",10.5,[20,6]]},"shinF":{"r":[392,0,44,80],"pivot":[15.21,6.99],"sole":[19.32,78.52],"toe":[41.52,76.06],"cap":["#24252a",10.5,[13,6]]},"thighF":{"r":[41,197,30,77],"pivot":[14.39,8.22],"knee":[15.21,74.0],"cap":["#202025",10.9,[13,8]]},"thighN":{"r":[73,197,30,77],"pivot":[16.03,8.22],"knee":[14.8,74.0],"cap":["#2b2b33",10.9,[16,8]]},"farmN":{"r":[252,197,29,59],"pivot":[15.21,5.76],"hand":[14.8,46.87],"cap":["#2c2b2b",8.4,[14,5]]},"farmF":{"r":[283,197,22,59],"pivot":[9.87,5.76],"hand":[10.28,46.87],"cap":["#1e1c1d",1.7,[6,5]]},"uarmN":{"r":[307,197,29,39],"pivot":[14.8,6.58],"elbow":[15.21,34.53],"cap":["#71a7ca",8.4,[14,6]]},"uarmF":{"r":[338,197,22,39],"pivot":[9.04,6.58],"elbow":[9.87,34.53],"cap":["#1a2630",1.3,[5,6]]}}},"boss":{"scale":1,"parts":{"stand":{"r":[283,0,28,81],"foot":[14,80]},"coffee":{"r":[313,0,35,81],"foot":[14,80]}}}};
+const CAST17 = { img: null, ok: false, cache: new Map(), work: null, half: null };
+function cast17Ready() {
+  if (!CAST17.img) { const im = new Image(); im.onload = () => { CAST17.ok = true; }; im.src = CAST17.src || 'assets/cast17.png'; CAST17.img = im; }
+  return CAST17.ok;
+}
+const RIG_W = 400, RIG_H = 440, RIG_OX = 200, RIG_OY = 250;   // the 4x working canvas, the hip at (RIG_OX, RIG_OY)
+const rigRot = (p, a) => ({ x: p.x * Math.cos(a) - p.y * Math.sin(a), y: p.x * Math.sin(a) + p.y * Math.cos(a) });
+// where every joint is (at 4x, relative to the hip) for a set of angles
+function rigJoints(who, A) {
+  const M = CAST17_META[who].parts, T = M.torso, at = (part, key) => ({ x: M[part][key][0] - M[part].pivot[0], y: M[part][key][1] - M[part].pivot[1] });
+  const add = (a, b) => ({ x: a.x + b.x, y: a.y + b.y });
+  const J = { hip: { x: 0, y: 0 } };
+  J.nearSh = rigRot(at('torso', 'nearSh'), A.torso || 0); J.farSh = rigRot(at('torso', 'farSh'), A.torso || 0);
+  J.head = rigRot(at('torso', 'head'), A.torso || 0); J.ear = rigRot(at('torso', 'ear'), A.torso || 0);
+  for (const s of ['N', 'F']) {
+    J['hip' + s] = rigRot(at('torso', 'hip' + s), A.torso || 0);
+    J['knee' + s] = add(J['hip' + s], rigRot(at('thigh' + s, 'knee'), A['thigh' + s] || 0));
+    J['sole' + s] = add(J['knee' + s], rigRot(at('shin' + s, 'sole'), A['shin' + s] || 0));
+    J['toe' + s] = add(J['knee' + s], rigRot(at('shin' + s, 'toe'), A['shin' + s] || 0));
+    const sh = s === 'N' ? J.nearSh : J.farSh;
+    J['sh' + s] = sh;
+    J['elbow' + s] = add(sh, rigRot(at('uarm' + s, 'elbow'), A['uarm' + s] || 0));
+    J['hand' + s] = add(J['elbow' + s], rigRot(at('farm' + s, 'hand'), A['farm' + s] || 0));
+  }
+  return J;
+}
+// a pose's dots: { cv, ox, oy (the hip, in its pixels), J (joints at game size, from the hip) }. o.only: 'armN' (just the near
+// arm, for the loading arm drawn after the body) or 'body' (all but the near arm)
+function rigFrame(who, A, only) {
+  const q = v => Math.round((v || 0) / 0.035);
+  const key = who + (only || '') + ['torso', 'thighN', 'shinN', 'thighF', 'shinF', 'uarmN', 'farmN', 'uarmF', 'farmF'].map(k => q(A[k])).join(',');
+  const hit = CAST17.cache.get(key); if (hit) return hit;
+  if (!CAST17.work) {
+    CAST17.work = document.createElement('canvas'); CAST17.work.width = RIG_W; CAST17.work.height = RIG_H;
+    CAST17.half = document.createElement('canvas'); CAST17.half.width = RIG_W / 2; CAST17.half.height = RIG_H / 2;
+  }
+  const c = CAST17.work.getContext('2d'), M = CAST17_META[who].parts, img = CAST17.img;
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, RIG_W, RIG_H); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+  const qa = k => q(A[k]) * 0.035;
+  const J = rigJoints(who, Object.fromEntries(Object.keys(A).map(k => [k, qa(k)])));
+  const put = (part, p, ang) => { const m = M[part], r = m.r; c.save(); c.translate(RIG_OX + p.x, RIG_OY + p.y); c.rotate(ang); c.drawImage(img, r[0], r[1], r[2], r[3], -m.pivot[0], -m.pivot[1], r[2], r[3]); c.restore(); };
+  const cap = (part, p) => { const m = M[part]; if (!m.cap) return; c.fillStyle = m.cap[0]; c.beginPath(); c.arc(RIG_OX + p.x, RIG_OY + p.y, m.cap[1], 0, Math.PI * 2); c.fill(); };
+  const leg = s => { put('shin' + s, J['knee' + s], qa('shin' + s)); put('thigh' + s, J['hip' + s], qa('thigh' + s)); cap('shin' + s, J['knee' + s]); };
+  const arm = s => { put('farm' + s, J['elbow' + s], qa('farm' + s)); put('uarm' + s, J['sh' + s], qa('uarm' + s)); cap('farm' + s, J['elbow' + s]); };
+  if (only !== 'armN') {
+    arm('F'); leg('F'); leg('N'); cap('thighF', J.hipF); cap('thighN', J.hipN);
+    put('torso', J.hip, qa('torso'));
+  }
+  if (only !== 'body') arm('N');
+  // shrink to the game's dots in two halvings, then a hard edge
+  const h = CAST17.half.getContext('2d'); h.imageSmoothingEnabled = true; h.imageSmoothingQuality = 'high';
+  h.clearRect(0, 0, RIG_W / 2, RIG_H / 2); h.drawImage(CAST17.work, 0, 0, RIG_W / 2, RIG_H / 2);
+  const out = document.createElement('canvas'); out.width = RIG_W / 4; out.height = RIG_H / 4;
+  const o = out.getContext('2d', { willReadFrequently: true }); o.imageSmoothingEnabled = true; o.imageSmoothingQuality = 'high';
+  o.drawImage(CAST17.half, 0, 0, RIG_W / 4, RIG_H / 4);
+  const id = o.getImageData(0, 0, out.width, out.height), d = id.data;
+  for (let i = 3; i < d.length; i += 4) d[i] = d[i] > 118 ? 255 : 0;
+  o.putImageData(id, 0, 0);
+  const S = CAST17_META[who].scale, Js = {}; for (const k in J) Js[k] = { x: J[k].x / S, y: J[k].y / S };
+  const fr = { cv: out, ox: RIG_OX / S, oy: RIG_OY / S, J: Js };
+  if (CAST17.cache.size > 900) CAST17.cache.delete(CAST17.cache.keys().next().value);
+  CAST17.cache.set(key, fr);
+  return fr;
+}
+// put a pose on the screen: the hip at x, the lower sole on footY (or the hip at o.hipY, sitting); mirror = facing left.
+// Returns the joints on the screen.
+function rigDraw(who, A, x, footY, mirror, o = {}) {
+  if (!cast17Ready()) return null;
+  const fr = rigFrame(who, A, o.only), J = fr.J;
+  const hy = o.hipY != null ? o.hipY : footY - Math.max(J.soleN.y, J.soleF.y);
+  const X = Math.round(x), Y = Math.round(hy);
+  g.save(); if (o.alpha != null) g.globalAlpha = o.alpha;
+  if (mirror) { g.translate(X, Y); g.scale(-1, 1); g.drawImage(fr.cv, -fr.ox, -fr.oy); }
+  else g.drawImage(fr.cv, X - fr.ox, Y - fr.oy);
+  g.restore();
+  const S = {}; for (const k in J) S[k] = { x: X + (mirror ? -J[k].x : J[k].x), y: Y + J[k].y };
+  return S;
+}
+// a two-bone arm reaching for a point (relative to the hip, game size, facing right): the angles for uarm/farm. The elbow
+// bends the natural way (the forearm comes forward and up); out of reach, the arm points at it, straight
+function rigReach(who, s, A, tx, ty) {
+  const M = CAST17_META[who].parts, S = CAST17_META[who].scale, U = M['uarm' + s], F = M['farm' + s];
+  const ue = { x: (U.elbow[0] - U.pivot[0]) / S, y: (U.elbow[1] - U.pivot[1]) / S }, fh = { x: (F.hand[0] - F.pivot[0]) / S, y: (F.hand[1] - F.pivot[1]) / S };
+  const l1 = Math.hypot(ue.x, ue.y), l2 = Math.hypot(fh.x, fh.y), r1 = Math.atan2(ue.y, ue.x), r2 = Math.atan2(fh.y, fh.x);
+  const J = rigJoints(who, A), sh = J['sh' + s], sx = sh.x / S, sy = sh.y / S;
+  const dx = tx - sx, dy = ty - sy, d = Math.max(Math.abs(l1 - l2) + 0.5, Math.min(l1 + l2 - 0.01, Math.hypot(dx, dy)));
+  const base = Math.atan2(dy, dx), a1 = Math.acos(Math.max(-1, Math.min(1, (l1 * l1 + d * d - l2 * l2) / (2 * l1 * d))));
+  // (facing right, the elbow below and behind the line from the shoulder to the hand)
+  const up = base + a1, ex = sx + Math.cos(up) * l1, ey = sy + Math.sin(up) * l1;
+  const fa = Math.atan2(ty - ey, tx - ex);
+  return { ['uarm' + s]: up - r1, ['farm' + s]: (Math.hypot(dx, dy) > l1 + l2 ? base : fa) - r2 };
+}
+// poses (angles in degrees forward: a thigh or an arm swung forward, a knee bent back, an elbow bent up)
+const D2R = Math.PI / 180;
+function rigPose(p = {}) {
+  const A = { torso: -(p.lean || 0) * D2R };
+  for (const s of ['N', 'F']) {
+    const h = p['h' + s] || 0, k = p['k' + s] || 0, sh = p['s' + s] || 0, e = p['e' + s] || 0;
+    A['thigh' + s] = -h * D2R; A['shin' + s] = -(h - k) * D2R;
+    A['uarm' + s] = -sh * D2R; A['farm' + s] = -(sh + e) * D2R;
+  }
+  return A;
+}
+// a walk (or a run) at phase ph (0-1 a full stride): the legs swing in turn, the knee bent through the swing, the arms the other way
+function rigGait(ph, run, extra = {}) {
+  const a = ph * Math.PI * 2, H = run ? 34 : 20, K = run ? 75 : 34, Sw = run ? 30 : 16, E = run ? 70 : 12;
+  const p = { lean: run ? 7 : 1 };
+  for (const [s, o] of [['N', 0], ['F', Math.PI]]) {
+    p['h' + s] = H * Math.sin(a + o);
+    p['k' + s] = K * Math.max(0, Math.cos(a + o)) + (run ? 18 : 4);
+    p['s' + s] = -Sw * Math.sin(a + o); p['e' + s] = E + (run ? 15 * Math.max(0, -Math.sin(a + o)) : 6 * Math.max(0, -Math.sin(a + o)));
+  }
+  return rigPose({ ...p, ...extra });
+}
+// sitting on a seat: the thighs out along it, the shins down to the ground (angled to reach it)
+function rigSit(who, seatY, footY, extra = {}) {
+  const M = CAST17_META[who].parts, S = CAST17_META[who].scale, T = M.thighN, Sh = M.shinN;
+  const thick = (T.cap ? T.cap[1] : 12) / S, hipY = seatY - thick;
+  const shinL = Math.hypot(Sh.sole[0] - Sh.pivot[0], Sh.sole[1] - Sh.pivot[1]) / S, drop = footY - hipY;
+  // the shin: straight down if it is long enough to reach the ground, angled forward if it is too long
+  const tilt = shinL > drop ? Math.acos(Math.max(-1, Math.min(1, drop / shinL))) / D2R : 0;
+  return { A: rigPose({ hN: 84, kN: 84 - tilt, hF: 80, kF: 80 - tilt + 6, lean: -4, sN: 18, eN: 40, sF: 14, eF: 40, ...extra }), hipY };
+}
+// 반장: the still (stand, coffee) with its feet at (x, footY); facing left as drawn, mirror = facing right
+function bossStill(kind, x, footY, mirror, bob = 0) {
+  if (!cast17Ready()) return false;
+  const m = CAST17_META.boss.parts[kind], r = m.r, X = Math.round(x), Y = Math.round(footY) + bob;
+  g.save();
+  if (mirror) { g.translate(X, Y); g.scale(-1, 1); g.drawImage(CAST17.img, r[0], r[1], r[2], r[3], -m.foot[0], -m.foot[1], r[2], r[3]); }
+  else g.drawImage(CAST17.img, r[0], r[1], r[2], r[3], X - m.foot[0], Y - m.foot[1], r[2], r[3]);
+  g.restore();
+  return true;
+}
+// ---------- end of 1-7's cast ----------
 // ---------- 1-7 하은의 새벽: the cutscene past the line (L.cine.out on) ----------
 // Four places, each painted once: the dawn street (1-5's bgCommute, at its bluest), the underground platform, inside the
 // next train, and the hospital's front with its bench. Who stands where, and when, comes from one place (cineCast), so the
@@ -2023,22 +2163,54 @@ function cineCast(b) {
   if (b < 136) return { scene: 'train', j: { x: 190, mode: 'strap' } };
   if (b < 188) {
     const hIn = b < 140.6 ? { x: L7(-10, 262, (b - 136) / 4.6), mode: 'walk', mirror: true } : b < 146.5 ? { x: L7(262, 304, (b - 140.6) / 4.4), mode: b > 142.6 && b < 144.2 ? 'watch' : 'walk', mirror: true, inside: true, gone: b > 145.6 } : null;
-    const hOut = b >= 165 ? { x: b < 168 ? L7(262, 140, (b - 165) / 3) : b < 186 ? 140 : L7(140, 72, (b - 186) / 1.6), mode: b < 168 || (b >= 186 && b < 187.6) ? 'walk' : b >= 187.6 ? 'sit' : 'stand', mirror: true, give: b >= 174 && b < 175.4 } : null;
+    const hOut = b >= 165 ? { x: b < 168 ? L7(262, 134, (b - 165) / 3) : b < 186 ? 134 : L7(134, 64, (b - 186) / 1.6), mode: b < 168 || (b >= 186 && b < 187.6) ? 'walk' : b >= 187.6 ? 'sit' : 'stand', mirror: true, give: b >= 174 && b < 175.4 } : null;
     let j = null;
     if (b >= 141.5) {
-      const x = b < 144.5 ? L7(-20, 200, (b - 141.5) / 3) : b < 151 ? 200 : b < 153.4 ? L7(200, 112, (b - 151) / 2.4) : 112;
+      const x = b < 144.5 ? L7(-20, 200, (b - 141.5) / 3) : b < 151 ? 200 : b < 153.4 ? L7(200, 120, (b - 151) / 2.4) : 120;
       const mode = b < 144.5 ? 'run' : b < 151 ? 'stand' : b < 153.4 ? 'walk' : b < 167.6 ? 'sit' : b < 186.6 ? 'stand' : 'sit';
-      j = { x: b >= 167.6 && b < 186.6 ? 160 : b >= 186.6 ? 114 : x, mode, mirror: b >= 151 && b < 153.4 ? true : b >= 153.4, phone: b >= 153.4 && b < 161.2, give: b >= 174 && b < 175.4 };
+      j = { x: b >= 167.6 && b < 186.6 ? 168 : b >= 186.6 ? 124 : x, mode, mirror: b >= 151 && b < 153.4 ? true : b >= 153.4, phone: b >= 153.4 && b < 161.2, give: b >= 174 && b < 175.4 };
     }
     return { scene: 'hosp', h: hOut || hIn, j };
   }
   // the bench at sunrise; at the end she gets up and goes back in, the earphones in
-  const h = b < 236 ? { x: 72, mode: 'sit', mirror: true, tap: b >= 190 && b < 227.3 } : { x: L7(72, 262, (b - 236.4) / 3.6), mode: b < 236.4 ? 'stand' : 'walk', mirror: true, inside: b > 240, gone: b > 241.2, ear: b >= 236.8 && b < 237.8 };
-  return { scene: 'hosp', h, j: { x: 114, mode: 'sit', mirror: true, nod: b >= 190 && b < 227.3 } };
+  const h = b < 236 ? { x: 64, mode: 'sit', mirror: true, tap: b >= 190 && b < 227.3 } : { x: L7(64, 262, (b - 236.4) / 3.6), mode: b < 236.4 ? 'stand' : 'walk', mirror: true, inside: b > 240, gone: b > 241.2, ear: b >= 236.8 && b < 237.8 };
+  return { scene: 'hosp', h, j: { x: 124, mode: 'sit', mirror: true, nod: b >= 190 && b < 227.3 } };
 }
 const CINE_FEET = { jiwoo: 163, haeun: 142 };
+const CINE_SEAT = 156;   // the hospital bench's seat
+// (a walk's phase from how far they have gone, so the feet never slide: a stride every 46 px walking, 66 running)
+const gaitPh = (c, stride) => ((((c.mirror ? -c.x : c.x) / stride) % 1) + 1) % 1;
+// 지우 in the new design: walking, running, at the pole (the train), standing, sitting (the bench); the near hand on the
+// phone, held out (giving the earphones back) or holding them. Returns his joints on the screen (null until the art is in)
+function jiwoo17(c, ground, b) {
+  const sit = c.mode === 'sit', move = c.mode === 'run' || c.mode === 'walk';
+  let A, o = {};
+  if (move) A = rigGait(gaitPh(c, c.mode === 'run' ? 66 : 46), c.mode === 'run');
+  else if (sit) { const songB = (b - 190) / 0.6667, nod = c.nod && (songB % 1) < 0.3; const st = rigSit('jiwoo', CINE_SEAT, ground, { lean: nod ? 2 : -4 }); A = st.A; o.hipY = st.hipY; }
+  else A = rigPose({ sF: -3, eF: 6, sN: 2, eN: 6 });
+  const t = c.mode === 'strap' ? [5, -46] : c.phone ? [12, -22] : c.give ? [19, -14] : c.holding ? (sit ? [12, -6] : [13, -12]) : null;
+  if (t) Object.assign(A, rigReach('jiwoo', 'N', A, t[0], t[1]));
+  const S = rigDraw('jiwoo', A, c.x, ground, !!c.mirror, o); if (!S) return null;
+  const hd = S.handN;
+  if (c.holding && !c.give) drawEarphones(hd.x + (c.mirror ? -1 : 1), hd.y - 3);
+  if (c.phone) { R(hd.x - 2, hd.y - 8, 5, 8, '#1e1e24'); R(hd.x - 1, hd.y - 7, 3, 5, '#8fd0f0'); }
+  return S;
+}
+// 하은 in the new design: o.walkPh (walking), o.sit, o.watch (the time), o.ear (an earbud in), o.tap (0/1 on the bench, the
+// beat), o.give (taking the earphones), o.body (her near arm left to the line's loading arm); o.right = facing right
+function haeun17(x, footY, o = {}) {
+  let A, d = {};
+  if (o.walkPh != null) A = rigGait(o.walkPh, false);
+  else if (o.sit) { const st = rigSit('haeun', CINE_SEAT, footY); A = st.A; d.hipY = st.hipY; }
+  else A = rigPose({ sF: -2, eF: 6, sN: 2, eN: 8 });
+  const ear = o.ear ? rigJoints('haeun', A).ear : null;
+  const t = o.watch ? [9, -10] : ear ? [ear.x / 4 + 2, ear.y / 4 + 1] : o.tap != null ? [4, o.tap ? 3 : -1] : o.give ? [14, -8] : null;
+  if (t) Object.assign(A, rigReach('haeun', 'N', A, t[0], t[1]));
+  return rigDraw('haeun', A, x, footY, !o.right, { ...d, only: o.body && !t ? 'body' : null });
+}
 // 지우, whole: the game's own sprite (drawActor) with legs to the ground and an arm; walking, running, at a strap, sitting
 function cineJiwoo(c, ground, b, nowMs) {
+  if (cast17Ready()) return jiwoo17(c, ground, b);
   const run = c.mode === 'run', walk = c.mode === 'walk', sit = c.mode === 'sit', step = Math.floor(b * (run ? 6 : 3)) % 2;
   const songB = (b - 190) / 0.6667, nod = c.nod && (songB % 1) < 0.3 ? 1 : 0;
   const pose = { ...standPose(run || walk ? step : 0), nod };
@@ -2061,12 +2233,18 @@ function cineHaeun(c, ground, b, nowMs) {
   const songB = (b - 190) / 0.6667, ph = songB - Math.floor(songB), k = Math.floor(songB);
   // her taps on the bench: every other beat to begin with, then every beat, then the 'and's too in the last bars
   const tapOn = c.tap && (k < 16 ? k % 2 === 0 : k < 40 ? true : true) && ph < 0.35, tapAnd = c.tap && k >= 40 && Math.abs(ph - 0.5) < 0.15;
+  if (cast17Ready()) return haeun17(c.x, ground, { right: !!c.mirror, walkPh: c.mode === 'walk' ? gaitPh(c, 46) : null, sit: c.mode === 'sit', watch: c.mode === 'watch', ear: c.ear, give: c.give, tap: c.tap ? (tapOn || tapAnd ? 1 : 0) : null });
   const top = ground - 56 + (c.mode === 'sit' ? 2 : 0);
   drawHaeunAt(c.x, top, nowMs, { mirror: !!c.mirror, step: c.mode === 'walk' ? 1 : null, sit: c.mode === 'sit', watch: c.mode === 'watch' || c.ear, rest: c.mode !== 'walk', tap: c.tap ? (tapOn || tapAnd ? 1 : 0) : null });
 }
 function cineHead(spk, b) {
   const c = cineCast(b), who = spk === 'J' ? c.j : spk === 'H' ? c.h : null; if (!who) return null;
   const ground = CINE_GROUND[c.scene];
+  if (CAST17.ok) {
+    // (standing: the head's top at the height of the design; sitting: from the hip on the seat)
+    const sit = who.mode === 'sit', top = spk === 'J' ? (sit ? CINE_SEAT - 50 : ground - 81) : (sit ? CINE_SEAT - 43 : ground - 74);
+    return { x: who.x + (who.mirror ? -2 : 2), y: top - 3 };
+  }
   if (spk === 'J') return { x: who.x + (who.mirror ? -2 : 2), y: ground - 82 + (who.mode === 'sit' ? 5 : 0) };
   return { x: who.x - (who.mirror ? -1 : 1), y: ground - 60 + (who.mode === 'sit' ? 2 : 0) };
 }
@@ -2122,13 +2300,15 @@ function drawCine17(b, t, nowMs) {
     // her, inside, seen through the glass
     if (c.h && c.h.inside && !c.h.gone) { g.save(); g.beginPath(); g.rect(D.x0, D.y0, LF.x1 - D.x0, D.y1 - D.y0); g.clip(); cineHaeun(c.h, G - 2, b, nowMs); g.restore(); }
     leaf(D.x0 - gp); leaf(D.x0 + 24 + gp);
-    if (c.h && !c.h.inside) cineHaeun(c.h, G, b, nowMs);
-    if (c.j) cineJiwoo({ ...c.j, holding: b < 174 }, G, b, nowMs);
+    const hJ = c.h && !c.h.inside ? cineHaeun(c.h, G, b, nowMs) : null;
+    const jJ = c.j ? cineJiwoo({ ...c.j, holding: b < 174 }, G, b, nowMs) : null;
     // the earphones changing hands (174-175.4), then shared: a bud in each of their ears, the cord between them
-    if (b >= 174 && b < 175.4) drawEarphones(lerp(c.j ? c.j.x - 14 : 140, (c.h ? c.h.x : 140) + 6, (b - 174) / 1.4), 132);
+    if (b >= 174 && b < 175.4) { const q = (b - 174) / 1.4; if (jJ && hJ) drawEarphones(lerp(jJ.handN.x, hJ.handN.x, q), lerp(jJ.handN.y, hJ.handN.y, q) - 3); else drawEarphones(lerp(c.j ? c.j.x - 14 : 140, (c.h ? c.h.x : 140) + 6, q), 132); }
     if (b >= 188.8 && b < 236) {
-      const hx = (c.h ? c.h.x : 72), jx = c.j ? c.j.x : 114, hy = G - 50, jy = G - 82 + 5 + 10;
-      for (let q = 0; q <= 1; q += 0.04) R(Math.round(lerp(hx + 2, jx - 4, q)), Math.round(lerp(hy, jy, q) + Math.sin(q * Math.PI) * 16), 1, 1, '#ece8e0');
+      // (from her ear to his: the new design's ears, or the dots')
+      const ha = hJ ? { x: hJ.ear.x + 1, y: hJ.ear.y + 1 } : { x: (c.h ? c.h.x : 72) + 2, y: G - 50 }, ja = jJ ? { x: jJ.ear.x - 1, y: jJ.ear.y + 1 } : { x: (c.j ? c.j.x : 114) - 4, y: G - 67 };
+      const hx = ha.x, hy = ha.y;
+      for (let q = 0; q <= 1; q += 0.03) R(Math.round(lerp(ha.x, ja.x, q)), Math.round(lerp(ha.y, ja.y, q) + Math.sin(q * Math.PI) * 18), 1, 1, '#ece8e0');
       // the beat, rising off the buds while it plays
       if (b >= 190 && b < 227.3) for (let i = 0; i < 3; i++) { const q = ((b - 190) / 2.6 + i / 3) % 1; g.globalAlpha = Math.sin(Math.PI * q) * 0.85; eighthNote(90 + i * 8 + Math.sin(q * 6 + i) * 3, hy - 10 - q * 30, i % 2 ? '#ffd1e0' : '#bfe6ff'); g.globalAlpha = 1; }
     }
@@ -2159,6 +2339,13 @@ function drawCinePhone(b) {
   R(x0 + 4, y0 + hh - 34, w - 8, 28, '#ffffff'); g.fillStyle = '#2a2430';
   if (!sent) { const ls = wrap(text + (Math.floor(b * 3) % 2 ? '|' : ''), w - 16).slice(-2); ls.forEach((l, i) => g.fillText(l, x0 + 8, y0 + hh - 22 + i * 10)); }
   g.restore();
+}
+// 1-7 on the line: the loading arm in the new design, reaching for the hand's point from a body standing at (BOSS_X, footY)
+function lineArm17(who, footY, hand, left) {
+  const A = rigPose(who === 'jiwoo' ? { sF: -3, eF: 6 } : { sF: -2, eF: 6 }), fr = rigFrame(who, A, 'body'), hy = footY - Math.max(fr.J.soleN.y, fr.J.soleF.y);
+  const tx = (hand.x - BOSS_X) * (left ? -1 : 1), ty = hand.y - hy;
+  Object.assign(A, rigReach(who, 'N', A, tx, ty));
+  rigDraw(who, A, BOSS_X, footY, left, { only: 'armN' });
 }
 // 1-7 on the line (before L.cine.out): her earphones on her belt's end cap, 하은 walking out, 지우 coming down for them and
 // running off
@@ -2748,6 +2935,7 @@ const PARTNERS = {
   jiwoo: {
     base: 84,
     draw(pose, nowMs, active) {
+      if (L.cine && cast17Ready()) { const top = bodyTop(84, pose) + (pose.doze ? 3 : 0); rigDraw('jiwoo', rigPose({ sF: -3, eF: 6 }), BOSS_X, top + 79, false, { only: 'body' }); return; }
       const cx = BOSS_X, top = bodyTop(84, pose) + (pose.bob ? 1 : 0) + (pose.doze ? 3 : 0), hood = '#6b2f3f', hoodD = '#4a2030';
       R(cx - 7, top + 18, 14, 46, hood);
       R(cx - 7, top + 20, 14, 20, C.vest2); R(cx - 7, top + 30, 14, 2, C.reflect);
@@ -2773,6 +2961,7 @@ const PARTNERS = {
     },
     arm(pose) {
       const top = bodyTop(84, pose);
+      if (L.cine && cast17Ready()) { lineArm17('jiwoo', top + 79, pose.hand, false); return; }
       if (pose.phone) { thick(BOSS_X + 5, top + 23, BOSS_X + 9, top + 11, 4, '#6b2f3f'); R(BOSS_X + 7, top + 9, 4, 4, C.skin); return; }
       const free = pose.hype && !pose.carry && Math.abs(pose.hand.x - (BOSS_X + 13)) < 2 && Math.abs(pose.hand.y - 134) < 2;
       if (free) { const up = pose.bob < 0 ? -6 : 0; thick(BOSS_X + 5, top + 23, BOSS_X + 8, top + 4 + up, 4, '#6b2f3f'); R(BOSS_X + 6, top + 1 + up, 5, 5, C.skin); return; }
@@ -2788,6 +2977,7 @@ const PARTNERS = {
     arm(pose) {
       const top = bodyTop(86, pose), shirt = '#1e1a1a', glove = C.skin;
       if (pose.phone || pose.tapK != null) return;
+      if (L.cine && cast17Ready()) { lineArm17('haeun', top + 56, pose.hand, !!pose.look); return; }
       // her loading arm from the near shoulder (she faces the belt: the shoulder is at the right side of her body) or, for the
       // lower belt when she feeds both, the far one; her own size (it cannot stretch past its reach), 3 px sleeves; the hand,
       // the watch on the wrist
@@ -2961,6 +3151,7 @@ function drawObserver(t, nowMs, active) {
   const ox = active ? obsX(beat) : OBS_X;
   FX.react[2] = { type: frown ? 'glance' : '', at: nowMs };
   const pose = { hand: { x: BOSS_X + 22, y: 108 }, carry: null, wince: false, dip: 0, bob: walking ? (ph < 0.5 ? 1 : 0) : (softened && ph < 0.2) || nodding ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
+  if (L.cine && cast17Ready()) { bossStill(active && beat >= 50 ? 'coffee' : 'stand', ox, 167 + pose.bob, leaving); return; }
   // (facing the line; turned the way he goes when he walks back out)
   g.save(); g.translate(ox, -2); if (!leaving) g.scale(-1, 1); g.translate(-BOSS_X, 0);
   PARTNERS[L.observer].draw(pose, nowMs, active);
@@ -3073,6 +3264,7 @@ const HAEUN_X = Math.round(SCAN_X + 0.82 * (PLAYER_X - SCAN_X)), HAEUN_TOP = 56;
 // o.gun = your scan kick while she works the upper gate; o.watch = checking the time; o.step = walking (which leg is forward);
 // o.load = she is a belt's loader and the arm is drawn with the box; o.mirror = facing right (at the loading end)
 function drawHaeunAt(cx, top, nowMs, o = {}) {
+  if (L.cine && cast17Ready()) { haeun17(cx, top + 56, { right: !!o.mirror, sit: o.sit, watch: o.watch, tap: o.tap, body: o.load }); return; }
   const kick = o.gun != null ? o.gun : 0, bob = o.bob ? 1 : 0;
   const hair = '#17121a', hairL = '#2e2630', shirt = '#1e1a1a', shirtD = '#121010', cap = '#d8463b', capD = '#a83328', brim = '#c43d33', glove = C.skin, sky = '#86c3e8', tee = '#e9f3f7', leg = '#3a3f45', shoe = '#1e1a1a';
   g.save(); if (o.mirror) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
@@ -9186,6 +9378,7 @@ function rbSeek(b, T) {
 function beginShift(level) {
   TUT.on = false; TUT.line = null; CAM.to = null; SLOW.on = false;
   ensureAudio(); loadLevel(level); loadSongs(level); resetRun(); handLabels();
+  if (level.cine) cast17Ready();   // (1-7's cast, in the new designs)
   $('title').hidden = true; $('result').hidden = true; $('select').hidden = true; state = 'intro';
   sceneReset((level.intro[0] && level.intro[0].scene) || 'line');
   const go = () => runDialog(level.intro, level.practice ? () => startPractice(level) : startPlay);
