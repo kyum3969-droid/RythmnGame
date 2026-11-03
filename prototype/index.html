@@ -863,12 +863,12 @@ const LEVELS = [
     // the two songs side by side (L.rb): the blues runs on from beat 0 (game beat 0 is halfway through its bar 0, 4.50 s in; file
     // time = lead + beat · 60/107.97, its rate follows the tempo through the heat; `bar` is the funk's bar in seconds).
     // turns: [beat, 'b' 반장 | 'v' 마르코 | 'h' both, a funk bar to start from]: the funk starts on its own opening hit on his
-    // first turn and is paused while 반장 has the line, picking up where it stopped (never spliced); only the cutscene's first
-    // turn starts it on its loudest stretch (bar 28). pokes: [beat, who, beats, funk bar]: inside the other's turn one grabs the
+    // first turn and is paused while 반장 has the line; his second comes back in at the song's highlight (bar 48, 1:49 in the
+    // original: a breath, then its last drop), and from there it picks up where it stopped, through the cutscene. pokes: [beat, who, beats, funk bar]: inside the other's turn one grabs the
     // volume for a moment (his song up, his look flashed over the floor, those boxes his). heat: the gauge climbs from [0] to
     // [1]. boom: the motor blows; radio: [the static, the blues back on at this beat, from this many seconds in]
-    rb: { turns: [[0, 'b'], [68, 'v'], [100, 'b'], [132, 'v'],
-             [164, 'b'], [168, 'v', 28], [172, 'b'], [176, 'v'], [180, 'b'], [182, 'v'], [184, 'b'], [186, 'v'], [188, 'h']],
+    rb: { turns: [[0, 'b'], [68, 'v'], [100, 'b'], [132, 'v', 48],
+             [164, 'b'], [168, 'v'], [172, 'b'], [176, 'v'], [180, 'b'], [182, 'v'], [184, 'b'], [186, 'v'], [188, 'h']],
       pokes: [], cut: [164, 220], heat: [100, 188], boom: 196, radio: [218.5, 220, 113.417], low: 0.07, bar: 2.22284 },
     mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 20,
       // 마르코 bored by the blues: yawning (hand to his open mouth, then a stretch), dozing (eyes shut, nodding, z's), jolted awake
@@ -892,11 +892,11 @@ const LEVELS = [
         '1...............1.......x...............1.......', '1...............1.......x.......................',
         '1...............1.......x...............1.......', '1...............1.......x.......................',
         '1...............1.......x...............1.......', '1...............1.......x.......................',
-        '1...............1.......x...............1.......', '1.......................1.....2.....2...........',
-        '1...........2.....2.....1...........2...........', '1.......................1.....4.....4.....4.....',
-        '1...........4.....4.....1.....4.....4...........', '1.......................1.....2.....2.....2.....',
-        '1.....2...........2.....1...........2.....2.....', '1.....4.................1.....4.....4.....4.....',
-        '1...........4.....4.....1.....4...........4.....', '................................................',
+        '1...............1.......x...............1.......', '1.................2.....1.....2.................',
+        '1.................2.....1.....2.................', '1.................4.....1.................4.....',
+        '1...........4.....4.....1...........4.....4.....', '1.................2.....1...........2.....2.....',
+        '1...........2...........1.....2.....2.....2.....', '1.....4.....4.....4.....1.................4.....',
+        '1...........4.....4.....1...........4.....4.....', '................................................',
         '................................................', '................................................',
         '................................................', '................................................',
         '................................................', '................................................',
@@ -3797,6 +3797,20 @@ function rbBack(b, bReal, nowMs, active, live) {
   if (radioLoud && radioOn) for (let k = 0; k < 2; k++) note(RB_RADIO.x + 8 + k * 6, RB_RADIO.y - 4, k, '#ffd9a0');
   if (boxOn) for (let k = 0; k < 3; k++) note(RB_BOX.x + 6 + k * 6, RB_BOX.y - 4, k + 5, '#9ff0ff');
 }
+// the cutscene's flood: boxes pour onto all four belts, faster and faster, from both loaders. Until the heat the scanners fire
+// on their own as they come (a machine-gun of beeps); from the heat on they jam at the scanners and back up along the belts,
+// and at the boom they are gone (spilled round the cart)
+function rbFlood() {
+  const D = L.rb; if (D.flood && D.flood.spd === SPEED) return D.flood;
+  const out = []; out.spd = SPEED; let b = D.cut[0] + 0.5, k = 0;
+  while (b < D.boom - 0.6) {
+    const p = (b - D.cut[0]) / (D.boom - D.cut[0]), v = SPEED * 1.8, tPlace = timeAt(b), ta = tPlace + (SCAN_X - PLACE_X) / v;
+    out.push({ q: rnd(k, 61) < 0.5 ? 0 : 1, up: rnd(k, 62) < 0.45, sb: b, tPlace, ta, v, w: 20 + Math.floor(rnd(k, 63) * 8), h: 15 + Math.floor(rnd(k, 64) * 6), i: 900 + k, jam: ta >= timeAt(D.heat[1]) });
+    b += lerp(0.8, 0.17, p) * (0.7 + rnd(k, 65) * 0.6); k++;
+  }
+  const qi = {}; for (const f of out) if (f.jam) { const key = f.q + (f.up ? 'u' : ''); f.qi = qi[key] || 0; qi[key] = f.qi + 1; }
+  return (D.flood = out);
+}
 // the cutscene's letterbox: black bars close in over a beat at the start of the cut and open again at its end
 function rbCine(c, w, h, b, active) {
   const C = L.rb.cut; if (!C || !active) return;
@@ -3891,6 +3905,13 @@ function drawMid(t, nowMs, active) {
       drawBox(n, x, BELT_Y, '', T);
     }
     if (!up && q === 0 && held) drawBox(held.n, held.x, held.y + held.n.h / 2, '', T);
+    if (L.rb && live && L.rb.cut && bReal >= L.rb.cut[0] && bReal < L.rb.boom) for (const f of rbFlood()) {
+      if (f.q !== q || f.up !== up || T < f.tPlace) continue;
+      let x = PLACE_X + (T - f.tPlace) * f.v, dy = 0; const fall = (T - f.tPlace) / (0.18 * SPB); if (fall < 1) dy = -(1 - fall) * 22;
+      if (f.jam) { const row = Math.floor(f.qi / 8), stop = SCAN_X - 4 - (f.w * 0.5) - (f.qi % 8) * 25; if (x > stop) { x = stop; dy -= row * (f.h - 2); } }
+      else if (T >= f.ta) { if (T - f.ta < 0.42) hitRings.push({ q, up, hitAt: f.ta, judge: 'perfect', beat: f.sb }); x = SCAN_X + (T - f.ta) * f.v; if (x > end) continue; }
+      drawBox(f, x, BELT_Y + dy, '', T, !f.jam && T >= f.ta && T - f.ta < 0.1 ? 0.8 : 0);
+    }
     drawBeltFront(L.rb ? rbBeltT(T) : T, live); if (up) drawBeltLegs();
     drawScannerFront(flashOf(q, up), false, missOf(q, up), 0);
     g.restore(); BELT_L = 48;
@@ -7415,6 +7436,10 @@ function rbEvents(ev) {
   for (const x of L.tempo || []) if (x[0] > 0 && x[0] < D.boom) at(x[0], T => { for (const k of ['b', 'f']) if (RB[k]) RB[k].s.playbackRate.setValueAtTime(x[1] / L.bpm, T); });
   at(D.boom, T => { for (const k of ['b', 'f']) { const x = RB[k]; if (!x) continue; RB[k] = null; x.s.playbackRate.setValueAtTime(x.s.playbackRate.value, T); x.s.playbackRate.linearRampToValueAtTime(0.1, T + 0.7); x.g.gain.setValueAtTime(x.g.gain.value, T); x.g.gain.linearRampToValueAtTime(0.0001, T + 0.75); try { x.s.stop(T + 0.8); } catch (e) {} } });
   at(D.radio[1], T => rbPlay('b', T, rbBluesOff(D.radio[1]), rbLoud()));
+  if (D.cut) for (const f of rbFlood()) {
+    if (!f.jam) ev.push([f.ta, T => { osc('square', f.q ? 2300 : 1750, T, 0.001, 0.03, 0.02, bus); noise(T, 'bandpass', f.q ? 3400 : 2600, 0.1, 0.02, 3, bus); }]);
+    else { const stop = SCAN_X - 4 - f.w * 0.5 - (f.qi % 8) * 25; ev.push([f.tPlace + (stop - PLACE_X) / f.v, T => thud(T, 0.35)]); }
+  }
   // a poke: 마르코 bangs the boombox on for a beat (a stab of the funk from a loud bar, the radio ducked under it); 반장 turns
   // the radio up over the funk for one of its beats
   for (const [pb, who, len, fb] of D.pokes || []) {
