@@ -1532,7 +1532,8 @@ const LEVELS = [
     // (no stage directions in the bubbles: what she does with the clock and the earbud is animated)
     // (the beat he plays her is the one he made after 1-5, for her; he asks her about dreams as a joke, and she checks her
     // watch and says "…일."; in the row he throws it back at her)
-    say: [[5.6, '누나, 이 비트 들어봐요! 누나 일하는 거 보고 만들었어요!', 4.2, 0, 'j'], [10, '…일이나 해.', 1.8, 1, 'h'],
+    // (after a week of the montage, the first time he says who the beat is about)
+    say: [[5.6, '누나, 이 비트… 사실 누나 일하는 거 보고 만들었어요!', 4.2, 0, 'j'], [10, '…일이나 해.', 1.8, 1, 'h'],
           // his "3-pointer" misses and lands on her belt: the rule, shown
           [12, '형, 이거 봐요. 3점—', 2, 0, 'j'], [14.5, '앗… 죄송! 손이 미끄러졌어요.', 2.5, 0, 'j'], [17.5, '…', 1.5, 1, 'h'],
           // his plans out loud; hers is one word (what she has room for is shown, never said)
@@ -1550,15 +1551,16 @@ const LEVELS = [
           [111.6, '몇 개 갖고… 저도 제 리듬이 있다구요.', 3.4, 0, 'j'], [115.2, '…네 리듬 때문에 내 비트가 다 꼬여.', 3.4, 0, 'v'],
           [118.8, '누나는 꿈도 없죠? 그러니까 맨날 시계만 보죠.', 4.4, 0, 'j'],
           // two beats of nothing, then her last word and she goes; he is left there; he picks his earbud up, puts it back in,
-          // makes up his mind and starts his beat (132)
+          // makes up his mind and starts his beat (132): not to beat her, to make her own up to what her fingers did (74-77)
           [125.4, '…됐어.', 2, 0, 'v'], [127.6, '…뭐예요, 진짜.', 1.8, 0, 'j'],
-          [130.4, '…좋아요. 그럼 비트로 해요.', 2.6, 0, 'j'], [133.2, '누나 비트가 그렇게 잘났으면, 따라와 봐요!', 3.8, 0, 'j'],
+          [130.4, '…아까 두드렸잖아요. 제 비트에.', 2.8, 0, 'j'], [133.2, '아니라면서요. …그럼 이거, 한 번만 타 봐요.', 3.8, 0, 'j'],
           // round one: before her first verse the camera goes in on her as his drums drop out
           [152.5, '뭐? 해보자고?', 4, 1, 'h'],
           // she shrugs his song off at the end of her hook; he cuts it, the camera on him, and the room turns into the stage
           // while he says it
           [204.5, '…이 정도?', 2.5, 1, 'h'],
-          [209, '…하. 그래요?', 2, 0, 'j'], [212, '이 비트도 한번 받아봐요!', 3.5, 0, 'j'],
+          // (floored, and more taken with her than ever: not angry)
+          [209, '(…뭐야. 누나 뭐야.)', 2.6, 0, 'j'], [212, '이 비트도 한번 받아봐요!', 3.5, 0, 'j'],
           // round two, his slow beat
           [231, '…또?', 1.5, 1, 'h'], [277, '…그게 다야?', 2, 1, 'h'],
           // the second switch: he reaches for another beat and she cuts him off - the last round is hers
@@ -1568,10 +1570,37 @@ const LEVELS = [
           // the end of her final: the song over, him still flat in the heap; then her, spent, getting her breath back
           [434, '…으으….', 5, 0, 'j'], [440.5, '…하아… 하아…', 6, 1, 'h']],
     comfort: [],   // nobody steadies you here
+    // the opening montage (startPrelude), before these lines: the week after 1-5, cut night to night. He brings the beat he made
+    // for her every night and never gets it heard; on the last night he makes up his mind to tell her who it is about
     intro: [
-      { who:'', text:'며칠 뒤. 명절 물량은 그대로다.' },
-      { who:'지우', text:'형! 누나! 저 왔어요! 오늘도 위에서 할게요. 위에서는 누나가 잘 보이거든요.' },
+      { who:'', text:'여드레째. 명절 물량은 그대로다.' },
+      { who:'지우', text:'형! 오늘도 위에서 할게요. 위에서는 누나가 잘 보이거든요.' },
+      { who:'지우', text:'(작게) …오늘은 끝까지 들려줄 거예요.' },
       { who:'하은', text:'(시계를 본다) …떨어뜨리지만 마.' }],
+    // the montage: a short shift of its own on the same line, played before the intro (startPrelude; no presses, every box loads
+    // and scans by itself, a skip button). Six nights, a hard cut to black and the day and the hour on each (cuts: [beat,
+    // caption, beats of black]); the cuts come quicker as it goes. Rollers only, but for his beat leaking off his phone the
+    // two times he gets to press play
+    prelude: {
+      bpm: 94, tempo: [[0, 94]], noCount: true, hints: false,
+      cuts: [[0, '이튿날 · 02:10'], [12, '사흘째 · 03:40'], [24, '나흘째 · 01:50'], [32, '닷새째 · 04:30'], [36, '엿새째 · 03:00'], [40, '이레째 · 05:50'], [50.5, '', 99]],
+      sections: [[0, 'lofi'], [2, 'silence'], [3, 'lofi'], [5, 'silence']],
+      act: { phoneBy: [[0.4, 8, 0], [12.4, 20, 0], [16.4, 17.6, 1], [32.2, 35, 0], [38.2, 39.8, 1], [40.3, 50.5, 0]], away: [[41, 50.5]], lookUp: [[1.4, 5.6]] },
+      camPlay: [[0, 12, { x: 80, y: 98, k: 1.6 }], [12, 16.2, { x: 104, y: 82, k: 2.2 }], [16.2, 20, { x: 56, y: 104, k: 2.4 }], [20, 24, { x: 80, y: 98, k: 1.6 }],
+        [24, 32, { x: 80, y: 96, k: 1.8 }], [32, 36, { x: 104, y: 82, k: 2.2 }], [36, 38.1, { x: 80, y: 96, k: 1.8 }], [38.1, 40, { x: 56, y: 104, k: 2.4 }],
+        [40, 52, { x: 104, y: 80, k: 2.4 }]],
+      cutscene: [[0, 52]],
+      say: [[1, '누나! 어제 비트 하나 만들었는데, 들어 볼래요?', 4.4, 0, 'j'], [6, '…일해.', 2, 1, 'h'], [8.8, '아… 넵.', 2.2, 0, 'j'],
+            [12.8, '이번엔 짧아요! 딱 삼십 초만!', 3.2, 0, 'j'], [17.6, '…물량 밀려.', 2.2, 1, 'h'], [21, '…넵.', 1.8, 0, 'j'],
+            [24.8, '누나, 이어폰 한쪽만요. 진짜 한쪽만.', 3.6, 0, 'j'], [29, '…시끄러.', 2, 1, 'h'],
+            [32.4, '누나—', 1.4, 0, 'j'], [34, '…상자.', 1.6, 1, 'h'],
+            [36.4, '누나, 오늘은 진짜—', 1.7, 0, 'j'], [38.3, '…', 1.5, 1, 'h'],
+            [41.5, '(…오늘도 못 들려줬다.)', 3.4, 0, 'j'], [45.6, '(…누나 보고 만들었다고 하면, 들어 주려나.)', 4.6, 0, 'j']],
+      devMarks: [[0, '이튿날'], [12, '사흘째'], [24, '나흘째'], [32, '닷새째'], [36, '엿새째'], [40, '이레째']],
+      // his belt only while his hands are free of the phone; hers never stops
+      bars: ['........', '........', '....x...', '........', '........', '....x...', 'x...x...', 'x...x...', '........', 'x.......', '........', '........', '........'],
+      bars2: ['x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', '........']
+    },
     // the outro sets up 1-7 (her last night, her mother in hospital) without saying any of it: its first lines stay on the dark
     // stage with the two of them out of breath; she is gone the moment the shift ends, and in the break room 지우 finds next
     // week's rota with her name in every row, day and night; 반장 looks in and tells him to say sorry tomorrow; he puts his earbuds away
@@ -4374,7 +4403,7 @@ const cineGone = (k, b) => !!(L.cine && L.cine[k] != null && b >= L.cine[k]);
 // (the scenes after act 1 keep the timeline they were written on: from L.cine.cut[0] on, a time is cut[1] s later there)
 const cineT = b => L.cine && L.cine.cut && b >= L.cine.cut[0] ? b + L.cine.cut[1] : b;
 let CINE_B = -1;   // (the time this frame, for the arm drawn with each belt)
-const isAuto = n => (L.cine && !n.quad) || n.victim || (n.lane === L.autoLane && (L.autoUntil == null || n.beat < L.autoUntil));
+const isAuto = n => ((L.cine || L.preludeOf) && !n.quad) || n.victim || (n.lane === L.autoLane && (L.autoUntil == null || n.beat < L.autoUntil));
 // where a belt's loader stands, in screen offsets from the single-belt spot
 function placerOff(lane) {
   if (DUO.mode === 'two') { if (lane === 0) { const h = haeunHome(); return { dx: h.x - BOSS_X, dy: h.top - 86 }; } return { dx: LANE_DX[lane], dy: LANE_DY[lane] + (L.nearLoaderDy || 0) }; }
@@ -9010,7 +9039,7 @@ function pairFx(a, b) {
 // heavy boxes need two different keys inside a short window; one hand alone drops it
 let PRESS_SIDE = null;   // which hand pressed (one-button mode), so a long crate is held and let go by that hand
 function onHit(ts, key, lane = 0) {
-  if (L.cine) return;   // (1-7 is all cutscene: nothing to press)
+  if (L.cine || L.preludeOf) return;   // (1-7 is all cutscene, and so is 1-6's opening montage: nothing to press)
   const t = songAt(ts) - offsetMs / 1000;
   // a chute (2-1's four lanes): lane 100 + chute
   if (L.mid && lane < 100) lane = 100;   // 2-1 before the floor opens: one belt, any key
@@ -9135,7 +9164,9 @@ function updateHud(t) {
   const beat = beatAt(t);
   // (1-5's room: his place and the hour there, counted from 4:12)
   const room = L.room && beat >= L.room.from, home = L.commute && beat >= L.commute.from && !room, [hh, mm] = (room ? '04:12' : home ? '04:01' : L.clock).split(':').map(Number);
-  const mins = mm + Math.max(0, Math.floor((room ? beat - L.room.from : home ? (beat - L.commute.from) * 2 : beat) / 4)), c = `${room ? '지우의 방' : home ? '귀갓길' : L.place || 'B동 3번 라인'} · ${String(hh + Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+  const mins = mm + Math.max(0, Math.floor((room ? beat - L.room.from : home ? (beat - L.commute.from) * 2 : beat) / 4));
+  let c = `${room ? '지우의 방' : home ? '귀갓길' : L.place || 'B동 3번 라인'} · ${String(hh + Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+  if (L.cuts) { const cc = L.cuts.filter(x => x[1] && beat >= x[0]).pop(); if (cc) c = `${L.place || 'B동 3번 라인'} · ${cc[1]}`; }   // (1-6's montage: that night)
   if (c !== lastClock) { clockEl.textContent = c; lastClock = c; }
   if (L.fever && ctx) {
     const cut = feverCut(beat);
@@ -9437,10 +9468,42 @@ function beginShift(level) {
   setRenderScale(level.cine ? 4 : 1); if (level.cine) cast17Ready();   // (1-7's cast, in the new designs, in detail)
   $('title').hidden = true; $('result').hidden = true; $('select').hidden = true; state = 'intro';
   sceneReset((level.intro[0] && level.intro[0].scene) || 'line');
-  const go = () => runDialog(level.intro, level.practice ? () => startPractice(level) : startPlay);
+  const go = () => level.prelude ? startPrelude(level) : runDialog(level.intro, level.practice ? () => startPractice(level) : startPlay);
   // a level whose recorded song starts on the first beat waits (up to 10 s) for it to load, or the shift would begin silent
   if (level.songStart != null && level.songs) { const t0 = performance.now(); const wait = () => { if (state !== 'intro' || L !== level) return; if (level.songs.every(sp => SONG.bufs[sp.src] !== null && SONG.bufs[sp.src] !== undefined) || performance.now() - t0 > 10000) go(); else setTimeout(wait, 100); }; wait(); }
   else go();
+}
+// an opening montage (level.prelude, 1-6): a short shift of its own on the same line, before the intro. Nothing to press, every
+// box loads and scans by itself, the night's staging keyed to its own beats (none of the shift's: her walk over, his doze, the
+// songs, the stage). When it is over, or skipped, the intro's lines and then the shift proper.
+function startPrelude(level) {
+  loadLevel({ ...level, ...level.prelude, preludeOf: level, practice: null, visit: null, doze: null, unplug: null, vibe: null, stage: null,
+    songs: null, battle: null, battleHard: null, breakdown: null, lastHit: null, climaxDrop: null, slam: null, crowdClap: null, show: false });
+  PRE.cut = -1; startPlay(); hud.classList.add('cine'); judgeEl.classList.add('cine');
+}
+const PRE = { cut: -1 };
+function endPrelude() {
+  const level = L.preludeOf; if (!level) return;
+  stopSong(); stopHum(); stopHold(); bubble.hidden = true; subEl.hidden = true; hint.hidden = true; CAM.to = null; SLOW.on = false; DEV.open = false;
+  hud.classList.remove('cine'); judgeEl.classList.remove('cine'); hud.hidden = true;
+  state = 'intro'; loadLevel(level); sceneReset(); devSync();
+  runDialog(level.intro, level.practice ? () => startPractice(level) : startPlay);
+}
+// the montage's cuts (L.cuts: [beat, caption, beats of black]): a hard cut to black with the punch clock's 탁, the caption in
+// the middle of the black and then down in the lower bar for a few beats
+function drawCuts(t) {
+  const b = beatAt(t); let i = -1; L.cuts.forEach((x, k) => { if (b >= x[0]) i = k; });
+  if (i < 0) { g.save(); g.setTransform(RS, 0, 0, RS, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.restore(); return; }   // (black until the first cut)
+  const [at, cap, blk = 0.35] = L.cuts[i], age = b - at;
+  if (i !== PRE.cut) { PRE.cut = i; if (ctx && cap) { const T = ctx.currentTime; tak(T, 0.5); noise(T, 'lowpass', 300, 0.25, 0.08, 0.7); } }
+  g.save(); g.setTransform(RS, 0, 0, RS, 0, 0);
+  if (age < blk) { g.fillStyle = '#000'; g.fillRect(0, 0, W, H); }
+  if (cap) {
+    const black = age < blk, a = black ? 1 : Math.max(0, Math.min(1, (3.5 - age) / 1));
+    if (a > 0) { g.globalAlpha = a; g.textAlign = black ? 'center' : 'left'; g.font = black ? '700 10px sans-serif' : '600 7px sans-serif'; g.fillStyle = '#efe6d2';
+      g.fillText(cap, black ? W / 2 : 14, black ? H / 2 + 3 : H - 7); }
+  }
+  g.restore();
 }
 // the tutorial (level.practice), played on the running belts: a long empty stretch of the level with the tutorial music, lines
 // over heads that wait for a press, and practice boxes added as it goes. When the last run is done the shift proper starts.
@@ -9456,6 +9519,7 @@ function startPractice(level) {
 }
 // skip the rest of the tutorial: straight to the shift
 function skipPractice() {
+  if (L.preludeOf && state === 'play') { endPrelude(); return; }
   if (!TUT.on || state !== 'play') return;
   guideOff(); TUT.on = false; TUT.line = null; TUT.count = null; CAM.to = null; SLOW.on = false; stopHum(); stopHold(); loadLevel(TUT.lvl); startPlay();
 }
@@ -9625,6 +9689,7 @@ function startPlay() {
 }
 function accuracy() { const mine = notes.filter(n => !isAuto(n)); return (stats.perfect + stats.good * 0.6 + stats.tailOk) / (mine.length + mine.filter(n => n.len).length); }
 function finishPlay(force) {
+  if (L.preludeOf) { endPrelude(); return; }   // (1-6's montage over: the intro, then the shift)
   stopSong(); state = 'outro'; stopHum(); stopHold(); bubble.hidden = true; subEl.hidden = true; hint.hidden = true; hud.classList.remove('cine'); judgeEl.classList.remove('cine'); $('devbtn').classList.remove('cine'); CAM.to = null; SLOW.on = false; DEV.open = false; devSync();
   const acc = accuracy();
   if (force == null) try { if ((progress[L.id] || 0) < acc) { progress[L.id] = acc; localStorage.setItem('belt.progress', JSON.stringify(progress)); } } catch (e) {}
@@ -9714,7 +9779,10 @@ function frame(now) {
   const t = active ? viewTime(tReal, now) : -99;
   if (active) {
     schedule(); judgeTick(tReal); updateHud(t);
-    if (L.camPlay && !L.practiceOf && !SLOW.on) { const bv = beatAt(t), c = L.camPlay.find(([a, z]) => bv >= a && bv < z); CAM.to = c ? c[2] : null; }
+    if (L.camPlay && !L.practiceOf && !SLOW.on) { const bv = beatAt(t), c = L.camPlay.find(([a, z]) => bv >= a && bv < z);
+      // (1-6's montage is cut, not panned: each new shot is there at once)
+      if (L.cuts && c && CAM.to !== c[2]) { CAM.k = c[2].k; CAM.x = c[2].x; CAM.y = c[2].y; }
+      CAM.to = c ? c[2] : null; }
     CAM.lbTo = L.cutscene && !L.practiceOf && L.cutscene.some(([a, z]) => beatAt(t) >= a && beatAt(t) < z) ? 1 : 0;
     if (TUT.on && L.practiceOf) tutTick(tReal);
     else if (tReal > timeAt(END_BEAT)) finishPlay();
@@ -9732,8 +9800,9 @@ function frame(now) {
   drawCamera(now);
   if (!active) CAM.lbTo = 0;
   drawLetterbox(now);
+  if (active && L.cuts) drawCuts(t);
   drawSlowFx(now);
-  const ts = $('tutskip'), showSkip = state === 'play' && TUT.on; if (ts.hidden === showSkip) ts.hidden = !showSkip;
+  const ts = $('tutskip'), showSkip = state === 'play' && (TUT.on || !!L.preludeOf); if (ts.hidden === showSkip) { ts.hidden = !showSkip; ts.textContent = L.preludeOf ? '건너뛰기 ▸' : '튜토리얼 건너뛰기 ▸'; }
   devSync();
 }
 requestAnimationFrame(frame);
