@@ -1534,70 +1534,6 @@ const LEVELS = [
       { who:'지우', text:'…형, 저 내일 일찍 올게요.', scene:'office', jpose:'down' }] : [
       { who:'지우', text:'…형, 오늘은 그냥 가요.' }]
   }
-  // ---- 시안: four ways a belt can vary the beat, one belt each. Short single-belt stages to try them by hand.
-  ,{
-    id:'lab-dark', stageNo:'시안 A1', who:'지우', role:'100 BPM · 벨트 하나', tag:'어둠 · 스캐너 불빛만 · 놓는 소리로', bpm:100, style:'duo', lab:true,
-    // A1 어둠: the power goes twice. Only the scanner's glow is left, so a box shows only as it reaches the gate; the cue is the
-    // thud of it being set down two beats before
-    clock:'03:00', title:'어둠', partners:['jiwoo'], chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4, hints:false,
-    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 76, crazy: [[24, 40], [48, 64]],
-    special:['어둠 속 상자', 'range', '개', [24, 64]],
-    sections: [[0, 'intro'], [2, 'a'], [6, 'dark'], [10, 'b'], [12, 'dark2'], [16, 'outro']],
-    bars: ['........', '........', 'x...x...', 'x...x...', 'x.x.x...', 'x...x.x.',
-           'x...x...', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.', 'x...x.x.',
-           'x...x.x.', 'x.x...x.', 'x.x.x.x.', 'x...x.x.', 'x.......', '........', '........'],
-    say: [], comfort: ['…다음 거.'],
-    intro: [{ who:'', text:'시안 A1 · 어둠. 두 번 정전된다. 스캐너 불빛만 남는다.' }],
-    outro: (good) => [{ who:'', text: good ? '시안 A1 끝.' : '시안 A1 끝. (다시 해보기)' }]
-  }
-  ,{
-    id:'lab-stop', stageNo:'시안 A2', who:'지우', role:'100 BPM · 벨트 하나', tag:'멈춤 → 재가동 · 실린 상자는 그대로 멈춤', bpm:100, style:'straight', lab:true,
-    // A2 멈춤 → 재가동: the belt stops dead (the motor dies) with boxes on it and they wait; on the last beat before it starts
-    // the lamp goes green and the motor winds up, and it starts on the beat. Whatever was on it lands that many beats later
-    clock:'03:00', title:'멈춤', partners:['jiwoo'], chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4, hints:false,
-    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 76, beltStop: [[31, 4], [54, 2]],
-    special:['멈췄다 온 상자', 'range', '개', [35, 40]],
-    sections: [[0, 'intro'], [2, 'a'], [16, 'outro']],
-    // landings as they happen (boxes on the belt at a stop land later by the stop's length; nothing lands while it is stopped)
-    bars: ['........', '........', 'x...x...', 'x...x...', 'x.x.x...', 'x...x.x.',
-           'x.x.x.x.', 'x...x...', '........', 'x.x.x.x.', 'x...x...', 'x.x.x...',
-           'x...x...', 'x.x.....', 'x.x.x.x.', 'x...x.x.', 'x...x...', 'x.......', '........', '........'],
-    say: [], comfort: ['…다음 거.'],
-    intro: [{ who:'', text:'시안 A2 · 멈춤 → 재가동. 벨트가 서면 실린 상자도 선다. 초록 불, 모터 소리, 다시 출발.' }],
-    outro: (good) => [{ who:'', text: good ? '시안 A2 끝.' : '시안 A2 끝. (다시 해보기)' }]
-  }
-  ,{
-    id:'lab-jam', stageNo:'시안 B1', who:'지우', role:'100 BPM · 벨트 하나', tag:'정체 → 쏟아짐 · 쌓인 만큼 연타', bpm:100, style:'straight', lab:true,
-    // B1 정체 → 쏟아짐: a roller sticks. Boxes pile up behind it (its lamp blinks red), one set down a beat, with nothing else
-    // coming; on the beat before the run it lets go (덜컹) and they come off one every half beat. As many hits as boxes held
-    clock:'03:00', title:'쏟아짐', partners:['jiwoo'], chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4, hints:false,
-    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 76, jam: { x: 170, dash: 0.5 },
-    special:['쏟아진 상자', 'jam', '개'],
-    sections: [[0, 'intro'], [2, 'a'], [16, 'outro']],
-    // j = a jammed box, written where it lands (a run of them half a beat apart); the bar before each run stays empty
-    bars: ['........', '........', 'x...x...', 'x...x.x.', 'x...x...', 'x.x.....',
-           '........', '.jjj....', 'x...x...', 'x...x...', '........', '.jjjj...',
-           'x...x...', 'x.x.....', '........', '.jjjjj..', 'x...x...', 'x.......', '........', '........'],
-    say: [], comfort: ['…다음 거.'],
-    intro: [{ who:'', text:'시안 B1 · 정체 → 쏟아짐. 롤러에 걸린 상자가 쌓였다가, 덜컹 하고 반 박 간격으로 쏟아진다.' }],
-    outro: (good) => [{ who:'', text: good ? '시안 B1 끝.' : '시안 B1 끝. (다시 해보기)' }]
-  }
-  ,{
-    id:'lab-swing', stageNo:'시안 B2', who:'지우', role:'100 BPM · 벨트 하나', tag:'스윙 · 길게 짧게 울컥 · 엇박은 뒤로', bpm:100, style:'straight', lab:true, beltSwing: true,
-    // B2 스윙: the belt chugs, long-short on every beat (it drags for two thirds of the beat, then rushes), so a box set down on
-    // the 'and' lands late, two thirds into the beat. The band swings with it
-    clock:'03:00', title:'스윙', partners:['jiwoo'], chords: CHILL.chords, roots: CHILL.roots, chordAt: bar => bar % 4, hints:false,
-    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 76,
-    special:['스윙 박', 'off', '개'],
-    sections: [[0, 'intro'], [2, 'a'], [16, 'outro']],
-    // written straight; the 'and's land swung
-    bars: ['........', '........', 'x...x...', 'x...x...', 'x...x.x.', 'x...x...',
-           'x.x.x...', 'x...x.x.', 'x.x.x.x.', 'x...x...', 'x.x.x.x.', 'x.x.x.x.',
-           'x...x.x.', 'x.x...x.', 'x.x.x.x.', 'x.x.x.x.', 'x...x...', 'x.......', '........', '........'],
-    say: [], comfort: ['…다음 거.'],
-    intro: [{ who:'', text:'시안 B2 · 스윙. 벨트가 박마다 길게-짧게 울컥 돈다. 엇박 상자는 조금 늦게, 박의 3분의 2 지점에 닿는다.' }],
-    outro: (good) => [{ who:'', text: good ? '시안 B2 끝.' : '시안 B2 끝. (다시 해보기)' }]
-  }
 ];
 // the stage board. Locked entries show what is coming.
 const STAGE1 = [
@@ -1609,7 +1545,6 @@ const STAGE1 = [
   { level: LEVELS.find(l => l.id === 's1-6') },
   // the finale is a page of its own (the opening, the heartbeat tutorial, the cutscene and its heartbeat lines): its card opens it
   { no: '1-7', title: '하은의 새벽', role: '하은 · 반장 · 지우 · 62 BPM · 컷씬', tag: '피날레 · 심박 · 마지막 새벽', pid: 'haeun', href: 'cutscene-1-7.html' },
-  ...LEVELS.filter(l => l.lab).map(level => ({ level, lab: true })),
   { level: LEVELS[4], stage2: true },
   { level: LEVELS[5] },
   { level: LEVELS[6] },
@@ -8563,7 +8498,6 @@ function buildCards() {
   STAGE1.forEach((it, i) => {
     const lv = it.level, locked = !lv && !it.href;
     if (it.stage2) { const dv = document.createElement('div'); dv.className = 'divider'; dv.textContent = '스테이지 2 · 본선'; cardsEl.append(dv); }
-    if (it.lab && !(STAGE1[i - 1] || {}).lab) { const dv = document.createElement('div'); dv.className = 'divider'; dv.textContent = '시안 · 벨트 변주'; cardsEl.append(dv); }
     const b = document.createElement('button'); b.type = 'button'; b.className = 'card' + (it.boss ? ' boss' : ''); b.style.setProperty('--tilt', ((i * 7) % 5 - 2) * 0.5 + 'deg');
     if (locked) b.disabled = true;
     const c = document.createElement('canvas'); c.width = 40; c.height = 64;
