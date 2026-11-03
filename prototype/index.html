@@ -1059,7 +1059,7 @@ const LEVELS = [
     // down; every new layer brings back something from the night. It ends when he presses stop and saves it.
     lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
     hitKit: 'ticktock', bareBand: true, observer: 'boss', observerIntro: true, noCount: true, observerAt: [[21, 35]], obsCue: { enter: [21, 23], leave: [30.6, 34.6] },   // 반장 by the line for the intro only
-    heads: { j: [104, 58], h: [52, 90], r: [132, 64], b: [168, 84] },
+    heads: { j: [104, 58], h: [52, 90], r: [132, 48], b: [168, 84] },
     clock:'02:50', title:'첫눈에', hints: false, special:['떨어진 상자', 'drop', '받아냄'],
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 368,
     chords: [[277.18, 349.23, 415.3], [233.08, 277.18, 349.23], [185, 233.08, 277.18], [207.65, 261.63, 311.13]], roots: [69.3, 58.27, 92.5, 103.83], chordAt: bar => bar % 4,
@@ -2747,7 +2747,8 @@ function drawLove15(t, nowMs) {
 // row and growing a row at a time, a half row up and a half row down (L.room.tracks). Its clips slide in from the right and
 // you set each one down as it reaches the playhead (the same one button); from then on it loops on its row while the next one
 // goes in; with each, something from the night comes back over his head. At the stop he saves it: '하은', deleted, '새 비트'.
-const ROOM = { pw: 300, cy: 169, rh: 9, head: 15, names: 32, play: 58, hip: [124, 119] };
+// (the room is drawn 16 px up (lift); below it a fixed black band (band) holds the app, which grows inside it)
+const ROOM = { pw: 300, rh: 8, head: 11, names: 32, play: 58, hip: [124, 119], lift: 16, band: 138 };
 const bgRoom15 = document.createElement('canvas'); bgRoom15.width = W; bgRoom15.height = H;
 const ROOM_WIN = { x: 250, y: 34, w: 62, h: 58 };
 (() => {
@@ -2866,6 +2867,7 @@ function drawRoom15(t, nowMs, b, post) {
   const Rm = L.room, spb = 60 / 90, beatK = post ? 0 : Math.max(0, 1 - (b % 1) * 3), stopped = b >= Rm.stop;
   const prog = Math.max(0, Math.min(1, (b - Rm.from) / (Rm.stop - Rm.from))), press = Math.max(0, 1 - (nowMs - lastPress) / 140);
   g.save();
+  g.save(); g.translate(0, -ROOM.lift);
   // the room, cut open; the sky in its window
   drawRoomSky(prog); g.drawImage(bgRoom15, 0, 0);
   // the dawn coming in through the window: a pale slant of light on the wall and the floor, stronger as it gets light
@@ -2907,11 +2909,14 @@ function drawRoom15(t, nowMs, b, post) {
     g.save(); g.globalAlpha = ma; for (const [dx, dy, r] of [[118, 62, 3], [113, 57, 2], [109, 53, 2]]) R(dx, dy, r, r, '#c8a0b8'); g.restore();
     drawRoomMemory(mem[1], ma, 48, 26, nowMs);
   }
+  g.restore();
+  // the black band the app lives in, fixed
+  R(0, ROOM.band, W, H - ROOM.band, '#000000'); R(0, ROOM.band, W, 1, '#1a1724');
   // ---- the music app, down below, centred, a row per instrument
   const tk = Rm.tracks, rh = ROOM.rh, PW = ROOM.pw, x0 = Math.round((W - PW) / 2), x1 = x0 + PW, px = x0 + ROOM.play, lx = x0 + ROOM.names;
   const v = (x1 - 6 - px) / (TRAVEL * spb), bpx = spb * v;
   const grow = tk.map(([at]) => Math.max(0, Math.min(1, (b - (at - TRAVEL)) / 0.6))), rowsF = grow.reduce((a, c) => a + c, 0);
-  const ph = ROOM.head + Math.max(1, rowsF) * rh + 4, y0 = Math.round(ROOM.cy - ph / 2), ry = y0 + ROOM.head + 1;
+  const cy = (ROOM.band + 1 + H) / 2, ph = ROOM.head + Math.max(1, rowsF) * rh + 3, y0 = Math.round(cy - ph / 2), ry = y0 + ROOM.head + 1;
   const recK = tk.reduce((m, tr, k) => (b >= tr[0] ? k : m), -1), shown = grow.filter(q => q > 0).length;
   const rowOf = beat => { let k = 0; tk.forEach((tr, i) => { if (beat >= tr[0]) k = i; }); return k; };
   const colOf = lane => (lane ? '#6fd8ff' : '#ff9cc2');
@@ -2919,15 +2924,15 @@ function drawRoom15(t, nowMs, b, post) {
   const ry0 = ry, rowsH = Math.max(1, rowsF) * rh;
   g.save(); g.globalAlpha = 0.45; R(x0 + 3, y0 + 4, PW, ph, '#000000'); g.restore();
   R(x0, y0 - 1, PW, ph + 2, '#2c3858'); R(x0 - 1, y0, PW + 2, ph, '#2c3858'); R(x0, y0, PW, ph, '#111827');
-  R(x0, y0, PW, 9, '#1a2238'); R(x0, y0, PW, 1, '#3a4870'); R(x0, y0 + 9, PW, 1, '#0a0e18');
-  R(x0 + 4, y0 + 3, 3, 3, '#ff5f57'); R(x0 + 9, y0 + 3, 3, 3, '#febc2e'); R(x0 + 14, y0 + 3, 3, 3, '#28c840');
-  R(x0, y0 + 10, PW, 4, '#0d1322');
+  R(x0, y0, PW, 8, '#1a2238'); R(x0, y0, PW, 1, '#3a4870'); R(x0, y0 + 8, PW, 1, '#0a0e18');
+  R(x0 + 4, y0 + 3, 2, 2, '#ff5f57'); R(x0 + 8, y0 + 3, 2, 2, '#febc2e'); R(x0 + 12, y0 + 3, 2, 2, '#28c840');
+  R(x0, y0 + 9, PW, 3, '#0d1322');
   g.save(); g.font = '700 6px sans-serif'; g.fillStyle = '#9aa6c8';
-  g.fillText(stopped ? (b - Rm.stop >= 4.8 ? '■ 정지  새 비트.prj' : '■ 정지') : '● 녹음  제목 없음.prj', x0 + 22, y0 + 7);
-  g.fillStyle = '#55607e'; g.fillText(`트랙 ${Math.max(0, recK + 1)}/${tk.length}`, x1 - 34, y0 + 7);
+  g.fillText(stopped ? (b - Rm.stop >= 4.8 ? '■ 정지  새 비트.prj' : '■ 정지') : '● 녹음  제목 없음.prj', x0 + 20, y0 + 6);
+  g.fillStyle = '#55607e'; g.fillText(`트랙 ${Math.max(0, recK + 1)}/${tk.length}`, x1 - 34, y0 + 6);
   g.restore();
-  g.save(); g.beginPath(); g.rect(lx, y0 + 10, x1 - 2 - lx, 4); g.clip();
-  for (let bb = Math.floor(b) - 4; bb < b + 8; bb++) { if (bb < Rm.from) continue; const x = Math.round(px + (bb - b) * bpx); R(x, y0 + 12 + ((bb - Rm.from) % 4 ? 1 : 0), 1, (bb - Rm.from) % 4 ? 1 : 2, (bb - Rm.from) % 4 ? '#2a3452' : '#5a6890'); }
+  g.save(); g.beginPath(); g.rect(lx, y0 + 9, x1 - 2 - lx, 3); g.clip();
+  for (let bb = Math.floor(b) - 4; bb < b + 8; bb++) { if (bb < Rm.from) continue; const x = Math.round(px + (bb - b) * bpx); R(x, y0 + 10 + ((bb - Rm.from) % 4 ? 1 : 0), 1, (bb - Rm.from) % 4 ? 1 : 2, (bb - Rm.from) % 4 ? '#2a3452' : '#5a6890'); }
   g.restore();
   // the rows: name tab (lit when it plays), a red dot while it is recording, a level meter at the right
   g.save(); g.font = '700 6px sans-serif';
@@ -2974,12 +2979,12 @@ function drawRoom15(t, nowMs, b, post) {
   g.restore();
   // the playhead: a line with a little flag on the ruler
   const phc = miss ? '#ff5040' : flash > 0 ? '#ffffff' : '#ffe27a';
-  R(px, y0 + 10, 1, rowsH + 5, phc); R(px - 2, y0 + 10, 5, 2, phc); R(px - 1, y0 + 12, 3, 1, phc);
+  R(px, y0 + 9, 1, rowsH + 4, phc); R(px - 2, y0 + 9, 5, 1, phc); R(px - 1, y0 + 10, 3, 1, phc);
   if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(px - 6, ry, 13, rowsH, '#fff2b0'); g.restore(); }
   // at the stop: saving it, over the app
   if (stopped) {
     const q = b - Rm.stop, name = q < 1.5 ? '하은'.slice(0, Math.min(2, Math.floor(q * 3) + 1)) : q < 2.6 ? (q < 2.1 ? '하' : '') : q < 4.5 ? '새 비트'.slice(0, Math.min(4, Math.floor((q - 2.6) * 4) + 1)) : '새 비트';
-    const dx = Math.round(W / 2 - 65), dy = Math.round(ROOM.cy - 22);
+    const dx = Math.round(W / 2 - 65), dy = Math.round((ROOM.band + H) / 2 - 22);
     g.save(); R(dx - 1, dy - 1, 132, 46, '#0a0c12'); R(dx, dy, 130, 44, '#0c111e'); R(dx, dy, 130, 1, '#6fd8ff'); g.font = '700 8px sans-serif'; g.fillStyle = '#9aa6c8'; g.fillText('파일 이름', dx + 8, dy + 14);
     R(dx + 8, dy + 18, 114, 14, '#182238'); g.fillStyle = '#ffffff'; g.fillText(name + (Math.floor(nowMs / 400) % 2 && q < 4.5 ? '|' : ''), dx + 12, dy + 28);
     if (q >= 4.8) { g.fillStyle = '#8fd694'; g.fillText('저장됨', dx + 90, dy + 14); }
