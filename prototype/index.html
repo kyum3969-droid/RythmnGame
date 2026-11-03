@@ -870,14 +870,19 @@ const LEVELS = [
     // [1]. boom: the motor blows; radio: [the static, the blues back on at this beat, from this many seconds in]
     rb: { turns: [[0, 'b'], [68, 'v'], [100, 'b'], [132, 'v', 48],
              [164, 'b'], [168, 'v'], [172, 'b'], [174, 'v'], [176, 'b'], [178, 'v'], [180, 'b'], [181, 'v'], [182, 'b'], [183, 'v'], [184, 'b'], [185, 'v'], [186, 'b'], [187, 'v'], [188, 'h']],
-      // zoom: the camera comes in on whoever speaks as the cutscene opens (the music running on): [from, to, 'b' | 'v']
-      zoom: [[164, 168, 'b'], [168, 172, 'v']],
-      pokes: [], cut: [164, 236], heat: [100, 188], boom: 196, radio: [9998, 9999, 0], unplug: 223.5, leave: [209, 215.5], low: 0.07, bar: 2.22284 },
+      // the cutscene's camera: [from, to, on whom ('b' 반장, following him as he walks off; 'v' 마르코; 'two' 마르코 and you;
+      // 'mid' the middle of the floor), how close]. Next to each other the shots pan across; otherwise they ease in from the
+      // wide view and back out to it
+      zoom: [[164, 168, 'b', 1.9], [168, 172, 'v', 1.9], [172, 188, 'mid', 1.22], [188, 196, 'mid', 1.38],
+             [199.5, 209, 'b', 1.9], [209, 215.5, 'b', 1.6], [215.5, 223.2, 'v', 1.9], [223.2, 232, 'two', 1.7]],
+      // the volume war (172 on) as a tug of war: each push shoves the edge between their looks over to the other side
+      tug: 172,
+      pokes: [], cut: [164, 236], heat: [100, 188], boom: 196, radio: [9998, 9999, 0], unplug: 222, leave: [209, 215.5], low: 0.07, bar: 2.22284 },
     mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 20,
       // 마르코 bored by the blues: yawning (hand to his open mouth, then a stretch), dozing (eyes shut, nodding, z's), jolted awake
       bore: { yawn: [[36, 40.5], [44, 47.5]], doze: [52, 64.5], jolt: 64.5 }, guide: [-9, -8], tags: [-9, -8, -7],
       shouts: [[36.5, 'none', '하아아암~'], [44.5, 'none', '하암…'], [53, 'none', 'Zzz…'], [57.5, 'none', '쿨… zzz'], [64.5, 'none', '헉!'], [67.5, 'fanfare', '빠바밤~!'], [68, 'hey', '헤이!'], [132, 'hey', '노노노~!'], [168, 'hey', '헤이~'], [174, 'hey', '업!'], [178, 'hey', '업!!'], [188, 'hey', '더!!']],
-      route: [[0, 'rl'], [86, 'ru'], [98, 'rl'], [138, 'ru'], [146, 'rl'], [154, 'ru'], [214, 'rl'], [215.5, 'c']],
+      route: [[0, 'rl'], [86, 'ru'], [98, 'rl'], [138, 'ru'], [146, 'rl'], [154, 'ru'], [214, 'rl'], [223.5, 'c']],
       bars: [
         '................................................', '1...............1.......1.......................',
         '1...............1.......1...............1.......', '1...............1.......x.......................',
@@ -910,10 +915,10 @@ const LEVELS = [
         '................................................', '................................................'
     ] },
     comfort: ['…다음 거.', '손 봐, 손.'],
-    phaseFx: { amber: [], lineOn: [-9, -9, -9], drop: 68, drop2: 196, last: 1e9, out: [218.4, 219.1, 1e9] },
+    phaseFx: { amber: [], lineOn: [-9, -9, -9], drop: 68, drop2: 196, last: 1e9, out: [225.2, 225.9, 1e9] },
     sfx: [[100, 'knob'], [164, 'knob'], [172, 'knob'], [176, 'knob'], [180, 'knob'], [182, 'knob'], [184, 'knob'], [186, 'knob'],
           [196, 'boom'], [196.6, 'alarm'], [198.6, 'alarm'], [200.6, 'alarm'], [207.5, 'knob'], [209.4, 'step'], [210.2, 'step'], [211, 'step'], [211.8, 'step'], [212.6, 'step'], [213.4, 'step'], [214.2, 'step'],
-          [218.4, 'lampOff'], [219.1, 'lampOff'], [223.5, 'switchOff']],
+          [222, 'switchOff'], [225.2, 'lampOff'], [225.9, 'lampOff']],
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 231,
     special:['마르코가 보낸 상자', 'right', '받아냄'],
@@ -928,8 +933,8 @@ const LEVELS = [
           [164.2, '마르코!! 천천히 하라고.', 3.6, 0, 'b'], [168.2, '에헤이, 괜찮아 괜찮아~', 3.6, 0, 'v'],
           [172.1, '(딸깍)', 1.6, 0, 'b'], [174.1, '볼륨 업!', 1.6, 0, 'v'], [176.1, '(딸깍)', 1.6, 0, 'b'], [178.1, '업!!', 1.6, 0, 'v'], [188.5, '더! 더!', 2, 0, 'v'],
           [196.6, '어, 어?', 2, 0, 'v'], [200, '(멈춘 벨트를 본다) …다 섰네.', 3.5, 0, 'b'], [204, '반장님, 이건 제가…', 2.5, 0, 'v'],
-          [207.5, '(라디오를 끈다) …내일 하자.', 3, 0, 'b'], [216, '…반장님?', 2.5, 0, 'v'], [219.5, '(쏟아진 상자를 본다) …아… 또 내가 망쳤어…', 3.5, 0, 'v'],
-          [223.5, '(붐박스 플러그를 뽑는다)', 2, 0, 'v'], [226, '…신입, 소주 한잔하러 가요.', 4, 0, 'v']],
+          [207.5, '(라디오를 끈다) …내일 하자.', 3, 0, 'b'], [216, '…반장님?', 2.5, 0, 'v'], [219, '(쏟아진 상자를 본다) …아… 또 내가 망쳤어…', 3, 0, 'v'],
+          [222, '(붐박스 플러그를 뽑는다)', 1.5, 0, 'v'], [226.3, '…신입, 소주 한잔하러 가요.', 4, 0, 'v']],
     intro: [
       { who:'', text:'둘째 밤, 새벽 1시 40분. 실적표 목표 수량 옆에 빨간 펜으로 고친 숫자. 반장은 집에서 낡은 라디오를 하나 들고 왔다.' },
       { who:'마르코', text:'반장님! 우리 어제 1등이래요!' },
@@ -3627,13 +3632,18 @@ const rbFunkOn = b => { const tn = rbTurn(b), pk = tn && rbPoke(b); return !!tn 
 function rbEdge(b) {
   const D = L.rb, WW = MID.ww; if (b < 0 || b >= D.boom) return WW;
   let i = 0; for (let k = 0; k < D.turns.length; k++) if (b >= D.turns[k][0]) i = k;
-  const inCut = D.cut && b >= D.cut[0] && b < D.cut[1], tn = D.turns[i], nx = D.turns[i + 1] ? D.turns[i + 1][0] : D.boom, d = Math.min(inCut ? 0.3 : 4, (nx - tn[0]) / 4), same = i > 0 && D.turns[i - 1][1] === tn[1], e = same ? 1 : ease((b - tn[0]) / d);
+  const inCut = D.cut && b >= D.cut[0] && b < D.cut[1], tn = D.turns[i], nx = D.turns[i + 1] ? D.turns[i + 1][0] : D.boom, d = Math.min(inCut ? (D.tug != null && b < D.tug ? 1 : 0.3) : 4, (nx - tn[0]) / 4), same = i > 0 && D.turns[i - 1][1] === tn[1], e = same ? 1 : ease((b - tn[0]) / d);
   const pk = rbPoke(b);
   if (pk) { const k = ease(Math.min(1, (b - pk[0]) / 0.12, (pk[0] + pk[2] - b) / 0.25)); return pk[1] === 'v' ? lerp(WW, 0, k) : lerp(0, WW, k); }
+  if (inCut && D.tug != null && b >= D.tug && tn[1] !== 'h') {
+    const tgt = x => x[1] === 'b' ? WW * 0.72 : WW * 0.28, prevT = i > 0 && D.turns[i - 1][0] >= D.tug ? tgt(D.turns[i - 1]) : tn[1] === 'b' ? 0 : WW;
+    const q = Math.min(1, (b - tn[0]) / 0.35), back = 1 + 2.2 * (q - 1) ** 3 + 1.2 * (q - 1) ** 2;   // ease out with a little overshoot
+    return lerp(prevT, tgt(tn), back) + (rnd(Math.floor(b * 10), 5) - 0.5) * 6;
+  }
   if (tn[1] === 'v') return lerp(WW, 0, e);
   if (tn[1] === 'b') return i === 0 ? WW : lerp(0, WW, e);
   // the heat: both at once, the edge thrashing back and forth across the middle
-  return WW / 2 + Math.sin(b * Math.PI * 1.5) * WW * 0.38 + (rnd(Math.floor(b * 8), 3) - 0.5) * 30;
+  return WW / 2 + Math.sin(b * Math.PI * 1.5) * WW * 0.2 + (rnd(Math.floor(b * 8), 3) - 0.5) * 24;
 }
 // how hot the belt motor is: rising with every turn from 반장's first, red through the heat; dead after the boom, cool again
 // once the radio is back on
@@ -3808,9 +3818,9 @@ function rbFlood() {
 }
 // the cutscene's letterbox: black bars close in over a beat at the start of the cut and open again at its end
 function rbCine(c, w, h, b, active) {
-  const C = L.rb.cut, on = !!C && active && b >= C[0] - 0.5 && b < C[1];
+  const C = L.rb.cut, live = active || state === 'outro', on = !!C && live && b >= C[0] - 0.5 && b < C[1];
   if (hud.classList.contains('cine') !== on) { hud.classList.toggle('cine', on); judgeEl.classList.toggle('cine', on); $('devbtn').classList.toggle('cine', on); }
-  if (!C || !active) return;
+  if (!C || !live) return;
   const k = ease(Math.min((b - C[0] + 1) / 1.5, (C[1] - b) / 1)); if (k <= 0) return;
   c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, w, Math.round(h * 0.14 * k)); c.fillRect(0, Math.round(h - h * 0.14 * k), w, Math.ceil(h * 0.14 * k)); c.restore();
 }
@@ -3948,6 +3958,7 @@ function drawMid(t, nowMs, active) {
       if (b >= BO.doze[0] && b < BO.doze[1]) { pose.doze = true; pose.bob = 0; sway = 0; lift = -(Math.floor(b / 2) % 2 ? 2 : 0); if (!toss) pose.hand = { x: BOSS_X + 12, y: 140 }; }
       if (b >= BO.jolt && b < BO.jolt + 1) { lift = Math.round(Math.sin(Math.PI * (b - BO.jolt)) * 8); pose.hand = { x: BOSS_X + 18, y: 80 }; }
     }
+    if (L.rb && active) { const tn = rbTurn(b); if (tn && tn[1] === 'v' && L.rb.cut && b >= L.rb.cut[0] && b - tn[0] < 0.7 && !marco.walking) { pose.hand = { x: BOSS_X + 24, y: 98 + (b - tn[0] < 0.2 ? 4 : 0) }; lift = Math.max(lift, 2); } }
     if (L.rb && active && b >= L.rb.boom + 1) { pose.sad = true; if (!marco.walking) pose.hand = { x: BOSS_X + 10, y: 138 }; }
     if (F && b >= F.last) { pose.hand = { x: BOSS_X + 11, y: 70 }; if (b < F.last + 1) lift = Math.max(lift, Math.round(Math.sin(Math.PI * (b - F.last)) * 9)); }
     FX.react[2] = FX.react[2] || { type: '', at: nowMs };
@@ -3976,6 +3987,7 @@ function drawMid(t, nowMs, active) {
   mirror(0, () => {
     const pose = { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: active && ph < 0.18 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 0 };
     if (held) pose.hand = { x: held.x - held.n.w / 2 + 1, y: held.y + 2 };
+    if (L.rb && live) { const tn = rbTurn(bReal); if (tn && tn[1] === 'b' && L.rb.cut && bReal >= L.rb.cut[0] && bReal - tn[0] < 0.7) pose.hand = { x: BOSS_X + 30, y: 103 }; }
     // 2-2: after the boom he calls it a night and walks out to the left, unhurried, gone off the floor
     const lv = L.rb && L.rb.leave, lp = lv && live ? (bReal - lv[0]) / (lv[1] - lv[0]) : -1;
     if (lp >= 1) return;
@@ -4047,15 +4059,20 @@ function drawMid(t, nowMs, active) {
   const dpr = window.devicePixelRatio || 1, hw = Math.max(W, Math.round(cv.clientWidth * dpr)), hh = Math.round(hw * H / W), k = hw / W;
   const want = W / (MID.ww + 12), mInt = Math.round(k * want), sEnd = mInt >= 2 && Math.abs(mInt / k - want) / want < 0.06 ? mInt / k : want, V = midView(b, sEnd);
   let sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
-  // 2-2: the camera comes in on whoever speaks as the cutscene opens and goes back out after (rb.zoom)
-  if (L.rb && L.rb.zoom && active) {
-    const Z = L.rb.zoom, wide = { s: V.s, cx: V.cx, cy: V.cy }, zs = V.s * 2.1;
-    const at = w => { if (!w) return wide; if (w[2] === 'b') return { s: zs, cx: BOSS_X + 40, cy: 116 }; const m = midMarco(b); return { s: zs, cx: m.x - 40, cy: 116 + m.dy }; };
+  // 2-2: the cutscene's camera (rb.zoom): close on whoever speaks, panning between shots that touch, easing in from the wide
+  // view and back out to it, never past the floor's ends
+  if (L.rb && L.rb.zoom && (active || state === 'outro')) {
+    const Z = L.rb.zoom, wide = { s: V.s, cx: V.cx, cy: V.cy }, mc = midMarco(b), lv = L.rb.leave, lp = lv ? Math.max(0, Math.min(1, (bReal - lv[0]) / (lv[1] - lv[0]))) : 0;
+    const at = w => { if (!w) return wide; const zs = V.s * w[3];
+      if (w[2] === 'b') return { s: zs, cx: BOSS_X - lp * 90 + 52, cy: 114 };
+      if (w[2] === 'v') return { s: zs, cx: mc.x + (mc.mir ? -48 : 48), cy: 112 + mc.dy };
+      if (w[2] === 'two') return { s: zs, cx: (mc.x + MID.ax) / 2, cy: 112 };
+      return { s: zs, cx: MID.ax, cy: 122 }; };
     const mix = (A, B, e) => ({ s: lerp(A.s, B.s, e), cx: lerp(A.cx, B.cx, e), cy: lerp(A.cy, B.cy, e) });
     const i = Z.findIndex(w => bReal >= w[0] && bReal < w[1]); let c = wide;
-    if (i >= 0) { const prev = i > 0 && Z[i - 1][1] === Z[i][0] ? Z[i - 1] : null; c = mix(at(prev), at(Z[i]), ease((bReal - Z[i][0]) / 0.7)); }
-    else { const last = Z.filter(w => bReal >= w[1]).pop(); if (last && bReal - last[1] < 0.9) c = mix(at(last), wide, ease((bReal - last[1]) / 0.9)); }
-    if (c !== wide) { V.s = c.s; const sw2 = W / V.s, sh2 = H / V.s; V.cx = Math.max(sw2 / 2, Math.min(MID.ww - sw2 / 2, c.cx)); V.cy = c.cy;
+    if (i >= 0) { const prev = i > 0 && Z[i - 1][1] === Z[i][0] ? Z[i - 1] : null; c = mix(at(prev), at(Z[i]), ease((bReal - Z[i][0]) / (prev ? 1 : 1.2))); }
+    else { const last = Z.filter(w => bReal >= w[1]).pop(); if (last && bReal - last[1] < 1) c = mix(at(last), wide, ease(bReal - last[1])); }
+    if (c !== wide) { V.s = c.s; const sw2 = W / V.s, sh2 = H / V.s; V.cx = Math.max(sw2 / 2 - 6, Math.min(MID.ww + 6 - sw2 / 2, c.cx)); V.cy = c.cy;
       sw = sw2; sh = sh2; sx = V.cx - sw / 2; sy = V.cy - sh / 2 + MID.oy; }
   }
   let [jx, jy] = phaseJolt(bReal);
@@ -4065,7 +4082,7 @@ function drawMid(t, nowMs, active) {
   if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
   cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#0c0a09'; gHi.fillRect(0, 0, hw, hh);
   gHi.drawImage(midCv, sx + jx / V.s, sy + jy / V.s, sw, sh, 0, 0, hw, hh);
-  phaseLook(gHi, hw, hh, bReal, active); if (L.rb) rbCine(gHi, hw, hh, bReal, active);
+  phaseLook(gHi, hw, hh, bReal, active); if (L.rb) rbCine(gHi, hw, hh, active ? bReal : END_BEAT, active);
   if (active) { midGuide(b, T, nowMs, { sx, sy, sw, sh, hw, hh, k }); midAdlib(nowMs, { sx, sy, sw, sh, hw, hh }); }
   // the game canvas under it still gets the plain floor colour (nothing else shows through)
   g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
