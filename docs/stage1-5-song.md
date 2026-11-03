@@ -53,3 +53,15 @@ Song form: intro, verse 1, pre-chorus, chorus, instrumental interlude, verse 2, 
 받아쓰기와 세기로 본 구조(곡 시간): 0–23초 1절("평범한 밤이었어" … "세상이 잠깐 느려진 것 같아"), 23–26초 "오오 오오, 잠깐만", 26–32초 거의 정적(28–32초 가장 조용함), 32–48초 후렴 1("두근두근 멈추질 않아" … "이게 사랑인가 봐"), 48–56초 짧은 간주·2절 시작("차가운 한마디도"), 56–64초 2절("눈 한 번 마주치려", "너는 늘 앞에, 나는 한 걸음 뒤", "네가 웃어 준 것도 아닌데"), 64–80초 마지막 후렴, 80–84초 끝, 84초부터 정적.
 
 길이가 지금 게임 1-5(85초)와 같고, 1-2~1-4(2분 15초 안팎)보다 짧다. 분량을 채우는 안은 `docs/stage1.md` 1-5 "정할 것".
+
+## 2페이즈 곡: "새 비트" (직접 합성)
+
+제미나이 한도가 차서 엔진 쪽에서 만들었다: `prototype/ref/beat15/render.py`(파이썬, numpy/scipy) → `prototype/audio/1-5-new-beat.mp3`. 90 BPM, 4/4, C# major(I–vi–IV–V7: C#maj7, A#m7, F#maj7, G#7), 첫 다운비트 0.10초, 32마디(85.4초) + 정지. 한 겹씩: 시계(0) → 뮤트 기타 코드, 카플러스-스트롱 현 합성(4) → 킥(1박에 두근 겹킥)·브러시 스네어·스윙 하이햇(8) → 베이스(12) → 글로켄슈필 멜로디, 두 마디 반복(16) → 전부(20, 28부터 멜로디 옥타브 위) → 32마디 첫 박에 뚝(스위치 딸깍). 밑에 바이닐 잡음, 테이프처럼 부드러운 로우패스와 포화. 평균 음량 약 -15 dB(Pink Belt -13 dB에 맞춤). 스크립트가 친 음표 목록(JSON)을 함께 내보내서 차트가 곡과 정확히 맞는다.
+
+제미나이로 다시 받으려면(같은 구조):
+
+```
+A cozy, sweet lo-fi bedroom beat, instrumental, no vocals at all: a young producer alone in his room at 4 a.m., making a beat about a girl he just met. The track builds up one layer at a time, as if he is adding them one by one, and every new layer starts exactly on a bar line. 90 BPM, 4/4, C# major.
+The layers, in order: a single soft ticking clock; then a warm, muted electric guitar chord loop; then a soft, dusty kick with a heartbeat-like double kick (ba-dum) and a gentle brushed snare; then a round, warm bass; then a twinkling glockenspiel melody; then everything together, warm, hopeful and a little shy.
+Cozy and intimate, soft vinyl crackle, warm tape saturation. Ends as if he pressed stop: the loop cuts off cleanly. No fade out.
+```

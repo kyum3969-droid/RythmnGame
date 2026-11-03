@@ -1044,63 +1044,86 @@ const LEVELS = [
       { who:'지우', text:'(작게) …괜찮아요, 형. 다음에 또 하면 돼요.' }]
   }
   ,{
-    id:'s1-5', stageNo:'1-5', who:'지우 + 하은', role:'지우 · 하은 · 118 BPM · 벨트 둘', tag:'첫눈에 · 두근두근 · 가벼운 팝', bpm:118, style:'pop15', fxTheme:'neon',
+    id:'s1-5', stageNo:'1-5', who:'지우 + 하은', role:'지우 · 하은 · 120 → 90 BPM · 벨트 둘', tag:'첫눈에 · 두근두근 · 새벽의 비트', bpm:120, style:'pop15', fxTheme:'neon',
     // 지우 is back, and on the lower belt there is someone he has never seen: 하은. He loads the upper belt, she the lower, and you
-    // scan both with one button as in 1-4. A light, bright band-pop song (for now a stand-in from the engine: 118 BPM, A major,
-    // I-V-vi-IV, the kick on every beat). He shows
-    // off how fast he is, fumbles a box, and it sails down at her; she catches it one-handed without looking, on the beat, and
-    // only then looks up - "…조심해." Everything stops but his heart (the moment, a cutscene in slow motion), and the chorus
-    // drops: his boxes come in heartbeats (두근: a beat and the 'and' after it), with hearts on them, pink in the room and
-    // hearts rising off him; staring at her, he lets a box or two fall onto her belt. In the second verse he tries to talk to
-    // her (one word back each time); in the bridge he hums and she says the one kind thing - …박자는 맞네. - and the last
-    // chorus goes off. Sets up 1-6: the beat he plays her there is the one he starts writing here.
+    // scan both with one button as in 1-4. The night is the recorded song 'Pink Belt' (120 BPM, C# major; its verse even says
+    // it: an ordinary night, and then you): he chats, she answers in one word; he shows off how fast he is (the song's
+    // "잠깐만" build), fumbles a box, and in the song's near-silence it floats down at her and she catches it one-handed
+    // without looking, on the beat - "…조심해." The chorus drops: his boxes come in heartbeats (a beat and its 'and') with
+    // hearts on them, pink in the room, hearts rising off him; staring at her he lets a box or two fall onto her belt. Then
+    // the walk out, and phase 2: 4 a.m. in his room, making the beat he will play her in 1-6 - his own beat (audio/
+    // 1-5-new-beat.mp3, made with ref/beat15/render.py: 90 BPM, C# major, built a layer at a time: clock, guitar, drums with a
+    // heartbeat kick, bass, glockenspiel). The clips slide along his laptop's timeline to the playhead and you set each one
+    // down; every new layer brings back something from the night. It ends when he presses stop and saves it.
     lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
-    heads: { j: [104, 58], h: [52, 90] },
+    hitKit: 'ticktock', bareBand: true,
+    heads: { j: [104, 58], h: [52, 90], r: [60, 116] },
     clock:'02:50', title:'첫눈에', hints: false, special:['떨어진 상자', 'drop', '받아냄'],
-    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 168,
-    chords: [[220, 277.18, 329.63], [207.65, 246.94, 329.63], [220, 277.18, 369.99], [220, 293.66, 369.99]], roots: [110, 82.41, 92.5, 73.42], chordAt: bar => bar % 4,
-    sections: [[0, 'intro'], [2, 'verse'], [10, 'pre'], [11, 'hush'], [13, 'chorus'], [21, 'verse2'], [29, 'bridge'], [31, 'chorus2'], [39, 'end'], [40, 'outro']],
-    tempo: [[0, 118]],
-    // the moment (love): his fumble (44) flies down at her in slow motion and she catches it (46.5) and holds it up (to 49.4);
-    // pink comes up round them; from then on he is smitten (hearts rising off him, his cheeks pink); his boxes in the
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 320,
+    chords: [[277.18, 349.23, 415.3], [233.08, 277.18, 349.23], [185, 233.08, 277.18], [207.65, 261.63, 311.13]], roots: [69.3, 58.27, 92.5, 103.83], chordAt: bar => bar % 4,
+    sections: [[0, 'intro'], [1, 'pb'], [42, 'walk'], [46, 'room'], [78, 'saved'], [80, 'outro']],
+    tempo: [[0, 120], [184, 90]],
+    songs: [{ src: 'audio/1-5-pink-belt.mp3', at: 4, lead: 0.11, gain: 0.85, sec: 'pb' },
+            { src: 'audio/1-5-new-beat.mp3', at: 184, lead: 0.1, gain: 1.0, sec: 'room' }],
+    // the moment (love): his fumble (56, the song's near-silence) floats down at her and she catches it (59) and holds it up
+    // (to 63); pink comes up round them; from then on he is smitten (hearts rising off him, his cheeks pink); his boxes in the
     // choruses carry hearts
-    love: { fumble: 44, catch: 46.5, hold: [46.5, 49.4], moment: [44, 52], glow: [[52, 84], [124, 160]], smit: [[49.5, 168]], heart: [[52, 84], [124, 157]] },
-    act: { lookUp: [[16, 19], [47.4, 50], [120, 123]], upAtDrops: true, alarmAt: [[44, 45.5], [122.8, 124]] },
-    camPlay: [[44, 46.5, { x: 84, y: 100, k: 1.4 }], [46.5, 49.5, { x: 58, y: 104, k: 2.4 }], [49.5, 52, { x: 104, y: 84, k: 2.4 }]],
-    cutscene: [[44, 52]],
-    devMarks: [[0, '처음'], [36, '자랑'], [44, '받아내기'], [52, '후렴 1'], [84, '2절'], [116, '브리지'], [124, '후렴 2']],
-    // upper belt: 지우 (8 cells; in the choruses his heartbeat: a beat and its 'and'); lower: 하은, and his boxes that fall
-    // onto her belt while he stares at her ('d')
+    love: { fumble: 56, catch: 59, hold: [59, 63], moment: [55.5, 68], glow: [[68, 100], [132, 165]], smit: [[62.5, 184]], heart: [[68, 100], [132, 164]] },
+    // the room (drawRoom15): from 184, the walk out fading to black before it (180-184); the stop at 312. Each layer that goes
+    // in lights its name on the timeline, and a moment of the night comes back in the laptop's corner
+    room: { from: 184, stop: 312, layers: [[188, '시계'], [200, '기타'], [216, '드럼'], [232, '베이스'], [248, '멜로디']],
+      memories: [[200, 'catch'], [216, 'look'], [232, 'cap'], [248, 'watch'], [296, 'catch']] },
+    act: { lookUp: [[20, 23], [60, 63], [126, 129]], upAtDrops: true, alarmAt: [[56, 57.5], [128.6, 130]] },
+    camPlay: [[55.5, 59, { x: 84, y: 100, k: 1.4 }], [59, 62.5, { x: 58, y: 104, k: 2.4 }], [62.5, 66, { x: 104, y: 84, k: 2.4 }]],
+    cutscene: [[55.5, 66], [166, 186], [312, 320]],
+    devMarks: [[0, '처음'], [44, '자랑'], [56, '받아내기'], [68, '후렴 1'], [100, '2절'], [124, '빌드업'], [132, '마지막 후렴'], [166, '퇴근길'], [184, '지우의 방'], [216, '드럼'], [248, '멜로디'], [296, '마지막 네 마디']],
+    // phase 1 (8 cells a bar): upper 지우 (in the choruses his heartbeat: a beat and its 'and'), lower 하은 and his boxes
+    // that fall onto her belt while he stares at her ('d'); phase 2 (16 cells a bar): the clips on his timeline, the top
+    // tracks (clock, guitar, melody) and the rhythm tracks (drums with the ba-dum kick, bass), the stop at the end
     bars: [
-      '........', '........', 'x...x...', 'x...x...', 'x.x.x...', '..x...x.', 'x...x...', 'x.x.x...',
-      'x...x...', 'x.x.x.x.', 'x.x.x.x.', '........', '........', '....xx..', 'xx..xx..', 'xx......',
-      'xx..xx..', 'xx..xx..', 'xx......', 'xx..xx..', 'xx..x...', 'x...x...', 'x.x.x...', 'x...x...',
-      '........', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.', '....x...', '........', 'xx..xx..',
-      'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'x.x.x.x.', 'x.x.x.x.', 'x.......',
-      '........', '........'
+      '........', '........', 'x...x...', 'x...x...', 'x.x.x...', '........', '..x.....', '..x...x.',
+      '..x.....', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.', 'x.x.x...', '........', '........',
+      '........', 'xx..xx..', 'xx......', 'xx..xx..', 'xx..xx..', 'xx......', 'xx..xx..', 'xx..xx..',
+      'xx..x...', 'x...x...', 'x.x.x...', 'x...x...', '........', '........', '........', 'x...x...',
+      'x.x.x.x.', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'x.x.x.x.',
+      'x.x.x.x.', 'x.......', '........', '........', '........', '........', '................', 'x.......x.......',
+      'x.......x.......', 'x.......x.......', 'x.....x...x.....', 'x.....x...x.....', 'x.....x...x.....', 'x.....x...x.....', 'x.........x.....', 'x.........x.....',
+      'x.........x.....', 'x.........x.....', 'x.....x.........', 'x.....x.........', 'x.....x.........', 'x.....x.........', 'x...x.x.x...x...', 'x...x...x.x...x.',
+      'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.',
+      'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.', 'x...............', '................'
     ],
     bars2: [
-      '........', '........', '........', '..x...x.', '..x...x.', 'x...x...', '..x.x.x.', '......x.',
-      '..x...x.', '........', '..x.....', '........', '........', '......x.', '..x...x.', '..x.x.x.',
-      '..x...d.', '..x...x.', '..x.x.x.', '..d...x.', '..x...x.', '..x...x.', '......x.', '..x.x...',
-      'x...d...', '..x...x.', '......x.', '..x...x.', '........', 'x.......', 'x...x...', '..x...x.',
-      'x.x.x.x.', '..x...x.', 'x.x.x.x.', '..x...x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.', 'x.......',
-      '........', '........'
+      '........', '........', '..x...x.', '..x...x.', '..x...x.', '....x...', 'x...x...', 'x...x...',
+      'x...x.x.', '..x...x.', '..x.....', 'x...x...', '..x.....', '........', '........', '........',
+      '........', '..x...x.', '..x.x.x.', '..x...x.', '..x...d.', '..x...x.', '..x.x.x.', '..d...x.',
+      '..x...x.', '..x...x.', '......x.', '..x.d...', '....x...', 'x.......', '........', '..x...x.',
+      '..x...x.', '..x...x.', 'x.x.x.x.', '..x...x.', 'x.x.x.x.', '..x...x.', 'x.x.x.x.', 'x.x.x.x.',
+      'x.x.x.x.', 'x.......', '........', '........', '........', '........', '................', '................',
+      '................', '................', '............x...', '............x...', '............x...', '............x...', 'xx..x...x...x...', 'xx..x...x...x...',
+      'xx..x...x...x...', 'xx..x...x...x...', 'x...x...x...x.x.', 'x...x...x...x.x.', 'x...x...x...x.x.', 'x...x...x...x.x.', '....x.......x...', '....x.......x...',
+      '....x.......x...', '....x.......x...', 'xx..x...x...x...', 'xx..x...x...x...', 'xx..x...x...x...', 'xx..x...x...x...', 'xx..x...x...x...', 'xx..x...x...x...',
+      'xx..x...x...x...', 'xx..x...x...x...', 'xx..x...x...x.x.', 'xx..x...x...x.x.', 'xx..x...x...x.x.', 'xx..x...x...x.x.', 'x...............', '................'
     ],
-    // [beat, text, beats shown, lane, speaker]
-    say: [[9, '형! 저 비트 새로 만들었어요. 이따 들려줄게요!', 3.5, 0, 'j'],
-          [16, '…어? 근데 저 누나는 누구예요?', 3, 0, 'j'], [19.5, '…일해.', 1.8, 1, 'h'], [23, '아, 넵! 일해요, 일!', 2.5, 0, 'j'],
-          [30, '(와… 손 진짜 빠르다…)', 3, 0, 'j'], [37, '형, 봐요. 저도 빨라요—', 2.5, 0, 'j'],
+    // [beat, text, beats shown, lane, speaker] ('r': 지우 in his room)
+    say: [[13, '…어? 근데 저 누나는 누구예요?', 3, 0, 'j'], [20.5, '…일해.', 1.8, 1, 'h'], [24, '아, 넵! 일해요, 일!', 2.5, 0, 'j'],
+          [32, '(와… 손 진짜 빠르다…)', 3, 0, 'j'], [44.5, '형, 봐요. 저도 빨라요—', 3, 0, 'j'],
           // the moment
-          [44.1, '앗!', 1.4, 0, 'j'], [47.6, '…조심해.', 2.2, 1, 'h'], [50, '(두근)', 1.8, 0, 'j'],
+          [56.1, '앗!', 1.4, 0, 'j'], [60.2, '…조심해.', 2.2, 1, 'h'], [63, '(두근)', 1.8, 0, 'j'],
           // chorus one: he can't stop looking
-          [60, '(멍…)', 2, 0, 'j'], [68, '…형. 방금 봤어요? 안 보고 잡았어요.', 3.5, 0, 'j'], [76, '박자까지 딱 맞춰서…', 3, 0, 'j'],
-          // verse two: he tries
-          [86, '누나! 저 지우예요! 아까 진짜 멋있었어요!', 3.5, 0, 'j'], [91, '…상자.', 1.6, 1, 'h'], [93.5, '앗, 넵!', 1.5, 0, 'j'],
-          [100, '누나는 노래 좋아해요?', 2.5, 0, 'j'], [103.5, '…시끄러.', 1.6, 1, 'h'], [106.5, '(좋아…)', 2, 0, 'j'],
-          // the bridge: he hums; the one kind thing she says
-          [116, '(흥얼흥얼)', 2.5, 0, 'j'], [119.8, '…박자는 맞네.', 2.8, 1, 'h'], [122.8, '…!!', 1.2, 0, 'j'],
-          [140, '형! 저 오늘 일 진짜 잘 되는 것 같아요!', 3, 0, 'j']],
+          [76, '(멍…)', 2, 0, 'j'], [84, '…형. 방금 봤어요? 안 보고 잡았어요.', 3.5, 0, 'j'], [92, '박자까지 딱 맞춰서…', 3, 0, 'j'],
+          // after it: he tries
+          [101, '누나! 저 지우예요! 아까 진짜 멋있었어요!', 3.5, 0, 'j'], [106, '…상자.', 1.6, 1, 'h'], [108.5, '앗, 넵!', 1.5, 0, 'j'],
+          [116, '누나는 노래 좋아해요?', 2.5, 0, 'j'], [119.5, '…시끄러.', 1.6, 1, 'h'], [122, '(좋아…)', 2, 0, 'j'],
+          // the build: he hums; the one kind thing she says
+          [124.5, '(흥얼흥얼)', 2.5, 0, 'j'], [127.4, '…박자는 맞네.', 2.8, 1, 'h'], [130.3, '…!!', 1.2, 0, 'j'],
+          [150, '형! 저 오늘 일 진짜 잘 되는 것 같아요!', 3, 0, 'j'],
+          // the walk out
+          [166.5, '…수고.', 1.6, 1, 'h'], [169, '…형. 방금 수고래요.', 2.6, 0, 'j'], [172.5, '아까 그 손 봤어요? 하나도 안 보고 잡았어요.', 3.6, 0, 'j'],
+          [177, '저 오늘 집에 가서 비트 만들 거예요. 처음부터 다.', 3.4, 0, 'j'],
+          // 4 a.m., his room: thoughts as the layers go in
+          [186, '(…잠이 안 와.)', 3, 0, 'r'], [201, '(그 손… 하나도 안 보고.)', 3, 0, 'r'], [217, '(두근, 두근.)', 2.5, 0, 'r'],
+          [233, '(일해. 상자. 시끄러.)', 3, 0, 'r'], [249, '(…박자는 맞네.)', 3, 0, 'r'], [264, '…됐다.', 2.5, 0, 'r'], [297, '(하은 누나.)', 2.5, 0, 'r'],
+          [313, '…내일 들려줘야지.', 4, 0, 'r']],
     comfort: [],
     intro: [
       { who:'', text:'명절 물량 셋째 주. 지우가 돌아왔다.' },
@@ -1109,14 +1132,12 @@ const LEVELS = [
       { who:'지우', text:'…어? 저 누나는…' },
       { who:'하은', text:'…하은. 위에 실어.' },
       { who:'지우', text:'아, 넵! 지우예요! 위에서 할게요!' }],
+    // the night ends in his room: the file saved, the laptop still open
     outro: (good) => good ? [
-      { who:'', text:'근무가 끝났다. 하은 누나는 인사도 없이 다음 라인으로 갔다.' },
-      { who:'', text:'휴게실.', scene:'office', office: { j: 184 }, jpose:'think' },
-      { who:'지우', text:'형… 아까 그 손 봤어요? 하나도 안 보고 잡았어요. 박자까지 딱 맞춰서.', scene:'office', jpose:'think' },
-      { who:'지우', text:'하은 누나… 이름도 예쁘다.', scene:'office', jpose:'down' },
-      { who:'지우', text:'형, 저 비트 다시 만들 거예요. 처음부터 다.', scene:'office', jpose:'fluster' },
-      { who:'', text:'지우는 폰 메모장에 한참 무언가를 적었다. 제목 칸에 \'하은\'이라고 썼다가, 지웠다.', scene:'office', jpose:'down' }] : [
-      { who:'지우', text:'…형, 저 오늘 왜 이렇게 손이 안 가죠?' }]
+      { who:'', text:'새벽 다섯 시. 지우는 노트북을 덮지 못했다.' },
+      { who:'', text:'파일 이름 칸에 \'하은\'이라고 썼다가, 지우고, \'새 비트\'라고 저장했다.' },
+      { who:'지우', text:'…누나 일하는 거 보고 만들었다고 하면, 이상하려나.' }] : [
+      { who:'지우', text:'…오늘은 그냥 자자.' }]
   }
   ,{
     id:'s1-6', stageNo:'1-6', who:'지우 + 하은', role:'지우 · 하은 · 94 BPM · 벨트 둘', tag:'둘의 다툼 · 랩 배틀', bpm:94, style:'duo15', fxTheme:'blues',
@@ -2388,6 +2409,8 @@ const LOVE = { fx: new Set(), lastB: -1e9 };
 const pxHeart = (x, y, c) => { R(x - 2, y, 2, 1, c); R(x + 1, y, 2, 1, c); R(x - 2, y + 1, 5, 1, c); R(x - 1, y + 2, 3, 1, c); R(x, y + 3, 1, 1, c); };
 function drawLove15(t, nowMs) {
   const V = L.love, b = beatAt(t), ph = b - Math.floor(b);
+  if (L.room && b >= L.room.from) return;
+  if (L.room && b >= L.room.from - 4) { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${Math.min(1, (b - (L.room.from - 4)) / 3.5)})`; g.fillRect(0, 0, W, H); g.restore(); return; }
   if (b < LOVE.lastB - 0.5) LOVE.fx.clear(); LOVE.lastB = b;
   const beatK = Math.max(0, 1 - ph * 3), dub = Math.max(0, 1 - Math.abs(ph - 0.28) * 6);
   let k = 0;
@@ -2417,6 +2440,99 @@ function drawLove15(t, nowMs) {
       drawBox(STG.box, hx, hy + 2, '', t);
     }
   }
+}
+// 1-5 phase 2: 4 a.m., 지우's room (L.room). We look over his shoulder at his laptop: the timeline of the beat he is making,
+// two tracks (the top ones: clock, guitar, melody; the rhythm ones: drums, bass), the playhead near the left. The clips
+// slide in from the right and you set each one down as it reaches the playhead (the same one button); each new layer lights
+// its name, and something from the night comes back in the screen's corner. A window with the city turning blue behind the
+// laptop; the screen's light on him; his head nodding on the beat. At the stop he saves it: '하은', deleted, '새 비트'.
+const ROOM = { x0: 70, x1: 292, y0: 22, y1: 142, ph: 112, tr: [70, 106] };
+function drawRoomMemory(kind, a, x, y, nowMs) {
+  // a small pink-tinted picture of the night: her at her belt
+  g.save(); g.globalAlpha = a;
+  R(x, y, 58, 34, '#2a1a26'); R(x + 1, y + 1, 56, 32, '#3a2232');
+  R(x + 1, y + 26, 56, 7, '#22181e'); R(x + 1, y + 25, 56, 1, '#6a4a5a');
+  g.save(); g.beginPath(); g.rect(x + 1, y + 1, 56, 32); g.clip();
+  g.translate(x + 22, y + 6); g.scale(0.42, 0.42);
+  drawHaeunAt(0, 0, nowMs, { mirror: true, rest: kind !== 'watch' && kind !== 'catch', watch: kind === 'watch', up: kind === 'look' });
+  if (kind === 'catch') { R(8, -6, 8, 18, '#1e1a1a'); R(11, -12, 6, 6, C.skin); drawBox(STG.box, 14, -10, '', 0); }
+  if (kind === 'cap') { R(-14, -4, 30, 4, 'rgba(255,200,220,.35)'); }
+  g.restore();
+  g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(255,110,160,.18)'; g.fillRect(x + 1, y + 1, 56, 32);
+  g.restore();
+}
+function drawRoom15(t, nowMs, b, post) {
+  const Rm = L.room, spb = 60 / 90, beatK = post ? 0 : Math.max(0, 1 - (b % 1) * 3), stopped = b >= Rm.stop;
+  g.save();
+  // the wall and the window: the city going blue towards morning
+  g.fillStyle = '#121626'; g.fillRect(0, 0, W, H);
+  const wx = 300, wy = 18, ww = 72, wh = 104;
+  const sky = g.createLinearGradient(0, wy, 0, wy + wh); sky.addColorStop(0, '#16204a'); sky.addColorStop(0.7, '#3a3466'); sky.addColorStop(1, '#a8607a');
+  g.fillStyle = sky; g.fillRect(wx, wy, ww, wh);
+  for (let k = 0; k < 7; k++) R(wx + 6 + ((k * 23) % 60), wy + 6 + ((k * 37) % 40), 1, 1, '#c8d0ff');
+  for (const [bx, bw, bh] of [[0, 14, 30], [12, 10, 44], [22, 16, 26], [38, 12, 52], [50, 22, 34]]) { R(wx + bx, wy + wh - bh, bw, bh, '#0d1020'); for (let yy = wy + wh - bh + 4; yy < wy + wh - 2; yy += 6) for (let xx = wx + bx + 2; xx < wx + bx + bw - 2; xx += 4) if (((xx * 7 + yy * 3) % 5) === 0) R(xx, yy, 1, 2, '#ffd98a'); }
+  R(wx - 3, wy - 3, ww + 6, 3, '#2a2f44'); R(wx - 3, wy + wh, ww + 6, 4, '#2a2f44'); R(wx - 3, wy, 3, wh, '#2a2f44'); R(wx + ww, wy, 3, wh, '#2a2f44'); R(wx + ww / 2 - 1, wy, 2, wh, '#2a2f44');
+  // a poster and a shelf on the left
+  R(10, 20, 40, 52, '#1c2236'); R(12, 22, 36, 48, '#2a3354'); R(16, 30, 28, 4, '#ff7fae'); R(16, 38, 20, 2, '#6fd8ff'); R(16, 44, 24, 2, '#6fd8ff');
+  R(6, 84, 56, 3, '#2a2230'); for (let k = 0; k < 6; k++) R(9 + k * 8, 72, 6, 12, ['#3a2a4a', '#2a3a4a', '#4a2a3a'][k % 3]);
+  // the desk
+  R(0, 168, W, 48, '#241a1e'); R(0, 168, W, 2, '#3a2a2e');
+  // the laptop: the screen, the timeline
+  const { x0, x1, y0, y1, ph } = ROOM;
+  R(x0 - 4, y0 - 4, x1 - x0 + 8, y1 - y0 + 8, '#0a0c12'); R(x0, y0, x1 - x0, y1 - y0, '#121a2c');
+  R(x0 - 18, 168 - 22, x1 - x0 + 36, 22, '#1a1d26'); R(x0 - 18, 168 - 22, x1 - x0 + 36, 2, '#2c3040');   // the keyboard deck
+  g.save(); g.font = '700 7px sans-serif'; g.fillStyle = '#9aa6c8'; g.fillText(stopped ? '■ 정지' : '● 녹음  새 비트.prj', x0 + 4, y0 + 9); g.restore();
+  // the layers' names, lit as each goes in
+  g.save(); g.font = '700 7px sans-serif';
+  Rm.layers.forEach(([lb, name], k) => { const on = b >= lb, x = x0 + 4 + k * 34; g.fillStyle = on ? (k % 2 ? '#6fd8ff' : '#ff9cc2') : '#2e3650'; g.fillRect(x, y0 + 14, 30, 10); g.fillStyle = on ? '#121a2c' : '#55607e'; g.fillText(name, x + 3, y0 + 22);
+    if (on && b < lb + 1 && !post) { g.globalAlpha = 1 - (b - lb); g.fillStyle = '#ffffff'; g.fillRect(x - 1, y0 + 13, 32, 12); g.globalAlpha = 1; } });
+  g.restore();
+  // the tracks
+  const ty = [ROOM.tr[0], ROOM.tr[1]];
+  for (const [k, y] of ty.entries()) { R(x0 + 2, y, x1 - x0 - 4, 26, '#182238'); R(x0 + 2, y + 26, x1 - x0 - 4, 1, '#253150'); g.save(); g.font = '700 6px sans-serif'; g.fillStyle = '#55607e'; g.fillText(k ? '리듬' : '멜로디', x0 + 4, y + 7); g.restore(); }
+  // the bar lines going by
+  for (let bb = Math.floor(b) - 4; bb < b + 8; bb++) { if (bb < Rm.from || bb % 4) continue; const x = ph + (bb - b) * spb * ((x1 - 4 - ph) / (TRAVEL * spb)); if (x > x0 + 2 && x < x1 - 2) R(Math.round(x), ty[0], 1, ty[1] + 26 - ty[0], '#253150'); }
+  // the clips
+  const v = (x1 - 6 - ph) / (TRAVEL * spb), flash = Math.max(0, 1 - (nowMs - lastGood) / 160), miss = nowMs - FX.lastMiss < 260;
+  g.save(); g.beginPath(); g.rect(x0 + 2, y0 + 30, x1 - x0 - 4, y1 - y0 - 30); g.clip();
+  for (const n of notes) {
+    if (n.beat < Rm.from) continue; if (!post && t < n.place) break;
+    const x = ph + (n.arr - t) * v; if (x < x0 - 10) continue;
+    const y = ty[n.lane] + 4, col = n.state === 'miss' ? '#d8463b' : n.lane ? '#6fd8ff' : '#ff9cc2';
+    const done = n.state === 'hit', ha = done ? t - n.hitAt : 9;
+    g.globalAlpha = done ? Math.max(0.35, 1 - ha * 1.2) : n.state === 'miss' ? 0.6 : 1;
+    R(Math.round(x - 5), y, 10, 18, col); R(Math.round(x - 5), y, 10, 2, '#ffffff'); for (let k = 0; k < 4; k++) R(Math.round(x - 3 + k * 2), y + 6 + ((k * 5 + n.i) % 7), 1, 5 - (k % 2) * 2, '#121a2c');
+    if (done && ha < 0.12) { g.globalAlpha = 1 - ha / 0.12; R(Math.round(x - 7), y - 2, 14, 22, '#ffffff'); }
+    g.globalAlpha = 1;
+  }
+  g.restore();
+  // the playhead
+  R(ph - 1, y0 + 30, 2, y1 - y0 - 32, miss ? '#ff5040' : flash > 0 ? '#ffffff' : '#ffe27a'); R(ph - 4, y0 + 28, 8, 3, miss ? '#ff5040' : '#ffe27a');
+  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(ph - 6, y0 + 30, 12, y1 - y0 - 32, '#fff2b0'); g.restore(); }
+  // the night coming back in the corner of the screen
+  const mem = Rm.memories.find(([mb]) => b >= mb && b < mb + 7);
+  if (mem && !stopped) drawRoomMemory(mem[1], Math.min(1, (b - mem[0]) / 0.6) * Math.min(1, (mem[0] + 7 - b) / 1), x1 - 62, y0 + 30, nowMs);
+  // at the stop: saving it
+  if (stopped) {
+    const q = b - Rm.stop, name = q < 1.5 ? '하은'.slice(0, Math.min(2, Math.floor(q * 3) + 1)) : q < 2.6 ? (q < 2.1 ? '하' : '') : q < 4.5 ? '새 비트'.slice(0, Math.min(4, Math.floor((q - 2.6) * 4) + 1)) : '새 비트';
+    g.save(); R(x0 + 46, y0 + 46, 130, 44, '#0c111e'); R(x0 + 46, y0 + 46, 130, 1, '#6fd8ff'); g.font = '700 8px sans-serif'; g.fillStyle = '#9aa6c8'; g.fillText('파일 이름', x0 + 54, y0 + 60);
+    R(x0 + 54, y0 + 64, 114, 14, '#182238'); g.fillStyle = '#ffffff'; g.fillText(name + (Math.floor(nowMs / 400) % 2 && q < 4.5 ? '|' : ''), x0 + 58, y0 + 74);
+    if (q >= 4.8) { g.fillStyle = '#8fd694'; g.fillText('저장됨', x0 + 136, y0 + 60); }
+    g.restore();
+  }
+  // the screen's glow on the room
+  g.save(); g.globalCompositeOperation = 'lighter'; const gl = g.createRadialGradient((x0 + x1) / 2, y1, 20, (x0 + x1) / 2, y1, 200); gl.addColorStop(0, `rgba(110,170,255,${0.1 + 0.05 * beatK})`); gl.addColorStop(1, 'rgba(110,170,255,0)'); g.fillStyle = gl; g.fillRect(0, 0, W, H); g.restore();
+  // 지우 from behind, in front of the laptop: the hood, headphones on, nodding on the beat; his hand on the pad as he sets
+  // each clip down
+  const nod = post || stopped ? 0 : Math.round(beatK * 1.5), jx = 58, jy = 122 + nod, press = Math.max(0, 1 - (nowMs - lastPress) / 140);
+  R(jx - 22, jy + 26, 44, 70, '#6b2f3f'); R(jx - 18, jy + 30, 36, 66, '#7a3a4a'); R(jx - 22, jy + 26, 44, 3, '#4a2030');
+  R(jx - 12, jy, 24, 28, '#6b2f3f'); R(jx - 10, jy + 2, 20, 24, '#7a3a4a'); R(jx - 12, jy + 22, 24, 6, '#4a2030');
+  R(jx - 14, jy - 2, 28, 3, '#22262e'); R(jx - 16, jy + 6, 5, 12, '#22262e'); R(jx + 11, jy + 6, 5, 12, '#22262e'); R(jx - 15, jy + 8, 3, 8, '#ff7fae');
+  R(jx + 18, 160 - Math.round(press * 3), 12, 6, C.skin); R(jx + 16, 152 - Math.round(press * 3), 8, 10, '#6b2f3f');
+  // fading in from black
+  const fin = post ? 0 : Math.max(0, 1 - (b - Rm.from) / 1.5);
+  if (fin > 0) { g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${fin})`; g.fillRect(0, 0, W, H); }
+  g.restore();
 }
 function drawShow15(t, nowMs) {
   const bA = beatAt(t), sec = sectionAt(Math.floor(bA / 4)), b = bA - sh15(sec), fb = Math.floor(b), bar = Math.floor(b / 4), ph = b - fb, inBar = ((fb % 4) + 4) % 4;
@@ -4285,6 +4401,7 @@ function drawScene(t, bt, active, nowMs) {
   const post = !active && (state === 'outro' || state === 'result') && SCENE.kind === 'line';
   const sv = L.stage && (active || post) ? stageView(active ? beatAt(t) : END_BEAT) : null;
   if (sv && sv.stage) { STG.post = post; drawStage15(t, nowMs, sv); return; }
+  if (L.room && (active || post) && (active ? beatAt(t) : END_BEAT) >= L.room.from) { STG.on = false; drawRoom15(t, nowMs, active ? beatAt(t) : END_BEAT, !active); return; }
   STG.on = false;
   g.save();
   if (sv) { g.translate(W / 2, H / 2); g.rotate(sv.rot); g.scale(sv.zoom, sv.zoom); g.translate(-W / 2, -H / 2); }
@@ -5925,15 +6042,23 @@ function buildEvents() {
     } else if (style === 'pop15') {
       // 1-5's stand-in pop (until the recorded song): bright, four on the floor, claps on 2 and 4, a bouncy octave bass, bell
       // chords on the 'and' in the verses, a hook on top in the choruses. The moment is a hush: a shimmer and his heart, 두근.
-      const bar = Math.floor(b / 4), sec = sectionAt(bar), C = chords[ci], r = roots[ci], AND = s / 2;
+      const bar = Math.floor(b / 4), C = chords[ci], r = roots[ci], AND = s / 2;
+      let sec = sectionAt(bar);
+      // a recorded song for the section, if it has one: started on its beat, and while it plays nothing of the engine's
+      const sp = L.songs && L.songs.find(x => x.sec === sec), si = sp ? L.songs.indexOf(sp) : -1;
+      if (sp) { if (b === sp.at) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(si)) startSong(T, 0, si); }); if (songReady(si)) continue; }
+      if (sec === 'walk' || sec === 'saved' || sec === 'outro') continue;
+      if (sec === 'room') { E(0, T => tak(T, inBar % 2 ? 0.12 : 0.2)); continue; }   // (stand-in: only his clock)
+      // the stand-in for the song: verse, the build into the moment, the moment's hush, the choruses, the last hit
+      if (sec === 'pb') { const V = L.love; sec = b >= 164 ? 'end' : inRange(b, V.glow) ? (b >= 132 ? 'chorus2' : 'chorus') : b >= V.moment[0] && b < V.moment[1] ? 'hush' : b >= 48 && b < V.moment[0] ? 'pre' : 'verse'; }
       const HOOK = [[659.25, 659.25, 739.99, 659.25, 554.37, 493.88, 554.37, 0], [493.88, 554.37, 659.25, 554.37, 493.88, 440, 440, 0]];
       if (sec === 'hush') {
-        if (b === bar * 4 && bar === 11) E(0, T => { crash(T); pad(T, C.map(f => f * 2), s * 8, 'sine', 0.035); });
+        if (L.love && b === Math.ceil(L.love.moment[0])) E(0, T => { crash(T); pad(T, C.map(f => f * 2), s * 8, 'sine', 0.035); });
         E(0, T => { kick(T, 0.45); kick(T + s * 0.28, 0.3); });
         if (inBar === 0) E(0, T => bell15(T, C[2] * 4, s * 3, 0.03));
         continue;
       }
-      if (sec === 'end') { if (inBar === 0) E(0, T => { crash(T); kick(T, 1); stab(T, C.map(f => f * 2), s * 1.5); bell15(T, 880, s * 3, 0.05); }); continue; }
+      if (sec === 'end') { if (b === 164) E(0, T => { crash(T); kick(T, 1); stab(T, C.map(f => f * 2), s * 1.5); bell15(T, 880, s * 3, 0.05); }); continue; }
       if (sec === 'outro') continue;
       const full = sec === 'chorus' || sec === 'chorus2', big = sec === 'chorus2', bridge = sec === 'bridge';
       if (inBar === 0) E(0, T => pad(T, C, s * 4, 'sawtooth', full ? 0.028 : 0.02));
@@ -6317,8 +6442,9 @@ const hud = $('hud'), clockEl = $('clock'), comboEl = $('combo'), bubble = $('bu
 let lastClock = '', lastCombo = -1, lastSay = '', lastHint = '';
 function updateHud(t) {
   const beat = beatAt(t);
-  const [hh, mm] = L.clock.split(':').map(Number);
-  const mins = mm + Math.max(0, Math.floor(beat / 4)), c = `${L.place || 'B동 3번 라인'} · ${String(hh + Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+  // (1-5's room: his place and the hour there, counted from 4:12)
+  const room = L.room && beat >= L.room.from, [hh, mm] = (room ? '04:12' : L.clock).split(':').map(Number);
+  const mins = mm + Math.max(0, Math.floor((room ? beat - L.room.from : beat) / 4)), c = `${room ? '지우의 방' : L.place || 'B동 3번 라인'} · ${String(hh + Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
   if (c !== lastClock) { clockEl.textContent = c; lastClock = c; }
   if (L.fever && ctx) {
     const cut = feverCut(beat);
