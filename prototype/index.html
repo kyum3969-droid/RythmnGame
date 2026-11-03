@@ -1101,18 +1101,22 @@ const LEVELS = [
       { who:'마르코', text:'…알겠어요.', scene:'office' },
       { who:'', text:'마르코는 캔 하나를 라디오 옆에 두고 자리로 갔다.', scene:'office', office: { b: 150, bm: true, m: 246, cans: 1 } },
       { who:'', text:'3라인. 둘은 말없이 각자 자리에 섰다.', scene:'line' }],
+    // the ending: the backlog cleared, 반장 gets up off his box, takes the request off the board and pockets it, starts to say
+    // well done, and goes down (act: what he does on the floor behind the lines)
     outro: good => good ? [
-      { who:'', text:'새벽 5시 52분. 잔량 0.' },
-      { who:'', text:'반장이 일어나 게시판으로 갔다. 종이를 떼어, 반으로 접고, 한 번 더 접어 주머니에 넣었다. 아무도 말하지 않았다.' },
-      { who:'', text:'마르코가 라디오 옆의 캔을 집어 내밀었다.' },
-      { who:'반장', text:'…식었네.' },
-      { who:'마르코', text:'데워 올까요?' },
-      { who:'반장', text:'(캔을 딴다) …됐어. 천천히 마시지 뭐.' },
-      { who:'마르코', text:'(웃는다) 헤헤.' }] : [
+      { who:'', text:'새벽 5시 52분. 잔량 0. 트럭이 나갔다.' },
+      { who:'마르코', text:'(환하게) 반장님! 다 뺐어요!' },
+      { who:'', text:'반장이 허리를 짚고 천천히 일어났다. 게시판의 종이를 떼어, 접어서 주머니에 넣었다.', act:'fold' },
+      { who:'반장', text:'…마르코.' },
+      { who:'마르코', text:'네?' },
+      { who:'반장', text:'수고했…', act:'sway' },
+      { who:'', text:'반장의 무릎이 꺾였다.', act:'fall' },
+      { who:'마르코', text:'반장님? …반장님!!' },
+      { who:'마르코', text:'신입! 119! 119 불러요!' }] : [
       { who:'', text:'새벽 6시. 잔량이 남았다.' },
-      { who:'반장', text:'…나머진 내일.' },
-      { who:'', text:'반장은 게시판 앞에 한참 서 있다가, 종이를 떼어 주머니에 넣었다.' },
-      { who:'반장', text:'(캔을 집는다) …식었네.' }],
+      { who:'반장', text:'…나머진 내가…', act:'sway' },
+      { who:'', text:'반장은 일어서려다 그대로 쓰러졌다.', act:'fall' },
+      { who:'마르코', text:'반장님!! 신입, 119!' }],
   }
   ,{
     id:'s2-4', stageNo:'2-4', who:'박씨', role:'박씨 · 순자 이모 · 84→96→104 BPM', tag:'하드 록 · 중량물 두 손 · 템포 상승', bpm:84, style:'rock22', fxTheme:'rock', inspector: true,
@@ -4555,7 +4559,11 @@ const MARCO_SPOTS = () => ({ bx: { x: MID.ww - 90, dy: 0, mir: true }, rl: { x: 
   lu: { x: BOSS_X + LANE_DX[0] + 22, dy: -22, mir: false }, ll: { x: BOSS_X + 24, dy: 0, mir: false }, lk: { x: BOSS_X + 42, dy: 0, mir: true }, c: { x: MID.ax + 64, dy: -2, mir: true } });
 const midSpotAt = bb => { let sp = L.mid.route[0][1]; for (const [rb, s] of L.mid.route) if (bb >= rb) sp = s; return sp; };
 function midMarco(b) {
-  const R0 = L.mid.route, S = MARCO_SPOTS(); let i = 0; for (let k = 0; k < R0.length; k++) if (b >= R0[k][0]) i = k;
+  const R0 = L.mid.route, S = MARCO_SPOTS();
+  if (L.ht && state === 'outro' && SCENE.act && SCENE.act.name === 'fall') {
+    const last = S[R0[R0.length - 1][1]], k = S.lk, p = Math.min(1, (performance.now() - SCENE.act.at - 250) / 800), e = ease(Math.max(0, p));
+    return { x: lerp(last.x, k.x, e), dy: lerp(last.dy, k.dy, e), mir: true, walking: p < 1, p: Math.max(0, p), up: false, spot: p < 1 ? 'run' : 'lk' };
+  } let i = 0; for (let k = 0; k < R0.length; k++) if (b >= R0[k][0]) i = k;
   const cur = S[R0[i][1]], prev = S[R0[Math.max(0, i - 1)][1]], p = i === 0 ? 1 : Math.min(1, (b - R0[i][0]) / 1.5), e = ease(p);
   const up = (cur.dy < -10 && p > 0.6) || (prev.dy < -10 && p < 0.4);
   return { x: lerp(prev.x, cur.x, e), dy: lerp(prev.dy, cur.dy, e), mir: p < 0.5 ? prev.x > cur.x || (prev.x === cur.x && prev.mir) : cur.mir, walking: p < 1, p, up, spot: R0[i][1] };
@@ -4958,6 +4966,14 @@ function htCine(c, w, h, b, active) {
 // his other hand patting the box at his belt's end in time
 function htBossPose(b, pose, held) {
   const D = L.ht; if (b < D.fuse[0]) pose.mute = true;
+  const A = state === 'outro' && SCENE.act, ak = A ? (performance.now() - A.at) / 1000 : 0;
+  if (A) {
+    pose.bob = 0; pose.wince = true; pose.dip = 0; pose.hand = { x: BOSS_X + 12, y: 132 };
+    if (A.name === 'fold') pose.hand = ak < 1.2 ? { x: BOSS_X - 8, y: 72 } : { x: BOSS_X + 3, y: 122 };
+    if (A.name === 'sway') { pose.hand = { x: BOSS_X + 3, y: 122 }; pose.dip = Math.round(1 + Math.sin(ak * 5) * 1); }
+    if (A.name === 'fall') { pose.dip = Math.round(lerp(0, 24, ease(Math.min(1, ak / 0.45)))); pose.doze = ak > 0.3; pose.wince = ak <= 0.3; pose.hand = { x: BOSS_X + 14, y: 152 + pose.dip / 3 }; }
+    return;
+  }
   if (D.strain && b < D.back) { pose.dip += b >= D.strain[2] ? 2 : b >= D.strain[1] ? 1 : 0; if (b >= D.strain[2]) pose.wince = Math.floor(b) % 2 === 0; }
   const tc = (D.touch || []).find(([x, y]) => b >= x && b < y);
   if (tc && !held) { pose.hand = { x: BOSS_X - 2, y: 126 }; pose.dip += 2; pose.wince = true; pose.bob = 0; }
@@ -5103,6 +5119,7 @@ function drawMid(t, nowMs, active) {
     if (F && b >= F.last) { pose.hand = { x: BOSS_X + 11, y: 70 }; if (b < F.last + 1) lift = Math.max(lift, Math.round(Math.sin(Math.PI * (b - F.last)) * 9)); }
     // 2-3: no grin until the song; kneeling by 반장 in the first cut; hands to his head at the jam; down at the boombox's plug;
     // turned to 반장 while he follows his pats
+    if (L.ht && state === 'outro' && SCENE.act && SCENE.act.name === 'fall') { pose.sad = true; if (marco.spot === 'lk') { pose.dip = 10; pose.hand = { x: BOSS_X + 24, y: 124 }; mir = true; sway = 0; } }
     if (L.ht && active) { const D = L.ht;
       if (b < D.song) pose.sad = true;
       if (marco.spot === 'lk' && !marco.walking && b >= D.back && b < (D.stand || D.cuts[0][1])) { pose.dip = 10; pose.hand = { x: BOSS_X + 22, y: 116 }; mir = true; sway = 0; }
@@ -5242,6 +5259,7 @@ function drawMid(t, nowMs, active) {
     const i = Z.findIndex(w => bReal >= w[0] && bReal < w[1]); let c = wide;
     if (i >= 0) { const prev = i > 0 && Z[i - 1][1] === Z[i][0] ? Z[i - 1] : null; c = mix(at(prev), at(Z[i]), ease((bReal - Z[i][0]) / (prev ? 1 : 1.2))); }
     else { const last = Z.filter(w => bReal >= w[1]).pop(); if (last && bReal - last[1] < 1) c = mix(at(last), wide, ease(bReal - last[1])); }
+    if (L.ht && state === 'outro' && SCENE.act && SCENE.act.name === 'fall') c = mix(wide, at([0, 0, 'b', 1.7]), ease(Math.min(1, (performance.now() - SCENE.act.at) / 1300)));
     if (c !== wide) { V.s = c.s; const sw2 = W / V.s, sh2 = H / V.s; V.cx = Math.max(sw2 / 2 - 6, Math.min(MID.ww + 6 - sw2 / 2, c.cx)); V.cy = c.cy;
       sw = sw2; sh = sh2; sx = V.cx - sw / 2; sy = V.cy - sh / 2 + MID.oy; }
   }
@@ -5824,7 +5842,7 @@ function drawPairBolt(nowMs) {
 // and on the line 반장 walks from the middle of the room over to his spot behind the belt before the next line shows.
 const SCENE = { kind: 'line', trans: null, walk: null };
 const OFFICE_X = 192, WALK_FROM = 200;
-function sceneReset(kind = 'line') { SCENE.kind = kind; SCENE.trans = null; SCENE.walk = null; SCENE.office = null; SCENE.enter = null; SCENE.jpose = null; }
+function sceneReset(kind = 'line') { SCENE.kind = kind; SCENE.trans = null; SCENE.walk = null; SCENE.office = null; SCENE.enter = null; SCENE.jpose = null; SCENE.act = null; }
 function sceneCut(to, done) {
   const now = performance.now(), out = reduce ? 200 : 320, walk = reduce || L.daw || to !== 'line' ? 0 : 2600;   // 반장's walk to the line only on the way in
   SCENE.trans = { at: now, out, to, done, swapped: false, walk };
@@ -8810,6 +8828,7 @@ function showLine() {
   if (ln.office) SCENE.office = { ...ln.office };
   if (sc === 'office') SCENE.jpose = ln.jpose || null;
   if (sc === 'pocha') SCENE.mpose = ln.mpose || null;
+  if (ln.act !== undefined && (!SCENE.act || SCENE.act.name !== ln.act)) { SCENE.act = ln.act ? { name: ln.act, at: performance.now() } : null; if (ln.act === 'fall' && ctx) levelSfx(ctx.currentTime, 'thud'); }
   if (sc !== SCENE.kind) { dialogEl.hidden = true; sceneCut(sc, () => { if (dlg) { dialogEl.hidden = false; showLine(); } }); return; }
   const L_ = dlg.lines[dlg.i], robot = L_.who === 'AS-7';
   CAM.to = L_.cam || null;
