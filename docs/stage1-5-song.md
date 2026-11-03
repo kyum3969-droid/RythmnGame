@@ -65,3 +65,7 @@ A cozy, sweet lo-fi bedroom beat, instrumental, no vocals at all: a young produc
 The instruments, in order: a single soft ticking clock, alone; then a warm electric piano playing the chords; then a soft, dusty kick with a heartbeat-like double kick (ba-dum); then a gentle brushed snare and soft hi-hats; then a round, warm bass; then a muted electric guitar chord loop; then a twinkling glockenspiel melody; then a high glockenspiel answering it and a soft pad under everything, warm, hopeful and a little shy.
 Cozy and intimate, soft vinyl crackle, warm tape saturation. Ends as if he pressed stop: the loop cuts off cleanly. No fade out.
 ```
+
+## 받은 곡 손질: 끝의 "첫눈에"
+
+"Pink Belt"의 마지막 단어 "첫눈에"(80.9–82.3초)가 "첫누에"로 들려서, 게임에 넣은 파일은 그 단어 전(80.38초)에서 끊고 마지막 화음의 울림 꼬리(리버브, 2.9초)를 붙였다. 다시 받을 때는 끝 가사가 또렷하게 나오는지(특히 받침 연음) 확인할 것.

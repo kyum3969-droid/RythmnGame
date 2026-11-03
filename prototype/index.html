@@ -1061,12 +1061,12 @@ const LEVELS = [
     hitKit: 'ticktock', bareBand: true, observer: 'boss', observerIntro: true, noCount: true, observerAt: [[21, 35]], obsCue: { enter: [21, 23], leave: [30.6, 34.6] },   // 반장 by the line for the intro only
     heads: { j: [104, 58], h: [52, 90], r: [24, 118], b: [168, 84] },
     clock:'02:50', title:'첫눈에', hints: false, special:['떨어진 상자', 'drop', '받아냄'],
-    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 356,
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 368,
     chords: [[277.18, 349.23, 415.3], [233.08, 277.18, 349.23], [185, 233.08, 277.18], [207.65, 261.63, 311.13]], roots: [69.3, 58.27, 92.5, 103.83], chordAt: bar => bar % 4,
-    sections: [[0, 'meet'], [10, 'pb'], [51, 'walk'], [55, 'room'], [87, 'saved'], [89, 'outro']],
-    tempo: [[0, 120], [220, 90]],
+    sections: [[0, 'meet'], [10, 'pb'], [51, 'walk'], [54, 'commute'], [58, 'room'], [90, 'saved'], [92, 'outro']],
+    tempo: [[0, 120], [232, 90]],
     songs: [{ src: 'audio/1-5-pink-belt.mp3', at: 40, lead: 0.11, gain: 0.85, sec: 'pb' },
-            { src: 'audio/1-5-new-beat.mp3', at: 220, lead: 0.1, gain: 1.0, sec: 'room' }],
+            { src: 'audio/1-5-new-beat.mp3', at: 232, lead: 0.1, gain: 1.0, sec: 'room' }],
     // the moment (love): his fumble (80, the song's near-silence) floats down at her and she catches it (59) and holds it up
     // (to 63); pink comes up round them; from then on he is smitten (hearts rising off him, his cheeks pink); his boxes in the
     // choruses carry hearts; a spring breeze blows through as the song starts (breeze.gust), and petals drift for the rest of
@@ -1079,7 +1079,7 @@ const LEVELS = [
     // pulling back, his heart beating and quietening, one thought; then 반장 walks in and snaps him out of it (23.1), and goes
     // off again muttering (27.5, the bubble going with him)
     meet: { rummage: [4, 7], lift: [7, 10.5], hold: [10.5, 13.5], reveal: [8.5, 14], linger: [15.5, 23.6] },
-    love: { fumble: 92, catch: 95, hold: [95, 99], moment: [91.5, 104], glow: [[104, 136], [168, 201]], smit: [[13, 220]], heart: [[104, 136], [168, 200]],
+    love: { fumble: 92, catch: 95, hold: [95, 99], moment: [91.5, 104], glow: [[104, 136], [168, 201]], smit: [[13, 216]], heart: [[104, 136], [168, 200]],
       breeze: { gust: [31, 40.5], drift: [37, 215] } },
     // and with the gust the loading bay turns to spring in his eyes, slowly: cherry trees in bloom (bgSpring), swept in from
     // the left after 반장 has gone (31.6-38); only then the song (40). Spring boxes: an outline, a ribbon and a bow (SPRING_BOX)
@@ -1088,15 +1088,18 @@ const LEVELS = [
     // instrument at a time, a new one every four bars (tracks: [beat it comes in, name, its pattern in 16ths, lane]): its row
     // appears on his timeline, you play it in for four bars (its clips), and from then on it loops on its row while the next
     // one goes in. Each new one brings back a moment of the night, a thought over his head
-    room: { from: 220, stop: 348,
-      tracks: [[220, '시계', 'x...x...x...x...', 0], [236, '피아노', 'x.....x...x.....', 0], [252, '킥', 'xx......x.......xx......x.....x.', 1], [268, '스네어', '....x...x...x.x.', 1],
-               [284, '베이스', 'x.......x.....x.', 1], [300, '기타', 'x.....x...x.x...', 0], [316, '멜로디', 'x...x.x.x...x...x...x...x.x...x.', 0], [332, '반짝이', '..x.......x.x.....x...x.....x...', 0]],
-      memories: [[236, 'face'], [252, 'catch'], [268, 'cap'], [284, 'watch'], [300, 'look'], [332, 'face']] },
+    // the walk home (drawCommute15, 217-232): the warehouse fades out (215.5-217), he walks home before dawn humming his tune
+    // and planning the beat, breaks into a run (run), and is gone; his laptop's screen comes up in the dark (boot); his room
+    commute: { from: 217, run: 226.6, boot: 229.5, x0: -16, x1: 250 },
+    room: { from: 232, stop: 360,
+      tracks: [[232, '시계', 'x...x...x...x...', 0], [248, '피아노', 'x.....x...x.....', 0], [264, '킥', 'xx......x.......xx......x.....x.', 1], [280, '스네어', '....x...x...x.x.', 1],
+               [296, '베이스', 'x.......x.....x.', 1], [312, '기타', 'x.....x...x.x...', 0], [328, '멜로디', 'x...x.x.x...x...x...x...x.x...x.', 0], [344, '반짝이', '..x.......x.x.....x...x.....x...', 0]],
+      memories: [[248, 'face'], [264, 'catch'], [280, 'cap'], [296, 'watch'], [312, 'look'], [344, 'face']] },
     act: { lookUp: [[56, 59], [96, 99], [162, 165]], upAtDrops: true, alarmAt: [[92, 93.5], [164.6, 166], [13.4, 15], [23.7, 25.5]] },
     camPlay: [[0.3, 4, { x: 80, y: 96, k: 1.5 }], [4, 13.2, { x: 58, y: 104, k: 2.6 }], [13.2, 18, { x: 104, y: 80, k: 2.6 }], [18, 21, { x: 102, y: 82, k: 2.2 }], [21, 30.6, { x: 122, y: 90, k: 1.6 }],
       [91.5, 95, { x: 84, y: 100, k: 1.4 }], [95, 98.5, { x: 58, y: 104, k: 2.4 }], [98.5, 102, { x: 104, y: 84, k: 2.4 }]],
-    cutscene: [[0, 39.5], [91.5, 102], [202, 222], [348, 356]],
-    devMarks: [[0, '처음 · 만남'], [15, '여운'], [31, '봄바람'], [40, 'Pink Belt'], [80, '자랑'], [92, '받아내기'], [104, '후렴 1'], [136, '2절'], [160, '빌드업'], [168, '마지막 후렴'], [202, '퇴근길'], [220, '지우의 방'], [236, '피아노'], [252, '킥'], [268, '스네어'], [284, '베이스'], [300, '기타'], [316, '멜로디'], [332, '반짝이']],
+    cutscene: [[0, 39.5], [91.5, 102], [202, 234], [360, 368]],
+    devMarks: [[0, '처음 · 만남'], [15, '여운'], [31, '봄바람'], [40, 'Pink Belt'], [80, '자랑'], [92, '받아내기'], [104, '후렴 1'], [136, '2절'], [160, '빌드업'], [168, '마지막 후렴'], [202, '퇴근길'], [217, '귀갓길'], [232, '지우의 방'], [248, '피아노'], [264, '킥'], [280, '스네어'], [296, '베이스'], [312, '기타'], [328, '멜로디'], [344, '반짝이']],
     // phase 1 (8 cells a bar): upper 지우 (in the choruses his heartbeat: a beat and its 'and'), lower 하은 and his boxes
     // that fall onto her belt while he stares at her ('d'); phase 2 (16 cells a bar): the clips on his timeline, four bars of
     // each new instrument as it goes in (upper: clock, piano, guitar, melody, the high glockenspiel; lower: the ba-dum kick,
@@ -1107,10 +1110,11 @@ const LEVELS = [
       'x...x...', 'x.x.x.x.', 'x.x.x...', '........', '........', '........', 'xx..xx..', 'xx......', 'xx..xx..', 'xx..xx..',
       'xx......', 'xx..xx..', 'xx..xx..', 'xx..x...', 'x...x...', 'x.x.x...', 'x...x...', '........', '........', '........',
       'x...x...', 'x.x.x.x.', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'xx..xx..', 'x.x.x.x.', 'x.x.x.x.',
-      'x.......', '........', '........', '........', '........', '................', 'x...x...x...x...', 'x...x...x...x...', 'x...x...x...x...', 'x.....x...x.....',
-      'x.....x...x.....', 'x.....x...x.....', 'x.....x...x.....', '................', '................', '................', '................', '................', '................', '................',
-      '................', '................', '................', '................', '................', 'x.....x...x.x...', 'x.....x...x.x...', 'x.....x...x.x...', 'x.....x...x.x...', 'x...x.x.x...x...',
-      'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.', '..x.......x.x...', '..x...x.....x...', '..x.......x.x...', '..x...x.....x...', 'x...............', '................'
+      'x.......', '........', '........', '........', '........', '........', '........', '........', '................', 'x...x...x...x...',
+      'x...x...x...x...', 'x...x...x...x...', 'x.....x...x.....', 'x.....x...x.....', 'x.....x...x.....', 'x.....x...x.....', '................', '................', '................', '................',
+      '................', '................', '................', '................', '................', '................', '................', '................', 'x.....x...x.x...', 'x.....x...x.x...',
+      'x.....x...x.x...', 'x.....x...x.x...', 'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.', '..x.......x.x...', '..x...x.....x...', '..x.......x.x...', '..x...x.....x...',
+      'x...............', '................'
     ],
     bars2: [
       '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
@@ -1118,10 +1122,11 @@ const LEVELS = [
       'x...x...', '..x.....', '........', '........', '........', '........', '..x...x.', '..x.x.x.', '..x...x.', '..x...d.',
       '..x...x.', '..x.x.x.', '..d...x.', '..x...x.', '..x...x.', '......x.', '..x.d...', '....x...', 'x.......', '........',
       '..x...x.', '..x...x.', '..x...x.', 'x.x.x.x.', '..x...x.', 'x.x.x.x.', '..x...x.', 'x.x.x.x.', 'x.x.x.x.', 'x.x.x.x.',
-      'x.......', '........', '........', '........', '........', '................', '................', '................', '................', '................',
-      '................', '................', '................', 'xx......x.......', 'xx......x.....x.', 'xx......x.......', 'xx......x.....x.', '....x...x...x.x.', '....x...x...x.x.', '....x...x...x.x.',
-      '....x...x...x.x.', 'x.......x.....x.', 'x.......x.....x.', 'x.......x.....x.', 'x.......x.....x.', '................', '................', '................', '................', '................',
-      '................', '................', '................', 'xx..............', 'xx..............', 'xx..............', 'xx..............', '................', '................'
+      'x.......', '........', '........', '........', '........', '........', '........', '........', '................', '................',
+      '................', '................', '................', '................', '................', '................', 'xx......x.......', 'xx......x.....x.', 'xx......x.......', 'xx......x.....x.',
+      '....x...x...x.x.', '....x...x...x.x.', '....x...x...x.x.', '....x...x...x.x.', 'x.......x.....x.', 'x.......x.....x.', 'x.......x.....x.', 'x.......x.....x.', '................', '................',
+      '................', '................', '................', '................', '................', '................', 'xx..............', 'xx..............', 'xx..............', 'xx..............',
+      '................', '................'
     ],
     // [beat, text, beats shown, lane, speaker] ('r': 지우 in his room)
     say: [[0.5, '누나, 혹시 박스 좀 올려줄래요?', 2.7, 0, 'j'], [3.4, '박스? 그래.', 1.8, 1, 'h'], [13.6, '어… 어, 고… 고마워요.', 3.4, 0, 'j'], [18.3, '(…큰일났다.)', 3.2, 0, 'j'], [23.1, '야 지우, 뭐해. 멍해빠져가지고는.', 4.4, 0, 'b'], [27.7, '넵! 넵!', 1.9, 0, 'j'], [29.9, '저놈 오늘따라 왜 저래?', 4.2, 0, 'b'],
@@ -1140,10 +1145,12 @@ const LEVELS = [
           // the walk out
           [202.5, '…수고.', 1.6, 1, 'h'], [205, '…형. 방금 수고래요.', 2.6, 0, 'j'], [208.5, '아까 그 손 봤어요? 하나도 안 보고 잡았어요.', 3.6, 0, 'j'],
           [213, '저 오늘 집에 가서 비트 만들 거예요. 처음부터 다.', 3.4, 0, 'j'],
+          // the walk home: planning it ('w': 지우 walking, the bubble going with him)
+          [219, '(시계 소리부터 깔고…)', 3, 0, 'w'], [222.6, '(그 위에 피아노. 그리고… 두근, 두근.)', 3.6, 0, 'w'], [226.5, '(…빨리 가야지!)', 2, 0, 'w'],
           // 4 a.m., his room: thoughts as the layers go in
-          [222, '(…잠이 안 와.)', 3, 0, 'r'], [237, '(그 손… 하나도 안 보고.)', 3, 0, 'r'], [253, '(두근, 두근.)', 2.5, 0, 'r'],
-          [269, '(일해. 상자. 시끄러.)', 3, 0, 'r'], [285, '(…박자는 맞네.)', 3, 0, 'r'], [301, '(내일도 지원 오려나.)', 3, 0, 'r'], [317, '…됐다.', 2.5, 0, 'r'], [333, '(하은 누나.)', 2.5, 0, 'r'],
-          [349, '…내일 들려줘야지.', 4, 0, 'r']],
+          [234, '(…잠이 안 와.)', 3, 0, 'r'], [249, '(그 손… 하나도 안 보고.)', 3, 0, 'r'], [265, '(두근, 두근.)', 2.5, 0, 'r'],
+          [281, '(일해. 상자. 시끄러.)', 3, 0, 'r'], [297, '(…박자는 맞네.)', 3, 0, 'r'], [313, '(내일도 지원 오려나.)', 3, 0, 'r'], [329, '…됐다.', 2.5, 0, 'r'], [345, '(하은 누나.)', 2.5, 0, 'r'],
+          [361, '…내일 들려줘야지.', 4, 0, 'r']],
     comfort: [],
     intro: [
       { who:'', text:'명절 물량 셋째 주. 지우가 돌아왔다.' },
@@ -1603,6 +1610,104 @@ const bgSpring = document.createElement('canvas'); bgSpring.width = W; bgSpring.
 })();
 // how far spring has swept in (0-1) at this beat: L.spring = [from, to], the edge going left to right with the gust
 const springAt = beat => (L.spring && beat >= L.spring[0] ? ease(Math.min(1, (beat - L.spring[0]) / (L.spring[1] - L.spring[0]))) : 0);
+// 1-5, between the shift and his room (L.commute): 지우 walking home before dawn. A deep blue street, the sky going faintly pink
+// at the bottom, low blocks with a few windows lit, three streetlamps, cherry trees along the pavement lit pink under them,
+// petals coming down. He walks across with his earphones in, humming the tune that will be his beat, planning it out loud
+// in his head; then he breaks into a run and is gone. Black; his laptop's screen lights up in the dark: '새 프로젝트', a
+// click, the timeline; then his room (L.room).
+const bgCommute = document.createElement('canvas'); bgCommute.width = W; bgCommute.height = H;
+const COMMUTE_LAMPS = [70, 200, 330];
+(() => {
+  const b = bgCommute.getContext('2d'), r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  const h2 = (x, y) => { const v = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return v - Math.floor(v); };
+  const sky = ['#0c1030', '#121638', '#1a1b44', '#23214e', '#2e2756', '#3c2d5c', '#4e3462', '#633b66'];
+  for (let y = 0; y < 150; y++) r(0, y, W, 1, sky[Math.min(7, Math.floor(y / 19))]);
+  for (let k = 0; k < 26; k++) { const x = Math.floor(h2(k, 1) * W), y = Math.floor(h2(k, 2) * 70); r(x, y, 1, 1, k % 5 ? '#aeb6ee' : '#ffffff'); }
+  r(296, 40, 8, 8, '#f4ecd0'); r(295, 42, 1, 4, '#f4ecd0'); r(304, 42, 1, 4, '#f4ecd0'); r(298, 39, 4, 1, '#fffaf0'); r(299, 40, 6, 6, '#1a1b44'); r(298, 48, 4, 1, '#f4ecd0');   // a thin moon
+  // the blocks: far ones lighter, near ones darker, a few windows lit
+  for (const [x0, w, h, c] of [[0, 40, 70, '#1b1c3e'], [36, 30, 52, '#1b1c3e'], [96, 46, 82, '#1b1c3e'], [150, 28, 60, '#1b1c3e'], [214, 52, 74, '#1b1c3e'], [280, 34, 56, '#1b1c3e'], [330, 54, 88, '#1b1c3e'],
+                               [12, 34, 44, '#14142e'], [64, 40, 58, '#14142e'], [170, 50, 50, '#14142e'], [250, 40, 62, '#14142e'], [306, 30, 40, '#14142e']]) {
+    r(x0, 150 - h, w, h, c);
+    for (let yy = 150 - h + 5; yy < 144; yy += 7) for (let xx = x0 + 3; xx < x0 + w - 3; xx += 5) if (h2(xx, yy) < 0.12) r(xx, yy, 2, 3, h2(yy, xx) < 0.5 ? '#ffd98a' : '#ffbf7a');
+  }
+  // a low wall and the pavement
+  r(0, 140, W, 24, '#22223a'); r(0, 140, W, 2, '#30304c'); for (let x = 0; x < W; x += 24) r(x, 142, 1, 22, '#1a1a30');
+  r(0, 164, W, 52, '#2b2a3c'); r(0, 164, W, 2, '#3a3950'); r(0, 200, W, 3, '#1e1d2c');
+  for (let x = 6; x < W; x += 30) r(x, 166, 1, 34, '#333246');
+  // cherry trees behind the wall, dark, their canopies lit pink where a lamp is near
+  for (const tx of [20, 132, 262, 372]) {
+    r(tx - 3, 96, 6, 46, '#241824'); r(tx - 1, 96, 2, 46, '#33222f');
+    for (let y = 50; y < 104; y++) for (let x = tx - 34; x < tx + 34; x++) {
+      const d = Math.hypot((x - tx) / 34, (y - 76) / 26); if (d > 1 + (h2(Math.floor(x / 2), Math.floor(y / 2)) - 0.5) * 0.3) continue;
+      const lamp = COMMUTE_LAMPS.reduce((m, lx) => Math.min(m, Math.abs(x - lx)), 999), lit = Math.max(0, 1 - lamp / 60) * (y > 64 ? 1 : 0.6);
+      const q = h2(Math.floor((x + tx) / 3), Math.floor(y / 3));
+      r(x, y, 1, 1, lit > 0.55 ? (q > 0.5 ? '#e48ab4' : '#c96a98') : lit > 0.25 ? (q > 0.5 ? '#a45380' : '#8a4570') : (q > 0.5 ? '#5e3256' : '#4c2a48'));
+    }
+  }
+  // the lamp posts
+  for (const lx of COMMUTE_LAMPS) { r(lx - 1, 52, 3, 112, '#3a3d4e'); r(lx - 2, 160, 5, 4, '#2a2c3a'); r(lx - 1, 50, 12, 2, '#3a3d4e'); r(lx + 6, 52, 8, 3, '#4a4d60'); r(lx + 7, 55, 6, 1, '#fff0c0'); }
+})();
+const commuteX = (C, b) => b < C.run ? lerp(C.x0, C.x1, (b - C.from - 0.6) / (C.run - C.from - 0.6)) : lerp(C.x1, W + 40, Math.min(1, (b - C.run) / 2));
+function commuteHead(b) { const C = L.commute; return { x: Math.round(commuteX(C, b)) + 2, y: 80 }; }
+function drawCommute15(b, nowMs) {
+  const C = L.commute;
+  if (b >= C.boot) return drawBoot15(b, nowMs);
+  g.drawImage(bgCommute, 0, 0);
+  // the lamps' light: a warm cone to the pavement and a pool on it
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (const lx of COMMUTE_LAMPS) {
+    const gr = g.createLinearGradient(0, 55, 0, 168); gr.addColorStop(0, 'rgba(255,214,150,.34)'); gr.addColorStop(1, 'rgba(255,214,150,0)');
+    g.fillStyle = gr; g.beginPath(); g.moveTo(lx + 7, 56); g.lineTo(lx + 13, 56); g.lineTo(lx + 44, 168); g.lineTo(lx - 24, 168); g.closePath(); g.fill();
+    const pg = g.createRadialGradient(lx + 10, 170, 2, lx + 10, 170, 40); pg.addColorStop(0, 'rgba(255,200,140,.22)'); pg.addColorStop(1, 'rgba(255,200,140,0)'); g.fillStyle = pg; g.fillRect(lx - 34, 150, 88, 40);
+  }
+  g.restore();
+  // petals coming down
+  for (let i = 0; i < 12; i++) {
+    const P = 6 + hash15(i, 21) * 4, q = ((b / P) + hash15(i, 22)) % 1, x = -10 + q * (W + 20), y = 30 + q * 140 + Math.sin(q * Math.PI * 3 + i) * 8;
+    g.globalAlpha = Math.sin(Math.PI * q) * 0.85; petal15(x, y, Math.sin((b + i) * 2.4), ['#e48ab4', '#ffb3cf', '#c96a98'][i % 3], i % 5 === 0 ? 2 : 1); g.globalAlpha = 1;
+  }
+  // 지우: walking, earphones in, his bag on his back; then running
+  const x = Math.round(commuteX(C, b)), run = b >= C.run, step = Math.floor(b * (run ? 4 : 2)) % 2, bob = step ? 1 : 0;
+  if (x < W + 30) drawActor('jiwoo', x, false, standPose(bob), nowMs, false, top => {
+    const f = run ? 4 : 2, l1 = step ? -f : f;
+    R(BOSS_X - 5 + l1, top + 64, 5, 12, '#2a2530'); R(BOSS_X + 1 - l1, top + 64, 5, 12, '#2a2530'); R(BOSS_X - 6 + l1, top + 75, 7, 4, '#1b1716'); R(BOSS_X + 1 - l1, top + 75, 7, 4, '#1b1716');
+    R(BOSS_X - 12, top + 26, 7, 16, '#2d2f33'); R(BOSS_X - 6, top + 20, 2, 14, '#2d2f33');
+    const sw = run ? (step ? 6 : -6) : (step ? 3 : -3); thick(BOSS_X + 4, top + 23, BOSS_X + 6 + sw, top + 44, 4, '#6b2f3f'); R(BOSS_X + 5 + sw, top + 43, 4, 4, C.skin);
+  });
+  // what he is humming: notes rising off him (none once he runs)
+  if (!run) for (let i = 0; i < 3; i++) {
+    const q = ((b - C.from) / 2.4 + i / 3) % 1, nx = x + 6 + Math.round(Math.sin(q * 6 + i) * 3) + i * 3, ny = Math.round(78 - q * 34);
+    g.globalAlpha = Math.sin(Math.PI * q) * 0.95; const c = i % 2 ? '#ffd1e0' : '#bfe6ff'; R(nx, ny, 4, 3, c); R(nx + 1, ny - 1, 2, 1, c); R(nx + 3, ny - 8, 1, 9, c); R(nx + 4, ny - 8, 2, 1, c); R(nx + 5, ny - 7, 1, 2, c); g.globalAlpha = 1;
+  }
+  // in from black, out to black
+  const fin = Math.max(0, 1 - (b - C.from) / 1), fout = Math.max(0, Math.min(1, (b - (C.boot - 1)) / 1)), dk = Math.max(fin, fout);
+  if (dk > 0) { g.fillStyle = `rgba(0,0,0,${dk})`; g.fillRect(0, 0, W, H); }
+}
+function drawBoot15(b, nowMs) {
+  // his laptop in the dark: the screen comes up, '새 프로젝트', a click, the empty timeline
+  const C = L.commute, q = b - C.boot;
+  g.fillStyle = '#000000'; g.fillRect(0, 0, W, H);
+  const on = Math.min(1, Math.max(0, (q - 0.3) / 0.8)), x0 = 122, y0 = 62, w = 140, h = 84;
+  if (on <= 0) return;
+  g.save(); g.globalAlpha = on;
+  R(x0 - 4, y0 - 4, w + 8, h + 8, '#0a0c12'); R(x0, y0, w, h, '#121a2c');
+  const glow = g.createRadialGradient(x0 + w / 2, y0 + h / 2, 20, x0 + w / 2, y0 + h / 2, 150); glow.addColorStop(0, 'rgba(110,170,255,.16)'); glow.addColorStop(1, 'rgba(110,170,255,0)');
+  g.globalCompositeOperation = 'lighter'; g.fillStyle = glow; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over';
+  g.font = '700 8px sans-serif';
+  if (q < 1.7) {
+    const hov = q > 1.1, press = q > 1.45;
+    R(x0 + 40, y0 + 34, 60, 16, press ? '#ffffff' : hov ? '#ff9cc2' : '#2e3650'); g.fillStyle = press || hov ? '#121a2c' : '#c8d0ee'; g.fillText('+ 새 프로젝트', x0 + 45, y0 + 45);
+    const mx = lerp(x0 + 120, x0 + 72, Math.min(1, q / 1.1)), my = lerp(y0 + 70, y0 + 44, Math.min(1, q / 1.1));
+    R(mx, my, 1, 7, '#ffffff'); R(mx + 1, my + 1, 1, 5, '#ffffff'); R(mx + 2, my + 2, 1, 3, '#ffffff'); R(mx + 3, my + 3, 1, 2, '#ffffff');
+  } else {
+    g.fillStyle = '#9aa6c8'; g.fillText('● 녹음  제목 없음.prj', x0 + 6, y0 + 11);
+    R(x0 + 6, y0 + 20, 22, 8, '#ff9cc2'); g.fillStyle = '#121a2c'; g.font = '700 6px sans-serif'; g.fillText('시계', x0 + 8, y0 + 26);
+    for (let k = 1; k < 8; k++) R(x0 + 6, y0 + 20 + k * 8, 22, 7, '#1c2640');
+    R(x0 + 40, y0 + 18, 1, 62, '#ffe27a');
+  }
+  g.restore();
+  const fo = Math.max(0, Math.min(1, (b - (L.room.from - 0.6)) / 0.6)); if (fo > 0) { g.fillStyle = `rgba(0,0,0,${fo})`; g.fillRect(0, 0, W, H); }
+}
 function drawSpring15(p) {
   if (p >= 1) { g.drawImage(bgSpring, 0, 0); return; }
   // the wipe: spring up to the edge, then a soft edge in strips
@@ -2534,6 +2639,16 @@ function petal15(x, y, spin, col, m = 1) {
   else if (a > 0.25) { P(0, 0, 2, 1, col); P(0, 1, 3, 1, col); P(1, 2, 1, 1, col); }
   else { P(0, 0, 1, 3, col); }
 }
+// the walk home's tune: the melody of his beat (ref/beat15/render.py's MEL, two bars) hummed an octave down, [beat, midi, beats]
+const HUM15 = [[0, 68, 0.9], [1, 65, 0.45], [1.5, 63, 0.45], [2, 61, 0.9], [3, 63, 0.9], [4, 65, 0.9], [5, 68, 0.9], [6, 70, 0.45], [6.5, 68, 0.9], [7.5, 65, 1.2]];
+function hum15(T, f, d) { osc('sine', f, T, 0.05, 0.05, d, mus); osc('triangle', f * 2, T, 0.05, 0.006, d * 0.6, mus); }
+function nightAir15(T, d) {
+  // the street before dawn: a low, still air
+  const s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), gn = ctx.createGain();
+  s.buffer = nbuf; s.loop = true; fl.type = 'lowpass'; fl.frequency.value = 700;
+  gn.gain.setValueAtTime(0.0001, T); gn.gain.exponentialRampToValueAtTime(0.05, T + 1); gn.gain.setValueAtTime(0.05, T + d - 1); gn.gain.exponentialRampToValueAtTime(0.0001, T + d);
+  s.connect(fl); fl.connect(gn); gn.connect(mus); s.start(T); s.stop(T + d + 0.05);
+}
 function breezeAir(T) {
   // the air moving: soft band-passed noise swelling in and out, its colour sweeping up and back down
   const s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), gn = ctx.createGain(), d = 4.4;
@@ -2577,8 +2692,9 @@ function drawBreeze15(B, b, nowMs) {
 const pxHeart = (x, y, c) => { R(x - 2, y, 2, 1, c); R(x + 1, y, 2, 1, c); R(x - 2, y + 1, 5, 1, c); R(x - 1, y + 2, 3, 1, c); R(x, y + 3, 1, 1, c); };
 function drawLove15(t, nowMs) {
   const V = L.love, b = beatAt(t), ph = b - Math.floor(b);
-  if (L.room && b >= L.room.from) return;
-  if (L.room && b >= L.room.from - 4) { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${Math.min(1, (b - (L.room.from - 4)) / 3.5)})`; g.fillRect(0, 0, W, H); g.restore(); return; }
+  const away = L.commute ? L.commute.from : L.room ? L.room.from : 1e9, fadeL = L.commute ? 1.5 : 4;
+  if (b >= away) return;
+  if (b >= away - fadeL) { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${Math.min(1, (b - (away - fadeL)) / (fadeL - 0.3))})`; g.fillRect(0, 0, W, H); g.restore(); return; }
   if (b < LOVE.lastB - 0.5) LOVE.fx.clear(); LOVE.lastB = b;
   const beatK = Math.max(0, 1 - ph * 3), dub = Math.max(0, 1 - Math.abs(ph - 0.28) * 6);
   let k = 0;
@@ -2665,7 +2781,7 @@ function drawRoom15(t, nowMs, b, post) {
   const { x0, x1, y0, y1, ph } = ROOM;
   R(x0 - 4, y0 - 4, x1 - x0 + 8, y1 - y0 + 8, '#0a0c12'); R(x0, y0, x1 - x0, y1 - y0, '#121a2c');
   R(x0 - 18, 168 - 22, x1 - x0 + 36, 22, '#1a1d26'); R(x0 - 18, 168 - 22, x1 - x0 + 36, 2, '#2c3040');   // the keyboard deck
-  g.save(); g.font = '700 7px sans-serif'; g.fillStyle = '#9aa6c8'; g.fillText(stopped ? '■ 정지' : '● 녹음  새 비트.prj', x0 + 4, y0 + 9); g.restore();
+  g.save(); g.font = '700 7px sans-serif'; g.fillStyle = '#9aa6c8'; g.fillText(stopped ? (b - Rm.stop >= 4.8 ? '■ 정지  새 비트.prj' : '■ 정지') : '● 녹음  제목 없음.prj', x0 + 4, y0 + 9); g.restore();
   // the tracks: a row for each instrument, appearing as its first clips come in (TRAVEL beats ahead); while it is being
   // recorded (its four bars) the row is lit with a red dot and its clips are the ones you set down; after that it loops on
   // its row, its pattern going by, its name blinking on its hits: the screen filling up a row at a time
@@ -4634,6 +4750,7 @@ function drawScene(t, bt, active, nowMs) {
   const sv = L.stage && (active || post) ? stageView(active ? beatAt(t) : END_BEAT) : null;
   if (sv && sv.stage) { STG.post = post; drawStage15(t, nowMs, sv); return; }
   if (L.room && (active || post) && (active ? beatAt(t) : END_BEAT) >= L.room.from) { STG.on = false; drawRoom15(t, nowMs, active ? beatAt(t) : END_BEAT, !active); return; }
+  if (L.commute && active && beatAt(t) >= L.commute.from && beatAt(t) < L.room.from) { STG.on = false; drawCommute15(beatAt(t), nowMs); return; }
   STG.on = false;
   g.save();
   if (sv) { g.translate(W / 2, H / 2); g.rotate(sv.rot); g.scale(sv.zoom, sv.zoom); g.translate(-W / 2, -H / 2); }
@@ -6289,6 +6406,18 @@ function buildEvents() {
         if (M.linger) for (const [k, v] of [[17, 0.3], [19.5, 0.22], [22, 0.15]]) if (b === Math.floor(k)) E((k - b) * s, T => { kick(T, v); kick(T + s * 0.28, v * 0.7); });
         continue;
       }
+      if (sec === 'commute') {
+        // the walk home: the night air, his footsteps (two a beat, four once he runs), the tune he hums (the melody his beat
+        // will have, an octave down, soft), a bird before dawn, and the laptop coming on
+        const Cm = L.commute;
+        if (b === Cm.from) E(0, T => nightAir15(T, (Cm.boot - Cm.from) * s));
+        if (b >= Cm.from + 1 && b < Cm.run + 2) { const n = b >= Math.floor(Cm.run) ? 4 : 2; for (let k = 0; k < n; k++) if (b + k / n >= Cm.from + 1 && b + k / n < Cm.run + 2) E(k * s / n, T => noise(T, 'lowpass', 520, k % 2 ? 0.05 : 0.065, 0.05)); }
+        for (const [st, m, d] of HUM15) { const at = Cm.from + 2 + st; if (Math.floor(at) === b && at < Cm.run) E((at - b) * s, T => hum15(T, 440 * Math.pow(2, (m - 81) / 12), d * s)); }
+        if (b === 225) E(0.3 * s, T => { for (const dt of [0, 0.11]) { const o = osc('sine', 3200, T + dt, 0.005, 0.02, 0.07); o.frequency.exponentialRampToValueAtTime(4300, T + dt + 0.06); } });
+        if (b === Math.ceil(Cm.boot)) E(0, T => { bell15(T, 1046.5, 1.2, 0.03); bell15(T + 0.14, 1568, 1.4, 0.025); });
+        if (b === Math.floor(Cm.boot + 1.45)) E((Cm.boot + 1.45 - b) * s, T => tak(T, 0.25));
+        continue;
+      }
       if (sec === 'walk' || sec === 'saved' || sec === 'outro') continue;
       if (sec === 'room') { E(0, T => tak(T, inBar % 2 ? 0.12 : 0.2)); continue; }   // (stand-in: only his clock)
       // the stand-in for the song: verse, the build into the moment, the moment's hush, the choruses, the last hit
@@ -6685,8 +6814,8 @@ let lastClock = '', lastCombo = -1, lastSay = '', lastHint = '';
 function updateHud(t) {
   const beat = beatAt(t);
   // (1-5's room: his place and the hour there, counted from 4:12)
-  const room = L.room && beat >= L.room.from, [hh, mm] = (room ? '04:12' : L.clock).split(':').map(Number);
-  const mins = mm + Math.max(0, Math.floor((room ? beat - L.room.from : beat) / 4)), c = `${room ? '지우의 방' : L.place || 'B동 3번 라인'} · ${String(hh + Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
+  const room = L.room && beat >= L.room.from, home = L.commute && beat >= L.commute.from && !room, [hh, mm] = (room ? '04:12' : home ? '04:01' : L.clock).split(':').map(Number);
+  const mins = mm + Math.max(0, Math.floor((room ? beat - L.room.from : home ? (beat - L.commute.from) * 2 : beat) / 4)), c = `${room ? '지우의 방' : home ? '귀갓길' : L.place || 'B동 3번 라인'} · ${String(hh + Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
   if (c !== lastClock) { clockEl.textContent = c; lastClock = c; }
   if (L.fever && ctx) {
     const cut = feverCut(beat);
@@ -6717,7 +6846,8 @@ function updateHud(t) {
   if (line && line[4] === 'h' && L.coScanner) placeHaeunBubble(beat);
   if (line && line[4] === 'd' && L.driver) placeHeadBubble(driverHead(beat));
   const spkNow = line ? line[4] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.spk : null;
-  if (spkNow && L.heads && L.heads[spkNow]) { const [hx, hy] = STG.on && STG.heads && STG.heads[spkNow] ? STG.heads[spkNow] : L.heads[spkNow], up = spkNow === 'b' && L.bossSeat && (inRange(beat, L.bossSeat.stand) || (TUT.on && TUT.stand)) ? 14 : 0, walk = spkNow === 'b' && L.obsCue ? obsX(beat) - OBS_X : 0; placeHeadBubble({ x: hx + (up ? 6 : 0) + walk, y: hy - up }); }
+  if (spkNow === 'w' && L.commute) placeHeadBubble(commuteHead(beat));
+  else if (spkNow && L.heads && L.heads[spkNow]) { const [hx, hy] = STG.on && STG.heads && STG.heads[spkNow] ? STG.heads[spkNow] : L.heads[spkNow], up = spkNow === 'b' && L.bossSeat && (inRange(beat, L.bossSeat.stand) || (TUT.on && TUT.stand)) ? 14 : 0, walk = spkNow === 'b' && L.obsCue ? obsX(beat) - OBS_X : 0; placeHeadBubble({ x: hx + (up ? 6 : 0) + walk, y: hy - up }); }
   let h = '';
   if (L.tutorial) for (let i = 0; i < 3; i++) { const n = notes[i]; if (n && n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 터치'; break; } }
   const hintFor = (key, text, holdText) => {
