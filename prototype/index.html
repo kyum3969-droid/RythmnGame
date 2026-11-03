@@ -512,6 +512,8 @@ const HOOK = [
   [24, 'E5', 1], [25, 'D5', 1], [26, 'B4', 1], [27, 'Gs4', 1],
   [28, 'A4', 3]
 ];
+// (1-7's office opening: the camera in on the table and the door, above the dialogue box)
+const O17_CAM = { x: 205, y: 150, k: 1.6 };
 const LEVELS = [
   {
     id:'s1-1', stageNo:'1-1', who:'반장', role:'반장 · 88 BPM', tag:'쿵 · 쿵짝 · 긴 화물', bpm:88, div:2, style:'night1', lofi:6500, chordShift:2,
@@ -668,6 +670,7 @@ const LEVELS = [
   }
   ,{
     id:'s1-4', stageNo:'1-4', who:'반장 + 하은', role:'반장 · 하은 · 100 BPM · 벨트 둘', tag:'벨트 둘 · 버튼 하나 · 양쪽 한 번에', bpm:100, style:'duo14',
+    earHook: { x: 354, y: 84, bottom: 146 },   // her old taped earphones on a hook by the upper gate, where she scans (every stage she's in)
     // 반장 feeds both belts while 하은 scans the upper gate above you. Her belt keeps running dry and she calls him on it, with room
     // to breathe between each call, and the song gets faster each time he answers (100, 104, 108): a knock on her gate and a call
     // (25-26), his answer while he digs in the stack (29); a look at her watch and a call (41-43), his answer (46) and a burst of
@@ -1279,6 +1282,7 @@ const LEVELS = [
   }
   ,{
     id:'s1-5', stageNo:'1-5', who:'지우 + 하은', role:'지우 · 하은 · 120 → 90 BPM · 벨트 둘', tag:'첫눈에 · 두근두근 · 새벽의 비트', bpm:120, style:'pop15', fxTheme:'neon',
+    earHook: { x: 44, y: 112, bottom: 150 },   // her old taped earphones on the hook of her belt's end post (every stage she's in)
     // 지우 is back, and on the lower belt there is someone he has never seen: 하은. He loads the upper belt, she the lower, and you
     // scan both with one button as in 1-4. The night is the recorded song 'Pink Belt' (120 BPM, C# major; its verse even says
     // it: an ordinary night, and then you): he chats, she answers in one word; he shows off how fast he is (the song's
@@ -1402,6 +1406,7 @@ const LEVELS = [
   }
   ,{
     id:'s1-6', stageNo:'1-6', who:'지우 + 하은', role:'지우 · 하은 · 94 BPM · 벨트 둘', tag:'둘의 다툼 · 랩 배틀', bpm:94, style:'duo15', fxTheme:'blues',
+    earHook: { x: 44, y: 112, bottom: 150 },   // her old taped earphones on the hook of her belt's end post (every stage she's in)
     // 지우 is back (반장 is not in this one). 지우 loads the upper belt and 하은 the lower, and you scan both with one button as
     // in 1-4, every light on the whole way, every box on the beat. Their fight is played on the belts: 지우 throws his boxes up
     // any old way and some miss, tumbling down onto 하은's belt ('d' on the lower belt: scanned at her gate) - by accident at
@@ -1578,6 +1583,7 @@ const LEVELS = [
     outro: (good) => good ? [
       { who:'', text:'노래가 끝났다. 하은은 숨을 몰아쉬었고, 지우는 상자 더미에 뻗어 있었다. 아무도 먼저 말하지 않았다.' },
       { who:'하은', text:'(시계를 본다) …먼저 갈게.' },
+      { who:'', text:'', scene:'hook16', silent: 14, cam: { x: 64, y: 122, k: 2.3 } },
       { who:'', text:'휴게실. 하은 누나는 벌써 카드를 찍고 나갔다.', scene:'office', office: { j: 184 }, jpose:'down' },
       { who:'지우', text:'형… 제가 많이 잘못했나요?', scene:'office', jpose:'down' },
       { who:'지우', text:'꿈 없냐고 한 거요. …그냥 한 말이었는데.', scene:'office', jpose:'think' },
@@ -1593,65 +1599,80 @@ const LEVELS = [
   }
   ,{
     id:'s1-7', stageNo:'1-7', who:'지우 + 하은', role:'지우 · 하은 · 반장 · 컷씬', tag:'마지막 근무 · 두고 간 이어폰 · 새벽', bpm:60, style:'cine17', fxTheme:'blues',
-    // 1-7 하은의 새벽, all cutscene (no play: every box loads and scans by itself, a press does nothing). 하은's last shift;
-    // 반장 tells 지우 she used to make music too and put it down; her old earphones left on her belt's end cap; 지우 runs after
-    // her to give them back and sees her go into a hospital; he waits outside and texts; she comes out, he says sorry, and she
-    // asks to hear his beat. Timeline in seconds (60 BPM, a beat = a second): the line (0-81.5) is the game's own scene, the
-    // rest is drawn by drawCine17 (from L.cine.out). Act 1 is 26 s (her tap on the belt, the earphones hung on the post); the
-    // scenes after it were written on a timeline 24 s later (L.cine.cut: cineT maps a time to it)
+    // 1-7 하은의 새벽, all cutscene (no play: every box loads and scans by itself, a press does nothing). It opens in the
+    // office (반장 and 하은 at the table: her last night; 지우 comes in early as he said). 하은's last shift; 반장 tells 지우 she
+    // used to make music too and put it down; her old earphones on her belt's end post (there since 1-4); 지우 runs after her
+    // to give them back and sees her go into a hospital; he waits outside, can't send a message; she comes out for air and
+    // finds him there, he gives them back and says sorry, and she asks to hear his beat. Timeline in seconds (60 BPM, a beat
+    // = a second): the line (0-119.5) is the game's own scene, the rest is drawn by drawCine17 (from L.cine.out), on the
+    // timeline it was written on, 14 s earlier (L.cine.cut: cineT maps a time to it)
     lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
     hitKit: 'ticktock', bareBand: true, noCount: true,
-    cine: { hGone: 34.5, jGone: 74.6, out: 81.5, end: 220, cut: [26, 24] },
-    observer: 'boss', observerIntro: true, observerAt: [[0, 81.5]],   // 반장 stands by the line (his coffee once it stops) until 지우 runs out
-    heads: { j: [104, 58], h: [52, 90], b: [168, 84] },
+    cine: { hGone: 48.6, jGone: 66.5, out: 119.5, end: 258, cut: [119.5, -14] },
+    observer: 'boss', observerIntro: true, observerAt: [[0, 119.5]],   // 반장 by the line with his coffee until 지우 runs out
+    heads: { j: [104, 67], h: [52, 100], b: [140, 97] },
     clock: '05:30', title: '하은의 새벽', hints: false, special: ['상자', 'none', '개'],
-    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 222,
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 260,
     chords: [[220, 261.63, 329.63]], roots: [110], chordAt: () => 0,
-    sections: [[0, 'line'], [20, 'away'], [41, 'hosp'], [55, 'outro']],
-    beltStop: [[26, 400]], dim: [[26, 82]],
-    act: { phoneBy: [[3, 4.5, 1], [24.2, 25.4, 1], [33.2, 34.4, 1]] },
-    songs: [{ src: 'audio/1-5-new-beat.mp3', at: 166, lead: 0.1, gain: 0.85, sec: 'none', into: 48.0 }],
-    cutscene: [[0, 222]],
-    camPlay: [[7.4, 13.4, { x: 92, y: 112, k: 1.5 }], [17.2, 22.8, { x: 54, y: 110, k: 2 }],
-      [26.5, 36.5, { x: 120, y: 108, k: 1.3 }], [37, 44.4, { x: 136, y: 86, k: 1.6 }], [44.4, 67, { x: 158, y: 92, k: 1.8 }],
-      [67, 72, { x: 110, y: 72, k: 1.7 }], [72, 74.4, { x: 46, y: 116, k: 3 }], [74.4, 79.6, { x: 96, y: 118, k: 1.5 }]],
-    devMarks: [[0, '1막 마지막 근무'], [7, '벨트 두드리기'], [17, '이어폰 걸기'], [26, '오늘까지'], [37, '2막 반장과 지우'], [72, '이어폰'], [81.5, '3막 거리'], [92, '승강장'], [103, '열차'], [112, '4막 병원 앞'], [129, '메시지'], [141, '하은이 나옴'], [164, '5막 벤치'], [204, '엔딩']],
+    sections: [[0, 'line'], [30, 'away'], [38, 'hosp'], [61, 'outro']],
+    beltStop: [[31.5, 400]], dim: [[32.6, 120]],
+    act: { phoneBy: [[5, 6.5, 1], [16.5, 18, 1], [26, 27.4, 1], [47, 48.4, 1]] },
+    songs: [{ src: 'audio/1-5-new-beat.mp3', at: 204, lead: 0.1, gain: 0.85, sec: 'none', into: 48.0 }],
+    cutscene: [[0, 260]],
+    camPlay: [[34, 47, { x: 110, y: 110, k: 1.3 }], [52, 66.5, { x: 128, y: 96, k: 1.55 }], [66.5, 97, { x: 128, y: 120, k: 1.7 }],
+      [97, 104, { x: 92, y: 120, k: 1.6 }], [104, 107.6, { x: 74, y: 122, k: 1.8 }], [107.6, 112.6, { x: 52, y: 116, k: 3 }], [112.6, 117.6, { x: 96, y: 120, k: 1.6 }]],
+    devMarks: [[0, '1막 마지막 근무'], [30, '종료 벨'], [37.5, '수고 많았다'], [52, '2막 반장과 지우'], [66.5, '지우 내려옴'], [97, '이어폰 발견'], [107.4, '이어폰 집기'], [119.5, '3막 거리'], [130, '승강장'], [141, '열차'], [150, '4막 병원 앞'], [167, '병원 앞 문자'], [177.5, '하은이 나옴'], [202, '5막 벤치'], [242, '엔딩']],
     bars: [
-      '........', 'x.......', 'x.......', '........', 'x.......', 'x.......', '........', '........', '........', '........',
+      '........', 'x.......', 'x.......', '........', '........', 'x.......', 'x.......', '........', '........', '........',
       '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
-      '........', '........', '........', '........', '........', '........'
+      '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........'
     ],
     bars2: [
-      '........', '....x...', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '....x...', '....x...', '....x...', '........', '....x...', '........', '........', '........', '........',
       '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
-      '........', '........', '........', '........', '........', '........'
+      '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........'
     ],
     // [time, text, shown, lane, speaker]; 'b' 반장 (on his chair); 'J'/'H' 지우/하은 in the drawn scenes (cineHead)
-    say: [[10.2, '(…어?)', 1.6, 0, 'j'], [12.9, '…….', 1.3, 1, 'h'], [14.6, '(…먼저 말 걸면 지는 거야.)', 3, 0, 'j'],
-          [27, '…하은아. 오늘까지지.', 2.6, 0, 'b'], [30, '…네. 그동안 감사했습니다.', 2.6, 1, 'h'], [33, '네?!', 1.4, 0, 'j'],
-          [38, '…말도 없이 그만두고. 제가 그렇게 싫었나 봐요.', 3.4, 0, 'j'], [41.8, '비트까지 만들어 줬는데.', 2.4, 0, 'j'],
-          [44.6, '…만들어 \'줬다\'라.', 2.6, 0, 'b'], [47.8, '그 애도 처음엔 너처럼 이어폰 끼고 다녔다.', 3.2, 0, 'b'], [51.4, '…네?', 1.4, 0, 'j'],
-          [53.2, '쉬는 시간마다 벨트 두드리면서 흥얼거리고.', 3.2, 0, 'b'], [56.8, '어느 날부터 빼더라. 왜인지는 나도 모른다.', 3.4, 0, 'b'],
-          [60.6, '꿈 없는 사람이 어딨냐. 내려놓은 사람이 있지.', 3.6, 0, 'b'], [64.6, '…나도 그랬고.', 2.2, 0, 'b'],
-          [67.2, '…아. 그래서 누나 자리에 이어폰이 있었구나.', 3.4, 0, 'j'], [72.6, '어…?', 1.2, 0, 'j'], [74.4, '어라, 누나 이어폰 두고 갔어요!', 2.4, 0, 'J'],
-          [77.2, '…그럼 갖다주던지.', 2.4, 0, 'b'],
-          [86.5, '누나! 이어폰—!', 2.2, 0, 'J'], [97.6, '…아!', 1.2, 0, 'J'], [100, '…누나!', 1.6, 0, 'J'],
-          [123.5, '(…그러니까 맨날 시계만 보죠.)', 3.4, 0, 'J'],
-          [144.5, '…봤어?', 1.6, 1, 'H'], [146.4, '…네. 죄송해요. 따라오려던 건 아닌데.', 3.2, 0, 'J'], [151, '…엄마. 작년부터.', 2.6, 1, 'H'],
-          [154, '어제, 꿈도 없냐고 한 거… 미안해요. 몰랐어요.', 3.4, 0, 'J'], [159, '…그 비트.', 1.6, 1, 'H'], [161, '한 번만 다시 들려줘.', 2.4, 1, 'H'],
-          [204, '…나도, 예전엔 이런 거 했었어.', 3, 1, 'H'], [207.4, '…알아요.', 1.6, 0, 'J'], [209.4, '…박자는 맞네.', 2.2, 1, 'H']],
+    say: [[11, '(…누나, 어제—)', 2, 0, 'j'], [13.8, '(…아니. 먼저 말 걸면 지는 거야.)', 3, 0, 'j'],
+          [38, '…하은아. 그동안 수고 많았다.', 3, 0, 'b'], [41.6, '…감사했습니다.', 2, 1, 'h'], [44.4, '네?! …그동안이라뇨?', 2.4, 0, 'j'], [49.2, '…누나—', 1.6, 0, 'j'],
+          [55, '…말도 없이 그만두고.', 2.4, 0, 'j'], [58, '제가 그렇게 싫었나 봐요.', 2.4, 0, 'j'], [61.6, '…비트까지 만들어 줬는데.', 2.6, 0, 'j'],
+          [65, '…만들어 \'줬다\'라.', 2.6, 0, 'b'], [71, '그 애도 처음엔 너처럼 이어폰 끼고 다녔다.', 3.2, 0, 'b'], [75.5, '…네?', 1.4, 0, 'J'],
+          [78, '쉬는 시간마다 벨트 두드리면서 흥얼거리고.', 3.2, 0, 'b'], [82.5, '어느 날부터 빼더라. 왜인지는 나도 모른다.', 3.4, 0, 'b'],
+          [87.5, '꿈 없는 사람이 어딨냐.', 2.4, 0, 'b'], [90.4, '내려놓은 사람이 있지.', 2.6, 0, 'b'], [94.4, '…나도 그랬고.', 2.2, 0, 'b'],
+          [99, '…아.', 1.2, 0, 'J'], [100.8, '그래서 누나 자리에 이어폰이 있었구나.', 3, 0, 'J'],
+          [109.4, '…이거, 두고 가신 거예요?', 2.6, 0, 'J'], [113, '…그럼 갖다주던지.', 2.6, 0, 'b'],
+          [124.5, '누나! 이어폰—!', 2.2, 0, 'J'], [135.6, '…아!', 1.2, 0, 'J'], [138, '…누나!', 1.6, 0, 'J'],
+          [161.5, '(…그러니까 맨날 시계만 보죠.)', 3.4, 0, 'J'],
+          [180.5, '…너, 왜 여기 있어?', 2.2, 1, 'H'], [183, '이거… 두고 가셔서요.', 2.6, 0, 'J'], [186, '…봤어?', 1.6, 1, 'H'],
+          [188, '…네. 죄송해요. 따라오려던 건 아닌데.', 3.2, 0, 'J'], [192.5, '…엄마. 작년부터.', 2.6, 1, 'H'],
+          [195.5, '어제, 꿈도 없냐고 한 거… 미안해요. 몰랐어요.', 3.4, 0, 'J'], [199.3, '…그 비트.', 1.4, 1, 'H'], [200.8, '한 번만 다시 들려줘.', 1.6, 1, 'H'],
+          [242, '…나도, 예전엔 이런 거 했었어.', 3, 1, 'H'], [245.4, '…알아요.', 1.6, 0, 'J'], [247.4, '…박자는 맞네.', 2.2, 1, 'H']],
     comfort: [],
+    // the opening: the office before the shift, 반장 and 하은 at the table (o17: how the room stands, drawOffice17)
     intro: [
-      { who:'', text:'명절 마지막 밤. 다툼 다음 날.' },
-      { who:'반장', text:'…사과는 했냐.' },
-      { who:'지우', text:'…제가 왜요. 누나가 먼저 그랬잖아요.' },
-      { who:'', text:'하은은 벌써 자기 벨트 앞에 서 있다. 시계를 본다.' }],
+      { who:'', text:'명절 마지막 밤. 출근 전 휴게실.', scene:'office', cam: O17_CAM, o17:'sit' },
+      { who:'반장', text:'(커피를 내려놓으며) …오늘이 마지막이지?', scene:'office', cam: O17_CAM, o17:'sit' },
+      { who:'하은', text:'…네.', scene:'office', cam: O17_CAM, o17:'sit' },
+      { who:'반장', text:'그래. 낮에 하는 데는 구했고?', scene:'office', cam: O17_CAM, o17:'sit' },
+      { who:'하은', text:'…네. 다음 주부터요.', scene:'office', cam: O17_CAM, o17:'sit' },
+      { who:'반장', text:'…지우 녀석한텐 말했냐?', scene:'office', cam: O17_CAM, o17:'sit' },
+      { who:'하은', text:'(시계를 본다) …굳이요.', scene:'office', cam: O17_CAM, o17:'watch' },
+      { who:'반장', text:'(한숨) …그 녀석, 너 따라다니는 거 알지.', scene:'office', cam: O17_CAM, o17:'sit' },
+      { who:'하은', text:'…라인 가 볼게요.', scene:'office', cam: O17_CAM, o17:'stand' },
+      { who:'', text:'문이 열렸다. 지우였다. 하은은 지우를 지나쳐 나갔다.', scene:'office', cam: O17_CAM, o17:'pass' },
+      { who:'반장', text:'…일찍 왔네.', scene:'office', cam: O17_CAM, o17:'jiwoo' },
+      { who:'지우', text:'…네.', scene:'office', cam: O17_CAM, o17:'jiwoo' },
+      { who:'반장', text:'…사과는.', scene:'office', cam: O17_CAM, o17:'jiwoo' },
+      { who:'지우', text:'…이따 할 거예요.', scene:'office', cam: O17_CAM, o17:'jiwoo' },
+      { who:'', text:'3번 라인. 하은의 마지막 근무.' }],
     outro: () => []
   }
 ];
@@ -2165,12 +2186,16 @@ function cineCast(b) {
   if (b < 136) return { scene: 'train', j: { x: 190, mode: 'strap' } };
   if (b < 188) {
     const hIn = b < 140.6 ? { x: L7(-10, 262, (b - 136) / 4.6), mode: 'walk', mirror: true } : b < 146.5 ? { x: L7(262, 304, (b - 140.6) / 4.4), mode: b > 142.6 && b < 144.2 ? 'watch' : 'walk', mirror: true, inside: true, gone: b > 145.6 } : null;
-    const hOut = b >= 165 ? { x: b < 168 ? L7(262, 134, (b - 165) / 3) : b < 186 ? 134 : L7(134, 64, (b - 186) / 1.6), mode: b < 168 || (b >= 186 && b < 187.6) ? 'walk' : b >= 187.6 ? 'sit' : 'stand', mirror: true, give: b >= 174 && b < 175.4 } : null;
+    // (out through the doors for some air with a cup from the lobby's machine; she stops when she sees him; a step closer to
+    // take the earphones; then to the bench)
+    const hOut = b >= 163.5 ? { x: b < 166.3 ? L7(262, 176, (b - 163.5) / 2.8) : b < 176.4 ? 176 : b < 177.3 ? L7(176, 148, (b - 176.4) / 0.9) : b < 186.2 ? 148 : L7(148, 64, (b - 186.2) / 2),
+      mode: b < 166.3 || (b >= 176.4 && b < 177.3) || b >= 186.2 ? 'walk' : 'stand', mirror: false, cup: true, give: b >= 177.3 && b < 178.7 } : null;
     let j = null;
     if (b >= 141.5) {
+      // (to the bench; the phone, nothing sent; the earphones turning in his hands; up when she speaks, holding them out)
       const x = b < 144.5 ? L7(-20, 200, (b - 141.5) / 3) : b < 151 ? 200 : b < 153.4 ? L7(200, 120, (b - 151) / 2.4) : 120;
-      const mode = b < 144.5 ? 'run' : b < 151 ? 'stand' : b < 153.4 ? 'walk' : b < 167.6 ? 'sit' : b < 186.6 ? 'stand' : 'sit';
-      j = { x: b >= 167.6 && b < 186.6 ? 168 : b >= 186.6 ? 124 : x, mode, mirror: b >= 151 && b < 153.4 ? true : b >= 153.4, phone: b >= 153.4 && b < 161.2, give: b >= 174 && b < 175.4 };
+      const mode = b < 144.5 ? 'run' : b < 151 ? 'stand' : b < 153.4 ? 'walk' : b < 168 ? 'sit' : b < 186.6 ? 'stand' : 'sit';
+      j = { x: b >= 186.6 ? 124 : x, mode, mirror: b >= 151 && b < 168 ? true : b >= 186.6, phone: b >= 153.4 && b < 159.4, give: (b >= 169 && b < 172) || (b >= 177.3 && b < 178.7) };
     }
     return { scene: 'hosp', h: hOut || hIn, j };
   }
@@ -2184,7 +2209,7 @@ const CINE_SEAT = 156;   // the hospital bench's seat
 const gaitPh = (c, stride) => ((((c.mirror ? -c.x : c.x) / (stride * 0.89)) % 1) + 1) % 1;   // (strides for the dot cast, a little shorter)
 // 지우 in the new design: walking, running, at the pole (the train), standing, sitting (the bench); the near hand on the
 // phone, held out (giving the earphones back) or holding them. Returns his joints on the screen (null until the art is in)
-function jiwoo17(c, ground, b) {
+function jiwoo17(c, ground, b, reachTo = null) {
   const sit = c.mode === 'sit', move = c.mode === 'run' || c.mode === 'walk';
   let A, o = {};
   if (move) A = rigGait(gaitPh(c, c.mode === 'run' ? 66 : 46), c.mode === 'run');
@@ -2192,6 +2217,7 @@ function jiwoo17(c, ground, b) {
   else A = rigPose({ sF: -3, eF: 6, sN: 2, eN: 6 });
   const t = c.mode === 'strap' ? [5, -44] : c.phone ? [10, -20] : c.give ? [17, -12] : c.holding ? (sit ? [10, -5] : [11, -10]) : null;
   if (t) Object.assign(A, rigReach('jiwoo', 'N', A, t[0], t[1]));
+  if (reachTo) { const hy = o.hipY != null ? o.hipY : ground - rigFoot('jiwoo', A); Object.assign(A, rigReach('jiwoo', 'N', A, (reachTo[0] - c.x) * (c.mirror ? -1 : 1), reachTo[1] - hy)); }
   const S = rigDraw('jiwoo', A, c.x, ground, !!c.mirror, o); if (!S) return null;
   const hd = S.handN;
   if (c.holding && !c.give) drawEarphones(hd.x + (c.mirror ? -1 : 1), hd.y - 3);
@@ -2203,12 +2229,12 @@ function jiwoo17(c, ground, b) {
 function haeun17(x, footY, o = {}) {
   let A, d = {};
   if (o.walkPh != null) A = rigGait(o.walkPh, false);
-  else if (o.sit) { const st = rigSit('haeun', CINE_SEAT, footY); A = st.A; d.hipY = st.hipY; }
-  else A = rigPose({ sF: -2, eF: 6, sN: 2, eN: 8 });
+  else if (o.sit) { const st = rigSit('haeun', o.seat || CINE_SEAT, footY); A = st.A; d.hipY = st.hipY; }
+  else A = rigPose({ sF: -2, eF: 6, sN: 2, eN: 8, lean: o.lean || 0 });
   const ear = o.ear ? rigJoints('haeun', A).ear : null;
   const t = o.watch ? [8, -9] : ear ? [ear.x + 2, ear.y + 1] : o.tap != null ? [4, o.tap ? 3 : -1] : o.give ? [12, -6] : null;
   if (t) Object.assign(A, rigReach('haeun', 'N', A, t[0], t[1]));
-  return rigDraw('haeun', A, x, footY, !o.right, { ...d, only: o.body && !t ? 'body' : null });
+  return rigDraw('haeun', A, x, footY, !o.right, { ...d, only: o.body && !t ? 'body' : null, alpha: o.alpha });
 }
 // 지우, whole: the game's own sprite (drawActor) with legs to the ground and an arm; walking, running, at a strap, sitting
 function cineJiwoo(c, ground, b, nowMs) {
@@ -2235,7 +2261,10 @@ function cineHaeun(c, ground, b, nowMs) {
   const songB = (b - 190) / 0.6667, ph = songB - Math.floor(songB), k = Math.floor(songB);
   // her taps on the bench: every other beat to begin with, then every beat, then the 'and's too in the last bars
   const tapOn = c.tap && (k < 16 ? k % 2 === 0 : k < 40 ? true : true) && ph < 0.35, tapAnd = c.tap && k >= 40 && Math.abs(ph - 0.5) < 0.15;
-  if (cast17Ready()) return haeun17(c.x, ground, { right: !!c.mirror, walkPh: c.mode === 'walk' ? gaitPh(c, 46) : null, sit: c.mode === 'sit', watch: c.mode === 'watch', ear: c.ear, give: c.give, tap: c.tap ? (tapOn || tapAnd ? 1 : 0) : null });
+  if (cast17Ready()) { const S = haeun17(c.x, ground, { right: !!c.mirror, walkPh: c.mode === 'walk' ? gaitPh(c, 46) : null, sit: c.mode === 'sit', watch: c.mode === 'watch', ear: c.ear, give: c.give, tap: c.tap ? (tapOn || tapAnd ? 1 : 0) : null });
+    // (the paper cup from the lobby's machine, in her far hand)
+    if (S && c.cup) { const hf = S.handF; R(hf.x - 1, hf.y - 5, 3, 5, '#f2efe6'); R(hf.x - 1, hf.y - 5, 3, 1, '#c8b89a'); }
+    return S; }
   const top = ground - 56 + (c.mode === 'sit' ? 2 : 0);
   drawHaeunAt(c.x, top, nowMs, { mirror: !!c.mirror, step: c.mode === 'walk' ? 1 : null, sit: c.mode === 'sit', watch: c.mode === 'watch' || c.ear, rest: c.mode !== 'walk', tap: c.tap ? (tapOn || tapAnd ? 1 : 0) : null });
 }
@@ -2297,15 +2326,15 @@ function drawCine17(b, t, nowMs) {
     const liftOpen = (b >= 144.8 && b < 146.8) ? Math.min(1, (b - 144.8) / 0.4) * Math.min(1, (146.8 - b) / 0.4) : 0;
     R(LF.x0, LF.y0, LF.x1 - LF.x0, LF.y1 - LF.y0, '#8a9098'); R(LF.x0 + 2, LF.y0 + 2, LF.x1 - LF.x0 - 4, LF.y1 - LF.y0 - 2, liftOpen > 0 ? '#f2e2b8' : '#b8bec4'); const lg = Math.round(9 * liftOpen); R(LF.x0 + 2, LF.y0 + 2, 10 - lg, LF.y1 - LF.y0 - 2, '#a8aeb4'); R(LF.x1 - 12 + lg, LF.y0 + 2, 10 - lg, LF.y1 - LF.y0 - 2, '#a8aeb4'); R(LF.x0 + 10, LF.y0 - 6, 4, 3, '#ff8a5a');
     // the glass doors: two leaves that slide apart as she comes and goes
-    const opens = [[139.6, 141.8], [164.6, 166.8], [239.4, 241.6]], o = opens.reduce((m, [a, z]) => Math.max(m, Math.min(1, (b - a) / 0.5) * Math.min(1, (z - b) / 0.5)), 0), gp = Math.round(20 * Math.max(0, o));
+    const opens = [[139.6, 141.8], [163.0, 165.4], [239.4, 241.6]], o = opens.reduce((m, [a, z]) => Math.max(m, Math.min(1, (b - a) / 0.5) * Math.min(1, (z - b) / 0.5)), 0), gp = Math.round(20 * Math.max(0, o));
     const leaf = (x) => { g.save(); g.globalAlpha = 0.5; R(x, D.y0, 24, D.y1 - D.y0, '#a8c8d8'); g.globalAlpha = 1; R(x, D.y0, 24, 1, '#e8f4f8'); R(x + 23, D.y0, 1, D.y1 - D.y0, '#6a7078'); g.restore(); };
     // her, inside, seen through the glass
     if (c.h && c.h.inside && !c.h.gone) { g.save(); g.beginPath(); g.rect(D.x0, D.y0, LF.x1 - D.x0, D.y1 - D.y0); g.clip(); cineHaeun(c.h, G - 2, b, nowMs); g.restore(); }
     leaf(D.x0 - gp); leaf(D.x0 + 24 + gp);
     const hJ = c.h && !c.h.inside ? cineHaeun(c.h, G, b, nowMs) : null;
-    const jJ = c.j ? cineJiwoo({ ...c.j, holding: b < 174 }, G, b, nowMs) : null;
+    const jJ = c.j ? cineJiwoo({ ...c.j, holding: b < 177.3 }, G, b, nowMs) : null;
     // the earphones changing hands (174-175.4), then shared: a bud in each of their ears, the cord between them
-    if (b >= 174 && b < 175.4) { const q = (b - 174) / 1.4; if (jJ && hJ) drawEarphones(lerp(jJ.handN.x, hJ.handN.x, q), lerp(jJ.handN.y, hJ.handN.y, q) - 3); else drawEarphones(lerp(c.j ? c.j.x - 14 : 140, (c.h ? c.h.x : 140) + 6, q), 132); }
+    if (b >= 177.3 && b < 178.7) { const q = (b - 177.3) / 1.4; if (jJ && hJ) drawEarphones(lerp(jJ.handN.x, hJ.handN.x, q), lerp(jJ.handN.y, hJ.handN.y, q) - 3); else drawEarphones(lerp(c.j ? c.j.x - 14 : 140, (c.h ? c.h.x : 140) + 6, q), 132); }
     if (b >= 188.8 && b < 236) {
       // (from her ear to his: the new design's ears, or the dots')
       const ha = hJ ? { x: hJ.ear.x + 1, y: hJ.ear.y + 1 } : { x: (c.h ? c.h.x : 72) + 2, y: G - 50 }, ja = jJ ? { x: jJ.ear.x - 1, y: jJ.ear.y + 1 } : { x: (c.j ? c.j.x : 114) - 4, y: G - 67 };
@@ -2316,7 +2345,7 @@ function drawCine17(b, t, nowMs) {
     }
   }
   // his phone, close (153.4-161.2): the long message typed and wiped, the short one sent
-  if (b >= 153.4 && b < 161.8) drawCinePhone(b);
+  if (b >= 153.4 && b < 159.8) drawCinePhone(b);
   // the cut in from the line, and out at the end
   const fin = Math.max(0, 1 - (b - cineT(L.cine.out)) / 1), fout = Math.max(0, Math.min(1, (b - 241) / 2.5));
   const cut = [116, 127, 136].reduce((m, x) => Math.max(m, Math.max(0, 1 - Math.abs(b - x) / 0.35)), 0);
@@ -2324,78 +2353,85 @@ function drawCine17(b, t, nowMs) {
   g.restore();
 }
 function drawCinePhone(b) {
-  const long = '누나 저 진짜 몰랐어요 제가 그동안 누나한테', short = '누나, 이어폰 두고 가셨어요. 병원 앞 벤치에 있어요.';
-  const q = b - 153.4, a = Math.min(1, q / 0.4) * Math.min(1, (161.8 - b) / 0.4);
-  let text = '', sent = false;
-  if (q < 3) text = long.slice(0, Math.floor(q / 3 * long.length));
-  else if (q < 4.4) text = long.slice(0, Math.max(0, Math.floor(long.length * (1 - (q - 3) / 1.4))));
-  else if (q < 7) text = short.slice(0, Math.floor((q - 4.4) / 2.6 * short.length));
-  else { text = short; sent = q >= 7.2; }
+  // the long one typed and wiped; a short one started and wiped too; the phone goes down unsent
+  const long = '누나 저 진짜 몰랐어요 제가 그동안 누나한테', short = '누나, 이어폰';
+  const q = b - 153.4, a = Math.min(1, q / 0.4) * Math.min(1, (159.8 - b) / 0.4);
+  let text = '';
+  if (q < 2.6) text = long.slice(0, Math.floor(q / 2.6 * long.length));
+  else if (q < 3.8) text = long.slice(0, Math.max(0, Math.floor(long.length * (1 - (q - 2.6) / 1.2))));
+  else if (q < 5) text = short.slice(0, Math.floor((q - 3.8) / 1.2 * short.length));
+  else if (q < 5.6) text = short.slice(0, Math.max(0, Math.floor(short.length * (1 - (q - 5) / 0.6))));
   const x0 = 228, y0 = 30, w = 120, hh = 150;
   g.save(); g.globalAlpha = a;
   R(x0 - 3, y0 - 3, w + 6, hh + 6, '#101014'); R(x0, y0, w, hh, '#f4f2f6'); R(x0, y0, w, 14, '#e4e0ea');
   g.font = '700 7px sans-serif'; g.fillStyle = '#3a3448'; g.fillText('하은 누나', x0 + 6, y0 + 10);
   g.font = '600 7px sans-serif';
   const wrap = (s, maxW) => { const out = []; let line = ''; for (const ch of s) { if (g.measureText(line + ch).width > maxW) { out.push(line); line = ch; } else line += ch; } if (line) out.push(line); return out; };
-  if (sent) { const ls = wrap(short, 86); const bh = ls.length * 10 + 6; R(x0 + w - 96, y0 + 30, 92, bh, '#ffe27a'); g.fillStyle = '#2a2430'; ls.forEach((l, i) => g.fillText(l, x0 + w - 92, y0 + 40 + i * 10)); g.font = '600 6px sans-serif'; g.fillStyle = '#8a8494'; g.fillText('1', x0 + w - 102, y0 + 30 + bh); }
   R(x0 + 4, y0 + hh - 34, w - 8, 28, '#ffffff'); g.fillStyle = '#2a2430';
-  if (!sent) { const ls = wrap(text + (Math.floor(b * 3) % 2 ? '|' : ''), w - 16).slice(-2); ls.forEach((l, i) => g.fillText(l, x0 + 8, y0 + hh - 22 + i * 10)); }
+  const ls = wrap(text + (Math.floor(b * 3) % 2 ? '|' : ''), w - 16).slice(-2); ls.forEach((l, i) => g.fillText(l, x0 + 8, y0 + hh - 22 + i * 10));
   g.restore();
 }
-// 1-7's act 1 (seconds): 하은 taps the belt's frame on the beat without thinking (7-12.7, the 'and's coming in), 지우 turns
-// to look (J17_GLANCE), she notices and stops; then she takes her old taped earphones out of her pocket, looks at them and
-// hangs them on her belt's end post (17.2-22.2), where they stay. Her hand's target: on the screen (sx/sy) or from her hip
-const H17_TAPS = [7, 8, 9, 10, 10.5, 11, 11.5, 12], H17_HUNG = 21.8, J17_GLANCE = [9.8, 12.9];
-function haeunAct17(b) {
-  if (!L.cine || b < 7 || b >= 22.2) return null;
-  // (on her thigh: the hand comes down on each tap)
-  if (b < 12.7) { const down = H17_TAPS.some(t => b >= t && b < t + 0.13); return { hx: 6, hy: down ? 5 : 1, tap: true }; }
-  if (b < 17.2) return null;
-  if (b < 18) return { hx: 3, hy: 3 };
-  if (b < 20.4) return { hx: 9, hy: -9, prop: true };
-  return { sx: CAP.x + 1, sy: CAP.y - 1, look: true, prop: b < H17_HUNG };
-}
+// 1-7 on the line (0-120 s, the game's own scene; the times here are the level's own). Her earphones hang on the hook of
+// her belt's end post from 1-6 on (EAR_HOOK) until 지우 takes them. Act 1 (0-30): the shift, no words between them; 지우 turns
+// to her once and doesn't say it. The end (30-52): the bell, the belt stops, the lights go one by one, 반장 walks over with
+// his coffee, she bows and goes. Act 2 (52-120): 반장 and 지우; 지우 comes down off his belt, looks at the hook, walks over,
+// takes the earphones, hesitates, runs.
+const J17_GLANCE = [10.5, 13.3], H17_BOW = [41.6, 43.4], J17_DOWN = 66.5, J17_TAKE = 107.4, J17_RUN = 117.5;
 const jiwooGlance17 = b => !!(L.cine && b >= J17_GLANCE[0] && b < J17_GLANCE[1]);
-// 1-7 on the line: the loading arm in the new design, reaching for the hand's point from a body standing at (BOSS_X, footY)
-// (or, in act 1, 하은's hand on the belt, in her pocket, the earphones)
-function lineArm17(who, footY, hand, left) {
-  const A = rigPose(who === 'jiwoo' ? { sF: -3, eF: 6 } : { sF: -2, eF: 6 }), hy = footY - rigFoot(who, A);
-  const act = who === 'haeun' ? haeunAct17(CINE_B) : null;
-  let tx = (hand.x - BOSS_X) * (left ? -1 : 1), ty = hand.y - hy;
-  if (act) {
-    left = !!act.look;
-    if (act.sx != null) {
-      // (a point on the screen, into this arm's own coordinates)
-      const m = g.getTransform().inverse(), p = m.transformPoint(new DOMPoint(act.sx * RS, act.sy * RS));
-      tx = (p.x - BOSS_X) * (left ? -1 : 1); ty = p.y - hy;
-    } else { tx = act.hx; ty = act.hy; }
-  }
-  Object.assign(A, rigReach(who, 'N', A, tx, ty));
-  const S = rigDraw(who, A, BOSS_X, footY, left, { only: 'armN' });
-  if (act && act.prop && S) drawEarphones(S.handN.x, S.handN.y - 3);
-  // (each tap: a little note off her hand, so the beat she keeps shows)
-  if (act && act.tap && S) for (const t of H17_TAPS) { const q = (CINE_B - t) / 0.7; if (q >= 0 && q < 1) { g.save(); g.globalAlpha = Math.sin(Math.PI * q) * 0.9; eighthNote(S.handN.x + 3 + q * 6, S.handN.y - 4 - q * 12, '#ffe9a8'); g.restore(); } }
+// 하은's torso bowing (forward, degrees) and 반장's place (he walks a few steps her way after the bell)
+const haeunBow17 = b => L.cine && b >= H17_BOW[0] && b < H17_BOW[1] ? 26 * Math.sin(Math.PI * Math.min(1, (b - H17_BOW[0]) / (H17_BOW[1] - H17_BOW[0]))) : 0;
+const boss17X = b => b < 34 ? 168 : b < 37.5 ? lerp(168, 140, ease((b - 34) / 3.5)) : 140;
+const boss17Walk = b => b >= 34 && b < 37.5;
+// 지우 off his belt (from J17_DOWN): where he is on the floor, which way he faces, what he does
+function jiwooFloor17(b) {
+  if (b < J17_DOWN) return null;
+  if (b < 70) return { x: lerp(86, 100, (b - J17_DOWN) / 3.5), mode: 'walk' };
+  if (b < 97) return { x: 100, mode: 'stand' };
+  if (b < 104) return { x: 100, mode: 'stand', mirror: true };
+  if (b < J17_TAKE) return { x: lerp(100, 55, (b - 104) / (J17_TAKE - 104)), mode: 'walk', mirror: true };
+  if (b < J17_RUN) return { x: 55, mode: 'stand', mirror: true, reach: b < J17_TAKE + 0.8, holding: b >= J17_TAKE + 0.5 };
+  if (b < 120) return { x: lerp(55, -30, (b - J17_RUN) / 2), mode: 'run', mirror: true, holding: true };
+  return null;
 }
-// 1-7 on the line (before L.cine.out): her earphones on her belt's end cap, 하은 walking out, 지우 coming down for them and
-// running off
-const CAP = { x: 44, y: 112 };   // the hook on the post at the end of her belt, at her hand's height
+function lineArm17(who, footY, hand, left) {
+  const A = rigPose(who === 'jiwoo' ? { sF: -3, eF: 6 } : { sF: -2, eF: 6, lean: haeunBow17(CINE_B) }), hy = footY - rigFoot(who, A);
+  Object.assign(A, rigReach(who, 'N', A, (hand.x - BOSS_X) * (left ? -1 : 1), hand.y - hy));
+  rigDraw(who, A, BOSS_X, footY, left, { only: 'armN' });
+}
+// the hook on the post at the end of her belt, at her hand's height, and her old taped earphones on it (every stage she
+// works in: L.earHook). drawEarHook draws the post and, while they are there, the earphones
+const CAP = { x: 44, y: 112 };
+function drawEarHook(h, withEar = true) {
+  R(h.x - 1, h.y - 1, 2, h.bottom - h.y, '#5a5550'); R(h.x - 1, h.y - 1, 1, h.bottom - h.y, '#7a746c'); R(h.x - 2, h.y - 2, 4, 2, '#8a847a'); R(h.x + 1, h.y, 2, 1, '#8a847a');
+  if (withEar) drawEarphones(h.x + 1, h.y + 2, 1);
+}
 function drawCineLine17(b, nowMs) {
-  // the post (a pole up from her belt's end, a hook at the top), and the earphones on it once she has hung them there
-  R(CAP.x - 1, CAP.y - 1, 2, 150 - CAP.y, '#5a5550'); R(CAP.x - 1, CAP.y - 1, 1, 150 - CAP.y, '#7a746c'); R(CAP.x - 2, CAP.y - 2, 4, 2, '#8a847a'); R(CAP.x + 1, CAP.y, 2, 1, '#8a847a');
-  if (b >= H17_HUNG && b < 99.6) drawEarphones(CAP.x + 1, CAP.y + 2, 1);
-  if (b >= 58.5 && b < 62) cineHaeun({ x: lerp(52, -20, (b - 58.5) / 3.2), mode: 'walk', mirror: false }, 169, b, nowMs);
-  if (b >= 98.6 && b < 105.5) {
-    const x = b < 99.6 ? lerp(84, 34, b - 98.6) : b < 103.6 ? 34 : lerp(34, -30, (b - 103.6) / 1.4);
-    cineJiwoo({ x, mode: b < 99.6 ? 'walk' : b < 103.6 ? 'stand' : 'run', mirror: true, holding: b >= 99.6 }, 169, b, nowMs);
+  drawEarHook({ x: CAP.x, y: CAP.y, bottom: 150 }, b < J17_TAKE + 0.5);
+  if (b >= L.cine.hGone && b < L.cine.hGone + 3.4) cineHaeun({ x: lerp(52, -20, (b - L.cine.hGone) / 3.2), mode: 'walk', mirror: false }, 169, b, nowMs);
+  const f = jiwooFloor17(b);
+  if (f) {
+    // (reaching up to the hook for them)
+    const S = cast17Ready() ? jiwoo17({ ...f, holding: !!f.holding }, 169, b, f.reach ? [CAP.x, CAP.y + 1] : null) : (cineJiwoo({ ...f, holding: !!f.holding }, 169, b, nowMs), null);
   }
+}
+// the line's sounds (the level's own seconds): the end-of-shift bell, the belt running down, the lights going off one by one,
+// footsteps, the earphones off the hook, 지우 running out into the night
+function line17Events(b, E, s) {
+  const at = (t, fn) => { if (Math.floor(t) === b) E((t - b) * s, fn); };
+  const steps = (t0, t1, every, v = 0.12) => { for (let t = t0; t < t1; t += every) at(t, T => noise(T, 'lowpass', 420, v, 0.07, 0.7)); };
+  at(30, T => { bell15(T, 783.99, 1.4, 0.05); bell15(T + 0.6, 659.25, 1.8, 0.05); });
+  at(31.5, T => whoosh(T, 1.6, true));
+  for (const t of [32.6, 33.4, 34.2]) at(t, T => { noise(T, 'bandpass', 1800, 0.05, 0.03, 3); noise(T + 0.02, 'lowpass', 160, 0.06, 0.12); });
+  steps(34, 37.5, 0.5); steps(L.cine.hGone, L.cine.hGone + 3.4, 0.4, 0.1);
+  steps(J17_DOWN, 70, 0.45); steps(104, J17_TAKE, 0.45);
+  at(J17_TAKE + 0.5, T => noise(T, 'bandpass', 3800, 0.04, 0.02, 4));
+  steps(J17_RUN, 119.5, 0.25, 0.16);
+  at(119, T => nightAir15(T + 0.5, 11));
 }
 // 1-7's sound: no band. The line's motor and its stop, the street, the station and the train, the hospital's doors, his
 // phone, and at the bench his beat (the 1-5 file, from bar 18 so it ends on its own stop)
 function cine17Events(b, E, s, real = b) {
-  for (const t of H17_TAPS) if (Math.floor(t) === real) E((t - real) * s, T => { noise(T, 'bandpass', 2600, 0.07, 0.03, 3); noise(T, 'lowpass', 500, 0.05, 0.05); });
-  if (Math.floor(H17_HUNG) === real) E((H17_HUNG - real) * s, T => noise(T, 'bandpass', 3800, 0.04, 0.02, 4));
-  if (b === 50) E(0, T => whoosh(T, 1.6, true));
-  if (b === 105) E(0.5, T => nightAir15(T, 11));
+  if (real < L.cine.out) { line17Events(real, E, s); return; }
   if (b >= 105 && b < 111) for (let k = 0; k < 2; k++) E(k * s / 2, T => noise(T, 'lowpass', 700, 0.035, 0.04));
   if (b >= 108 && b < 115) for (let k = 0; k < 3; k++) E(k * s / 3, T => noise(T, 'lowpass', 560, 0.06, 0.05));
   if (b === 116) E(0, T => noise(T, 'lowpass', 300, 0.05, 10, 0.7));
@@ -2406,9 +2442,8 @@ function cine17Events(b, E, s, real = b) {
   if (b === 136 || b === 150 || b === 170 || b === 200 || b === 220) E(0.3, T => { for (const dt of [0, 0.13, 0.31]) { const o = osc('sine', 3000 + dt * 1800, T + dt, 0.005, 0.016, 0.08); o.frequency.exponentialRampToValueAtTime(4200, T + dt + 0.07); } });
   if (b >= 136 && b < 141) for (let k = 0; k < 2; k++) E(k * s / 2, T => noise(T, 'lowpass', 700, 0.03, 0.04));
   if (b >= 141 && b < 145) for (let k = 0; k < 3; k++) E(k * s / 3, T => noise(T, 'lowpass', 560, 0.055, 0.05));
-  for (const d of [139.6, 164.6, 239.4]) if (Math.floor(d) === b) E((d - b) * s, T => noise(T, 'bandpass', 1200, 0.04, 0.6, 0.6));
-  if (b >= 153 && b < 161) for (let k = 0; k < 4; k++) if ((b * 4 + k) % 3) E(k * s / 4, T => noise(T, 'highpass', 4000, 0.012, 0.015));
-  if (b === 160) E(0.6, T => { const o = osc('sine', 880, T, 0.005, 0.03, 0.15); o.frequency.exponentialRampToValueAtTime(1760, T + 0.12); });
+  for (const d of [139.6, 163.0, 239.4]) if (Math.floor(d) === b) E((d - b) * s, T => noise(T, 'bandpass', 1200, 0.04, 0.6, 0.6));
+  if (b >= 153 && b < 159) for (let k = 0; k < 4; k++) if ((b * 4 + k) % 3) E(k * s / 4, T => noise(T, 'highpass', 4000, 0.012, 0.015));
   if (b === 190) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(0)) startSong(T, L.songs[0].into || 0, 0); });
 }
 function drawSpring15(p) {
@@ -3198,7 +3233,7 @@ function drawObserver(t, nowMs, active) {
   const ox = active ? obsX(beat) : OBS_X;
   FX.react[2] = { type: frown ? 'glance' : '', at: nowMs };
   const pose = { hand: { x: BOSS_X + 22, y: 108 }, carry: null, wince: false, dip: 0, bob: walking ? (ph < 0.5 ? 1 : 0) : (softened && ph < 0.2) || nodding ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
-  if (L.cine && cast17Ready()) { bossStill(active && beat >= L.beltStop[0][0] ? 'coffee' : 'stand', ox, 167 + pose.bob, leaving); return; }
+  if (L.cine && cast17Ready()) { const wb = active && boss17Walk(beat) && (beat % 0.5) < 0.25 ? 1 : 0; bossStill('coffee', active ? boss17X(beat) : 168, 167 + wb, false); return; }
   // (facing the line; turned the way he goes when he walks back out)
   g.save(); g.translate(ox, -2); if (!leaving) g.scale(-1, 1); g.translate(-BOSS_X, 0);
   PARTNERS[L.observer].draw(pose, nowMs, active);
@@ -3311,7 +3346,7 @@ const HAEUN_X = Math.round(SCAN_X + 0.82 * (PLAYER_X - SCAN_X)), HAEUN_TOP = 56;
 // o.gun = your scan kick while she works the upper gate; o.watch = checking the time; o.step = walking (which leg is forward);
 // o.load = she is a belt's loader and the arm is drawn with the box; o.mirror = facing right (at the loading end)
 function drawHaeunAt(cx, top, nowMs, o = {}) {
-  if (L.cine && cast17Ready()) { const act = haeunAct17(CINE_B); haeun17(cx, top + 56, { right: act && act.look ? false : !!o.mirror, sit: o.sit, watch: o.watch, tap: o.tap, body: o.load }); return; }
+  if (L.cine && cast17Ready()) { haeun17(cx, top + 56, { right: !!o.mirror, sit: o.sit, watch: o.watch, tap: o.tap, body: o.load, lean: haeunBow17(CINE_B) }); return; }
   const kick = o.gun != null ? o.gun : 0, bob = o.bob ? 1 : 0;
   const hair = '#17121a', hairL = '#2e2630', shirt = '#1e1a1a', shirtD = '#121010', cap = '#d8463b', capD = '#a83328', brim = '#c43d33', glove = C.skin, sky = '#86c3e8', tee = '#e9f3f7', leg = '#3a3f45', shoe = '#1e1a1a';
   g.save(); if (o.mirror) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
@@ -6277,9 +6312,9 @@ function drawPairBolt(nowMs) {
 // and on the line 반장 walks from the middle of the room over to his spot behind the belt before the next line shows.
 const SCENE = { kind: 'line', trans: null, walk: null };
 const OFFICE_X = 192, WALK_FROM = 200;
-function sceneReset(kind = 'line') { SCENE.kind = kind; SCENE.trans = null; SCENE.walk = null; SCENE.office = null; SCENE.enter = null; SCENE.jpose = null; }
+function sceneReset(kind = 'line') { SCENE.kind = kind; SCENE.trans = null; SCENE.walk = null; SCENE.office = null; SCENE.enter = null; SCENE.jpose = null; SCENE.o17 = null; }
 function sceneCut(to, done) {
-  const now = performance.now(), out = reduce ? 200 : 320, walk = reduce || L.daw || to !== 'line' ? 0 : 2600;   // 반장's walk to the line only on the way in
+  const now = performance.now(), out = reduce ? 200 : 320, walk = reduce || L.daw || L.cine || to !== 'line' ? 0 : 2600;   // 반장's walk to the line only on the way in
   SCENE.trans = { at: now, out, to, done, swapped: false, walk };
 }
 function sceneTick(nowMs) {
@@ -6308,6 +6343,7 @@ function drawStandingBoss(x, nowMs, bob, mirrored = false) {
   });
 }
 function drawOffice(nowMs) {
+  if (L.cine && SCENE.o17 && cast17Ready()) { drawOffice17(nowMs); return; }
   g.drawImage(bgOffice, 0, 0);
   g.save(); g.globalCompositeOperation = 'lighter';
   const grd = g.createLinearGradient(0, 18, 0, 170); grd.addColorStop(0, 'rgba(255,236,170,.16)'); grd.addColorStop(1, 'rgba(255,236,170,0)');
@@ -6324,6 +6360,68 @@ function drawOffice(nowMs) {
       drawStandingBoss(Math.round(x), nowMs, q < 1 ? (Math.floor(nowMs / 190) % 2) : bob, true);
     }
   }
+  drawSceneFade(nowMs);
+}
+// 1-6's ending, after the battle and '…먼저 갈게.': the line in the dark, one lamp over the end post of her belt. She comes
+// to it, looks at the old taped earphones on its hook, touches them (they swing; a faint 'tick-tock' from them, the
+// battle's own words), lets them be and goes. The camera stays on them. (s: seconds since the scene came up)
+function drawHook16(nowMs) {
+  const s = (nowMs - (SCENE.silentAt || nowMs)) / 1000, K = L.earHook || { x: 44, y: 112, bottom: 150 };
+  g.drawImage(bg, 0, 0);
+  g.fillStyle = 'rgba(6,4,4,.86)'; g.fillRect(0, 0, W, H);
+  // the lamp's cone down onto the post
+  g.save(); g.globalCompositeOperation = 'lighter';
+  const grd = g.createRadialGradient(K.x + 6, K.y + 10, 2, K.x + 6, K.y + 10, 60); grd.addColorStop(0, 'rgba(255,226,160,.42)'); grd.addColorStop(1, 'rgba(255,226,160,0)');
+  g.fillStyle = grd; g.fillRect(K.x - 60, K.y - 60, 130, 130); g.restore();
+  // her: in from the right, standing at it, her hand to them, back down, out to the right
+  const hx = s < 1.4 ? W + 10 : s < 3.2 ? lerp(110, 58, ease((s - 1.4) / 1.8)) : s < 8.4 ? 58 : lerp(58, 120, ease((s - 8.4) / 2.2));
+  const walking = (s >= 1.4 && s < 3.2) || (s >= 8.4 && s < 10.6), touch = s >= 5.4 && s < 7.4;
+  if (s >= 1.4 && s < 10.6) {
+    const top = 113;
+    g.save(); if (s > 9.6) g.globalAlpha = Math.max(0, 1 - (s - 9.6));
+    drawHaeunAt(hx, top, nowMs, { mirror: s >= 8.2, step: walking ? 1 : null, rest: !walking });
+    if (touch) { const sx = hx - 7, sy = top + 17, q = Math.min(1, (s - 5.4) / 0.5) * Math.min(1, (7.4 - s) / 0.5); const h = reachArm(sx, sy, lerp(sx - 2, K.x + 2, q), lerp(sy + 12, K.y + 4, q), '#1e1a1a', 22, 3); R(h.x - 2, h.y - 2, 4, 4, C.skin); }
+    g.restore();
+  }
+  // the earphones, swinging a little after her touch
+  const sw = s >= 6 ? Math.sin((s - 6) * 5) * Math.max(0, 1 - (s - 6) / 3) * 2 : 0;
+  R(K.x - 1, K.y - 1, 2, K.bottom - K.y, '#5a5550'); R(K.x - 1, K.y - 1, 1, K.bottom - K.y, '#7a746c'); R(K.x - 2, K.y - 2, 4, 2, '#8a847a'); R(K.x + 1, K.y, 2, 1, '#8a847a');
+  drawEarphones(Math.round(K.x + 1 + sw), K.y + 2, 1);
+  // in and out of the dark
+  const fin = Math.max(0, 1 - s / 1), fout = Math.max(0, Math.min(1, (s - 12.6) / 1.2)), a = Math.max(fin, fout);
+  if (a > 0) { g.fillStyle = `rgba(0,0,0,${a})`; g.fillRect(0, 0, W, H); }
+  if (!SCENE.h16Tick && s >= 6 && ctx) { SCENE.h16Tick = true; const T = ctx.currentTime + 0.05; for (const [dt, f] of [[0, 1760], [0.32, 1320], [0.64, 1760], [0.96, 1320]]) noise(T + dt, 'bandpass', f, 0.03 * (1 - dt / 1.4), 0.03, 4, bus); }
+  drawSceneFade(nowMs);
+}
+// 1-7's opening in the office: a table under the light, 하은 (left, facing right) and 반장 (right, his coffee) sitting at it;
+// her cup on the table. o17: 'sit', 'watch' (her watch), 'stand' (up beside her chair), 'pass' (she goes out through the
+// door to the line while 지우 comes in, the two passing at the door), 'jiwoo' (지우 inside the door, 하은 gone)
+const O17 = { tx0: 158, tx1: 232, top: 140, floor: 168, seat: 156, hx: 170, bx: 220, door: 330, jx: 288 };
+function drawOffice17(nowMs) {
+  g.drawImage(bgOffice, 0, 0);
+  g.save(); g.globalCompositeOperation = 'lighter';
+  const grd = g.createLinearGradient(0, 18, 0, 170); grd.addColorStop(0, 'rgba(255,236,170,.16)'); grd.addColorStop(1, 'rgba(255,236,170,0)');
+  g.fillStyle = grd; g.beginPath(); g.moveTo(170, 19); g.lineTo(216, 19); g.lineTo(258, 170); g.lineTo(128, 170); g.closePath(); g.fill();
+  g.restore();
+  const O = O17, st = SCENE.o17, age = (nowMs - (SCENE.o17At || nowMs)) / 1000;
+  // the chairs' backs (behind them)
+  R(O.hx - 12, 126, 3, 42, '#4a3a2f'); R(O.hx - 12, 126, 3, 1, '#6a5444'); R(O.hx - 14, O.seat, 14, 3, '#4a3a2f');
+  R(O.bx + 10, 126, 3, 42, '#4a3a2f'); R(O.bx + 10, 126, 3, 1, '#6a5444'); R(O.bx, O.seat, 14, 3, '#4a3a2f');
+  // 하은: sitting, her watch, up, out of the door
+  const passH = st === 'pass' ? Math.min(1, age / 2.4) : 0;
+  if (st === 'sit' || st === 'watch') haeun17(O.hx, O.floor, { right: true, sit: true, seat: O.seat, watch: st === 'watch' });
+  else if (st === 'stand') haeun17(O.hx - 8, O.floor, { right: true });
+  else if (st === 'pass' && passH < 1) haeun17(lerp(O.hx - 8, O.door + 8, passH), O.floor, { right: true, walkPh: ((lerp(O.hx - 8, O.door + 8, passH) / 41) % 1 + 1) % 1, alpha: passH > 0.85 ? (1 - passH) / 0.15 : 1 });
+  // 반장, sitting behind the table (his still, the table and his chair hiding his legs)
+  g.save(); g.beginPath(); g.rect(0, 0, W, O.top + 12); g.clip(); bossStill('coffee', O.bx, O.seat + 30, false); g.restore();
+  // the table, her cup
+  R(O.tx0, O.top, O.tx1 - O.tx0, 4, '#8a6a4a'); R(O.tx0, O.top, O.tx1 - O.tx0, 1, '#a88a6a'); R(O.tx0 + 2, O.top + 4, O.tx1 - O.tx0 - 4, 8, '#6a5038');
+  R(O.tx0 + 4, O.top + 12, 3, O.floor - O.top - 12, '#4a3a2f'); R(O.tx1 - 7, O.top + 12, 3, O.floor - O.top - 12, '#4a3a2f');
+  R(O.hx + 12, O.top - 5, 4, 5, '#f2efe6'); R(O.hx + 12, O.top - 5, 4, 1, '#c8b89a');
+  // the door opening, and 지우 coming in (from the start of 'pass', a beat after her) and standing there
+  const passJ = st === 'pass' ? Math.min(1, Math.max(0, (age - 0.7) / 1.9)) : st === 'jiwoo' ? 1 : 0;
+  if (st === 'pass' && age < 3) { g.fillStyle = `rgba(255,236,170,${0.22 * Math.max(0, 1 - Math.abs(age - 1.2) / 1.6)})`; g.fillRect(302, 60, 42, 108); }
+  if (passJ > 0) { const jx = lerp(O.door + 6, O.jx, ease(passJ)); jiwoo17({ x: jx, mode: passJ < 1 ? 'walk' : 'stand', mirror: true }, O.floor, 0); }
   drawSceneFade(nowMs);
 }
 // 2-2's epilogue: a 포장마차 outside the centre at dawn, played to 마르코's song ("Street Corner Dawn") with no presses: the
@@ -6965,6 +7063,7 @@ function drawScene(t, bt, active, nowMs) {
   // (the dotted tether between a same-beat pair was tried and taken out: the stacked gates say it on their own)
   drawPlayerArm(kick, nowMs, nowMs - lastHeavy < 260, upperKick);
   if (L.cine && active) drawCineLine17(cineT(beatAt(t)), nowMs);
+  else if (L.earHook && !STG.on) drawEarHook(L.earHook);
   drawParticles(nowMs);
   if (L.daw) { drawJudges(t, active, nowMs); drawGuests(t, active, nowMs); }
   if (al) { drawAlleyLight(al, t, nowMs); drawBeltString(al, t, nowMs); drawPuddleMirror(al, t, nowMs); }
@@ -9174,7 +9273,7 @@ function updateHud(t) {
   if (line && line[4] === 'd' && L.driver) placeHeadBubble(driverHead(beat));
   const spkNow = line ? line[4] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.spk : null;
   if (spkNow === 'w' && L.commute) placeHeadBubble(commuteHead(beat));
-  else if ((spkNow === 'J' || spkNow === 'H') && L.cine) { const hp = beat >= L.cine.out ? cineHead(spkNow, cineT(beat)) : spkNow === 'J' ? { x: 32, y: 87 } : null; if (hp) placeHeadBubble(hp); }
+  else if ((spkNow === 'J' || spkNow === 'H') && L.cine) { const f = jiwooFloor17(beat), hp = beat >= L.cine.out ? cineHead(spkNow, cineT(beat)) : spkNow === 'J' && f ? { x: f.x + (f.mirror ? -2 : 2), y: 169 - 75 } : null; if (hp) placeHeadBubble(hp); }
   else if (spkNow && L.heads && L.heads[spkNow]) { const [hx, hy] = STG.on && STG.heads && STG.heads[spkNow] ? STG.heads[spkNow] : L.heads[spkNow], up = spkNow === 'b' && L.bossSeat && (inRange(beat, L.bossSeat.stand) || (TUT.on && TUT.stand)) ? 14 : 0, walk = spkNow === 'b' && L.obsCue ? obsX(beat) - OBS_X : 0; placeHeadBubble({ x: hx + (up ? 6 : 0) + walk, y: hy - up }); }
   let h = '';
   if (L.tutorial) for (let i = 0; i < 3; i++) { const n = notes[i]; if (n && n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 터치'; break; } }
@@ -9240,9 +9339,14 @@ function showLine() {
   if (ln.office) SCENE.office = { ...ln.office };
   if (sc === 'office') SCENE.jpose = ln.jpose || null;
   if (sc === 'pocha') SCENE.mpose = ln.mpose || null;
+  if (ln.o17 && ln.o17 !== SCENE.o17) { SCENE.o17 = ln.o17; SCENE.o17At = performance.now(); if (ln.o17 === 'pass' && ctx) { const t0 = ctx.currentTime; noise(t0, 'bandpass', 900, 0.12, 0.1, 1.5, bus); for (let k = 0; k < 6; k++) noise(t0 + 0.2 + k * 0.4, 'lowpass', 420, 0.14, 0.07, 0.7, bus); } }
   if (sc !== SCENE.kind) { dialogEl.hidden = true; sceneCut(sc, () => { if (dlg) { dialogEl.hidden = false; showLine(); } }); return; }
   const L_ = dlg.lines[dlg.i], robot = L_.who === 'AS-7';
   CAM.to = L_.cam || null;
+  if (L_.silent) {
+    dialogEl.hidden = true; dlg.full = ''; dlg.n = 0; SCENE.silentAt = performance.now(); SCENE.h16Tick = false; const me = dlg.i;
+    setTimeout(() => { if (dlg && dlg.i === me) advanceDialog(); }, L_.silent * 1000); return;
+  } else dialogEl.hidden = false;
   if (L_.enter && SCENE.office) { SCENE.enter = { who: L_.enter, at: performance.now(), from: 323, dur: reduce ? 1 : 1700 }; if (ctx) { const t0 = ctx.currentTime; noise(t0, 'bandpass', 900, 0.12, 0.1, 1.5, bus); for (let k = 0; k < 4; k++) noise(t0 + 0.25 + k * 0.38, 'lowpass', 420, 0.16, 0.07, 0.7, bus); } }
   whoEl.textContent = L_.who; whoEl.hidden = !L_.who; whoEl.classList.toggle('robot', robot);
   textEl.classList.toggle('narr', !L_.who); textEl.classList.toggle('robot', robot);
@@ -9723,6 +9827,7 @@ function frame(now) {
   if (!(L.mid && castBeatAt(t, active) >= L.mid.at && state !== 'select' && state !== 'title' && (SCENE.kind === 'line' || active)) && !cvHi.hidden) cvHi.hidden = true;
   if (SCENE.kind === 'office' && !active) { drawOffice(now); if (!hud.hidden) hud.hidden = true; }
   else if (SCENE.kind === 'wings' && !active) drawWings(now);
+  else if (SCENE.kind === 'hook16' && !active) { drawHook16(now); if (!hud.hidden) hud.hidden = true; }
   else if (SCENE.kind === 'pocha' && !active) { drawPocha(now); if (!hud.hidden) hud.hidden = true; }
   else if (L.mid && castBeatAt(t, active) >= L.mid.at && state !== 'select' && state !== 'title') { drawMid(t, now, active); drawSceneFade(now); }
   else if (L.quad && quadP(castBeatAt(t, active)) >= 1) { drawQuad(t, now, active); drawSceneFade(now); }
