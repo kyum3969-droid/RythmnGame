@@ -765,7 +765,7 @@ const LEVELS = [
     tempo: [[0, 110.01], [56, 120]], clock:'02:40', title:'통합 라인', partners:['boss'], hints:false,
     songs: [{ src: 'audio/2-1-across-the-empty-floor.mp3', at: 0, lead: 1.0707, gain: 0.9, until: 56 },
             { src: 'audio/2-1-the-copper-stomp.mp3', at: 62, lead: 0.116, gain: 0.85 }],
-    songStart: 0, songCues: [[56, 'tape'], [62, 1]], songDuck: [144, 208, 1100, 0.93, 0.5], noCount: true, bareBand: true, hitKit: 'ticktock',
+    songStart: 0, songCues: [[56, 'tape'], [62, 1]], songDuck: [144, 208, 1100, 0.93, 0.5], noCount: true, bareBand: true, hitKit: 'ticktock', subs: true,
     // the whole night is drawn on the floor renderer (at 0): the upper belt of line 3 (하은's) stands idle in phase 1. Over
     // `zoom` the camera pulls back on all four belts; the keys split at `keys` (left hand: both left belts, right hand: both
     // right); the chart is in `bars` ('1' left lower = 반장's, '2' right lower, '3' left upper, '4' right upper, 'x' both lower;
@@ -3776,7 +3776,8 @@ function rbBack(b, bReal, nowMs, active, live) {
   if (cw > 0) { g.save(); g.beginPath(); g.rect(0, -MID.oy, cw, MID.wh); g.clip(); rbChicago(nowMs); g.restore();
     if (cw < x0) { const gr = g.createLinearGradient(cw, 0, cw + 14, 0); gr.addColorStop(0, 'rgba(255,190,120,.45)'); gr.addColorStop(1, 'rgba(255,190,120,0)'); g.fillStyle = gr; g.fillRect(cw, -MID.oy, 14, MID.wh); R(cw - 1, -MID.oy, 2, MID.wh, 'rgba(255,220,170,.8)'); } }
   if (x0 < WW) {
-    g.save(); g.beginPath(); g.rect(x0, -MID.oy, WW - x0, MID.wh); g.clip(); rbBeach(nowMs); g.restore();
+    // (the beach toned down under a dusky veil, so the kraft boxes in front of it stand out)
+    g.save(); g.beginPath(); g.rect(x0, -MID.oy, WW - x0, MID.wh); g.clip(); rbBeach(nowMs); g.fillStyle = 'rgba(14,22,46,.34)'; g.fillRect(x0, -MID.oy, WW - x0, MID.wh); g.restore();
     if (x0 > 0) { const gr = g.createLinearGradient(x0 - 14, 0, x0, 0); gr.addColorStop(0, 'rgba(255,236,170,0)'); gr.addColorStop(1, 'rgba(255,236,170,.45)'); g.fillStyle = gr; g.fillRect(x0 - 14, -MID.oy, 14, MID.wh); R(x0 - 1, -MID.oy, 2, MID.wh, 'rgba(255,252,230,.8)'); }
   }
   // 반장's radio on the left, 마르코's boombox on the right; whichever is playing out loud gives off notes
@@ -7195,7 +7196,7 @@ function updateHud(t) {
   if (s !== lastSay) {
     bubble.textContent = s; bubble.hidden = !s; lastSay = s;
     // 2-2: the line as a subtitle in the middle, where your eyes are; over the speaker's head only a small "…"
-    if (L.subs) { const sp = line && line[4], nm = { b: ['반장', '#f0a050'], v: ['마르코', '#6fdcec'] }[sp];
+    if (L.subs) { const sp = line && (line[4] || (L.mid ? 'b' : null)), nm = { b: ['반장', '#f0a050'], v: ['마르코', '#6fdcec'] }[sp];
       subEl.hidden = !s; subEl.innerHTML = ''; if (s) { if (nm) { const k = document.createElement('b'); k.textContent = nm[0]; k.style.color = nm[1]; subEl.append(k); } subEl.append(s); }
       bubble.classList.toggle('dots', !!s); if (s) bubble.textContent = '…'; }
     const lane = line ? (line[3] || 0) : 0, spk = line && line[4];
