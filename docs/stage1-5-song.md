@@ -1,381 +1,71 @@
-# 1-5 노래: 하은의 랩 두 곡 — 제미나이(Lyria) 프롬프트
+# 1-5 노래: "Right On Time" — 제미나이(Lyria) 프롬프트
 
-**세 라운드**: 2페이즈(1라운드)는 아래의 "You Play, I Pay"(94), 3페이즈(2라운드)는 느린 곡 "The Lazy Shift"(`prototype/audio/1-5-the-lazy-shift.mp3`, 91.98초, 실측 75.5 BPM, 28마디, 첫 다운비트 0.068초, 끝에 테이프 정지), 4페이즈(3라운드, 절정)는 하은의 드릴(`prototype/audio/1-5-this-is-a-beat.mp3`, 아래 "드릴" 프롬프트로 받음; 실측은 이 문서 끝). 처음 받은 "Your Beat, My Belt"(랩락)는 뺐다. **게임에서는 세 곡 모두 첫 훅(Hook 1)까지만** 쓰고 스크래치로 끊는다(절정 곡은 짧아서 끝까지).
+1-5 "첫눈에"에 깔 곡. 지우가 하은을 처음 보고 반하는 밤이라 **가볍고 신나는 밴드 팝**, 지우 마음의 노래라 **젊은 남자 솔로 보컬, 달달한 목소리**(남녀 듀엣은 제미나이가 파트를 헷갈려서 피한다). 레퍼런스처럼 **한국어 가사**(해외판 자막은 아래 영어 뜻). 처음에 쓴 영어 가사판은 git 기록에 있다.
 
+**레퍼런스**(사용자가 준 곡, 수치로 분석, 프롬프트에는 곡·가수 이름 안 넣음): 2:48, 실측 **118 BPM**, **가 장조**(A major), 박마다 킥(포 온 더 플로어)에 2·4박 스네어·박수, 밝은 음색(스펙트럼 중심 높음). 한국어 남녀 구분이 애매한 중간 음역(중앙값 약 D4) 보컬, 곡이 후렴 훅으로 바로 열림, "자석처럼 끌리는 첫 만남" 가사, 맑은 일렉 기타가 중심인 K-밴드 팝. 그래서 템포·조·드럼 패턴·악기 결은 그대로 가져오고, 구조는 게임에 맞춘다.
 
-1-5 2페이즈(32–72마디)에 깔 곡. 다툼 끝에 하은이 지우를 밀쳐내자, 자기 벨트로 돌아온 지우가 "좋아요. 그럼 박으로 해요. 누나 박이 그렇게 잘났으면, 따라와 봐요!" 하고 자기 비트를 튼다. **지우는 비트로 도발하고(가사 없음, 으스스한 멜로디 리프 + 상자 던지기), 하은이 그 비트를 뺏어 랩으로 받아친다.** 랩은 하은 혼자. **95 BPM**, 4/4, A 단조(어두운 반음 하강 루프), **2:34**(61마디). 게임은 정적이 끝나는 128박부터 95. 1-6 노래처럼 글로벌 출시용 영어 가사(한국어는 자막).
+**게임과 맞춤**: 프롬프트에는 곡 길이, 시간, 마디 수를 적지 않는다. 제미나이는 길이와 마디 수를 맞추려다 구조를 뭉개고, 가사가 비트에서 밀린다. 대신 흔한 팝 구조 태그(1절, 프리코러스, 후렴, 간주, 브리지)만 주고, 곡을 받으면 실제 박과 구간을 재서 차트(`docs/stage1.md` 1-5 표)를 곡에 맞춘다. 지금 게임은 엔진 임시 곡(`style: 'pop15'`, 118 BPM)으로 돈다.
 
-**왜 싱글 래퍼**: 남녀 두 사람이 주고받는 버전은 제미나이가 남자 파트와 여자 파트를 계속 헷갈렸다(이름에 성별을 붙여도). 그래서 랩은 하은 혼자 하고, 지우 차례는 가사 없는 비트 구간으로 바꿨다. 지우가 하던 "Haeun, why so cold, did the night shift steal your heart?"는 하은이 2절 첫 줄에서 그대로 따라 하며 비꼰다.
-
-**비트 레퍼런스**(사용자가 준 곡, 수치로 분석, 프롬프트에는 곡·가수 이름 안 넣음): 85 BPM, 2마디(약 5.6초) 루프 반복, 베이스가 A → G# → F# → E로 반음씩 내려가고 위에 C#·D#·G# 같은 긴장음, 길게 울리는 무거운 저음과 킥, 2·4박 스네어, 촘촘한 하이햇의 붐뱁. 가사 들어가기 전에 드럼이 잠깐 빠졌다 들어옴. 템포는 95로 올려서 더 몰아붙임.
-
-**거절 대응**: "diss battle", "menacing" 같은 말은 제미나이가 민감한 주제로 막았다. 동료에게 랩으로 받아치는 자신감 있는 곡으로 쓰고 욕은 없다. 그래도 막히면 가사를 빼고 비트만 먼저 받는다.
-
-**받은 곡**: `prototype/audio/1-5-you-play-i-pay.mp3`(2:35.7, 94.000 BPM, 61마디, 첫 다운비트 0.055초, 153.2초부터 정적). 실제 구조는 계획과 조금 다름: 지우 비트가 36–43마디 8마디로 길고(계획 4), 브레이크다운이 44–47, 빌드업 48–51, 마지막 훅 52–58, 마지막 한 방 59(곡 마디 기준). 게임 차트는 실제 구조에 맞춤(`docs/stage1.md` 2페이즈 표).
-
-노래를 받으면 할 일(했음):
-- 실제 박과 구간이 바뀌는 지점을 찾아 2페이즈 차트와 `battle` 표를 노래에 맞춘다.
-- 지금 있는 임시 비트(`diss` 구간)를 받은 음원으로 바꾼다.
-- 실제로 부른 시간대로 영어 가사 + 한국어 자막 파일을 만든다.
-
-## 게임과 맞춤 (1마디 = 2.53초)
-
-| 노래 | 마디(게임) | 차례 | 게임에서 |
-|---|---|---|---|
-| 0:00–0:10 인트로 | 32–35 | 지우 비트 | 지우가 비트를 틀고 도발. 34마디부터 지우 상자 |
-| 0:10–0:20 지우 비트 | 36–39 | 지우 | **일부러** 하은 벨트로 던져 떨어뜨림. 끝 마디에 드럼이 빠짐 |
-| 0:20–0:40 1절 | 40–47 | 하은 랩 | 스크래치, 하은 벨트에 정박(긴 화물 포함), 지우 벨트는 빔 |
-| 0:40–0:51 훅 1 (×4, 낮게) | 48–51 | 하은 | "Tick-tock on the line…" 하은 벨트 째깍째깍 |
-| 0:51–1:01 지우 비트 | 52–55 | 지우 | 또 던져 떨어뜨림 |
-| 1:01–1:21 2절 | 56–63 | 하은 랩 | 더 세게, 더 빽빽하게 |
-| 1:21–1:31 훅 2 (×4, 더 세게) | 64–67 | 하은 | 째깍째깍 |
-| 1:31–1:41 지우 비트 | 68–71 | 지우 | 또 던짐. 끝 마디에 드럼이 빠짐 |
-| 1:41–1:51 브레이크다운 | 72–75 | 1마디씩 지우·하은·지우·하은 | 한 마디짜리 긴 화물이 위·아래 번갈아. 하은은 짧은 두 줄 |
-| 1:51–2:11 3절 | 76–83 | 둘 동시에, 하은 랩 | "You throw it, I catch it": 던지면 받고, 떨어뜨림과 하은 상자가 번갈아 |
-| 2:11–2:32 마지막 훅 (×8, 고조) | 84–91 | 둘 동시에 | tick은 위, tock은 아래로 번갈아 → 끝 두 마디는 박마다 둘이 같이 |
-| 2:32–2:34 마지막 한 방 | 92 | 둘 | 두 벨트 같은 박 하나, 그리고 정적 |
-
-곡 전체에 같은 어두운 루프가 깔린다. 지우 비트 구간엔 높고 으스스한 멜로디 리프와 보컬 찹(펑키한 층은 뺐다), 하은 구간엔 날것의 루프 위에 하은 랩. 하은 구간으로 넘어갈 때 레코드 스크래치, 지우 구간으로 넘어갈 때 보컬 찹 → 게임의 조명(하은 빨강, 지우 하늘)과 박마다 바닥 진동이 같은 자리에서 바뀐다.
-
-**훅 "Tick-tock on the line, and nobody's gonna stop"**: 1절 뒤 4번(낮게, 반쯤 속삭이듯), 2절 뒤 4번(제 목소리, 겹쳐 녹음), 마지막에 8번(2마디마다 쌓임: 킥만 → 스네어·하이햇 → 겹친 목소리와 라이저 → 전부, 박마다 크래시, 마지막 줄은 소리쳐서 마지막 한 방으로).
-
-가사 원칙: 반장·허리 얘기 없음. **꿈은 직접 말하지 않는다**(하은은 "Somebody's waiting." 정도로만, 사정은 1-6에서. 돈·월세 얘기 아님). 욕 없음.
+| 구간 | 게임 |
+|---|---|
+| 전주 | 없음 |
+| 1절 | 지우가 떠들고 하은을 알아챔 |
+| 프리코러스(끝에 거의 정적, 속삭임) | 지우 자랑 → 받아 내는 순간(슬로 모션 컷씬) |
+| 후렴 1 | 두근 상자, 분홍, 하트 |
+| 간주(기타 리프, 보컬 없음) | 쉬는 구간 또는 지우가 하은을 멍하니 보는 짧은 장면 |
+| 2절 → 프리코러스 2 | 지우가 말을 걸어 봄 |
+| 후렴 2 | |
+| 브리지(반으로 줄어든 비트) | "…박자는 맞네." |
+| 마지막 후렴 | 가장 빽빽 |
+| 끝 | 마지막 한 방 |
 
 ## 프롬프트 (그대로 붙여 넣기)
 
-```
-A dark, swaggering boom bap track with ONE solo female rapper. A young woman on the night shift answers a show-off coworker: he keeps playing his beat and throwing things around, and she takes over the beat and raps back, cool and precise. English rap vocals, one female voice only, no male vocals, no singing. 2:34 long, 95 BPM, 4/4, A minor. Clean lyrics.
-
-The beat (the same loop under the whole song):
-- A heavy, dark two-bar loop with a cinematic feel: the bass line walks down by half steps (A, G#, F#, E), with tense dissonant notes ringing on top.
-- Hard-hitting dusty drums: a heavy kick with a long, deep low end, a loud cracking snare on 2 and 4, busy crisp sixteenth-note hi-hats.
-- Driving and hard-hitting, pushing forward, but still heavy with lots of room for the vocal. Not funky, no disco, no slap bass.
-
-The rapper: a young woman of 23. Low, calm, cool, precise, lands every word right on the beat, confident and steady, getting harder with every section and shouting only at the very end.
-
-Two kinds of sections:
-- BEAT sections (no rap): the full dark beat plays out loud with a catchy, high, eerie melodic riff on top (a cold bell-like synth) and chopped vocal stabs ("yah!", "uh!"), cocky and showing off. Every BEAT section starts with a chopped vocal stab.
-- RAP and HOOK sections: the riff drops out and only the raw dark loop is left under her voice. Every RAP section starts with a record scratch.
-- Every switch lands exactly on the bar line.
-
-The hook is one line, "Tick-tock on the line, and nobody's gonna stop", one line per bar, and it builds every time it comes back.
-
-Structure with timestamps (one bar = 2.5 seconds):
-0:00–0:10 Intro, BEAT (4 bars): the dark loop and the riff come in loud and cocky. No rap.
-0:10–0:20 BEAT (4 bars): the riff keeps showing off with vocal stabs; on the last bar the drums cut out. No rap.
-0:20–0:40 Verse 1, RAP (8 bars): record scratch, the drums slam back in, raw loop only. She is calm and precise.
-0:40–0:51 Hook 1 (4 bars): the hook four times, low and half-whispered, eerily calm.
-0:51–1:01 BEAT (4 bars): the riff comes back, cocky, vocal stabs. No rap.
-1:01–1:21 Verse 2, RAP (8 bars): record scratch, raw loop; she is sharper and harder now.
-1:21–1:31 Hook 2 (4 bars): the hook four times, full voice, doubled, the drums hitting harder.
-1:31–1:41 BEAT (4 bars): the riff again, the longest and loudest show-off; on the last bar the drums cut out. No rap.
-1:41–1:51 Breakdown (4 bars): just the bass line and claps, half-time feel. Bar 1: a stab hit, no rap. Bar 2: her first short line. Bar 3: a stab hit, no rap. Bar 4: her second short line.
-1:51–2:11 Verse 3, RAP (8 bars): everything back in at once, the riff and the dark loop together, louder. Quick, punchy lines.
-2:11–2:32 Final hook (8 bars): the hook eight times, building in four steps of two bars: (1) her voice over just the kick, (2) the snare and double-time hi-hats come in, (3) her voice stacked and layered with a rising riser, (4) everything at full power, a crash on every beat, the last line shouted.
-2:32–2:34 Ending: one huge hit on the downbeat of the last bar, then silence. No fade out.
-
-Lyrics (all by the one female rapper):
-
-[Intro – BEAT, no vocals]
-
-[BEAT, no vocals]
-
-[Verse 1 – female rap]
-You throw it, it falls, and it lands next to me
-Every box you drop is a box I carry
-You call it a flow, I call it a mess
-You nap through the shift and I handle the rest
-You talk about tomorrow like it's already yours
-I'm counting the minutes to the next set of doors
-Keep your rhythm, kid, keep it loud in your ears
-Some of us can't stop long enough to hear
-
-[Hook 1 – low, half-whispered]
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-
-[BEAT, no vocals]
-
-[Verse 2 – female rap]
-"Haeun, why so cold, did the night shift steal your heart?"
-That's what you said, so let me take it from the start
-Every time you start, I'm the one who has to finish
-You play, I pay. That's the difference.
-You don't know what I need, you don't know what I've seen
-Stay up on your stage, I'll stay down at the machine
-Call me stiff, call me slow, say I live by the clock
-But the clock keeps the line moving while you watch it drop
-
-[Hook 2 – full voice, doubled]
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-
-[BEAT, no vocals]
-
-[Breakdown – female rap, one short line every other bar]
-What's it for? Somebody's waiting.
-That's the beat. Keep time.
-
-[Verse 3 – female rap]
-You throw it, I catch it
-You're careless, I'm counting
-Your beat, my belt
-Your way? Every day
-Can't keep up? Watch me
-One more box, one more drop
-Go on, throw another, I'll catch every one
-Count it with me now, we're not done
-
-[Final hook – building to the end]
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-TICK-TOCK ON THE LINE, AND NOBODY'S GONNA STOP
-
-[Ending]
-(one huge hit, then silence)
-```
-
-## 가사 뜻 (자막 초안)
-
-| 영어 | 한국어 |
-|---|---|
-| You throw it, it falls, and it lands next to me | 네가 던지면, 떨어지고, 내 옆에 와 |
-| Every box you drop is a box I carry | 네가 떨군 상자는 전부 내가 들어 |
-| You call it a flow, I call it a mess | 넌 그걸 흐름이라 하고, 난 엉망이라 해 |
-| You nap through the shift and I handle the rest | 넌 근무 중에 졸고, 나머진 내가 해 |
-| You talk about tomorrow like it's already yours | 넌 내일이 벌써 네 것처럼 말하지 |
-| I'm counting the minutes to the next set of doors | 난 다음 문까지 남은 분을 세 |
-| Keep your rhythm, kid, keep it loud in your ears | 네 리듬 지켜, 꼬마야, 귀에 크게 틀어 놔 |
-| Some of us can't stop long enough to hear | 누군 들을 만큼 멈출 수도 없거든 |
-| "Haeun, why so cold, did the night shift steal your heart?" | "하은 누나, 왜 그렇게 차가워요, 야간이 마음까지 가져갔어요?" |
-| That's what you said, so let me take it from the start | 네가 그랬지, 그럼 처음부터 말해 줄게 |
-| Every time you start, I'm the one who has to finish | 네가 시작하면, 끝내는 건 늘 나야 |
-| You play, I pay. That's the difference. | 넌 놀고, 난 갚아. 그게 차이야. |
-| You don't know what I need, you don't know what I've seen | 넌 내가 뭘 필요한지 몰라, 내가 뭘 봤는지도 |
-| Stay up on your stage, I'll stay down at the machine | 넌 네 무대 위에 있어, 난 기계 앞에 있을게 |
-| Call me stiff, call me slow, say I live by the clock | 딱딱하다, 느리다, 시계대로 산다 해 |
-| But the clock keeps the line moving while you watch it drop | 근데 라인을 돌리는 건 그 시계야, 넌 떨어지는 거 구경이나 하고 |
-| What's it for? Somebody's waiting. | 뭐 때문이냐고? …기다리는 사람이 있어. |
-| That's the beat. Keep time. | 그게 박이야. 박이나 맞춰. |
-| You throw it, I catch it | 넌 던지고, 난 받아 |
-| You're careless, I'm counting | 넌 대충, 난 세고 있어 |
-| Your beat, my belt | 네 비트, 내 벨트 |
-| Your way? Every day | 네 방식? 매일이 그래 |
-| Can't keep up? Watch me | 못 따라온다고? 봐 |
-| One more box, one more drop | 상자 하나 더, 하나 더 떨궈 |
-| Go on, throw another, I'll catch every one | 더 던져 봐, 하나도 안 놓쳐 |
-| Count it with me now, we're not done | 같이 세, 아직 안 끝났어 |
-| Tick-tock on the line, and nobody's gonna stop | 라인 위에 째깍째깍, 아무도 안 멈춰 |
-
-"Stay up on your stage / down at the machine"은 지우가 위 벨트(무대), 하은이 아래 벨트(기계)라는 자리를 그대로 쓴 것. "Somebody's waiting."(기다리는 사람이 있어)이 1-6 병원 사정(어머니)의 유일한 실마리. 돈 얘기는 하지 않는다. "What's it for?"는 원래 지우가 묻던 말을 하은이 스스로 묻고 답하는 식.
-
-## 2라운드 곡 "The Lazy Shift" 프롬프트 (받아서 씀)
+**가사는 지정하지 않는다.** 가사를 정해 주면 제미나이가 비트에 억지로 끼워 넣느라 곡이 어색해진다. 주제와 분위기만 알려 주고 가사는 제미나이가 비트에 맞춰 쓰게 한다. 하은 목소리는 넣지 않는다(남자 목소리 하나). 받은 곡의 가사는 받아쓰기로 확인해서 자막을 만든다.
 
 ```
-A slow, lazy, swaggering hip-hop track with ONE solo female rapper. A young woman on the night shift answers a careless coworker who keeps playing his sleepy beat at her: she takes it over and raps on it, cool and unimpressed. English rap vocals, one female voice only, no male vocals, no singing. 1:29 long, 78 BPM, 4/4, A minor. Clean lyrics.
-(beat: dark, dusty, laid-back boom bap; sub bass walking A, G#, F#, E; hazy Rhodes, tape wobble, vinyl. BEAT sections with a lazy whistle-like riff and vocal stabs, RAP sections with the raw loop. Structure: intro BEAT 4, BEAT 4, verse 1 8, hook 4, BEAT 4, verse 2 4, ending 1 bar slowing down like a tape stopping.)
+A bright, bouncy, feel-good Korean band-pop song with ONE solo young male singer, about a sweet first-sight crush. Korean lyrics, written to sit naturally on the beat: short, simple, everyday Korean words, a catchy chorus hook that repeats. One male voice only from start to finish: no female vocals, no second singer, no spoken dialogue, no rap. 118 BPM, 4/4, A major. Clean lyrics.
 
-[Verse 1] This your beat? It's half asleep / Just like you on the shift, counting sheep / You throw it so lazy, it lands on my side / I pick up the pieces, you call it a vibe / Earbuds in and the whole world out / Nodding along like you know what it's about / You're waiting on the drop, you're waiting on the cheer / I've been on the beat since before you got here
-[Hook] Is that it? Is that all you got? (x2) / Is that it? You call that hot? / Is that it? Is that all you got?
-[Verse 2] Turn it up, turn it down, I don't really mind / I'll ride any beat that you leave behind / You want it faster? Go on, raise the bar / Play me another. I'll catch every bar.
+What the song is about: a cheerful guy on an ordinary night sees a quiet, cool girl for the first time. She doesn't even look at him, but when he drops something she catches it without looking, perfectly on time, and his heart skips. Now his heart goes ba-dum, ba-dum and won't slow down, the whole world looks pink, everything she says (even the cold, short words) sounds like a song to him, and he keeps walking one step behind her. Sweet, playful and a little silly, like the first rush of a crush.
+
+The sound: bright, jangly clean electric guitars with a catchy guitar riff, a punchy four-on-the-floor kick, a snappy snare and handclaps on 2 and 4, a bouncy melodic bass, sparkling synths and a glockenspiel. Bright, warm, youthful and upbeat.
+
+The singer: a young man of 21 with a sweet, soft, honey-toned voice, warm and a little breathy, like he is smiling while he sings. Tender and cute, never shouting. Doubled in the choruses, with "oh-oh" backing vocals by the same male voice.
+
+Song form: intro, verse 1, pre-chorus, chorus, instrumental interlude, verse 2, pre-chorus, chorus, bridge, final chorus, ending.
+- Intro: the guitar riff and the drums, no vocals.
+- Pre-chorus: the drums build, then at its end almost everything stops for a moment, only a twinkling glockenspiel and a soft heartbeat kick, and he whispers one word.
+- Chorus: everything bursts back in, big and happy, handclaps.
+- Instrumental interlude: no vocals, the guitar riff takes the lead with the glockenspiel answering it.
+- Bridge: half-time and soft, almost a whisper.
+- Final chorus: the biggest, doubled vocals and "oh-oh" backing vocals.
+- Ending: one big bright hit, then the guitar chord rings out. No fade out.
 ```
 
-받은 곡의 실제 구조(곡 마디): 0–3 조용한 인트로(저음 없음), 4–7 지우 비트, 8–15 1절, 16–19 훅(2·3박 강세), 20–23 지우 비트, 24–27 2절, 28 정적. 템포는 75.5에서 ±0.03초 안으로 맞음.
+**막히면**: "crush"를 "little crush"로. 가사가 너무 길게 나와 비트에서 밀리면 첫 문단에 "few words per line, lots of space between lines"를 붙인다. 목소리가 세면 `The singer:` 끝에 "soft and intimate, close to the microphone"을 붙인다. 발음이 뭉개지는 말이 있으면(예: 핑크빛, 콧노래) "use 분홍빛 instead of 핑크빛"처럼 그 말만 짚어 준다.
 
-## 3라운드(절정) 곡 프롬프트
+**곡을 받으면**: 템포·첫 박·구간을 재서 차트를 맞추고, 받아쓰기로 가사를 확인해 해외판 영어 자막을 만든다. 처음에 쓴 가사판들은 git 기록에 있다.
 
-절정. The Lazy Shift 끝("Play me another")에 지우가 가장 무겁고 센 비트를 튼다. **빠르기보다 무게**: 100 BPM 하프타임 드럼, 디스토션 기타 파워코드(A–G#–F#–E 반음 하강), 찢어지는 808, 브라스·합창. 인트로·훅·브리지 없이 **Final 하나만**: 첫 박부터 전부 터지고, 1라운드 Tick-tock 훅 4줄 → "You play, I pay" 벌스(1라운드 2절) 8줄 → 마지막 한 방. 13마디, 0:31.
+## 받은 곡: "Pink Belt"
 
-```
-A HEAVY, POWERFUL, anthemic rap-rock / trap-metal track with ONE solo female rapper: the final blow of a rap battle on a night shift. It must feel huge and crushing, not fast. Stadium-sized: every drum hit is a cannon, the guitars are a wall. English rap vocals, one female voice only, no male vocals, no singing. 0:31 long, 100 BPM, 4/4, A minor. Clean lyrics.
+`prototype/audio/1-5-pink-belt.mp3`(86.0초). 실측 **120.0 BPM**(1마디 2.0초), 첫 다운비트 0.11초, 박마다 킥에 2·4박 스네어, 조는 **올림다 장조**(C# major, 프롬프트의 가 장조와 다름), 약 42마디. 제미나이가 예전 가사판("평범한 밤이었어, 늘 그렇듯이…")을 거의 그대로 불렀다.
 
-The sound:
-- Half-time drums: a massive kick and a giant snare with a big hall reverb on beat 3, slow and heavy, like stomping. A crash on every bar.
-- Thick distorted electric guitars playing low power chords, chugging: the riff walks down by half steps, A, G#, F#, E, one chord per beat, hammered.
-- A loud, overdriven 808 sub that shakes the floor, doubling the guitar riff.
-- Low brass and choir hits on the downbeats, epic and dark.
-- Mixed loud, wide and aggressive, at full power from the first beat to the last.
+받아쓰기와 세기로 본 구조(곡 시간): 0–23초 1절("평범한 밤이었어" … "세상이 잠깐 느려진 것 같아"), 23–26초 "오오 오오, 잠깐만", 26–32초 거의 정적(28–32초 가장 조용함), 32–48초 후렴 1("두근두근 멈추질 않아" … "이게 사랑인가 봐"), 48–56초 짧은 간주·2절 시작("차가운 한마디도"), 56–64초 2절("눈 한 번 마주치려", "너는 늘 앞에, 나는 한 걸음 뒤", "네가 웃어 준 것도 아닌데"), 64–80초 마지막 후렴, 80–84초 끝, 84초부터 정적.
 
-The rapper: a young woman of 23, cold and forceful, every word hitting with the snare. Her voice is doubled and stacked, like a crowd made of her own voice. The last line is screamed.
+길이가 지금 게임 1-5(85초)와 같고, 1-2~1-4(2분 15초 안팎)보다 짧다. 분량을 채우는 안은 `docs/stage1.md` 1-5 "정할 것".
 
-Structure (one bar = 2.4 seconds). NO intro, NO hook, NO bridge: the song is only this one final verse.
-0:00–0:10 (4 bars): everything slams in on the very first downbeat with her voice. The chant "Tick-tock on the line", one line per bar.
-0:10–0:29 (8 bars): her verse "You play, I pay", one line per bar, heavier and louder to the end.
-0:29–0:31 Ending: one huge hit on the downbeat of the last bar, then silence. No fade out.
+## 2페이즈 곡: "새 비트" (직접 합성)
 
-Lyrics (all by the one female rapper):
+제미나이 한도가 차서 엔진 쪽에서 만들었다: `prototype/ref/beat15/render.py`(파이썬, numpy/scipy) → `prototype/audio/1-5-new-beat.mp3`. 90 BPM, 4/4, C# major(I–vi–IV–V7: C#maj7, A#m7, F#maj7, G#7), 첫 다운비트 0.10초, 32마디(85.4초) + 정지. **네 마디마다 악기가 하나씩** 들어온다: 시계(0, 혼자일 땐 크게) → 일렉트릭 피아노 코드, 2-오퍼레이터 FM + 틴 + 트레몰로(4) → 킥, 1박에 두근 겹킥(8) → 브러시 스네어·스윙 하이햇(12) → 베이스(16) → 뮤트 기타 코드, 카플러스-스트롱 현 합성(20) → 글로켄슈필 멜로디, 두 마디 반복(24) → 높은 글로켄슈필 대답 + 부드러운 패드 + 심벌(28) → 32마디 첫 박에 뚝(스위치 딸깍). 새 악기 앞 마디 끝 두 박에 작은 스웰. 밑에 바이닐 잡음, 테이프처럼 부드러운 로우패스와 포화. 4마디씩 음량 -27.5 → -12.8 dB로 차오름, 전체 평균 약 -16 dB. 스크립트가 친 음표 목록(JSON)을 함께 내보내서 차트가 곡과 정확히 맞는다.
 
-[Final]
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-"Haeun, why so cold, did the night shift steal your heart?"
-That's what you said, so let me take it from the start
-Every time you start, I'm the one who has to finish
-You play, I pay. That's the difference.
-You don't know what I need, you don't know what I've seen
-Stay up on your stage, I'll stay down at the machine
-Call me stiff, call me slow, say I live by the clock
-BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
-
-[Ending]
-(one huge hit, then silence)
-```
-
-**받은 곡**: `prototype/audio/1-5-your-beat-my-belt.mp3`(62.85초, 실측 105.0 BPM, 첫 다운비트 0.236초, 26마디 + 마지막 한 방, 60.1초부터 정적). 받아쓰기(whisper)로 찾은 실제 구조(곡 마디): 0–3 Tick-tock ×4, 4–11 "You play, I pay" 벌스(줄마다 반 박쯤 앞서 들어감), 12–21 브레이크다운(드럼이 빠지고 짝수 마디에 붐 한 번; Tick-tock, "What's it for? Somebody's waiting.", "That's the beat. Keep time.", "You throw it, I catch it…", "Your beat, my belt…", "Can't keep up? Watch me" — 1라운드 브레이크다운·3절 가사를 제미나이가 넣음), 22–25 전부("One more box, one more drop", Tick-tock ×2, "But the clock… watch it drop"), 26 마지막 한 방. 게임 76–102마디(`docs/stage1.md` 4페이즈 표).
-
-### 절정 곡 다시 뽑기: 도입부 포함
-
-받은 곡은 첫 박부터 전부 터져서 확 들어온다(게임은 지금 도입 두 마디를 직접 붙여 메움). 도입 4마디(약 9초)를 넣은 버전. 받은 곡과 같은 105 BPM.
+제미나이로 다시 받으려면(같은 구조):
 
 ```
-A HEAVY, POWERFUL, anthemic rap-rock / trap-metal track with ONE solo female rapper: the final blow of a rap battle on a night shift. It must feel huge and crushing, not fast. Stadium-sized: every drum hit is a cannon, the guitars are a wall. English rap vocals, one female voice only, no male vocals, no singing. 0:41 long, 105 BPM, 4/4, A minor. Clean lyrics.
-
-The sound:
-- Half-time drums: a massive kick and a giant snare with a big hall reverb on beat 3, slow and heavy, like stomping. A crash on every bar.
-- Thick distorted electric guitars playing low power chords, chugging: the riff walks down by half steps, A, G#, F#, E, one chord per beat, hammered.
-- A loud, overdriven 808 sub that shakes the floor, doubling the guitar riff.
-- Low brass and choir hits on the downbeats, epic and dark.
-- Mixed loud, wide and aggressive.
-
-The rapper: a young woman of 23, cold and forceful, every word hitting with the snare. Her voice is doubled and stacked, like a crowd made of her own voice. The last line is screamed.
-
-Structure (one bar = 2.29 seconds):
-0:00–0:09 Intro (4 bars), NO vocals, building up from almost nothing:
-  bar 1: only a slow heartbeat kick and a ticking clock, dark and tense.
-  bar 2: low war drums and a deep choir hum come in under it; the clock ticks twice as fast.
-  bar 3: the distorted guitars fade in on the riff, a rising riser, the drums getting louder.
-  bar 4: a snare roll building to the top, the riser at its peak; on the last half beat everything cuts to silence for a breath.
-0:09–0:18 (4 bars): everything slams in at once on the downbeat with her voice. The chant "Tick-tock on the line", one line per bar.
-0:18–0:37 (8 bars): her verse "You play, I pay", one line per bar, heavier and louder to the end.
-0:37–0:41 Ending: one huge hit on the downbeat of the last bar, then silence. No fade out.
-
-Lyrics (all by the one female rapper):
-
-[Intro – no vocals, building]
-
-[Final]
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-"Haeun, why so cold, did the night shift steal your heart?"
-That's what you said, so let me take it from the start
-Every time you start, I'm the one who has to finish
-You play, I pay. That's the difference.
-You don't know what I need, you don't know what I've seen
-Stay up on your stage, I'll stay down at the machine
-Call me stiff, call me slow, say I live by the clock
-BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
-
-[Ending]
-(one huge hit, then silence)
+A cozy, sweet lo-fi bedroom beat, instrumental, no vocals at all: a young producer alone in his room at 4 a.m., making a beat about a girl he just met. The track builds up one instrument at a time, a new one every four bars, each starting exactly on a bar line, so the sound slowly fills up. 90 BPM, 4/4, C# major.
+The instruments, in order: a single soft ticking clock, alone; then a warm electric piano playing the chords; then a soft, dusty kick with a heartbeat-like double kick (ba-dum); then a gentle brushed snare and soft hi-hats; then a round, warm bass; then a muted electric guitar chord loop; then a twinkling glockenspiel melody; then a high glockenspiel answering it and a soft pad under everything, warm, hopeful and a little shy.
+Cozy and intimate, soft vinyl crackle, warm tape saturation. Ends as if he pressed stop: the loop cuts off cleanly. No fade out.
 ```
 
-### 절정 곡 장르 변경: 시네마틱 오케스트라 트랩 (추천)
+## 받은 곡 손질: 끝의 "첫눈에"
 
-랩락(디스토션 기타)은 앞의 두 곡(붐뱁)과 결이 어긋나서 뺀다. 힙합은 그대로 두고, 힘은 기타 대신 **오케스트라(현악 오스티나토, 브라스, 합창, 타이코) + 찢어지는 808**에서 낸다. 시계 모티프는 피치카토 현과 시계 째깍으로, 브리지 없이도 1-6 심장 박동으로 이어지는 킥.
-
-```
-An epic, cinematic orchestral trap / hip-hop track with ONE solo female rapper: the final round of a rap battle on a night shift, like the last boss fight in a film. Powerful and huge, not fast. English rap vocals, one female voice only, no male vocals, no singing. No electric guitars, no rock. 0:41 long, 105 BPM, 4/4, A minor. Clean lyrics.
-
-The sound:
-- Hip-hop drums, half-time and heavy: a deep booming kick, a huge snare and clap with a big reverb on beat 3, crisp trap hi-hats with short rolls.
-- A massive distorted 808 sub that slides and shakes the floor.
-- An orchestra on top: fast, driving staccato strings repeating the riff, the bass line walking down by half steps (A, G#, F#, E); big low brass stabs on the downbeats; a dark choir; taiko drums hitting with the kick.
-- A ticking clock sound and plucked pizzicato strings keeping time, like a clock running out.
-- Mixed loud, wide and dramatic.
-
-The rapper: a young woman of 23, cold, controlled and forceful, every word landing on the beat. Her voice is doubled and stacked, like a crowd made of her own voice. The last line is shouted.
-
-Structure (one bar = 2.29 seconds):
-0:00–0:09 Intro (4 bars), NO vocals, building up from almost nothing:
-  bar 1: only a slow heartbeat kick and a ticking clock, dark and tense.
-  bar 2: pizzicato strings and a low choir hum come in; the clock ticks twice as fast.
-  bar 3: the staccato strings start the riff, taiko drums, a rising swell.
-  bar 4: a snare roll and the whole orchestra rising to the top; on the last half beat everything cuts to silence for a breath.
-0:09–0:18 (4 bars): everything slams in at once on the downbeat with her voice: drums, 808, strings, brass, choir. The chant "Tick-tock on the line", one line per bar.
-0:18–0:37 (8 bars): her verse "You play, I pay", one line per bar, bigger and louder to the end.
-0:37–0:41 Ending: one huge orchestral hit with the 808 on the downbeat of the last bar, then silence. No fade out.
-
-Lyrics (all by the one female rapper):
-
-[Intro – no vocals, building]
-
-[Final]
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-"Haeun, why so cold, did the night shift steal your heart?"
-That's what you said, so let me take it from the start
-Every time you start, I'm the one who has to finish
-You play, I pay. That's the difference.
-You don't know what I need, you don't know what I've seen
-Stay up on your stage, I'll stay down at the machine
-Call me stiff, call me slow, say I live by the clock
-BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
-
-[Ending]
-(one huge hit, then silence)
-```
-
-### 절정 곡 장르 후보: 드릴
-
-드릴은 원래 140대 BPM에 하프타임(스네어가 3박)이라 105로 두면 드릴 같지 않다. 142 BPM(1마디 1.69초), 0:29. 미끄러지는 808이 A–G#–F#–E 하강선을 타고, 어두운 피아노·현, 통통 튀는 하이햇과 셋잇단 롤.
-
-```
-A dark, menacing, hard-hitting drill track with ONE solo female rapper: the final round of a rap battle on a night shift. Cold, heavy and powerful. English rap vocals, one female voice only, no male vocals, no singing. No guitars. 0:29 long, 142 BPM, 4/4 with a half-time feel, A minor. Clean lyrics.
-
-The sound:
-- Drill drums: a heavy kick, a hard snare and clap on beat 3 of every bar (half-time), skippy sliding hi-hats with triplet rolls, sparse off-beat percussion.
-- A huge, distorted sliding 808 that glides between notes, walking down by half steps: A, G#, F#, E.
-- A dark, eerie melody on top: a cold piano and haunting strings, with a low choir pad underneath.
-- A ticking clock sound running through the whole song, like time running out.
-- Mixed loud, wide and aggressive.
-
-The rapper: a young woman of 23, cold, sharp and controlled, every word landing on the beat, menacing rather than loud. Her voice is doubled on the ends of lines. The last line is shouted.
-
-Structure (one bar = 1.69 seconds):
-0:00–0:07 Intro (4 bars), NO vocals, building up:
-  bar 1: only the ticking clock and the cold piano melody, dark and tense.
-  bar 2: the strings and a low choir come in; the clock ticks twice as fast.
-  bar 3: the hi-hats start, a rising swell.
-  bar 4: a hi-hat roll building up; on the last half beat everything cuts to silence for a breath.
-0:07–0:14 (4 bars): the drums and the sliding 808 slam in on the downbeat with her voice. The chant "Tick-tock on the line", one line per bar.
-0:14–0:27 (8 bars): her verse "You play, I pay", one line per bar, harder to the end.
-0:27–0:29 Ending: one huge 808 hit on the downbeat of the last bar, then silence. No fade out.
-
-Lyrics (all by the one female rapper):
-
-[Intro – no vocals, building]
-
-[Final]
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-Tick-tock on the line, and nobody's gonna stop
-"Haeun, why so cold, did the night shift steal your heart?"
-That's what you said, so let me take it from the start
-Every time you start, I'm the one who has to finish
-You play, I pay. That's the difference.
-You don't know what I need, you don't know what I've seen
-Stay up on your stage, I'll stay down at the machine
-Call me stiff, call me slow, say I live by the clock
-BUT THE CLOCK KEEPS THE LINE MOVING WHILE YOU WATCH IT DROP
-
-[Ending]
-(one huge 808 hit, then silence)
-```
-
-**받은 드릴 곡**: `prototype/audio/1-5-this-is-a-beat.mp3`(받은 이름 you_play_i_pay_1, 67.13초, 실측 146.0 BPM 하프타임 — 스네어가 3박, 첫 다운비트 0.483초, 39마디, 64.6초에 뚝 끊김). 실제 구조(곡 마디, 받아쓰기는 드릴이라 일부만 잡힘): 0–3 도입, 4–9 Tick-tock ×3(두 마디에 한 줄), 10–19 벌스("Haeun, why so cold…"부터 "…watch it drop"까지, 줄 간격이 고르지 않음), 20–21 끊김, 22–27 풀 비트(스네어·하이햇 빽빽), 28–30 드럼 빠지고 Tick-tock ×2, 31–38 벌스 다시 더블타임, 39 끊김. 게임 76–115마디(`docs/stage1.md` 4페이즈 표).
+"Pink Belt"의 마지막 단어 "첫눈에"(80.9–82.3초)가 "첫누에"로 들려서, 게임에 넣은 파일은 그 단어 전(80.38초)에서 끊고 마지막 화음의 울림 꼬리(리버브, 2.9초)를 붙였다. 다시 받을 때는 끝 가사가 또렷하게 나오는지(특히 받침 연음) 확인할 것.
