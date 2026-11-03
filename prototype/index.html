@@ -260,6 +260,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 
 <script src="rookie-rig.js"></script>
 <script src="rookie-art.js"></script>
+<script src="shared/character-rig.js"></script>
 <script>
 (() => {
 'use strict';
@@ -2360,7 +2361,45 @@ function drawLiftDrop(beat, t) {
   g.save(); g.translate(top.x + p * 6, lerp(top.y + LIFT_BOX.h / 2, 190, p * p)); g.rotate(p * 0.7); drawBox(LIFT_BOX, 0, 0, '', t); g.restore();
 }
 function basePose(t, bt, active, lane = 0) {
-  const IDLE_HAND = idleHand(lane), pose = { hand: IDLE_HAND, carry: null, wince: false, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: false, beat: 0, lane };
+  const pose = basePoseLegacy(t, bt, active, lane);
+  const actor = L.cast ? castPlacer(pose.beat) : L.partners[lane];
+  const profile = WORK_RIG_PROFILES[actor];
+  // Opt in standard belt work. Dual-belt throws and stage choreography retain
+  // their authored targets; other cast members can opt in with their own profile.
+  if (!profile || L.lanes === 2 || L.daw || L.stage || pose.phone) return pose;
+  pose.workRig = true;
+  pose.armBend = profile.bendSide;
+  if (!active) return pose;
+  const laneNotes = notes.filter(n => loadLane(n) === lane && !n.toss && !n.quad);
+  for (let i = 0; i < laneNotes.length; i++) {
+    const n = laneNotes[i]; if (n.len || n.drop || n.up || n.slam) continue;
+    const pickTime = n.place - n.carry, previous = laneNotes[i - 1], next = laneNotes[i + 1];
+    const prepare = Math.min(profile.prepare, previous ? Math.max(0, (pickTime - previous.place) / 2) : profile.prepare);
+    const recover = Math.min(profile.recover, next ? Math.max(0, (next.place - next.carry - n.place) / 2) : profile.recover);
+    if (t < pickTime - prepare || t > n.place + recover) continue;
+    const motion = CharacterRig.sampleCarryCycle(profile, {
+      time: t, pickTime, placeTime: n.place, prepare, recover,
+      from: carryFrom(n), to: { x: PLACE_X + (n.cxOff || 0), y: BELT_Y - n.h / 2 },
+      grip: { x: -n.w / 2 + 1, y: 2 }, origin: { x: BOSS_X, y: PARTNERS[actor].base }
+    });
+    pose.carryMotion = motion; pose.hand = motion.hand;
+    pose.carry = motion.box ? { n, ...motion.box } : null;
+    pose.bob = 0; pose.nod = 0; pose.dip = 0;
+    return pose;
+  }
+  // A shortened recovery can finish before the old chart pose's return timer.
+  // Keep its settled rest pose until the next action, including long crates.
+  const last = laneNotes.findLast(n => n.place - n.carry <= t);
+  if (last && !last.len && !last.drop && !last.up && !last.slam && t >= last.place) {
+    pose.hand = { x: BOSS_X + profile.restHand.x, y: PARTNERS[actor].base + profile.restHand.y };
+  }
+  return pose;
+}
+function basePoseLegacy(t, bt, active, lane = 0) {
+  const actor = L.cast ? castPlacer(active ? beatAt(t) : 0) : L.partners[lane];
+  const profile = L.lanes !== 2 && !L.daw && !L.stage ? WORK_RIG_PROFILES[actor] : null;
+  const IDLE_HAND = profile ? { x: BOSS_X + profile.restHand.x, y: PARTNERS[actor].base + profile.restHand.y } : idleHand(lane);
+  const pose = { hand: IDLE_HAND, carry: null, wince: false, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: false, beat: 0, lane };
   if (!active) { pose.bob = Math.sin(bt * 1.7 + lane) > 0.85 ? 1 : 0; return pose; }
   const beat = beatAt(t), ph = beat - Math.floor(beat);
   pose.beat = beat;
@@ -2424,9 +2463,17 @@ function zzz(x, y, nowMs) {
   }
 }
 // eye, brow, sweat and breath for a human partner. ex/ey is the eye's top-left; faces right.
-function faceFx(cx, top, ex, ey, pose, nowMs, hairColor, active) {
+function faceFx(cx, top, ex, ey, pose, nowMs, hairColor, active, eyeStyle = null) {
   const r = FX.react[pose.lane], age = nowMs - r.at;
-  if (pose.doze) { R(ex - 1, ey + 1, 4, 1, C.ink); zzz(cx + 10, top + 2, nowMs); }
+  if (eyeStyle === 'jiwoo-a') {
+    // A's connected upper lid and vertical pupil stay recognizable in reactions.
+    const x = ex - (r.type === 'glance' && age < 700 ? 1 : 0);
+    if (pose.doze || pose.wince) R(x, ey + 1, 2, 1, '#2d1d21');
+    else { R(x, ey, 2, 1, '#2d1d21'); R(x + 1, ey + 1, 1, 1, '#2d1d21'); }
+    if (pose.doze) zzz(cx + 10, top + 2, nowMs);
+    if (pose.wince) R(cx - 9, top + 5, 2, 3, C.sweat);
+  }
+  else if (pose.doze) { R(ex - 1, ey + 1, 4, 1, C.ink); zzz(cx + 10, top + 2, nowMs); }
   else if (pose.wince) { R(ex - 1, ey + 1, 4, 1, C.ink); R(cx - 9, top + 5, 2, 3, C.sweat); }
   else if (r.type === 'glance' && age < 700) { R(ex - 2, ey - 1, 5, 1, hairColor); R(ex - 1, ey + 1, 3, 1, C.ink); }
   else R(ex, ey, 2, 2, C.ink);
@@ -2443,6 +2490,101 @@ function faceFx(cx, top, ex, ey, pose, nowMs, hairColor, active) {
 }
 
 // each partner: draw(pose, nowMs, active) and arm(pose). Same 4-head silhouette as the first mockup, different build and props.
+function drawJiwooPhone(hand) {
+  R(hand.x - 1, hand.y - 6, 4, 7, '#1e1a1a'); R(hand.x, hand.y - 5, 2, 4, '#8fe3f0');
+}
+// A reference head, traced on its native pixel grid. Eyes, mouth and earbud
+// remain separate so expressions and the unplug action share this silhouette.
+const JIWOO_A_HEAD = [
+  '.....HHHHHHH......',
+  '...HHLLLLHHHHH....',
+  '..HHLLLHHHHKllk...',
+  '.HHLLHHHHHKKlKKk..',
+  '.HLLHHHHHKKKKKKk..',
+  'HLLHHHHHHKKKKKKKk.',
+  'HLHHHHHHKKkKKSKKk.',
+  'HHHHHHHKKKkKKKKKK.',
+  'hHHHHHHKKKKSSSSK..',
+  'hHHHHHKKKKSSSSS...',
+  'hHHHHHKKSKSSSSS...',
+  'hhHHHHKKSSSSSSSS..',
+  '.hHHHHhKSSSSSSS...',
+  '.hhHHHHhsSSSSSS...',
+  '..hhHHHHhsSSSSS...',
+  '..hhhhHHHhhsh.....',
+  '...hhhhHHhHH......',
+].flatMap((row, y) => {
+  const runs = [];
+  for (let x = 0; x < row.length;) {
+    const color = row[x], start = x;
+    while (x < row.length && row[x] === color) x++;
+    if (color !== '.') runs.push({ x: start, y, w: x - start, color });
+  }
+  return runs;
+});
+// Same broad light/shadow planes and workwear details as main's RookieArt;
+// Jiwoo keeps his own burgundy hoodie, A face geometry, and warm skin palette.
+const JIWOO_CLOTH = Object.freeze({ hood: '#6b2f3f', shadow: '#4a2030', light: '#8b4658',
+  seam: '#39212d', vest: '#cfe04a', vestLight: '#dfe978', vestShadow: '#8eaa32',
+  vestDeep: '#647c30', reflect: '#eee8c4', pants: '#2f3440', pantsShadow: '#20232d', pantsLight: '#424650' });
+const JIWOO_A_COLORS = { H: JIWOO_CLOTH.hood, h: JIWOO_CLOTH.shadow, L: JIWOO_CLOTH.light,
+  K: '#2d1d21', k: '#44302a', l: '#5b4140', S: '#d99d6f', s: '#ba805d' };
+const JIWOO_RIG_PROFILE = CharacterRig.createProfile({
+  pivot: { x: 0, y: 56 }, shoulder: { x: -5, y: 25 }, restHand: { x: 8, y: 56 },
+  upper: 18, fore: 18, bendSide: 1, carryArc: 0, prepareArc: 0, prepare: 0.24, recover: 0.28,
+  // A short waist-level reach spawns the box at the hand on the pickup beat.
+  headFollow: false, pickupHand: { x: 2, y: 48 },
+  pickup: { lean: 0, shiftX: 0, shiftY: 1 }, place: { lean: 0.16, shiftX: 3, shiftY: 2 }
+});
+const WORK_RIG_PROFILES = Object.freeze({ jiwoo: JIWOO_RIG_PROFILE });
+// Rasterize the original pixels before leaning them, so individual rectangles
+// do not acquire blurred edges. Feet and the arm are drawn in world space.
+const jiwooBodyLayer = document.createElement('canvas');
+jiwooBodyLayer.width = 128; jiwooBodyLayer.height = 192;
+const jiwooHeadLayer = document.createElement('canvas');
+jiwooHeadLayer.width = 128; jiwooHeadLayer.height = 192;
+function drawRigBody(rig, draw) {
+  const m = rig.transform;
+  if (m.a === 1 && m.b === 0 && m.c === 0 && m.d === 1 && m.e === 0 && m.f === 0) { draw(); return; }
+  const target = g, layer = jiwooBodyLayer.getContext('2d');
+  layer.clearRect(0, 0, jiwooBodyLayer.width, jiwooBodyLayer.height);
+  try { g = layer; draw(); } finally { g = target; }
+  g.save(); g.imageSmoothingEnabled = false;
+  g.transform(m.a, m.b, m.c, m.d, m.e, m.f); g.drawImage(jiwooBodyLayer, 0, 0); g.restore();
+}
+function drawRigHead(rig, draw) {
+  const m = rig.headTransform;
+  if (m.a === 1 && m.b === 0 && m.c === 0 && m.d === 1 && m.e === 0 && m.f === 0) { draw(); return; }
+  const target = g, layer = jiwooHeadLayer.getContext('2d');
+  layer.clearRect(0, 0, jiwooHeadLayer.width, jiwooHeadLayer.height);
+  try { g = layer; draw(); } finally { g = target; }
+  g.save(); g.imageSmoothingEnabled = false;
+  g.transform(m.a, m.b, m.c, m.d, m.e, m.f); g.drawImage(jiwooHeadLayer, 0, 0); g.restore();
+}
+// The head, sleeves and props share a pose origin; only the feet stay planted.
+function jiwooRig(pose) {
+  const top = pose.carryMotion ? 84 : bodyTop(84, pose) + (pose.doze ? 3 : 0), cx = BOSS_X, neckX = cx + 4.5;
+  const transform = CharacterRig.torsoTransform({ x: cx, y: top }, JIWOO_RIG_PROFILE, pose.carryMotion?.body || {});
+  const world = point => CharacterRig.transformPoint(transform, point);
+  const head = pose.carryMotion?.head || { turn: pose.headLeft ? -1 : 1, nod: 0 };
+  const direction = head.turn < 0 ? -1 : 1, width = 0.8 + 0.2 * Math.abs(head.turn);
+  const scale = direction * width, headCenter = cx + 1.5, neckY = top + 17;
+  // Move the head's center continuously around the neck. A brief hood-back
+  // pose bridges the two profiles without squeezing the face to zero width.
+  const yawOffset = neckX + (headCenter - neckX) * head.turn - scale * headCenter;
+  const angle = head.nod * direction, cos = Math.cos(angle), sin = Math.sin(angle);
+  const headTransform = { a: cos * scale, b: sin * scale, c: -sin, d: cos,
+    e: neckX + cos * (yawOffset - neckX) + sin * neckY,
+    f: neckY + sin * (yawOffset - neckX) - cos * neckY };
+  const headPoint = point => CharacterRig.transformPoint(headTransform, point);
+  return { top, hx: cx - 7, hy: top + 1, neckX, transform, headTransform, headBack: !!pose.away || Math.abs(head.turn) < 0.45,
+    hip: world({ x: cx, y: top + 56 }), shoulder: world({ x: cx - 5, y: top + 25 }),
+    ear: world(headPoint({ x: cx + 1.5, y: top + 12 })),
+    cord: headPoint({ x: cx + 2.5, y: top + 13 }),
+    chest: { x: cx + 3.5, y: top + 22 },
+    chin: world(headPoint({ x: cx + 6.5, y: top + 18 })),
+    phone: pose.phoneHand || world({ x: cx + 14, y: top + 11 }) };
+}
 const PARTNERS = {
   boss: {
     base: 90,
@@ -2470,35 +2612,107 @@ const PARTNERS = {
   jiwoo: {
     base: 84,
     draw(pose, nowMs, active) {
-      const cx = BOSS_X, top = bodyTop(84, pose) + (pose.bob ? 1 : 0) + (pose.doze ? 3 : 0), hood = '#6b2f3f', hoodD = '#4a2030';
-      R(cx - 7, top + 18, 14, 46, hood);
-      R(cx - 7, top + 20, 14, 20, C.vest2); R(cx - 7, top + 30, 14, 2, C.reflect);
-      R(cx - 7, top + 40, 14, 2, hoodD);
-      R(cx - 9, top - 2, 18, 20, hood); R(cx - 9, top - 2, 18, 2, hoodD);
-      R(cx - 5, top + 3, 10, 12, C.skin);
-      R(cx - 5, top + 3, 10, 2, C.hairDark);
+      const cx = BOSS_X, rig = jiwooRig(pose), top = rig.top;
+      const cloth = JIWOO_CLOTH, hood = cloth.hood, hoodD = cloth.shadow, hoodL = cloth.light;
+      // Weight shifts at the hips while the knees still meet the planted legs.
+      for (const offset of [-3.5, 3.5]) {
+        thick(rig.hip.x + offset, rig.hip.y + 2.5, cx + offset, top + 61.5, 5, cloth.pants);
+        thick(rig.hip.x + offset + 1.5, rig.hip.y + 3, cx + offset + 1.5, top + 61.5, 1, cloth.pantsShadow);
+      }
+      drawRigBody(rig, () => {
+      R(cx - 7, top + 23, 14, 33, hood);
+      R(cx - 6, top + 19, 12, 3, hood); R(cx - 8, top + 22, 16, 27, hood);
+      R(cx - 8, top + 28, 2, 21, hoodD); R(cx - 6, top + 53, 12, 3, hoodD);
+      // Raised collar, two vest panels, and the recessed zip follow the same
+      // workwear construction as the rookie, at Jiwoo's native sprite scale.
+      R(cx - 5, top + 19, 4, 4, cloth.vestLight); R(cx - 6, top + 23, 14, 27, cloth.vest);
+      R(cx - 6, top + 26, 2, 24, cloth.vestShadow); R(cx - 5, top + 28, 1, 8, cloth.vestDeep);
+      R(cx - 3, top + 23, 2, 12, cloth.vestLight); R(cx + 5, top + 23, 2, 2, cloth.vestLight);
+      R(cx + 7, top + 25, 1, 25, cloth.vestShadow);
+      R(cx + 3, top + 22, 2, 30, cloth.seam); R(cx + 3, top + 26, 1, 2, '#ac9090');
+      R(cx - 6, top + 37, 14, 3, cloth.reflect); R(cx - 6, top + 39, 2, 1, '#b6bd7b');
+      R(cx - 6, top + 40, 14, 1, cloth.vestShadow); R(cx + 3, top + 37, 2, 4, cloth.seam);
+      // The small ID and pocket are readable blocks, not miniature text.
+      R(cx + 4, top + 27, 4, 5, cloth.seam); R(cx + 5, top + 26, 1, 1, '#aeb9b0');
+      R(cx + 5, top + 28, 2, 3, '#e2e5d7'); R(cx + 5, top + 28, 1, 1, '#74858b');
+      R(cx + 5, top + 30, 2, 1, '#a4b3af');
+      R(cx + 4, top + 43, 4, 4, cloth.vestDeep); R(cx + 5, top + 44, 2, 2, cloth.vest);
+      R(cx + 4, top + 42, 4, 1, cloth.vestLight);
+      R(cx - 6, top + 50, 14, 2, cloth.seam); R(cx - 5, top + 50, 7, 1, hoodL);
+      R(cx - 5, top + 53, 1, 2, hoodL); R(cx + 3, top + 53, 2, 2, cloth.seam);
+      // The near shoulder is stepped into the sleeve, instead of a square vest corner.
+      R(cx - 8, top + 23, 5, 5, hood); R(cx - 8, top + 23, 4, 1, hoodL); R(cx - 9, top + 27, 5, 7, hood);
+      R(cx - 5, top + 17, 11, 2, cloth.seam); R(cx - 4, top + 18, 5, 1, hoodL);
+      drawRigHead(rig, () => {
+      // The study's roughly 18px square head replaces the old 20x23 head.
+      const { hx, hy } = rig, hair = JIWOO_A_COLORS.K;
+      for (const pixel of JIWOO_A_HEAD) R(hx + pixel.x, hy + pixel.y, pixel.w, 1,
+        rig.headBack ? (pixel.y > 13 ? hoodD : hood) : JIWOO_A_COLORS[pixel.color]);
+      if (rig.headBack) {
+        R(hx + 7, hy + 3, 1, 10, hoodD); R(hx + 8, hy + 2, 1, 11, hoodL);
+        return;
+      }
+      const eyeY = hy + 9 + (pose.lookDown ? 1 : 0);
+      if (pose.surprised) {
+        R(hx + 12, eyeY - 1, 2, 1, hair); R(hx + 13, eyeY + 1, 1, 2, hair);
+        R(hx + 13, hy + 13, 1, 2, '#3c2825');
+      } else {
+        faceFx(cx, top, hx + 12, eyeY, pose, nowMs, hair, active && !pose.vibe, 'jiwoo-a');
+        R(hx + 13, hy + 13, 1, 1, '#3c2825');
+      }
       if (pose.vibe) {
-        R(cx, top + 9, 3, 1, C.ink); R(cx + 1, top + 12, 2, 1, '#b2565a');
-        for (let k = 0; k < 2; k++) { const p = ((nowMs / 1000) / (SPB * 2) + k * 0.5) % 1; g.globalAlpha = Math.sin(Math.PI * p); eighthNote(cx + 8 + p * 12, top - 4 - p * 16, '#f2a6c8'); g.globalAlpha = 1; }
-      } else faceFx(cx, top, cx + 1, top + 8, pose, nowMs, C.hairDark, active);
-      // earbuds: in both ears, or one out and dangling once 반장 makes her pull them
-      if (pose.unplug) { R(cx + 5, top + 18, 2, 2, '#f4f1ea'); for (let k = 0; k < 8; k++) R(cx + 6 + (k % 2), top + 10 + k, 1, 1, '#f4f1ea'); }
-      else { R(cx + 5, top + 8, 2, 2, '#f4f1ea'); for (let k = 0; k < 10; k++) R(cx + 6 + (k % 2), top + 10 + k, 1, 1, '#f4f1ea'); }
-      R(cx - 8, top + 8, 2, 2, '#f4f1ea');
-      if (pose.phone) { R(cx + 8, top + 5, 4, 7, '#1e1a1a'); R(cx + 9, top + 6, 2, 4, '#8fe3f0'); }
-      if (!pose.doze && active && pose.bob) R(cx - 9, top + 6, 2, 1, hoodD);
-      // his face turned away (the side of his hood towards us), and the '!' of waking with a start
-      if (pose.away) { R(cx - 5, top + 3, 8, 12, hood); R(cx - 5, top + 3, 8, 2, hoodD); R(cx + 3, top + 6, 2, 8, C.skin); }
-      if (pose.alarm) { R(cx + 11, top - 12, 2, 6, '#ffe27a'); R(cx + 11, top - 4, 2, 2, '#ffe27a'); }
-      // smitten (1-5): pink cheeks
-      if (pose.smit) { R(cx - 4, top + 11, 2, 1, '#ff8fb0'); R(cx + 3, top + 11, 2, 1, '#ff8fb0'); }
+        R(hx + 14, hy + 12, 1, 1, '#3c2825');
+        for (let k = 0; k < 2; k++) { const p = ((nowMs / 1000) / (SPB * 2) + k * 0.5) % 1; g.globalAlpha = Math.sin(Math.PI * p); eighthNote(cx + 10 + p * 12, top - 4 - p * 16, '#f2a6c8'); g.globalAlpha = 1; }
+      }
+      if (pose.smit) R(hx + 10, hy + 12, 2, 1, '#ff8fb0');
+      if (!pose.nobuds && !pose.unplug) R(hx + 8, hy + 10, 1, 2, '#f4f1ea');
+      });
+      if (!pose.nobuds) {
+        // Turning the head moves the ear, while the cord stays attached at the chest.
+        for (let y = rig.cord.y; !rig.headBack && y < rig.chest.y; y++) {
+          const p = (y - rig.cord.y) / (rig.chest.y - rig.cord.y - 1);
+          R(lerp(rig.cord.x, rig.chest.x, p) - 0.5, y, 1, 1, '#f4f1ea');
+        }
+        if (pose.unplug) R(rig.chest.x - 0.5, rig.chest.y, 2, 2, '#f4f1ea');
+      }
+      });
+      if (pose.alarm) { const at = CharacterRig.transformPoint(rig.transform, { x: cx + 11, y: top - 12 }); R(at.x, at.y, 2, 6, '#ffe27a'); R(at.x, at.y + 8, 2, 2, '#ffe27a'); }
+      if (pose.phone && !pose.phoneHand) drawJiwooPhone(rig.phone);
     },
     arm(pose) {
-      const top = bodyTop(84, pose);
-      if (pose.phone) { thick(BOSS_X + 5, top + 23, BOSS_X + 9, top + 11, 4, '#6b2f3f'); R(BOSS_X + 7, top + 9, 4, 4, C.skin); return; }
-      const free = pose.hype && !pose.carry && Math.abs(pose.hand.x - (BOSS_X + 13)) < 2 && Math.abs(pose.hand.y - 134) < 2;
-      if (free) { const up = pose.bob < 0 ? -6 : 0; thick(BOSS_X + 5, top + 23, BOSS_X + 8, top + 4 + up, 4, '#6b2f3f'); R(BOSS_X + 6, top + 1 + up, 5, 5, C.skin); return; }
-      thick(BOSS_X + 5, top + 23, pose.hand.x, pose.hand.y, 4, '#6b2f3f'); R(pose.hand.x - 2, pose.hand.y - 2, 4, 4, C.skin);
+      const rig = jiwooRig(pose), top = rig.top, { x: sx, y: sy } = rig.shoulder;
+      const sleeve = (hand, bendSide = pose.phone ? 1 : (pose.armBend ?? JIWOO_RIG_PROFILE.bendSide)) => {
+        const { upper, fore } = JIWOO_RIG_PROFILE;
+        // Standard carrying uses fixed lengths and one bend direction throughout.
+        // Older stage/dual-belt gestures keep their existing farther prop targets.
+        const stretch = pose.carryMotion ? 1 : Math.max(1, Math.hypot(hand.x - sx, hand.y - sy) / (upper + fore));
+        const arm = CharacterRig.solveArm(rig.shoulder, hand, { upper, fore, stretch, bendSide });
+        const e = arm.elbow, h = arm.wrist;
+        const cloth = JIWOO_CLOTH;
+        thick(sx, sy, e.x, e.y, 5, cloth.shadow); thick(e.x, e.y, h.x, h.y, 5, cloth.shadow);
+        thick(sx, sy, e.x, e.y, 4, cloth.hood); thick(e.x, e.y, h.x, h.y, 4, cloth.hood);
+        // Short lit planes follow each bone, so elbow folds and cuffs stay on
+        // the sleeve in every pose without changing the solved hand contact.
+        for (const [a, b] of [[rig.shoulder, e], [e, h]]) {
+          const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy);
+          if (len < 1) continue;
+          const side = dx > 0 ? -1 : 1, nx = -dy / len * side, ny = dx / len * side;
+          thick(lerp(a.x, b.x, 0.18) + nx, lerp(a.y, b.y, 0.18) + ny,
+            lerp(a.x, b.x, 0.7) + nx, lerp(a.y, b.y, 0.7) + ny, 1, cloth.light);
+        }
+        thick(lerp(e.x, h.x, 0.8), lerp(e.y, h.y, 0.8), lerp(e.x, h.x, 0.94), lerp(e.y, h.y, 0.94), 4, cloth.shadow);
+        return h;
+      };
+      if (pose.phone) {
+        const h = sleeve(rig.phone);
+        if (pose.phoneHand) drawJiwooPhone(h);
+        R(h.x - 2, h.y - 2, 4, 4, C.skin); return;
+      }
+      const atRest = Math.hypot(pose.hand.x - (BOSS_X + 13), pose.hand.y - 134) < 2 ||
+        Math.hypot(pose.hand.x - (BOSS_X + JIWOO_RIG_PROFILE.restHand.x), pose.hand.y - (84 + JIWOO_RIG_PROFILE.restHand.y)) < 2;
+      const free = pose.hype && !pose.workRig && !pose.carryMotion && !pose.carry && atRest;
+      if (free) { const up = pose.bob < 0 ? -6 : 0, h = sleeve({ x: BOSS_X + 13, y: top + 4 + up }, 1); R(h.x - 2, h.y - 3, 5, 5, C.skin); return; }
+      const hand = sleeve(pose.hand); R(hand.x - 2, hand.y - 2, 4, 4, C.skin);
     }
   },
   haeun: {
@@ -2752,7 +2966,7 @@ function drawActor(id, x, mirrored, pose, nowMs, active, extra) {
   g.save();
   if (mirrored) { g.translate(x, 0); g.scale(-1, 1); g.translate(-BOSS_X, 0); } else g.translate(x - BOSS_X, 0);
   PARTNERS[id].draw(pose, nowMs, active);
-  if (extra) extra(bodyTop(PARTNERS[id].base, pose));
+  if (extra) extra(id === 'jiwoo' ? jiwooRig(pose).top : bodyTop(PARTNERS[id].base, pose));
   g.restore();
 }
 // after the shift the cast stays where the song left them (반장 on the line, 지우 behind the belt) through the outro and result
@@ -2782,7 +2996,7 @@ function drawCast(t, nowMs, active, placerPose) {
     else if (!(rel >= 8)) { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); }
   });
   // the earbud cord stretched between them while he listens
-  if (listening) { const ax = jx + 6, ay = 92, bxe = bx - 3, bye = 99; for (let k = 0; k <= 20; k++) { const p = k / 20; R(lerp(ax, bxe, p), lerp(ay, bye, p) + Math.sin(p * Math.PI) * 6, 1, 1, '#f4f1ea'); } }
+  if (listening) { const ear = jiwooRig(jPose).ear, ax = jx + ear.x - BOSS_X, ay = ear.y, bxe = bx - 3, bye = 99; for (let k = 0; k <= 20; k++) { const p = k / 20; R(lerp(ax, bxe, p), lerp(ay, bye, p) + Math.sin(p * Math.PI) * 6, 1, 1, '#f4f1ea'); } }
 }
 
 // 하은, the co-scanner on the upper belt. A smaller head than the rest of the cast (a 10x12 face under a 12-wide cap). She stands at the
@@ -3443,16 +3657,18 @@ function drawShoved(b, nowMs) {
   // the streaks he leaves
   if (d < 0.5) { const a = 1 - d / 0.5; g.fillStyle = `rgba(255,255,255,${0.7 * a})`; for (let k = 0; k < 5; k++) { const len = Math.round((x - x0) + 14 - k * 3); g.fillRect(Math.round(x - 10 - len), 70 + k * 8 + (k % 2) * 3, Math.max(0, len), 1); } }
   const stare = d >= 0.9 && back === 0, talk = inRange(b, [[V.shove + 4.2, V.shove + 7]]);
-  const pose = { hand: talk ? { x: BOSS_X + 11, y: 114 } : { x: BOSS_X + 4, y: 128 }, carry: null, wince: d < 0.9, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: true, lane: 0, beat: b };
+  const pose = { hand: talk ? { x: BOSS_X + 11, y: 114 } : { x: BOSS_X + 4, y: 128 }, carry: null, wince: d < 0.9, surprised: stare, dip: 0, bob: 0, nod: 0, doze: false, phone: false, vibe: false, unplug: true, lane: 0, beat: b };
   const feet = 148;
-  g.save(); clipBehindUpper(); g.translate(Math.round(x - BOSS_X), o.dy + hop); g.translate(BOSS_X, feet); g.rotate(lean); g.translate(-BOSS_X, -feet);
-  if (back > 0 && back < 1) { g.translate(BOSS_X, 0); g.scale(-1, 1); g.translate(-BOSS_X, 0); }   // facing the way he walks back
+  const applyPoseTransform = () => {
+    g.translate(Math.round(x - BOSS_X), o.dy + hop);
+    g.translate(BOSS_X, feet); g.rotate(lean); g.translate(-BOSS_X, -feet);
+    if (back > 0 && back < 1) { g.translate(BOSS_X, 0); g.scale(-1, 1); g.translate(-BOSS_X, 0); }
+  };
+  g.save(); clipBehindUpper(); applyPoseTransform();
   PARTNERS.jiwoo.draw(pose, nowMs, true);
   if (stare) {
-    // the face gone blank: brows up, wide eyes, mouth open
-    const cx = BOSS_X, top = bodyTop(84, pose), ink = C.ink;
-    R(cx - 5, top + 6, 10, 9, C.skin); R(cx - 3, top + 6, 2, 1, C.hairDark); R(cx + 2, top + 6, 2, 1, C.hairDark);
-    R(cx - 3, top + 8, 1, 2, ink); R(cx + 2, top + 8, 1, 2, ink); R(cx - 1, top + 11, 2, 2, '#5a2a2a');
+    // The shared A face draws the reaction; only the floating cues go here.
+    const cx = BOSS_X, top = jiwooRig(pose).top;
     // the '?' over his head, blinking in, and a bead of sweat once he speaks
     if (b < V.shove + 4.2 || talk) { const on = (b - V.shove) % 1 < 0.75 || b > V.shove + 2.2, qx = cx + 7, qy = top - 12;
       if (on) { R(qx, qy, 3, 1, '#ffffff'); R(qx + 2, qy + 1, 1, 1, '#ffffff'); R(qx + 1, qy + 2, 2, 1, '#ffffff'); R(qx + 1, qy + 4, 1, 1, '#ffffff'); } }
@@ -3460,7 +3676,7 @@ function drawShoved(b, nowMs) {
   }
   g.restore();
   // his arms above the belt (screen space, like his loading arm): hanging, or up when he speaks
-  g.save(); g.translate(Math.round(x - BOSS_X), o.dy + hop); PARTNERS.jiwoo.arm(pose); g.restore();
+  g.save(); applyPoseTransform(); PARTNERS.jiwoo.arm(pose); g.restore();
   return true;
 }
 // 하은 on her visit, drawn in front of the lower belt
@@ -6147,17 +6363,29 @@ function drawMemory(et, a, vanish, nowMs) {
 }
 // 지우 standing in the office, one earbud hanging: head down, a hand at his chin, or flustered (a hand up, sweating); he turns
 // to 반장 once 반장 is in the room
-function drawStandingJiwoo(x, nowMs, how, toBoss) {
+function drawStandingJiwoo(x, nowMs, how, toBoss, options = {}) {
   const pose = { hand: { x: BOSS_X + 8, y: 130 }, carry: null, wince: how === 'fluster', dip: how === 'down' ? 2 : 0, bob: Math.sin(nowMs / 1000 * 1.5 + 1) > 0.88 ? 1 : 0, nod: 0, doze: false, phone: false, vibe: false, unplug: true, lane: 1, beat: 0 };
-  if (how === 'think') pose.hand = { x: BOSS_X + 2, y: 100 };
+  pose.nobuds = !!options.nobuds;
+  pose.lookDown = how === 'down' || how === 'think';
+  if (Number.isFinite(options.bob)) pose.bob = options.bob;
+  if (how === 'think') pose.hand = jiwooRig(pose).chin;
   if (how === 'fluster') pose.hand = { x: BOSS_X + 12, y: 108 + (Math.floor(nowMs / 160) % 2) };
   g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(x, 169, 14, 3, 0, 0, Math.PI * 2); g.fill();
-  drawActor('jiwoo', x, false, pose, nowMs, false, top => {
-    R(BOSS_X - 6, top + 64, 5, 17, '#2f3440'); R(BOSS_X + 1, top + 64, 5, 17, '#2f3440');
-    R(BOSS_X - 7, top + 81, 7, 4, '#e9e4da'); R(BOSS_X + 1, top + 81, 7, 4, '#e9e4da');
+  drawActor('jiwoo', x, options.facing === 'left', pose, nowMs, false, top => {
+    const ankleY = 165, legY = top + 64, kneeY = Math.round((legY + ankleY) / 2), cloth = JIWOO_CLOTH;
+    for (const lx of [BOSS_X - 6, BOSS_X + 1]) {
+      R(lx, legY, 5, ankleY - legY, cloth.pants); R(lx + 4, legY, 1, ankleY - legY, cloth.pantsShadow);
+      R(lx + 1, legY + 2, 2, Math.max(1, kneeY - legY - 3), cloth.pantsLight);
+      R(lx, kneeY, 3, 1, cloth.pantsShadow); R(lx + 1, kneeY + 1, 3, 1, cloth.pantsLight);
+      R(lx + 1, kneeY + 3, 1, Math.max(1, ankleY - kneeY - 5), cloth.pantsLight);
+      R(lx, ankleY - 2, 5, 2, cloth.pantsShadow); R(lx + 1, ankleY - 2, 3, 1, cloth.pantsLight);
+    }
+    for (const sx of [BOSS_X - 7, BOSS_X + 1]) {
+      R(sx, ankleY, 7, 4, '#e9e4da'); R(sx, ankleY, 2, 3, '#9d9b98');
+      R(sx + 2, ankleY, 3, 1, '#b9b5ad'); R(sx, ankleY + 3, 7, 1, '#6f7273');
+    }
     PARTNERS.jiwoo.arm(pose);
-    // head down: eyes on the floor
-    if (how === 'down' || how === 'think') { R(BOSS_X - 5, top + 7, 10, 3, C.skin); R(BOSS_X - 2, top + 9, 2, 1, C.ink); R(BOSS_X + 2, top + 9, 2, 1, C.ink); }
+    // The shared profile renderer handles the lowered gaze without painting over its fringe.
   });
 }
 // on the line, during the walk: 반장 crosses behind the belt from the middle to his place, facing the way he walks
