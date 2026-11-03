@@ -81,7 +81,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .bubble.obs{background:#d9d0bd}
 .bubble.tr::after{left:auto;right:1.6em}
 .bubble.mid::after{left:var(--tx,1.6em);right:auto}
-.sub{position:absolute;left:50%;top:78%;transform:translateX(-50%);max-width:70cqw;text-align:center;pointer-events:none;
+.sub{position:absolute;left:50%;top:69%;transform:translateX(-50%);max-width:70cqw;text-align:center;pointer-events:none;
   font-weight:700;font-size:clamp(13px,2.4cqw,24px);line-height:1.35;color:#f4ead8;background:rgba(10,8,8,.74);padding:.3em .8em;border-radius:.4em;
   box-shadow:0 2px 0 rgba(0,0,0,.45);white-space:nowrap}
 .sub b{font-weight:800;margin-right:.45em}
@@ -3598,13 +3598,15 @@ function phaseJolt(b) { const F = L.phaseFx; if (!F || reduce) return [0, 0]; co
 // 반장, the belt, the scanner) is the left half; the right half is its mirror about where you stand: line 4, 마르코 loading it,
 // its own scanner facing yours. Over mid.zoom the camera pulls back from the old view to the whole floor. A scanned box rides
 // on to the end of its belt and drops into the cart between the lines; a missed one runs off the end.
-const MID = { ax: PLAYER_X, ww: 2 * PLAYER_X, wh: 432, oy: 108 };
+const MID = { ax: PLAYER_X, ww: 2 * PLAYER_X, wh: 480, oy: 108 };
 let midCv = null, midG = null, MIDCAM = null;
 // (the far ends are trimmed a little and the view sits a touch higher, so the floor fills the screen). sEnd: the pulled-back
 // scale, rounded so that at the screen's real resolution one dot of the floor is a whole number of device pixels
 function midView(b, sEnd) {
   const z = L.mid.zoom, e = b < z[0] ? 0 : b >= z[1] ? 1 : ease((b - z[0]) / (z[1] - z[0]));
-  let s = lerp(1, sEnd, e), cx = lerp(W / 2, MID.ax, e), cy = lerp(H / 2, H / 2 - 12, e);
+  // (stage 2: the view sits low, so the belts ride in the upper part of the screen, clear of the thumbs on a phone, and the whole
+  // floor's width shows, 반장 and 마르코 not cut at the ends)
+  let s = lerp(1, sEnd, e), cx = lerp(W / 2, MID.ax, e), cy = lerp(H / 2, H / 2 + 58, e);
   // while 마르코 introduces himself beside you the camera comes in on the two of you, and goes back out after
   // (no zoom while 마르코 talks: the whole floor stays in view)
   return { s, cx, cy, e };
@@ -3960,7 +3962,7 @@ function drawMid(t, nowMs, active) {
   // the camera. Before it moves it draws into the game canvas like any frame; once it pulls back it draws into a canvas the size
   // of the screen in device pixels laid over it (each dot of the floor a whole number of device pixels where the framing allows)
   const dpr = window.devicePixelRatio || 1, hw = Math.max(W, Math.round(cv.clientWidth * dpr)), hh = Math.round(hw * H / W), k = hw / W;
-  const want = W / (MID.ww - 70), mInt = Math.round(k * want), sEnd = mInt >= 2 && Math.abs(mInt / k - want) / want < 0.06 ? mInt / k : want, V = midView(b, sEnd), sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
+  const want = W / (MID.ww + 12), mInt = Math.round(k * want), sEnd = mInt >= 2 && Math.abs(mInt / k - want) / want < 0.06 ? mInt / k : want, V = midView(b, sEnd), sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
   let [jx, jy] = phaseJolt(bReal);
   if (FX.midPair && nowMs - FX.midPair.at < 170 && !reduce) { const k = FX.midPair.both ? 2 : 1; jx += Math.round((Math.random() * 2 - 1) * k); jy += Math.round((Math.random() * 2 - 1) * k); }
   MIDCAM = { sx, sy, sw, sh };
@@ -6831,7 +6833,7 @@ function popJudge(kind, sub = '', lane = 0) {
   judgeEl.className = 'judge ' + cls;
   judgeEl.style.top = kind === 'both' ? '19%' : L.lanes === 2 && lane === 0 ? '12%' : '29%';
   // on the four chutes the word comes up over the middle of the highway
-  const bNow = castBeatAt(songAt(performance.now()), state === 'play'), qd = (L.quad && quadP(bNow) > 0.5) || (L.mid && bNow >= L.mid.zoom[1]); judgeEl.style.left = qd ? '50%' : ''; if (qd) judgeEl.style.top = L.mid ? '11%' : '44%';
+  const bNow = castBeatAt(songAt(performance.now()), state === 'play'), qd = (L.quad && quadP(bNow) > 0.5) || (L.mid && bNow >= L.mid.zoom[1]); judgeEl.style.left = qd ? '50%' : ''; if (qd) judgeEl.style.top = L.mid ? '55%' : '44%';
   judgeEl.innerHTML = '';
   judgeEl.append(txt);
   if (sub) { const s = document.createElement('small'); s.textContent = sub; judgeEl.append(s); }
