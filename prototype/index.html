@@ -5074,7 +5074,13 @@ function drawMid(t, nowMs, active) {
     drawActor('boss', Math.round(bx0), false, pose, nowMs, active, () => PARTNERS.boss.arm(pose));
   });
   if (!marco.up) drawMarco();
-  drawPlayer(Math.max(pk(0), pk(1)), nowMs);
+  // you face the side you last scanned: the right line's box, and you turn your head (the whole of you, mirrored about your
+  // spot) to the right; a box on the left turns you back. Both at once keeps you as you were
+  const pr0 = QUADFX.press[0], pr1 = QUADFX.press[1];
+  if (Math.abs(pr1 - pr0) > 30) FX.faceR = pr1 > pr0;
+  if (!live) FX.faceR = false;
+  if (FX.faceR) { g.save(); g.translate(2 * AX, 0); g.scale(-1, 1); drawPlayer(Math.max(pk(0), pk(1)), nowMs); g.restore(); }
+  else drawPlayer(Math.max(pk(0), pk(1)), nowMs);
   mirror(0, () => belt(0, false)); mirror(1, () => belt(1, false));
   // each hit's square rings out of its own scanner, over the floor (not cut at the middle); a pair's white and bigger, with a
   // white flash in the scanner, so both hands at once show two
