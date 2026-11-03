@@ -1,6 +1,5 @@
-# Builds prototype/assets/cast17.png + cast17.json: the 1-7 cutscene's cast (지우, 하은, 반장) cut from the approved design
-# references in docs/art into rig parts. Parts are kept at 4x the game's dot size (the game draws a pose at that size and
-# shrinks it, so joints never seam); 반장's two still frames are shrunk here straight to game size.
+# Builds prototype/assets/cast17.png + cast17.json: the 1-7 cutscene's cast (지우, 하은, 반장, 신입) cut from the approved design
+# references in docs/art into rig parts and stills, all at 4x the game's dot size (1-7 draws at 4x: see RS in index.html).
 # Run from the repo root:  python3 prototype/ref/cast17/build.py
 import json
 import numpy as np
@@ -120,28 +119,32 @@ def thigh_fill(src, off):
         src[y, x] = [0.17, 0.17, 0.20, 1] if rx < 470 else [0, 0, 0, 0]
 H.part('thighN', (404, 412, 476, 600), (437, 432), knee=(440, 592), fill=thigh_fill)
 
-# ---------------- 반장 (two stills straight at game size: standing, and the coffee) ----------------
+# ---------------- 반장 (two stills: standing, the coffee) and 신입 (the game's player: standing, scanning), at 4x too ----------------
 B = load('foreman-concept.png')
-BOSS_H = 80
-def still(rect, foot):
-    x0, y0, x1, y1 = rect; k = BOSS_H / (827 - 15)
-    arr = shrink(B.crop(rect), (round((x1 - x0) * k), round((y1 - y0) * k)))
-    return {'arr': arr, 'foot': [round((foot[0] - x0) * k), round((foot[1] - y0) * k)], 'k': k}
-BS = {'stand': still((222, 10, 510, 832), (360, 827)), 'coffee': still((1350, 10, 1710, 832), (1490, 827))}
+def still(im, rect, foot, height, full_h):
+    x0, y0, x1, y1 = rect; k = 4 * height / full_h
+    arr = shrink(im.crop(rect), (round((x1 - x0) * k), round((y1 - y0) * k)))
+    return {'arr': arr, 'foot': [round((foot[0] - x0) * k, 1), round((foot[1] - y0) * k, 1)]}
+BS = {'stand': still(B, (222, 10, 510, 832), (360, 827), 80, 812), 'coffee': still(B, (1350, 10, 1710, 832), (1490, 827), 80, 812)}
+# 신입: prototype/assets/rookie-sprites.png (main's sheet from docs/art/rookie-approved.png; faces left): idle, scan, flinch.
+# The frames and foot anchors are rookie-art.js's own
+RK = Image.open('prototype/assets/rookie-sprites.png').convert('RGBA')
+ra = np.asarray(RK).copy(); ra[..., 3] = np.where(ra[..., 3] < 160, 0, ra[..., 3]); RK = Image.fromarray(ra, 'RGBA')
+RKS = {'idle': still(RK, (208, 16, 528, 720), (425, 704), 80, 679), 'scan': still(RK, (824, 16, 1224, 720), (1119, 704), 80, 679),
+       'flinch': still(RK, (1560, 16, 1912, 720), (1795, 704), 80, 679)}
 
 # ---------------- pack ----------------
-items = [('jiwoo', n, p['arr'], p) for n, p in J.parts.items()] + [('haeun', n, p['arr'], p) for n, p in H.parts.items()] + [('boss', n, s['arr'], s) for n, s in BS.items()]
-PAD, ROWW = 2, 512
+items = [('jiwoo', n, p['arr'], p) for n, p in J.parts.items()] + [('haeun', n, p['arr'], p) for n, p in H.parts.items()] + [('boss', n, s['arr'], s) for n, s in BS.items()] + [('rookie', n, s['arr'], s) for n, s in RKS.items()]
+PAD, ROWW = 2, 1024
 x = y = rowh = 0; place = []
 for who, n, arr, p in sorted(items, key=lambda it: -it[2].shape[0]):
     h, w = arr.shape[:2]
     if x + w + PAD > ROWW: x = 0; y += rowh + PAD; rowh = 0
     place.append((who, n, arr, p, x, y)); x += w + PAD; rowh = max(rowh, h)
 atlas = Image.new('RGBA', (ROWW, y + rowh), (0, 0, 0, 0))
-meta = {'jiwoo': {'scale': 4, 'parts': {}}, 'haeun': {'scale': 4, 'parts': {}}, 'boss': {'scale': 1, 'parts': {}}}
+meta = {'jiwoo': {'scale': 4, 'parts': {}}, 'haeun': {'scale': 4, 'parts': {}}, 'boss': {'scale': 4, 'parts': {}}, 'rookie': {'scale': 4, 'parts': {}}}
 for who, n, arr, p, px, py in place:
-    hard = 0.5 if who == 'boss' else None
-    atlas.alpha_composite(to_img(arr, hard), (px, py))
+    atlas.alpha_composite(to_img(arr), (px, py))
     e = {'r': [px, py, arr.shape[1], arr.shape[0]]}
     e.update({k: v for k, v in p.items() if k not in ('arr', 'k')})
     meta[who]['parts'][n] = e
