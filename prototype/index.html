@@ -1056,31 +1056,37 @@ const LEVELS = [
     // heartbeat kick, bass, glockenspiel). The clips slide along his laptop's timeline to the playhead and you set each one
     // down; every new layer brings back something from the night. It ends when he presses stop and saves it.
     lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
-    hitKit: 'ticktock', bareBand: true, observer: 'boss', observerIntro: true,   // 반장 by the line for the intro only
+    hitKit: 'ticktock', bareBand: true, observer: 'boss', observerIntro: true, noCount: true,   // 반장 by the line for the intro only
     heads: { j: [104, 58], h: [52, 90], r: [60, 116] },
     clock:'02:50', title:'첫눈에', hints: false, special:['떨어진 상자', 'drop', '받아냄'],
-    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 320,
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 336,
     chords: [[277.18, 349.23, 415.3], [233.08, 277.18, 349.23], [185, 233.08, 277.18], [207.65, 261.63, 311.13]], roots: [69.3, 58.27, 92.5, 103.83], chordAt: bar => bar % 4,
-    sections: [[0, 'intro'], [1, 'pb'], [42, 'walk'], [46, 'room'], [78, 'saved'], [80, 'outro']],
-    tempo: [[0, 120], [184, 90]],
-    songs: [{ src: 'audio/1-5-pink-belt.mp3', at: 4, lead: 0.11, gain: 0.85, sec: 'pb' },
-            { src: 'audio/1-5-new-beat.mp3', at: 184, lead: 0.1, gain: 1.0, sec: 'room' }],
-    // the moment (love): his fumble (56, the song's near-silence) floats down at her and she catches it (59) and holds it up
+    sections: [[0, 'meet'], [5, 'pb'], [46, 'walk'], [50, 'room'], [82, 'saved'], [84, 'outro']],
+    tempo: [[0, 120], [200, 90]],
+    songs: [{ src: 'audio/1-5-pink-belt.mp3', at: 20, lead: 0.11, gain: 0.85, sec: 'pb' },
+            { src: 'audio/1-5-new-beat.mp3', at: 200, lead: 0.1, gain: 1.0, sec: 'room' }],
+    // the moment (love): his fumble (72, the song's near-silence) floats down at her and she catches it (59) and holds it up
     // (to 63); pink comes up round them; from then on he is smitten (hearts rising off him, his cheeks pink); his boxes in the
     // choruses carry hearts
-    love: { fumble: 56, catch: 59, hold: [59, 63], moment: [55.5, 68], glow: [[68, 100], [132, 165]], smit: [[62.5, 184]], heart: [[68, 100], [132, 164]] },
-    // the room (drawRoom15): from 184, the walk out fading to black before it (180-184); the stop at 312. Each layer that goes
+    // the meeting before the song (meet): he asks her to pass a box up (1); she lifts it up to him (3.5-6) and as she does her
+    // cap tips back and for the first time her face shows (5-10): the camera close on her, a glockenspiel rising, a warm swell,
+    // his heart; then him, red to the ears (10.5)
+    meet: { lift: [3.5, 6.2], reveal: [5, 10] },
+    love: { fumble: 72, catch: 75, hold: [75, 79], moment: [71.5, 84], glow: [[84, 116], [148, 181]], smit: [[9.5, 200]], heart: [[84, 116], [148, 180]] },
+    // the room (drawRoom15): from 200, the walk out fading to black before it (196-200); the stop at 328. Each layer that goes
     // in lights its name on the timeline, and a moment of the night comes back in the laptop's corner
-    room: { from: 184, stop: 312, layers: [[188, '시계'], [200, '기타'], [216, '드럼'], [232, '베이스'], [248, '멜로디']],
-      memories: [[200, 'catch'], [216, 'look'], [232, 'cap'], [248, 'watch'], [296, 'catch']] },
-    act: { lookUp: [[20, 23], [60, 63], [126, 129]], upAtDrops: true, alarmAt: [[56, 57.5], [128.6, 130]] },
-    camPlay: [[55.5, 59, { x: 84, y: 100, k: 1.4 }], [59, 62.5, { x: 58, y: 104, k: 2.4 }], [62.5, 66, { x: 104, y: 84, k: 2.4 }]],
-    cutscene: [[55.5, 66], [166, 186], [312, 320]],
-    devMarks: [[0, '처음'], [44, '자랑'], [56, '받아내기'], [68, '후렴 1'], [100, '2절'], [124, '빌드업'], [132, '마지막 후렴'], [166, '퇴근길'], [184, '지우의 방'], [216, '드럼'], [248, '멜로디'], [296, '마지막 네 마디']],
+    room: { from: 200, stop: 328, layers: [[204, '시계'], [216, '기타'], [232, '드럼'], [248, '베이스'], [264, '멜로디']],
+      memories: [[216, 'face'], [232, 'catch'], [248, 'cap'], [264, 'watch'], [312, 'face']] },
+    act: { lookUp: [[36, 39], [76, 79], [142, 145]], upAtDrops: true, alarmAt: [[72, 73.5], [144.6, 146], [10.2, 12]] },
+    camPlay: [[0.5, 3.5, { x: 80, y: 96, k: 1.5 }], [3.5, 10, { x: 54, y: 100, k: 3.2 }], [10, 15, { x: 104, y: 80, k: 2.6 }],
+      [71.5, 75, { x: 84, y: 100, k: 1.4 }], [75, 78.5, { x: 58, y: 104, k: 2.4 }], [78.5, 82, { x: 104, y: 84, k: 2.4 }]],
+    cutscene: [[0, 16], [71.5, 82], [182, 202], [328, 336]],
+    devMarks: [[0, '처음 · 만남'], [20, 'Pink Belt'], [60, '자랑'], [72, '받아내기'], [84, '후렴 1'], [116, '2절'], [140, '빌드업'], [148, '마지막 후렴'], [182, '퇴근길'], [200, '지우의 방'], [232, '드럼'], [264, '멜로디'], [312, '마지막 네 마디']],
     // phase 1 (8 cells a bar): upper 지우 (in the choruses his heartbeat: a beat and its 'and'), lower 하은 and his boxes
     // that fall onto her belt while he stares at her ('d'); phase 2 (16 cells a bar): the clips on his timeline, the top
     // tracks (clock, guitar, melody) and the rhythm tracks (drums with the ba-dum kick, bass), the stop at the end
     bars: [
+      '........', '........', '........', '........',
       '........', '........', 'x...x...', 'x...x...', 'x.x.x...', '........', '..x.....', '..x...x.',
       '..x.....', 'x...x...', 'x.x.x...', 'x...x...', 'x.x.x.x.', 'x.x.x...', '........', '........',
       '........', 'xx..xx..', 'xx......', 'xx..xx..', 'xx..xx..', 'xx......', 'xx..xx..', 'xx..xx..',
@@ -1093,6 +1099,7 @@ const LEVELS = [
       'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.', 'x...x.x.x...x...', 'x...x...x.x...x.', 'x...............', '................'
     ],
     bars2: [
+      '........', '........', '........', '........',
       '........', '........', '..x...x.', '..x...x.', '..x...x.', '....x...', 'x...x...', 'x...x...',
       'x...x.x.', '..x...x.', '..x.....', 'x...x...', '..x.....', '........', '........', '........',
       '........', '..x...x.', '..x.x.x.', '..x...x.', '..x...d.', '..x...x.', '..x.x.x.', '..d...x.',
@@ -1105,25 +1112,26 @@ const LEVELS = [
       'xx..x...x...x...', 'xx..x...x...x...', 'xx..x...x...x.x.', 'xx..x...x...x.x.', 'xx..x...x...x.x.', 'xx..x...x...x.x.', 'x...............', '................'
     ],
     // [beat, text, beats shown, lane, speaker] ('r': 지우 in his room)
-    say: [[13, '…어? 근데 저 누나는 누구예요?', 3, 0, 'j'], [20.5, '…일해.', 1.8, 1, 'h'], [24, '아, 넵! 일해요, 일!', 2.5, 0, 'j'],
-          [32, '(와… 손 진짜 빠르다…)', 3, 0, 'j'], [44.5, '형, 봐요. 저도 빨라요—', 3, 0, 'j'],
+    say: [[1, '누나, 혹시 박스 좀 올려줄래요?', 2.8, 0, 'j'], [10.6, '어… 어, 고… 고마워요.', 3.6, 0, 'j'],
+          [29, '형… 하은 누나요. 원래 2라인이에요?', 3, 0, 'j'], [36.5, '…일해.', 1.8, 1, 'h'], [40, '아, 넵! 일해요, 일!', 2.5, 0, 'j'],
+          [48, '(와… 손 진짜 빠르다…)', 3, 0, 'j'], [60.5, '형, 봐요. 저도 빨라요—', 3, 0, 'j'],
           // the moment
-          [56.1, '앗!', 1.4, 0, 'j'], [60.2, '…조심해.', 2.2, 1, 'h'], [63, '(두근)', 1.8, 0, 'j'],
+          [72.1, '앗!', 1.4, 0, 'j'], [76.2, '…조심해.', 2.2, 1, 'h'], [79, '(두근)', 1.8, 0, 'j'],
           // chorus one: he can't stop looking
-          [76, '(멍…)', 2, 0, 'j'], [84, '…형. 방금 봤어요? 안 보고 잡았어요.', 3.5, 0, 'j'], [92, '박자까지 딱 맞춰서…', 3, 0, 'j'],
+          [92, '(멍…)', 2, 0, 'j'], [100, '…형. 방금 봤어요? 안 보고 잡았어요.', 3.5, 0, 'j'], [108, '박자까지 딱 맞춰서…', 3, 0, 'j'],
           // after it: he tries
-          [101, '누나! 저 지우예요! 아까 진짜 멋있었어요!', 3.5, 0, 'j'], [106, '…상자.', 1.6, 1, 'h'], [108.5, '앗, 넵!', 1.5, 0, 'j'],
-          [116, '누나는 노래 좋아해요?', 2.5, 0, 'j'], [119.5, '…시끄러.', 1.6, 1, 'h'], [122, '(좋아…)', 2, 0, 'j'],
+          [117, '누나! 저 지우예요! 아까 진짜 멋있었어요!', 3.5, 0, 'j'], [122, '…상자.', 1.6, 1, 'h'], [124.5, '앗, 넵!', 1.5, 0, 'j'],
+          [132, '누나는 노래 좋아해요?', 2.5, 0, 'j'], [135.5, '…시끄러.', 1.6, 1, 'h'], [138, '(좋아…)', 2, 0, 'j'],
           // the build: he hums; the one kind thing she says
-          [124.5, '(흥얼흥얼)', 2.5, 0, 'j'], [127.4, '…박자는 맞네.', 2.8, 1, 'h'], [130.3, '…!!', 1.2, 0, 'j'],
-          [150, '형! 저 오늘 일 진짜 잘 되는 것 같아요!', 3, 0, 'j'],
+          [140.5, '(흥얼흥얼)', 2.5, 0, 'j'], [143.4, '…박자는 맞네.', 2.8, 1, 'h'], [146.3, '…!!', 1.2, 0, 'j'],
+          [166, '형! 저 오늘 일 진짜 잘 되는 것 같아요!', 3, 0, 'j'],
           // the walk out
-          [166.5, '…수고.', 1.6, 1, 'h'], [169, '…형. 방금 수고래요.', 2.6, 0, 'j'], [172.5, '아까 그 손 봤어요? 하나도 안 보고 잡았어요.', 3.6, 0, 'j'],
-          [177, '저 오늘 집에 가서 비트 만들 거예요. 처음부터 다.', 3.4, 0, 'j'],
+          [182.5, '…수고.', 1.6, 1, 'h'], [185, '…형. 방금 수고래요.', 2.6, 0, 'j'], [188.5, '아까 그 손 봤어요? 하나도 안 보고 잡았어요.', 3.6, 0, 'j'],
+          [193, '저 오늘 집에 가서 비트 만들 거예요. 처음부터 다.', 3.4, 0, 'j'],
           // 4 a.m., his room: thoughts as the layers go in
-          [186, '(…잠이 안 와.)', 3, 0, 'r'], [201, '(그 손… 하나도 안 보고.)', 3, 0, 'r'], [217, '(두근, 두근.)', 2.5, 0, 'r'],
-          [233, '(일해. 상자. 시끄러.)', 3, 0, 'r'], [249, '(…박자는 맞네.)', 3, 0, 'r'], [264, '…됐다.', 2.5, 0, 'r'], [297, '(하은 누나.)', 2.5, 0, 'r'],
-          [313, '…내일 들려줘야지.', 4, 0, 'r']],
+          [202, '(…잠이 안 와.)', 3, 0, 'r'], [217, '(그 손… 하나도 안 보고.)', 3, 0, 'r'], [233, '(두근, 두근.)', 2.5, 0, 'r'],
+          [249, '(일해. 상자. 시끄러.)', 3, 0, 'r'], [265, '(…박자는 맞네.)', 3, 0, 'r'], [280, '…됐다.', 2.5, 0, 'r'], [313, '(하은 누나.)', 2.5, 0, 'r'],
+          [329, '…내일 들려줘야지.', 4, 0, 'r']],
     comfort: [],
     intro: [
       { who:'', text:'명절 물량 셋째 주. 지우가 돌아왔다.' },
@@ -1893,6 +1901,9 @@ function act15(p, t, lane) {
     // her fingers on the edge of her belt, down on every beat of his music; her look up at him
     if (inRange(b, A.tap)) p.tapK = Math.max(0, 1 - ph * 4);
     if (inRange(b, A.lookUp)) p.up = true;
+    // 1-5's meeting: her arm up passing him the box; her face as it comes up
+    if (L.meet && b >= L.meet.lift[0] && b < L.meet.lift[1]) { p.wave = true; p.carry = null; p.up = true; }
+    if (L.meet && b >= L.meet.reveal[0] && b < L.meet.reveal[1]) p.reveal = true;
     // 1-5: her hand up, holding the box she caught
     if (L.love && b >= L.love.hold[0] && b < L.love.hold[1]) { p.wave = true; p.carry = null; }
     if (A.upAtDrops) for (const n of notes) if (n.drop && n.tFall != null && t >= n.tFall + n.fallDur && t < n.tFall + n.fallDur + 1.4 * SPB) p.up = true;
@@ -2102,7 +2113,7 @@ const PARTNERS = {
     base: 86,
     draw(pose, nowMs, active) {
       const top = bodyTop(86, pose) + (pose.bob ? 1 : 0);
-      drawHaeunAt(BOSS_X, top, nowMs, { mirror: !pose.look, watch: pose.phone, load: true, bob: 0, rest: pose.look, noFar: pose.solo, up: pose.up, tap: pose.tapK });
+      drawHaeunAt(BOSS_X, top, nowMs, { mirror: !pose.look, watch: pose.phone, load: true, bob: 0, rest: pose.look, noFar: pose.solo, up: pose.up, tap: pose.tapK, reveal: pose.reveal });
     },
     arm(pose) {
       const top = bodyTop(86, pose), shirt = '#1e1a1a', glove = C.skin;
@@ -2331,10 +2342,13 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
   R(cx - 6, top, 12, 6, cap); R(cx - 5, top - 1, 10, 1, cap); R(cx - 6, top + 5, 12, 1, capD); R(cx - 2, top - 1, 1, 7, capD); R(cx - 1, top - 2, 2, 1, capD);
   R(cx - 5, top + 1, 3, 2, '#f4e6e0');
   // looking up (o.up) the brim tips up a pixel and the shadow lifts off her eyes
-  if (o.up) { R(cx - 13, top + 3, 7, 2, brim); R(cx - 13, top + 3, 7, 1, cap); R(cx - 13, top + 5, 7, 1, capD); }
+  // her face (o.reveal, 1-5's first sight): the cap pushed back off her eyes, the brim up
+  if (o.reveal) { R(cx - 6, top - 1, 12, 2, cap); R(cx - 12, top + 1, 6, 2, brim); R(cx - 12, top + 1, 6, 1, cap); }
+  else if (o.up) { R(cx - 13, top + 3, 7, 2, brim); R(cx - 13, top + 3, 7, 1, cap); R(cx - 13, top + 5, 7, 1, capD); }
   else { R(cx - 13, top + 4, 7, 2, brim); R(cx - 13, top + 4, 7, 1, cap); R(cx - 13, top + 6, 7, 1, capD); }
   // the cap's shadow over her eyes, always: deep under the brim, softening down to the cheeks
-  if (o.up) { R(cx - 5, top + 6, 10, 1, '#3a2622'); R(cx - 5, top + 7, 10, 1, '#8a5a44'); R(cx - 4, top + 8, 2, 2, C.ink); }
+  if (o.reveal) { R(cx - 5, top + 4, 10, 1, '#8a5a44'); R(cx - 5, top + 5, 10, 4, C.skin); R(cx - 5, top + 6, 3, 1, '#3a2622'); R(cx - 4, top + 7, 2, 3, C.ink); R(cx - 4, top + 7, 1, 1, '#ffffff'); R(cx - 1, top + 8, 1, 1, '#d99a8a'); }
+  else if (o.up) { R(cx - 5, top + 6, 10, 1, '#3a2622'); R(cx - 5, top + 7, 10, 1, '#8a5a44'); R(cx - 4, top + 8, 2, 2, C.ink); }
   else { R(cx - 5, top + 6, 10, 3, '#3a2622'); R(cx - 5, top + 9, 10, 1, '#8a5a44'); }
   // a thin dark line down the front of her face, from under the brim to the chin
   R(cx - 6, top + 6, 1, 9, '#1b1716');
@@ -2424,6 +2438,18 @@ function drawLove15(t, nowMs) {
     const gr = g.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, 230); gr.addColorStop(0, 'rgba(255,120,170,0)'); gr.addColorStop(1, `rgba(255,120,170,${0.45 * k})`);
     g.fillStyle = gr; g.fillRect(0, 0, W, H); g.restore();
   }
+  // the meeting: the box she passes up to him, and the moment her face shows - a warm light on her, sparkles, pink coming up
+  const M = L.meet;
+  if (M && b < M.reveal[1] + 2) {
+    const o = placerOff(1), hx = BOSS_X + 9 + o.dx, hy = 86 + o.dy + 2, x1 = farX(PLACE_X), y1 = farY(BELT_Y) - 4;
+    if (b >= M.lift[0] && b < M.lift[1] + 1.5) { const p0 = Math.min(1, (b - M.lift[0]) / (M.lift[1] - M.lift[0])), p = p0 * p0 * (3 - 2 * p0); drawBox(STG.box, Math.round(lerp(hx, x1, p)), Math.round(lerp(hy + 2, y1, p) - Math.sin(Math.PI * p) * 10), '', t); }
+    if (b >= M.reveal[0] && b < M.reveal[1] + 2) {
+      const a = Math.min(1, (b - M.reveal[0]) / 1.2) * Math.min(1, (M.reveal[1] + 2 - b) / 2);
+      g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(hx - 8, hy - 2, 2, hx - 8, hy - 2, 70); gr.addColorStop(0, `rgba(255,214,190,${0.35 * a})`); gr.addColorStop(1, 'rgba(255,150,190,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      g.fillStyle = `rgba(255,90,150,${0.06 * a})`; g.fillRect(0, 0, W, H); g.restore();
+      for (let i = 0; i < 12; i++) { const q = (nowMs / 1100 + i / 12) % 1, x = hx - 40 + ((i * 41) % 70), y = hy - 30 + ((i * 29) % 50) - q * 12; g.globalAlpha = Math.sin(Math.PI * q) * a; R(x, y, 1, 3, '#fff1f6'); R(x - 1, y + 1, 3, 1, '#fff1f6'); g.globalAlpha = 1; }
+    }
+  }
   // sparkles round her while it floats down to her
   if (b >= V.fumble && b < V.hold[1]) for (let i = 0; i < 10; i++) { const q = (nowMs / 900 + i / 10) % 1, x = 40 + ((i * 37) % 60), y = 70 + ((i * 53) % 50) - q * 10; g.globalAlpha = Math.sin(Math.PI * q); R(x, y, 1, 3, '#ffe9f2'); R(x - 1, y + 1, 3, 1, '#ffe9f2'); g.globalAlpha = 1; }
   // hearts rising off him
@@ -2457,7 +2483,7 @@ function drawRoomMemory(kind, a, x, y, nowMs) {
   R(x + 1, y + 26, 56, 7, '#22181e'); R(x + 1, y + 25, 56, 1, '#6a4a5a');
   g.save(); g.beginPath(); g.rect(x + 1, y + 1, 56, 32); g.clip();
   g.translate(x + 22, y + 6); g.scale(0.42, 0.42);
-  drawHaeunAt(0, 0, nowMs, { mirror: true, rest: kind !== 'watch' && kind !== 'catch', watch: kind === 'watch', up: kind === 'look' });
+  drawHaeunAt(0, 0, nowMs, { mirror: true, rest: kind !== 'watch' && kind !== 'catch', watch: kind === 'watch', up: kind === 'look', reveal: kind === 'face' });
   if (kind === 'catch') { R(8, -6, 8, 18, '#1e1a1a'); R(11, -12, 6, 6, C.skin); drawBox(STG.box, 14, -10, '', 0); }
   if (kind === 'cap') { R(-14, -4, 30, 4, 'rgba(255,200,220,.35)'); }
   g.restore();
@@ -5210,7 +5236,7 @@ function buildEvents() {
     const t = timeAt(b), s = spbAt(t), ci = chordIdx(b), inBar = b % 4;
     const quiet = inRange(b, L.quiet), doze = inRange(b, L.doze), phone = inRange(b, L.phone), dark = blackout(b);
     const E = (dt, fn) => ev.push([t + dt, fn]);
-    if (b < 4) { E(0, T => rim(T, inBar === 0 ? 0.5 : 0.3)); continue; }
+    if (b < 4) { if (!L.noCount) E(0, T => rim(T, inBar === 0 ? 0.5 : 0.3)); if (style !== 'pop15') continue; }
     if (b >= total - 4) continue;
     // combo layers shared by every track
     // (a level with bareBand has none: 1-6 plays recorded songs, and nothing of the engine's may sound under them)
@@ -6050,10 +6076,18 @@ function buildEvents() {
       // a recorded song for the section, if it has one: started on its beat, and while it plays nothing of the engine's
       const sp = L.songs && L.songs.find(x => x.sec === sec), si = sp ? L.songs.indexOf(sp) : -1;
       if (sp) { if (b === sp.at) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(si)) startSong(T, 0, si); }); if (songReady(si)) continue; }
+      if (sec === 'meet') {
+        const M = L.meet, rv = Math.round(M.reveal[0]);
+        if (b === rv - 2) E(0, T => riser(T, s * 2, 0.06));
+        if (b === rv) E(0, T => { [1108.73, 1396.91, 1661.22, 2217.46, 2793.83].forEach((f, k) => bell15(T + k * s / 4, f, s * 3, 0.05 - k * 0.006)); pad(T, [277.18, 349.23, 415.3, 523.25], s * 9, 'sine', 0.045); pad(T, [138.59, 207.65], s * 9, 'triangle', 0.03); });
+        if (b > rv && b <= rv + 6) E(0, T => { kick(T, 0.42); kick(T + s * 0.28, 0.3); });
+        if (b === rv + 3) E(s / 2, T => bell15(T, 1661.22, s * 2, 0.03));
+        continue;
+      }
       if (sec === 'walk' || sec === 'saved' || sec === 'outro') continue;
       if (sec === 'room') { E(0, T => tak(T, inBar % 2 ? 0.12 : 0.2)); continue; }   // (stand-in: only his clock)
       // the stand-in for the song: verse, the build into the moment, the moment's hush, the choruses, the last hit
-      if (sec === 'pb') { const V = L.love; sec = b >= 164 ? 'end' : inRange(b, V.glow) ? (b >= 132 ? 'chorus2' : 'chorus') : b >= V.moment[0] && b < V.moment[1] ? 'hush' : b >= 48 && b < V.moment[0] ? 'pre' : 'verse'; }
+      if (sec === 'pb') { const V = L.love; sec = b >= 180 ? 'end' : inRange(b, V.glow) ? (b >= 148 ? 'chorus2' : 'chorus') : b >= V.moment[0] && b < V.moment[1] ? 'hush' : b >= 64 && b < V.moment[0] ? 'pre' : 'verse'; }
       const HOOK = [[659.25, 659.25, 739.99, 659.25, 554.37, 493.88, 554.37, 0], [493.88, 554.37, 659.25, 554.37, 493.88, 440, 440, 0]];
       if (sec === 'hush') {
         if (L.love && b === Math.ceil(L.love.moment[0])) E(0, T => { crash(T); pad(T, C.map(f => f * 2), s * 8, 'sine', 0.035); });
@@ -6061,7 +6095,7 @@ function buildEvents() {
         if (inBar === 0) E(0, T => bell15(T, C[2] * 4, s * 3, 0.03));
         continue;
       }
-      if (sec === 'end') { if (b === 164) E(0, T => { crash(T); kick(T, 1); stab(T, C.map(f => f * 2), s * 1.5); bell15(T, 880, s * 3, 0.05); }); continue; }
+      if (sec === 'end') { if (b === 180) E(0, T => { crash(T); kick(T, 1); stab(T, C.map(f => f * 2), s * 1.5); bell15(T, 880, s * 3, 0.05); }); continue; }
       if (sec === 'outro') continue;
       const full = sec === 'chorus' || sec === 'chorus2', big = sec === 'chorus2', bridge = sec === 'bridge';
       if (inBar === 0) E(0, T => pad(T, C, s * 4, 'sawtooth', full ? 0.028 : 0.02));
