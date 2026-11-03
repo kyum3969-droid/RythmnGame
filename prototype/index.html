@@ -258,8 +258,6 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 
 </div>
 
-<script src="rookie-rig.js"></script>
-<script src="rookie-art.js"></script>
 <script>
 (() => {
 'use strict';
@@ -2087,19 +2085,8 @@ const NEON_GTR = ['....x', '...x.', '..x..', '..x..', '.xxx.', 'x...x', 'x...x',
 const NOTE_PIX = ['..xx..', '..x.x.', '..x..x', '..x...', '..x...', 'xxx...', 'xxx...'];
 
 // ---------- drawing helpers ----------
-const RENDER_SCALE = 4, canvasScales = new WeakMap();
-function sizeRenderCanvas(canvas, w, h) {
-  canvas.width = w * RENDER_SCALE; canvas.height = h * RENDER_SCALE;
-  canvasScales.set(canvas, RENDER_SCALE); return canvas;
-}
-function setContextTransform(context, a, b, c, d, e, f) {
-  const s = canvasScales.get(context.canvas) || 1;
-  context.setTransform(a * s, b * s, c * s, d * s, e * s, f * s);
-}
-const cv = sizeRenderCanvas($('cv'), W, H);
+const cv = $('cv');
 let g = cv.getContext('2d');
-const setDrawTransform = (...matrix) => setContextTransform(g, ...matrix);
-setDrawTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false;
 const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
 const thick = (x1, y1, x2, y2, s, c) => {
   const d = Math.max(1, Math.hypot(x2 - x1, y2 - y1));
@@ -2973,7 +2960,7 @@ function drawLove15(t, nowMs) {
   const V = L.love, b = beatAt(t), ph = b - Math.floor(b);
   const away = L.commute ? L.commute.from : L.room ? L.room.from : 1e9, fadeL = L.commute ? 1.5 : 4;
   if (b >= away) return;
-  if (b >= away - fadeL) { g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${Math.min(1, (b - (away - fadeL)) / (fadeL - 0.3))})`; g.fillRect(0, 0, W, H); g.restore(); return; }
+  if (b >= away - fadeL) { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${Math.min(1, (b - (away - fadeL)) / (fadeL - 0.3))})`; g.fillRect(0, 0, W, H); g.restore(); return; }
   if (b < LOVE.lastB - 0.5) LOVE.fx.clear(); LOVE.lastB = b;
   const beatK = Math.max(0, 1 - ph * 3), dub = Math.max(0, 1 - Math.abs(ph - 0.28) * 6);
   let k = 0;
@@ -3266,7 +3253,7 @@ function drawRoom15(t, nowMs, b, post) {
   }
   // fading in from black
   const fin = post ? 0 : Math.max(0, 1 - (b - Rm.from) / 1.5);
-  if (fin > 0) { setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${fin})`; g.fillRect(0, 0, W, H); }
+  if (fin > 0) { g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${fin})`; g.fillRect(0, 0, W, H); }
   g.restore();
 }
 function drawShow15(t, nowMs) {
@@ -3592,32 +3579,35 @@ function haeunHead(beat) {
   if (spot === 'cross') { const w = haeunWalkPos((beat - L.haeunCross[0]) / (L.haeunCross[1] - L.haeunCross[0])); return { x: w.x, y: w.top - 4 }; }
   return { x: haeunHome().x, y: haeunHome().top - 4 };
 }
-const rookieScans = [0, 1, 2, 3].map(() => ({ motion: RookieRig.createMotion(), last: -1e9 }));
-function rookieScan(slot, pressAt, nowMs, holding) {
-  const scan = rookieScans[slot];
-  if (pressAt !== scan.last) { scan.motion.trigger(pressAt); scan.last = pressAt; }
-  scan.motion.setHolding(holding, nowMs);
-  return scan.motion.sample(nowMs);
+const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
+function drawPlayer(kick, nowMs) {
+  const fl = nowMs - FX.flinch, cx = PLAYER_X + (fl < 160 ? 1 : 0), top = playerTop(kick, nowMs);
+  R(cx - 9, top + 18, 18, 36, C.hoodie);
+  R(cx - 9, top + 20, 18, 22, C.vest2); R(cx - 9, top + 32, 18, 2, C.reflect);
+  R(cx - 7, top + 14, 15, 5, '#264149');
+  R(cx - 6, top + 1, 12, 14, C.skin);
+  R(cx - 7, top - 1, 14, 5, C.hairDark); R(cx + 1, top + 1, 6, 10, C.hairDark);
+  if (fl < 500) { R(cx - 4, top + 6, 2, 3, C.ink); R(cx - 5, top + 5, 3, 1, C.hairDark); R(cx + 6, top + 2 + Math.floor(fl / 120), 2, 3, C.sweat); }
+  else R(cx - 4, top + 7, 2, 2, C.ink);
 }
-const playerTop = (kick, nowMs) => 94 + (nowMs - FX.playerNod < 160 ? 2 : 0);
-function drawPlayer(kick, nowMs, showLegs = true) {
-  RookieArt.drawBody(g, PLAYER_X, playerTop(kick, nowMs), kick, nowMs - FX.flinch, showLegs);
+function drawGun(gx, gy, kick) {
+  R(gx - 9, gy - 3, 12, 5, '#2d2f33'); R(gx - 1, gy + 2, 3, 6, '#2d2f33');
+  R(gx - 10, gy - 2, 2, 3, kick > 0.2 ? C.ok : C.laser);
+  R(gx, gy + 2, 3, 3, C.skin);
 }
-function drawGun(gx, gy, kick) { RookieArt.drawTool(g, gx, gy, kick); }
-function drawPlayerSleeve(sx, sy, hx, hy) { RookieArt.drawSleeve(g, sx, sy, hx, hy); }
 function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
-  const top = playerTop(kick, nowMs), fl = nowMs - FX.flinch, cx = PLAYER_X + (fl < 160 ? 1 : 0);
+  const top = playerTop(kick, nowMs);
   if (L.daw) { drawPadArm(kick, nowMs, top, twoHands); return; }
-  const lowerLane = L.lanes === 2 ? 1 : 0;
-  const motion = rookieScan(0, lastPress, nowMs, notes.some(n => n.lane === lowerLane && n.state === 'holding'));
-  const upperMotion = rookieScan(1, lastPressUpper, nowMs, L.lanes === 2 && notes.some(n => n.lane === 0 && n.state === 'holding'));
-  const upper = L.lanes === 2 && (!L.coScanner || DUO.mode !== 'one');
-  if (upper) RookieArt.drawUpperArm(g, PLAYER_X, top, fl, upperMotion);
-  if (twoHands && !upper) {
-    const grip = RookieArt.gripPosition(PLAYER_X, top, kick, fl, motion);
-    if (grip) drawPlayerSleeve(cx - 4, top + 24, grip.x + 1, grip.y + 1.5);
+  const gx = 324 - kick * 4, gy = 117;
+  if (L.lanes === 2 && (!L.coScanner || DUO.mode !== 'one')) {
+    // the left hand works the upper (far) gate, the right hand the lower one
+    const ux = 320 - upperKick * 4, uy = 86;
+    thick(PLAYER_X - 5, top + 20, ux + 2, uy + 3, 4, C.hoodie); drawGun(ux, uy, upperKick);
   }
-  RookieArt.drawMainArm(g, PLAYER_X, top, kick, fl, motion);
+  thick(PLAYER_X - 6, top + 22, gx + 2, gy + 3, 4, C.hoodie);
+  if (twoHands) thick(PLAYER_X - 4, top + 24, gx + 6, gy + 7, 4, C.hoodie);
+  drawGun(gx, gy, kick);
+  if (twoHands) R(gx + 4, gy + 6, 3, 3, C.skin);
 }
 
 // belt top doubles as a beat grid: bright paint = beat, mid = 8th, dim = 16th
@@ -4431,9 +4421,9 @@ function drawStageRest(t, nowMs, sv, b, sec, beatK, fin) {
     [[70, 0], [196, 0.15], [318, 0.3]].forEach(([x, d], i) => { const q = P.q - d; if (q < 0) return; const y = 168 - Math.round(q * 10), sx = x + ((P.b0 * 7 + i * 31) % 40) - 20; g.globalAlpha = Math.max(0, a); g.fillStyle = '#1b1716'; g.fillText(words[i], sx + 1, y + 1); g.fillStyle = '#ffe9a8'; g.fillText(words[i], sx, y); });
     g.restore();
   }
-  if (sv.dark) { setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${sv.dark})`; g.fillRect(0, 0, W, H); }
+  if (sv.dark) { g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${sv.dark})`; g.fillRect(0, 0, W, H); }
   const mA = nowMs - FX.lastMiss;
-  if (mA < 320) { const a = (1 - mA / 320) * 0.4; setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(210,30,20,${a})`; g.fillRect(0, 0, W, 5); g.fillRect(0, H - 5, W, 5); g.fillRect(0, 5, 5, H - 10); g.fillRect(W - 5, 5, 5, H - 10); }
+  if (mA < 320) { const a = (1 - mA / 320) * 0.4; g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(210,30,20,${a})`; g.fillRect(0, 0, W, 5); g.fillRect(0, H - 5, W, 5); g.fillRect(0, 5, 5, H - 10); g.fillRect(W - 5, 5, 5, H - 10); }
   g.restore();
 }
 // 1-6: metal stairs from her deck behind the upper belt down to the floor at its left end: a landing at the deck's height,
@@ -4512,7 +4502,7 @@ function drawInspector(t, active, nowMs) {
 function phaseGloom(b) { const G = L.phaseFx && L.phaseFx.gloom; return G && b >= G[0] && b < G[1] ? 1 : 0; }
 function phaseLook(c, w, h, b, active) {
   const F = L.phaseFx; if (!F || !active) return;
-  c.save(); setContextTransform(c, 1, 0, 0, 1, 0, 0);
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
   // grey and tired: the colour drained, the room a little darker
   const gl = phaseGloom(b);
   if (gl > 0) { c.globalCompositeOperation = 'multiply'; c.fillStyle = `rgba(120,115,130,${0.35 * gl})`; c.fillRect(0, 0, w, h); }
@@ -4620,7 +4610,7 @@ let RB_CHI = null;
 function rbChiStatic() {
   if (RB_CHI) return RB_CHI;
   const WW = MID.ww, cv = document.createElement('canvas'); cv.width = WW; cv.height = MID.wh;
-  const g0 = g; g = cv.getContext('2d'); setDrawTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
+  const g0 = g; g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
   // the sky: deep blue into the city's warm glow; stars; a crescent moon
   const sky = g.createLinearGradient(0, -MID.oy, 0, 40); sky.addColorStop(0, '#070a1e'); sky.addColorStop(0.55, '#19173e'); sky.addColorStop(0.85, '#3a2348'); sky.addColorStop(1, '#5e3248');
   g.fillStyle = sky; g.fillRect(0, -MID.oy, WW, MID.oy + 40);
@@ -4756,7 +4746,7 @@ function rbCine(c, w, h, b, active) {
   if (hud.classList.contains('cine') !== on) { hud.classList.toggle('cine', on); judgeEl.classList.toggle('cine', on); $('devbtn').classList.toggle('cine', on); }
   if (!C || !live) return;
   const k = ease(Math.min((b - C[0] + 1) / 1.5, (C[1] - b) / 1)); if (k <= 0) return;
-  c.save(); setContextTransform(c, 1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, w, Math.round(h * 0.14 * k)); c.fillRect(0, Math.round(h - h * 0.14 * k), w, Math.ceil(h * 0.14 * k)); c.restore();
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, w, Math.round(h * 0.14 * k)); c.fillRect(0, Math.round(h - h * 0.14 * k), w, Math.ceil(h * 0.14 * k)); c.restore();
 }
 function rbFront(b, bReal, nowMs, active, live) {
   if (!live) return;
@@ -4802,7 +4792,7 @@ const HT_CV = {};
 function htLakeStatic(kind) {
   if (HT_CV[kind]) return HT_CV[kind];
   const WW = MID.ww, cv = document.createElement('canvas'); cv.width = WW; cv.height = MID.wh;
-  const g0 = g; g = cv.getContext('2d'); setDrawTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
+  const g0 = g; g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
   const dn = kind === 'day' ? 1 : 0, top = -MID.oy, HZ = 62;
   const sky = g.createLinearGradient(0, top, 0, HZ);
   sky.addColorStop(0, mixC('#10163a', '#5c7cbc', dn)); sky.addColorStop(0.6, mixC('#36305e', '#e8a08a', dn)); sky.addColorStop(1, mixC('#8a5266', '#ffd8a4', dn));
@@ -4887,7 +4877,7 @@ function htCine(c, w, h, b, active) {
   if (hud.classList.contains('cine') !== on) { hud.classList.toggle('cine', on); judgeEl.classList.toggle('cine', on); $('devbtn').classList.toggle('cine', on); }
   if (!C) return;
   const k = ease(Math.min((b - C[0] + 1) / 1.5, (C[1] - b) / 1)); if (k <= 0) return;
-  c.save(); setContextTransform(c, 1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, w, Math.round(h * 0.14 * k)); c.fillRect(0, Math.round(h - h * 0.14 * k), w, Math.ceil(h * 0.14 * k)); c.restore();
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, w, Math.round(h * 0.14 * k)); c.fillRect(0, Math.round(h - h * 0.14 * k), w, Math.ceil(h * 0.14 * k)); c.restore();
 }
 // 반장: hurrying (a quicker bob), heaving the heavy box up, his back going (a hand to it, sinking down onto the box), then sitting,
 // his other hand patting the box at his belt's end in time
@@ -4924,8 +4914,8 @@ function drawMid(t, nowMs, active) {
   const F = L.phaseFx, M = L.mid, bReal = active ? beatAt(t) : castBeatAt(t, active), live = active || state === 'outro' || state === 'result';
   // the last hit holds the picture still for a moment (a hitstop) before the lights start going out
   const frozen = F && active && bReal >= F.last && bReal < F.last + 1.2, b = frozen ? F.last : bReal, T = frozen ? timeAt(F.last) : active ? t : live ? timeAt(END_BEAT) : 0, AX = MID.ax, WW = MID.ww;
-  if (!midCv) { midCv = sizeRenderCanvas(document.createElement('canvas'), MID.ww, MID.wh); midG = midCv.getContext('2d'); }
-  const g0 = g; g = midG; setDrawTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
+  if (!midCv) { midCv = document.createElement('canvas'); midCv.width = MID.ww; midCv.height = MID.wh; midG = midCv.getContext('2d'); }
+  const g0 = g; g = midG; g.setTransform(1, 0, 0, 1, 0, MID.oy); g.imageSmoothingEnabled = false;
   // above and below the 216 px the screen used to show: the dark of the roof and the floor going on
   g.fillStyle = '#120d0c'; g.fillRect(0, -MID.oy, WW, MID.oy); g.fillStyle = '#18120f'; g.fillRect(0, H, WW, MID.wh - MID.oy - H);
   for (let x = 0; x < WW; x += 14) R(x, 200, 8, 3, '#c99a1e');
@@ -5109,9 +5099,8 @@ function drawMid(t, nowMs, active) {
     if (q === 1 && !open) continue;
     const nx = live ? notes.find(n => n.quad && n.q === q && n.state === 'pending' && n.arr > T - 0.15) : null, upAim = nx && nx.up && nx.arr - T < 0.6;
     g.save(); if (q) { g.translate(WW, 0); g.scale(-1, 1); }
-    const motion = rookieScan(2 + q, QUADFX.press[q], nowMs, notes.some(n => n.quad && n.q === q && n.state === 'holding'));
-    if (upAim) RookieArt.drawUpperArm(g, AX, top, nowMs - FX.flinch, motion);
-    else RookieArt.drawMainArm(g, AX, top, pk(q), nowMs - FX.flinch, motion);
+    if (upAim) { thick(AX - 5, top + 20, 320 - pk(q) * 4 + 2, 89, 4, C.hoodie); drawGun(320 - pk(q) * 4, 86, pk(q)); }
+    else { thick(AX - 5, top + 20, 326 - pk(q) * 4, 120, 4, C.hoodie); drawGun(324 - pk(q) * 4, 117, pk(q)); }
     g.restore();
   }
   drawParticles(nowMs);
@@ -5167,14 +5156,14 @@ function drawMid(t, nowMs, active) {
   let [jx, jy] = phaseJolt(bReal);
   if (FX.midPair && nowMs - FX.midPair.at < 170 && !reduce) { const k = FX.midPair.both ? 2 : 1; jx += Math.round((Math.random() * 2 - 1) * k); jy += Math.round((Math.random() * 2 - 1) * k); }
   MIDCAM = { sx, sy, sw, sh };
-  if (V.e <= 0) { cvHi.hidden = true; g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, (sx + jx) * RENDER_SCALE, (sy + jy) * RENDER_SCALE, sw * RENDER_SCALE, sh * RENDER_SCALE, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); if (L.rb) rbCine(g, W, H, bReal, active); if (L.ht) htCine(g, W, H, active ? bReal : END_BEAT, active); return; }
+  if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx + jx, sy + jy, sw, sh, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); if (L.rb) rbCine(g, W, H, bReal, active); if (L.ht) htCine(g, W, H, active ? bReal : END_BEAT, active); return; }
   if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
   cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#0c0a09'; gHi.fillRect(0, 0, hw, hh);
-  gHi.drawImage(midCv, (sx + jx / V.s) * RENDER_SCALE, (sy + jy / V.s) * RENDER_SCALE, sw * RENDER_SCALE, sh * RENDER_SCALE, 0, 0, hw, hh);
+  gHi.drawImage(midCv, sx + jx / V.s, sy + jy / V.s, sw, sh, 0, 0, hw, hh);
   phaseLook(gHi, hw, hh, bReal, active); if (L.rb) rbCine(gHi, hw, hh, active ? bReal : END_BEAT, active); if (L.ht) htCine(gHi, hw, hh, active ? bReal : END_BEAT, active);
   if (active) { midGuide(b, T, nowMs, { sx, sy, sw, sh, hw, hh, k }); midAdlib(nowMs, { sx, sy, sw, sh, hw, hh }); }
   // the game canvas under it still gets the plain floor colour (nothing else shows through)
-  g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
 }
 // 2-1's lesson, drawn on the device-resolution canvas: as the camera pulls back, a big hand label on each side (the left in
 // 반장's orange, the right in 마르코's teal, lit while that hand is pressed), and over the first bars' boxes a small arrow tag
@@ -5238,12 +5227,12 @@ let quadBuf = null;
 // the turn: the side view spins a quarter turn away, clockwise (the belt's left-to-right becomes far-to-near), over the chutes
 function drawQuadTurn(t, nowMs, active) {
   const p = quadP(castBeatAt(t, active));
-  if (!quadBuf) { quadBuf = sizeRenderCanvas(document.createElement('canvas'), W, H); }
-  const c = quadBuf.getContext('2d'); c.clearRect(0, 0, quadBuf.width, quadBuf.height); c.drawImage(cv, 0, 0);
+  if (!quadBuf) { quadBuf = document.createElement('canvas'); quadBuf.width = W; quadBuf.height = H; }
+  const c = quadBuf.getContext('2d'); c.clearRect(0, 0, W, H); c.drawImage(cv, 0, 0);
   drawQuad(t, nowMs, active);
-  g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = Math.max(0, 1 - p * 1.15);
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = Math.max(0, 1 - p * 1.15);
   g.translate(W / 2, H / 2); g.rotate(p * Math.PI / 2); g.scale(1 + p * 0.8, 1 + p * 0.8); g.translate(-W / 2, -H / 2);
-  g.drawImage(quadBuf, 0, 0, W, H); g.restore();
+  g.drawImage(quadBuf, 0, 0); g.restore();
   // a white streak through the middle of the turn
   const fl = Math.max(0, 1 - Math.abs(p - 0.5) * 4); if (fl > 0 && !reduce) { g.fillStyle = `rgba(255,250,235,${fl * 0.35})`; g.fillRect(0, 0, W, H); }
 }
@@ -5333,7 +5322,7 @@ function drawQuadBox(n, z, t) {
 function drawQuad(t, nowMs, active) {
   const beat = castBeatAt(t, active), now = nowMs, live = active || state === 'outro' || state === 'result';
   const scroll = live ? (active ? beatAt(t) : END_BEAT) / QUAD.look : 0;
-  g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false;
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false;
   drawQuadRoom(beat, active);
   // the sorter at the far end: its housing, a lit mouth over the four chutes, 마르코 on the platform behind it sending boxes down
   const yS = qY(1), xS0 = qX(-2.5, 1), xS1 = qX(2.5, 1);
@@ -5555,13 +5544,12 @@ function drawLaptop(t, active, nowMs) {
 // your launchpad on its stand: a 4x2 grid of pads, one lighting with each press; the right hand on it, the left hand holding a crate
 function drawPadArm(kick, nowMs, top, twoHands) {
   const { x, y } = PAD;
-  const cx = PLAYER_X + (nowMs - FX.flinch < 160 ? 1 : 0);
   R(x + 10, y + 10, 2, 10, '#3a3d45'); R(x + 5, y + 19, 12, 2, '#2a2d33');
   R(x, y, 22, 10, '#1e2024'); R(x, y, 22, 1, '#3a3d45');
   for (let k = 0; k < 8; k++) { const lit = kick > 0.3 && k === stats.combo % 8; R(x + 2 + (k % 4) * 5, y + 2 + (k >> 2) * 4, 4, 3, lit ? '#8fe3ff' : '#2b2f36'); }
   const hx = x + 12, hy = y - 2 + (kick > 0.5 ? 2 : 0);
-  drawPlayerSleeve(cx - 6, top + 22, hx, hy);
-  if (twoHands) drawPlayerSleeve(cx - 4, top + 24, hx + 6, hy + 2);
+  thick(PLAYER_X - 6, top + 22, hx, hy, 4, C.hoodie); R(hx - 2, hy - 1, 5, 4, C.skin);
+  if (twoHands) { thick(PLAYER_X - 4, top + 24, hx + 6, hy + 2, 4, C.hoodie); R(hx + 4, hy + 1, 4, 3, C.skin); }
 }
 // the three judges, from behind: heads and shoulders against the stage light, leaning in once the set gets going
 function drawJudges(t, active, nowMs) {
@@ -5884,8 +5872,8 @@ function drawPocha(nowMs) {
   const vw = W / Math.max(1, cz), vh = H / Math.max(1, cz), cx = Math.max(vw / 2, Math.min(W - vw / 2, ccx)), cy = Math.max(vh / 2, Math.min(H - vh / 2, ccy));
   // the street is drawn at its own size into a buffer, then the camera's crop of it is blown up onto the hi-res canvas pixel for
   // pixel (no smoothing), so a close-up shows big clean dots instead of half-drawn ones
-  if (!POCHA_CV.buf) { for (const k of ['buf', 'over']) { POCHA_CV[k] = sizeRenderCanvas(document.createElement('canvas'), W, H); } }
-  const g0 = g; g = POCHA_CV.buf.getContext('2d'); setDrawTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.clearRect(0, 0, W, H);
+  if (!POCHA_CV.buf) { for (const k of ['buf', 'over']) { POCHA_CV[k] = document.createElement('canvas'); POCHA_CV[k].width = W; POCHA_CV[k].height = H; } }
+  const g0 = g; g = POCHA_CV.buf.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.clearRect(0, 0, W, H);
   g.save();
   // the sky lightening from night into dawn, the stars going, the sun coming up between the blocks
   const sky = g.createLinearGradient(0, 0, 0, 120); sky.addColorStop(0, mixC('#141c3a', '#4a6aa8', dawn)); sky.addColorStop(0.6, mixC('#3a4672', '#e2a27e', dawn)); sky.addColorStop(1, mixC('#c4876a', '#ffd8a0', dawn)); g.fillStyle = sky; g.fillRect(0, 0, W, 122);
@@ -5939,9 +5927,9 @@ function drawPocha(nowMs) {
   g.save(); g.translate(0, 22); drawActor('marco', 150, false, pose, nowMs, false, () => { PARTNERS.marco.arm(pose);
     if (mp === 'pour') { g.save(); g.translate(pose.hand.x + 2, pose.hand.y - 2); g.rotate(1.1); R(-3, -12, 6, 18, '#2e8a4a'); R(-2, -16, 4, 4, '#2e8a4a'); R(-3, -5, 6, 5, '#e9f0e0'); g.restore(); R(pose.hand.x + 10, pose.hand.y + 6, 1, 7, 'rgba(220,240,230,.7)'); }
     else { R(pose.hand.x - 1, pose.hand.y - 6, 4, 6, '#e9eef0'); R(pose.hand.x, pose.hand.y - 4, 2, 3, '#cfe8d8'); } }); g.restore();
-  g.save(); g.translate(236 - PLAYER_X, 26); drawPlayer(0, nowMs, false); g.restore();
+  g.save(); g.translate(236 - PLAYER_X, 26); drawPlayer(0, nowMs); g.restore();
   const r2 = in1(TL && TL.raise2);
-  if (r2) { const gx = 214 - Math.round(cl * 6), gy = 114; drawPlayerSleeve(232, 148, gx + 3, gy + 4); R(gx + 1, gy + 2, 4, 4, C.skin); R(gx, gy - 4, 4, 6, '#e9eef0'); R(gx + 1, gy - 2, 2, 3, '#cfe8d8'); }
+  if (r2) { const gx = 214 - Math.round(cl * 6), gy = 114; thick(232, 148, gx + 3, gy + 4, 4, C.hoodie); R(gx + 1, gy + 2, 4, 4, C.skin); R(gx, gy - 4, 4, 6, '#e9eef0'); R(gx + 1, gy - 2, 2, 3, '#cfe8d8'); }
   if (clk >= 0 && clk < 0.45) { const k = clk / 0.45; g.globalAlpha = 1 - k; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, r = 3 + k * 11; R(198 + Math.cos(a) * r, 106 + Math.sin(a) * r, 2, 2, '#fff6c8'); } g.globalAlpha = 1; }
   // the little steel table between them: a lip and a cross-bar, the bottles (one lying empty), glasses, rolled egg, chopsticks,
   // and his phone face up with the song coming out of it
@@ -5954,7 +5942,7 @@ function drawPocha(nowMs) {
   if (POCHA.src) for (let k = 0; k < 2; k++) { const p = ((t / 2.4) + k / 2) % 1; g.globalAlpha = 1 - p; eighthNote(169 + Math.sin(p * 6 + k) * 3, 130 - p * 16, '#bfe6ff'); g.globalAlpha = 1; }
   g.restore();
   // his memory and the fades go over the crop, at the screen's scale
-  g = POCHA_CV.over.getContext('2d'); setDrawTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.clearRect(0, 0, W, H);
+  g = POCHA_CV.over.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.clearRect(0, 0, W, H);
   const fb = TL && TL.flash; if (fb && et > fb[0] && et < fb[1]) drawMemory(et, Math.min(1, (et - fb[0]) / 2.5, (fb[1] - et) / 2.5), TL.vanish || [], nowMs);
   if (EPI.on && TL) { const ln = TL.lines.find(([a, , , d]) => et >= a && et < a + d), key = ln ? ln[0] + ln[2] : '';
     if (key !== EPI.key) { EPI.key = key; subEl.innerHTML = ''; subEl.hidden = !ln; if (ln) { const nm = { v: ['마르코', '#6fdcec'], b: ['반장', '#f0a050'] }[ln[1]]; if (nm) { const k = document.createElement('b'); k.textContent = nm[0]; k.style.color = nm[1]; subEl.append(k); } subEl.append(ln[2]); } } }
@@ -5964,8 +5952,8 @@ function drawPocha(nowMs) {
   const dpr = window.devicePixelRatio || 1, hw = Math.max(W, Math.round(cv.clientWidth * dpr)), hh = Math.round(hw * H / W);
   if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
   cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#000'; gHi.fillRect(0, 0, hw, hh);
-  gHi.drawImage(POCHA_CV.buf, (cx - vw / 2) * RENDER_SCALE, (cy - vh / 2) * RENDER_SCALE, vw * RENDER_SCALE, vh * RENDER_SCALE, 0, 0, hw, hh); gHi.drawImage(POCHA_CV.over, 0, 0, hw, hh);
-  g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.restore();
+  gHi.drawImage(POCHA_CV.buf, cx - vw / 2, cy - vh / 2, vw, vh, 0, 0, hw, hh); gHi.drawImage(POCHA_CV.over, 0, 0, hw, hh);
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.restore();
 }
 function drawMemory(et, a, vanish, nowMs) {
   const TL = L.epilogue && (EPI.good ? L.epilogue : L.epilogue.fail), fast = TL.fast != null && et >= TL.fast, turned = TL.turn != null && et >= TL.turn;
@@ -6264,7 +6252,7 @@ function drawPuddleMirror(al, t, nowMs) {
   const top = BELT_Y + 18, rows = H - top, m = mirrorBuf.getContext('2d');
   // the reflection only needs a fresh copy of the picture every third frame
   FX.mirrorTick = (FX.mirrorTick || 0) + 1;
-  if (FX.mirrorTick % 3 === 1) { m.clearRect(0, 0, W, BELT_Y); m.drawImage(cv, 0, 0, cv.width, BELT_Y * RENDER_SCALE, 0, 0, W, BELT_Y); }
+  if (FX.mirrorTick % 3 === 1) { m.clearRect(0, 0, W, BELT_Y); m.drawImage(cv, 0, 0, W, BELT_Y, 0, 0, W, BELT_Y); }
   g.save(); g.globalAlpha = 0.3 * fade;
   for (let k = 0; k < rows; k += 2) {
     const sy = Math.round(BELT_Y + 14 - k * 2.2); if (sy < 20) break;
@@ -6463,7 +6451,7 @@ function drawScene(t, bt, active, nowMs) {
   const sh = (nowMs - (FX.hypeAt || -1e9)) / 1000;
   if (active && !reduce && sh < 0.14) { g.fillStyle = `rgba(255,255,255,${(0.14 - sh) / 0.14 * (FX.hypeBig ? 0.55 : 0.38)})`; g.fillRect(0, 0, W, H); }
   if (al) drawAlleyFront(al, t);
-  if (sv && sv.dark) { g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${sv.dark})`; g.fillRect(0, 0, W, H); g.restore(); }
+  if (sv && sv.dark) { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${sv.dark})`; g.fillRect(0, 0, W, H); g.restore(); }
   const mAge = nowMs - FX.lastMiss;
   if (mAge < 320) {
     const a = (1 - mAge / 320) * 0.4;
@@ -8307,7 +8295,6 @@ let progress = {};
 try { progress = JSON.parse(localStorage.getItem('belt.progress') || '{}') || {}; } catch (e) {}
 
 function resetRun() {
-  rookieScans.forEach((scan, i) => { scan.motion.reset(); scan.last = i >= 2 ? QUADFX.press[i - 2] : i ? lastPressUpper : lastPress; });
   notes.forEach(n => { n.state = 'pending'; n.hitAt = null; n.judge = null; n.doneAt = null; n.binSfx = false; n.missKind = ''; n.jamFx = false; n.tossFx = false; n.dropFx = false; n.slipFx = false; n.slamFx = false; }); BANG.done = false; FX.yankFx = false;
   FX.particles = []; FX.marks = []; FX.yankFx = false; FX.shoveFx = false; FX.knockFx = 0; FX.tapsFx = {}; FX.react = [{ type: '', at: -1e9 }, { type: '', at: -1e9 }]; FX.lastMiss = -1e9; FX.missKind = ''; FX.missLane = 0; FX.goodLane = 0; FX.shakeUntil = -1e9; FX.playerNod = -1e9; FX.flinch = -1e9; FX.binHit = -1e9; FX.bossLine = null; FX.punchAt = -1e9; FX.hypeAt = -1e9; FX.club = 0; FX.shakeAmp = 1; FX.lit = 0; FX.splashes = []; FX.litAt = []; FX.pluckAt = -1e9; FX.pluckAmp = 0; FX.freezeAt = -1e9; FX.goodBoth = -1e9;
   stats = { perfect: 0, good: 0, miss: 0, tailOk: 0, tailBroken: 0, combo: 0, maxCombo: 0, special: 0, missStreak: 0 };
@@ -8682,17 +8669,17 @@ function drawCamera(now) {
   const to = CAM.to || { x: W / 2, y: H / 2, k: 1 }, e = Math.min(1, dt * 5);
   CAM.k += (to.k - CAM.k) * e; CAM.x += (to.x - CAM.x) * e; CAM.y += (to.y - CAM.y) * e;
   if (CAM.k < 1.002) { CAM.k = 1; CAM.sx = CAM.sy = 0; return; }
-  if (!camBuf) { camBuf = sizeRenderCanvas(document.createElement('canvas'), W, H); }
-  const c = camBuf.getContext('2d'); c.clearRect(0, 0, camBuf.width, camBuf.height); c.drawImage(cv, 0, 0);
+  if (!camBuf) { camBuf = document.createElement('canvas'); camBuf.width = W; camBuf.height = H; }
+  const c = camBuf.getContext('2d'); c.clearRect(0, 0, W, H); c.drawImage(cv, 0, 0);
   const vw = W / CAM.k, vh = H / CAM.k, sx = Math.max(0, Math.min(W - vw, CAM.x - vw / 2)), sy = Math.max(0, Math.min(H - vh, CAM.y - vh / 2)); CAM.sx = sx; CAM.sy = sy;
-  g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.drawImage(camBuf, sx * RENDER_SCALE, sy * RENDER_SCALE, vw * RENDER_SCALE, vh * RENDER_SCALE, 0, 0, W, H); g.restore();
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.drawImage(camBuf, sx, sy, vw, vh, 0, 0, W, H); g.restore();
 }
 // a scene played out in the middle of the shift (1-6's doze and row): black bars slide in top and bottom while it lasts
 function drawLetterbox(now) {
   const dt = Math.min(0.1, (now - (CAM.lbLast || now)) / 1000); CAM.lbLast = now;
   CAM.lb = (CAM.lb || 0) + ((CAM.lbTo || 0) - (CAM.lb || 0)) * Math.min(1, dt * 4);
   if (CAM.lb < 0.01) { CAM.lb = 0; return; }
-  const h = Math.round(20 * ease(CAM.lb)); g.save(); setDrawTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, h); g.fillRect(0, H - h, W, h); g.restore();
+  const h = Math.round(20 * ease(CAM.lb)); g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, h); g.fillRect(0, H - h, W, h); g.restore();
 }
 function runDialog(lines, done) { if (!lines || !lines.length) { dlg = null; dialogEl.hidden = true; if (done) done(); return; } dlg = { lines, i: 0, done, n: 0, full: '' }; dialogEl.hidden = false; showLine(); }
 function showLine() {
@@ -9106,10 +9093,6 @@ function showResult() {
   $('result').hidden = false;
   $('retry').focus({ preventScroll: true });
 }
-$('start').disabled = true;
-RookieArt.ready.then(() => { $('start').disabled = false; }).catch(() => {
-  $('title').querySelector('p').textContent = '캐릭터 이미지를 불러오지 못했습니다. 페이지를 새로고침해 주세요.';
-});
 $('start').addEventListener('click', e => { e.stopPropagation(); openBoard(); });
 $('retry').addEventListener('click', e => { e.stopPropagation(); startPlay(); });
 $('again').addEventListener('click', e => { e.stopPropagation(); beginShift(L); });
