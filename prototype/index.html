@@ -870,6 +870,8 @@ const LEVELS = [
     // [1]. boom: the motor blows; radio: [the static, the blues back on at this beat, from this many seconds in]
     rb: { turns: [[0, 'b'], [68, 'v'], [100, 'b'], [132, 'v', 48],
              [164, 'b'], [168, 'v'], [172, 'b'], [176, 'v'], [180, 'b'], [182, 'v'], [184, 'b'], [186, 'v'], [188, 'h']],
+      // hold: the shift stops dead (the music too) on this beat and these lines come up in the dialogue box, a press each
+      hold: [163.9, [{ who:'반장', text:'마르코!! 천천히 하라고.' }, { who:'마르코', text:'에헤이, 괜찮아 괜찮아~' }]],
       pokes: [], cut: [164, 236], heat: [100, 188], boom: 196, radio: [9998, 9999, 0], unplug: 223.5, leave: [209, 215.5], low: 0.07, bar: 2.22284 },
     mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 20,
       // 마르코 bored by the blues: yawning (hand to his open mouth, then a stretch), dozing (eyes shut, nodding, z's), jolted awake
@@ -922,7 +924,7 @@ const LEVELS = [
           [41, '…반장님, 이거 몇 절까지 있어요?', 3, 0, 'v'], [48.5, '…끝까지.', 2, 0, 'b'],
           [60, '…마르코.', 2, 0, 'b'], [62.5, '마르코!', 1.5, 0, 'b'], [65, '아, 못 참겠다! 뮤직, 큐!', 2.5, 0, 'v'],
           [70, '어제보다 빨리! 가즈아~!', 3, 0, 'v'], [88, '…시끄럽다.', 2.5, 0, 'b'], [100.5, '(라디오를 올린다) …천천히.', 3, 0, 'b'],
-          [118, '반장님~ 이건 너무 느려요!', 3, 0, 'v'], [132.5, '이거죠, 이거!', 2.5, 0, 'v'], [140, '에이스는 안 멈춰요~', 2.5, 0, 'v'], [152, '…천천히 하라고.', 2.5, 0, 'b'],
+          [118, '반장님~ 이건 너무 느려요!', 3, 0, 'v'], [132.5, '이거죠, 이거!', 2.5, 0, 'v'], [140, '에이스는 안 멈춰요~', 2.5, 0, 'v'],
           [164.3, '…내 라인이다.', 1.6, 0, 'b'], [168.2, '볼륨 업~!', 1.4, 0, 'v'], [172.2, '(딸깍)', 1.4, 0, 'b'], [176.2, '업!!', 1.4, 0, 'v'],
           [180.1, '(딸깍)', 0.9, 0, 'b'], [182.1, '업!', 0.9, 0, 'v'], [188.5, '더! 더!', 2, 0, 'v'],
           [196.6, '어, 어?', 2, 0, 'v'], [200, '(멈춘 벨트를 본다) …다 섰네.', 3.5, 0, 'b'], [204, '반장님, 이건 제가…', 2.5, 0, 'v'],
@@ -3803,6 +3805,16 @@ function rbFlood() {
   }
   const qi = {}; for (const f of out) if (f.jam) { const key = f.q + (f.up ? 'u' : ''); f.qi = qi[key] || 0; qi[key] = f.qi + 1; }
   return (D.flood = out);
+}
+// 2-2's held lines (rb.hold): on the beat the whole shift stops dead, the audio clock suspended so the songs stop where they
+// are and nothing slips, and the lines come up in the dialogue box, a press each; after the last it all runs on from there
+const RBH = { on: false, t: 0, done: false, at: 0 };
+function rbHoldTick(t) {
+  const H = L.rb && L.rb.hold; if (!H || RBH.on || RBH.done || state !== 'play') return;
+  if (beatAt(t) < H[0]) return;
+  RBH.done = true; RBH.on = true; RBH.t = t; RBH.at = performance.now(); if (ctx) ctx.suspend();
+  subEl.hidden = true; bubble.hidden = true; lastSay = '';
+  runDialog(H[1], () => { RBH.on = false; if (ctx) ctx.resume(); });
 }
 // the cutscene's letterbox: black bars close in over a beat at the start of the cut and open again at its end
 function rbCine(c, w, h, b, active) {
@@ -6898,6 +6910,7 @@ function stopHold() { if (holdOsc) { fadeStop(holdOsc, holdOsc._gn, holdOsc._lf)
 
 const GUIDE = { on: false, t: 0, n: null, side: '', resuming: false };   // see guideTick
 function songAt(perfMs) {
+  if (RBH.on) return RBH.t;   // 2-2's held lines: the shift stands still
   if (GUIDE.on) return GUIDE.t;   // the tutorial's guide holds the shift still at the gate
   return songRaw(perfMs);
 }
@@ -7223,7 +7236,7 @@ function updateHud(t) {
   const line = TUT.on && TUT.line ? [beat, TUT.line.text, 1, TUT.line.spk === 'h' ? 0 : 1, TUT.line.spk]
     : cnt >= 0 ? [beat, ['하나!', '둘!', '셋!'][cnt], 1, TUT.countSpk === 'h' ? 0 : 1, TUT.countSpk]
     : L.say.find(([b, , d]) => beat >= b && beat < b + d);
-  const s = line ? line[1] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.text : '';
+  const s = RBH.on ? '' : line ? line[1] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.text : '';
   if (s !== lastSay) {
     bubble.textContent = s; bubble.hidden = !s; lastSay = s;
     // 2-2: the line as a subtitle in the middle, where your eyes are; over the speaker's head only a small "…"
@@ -7535,6 +7548,8 @@ function devMarks() {
 }
 function devSeek(beat) {
   if (state !== 'play' || !ctx) return;
+  if (RBH.on) return;
+  if (L.rb && L.rb.hold) RBH.done = beat > L.rb.hold[0];
   if (TUT.on) { skipPractice(); if (state !== 'play') return; }
   const tB = timeAt(beat);
   stopHold(); CAM.to = null; SLOW.on = false;
@@ -7684,6 +7699,7 @@ function startPlay() {
   mus.gain.cancelScheduledValues(ctx.currentTime); mus.gain.setValueAtTime(1, ctx.currentTime);
   hud.hidden = false; state = 'play'; startHum();
   hud.classList.remove('cine'); judgeEl.classList.remove('cine'); $('devbtn').classList.remove('cine');
+  RBH.on = false; RBH.done = false;
 }
 function accuracy() { const mine = notes.filter(n => !isAuto(n)); return (stats.perfect + stats.good * 0.6 + stats.tailOk) / (mine.length + mine.filter(n => n.len).length); }
 function finishPlay(force) {
@@ -7722,6 +7738,7 @@ const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyD', 'KeyK']);
 function laneOf(side) { if (L.oneButton) return side; return L.lanes === 2 ? (L.autoLane != null ? 1 - L.autoLane : side === 'L' ? 0 : 1) : 0; }
 function handLabels() {}
 function press(ts, key, lane) {
+  if (state === 'play' && RBH.on) { if (performance.now() - RBH.at > 300) advanceDialog(); return; }
   if (state === 'play' && GUIDE.on) guidePress(ts, key, lane);
   else if (state === 'play' && TUT.on && TUT.phase === 'talk') tutAdvance();
   else if (state === 'play') onHit(ts, key, lane);
@@ -7773,7 +7790,7 @@ function frame(now) {
   const tReal = active ? songAt(now) : -99;
   const t = active ? viewTime(tReal, now) : -99;
   if (active) {
-    schedule(); judgeTick(tReal); updateHud(t);
+    rbHoldTick(tReal); schedule(); judgeTick(tReal); updateHud(t);
     if (L.camPlay && !L.practiceOf && !SLOW.on) { const bv = beatAt(t), c = L.camPlay.find(([a, z]) => bv >= a && bv < z); CAM.to = c ? c[2] : null; }
     CAM.lbTo = L.cutscene && !L.practiceOf && L.cutscene.some(([a, z]) => beatAt(t) >= a && beatAt(t) < z) ? 1 : 0;
     if (TUT.on && L.practiceOf) tutTick(tReal);
