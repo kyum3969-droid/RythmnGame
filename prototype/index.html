@@ -873,8 +873,11 @@ const LEVELS = [
       // the cutscene's camera: [from, to, on whom ('b' 반장, following him as he walks off; 'v' 마르코; 'two' 마르코 and you;
       // 'mid' the middle of the floor), how close]. Next to each other the shots pan across; otherwise they ease in from the
       // wide view and back out to it
-      zoom: [[164, 168, 'b', 1.9], [168, 172, 'v', 1.9], [172, 188, 'mid', 1.22], [188, 196, 'mid', 1.38],
+      zoom: [[164, 168, 'b', 1.9], [168, 172, 'v', 1.9], [172, 188, 'mid', 1.06], [188, 196, 'mid', 1.1],
              [199.5, 209, 'b', 1.9], [209, 215.5, 'b', 1.6], [215.5, 223.2, 'v', 1.9], [223.2, 232, 'two', 1.7]],
+      // his first takeover overlaps the songs: the funk comes in from its own lead-in (`pre` seconds before its first hit),
+      // the blues fading out under it over `xf` seconds from the hit
+      firstIn: { at: 68, pre: 0.6277, xf: 2.4 },
       // the volume war (172 on) as a tug of war: each push shoves the edge between their looks over to the other side
       tug: 172,
       pokes: [], cut: [164, 236], heat: [100, 188], boom: 196, radio: [9998, 9999, 0], unplug: 222, leave: [209, 215.5], low: 0.07, bar: 2.22284 },
@@ -7496,6 +7499,7 @@ function rbEvents(ev) {
   const D = L.rb, at = (b, fn) => ev.push([timeAt(b), fn]);
   at(0, T => rbPlay('b', T, rbBluesOff(0), rbLoud()));
   for (const tn of D.turns) at(tn[0], T => rbTake(tn, T, tn[0]));
+  if (D.firstIn) at(D.firstIn.at - D.firstIn.pre / rbSPB0(), T => rbPlay('f', T, 0, rbFunkLoud(), 0.15));
   for (const x of L.tempo || []) if (x[0] > 0 && x[0] < D.boom) at(x[0], T => { for (const k of ['b', 'f']) if (RB[k]) RB[k].s.playbackRate.setValueAtTime(x[1] / L.bpm, T); });
   at(D.boom, T => { for (const k of ['b', 'f']) { const x = RB[k]; if (!x) continue; RB[k] = null; x.s.playbackRate.setValueAtTime(x.s.playbackRate.value, T); x.s.playbackRate.linearRampToValueAtTime(0.1, T + 0.7); x.g.gain.setValueAtTime(x.g.gain.value, T); x.g.gain.linearRampToValueAtTime(0.0001, T + 0.75); try { x.s.stop(T + 0.8); } catch (e) {} } });
   at(D.radio[1], T => rbPlay('b', T, rbBluesOff(D.radio[1]), rbLoud()));
@@ -7516,8 +7520,9 @@ function rbTake(tn, T, b) {
   // while you play a change of hands is a turn of the knob (a third of a second); in the cutscene they slam
   const D = L.rb, f = D.cut && b >= D.cut[0] && b < D.cut[1] ? 0.05 : 0.3;
   if (tn[1] === 'b') { rbKill('f', T, f); if (RB.b) rbGain('b', T, rbLoud(), f); else rbPlay('b', T, rbBluesOff(b), rbLoud(), f); return; }
-  rbPlay('f', T, rbFunkOff(b), rbFunkLoud(), f);
-  if (RB.b) rbGain('b', T, tn[1] === 'h' ? rbLoud() : rbLoud() * D.low, f); else rbPlay('b', T, rbBluesOff(b), tn[1] === 'h' ? rbLoud() : rbLoud() * D.low, f);
+  if (RB.f && D.firstIn && b === D.firstIn.at) rbGain('f', T, rbFunkLoud(), 0.05); else rbPlay('f', T, rbFunkOff(b), rbFunkLoud(), f);
+  const bf = D.firstIn && b === D.firstIn.at ? D.firstIn.xf : f;
+  if (RB.b) rbGain('b', T, tn[1] === 'h' ? rbLoud() : rbLoud() * D.low, bf); else rbPlay('b', T, rbBluesOff(b), tn[1] === 'h' ? rbLoud() : rbLoud() * D.low, f);
 }
 // a jump (DEV): whatever should be sounding at that beat, from the right place
 function rbSeek(b, T) {
