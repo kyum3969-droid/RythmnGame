@@ -1008,7 +1008,7 @@ const LEVELS = [
     // in from both ends of the floor); dawn and sun; left: the backlog on the board [shown from, the count, at zero by]
     ht: { song: 108, cuts: [[72, 84], [100, 113]],
       zoom: [[72, 76, 'b', 1.9], [76, 84, 'b', 1.6], [100, 103, 'v', 1.8], [103, 107, 'b', 1.9], [107, 110, 'v', 1.7], [110, 113, 'b', 1.4]],
-      rush: [54, 72], lift: [69.5, 72], back: 72, jam: 100, plug: 107, taps: [104, 106, 108, 110, 111.5, 114, 116, 118, 119.5], tapFrom: 120,
+      rush: [54, 72], lift: [69.5, 72], back: 72, alone: [84, 100], jam: 100, plug: 107, taps: [104, 106, 108, 110, 111.5, 114, 116, 118, 119.5], tapFrom: 120,
       fuse: [136, 168], dawn: [136, 380], sun: [340, 384], left: [10, 1240, 352] },
     mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 136, guide: [-9, -8], tags: [-9, -8, -7],
       shouts: [[136, 'hey', '헤이!'], [284, 'hey', '가즈아~!'], [352, 'none', '마지막!']],
@@ -4777,6 +4777,31 @@ function rbFront(b, bReal, nowMs, active, live) {
   if (alarm) { const k = 0.5 + 0.5 * Math.sin(bReal * Math.PI * 2); g.fillStyle = `rgba(255,110,25,${0.12 * k * Math.min(1, (D.boom + 12 - bReal) / 2)})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
 }
 // ---------- 2-3 합주 (L.ht) ----------
+// the line getting uneasy, no music: when 반장 hurries (rush) a faint machine whine rises under the motor and it clunks on the
+// off-beats too, a box rattles now and then; it eases off when his back goes. With 마르코 alone (alone .. jam) the whine
+// climbs higher and louder, the motor clunks every eighth and every sixteenth in the last bar, the rattling thickens,
+// the scanners' notes drift out of tune (in quadHit); at the jam it all stops dead
+function htWhine(T, dur, f0, f1, g0, g1, cut) {
+  const o = ctx.createOscillator(), o2 = ctx.createOscillator(), lp = ctx.createBiquadFilter(), gn = ctx.createGain(), end = T + dur;
+  o.type = 'sawtooth'; o2.type = 'square';
+  o.frequency.setValueAtTime(f0, T); o.frequency.linearRampToValueAtTime(f1, end); o2.frequency.setValueAtTime(f0 * 2.01, T); o2.frequency.linearRampToValueAtTime(f1 * 2.03, end);
+  lp.type = 'lowpass'; lp.Q.value = 2; lp.frequency.setValueAtTime(300, T); lp.frequency.linearRampToValueAtTime(1500, end);
+  gn.gain.setValueAtTime(0.0001, T); gn.gain.linearRampToValueAtTime(g0, T + 1.2); gn.gain.linearRampToValueAtTime(g1, end); gn.gain.linearRampToValueAtTime(0.0001, end + (cut ? 0.04 : 1.6));
+  o.connect(lp); o2.connect(lp); lp.connect(gn); gn.connect(bus); o.start(T); o2.start(T); o.stop(end + 2); o2.stop(end + 2);
+}
+function htEvents(ev) {
+  const D = L.ht, at = (b, fn) => ev.push([timeAt(b), fn]), al = D.alone || [84, D.jam];
+  const clunk = (T, v, hi) => { osc('sine', hi ? 72 : 58, T, 0.004, 0.08 * v, 0.12, bus); noise(T, 'lowpass', hi ? 420 : 260, 0.06 * v, 0.045, 0.8, bus); };
+  const rattle = (T, k) => { noise(T, 'bandpass', 1400 + rnd(k, 33) * 1600, 0.05 + rnd(k, 34) * 0.05, 0.03, 4, bus); if (rnd(k, 35) < 0.4) noise(T + 0.03, 'bandpass', 2200, 0.04, 0.02, 4, bus); };
+  for (let b = D.rush[0] + 2; b < D.back; b++) at(b + 0.5, T => clunk(T, 0.45, false));
+  for (let b = al[0]; b < D.jam; b++) { at(b + 0.5, T => clunk(T, 0.7, true)); if (b >= D.jam - 4) for (const f of [0.25, 0.75]) at(b + f, T => clunk(T, 0.5, true)); }
+  for (let b = D.rush[0], k = 0; b < D.jam; b += 0.25, k++) {
+    const p = b < D.back ? 0.06 + 0.1 * (b - D.rush[0]) / (D.back - D.rush[0]) : b >= al[0] ? 0.12 + 0.55 * (b - al[0]) / (D.jam - al[0]) : 0;
+    if (rnd(k, 32) < p) at(b, T => rattle(T, k));
+  }
+  at(D.rush[0], T => htWhine(T, timeAt(D.back) - timeAt(D.rush[0]), 52, 64, 0.008, 0.022, false));
+  at(al[0], T => htWhine(T, timeAt(D.jam) - timeAt(al[0]), 60, 118, 0.016, 0.06, true));
+}
 // The cold war is the warehouse under a chill; once the song is in, a lake beach at dawn under a city's skyline (반장's Chicago
 // and 마르코's beach in one picture) comes in from both ends of the floor at once and meets in the middle.
 const htClamp = x => x < 0 ? 0 : x > 1 ? 1 : x;
@@ -7012,7 +7037,7 @@ function levelSfx(t, kind) {
 function quadHit(q, j, n) {
   const t = ctx.currentTime, v = j === 'good' ? 0.7 : 1;
   // 2-3's cold war (no song yet): each scanner beeps its own note, so what you scan is the only tune on the floor
-  if (L.ht && n && n.beat < L.ht.song) { const f = [[415.3, 523.25], [622.25, 698.46]][q][n.up ? 1 : 0]; osc('sine', f, t, 0.002, 0.12 * v, 0.18, bus); osc('sine', f * 2, t, 0.002, 0.025 * v, 0.08, bus); return; }
+  if (L.ht && n && n.beat < L.ht.song) { const D = L.ht, al = D.alone || [84, D.jam], dz = n.beat >= al[0] ? Math.min(1, (n.beat - al[0]) / (D.jam - al[0])) : n.beat >= D.rush[0] && n.beat < D.back ? 0.2 : 0, f = [[415.3, 523.25], [622.25, 698.46]][q][n.up ? 1 : 0] * Math.pow(2, (Math.random() * 2 - 1) * 75 * dz / 1200); osc('sine', f, t, 0.002, 0.12 * v, 0.18, bus); osc('sine', f * 2, t, 0.002, 0.025 * v, 0.08, bus); return; }
   if (L.mid) { if (q === 0) { osc('sine', 820, t, 0.001, 0.12 * v, 0.05, bus); noise(t, 'bandpass', 1300, 0.2 * v, 0.04, 2.2, bus); noise(t, 'lowpass', 400, 0.12 * v, 0.03, 0.7, bus); } else { osc('square', 2300, t, 0.001, 0.05 * v, 0.02, bus); noise(t, 'bandpass', 3400, 0.22 * v, 0.03, 3, bus); } return; }
   if (q === 0) { const o = osc('sine', 140, t, 0.002, 0.5 * v, 0.16, bus); o.frequency.exponentialRampToValueAtTime(50, t + 0.12); noise(t, 'lowpass', 900, 0.12 * v, 0.03, 0.7, bus); }
   else if (q === 1) { noise(t, 'bandpass', 1300, 0.3 * v, 0.07, 1.4, bus); noise(t + 0.011, 'bandpass', 1500, 0.24 * v, 0.09, 1.4, bus); }
@@ -8259,6 +8284,7 @@ function buildEvents() {
   if (L.stampBar) for (const n of notes) { if (n.stamp) ev.push([passAt(n), T => stampSnd(T)]); }
   else if (L.inspector) for (const n of notes) { if (n.top || inRange(n.beat0, L.phone)) continue; if (n.grab) { ev.push([passAt(n), T => { rim(T, 0.4); rim(T + 0.11, 0.4); }]); ev.push([n.tRel, T => roller(T, 0.06)]); } else ev.push([passAt(n), n.push ? T => { tak(T, 0.3); shoop(T); } : T => tak(T, 0.3)]); }
   if (L.rb) rbEvents(ev);
+  if (L.ht) htEvents(ev);
   return ev.sort((a, b) => a[0] - b[0]);
 }
 let events = [], evI = 0, T0 = 0;
