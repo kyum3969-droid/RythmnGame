@@ -1009,13 +1009,13 @@ const LEVELS = [
     ht: { song: 108, cuts: [[72, 84], [100, 113]],
       zoom: [[72, 76, 'b', 1.9], [76, 84, 'b', 1.6], [100, 104, 'v', 1.8], [104, 107, 'b', 1.9], [107, 110, 'v', 1.7], [110, 113, 'b', 1.4]],
       rush: [54, 72], lift: [69.5, 72], back: 72, jam: 100, plug: 107, taps: [104, 106, 108, 110, 111.5, 114, 116, 118, 119.5], tapFrom: 120,
-      fuse: [136, 168], dawn: [136, 380], sun: [340, 384], left: [48, 1240, 352] },
+      fuse: [136, 168], dawn: [136, 380], sun: [340, 384], left: [10, 1240, 352] },
     mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 136, guide: [-9, -8], tags: [-9, -8, -7],
       shouts: [[136, 'hey', '헤이!'], [284, 'hey', '가즈아~!'], [352, 'none', '마지막!']],
-      route: [[0, "rl"], [6.5, "ru"], [10.5, "rl"], [22.5, "ru"], [26.5, "rl"], [38.5, "ru"], [42.5, "rl"], [62.5, "ru"], [72.5, "lk"], [83, "lu"], [87, "ru"], [91, "rl"], [95, "ll"], [101, "bx"], [108.5, "lk"], [118.5, "rl"], [134.5, "rl"], [150.5, "ru"], [166.5, "rl"], [182.5, "ru"], [198.5, "rl"], [202.5, "lu"], [206.5, "rl"], [210.5, "lu"], [214.5, "rl"], [218.5, "lu"], [222.5, "rl"], [226.5, "lu"], [230.5, "rl"], [234.5, "lu"], [238.5, "rl"], [242.5, "lu"], [246.5, "rl"], [250.5, "lu"], [254.5, "rl"], [258.5, "lu"], [262.5, "rl"], [266.5, "lu"], [270.5, "rl"], [274.5, "lu"], [278.5, "rl"]],
+      route: [[0, "rl"], [6.5, "ru"], [14.5, "rl"], [22.5, "ru"], [26.5, "rl"], [38.5, "ru"], [42.5, "rl"], [62.5, "ru"], [72.5, "lk"], [83, "lu"], [87, "ru"], [91, "rl"], [95, "ll"], [101, "bx"], [108.5, "lk"], [118.5, "rl"], [134.5, "rl"], [150.5, "ru"], [166.5, "rl"], [182.5, "ru"], [198.5, "rl"], [202.5, "lu"], [206.5, "rl"], [210.5, "lu"], [214.5, "rl"], [218.5, "lu"], [222.5, "rl"], [226.5, "lu"], [230.5, "rl"], [234.5, "lu"], [238.5, "rl"], [242.5, "lu"], [246.5, "rl"], [250.5, "lu"], [254.5, "rl"], [258.5, "lu"], [262.5, "rl"], [266.5, "lu"], [270.5, "rl"], [274.5, "lu"], [278.5, "rl"]],
       bars: [
         '1.......................1.......................', '1...........2...........1...........2...........',
-        '1...........4...........1...........4...........', 'x...........4...........1...........4...........',
+        '1...........4...................................', '........................1...........4...........',
         '1...........2...........1...........2...........', '1...........2...........1...........2...........',
         '1...........4...........1...........4...........', 'x...........4...........1...........4...........',
         '1...........2...........1...........2...........', '1...........2...........1...........2...........',
@@ -1066,26 +1066,28 @@ const LEVELS = [
     ] },
     comfort: ['…다음 거.'],
     phaseFx: { amber: [], lineOn: [-9, -9, -9], drop: 136, drop2: null, last: 380.5, out: [383.5, 384.2, 1e9] },
-    sfx: [...Array(100).keys()].map(b => [b, 'motor']).concat([[47, 'pa'], [69.5, 'heave'], [72, 'thud'], [100, 'jam'], [104, 'thump'], [106, 'thump'], [107, 'plug']], [108, 110, 111.5, 114, 116, 118, 119.5].map(b => [b, 'thump'])),
+    sfx: [...Array(100).keys()].map(b => [b, 'motor']).concat([[9.5, 'pa'], [69.5, 'heave'], [72, 'thud'], [100, 'jam'], [104, 'thump'], [106, 'thump'], [107, 'plug']], [108, 110, 111.5, 114, 116, 118, 119.5].map(b => [b, 'thump'])),
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 386,
     special:['마르코가 보낸 상자', 'right', '받아냄'],
     sections: [[0, 'cold'], [12, 'pa'], [14, 'rush'], [18, 'back'], [21, 'alone'], [25, 'jam'], [27, 'song'], [34, 'band'], [51, 'trade'], [71, 'drop'], [81, 'down'], [88, 'last']],
     bars: Array(97).fill('................'),
     // 'b' 반장, 'v' 마르코, 'p' the announcement, 'n' nobody (a stage direction)
-    say: [[48.2, '3라인, 어제 잔량 포함해서 06시까지 정리 바랍니다.', 5, 0, 'p'], [54.2, '…내가 뺀다.', 2.5, 0, 'b'], [60, '반장님?', 2, 0, 'v'],
+    // the announcement stops the shift (a press to go on): there is no song yet, so nothing is cut off
+    hold: [[10, [{ who:'방송', text:'3라인, 어제 잔량 포함해서 06시까지 정리 바랍니다.' }]]],
+    say: [[54.2, '부지런히 해야겠구만.', 2.6, 0, 'b'], [60, '반장님?', 2, 0, 'v'],
           [72.1, '윽—!', 1.6, 0, 'b'], [73.8, '반장님!', 1.8, 0, 'v'], [75.8, '(허리를 짚고) …또 이러네.', 2.8, 0, 'b'],
           [78.7, '(무릎을 꿇고) 반장님, 천천히 해요.', 3, 0, 'v'], [81.8, '…내가 할게요.', 2.2, 0, 'v'],
-          [100.4, '어, 어… 왜 안 돼…', 3, 0, 'v'], [104, '…하나.', 1.8, 0, 'b'], [106, '…둘.', 1.6, 0, 'b'], [107.2, '(붐박스 플러그를 다시 꽂는다)', 1.6, 0, 'n'],
+          [100.4, '어… 이러면 안 되는데.', 3, 0, 'v'], [104, '…하나.', 1.8, 0, 'b'], [106, '…둘.', 1.6, 0, 'b'], [107.2, '(붐박스 플러그를 다시 꽂는다)', 1.6, 0, 'n'],
           [140, '…그래. 그거.', 2.5, 0, 'b'], [230, '반장님, 이 노래 괜찮죠?', 3, 0, 'v'], [234, '…시끄러.', 2.5, 0, 'b']],
+    // the office before the shift: 반장 at the notice board with his back to 마르코, 마르코 behind him with two cans of coffee
     intro: [
-      { who:'', text:'셋째 밤. 새벽 1시.' },
-      { who:'마르코', text:'(캔커피 둘을 들고) 반장님, 저기… 어제는…' },
-      { who:'', text:'게시판에 종이가 한 장 붙어 있다. 「3라인 마르코 → 7라인 전환 요청. 요청: 3라인 반장」' },
-      { who:'마르코', text:'……' },
-      { who:'반장', text:'(돌아보지 않는다) 위에서 답 오면, 가면 돼.' },
-      { who:'마르코', text:'…알겠어요.' },
-      { who:'', text:'마르코는 캔 하나를 라디오 옆에 두고 자리로 갔다. 그날 밤, 라디오도 붐박스도 켜지지 않았다.' }],
+      { who:'', text:'셋째 밤. 새벽 1시. 사무실.', scene:'office', office: { b: 150, bm: true, m: 246, cans: 2 } },
+      { who:'마르코', text:'(캔커피 둘을 들고) 반장님, 저기… 어제는…', scene:'office' },
+      { who:'반장', text:'(돌아보지 않는다) 너 다른 라인으로 전환 요청했다. 그렇게 알아라.', scene:'office' },
+      { who:'마르코', text:'……', scene:'office' },
+      { who:'마르코', text:'…알겠어요.', scene:'office' },
+      { who:'', text:'마르코는 캔 하나를 라디오 옆에 두고 자리로 갔다.', scene:'office', office: { b: 150, bm: true, m: 246, cans: 1 } }],
     outro: good => good ? [
       { who:'', text:'새벽 5시 52분. 잔량 0.' },
       { who:'', text:'반장이 일어나 게시판으로 갔다. 종이를 떼어, 반으로 접고, 한 번 더 접어 주머니에 넣었다. 아무도 말하지 않았다.' },
@@ -5762,6 +5764,18 @@ function drawStandingBoss(x, nowMs, bob, mirrored = false) {
     thick(BOSS_X + 7, top + 22, BOSS_X + 9, top + 48, 4, C.shirt); R(BOSS_X + 7, top + 47, 4, 4, C.skin);
   });
 }
+// 마르코 standing in the room (facing left), legs and shoes under his shirt, his hands in front holding cans of coffee
+function drawStandingMarco(x, nowMs, bob, cans) {
+  g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(x, 169, 16, 3, 0, 0, Math.PI * 2); g.fill();
+  const pose = { ...standPose(bob), hand: { x: BOSS_X + 15, y: 128 }, sad: true };
+  FX.react[2] = FX.react[2] || { type: '', at: nowMs };
+  drawActor('marco', x, true, pose, nowMs, false, top => {
+    R(BOSS_X - 8, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X + 1, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X - 8, top + 60, 16, 2, '#2c3a56');
+    R(BOSS_X - 9, top + 75, 9, 4, '#1b1716'); R(BOSS_X + 1, top + 75, 9, 4, '#1b1716');
+    PARTNERS.marco.arm(pose);
+    for (let k = 0; k < cans; k++) { const cx = pose.hand.x - 2 + k * 5, cy = pose.hand.y - 6; R(cx, cy, 4, 7, '#c8302a'); R(cx, cy, 4, 1, '#d8dde2'); R(cx, cy + 3, 4, 2, '#f4efe2'); }
+  });
+}
 function drawOffice(nowMs) {
   g.drawImage(bgOffice, 0, 0);
   g.save(); g.globalCompositeOperation = 'lighter';
@@ -5770,7 +5784,11 @@ function drawOffice(nowMs) {
   g.restore();
   const bob = Math.sin(nowMs / 1000 * 1.7) > 0.85 ? 1 : 0, O = SCENE.office;
   if (!O) drawStandingBoss(OFFICE_X, nowMs, bob);
-  else {
+  else if (O.m != null) {
+    // 2-3: 반장 with his back turned, 마르코 behind him, not his grin, holding his cans of coffee
+    if (O.b != null) drawStandingBoss(O.b, nowMs, bob, !!O.bm);
+    drawStandingMarco(O.m, nowMs, bob, O.cans || 0);
+  } else {
     if (O.j != null) drawStandingJiwoo(O.j, nowMs, SCENE.jpose, O.b != null);
     if (O.b != null) {
       // 반장 comes in through the door to the line and stops beside 지우, facing him
@@ -8268,7 +8286,18 @@ function startHold(beat) {
 function stopHold() { if (holdOsc) { fadeStop(holdOsc, holdOsc._gn, holdOsc._lf); holdOsc = null; } stopHypeHold(); }
 
 const GUIDE = { on: false, t: 0, n: null, side: '', resuming: false };   // see guideTick
+// a level's held lines (L.hold: [[beat, lines]]): on the beat the whole shift stops dead (the audio clock suspended, so
+// nothing slips), the lines come up in the dialogue box, a press each, and after the last it runs on from there
+const HOLD = { on: false, t: 0, i: 0, at: 0 };
+function holdTick(t) {
+  const H = L.hold && L.hold[HOLD.i]; if (!H || HOLD.on || state !== 'play' || TUT.on) return;
+  if (beatAt(t) < H[0]) return;
+  HOLD.i++; HOLD.on = true; HOLD.t = t; HOLD.at = performance.now(); if (ctx) ctx.suspend();
+  subEl.hidden = true; bubble.hidden = true; lastSay = '';
+  runDialog(H[1], () => { HOLD.on = false; if (ctx) ctx.resume(); });
+}
 function songAt(perfMs) {
+  if (HOLD.on) return HOLD.t;   // a held line: the shift stands still
   if (GUIDE.on) return GUIDE.t;   // the tutorial's guide holds the shift still at the gate
   return songRaw(perfMs);
 }
@@ -8597,7 +8626,7 @@ function updateHud(t) {
   const line = TUT.on && TUT.line ? [beat, TUT.line.text, 1, TUT.line.spk === 'h' ? 0 : 1, TUT.line.spk]
     : cnt >= 0 ? [beat, ['하나!', '둘!', '셋!'][cnt], 1, TUT.countSpk === 'h' ? 0 : 1, TUT.countSpk]
     : L.say.find(([b, , d]) => beat >= b && beat < b + d);
-  const s = line ? line[1] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.text : '';
+  const s = HOLD.on ? '' : line ? line[1] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.text : '';
   if (s !== lastSay) {
     bubble.textContent = s; bubble.hidden = !s; lastSay = s;
     // 2-2: the line as a subtitle in the middle, where your eyes are; over the speaker's head only a small "…"
@@ -8919,7 +8948,8 @@ function devMarks() {
   return (L.sections || []).map(([bar, name]) => [bar * 4, (SEC_KO[name] || name) + ' · ' + bar + '마디']).filter(([b], i, a) => i === 0 || b !== a[i - 1][0]);
 }
 function devSeek(beat) {
-  if (state !== 'play' || !ctx) return;
+  if (state !== 'play' || !ctx || HOLD.on) return;
+  HOLD.i = (L.hold || []).filter(h => h[0] < beat).length;
   if (TUT.on) { skipPractice(); if (state !== 'play') return; }
   const tB = timeAt(beat);
   stopHold(); CAM.to = null; SLOW.on = false;
@@ -9069,6 +9099,7 @@ function startPlay() {
   mus.gain.cancelScheduledValues(ctx.currentTime); mus.gain.setValueAtTime(1, ctx.currentTime);
   hud.hidden = false; state = 'play'; startHum();
   hud.classList.remove('cine'); judgeEl.classList.remove('cine'); $('devbtn').classList.remove('cine');
+  HOLD.on = false; HOLD.i = 0;
 }
 function accuracy() { const mine = notes.filter(n => !isAuto(n)); return (stats.perfect + stats.good * 0.6 + stats.tailOk) / (mine.length + mine.filter(n => n.len).length); }
 function finishPlay(force) {
@@ -9108,6 +9139,7 @@ function laneOf(side) { if (L.oneButton) return side; return L.lanes === 2 ? (L.
 function handLabels() {}
 function press(ts, key, lane) {
   if (state === 'outro' && EPI.on && !dlg) { epiPress(); return; }
+  if (state === 'play' && HOLD.on) { if (performance.now() - HOLD.at > 300) advanceDialog(); return; }
   if (state === 'play' && GUIDE.on) guidePress(ts, key, lane);
   else if (state === 'play' && TUT.on && TUT.phase === 'talk') tutAdvance();
   else if (state === 'play') onHit(ts, key, lane);
@@ -9159,7 +9191,7 @@ function frame(now) {
   const tReal = active ? songAt(now) : -99;
   const t = active ? viewTime(tReal, now) : -99;
   if (active) {
-    schedule(); judgeTick(tReal); updateHud(t);
+    holdTick(tReal); schedule(); judgeTick(tReal); updateHud(t);
     if (L.camPlay && !L.practiceOf && !SLOW.on) { const bv = beatAt(t), c = L.camPlay.find(([a, z]) => bv >= a && bv < z); CAM.to = c ? c[2] : null; }
     CAM.lbTo = L.cutscene && !L.practiceOf && L.cutscene.some(([a, z]) => beatAt(t) >= a && beatAt(t) < z) ? 1 : 0;
     if (TUT.on && L.practiceOf) tutTick(tReal);
