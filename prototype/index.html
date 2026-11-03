@@ -2811,15 +2811,19 @@ function drawBeltTop(time, active) {
     const tk = active ? timeAt(k / 4) : (k / 4) * SPB;
     const x = Math.round(SCAN_X + (time - tk) * SPEED);
     if (x < BELT_L + 1 || x >= W) continue;
-    if (q === 0) { R(x - 1, BELT_Y, 3, 4, '#a08a3c'); R(x - 1, BELT_Y, 3, 1, '#c9ad4c'); }
+    if (q === 0) { R(x - 1, BELT_Y, 3, 4, L.mid ? '#d9b84a' : '#a08a3c'); R(x - 1, BELT_Y, 3, 1, L.mid ? '#f3d76a' : '#c9ad4c'); }
     else if (q === 2) R(x, BELT_Y, 1, 4, '#5a4d44');
     else R(x, BELT_Y + 1, 1, 3, C.slat);
   }
 }
-function drawBeltFront(time) {
+function drawBeltFront(time, active = true) {
   R(BELT_L - 2, BELT_Y + 4, W - BELT_L + 2, 12, C.face);
   const ro = (((time * SPEED) % 14) + 14) % 14;
   for (let x = BELT_L + 2 + ro - 14; x < W; x += 14) if (x >= BELT_L) { R(x, BELT_Y + 8, 8, 4, '#2b2422'); R(x + 2, BELT_Y + 9, 2, 2, '#4a403b'); }
+  // 2-1 and 2-2 (boxes from both ends): each beat's yellow mark carried on down the belt's face, so the beat reads at a glance
+  if (L.mid) { const beat = active ? beatAt(time) : time / SPB; for (let k = Math.floor(beat) - 14; k <= Math.floor(beat) + 3; k++) {
+    const x = Math.round(SCAN_X + (time - (active ? timeAt(k) : k * SPB)) * SPEED); if (x < BELT_L + 1 || x >= W) continue;
+    R(x - 1, BELT_Y + 4, 3, 11, '#d9b84a'); R(x - 1, BELT_Y + 4, 3, 1, '#f3d76a'); } }
   R(BELT_L - 2, BELT_Y + 15, W - BELT_L + 2, 1, '#0c0a09');
   for (const x of BELT_L < 48 ? [BELT_L + 6, 70, 150, 230, 352] : [70, 150, 230, 352]) R(x, BELT_Y + 16, 4, 10, '#2b2422');
   R(BELT_L - 4, BELT_Y - 1, 5, 17, '#3d3431');
@@ -3636,16 +3640,18 @@ function rbBeach(nowMs) {
   g.fillStyle = 'rgba(255,244,190,.35)'; g.beginPath(); g.arc(540, 22, 30, 0, Math.PI * 2); g.fill();
   g.fillStyle = '#fff6cc'; g.beginPath(); g.arc(540, 22, 17, 0, Math.PI * 2); g.fill();
   for (const [cx, cy, w] of [[90, 4, 34], [250, -20, 46], [380, 14, 28], [640, -8, 36]]) { const x = (cx + t * 3) % (WW + 60) - 30; R(x, cy, w, 5, '#ffffff'); R(x + 6, cy - 4, w - 14, 4, '#ffffff'); R(x + 3, cy + 5, w - 6, 2, '#e3f1fa'); }
-  R(0, 88, WW, 28, '#2a86c2'); R(0, 88, WW, 4, '#4aa6d8'); R(0, 104, WW, 12, '#2479b3');
-  for (let i = 0; i < 26; i++) { const x = (i * 53 + t * (8 + (i % 3) * 4)) % (WW + 20) - 10, y = 93 + (i % 4) * 5; R(x, y, 7 + (i % 3) * 2, 1, '#e6f6ff'); }
-  for (let x = 0; x < WW; x += 4) R(x, 116 + Math.round(Math.sin(x / 13 + t * 2) * 1.5), 4, 3, '#f2fbfc');
-  R(0, 119, WW, MID.wh, '#f1d49a'); R(0, 119, WW, 5, '#dcb87c');
-  for (let i = 0; i < 160; i++) R(rnd(i, 1) * WW, 126 + rnd(i, 2) * 190, 1, 1, '#d8b676');
-  // parasols and two palms behind the belts; a towel and a beach ball on the sand in front
-  [[120, '#e84b4b', '#fff4e6'], [262, '#f3c43a', '#2d7fd0'], [452, '#2fbf8f', '#fff4e6'], [598, '#e84b4b', '#f3c43a']].forEach(([x, a, c]) => {
-    R(x, 92, 2, 34, '#e9e4d8'); for (let r = 0; r < 5; r++) { const w = 10 + r * 6; for (let k = 0; k < w; k += 4) R(x + 1 - w / 2 + k, 84 + r * 2, 4, 2, (Math.floor((k + r) / 4) % 2) ? a : c); } });
-  for (const px of [30, 652]) { for (let k = 0; k < 9; k++) R(px + Math.round(Math.sin(k / 3) * 3), 60 + k * 7, 5, 7, k % 2 ? '#8a5a32' : '#7a4e2a');
-    for (const [dx, dy] of [[-16, 2], [-9, -3], [0, -5], [9, -3], [16, 2]]) { R(px + 2 + dx, 56 + dy, 10, 3, '#2f9d4f'); R(px + 2 + dx + (dx < 0 ? -4 : 6), 59 + dy, 6, 2, '#24813f'); } }
+  // the sea, deep enough to lie behind both belts so the boxes stand out against blue; an island and a sail far out
+  const sea = g.createLinearGradient(0, 88, 0, 166); sea.addColorStop(0, '#4aa6d8'); sea.addColorStop(0.15, '#2a86c2'); sea.addColorStop(1, '#1f6fa8');
+  g.fillStyle = sea; g.fillRect(0, 88, WW, 78);
+  R(486, 84, 44, 4, '#3d7a4a'); R(494, 81, 26, 3, '#4a8a52'); R(507, 70, 2, 11, '#6a4a2a'); R(500, 68, 8, 2, '#2f9d4f'); R(508, 69, 8, 2, '#2f9d4f');
+  { const sx = (WW + 30) - ((t * 6) % (WW + 60)); R(sx, 86, 10, 2, '#f4f1ea'); R(sx + 4, 76, 1, 10, '#6a5a4a'); R(sx + 5, 77, 4, 8, '#ffffff'); }
+  for (let i = 0; i < 44; i++) { const x = (i * 53 + t * (8 + (i % 3) * 4)) % (WW + 20) - 10, y = 93 + (i % 9) * 8; R(x, y, 7 + (i % 3) * 2, 1, i % 9 > 5 ? '#cfe9f7' : '#e6f6ff'); }
+  for (let x = 0; x < WW; x += 4) R(x, 166 + Math.round(Math.sin(x / 13 + t * 2) * 1.5), 4, 3, '#f2fbfc');
+  R(0, 169, WW, MID.wh, '#f1d49a'); R(0, 169, WW, 4, '#dcb87c');
+  for (let i = 0; i < 120; i++) R(rnd(i, 1) * WW, 176 + rnd(i, 2) * 140, 1, 1, '#d8b676');
+  // parasols on the sand in front of the belts, clear of you and the cart in the middle
+  [[118, '#e84b4b', '#fff4e6'], [226, '#f3c43a', '#2d7fd0'], [454, '#2fbf8f', '#fff4e6'], [562, '#e84b4b', '#f3c43a']].forEach(([x, a, c]) => {
+    R(x, 176, 2, 28, '#e9e4d8'); R(x - 3, 203, 8, 2, '#c9a86a'); for (let r = 0; r < 5; r++) { const w = 10 + r * 6; for (let k = 0; k < w; k += 4) R(x + 1 - w / 2 + k, 168 + r * 2, 4, 2, (Math.floor((k + r) / 4) % 2) ? a : c); } });
   R(168, 210, 46, 16, '#e8505b'); for (let k = 0; k < 46; k += 8) R(168 + k, 210, 4, 16, '#fff2e0');
   g.fillStyle = '#ffffff'; g.beginPath(); g.arc(512, 214, 8, 0, Math.PI * 2); g.fill(); R(504, 212, 16, 3, '#e84b4b'); R(511, 206, 3, 16, '#2d7fd0');
 }
@@ -3802,7 +3808,7 @@ function drawMid(t, nowMs, active) {
       drawBox(n, x, BELT_Y, '', T);
     }
     if (!up && q === 0 && held) drawBox(held.n, held.x, held.y + held.n.h / 2, '', T);
-    drawBeltFront(T); if (up) drawBeltLegs();
+    drawBeltFront(L.rb ? rbBeltT(T) : T, live); if (up) drawBeltLegs();
     drawScannerFront(flashOf(q, up), false, missOf(q, up), 0);
     g.restore(); BELT_L = 48;
   };
