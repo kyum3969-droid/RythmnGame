@@ -91,14 +91,15 @@
     const frame = definitions[1], sy = (80 - (top - 94)) / 679;
     const point = ([px, py]) => ({ x: x + (flinchAge < 160 ? 1 : 0) + (px - frame.anchor) * SCALE, y: FLOOR - (704 - py) * sy });
     const shoulder = point(joints.shoulder), reach = motion.reach;
-    const target = point([998 - 64 * reach, 274 - 8 * reach]);
+    // The lower belt's box passes the gate below the chest: the hand drops and the scanner tips down-left onto it.
+    const target = upper ? point([998 - 64 * reach, 274 - 8 * reach]) : { x: shoulder.x - 8 - 5 * reach, y: shoulder.y + 9 + 2 * reach };
     // The far conveyor is higher; its second arm keeps a fixed, longer reach.
     // Bone lengths remain constant through each lane's animation.
     const stretch = upper ? 1.75 : 1;
     if (upper) { target.x = x - 18 - reach * 4; target.y = top - 5; }
     const boneLength = (a, b) => Math.hypot((b[0] - a[0]) * SCALE, (b[1] - a[1]) * sy) * stretch;
     const solved = RookieRig.solveTwoBone(shoulder, target, boneLength(joints.shoulder, joints.elbow), boneLength(joints.elbow, joints.wrist), upper ? 1 : -1);
-    const angle = motion.tilt || 0;
+    const angle = upper ? (motion.tilt || 0) : -0.12 - 0.32 * reach;
     const mx = (846 - joints.wrist[0]) * SCALE, my = (228 - joints.wrist[1]) * sy;
     const muzzle = { x: solved.wrist.x + mx * Math.cos(angle) - my * Math.sin(angle), y: solved.wrist.y + mx * Math.sin(angle) + my * Math.cos(angle) };
     return { ...solved, angle, muzzle, pulse: motion.pulse || 0, sy };
@@ -126,11 +127,14 @@
     g.restore();
     if (p.pulse > .01) {
       // Short scan light belongs to the scanner; existing gate FX judge notes.
+      // (it leaves the scanner the way the scanner points)
+      g.save(); g.translate(p.muzzle.x, p.muzzle.y); g.rotate(p.angle);
       g.globalAlpha = p.pulse * .55;
       g.fillStyle = '#b5ed77';
-      g.beginPath(); g.moveTo(p.muzzle.x - .5, p.muzzle.y);
-      g.lineTo(p.muzzle.x - 11, p.muzzle.y + 3); g.lineTo(p.muzzle.x - 11, p.muzzle.y + 8); g.closePath(); g.fill();
-      g.globalAlpha = p.pulse; g.fillRect(p.muzzle.x - 11, p.muzzle.y + 3, .6, 5);
+      g.beginPath(); g.moveTo(-.5, 0);
+      g.lineTo(-11, 3); g.lineTo(-11, 8); g.closePath(); g.fill();
+      g.globalAlpha = p.pulse; g.fillRect(-11, 3, .6, 5);
+      g.restore();
     }
     g.restore();
   }
