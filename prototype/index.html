@@ -72,6 +72,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .hud span.hot{background:var(--vest);color:#1b120c}
 .hud span.fever{background:#7ec8e3;color:#0b1a24;box-shadow:0 0 10px rgba(126,200,227,.8)}
 .hud span.pulse{animation:pulse .35s ease-out}
+.hud.cine,.judge.cine,#devbtn.cine{opacity:0!important;transition:opacity .4s}
 .hud span.broke{animation:broke .5s ease-out}
 @keyframes broke{0%{background:var(--laser);color:#1b120c;transform:translateX(-4px)}15%{transform:translateX(4px)}30%{transform:translateX(-3px)}45%{transform:translateX(2px)}70%{background:var(--laser);color:#1b120c}100%{transform:none}}
 @keyframes pulse{0%{transform:scale(1.3)}100%{transform:scale(1)}}
@@ -869,7 +870,7 @@ const LEVELS = [
     // [1]. boom: the motor blows; radio: [the static, the blues back on at this beat, from this many seconds in]
     rb: { turns: [[0, 'b'], [68, 'v'], [100, 'b'], [132, 'v', 48],
              [164, 'b'], [168, 'v'], [172, 'b'], [176, 'v'], [180, 'b'], [182, 'v'], [184, 'b'], [186, 'v'], [188, 'h']],
-      pokes: [], cut: [164, 236], heat: [100, 188], boom: 196, radio: [9998, 9999, 0], unplug: 222, leave: [209, 215.5], low: 0.07, bar: 2.22284 },
+      pokes: [], cut: [164, 236], heat: [100, 188], boom: 196, radio: [9998, 9999, 0], unplug: 223.5, leave: [209, 215.5], low: 0.07, bar: 2.22284 },
     mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 20,
       // 마르코 bored by the blues: yawning (hand to his open mouth, then a stretch), dozing (eyes shut, nodding, z's), jolted awake
       bore: { yawn: [[36, 40.5], [44, 47.5]], doze: [52, 64.5], jolt: 64.5 }, guide: [-9, -8], tags: [-9, -8, -7],
@@ -910,9 +911,9 @@ const LEVELS = [
     phaseFx: { amber: [], lineOn: [-9, -9, -9], drop: 68, drop2: 196, last: 1e9, out: [218.4, 219.1, 1e9] },
     sfx: [[100, 'knob'], [164, 'knob'], [172, 'knob'], [180, 'knob'], [184, 'knob'],
           [196, 'boom'], [196.6, 'alarm'], [198.6, 'alarm'], [200.6, 'alarm'], [207.5, 'knob'], [209.4, 'step'], [210.2, 'step'], [211, 'step'], [211.8, 'step'], [212.6, 'step'], [213.4, 'step'], [214.2, 'step'],
-          [218.4, 'lampOff'], [219.1, 'lampOff'], [222, 'switchOff']],
+          [218.4, 'lampOff'], [219.1, 'lampOff'], [223.5, 'switchOff']],
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
-    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 230,
+    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 231,
     special:['마르코가 보낸 상자', 'right', '받아냄'],
     sections: [[0, 'intro'], [9, 'bored'], [13, 'doze'], [17, 'tug'], [33, 'tug2'], [41, 'cut'], [49, 'boom'], [52, 'alone']],
     bars: Array(58).fill('................'),
@@ -925,8 +926,8 @@ const LEVELS = [
           [164.3, '…내 라인이다.', 1.6, 0, 'b'], [168.2, '볼륨 업~!', 1.4, 0, 'v'], [172.2, '(딸깍)', 1.4, 0, 'b'], [176.2, '업!!', 1.4, 0, 'v'],
           [180.1, '(딸깍)', 0.9, 0, 'b'], [182.1, '업!', 0.9, 0, 'v'], [188.5, '더! 더!', 2, 0, 'v'],
           [196.6, '어, 어?', 2, 0, 'v'], [200, '(멈춘 벨트를 본다) …다 섰네.', 3.5, 0, 'b'], [204, '반장님, 이건 제가…', 2.5, 0, 'v'],
-          [207.5, '(라디오를 끈다) …내일 하자.', 3, 0, 'b'], [216, '…반장님?', 2.5, 0, 'v'], [222, '(붐박스 플러그를 뽑는다)', 2.5, 0, 'v'],
-          [225, '…신입, 소주 한잔할래요?', 4, 0, 'v']],
+          [207.5, '(라디오를 끈다) …내일 하자.', 3, 0, 'b'], [216, '…반장님?', 2.5, 0, 'v'], [219.5, '(쏟아진 상자를 본다) …아… 또 내가 망쳤어…', 3.5, 0, 'v'],
+          [223.5, '(붐박스 플러그를 뽑는다)', 2, 0, 'v'], [226, '…신입, 소주 한잔하러 가요.', 4, 0, 'v']],
     intro: [
       { who:'', text:'둘째 밤, 새벽 1시 40분. 실적표 목표 수량 옆에 빨간 펜으로 고친 숫자. 반장은 집에서 낡은 라디오를 하나 들고 왔다.' },
       { who:'마르코', text:'반장님! 우리 어제 1등이래요!' },
@@ -3805,9 +3806,11 @@ function rbFlood() {
 }
 // the cutscene's letterbox: black bars close in over a beat at the start of the cut and open again at its end
 function rbCine(c, w, h, b, active) {
-  const C = L.rb.cut; if (!C || !active) return;
-  const k = ease(Math.min((b - C[0] + 0.5) / 1, (C[1] - b) / 1)); if (k <= 0) return;
-  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, w, Math.round(h * 0.1 * k)); c.fillRect(0, Math.round(h - h * 0.1 * k), w, Math.ceil(h * 0.1 * k)); c.restore();
+  const C = L.rb.cut, on = !!C && active && b >= C[0] - 0.5 && b < C[1];
+  if (hud.classList.contains('cine') !== on) { hud.classList.toggle('cine', on); judgeEl.classList.toggle('cine', on); $('devbtn').classList.toggle('cine', on); }
+  if (!C || !active) return;
+  const k = ease(Math.min((b - C[0] + 1) / 1.5, (C[1] - b) / 1)); if (k <= 0) return;
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, w, Math.round(h * 0.14 * k)); c.fillRect(0, Math.round(h - h * 0.14 * k), w, Math.ceil(h * 0.14 * k)); c.restore();
 }
 function rbFront(b, bReal, nowMs, active, live) {
   if (!live) return;
@@ -7680,10 +7683,11 @@ function startPlay() {
   musHP.frequency.cancelScheduledValues(ctx.currentTime); musHP.frequency.setValueAtTime(20, ctx.currentTime);
   mus.gain.cancelScheduledValues(ctx.currentTime); mus.gain.setValueAtTime(1, ctx.currentTime);
   hud.hidden = false; state = 'play'; startHum();
+  hud.classList.remove('cine'); judgeEl.classList.remove('cine'); $('devbtn').classList.remove('cine');
 }
 function accuracy() { const mine = notes.filter(n => !isAuto(n)); return (stats.perfect + stats.good * 0.6 + stats.tailOk) / (mine.length + mine.filter(n => n.len).length); }
 function finishPlay(force) {
-  stopSong(); state = 'outro'; stopHum(); stopHold(); bubble.hidden = true; subEl.hidden = true; hint.hidden = true; CAM.to = null; SLOW.on = false; DEV.open = false; devSync();
+  stopSong(); state = 'outro'; stopHum(); stopHold(); bubble.hidden = true; subEl.hidden = true; hint.hidden = true; hud.classList.remove('cine'); judgeEl.classList.remove('cine'); $('devbtn').classList.remove('cine'); CAM.to = null; SLOW.on = false; DEV.open = false; devSync();
   const acc = accuracy();
   if (force == null) try { if ((progress[L.id] || 0) < acc) { progress[L.id] = acc; localStorage.setItem('belt.progress', JSON.stringify(progress)); } } catch (e) {}
   runDialog(L.outro(force != null ? force : acc >= 0.8, stats.special), showResult);
