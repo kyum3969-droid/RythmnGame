@@ -1056,7 +1056,7 @@ const LEVELS = [
     // heartbeat kick, bass, glockenspiel). The clips slide along his laptop's timeline to the playhead and you set each one
     // down; every new layer brings back something from the night. It ends when he presses stop and saves it.
     lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
-    hitKit: 'ticktock', bareBand: true,
+    hitKit: 'ticktock', bareBand: true, observer: 'boss', observerIntro: true,   // 반장 by the line for the intro only
     heads: { j: [104, 58], h: [52, 90], r: [60, 116] },
     clock:'02:50', title:'첫눈에', hints: false, special:['떨어진 상자', 'drop', '받아냄'],
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 320,
@@ -1130,8 +1130,10 @@ const LEVELS = [
       { who:'지우', text:'형! 저 왔어요! 저 없는 동안 심심했죠?' },
       { who:'', text:'아래 벨트에 처음 보는 사람이 서 있다. 모자를 깊게 눌러쓰고, 시계를 본다.' },
       { who:'지우', text:'…어? 저 누나는…' },
-      { who:'하은', text:'…하은. 위에 실어.' },
-      { who:'지우', text:'아, 넵! 지우예요! 위에서 할게요!' }],
+      { who:'반장', text:'2라인에서 지원 나왔다. 하은이다.' },
+      { who:'반장', text:'지우 너는 위에 실어.' },
+      { who:'지우', text:'아, 넵! 지우예요! 잘 부탁드려요!' },
+      { who:'', text:'하은은 고개만 한 번 까딱했다.' }],
     // the night ends in his room: the file saved, the laptop still open
     outro: (good) => good ? [
       { who:'', text:'새벽 다섯 시. 지우는 노트북을 덮지 못했다.' },
@@ -2201,6 +2203,7 @@ function drawPartnerBody(id, pose, nowMs, active) { PARTNERS[id].draw(pose, nowM
 const OBS_X = 168;
 function drawObserver(t, nowMs, active) {
   if (!L.observer) return;
+  if (L.observerIntro && state !== 'intro') return;   // (1-5: he is only there to introduce her)
   // after the song he stays where it left him, through the outro and the result, and the foot keeps tapping on the old tempo
   const post = !active && (state === 'outro' || state === 'result'), on = active || post;
   const beat = active ? beatAt(t) : post ? END_BEAT : 0, ph = post ? ((nowMs / 1000) / SPB) % 1 : beat - Math.floor(beat);
