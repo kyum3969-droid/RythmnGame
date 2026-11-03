@@ -944,7 +944,7 @@ const LEVELS = [
       { who:'반장', text:'…목표도 올랐네.' }],
     // the 포장마차 (scene 'pocha'): 마르코's song on his phone under it (`pocha`, played small, once the scene is up);
     // mpose: what 마르코's hands do on the line (pour, drink, spin the glass, head down, raise it)
-    pocha: { src: 'audio/2-2-pocha.mp3', gain: 0.55 },
+    pocha: { src: 'audio/2-2-pocha.mp3', gain: 0.75 },
     outro: good => good ? [
       { who:'', text:'새벽 5시 반. 센터 앞 포장마차. 둘 말고는 아무도 없다.', scene:'pocha' },
       { who:'마르코', text:'(잔을 채운다) …신입은 한 잔만.', scene:'pocha', mpose:'pour' },
@@ -7442,7 +7442,7 @@ function stopSong() { if (SONG.src) { try { SONG.src.stop(); } catch (e) {} SONG
 const POCHA = { src: null, started: false };
 function pochaSong() {
   const sp = L.pocha; if (!sp || POCHA.started || !ctx) return; const buf = SONG.bufs[sp.src]; if (buf === null || buf === undefined) return; POCHA.started = true; if (!buf) return;
-  const s_ = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(), g_ = ctx.createGain(); s_.buffer = buf; hp.type = 'highpass'; hp.frequency.value = 220; lp.type = 'lowpass'; lp.frequency.value = 5200;
+  const s_ = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(), g_ = ctx.createGain(); s_.buffer = buf; hp.type = 'highpass'; hp.frequency.value = 90; lp.type = 'lowpass'; lp.frequency.value = 11000;
   s_.connect(hp); hp.connect(lp); lp.connect(g_); g_.connect(mus); const T = ctx.currentTime; g_.gain.setValueAtTime(0.0001, T); g_.gain.linearRampToValueAtTime(sp.gain || 0.55, T + 1.5); s_.start(T); POCHA.src = s_;
 }
 // start song i at audio time T, `into` seconds past its first downbeat
