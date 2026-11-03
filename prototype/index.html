@@ -81,7 +81,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .bubble.obs{background:#d9d0bd}
 .bubble.tr::after{left:auto;right:1.6em}
 .bubble.mid::after{left:var(--tx,1.6em);right:auto}
-.sub{position:absolute;left:50%;top:73%;transform:translateX(-50%);max-width:70cqw;text-align:center;pointer-events:none;
+.sub{position:absolute;left:50%;top:78%;transform:translateX(-50%);max-width:70cqw;text-align:center;pointer-events:none;
   font-weight:700;font-size:clamp(13px,2.4cqw,24px);line-height:1.35;color:#f4ead8;background:rgba(10,8,8,.74);padding:.3em .8em;border-radius:.4em;
   box-shadow:0 2px 0 rgba(0,0,0,.45);white-space:nowrap}
 .sub b{font-weight:800;margin-right:.45em}
@@ -771,7 +771,7 @@ const LEVELS = [
     // right); the chart is in `bars` ('1' left lower = 반장's, '2' right lower, '3' left upper, '4' right upper, 'x' both lower;
     // 16 cells a bar; one hand's notes at least an 8th apart). 마르코 runs `route` ([beat, spot]: rl, ru, lu, ll, c beside you)
     // and throws the boxes he loads; he switches the radio off at `radio`; while he talks (`talk`) the camera comes in.
-    mid: { at: 0, zoom: [57, 62], keys: 70, from: 0, radio: 56, boombox: 61.5, talk: [146, 204], guide: [66, 100], tags: [72, 88, 100], upTags: [[124, 132, 140]],
+    mid: { at: -99, zoom: [57, 62], keys: 70, from: 0, radio: 56, boombox: 61.5, talk: [146, 204], guide: [66, 100], tags: [72, 88, 100], upTags: [[124, 132, 140]],
       // the floor shouts (sound and ad-lib): a gang 'hey!' on the drop, in the band's stop and through the last run, 'yeah!'
       // when the horns come back, a brass fanfare (landing half a beat after its entry) on the second drop and the last hit
       shouts: [[76, 'hey', '헤이!'], [108, 'hey', '헤이!'], [142.5, 'hey', '헤이!'], [208, 'yeah', '예에~!'], [239.5, 'fanfare', '빠바밤~!'],
@@ -870,7 +870,7 @@ const LEVELS = [
     rb: { turns: [[0, 'b'], [68, 'v', 0], [72, 'v', 28], [100, 'b'], [132, 'v', 36],
              [164, 'b'], [168, 'v', 49], [172, 'b'], [176, 'v', 50], [180, 'b'], [182, 'v', 51], [184, 'b'], [186, 'v', 51.5], [188, 'h', 53]],
       pokes: [], cut: [164, 220], heat: [100, 188], boom: 196, radio: [218.5, 220, 113.417], low: 0.07, bar: 2.22284 },
-    mid: { at: 0, zoom: [-2, -1], keys: 0, from: 0, adFrom: 20,
+    mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 20,
       // 마르코 bored by the blues: yawning (hand to his open mouth, then a stretch), dozing (eyes shut, nodding, z's), jolted awake
       bore: { yawn: [[36, 40.5], [44, 47.5]], doze: [52, 64.5], jolt: 64.5 }, guide: [-9, -8], tags: [-9, -8, -7],
       shouts: [[36.5, 'none', '하아아암~'], [44.5, 'none', '하암…'], [53, 'none', 'Zzz…'], [57.5, 'none', '쿨… zzz'], [64.5, 'none', '헉!'], [67.5, 'fanfare', '빠바밤~!'], [68, 'hey', '헤이!'], [132, 'hey', '노노노~!'], [168, 'hey', '볼륨 업!'], [176, 'hey', '업!!'], [188, 'hey', '더!!']],
@@ -3608,7 +3608,7 @@ function midView(b, sEnd) {
   const z = L.mid.zoom, e = b < z[0] ? 0 : b >= z[1] ? 1 : ease((b - z[0]) / (z[1] - z[0]));
   // (stage 2: the view sits low, so the belts ride in the upper part of the screen, clear of the thumbs on a phone, and the whole
   // floor's width shows, 반장 and 마르코 not cut at the ends)
-  let s = lerp(1, sEnd, e), cx = lerp(W / 2, MID.ax, e), cy = lerp(H / 2, H / 2 + 38, e);
+  let s = lerp(1, sEnd, e), cx = lerp(W / 2, MID.ax, e), cy = lerp(H / 2, H / 2 + 20, e);
   // while 마르코 introduces himself beside you the camera comes in on the two of you, and goes back out after
   // (no zoom while 마르코 talks: the whole floor stays in view)
   return { s, cx, cy, e };
@@ -6828,7 +6828,7 @@ function popJudge(kind, sub = '', lane = 0) {
   judgeEl.className = 'judge ' + cls;
   judgeEl.style.top = kind === 'both' ? '19%' : L.lanes === 2 && lane === 0 ? '12%' : '29%';
   // on the four chutes the word comes up over the middle of the highway
-  const bNow = castBeatAt(songAt(performance.now()), state === 'play'), qd = (L.quad && quadP(bNow) > 0.5) || (L.mid && bNow >= L.mid.zoom[1]); judgeEl.style.left = qd ? '50%' : ''; if (qd) judgeEl.style.top = L.mid ? '60%' : '44%';
+  const bNow = castBeatAt(songAt(performance.now()), state === 'play'), qd = (L.quad && quadP(bNow) > 0.5) || (L.mid && bNow >= L.mid.zoom[1]); judgeEl.style.left = qd ? '50%' : ''; if (qd) judgeEl.style.top = L.mid ? '65%' : '44%';
   judgeEl.innerHTML = '';
   judgeEl.append(txt);
   if (sub) { const s = document.createElement('small'); s.textContent = sub; judgeEl.append(s); }
