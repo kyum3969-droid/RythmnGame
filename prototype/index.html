@@ -2834,7 +2834,7 @@ function drawRoomMemory(kind, a, x, y, nowMs) {
   g.restore();
 }
 // 지우 sitting at his desk, from the side, facing right (his own sprite for this scene: the standing one cannot sit). Hoodie,
-// jeans, slippers; headphones; his hand on the pad. (hx, hy) = the back of his seat; nod drops his head a pixel on the beat,
+// jeans, slippers; the hood up and his earbuds in, as in the game; his hand on the pad. (hx, hy) = the back of his seat; nod drops his head a pixel on the beat,
 // press pushes the hand down a pixel as he sets a clip down
 function drawJiwooSeated(hx, hy, nod, press) {
   const P = (x, y, w, h, c) => R(hx + x, hy + y, w, h, c);
@@ -2847,17 +2847,12 @@ function drawJiwooSeated(hx, hy, nod, press) {
   for (let y = -32; y < -4; y++) { const lean = Math.floor((-4 - y) / 9), w = 12; P(-1 + lean, y, w, 1, HD); P(-1 + lean, y, 1, 1, HDd); P(w - 2 + lean, y, 1, 1, HDl); }
   P(-1, -6, 13, 2, HDd); P(3, -14, 8, 1, HDd); P(3, -14, 1, 6, HDd);
   P(9, -30 + nod, 1, 6, '#e8e0d0');
-  // the hood bunched at the back of his neck
-  P(-2, -36 + nod, 8, 6, HDd); P(-1, -35 + nod, 6, 4, HD);
-  // the head: hair, ear (under the headphones), face in profile: eye, brow, nose, mouth
+  // the head as in the game: the hood up, his face in its opening (turned toward the laptop), the fringe, one eye, and his
+  // white earbuds, the wire zigzagging down to his neck (and on to the laptop)
   const y0 = -50 + nod;
-  P(2, y0 + 3, 12, 12, SK); P(2, y0 + 3, 3, 12, SKd);
-  P(1, y0, 13, 5, HA); P(0, y0 + 2, 4, 9, HA); P(12, y0 + 1, 3, 3, HA); P(3, y0 - 1, 9, 1, HA); P(13, y0 + 4, 1, 1, HA);
-  P(14, y0 + 8, 1, 2, SK); P(12, y0 + 7, 1, 2, '#1b1716'); P(11, y0 + 6, 3, 1, HA); P(12, y0 + 12, 2, 1, '#b86a58');
-  P(3, y0 + 15, 7, 2, SKd);
-  // headphones: the band over the top, the cup over his ear (a pink ring)
-  P(4, y0 - 2, 8, 1, '#1e2028'); P(3, y0 - 1, 1, 3, '#1e2028'); P(12, y0 - 1, 1, 3, '#1e2028');
-  P(3, y0 + 4, 6, 8, '#1e2028'); P(4, y0 + 5, 4, 6, '#30333e'); P(5, y0 + 6, 2, 4, '#ff7fae');
+  P(0, y0 - 2, 18, 20, HD); P(0, y0 - 2, 18, 2, HDd); P(0, y0, 1, 16, HDd); P(17, y0, 1, 16, HDl);
+  P(6, y0 + 3, 10, 12, SK); P(6, y0 + 3, 10, 2, C.hairDark); P(12, y0 + 8, 2, 2, C.ink);
+  P(15, y0 + 8, 2, 2, '#f4f1ea'); for (let k = 0; k < 10; k++) P(16 + (k % 2), y0 + 10 + k, 1, 1, '#f4f1ea');
   // the arm: shoulder, elbow down by his side, the forearm out to the pad, the hand
   const sx = hx + 6, sy = hy - 28 + nod, ex = hx + 12, ey = hy - 17, wx = hx + 27, wy = hy - 16 + press;
   thick(sx, sy, ex, ey, 4, HD); thick(ex, ey, wx - 2, wy, 4, HD); R(sx - 1, sy - 2, 4, 2, HDl);
@@ -2897,8 +2892,8 @@ function drawRoom15(t, nowMs, b, post) {
   R(174, 104, 28, 2, '#a8acb8'); R(174, 104, 28, 1, '#c8ccd6'); R(175, 106, 26, 0.5, '#5a5e6a');
   g.save(); g.translate(175, 104); g.rotate(-0.26);
   R(-2, -23, 3, 23, '#3a3d4a'); R(-3, -23, 1, 23, `rgba(170,210,255,${0.75 + 0.25 * beatK})`); R(-2, -23, 3, 1, '#5a5e6a'); g.restore();
-  // his headphone cable, down to the laptop
-  { const [hx, hy] = ROOM.hip; for (let q = 0; q <= 1; q += 0.01) R(Math.round(lerp(hx + 6, 176, q)), Math.round(lerp(hy - 39, 103, q) + Math.sin(q * Math.PI) * 10), 1, 1, '#101018'); }
+  // his earbuds' wire, down to the laptop
+  { const [hx, hy] = ROOM.hip; for (let q = 0; q <= 1; q += 0.01) R(Math.round(lerp(hx + 17, 176, q)), Math.round(lerp(hy - 31, 103, q) + Math.sin(q * Math.PI) * 6), 1, 1, '#d8d4cc'); }
   // 지우
   const nod = post || stopped ? 0 : beatK > 0.5 ? 1 : 0;
   drawJiwooSeated(ROOM.hip[0], ROOM.hip[1], nod, pd);
