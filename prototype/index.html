@@ -987,58 +987,115 @@ const LEVELS = [
       { who:'마르코', text:'그래도 도움이 되고 싶은데. …내일 다시 해요, 신입.', scene:'pocha', mpose:'raise' }],
   }
   ,{
-    id:'s2-3', stageNo:'2-3', who:'반장 + 지우', role:'반장 · 지우 · 순자 이모 · 96 BPM · 벨트 둘', tag:'레게톤 · 버튼 둘 · 본선 사흘 전', bpm:96, style:'dembow23', fxTheme:'neon', inspector: true,
-    // 2-3 두 벨트: peak season opens a second belt; 지우 loads the upper one, three nights before her final, while 반장 loads
-    // the lower one. Two buttons again (left hand the upper gate, right hand the lower). 순자 이모 stands between the belts and
-    // pushes or grabs on either. Halfway through 지우 stops to stare at her phone (the final's notice): her belt goes quiet, and
-    // her hands are late for a while after.
-    lanes: 2, partners: ['jiwoo', 'boss'], tempo: [[0, 96]], clock:'02:10', title:'두 벨트', hints:true,
-    chords: DEM.chords, roots: DEM.roots,
-    chordAt: bar => bar < 2 ? 0 : bar < 10 ? DEM.verse[(bar - 2) % 4] : bar < 14 ? DEM.pre[(bar - 10) % 4] : bar < 22 ? DEM.chorus[(bar - 14) % 4] : bar < 30 ? DEM.verse[(bar - 22) % 4] : bar < 34 ? DEM.pre[(bar - 30) % 4] : bar < 42 ? DEM.chorus[(bar - 34) % 4] : bar < 46 ? DEM.verse[(bar - 42) % 4] : bar < 54 ? DEM.chorus[(bar - 46) % 4] : 0,
-    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16, off: 1.3 }, endAt: 216,
-    phone: [[88, 104]], phoneLane: 0, lateHint: '지우가 본선 생각에… 손이 늦어요. 손을 봐요',
-    special:['밀리거나 붙잡힌 상자', 'off', '받아냄'],
-    sections: [[0, 'intro'], [2, 'v1'], [10, 'pre1'], [14, 'ch1'], [22, 'v2'], [30, 'pre2'], [34, 'ch2'], [42, 'bridge'], [46, 'ch3'], [54, 'outro']],
-    // lower belt (반장, right hand) and upper belt (지우, left hand). 'P' pushed, 'R' grabbed, 'L' late (지우 after the phone)
-    bars: [
-      '........', '........',
-      'x...x...', 'x.x.x...', 'x...P...', 'x.x.x...', 'x...x.x.', 'R...x...', 'x.x.x...', 'x...P...',
-      'x...x...', 'x.x.x...', 'x...R...', 'x.x.x.x.',
-      'x.x.x...', 'P...x.x.', 'x...R...', 'x.x.x...', 'x.x.x.x.', 'R...P...', 'x.x.x...', 'x...x.P.',
-      'x...x...', 'x.x.x...', 'x...P...', 'x...x.x.', 'x.x.x...', 'R...x...', 'x...P.x.', 'x.x.x...',
-      'x...x...', 'x.x.x...', 'x...R...', 'x.x.x.x.',
-      'x.x.x...', 'P...x.x.', 'x...R...', 'x.x.x...', 'x.x.x.x.', 'R...P...', 'x.x.x...', 'x...x.P.',
-      'x.......', 'x...x...', 'x.......', 'x.x.x.x.',
-      'x.x.x.x.', 'P...x.x.', 'x...R.x.', 'x.x.x...', 'x.x.x.x.', 'R...P...', 'x.x.x.x.', 'P...x.R.',
-      '........', '........'
-    ],
-    bars2: [
-      '........', '........',
-      '....x...', 'x.......', '....x...', 'x.......', '....x...', 'x.......', '....R...', 'x.......',
-      'x...x...', 'x.......', 'x...x...', 'x.......',
-      'x...x...', 'x.P.....', 'x...x...', '....R...', 'x...x...', 'P.......', 'x...x...', '....x...',
-      '........', '........', '........', '........', 'L.......', '....L...', 'L...x...', '....x...',
-      'x...x...', 'x.......', 'x...x...', 'x.......',
-      'x...x...', 'x.P.....', 'x...x...', '....R...', 'x...x...', 'P.......', 'x...x...', '....x...',
-      '........', '....x...', '........', 'x...x...',
-      'x...x...', 'x.P.x...', 'x...x...', 'R...x...', 'x.x.x...', 'P...x...', 'x...x...', 'x.R.....',
-      '........', '........'
-    ],
-    say: [[8, '왼손 위, 오른손 아래.', 3, 1], [40, '(지게차 소리) …어, 저 양반 오늘은 반듯하네.', 3.5, 0, 's'], [60, '둘 다 본다. 손 봐.', 2.5, 0, 's'],
-          [86, '(폰을 본다) …본선 공지 떴다. 사흘 뒤.', 4, 0, 'j'], [96, '형, 나 손 떨려.', 2.5, 0, 'j'], [104, '…미안해요. 다시 할게요.', 3, 0, 'j'], [112, '(작게) …붙으면 뭐 하지.', 3.5, 0, 'j'],
-          [168, '위에 늦는다! 신입, 손 봐.', 3, 1], [200, '…됐다. 고마워요, 형.', 2.5, 0, 'j']],
-    comfort: ['괜찮아. 다음 거 봐.', '신입! 위도 봐!'],
+    id:'s2-3', stageNo:'2-3', who:'반장 + 마르코', role:'반장 · 마르코 · 106 BPM · 라인 넷', tag:'곡 없는 냉전 · 허리 · 블루스 펑크 합주', bpm:105.99, style:'funk21', fxTheme:'warm',
+    // 2-3 합주: the night after 천천히. 마르코 comes with two cans of coffee to say sorry and finds a transfer request on the board
+    // (마르코 → line 7, asked for by 반장). No radio, no boombox: the cold war plays to the line's own sounds (the motor's clunk,
+    // each belt's scanner beeping its own note). The announcement wants yesterday's backlog cleared by six; 반장, of all people,
+    // rushes (his boxes on every eighth), lifts a heavy one and his back goes (the same back as 1-4) and he sits down on it.
+    // 마르코 crosses to the left for the first time: "반장님, 천천히 해요." Alone on all four belts he goes fast and it jams. In
+    // the silence 반장 pats the box beside him (하나… 둘…), 마르코 plugs the boombox back in, and the pats are the first sound of
+    // the song (a blues funk, "First Light on the Sand", 105.99 BPM): the two of them in one groove at last, the floor a lake
+    // beach at dawn under a city's skyline (his Chicago and the beach in one picture), the backlog counted down to nothing.
+    tempo: [[0, 105.99]], clock:'01:00', title:'합주', partners:['boss'], hints:false,
+    songs: [{ src: 'audio/2-3-first-light-on-the-sand.mp3', at: 108, lead: 0.365, gain: 0.9 }],
+    songStart: -1, songCues: [[108, 0]], noCount: true, bareBand: true, hitKit: 'ticktock', subs: true,
+    // ht: the cold war (each scanner its own note until `song`); cuts [from, to] (letterboxed, no boxes) and the camera's shots
+    // in them ('b' 반장, 'v' 마르코, 'mid'); rush (반장 hurrying), lift (the heavy box), back (his back goes, he sits on it);
+    // jam (마르코's four belts jam: the belts stop, boxes spill, until the song); plug (the boombox back in); taps (his pats on a
+    // box: the two before the song, then the song's own, then every half bar as he keeps time); fuse (the lake beach coming
+    // in from both ends of the floor); dawn and sun; left: the backlog on the board [shown from, the count, at zero by]
+    ht: { song: 108, cuts: [[72, 84], [100, 113]],
+      zoom: [[72, 76, 'b', 1.9], [76, 84, 'b', 1.6], [100, 104, 'v', 1.8], [104, 107, 'b', 1.9], [107, 110, 'v', 1.7], [110, 113, 'b', 1.4]],
+      rush: [54, 72], lift: [69.5, 72], back: 72, jam: 100, plug: 107, taps: [104, 106, 108, 110, 111.5, 114, 116, 118, 119.5], tapFrom: 120,
+      fuse: [136, 168], dawn: [136, 380], sun: [340, 384], left: [48, 1240, 352] },
+    mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 136, guide: [-9, -8], tags: [-9, -8, -7],
+      shouts: [[136, 'hey', '헤이!'], [284, 'hey', '가즈아~!'], [352, 'none', '마지막!']],
+      route: [[0, "rl"], [6.5, "ru"], [10.5, "rl"], [22.5, "ru"], [26.5, "rl"], [38.5, "ru"], [42.5, "rl"], [62.5, "ru"], [72.5, "lk"], [83, "lu"], [87, "ru"], [91, "rl"], [95, "ll"], [101, "bx"], [108.5, "lk"], [118.5, "rl"], [134.5, "rl"], [150.5, "ru"], [166.5, "rl"], [182.5, "ru"], [198.5, "rl"], [202.5, "lu"], [206.5, "rl"], [210.5, "lu"], [214.5, "rl"], [218.5, "lu"], [222.5, "rl"], [226.5, "lu"], [230.5, "rl"], [234.5, "lu"], [238.5, "rl"], [242.5, "lu"], [246.5, "rl"], [250.5, "lu"], [254.5, "rl"], [258.5, "lu"], [262.5, "rl"], [266.5, "lu"], [270.5, "rl"], [274.5, "lu"], [278.5, "rl"]],
+      bars: [
+        '1.......................1.......................', '1...........2...........1...........2...........',
+        '1...........4...........1...........4...........', 'x...........4...........1...........4...........',
+        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
+        '1...........4...........1...........4...........', 'x...........4...........1...........4...........',
+        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
+        '1...........4...........1...........4...........', 'x...........4...........1...........4...........',
+        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
+        '1...........x...........1...........x...........', '1.....1.....x.....1.....1.....1.....x.....1.....',
+        '1.....1.....y.....1.....1.....1.....y.....1.....', '1.....1.....y.....1.....1.....1.....y.....1.....',
+        '................................................', '................................................',
+        '................................................', '3.....2.....1.....4.....3.....4.....3.....2.....',
+        '1.....4.....3.....2.....1.....4.....1.....2.....', '1.....4.....3.....2.....3.....4.....1.....2.....',
+        '1.....4.....1.....2.....3.....4.....3.....4.....', '................................................',
+        '................................................', '................................................',
+        '........................1.......................', '1.......................1.................1.....',
+        '..................2.....1.......................', '2.......................1.....2.................',
+        '............1...........2...........2...........', '2.......................1.......................',
+        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
+        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
+        '1...........4...........1...........4.....4.....', '1...........4...........1...........4.....4.....',
+        '1...........4.....4.....1...........4...........', '1...........4...........1...........4.....4.....',
+        '1...........2...........1...........2.....2.....', '1...........2...........1...........2.....2.....',
+        '1...........2.....2.....1...........2...........', '1...........2...........1...........2.....2.....',
+        '1...........4.....4.....1...........4...........', '1...........4...........1...........4.....4.....',
+        '1...........4...........1.....4.....4...........', '1...........4...........1...........4.....4.....',
+        '1.....2.....2...........1...........2...........', '1.......................1...........3.....3.....',
+        '1...........2.......................2.....4.....', '1...........3...........1.....3.................',
+        '1...........2...........2.................4.....', '1.......................1.....3...........3.....',
+        '1...........2.....4.................2...........', '1...........3...........1.................3.....',
+        '1...........2...........2...........2...........', '1.......................1.....3...........3.....',
+        '1...........2.......................2.....4.....', '1.......................1.....3.....3.....3.....',
+        '1...........2.....4.....2...........2...........', '1...........3...........1.....3...........3.....',
+        '1...........2.....4.................2.....4.....', '1...........3...........1.....3...........3.....',
+        '1...........2.....4.....2.....4.................', '............3...........1.....3...........3.....',
+        '............2.....4...........4...........4.....', '............3.....3...........3.................',
+        '............2...........2.....4...........4.....', 'x...........2.....4.....1.................4.....',
+        'x.......................1.....2.....4.....2.....', 'x...........2.....4.....1.....4.................',
+        'x...........4.....2.....1.....2.................', 'x...........2...........1.....4...........4.....',
+        'x...........4...........1.....2...........2.....', 'x...........2.....4.....1.....4.................',
+        'x.................2.....1.....2...........2.....', 'x.................4.....1.....4...........4.....',
+        'x.....2.....4.....2.....1.......................', '1.......................1.......................',
+        '1.......................1.......................', '1.......................1.......................',
+        '1.......................1.......................', '1...........2...........1...........2...........',
+        '1...........2...........1...........2...........', '1...........2...........1.....4.....2.....4.....',
+        'x.....4.................x.....4.....2...........', 'x...........2...........x.....4...........3.....',
+        'x...........2...........x.....4.....2...........', 'x...........2.....3.....x.....4.................',
+        '........x.......................2...............', '................1...............................',
+        '..............2......1.....4....................', '......x.........................................',
+        '................................................'
+    ] },
+    comfort: ['…다음 거.'],
+    phaseFx: { amber: [], lineOn: [-9, -9, -9], drop: 136, drop2: null, last: 380.5, out: [383.5, 384.2, 1e9] },
+    sfx: [...Array(100).keys()].map(b => [b, 'motor']).concat([[47, 'pa'], [69.5, 'heave'], [72, 'thud'], [100, 'jam'], [104, 'thump'], [106, 'thump'], [107, 'plug']], [108, 110, 111.5, 114, 116, 118, 119.5].map(b => [b, 'thump'])),
+    chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
+    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 386,
+    special:['마르코가 보낸 상자', 'right', '받아냄'],
+    sections: [[0, 'cold'], [12, 'pa'], [14, 'rush'], [18, 'back'], [21, 'alone'], [25, 'jam'], [27, 'song'], [34, 'band'], [51, 'trade'], [71, 'drop'], [81, 'down'], [88, 'last']],
+    bars: Array(97).fill('................'),
+    // 'b' 반장, 'v' 마르코, 'p' the announcement, 'n' nobody (a stage direction)
+    say: [[48.2, '3라인, 어제 잔량 포함해서 06시까지 정리 바랍니다.', 5, 0, 'p'], [54.2, '…내가 뺀다.', 2.5, 0, 'b'], [60, '반장님?', 2, 0, 'v'],
+          [72.1, '윽—!', 1.6, 0, 'b'], [73.8, '반장님!', 1.8, 0, 'v'], [75.8, '(허리를 짚고) …또 이러네.', 2.8, 0, 'b'],
+          [78.7, '(무릎을 꿇고) 반장님, 천천히 해요.', 3, 0, 'v'], [81.8, '…내가 할게요.', 2.2, 0, 'v'],
+          [100.4, '어, 어… 왜 안 돼…', 3, 0, 'v'], [104, '…하나.', 1.8, 0, 'b'], [106, '…둘.', 1.6, 0, 'b'], [107.2, '(붐박스 플러그를 다시 꽂는다)', 1.6, 0, 'n'],
+          [140, '…그래. 그거.', 2.5, 0, 'b'], [230, '반장님, 이 노래 괜찮죠?', 3, 0, 'v'], [234, '…시끄러.', 2.5, 0, 'b']],
     intro: [
-      { who:'', text:'셋째 밤, 새벽 2시 10분. 성수기라 벨트를 하나 더 열었다. 위는 지우.' },
-      { who:'반장', text:'위는 지우가 싣는다. 왼손 위, 오른손 아래.' },
-      { who:'지우', text:'본선 사흘 전인데 야간이라니…' },
-      { who:'순자 이모', text:'노래하는 애? 둘 다 내가 본다. 손 봐.' }],
-    outro: (good, sp) => good ? [
-      { who:'지우', text:'…고마워요, 형. 위에.' },
-      { who:'반장', text:'…잘 받았다.' },
-      { who:'순자 이모', text:'노래하는 애가 손은 빠르네.' },
-      { who:'', text:'지게차가 둘째 벨트 자리에 팔레트를 딱 맞춰 놓고 갔다.' }] : [
-      { who:'지우', text:'…내일은 더 빨리 실을게요.' }]
+      { who:'', text:'셋째 밤. 새벽 1시.' },
+      { who:'마르코', text:'(캔커피 둘을 들고) 반장님, 저기… 어제는…' },
+      { who:'', text:'게시판에 종이가 한 장 붙어 있다. 「3라인 마르코 → 7라인 전환 요청. 요청: 3라인 반장」' },
+      { who:'마르코', text:'……' },
+      { who:'반장', text:'(돌아보지 않는다) 위에서 답 오면, 가면 돼.' },
+      { who:'마르코', text:'…알겠어요.' },
+      { who:'', text:'마르코는 캔 하나를 라디오 옆에 두고 자리로 갔다. 그날 밤, 라디오도 붐박스도 켜지지 않았다.' }],
+    outro: good => good ? [
+      { who:'', text:'새벽 5시 52분. 잔량 0.' },
+      { who:'', text:'반장이 일어나 게시판으로 갔다. 종이를 떼어, 반으로 접고, 한 번 더 접어 주머니에 넣었다. 아무도 말하지 않았다.' },
+      { who:'', text:'마르코가 라디오 옆의 캔을 집어 내밀었다.' },
+      { who:'반장', text:'…식었네.' },
+      { who:'마르코', text:'데워 올까요?' },
+      { who:'반장', text:'(캔을 딴다) …됐어. 천천히 마시지 뭐.' },
+      { who:'마르코', text:'(웃는다) 헤헤.' }] : [
+      { who:'', text:'새벽 6시. 잔량이 남았다.' },
+      { who:'반장', text:'…나머진 내일.' },
+      { who:'', text:'반장은 게시판 앞에 한참 서 있다가, 종이를 떼어 주머니에 넣었다.' },
+      { who:'반장', text:'(캔을 집는다) …식었네.' }],
   }
   ,{
     id:'s2-4', stageNo:'2-4', who:'박씨', role:'박씨 · 순자 이모 · 84→96→104 BPM', tag:'하드 록 · 중량물 두 손 · 템포 상승', bpm:84, style:'rock22', fxTheme:'rock', inspector: true,
@@ -1506,7 +1563,7 @@ function loadLevel(level) {
   // the four-lane part (L.quad): one note per cell, n.q = the chute (0-3); they are on no belt (lane 0 only for the effects).
   // The two-line part (L.mid) the same with '1' = the left line, '2' = the right, 'x' = both at once
   const QD = level.quad || level.mid;
-  if (QD) QD.bars.forEach((bar, k) => { const div = bar.length / 4; for (let c = 0; c < bar.length; c++) { const beat = (QD.from + k) * 4 + c / div; const ds = level.mid && bar[c] === 'x' ? [0, 1] : ['1234'.indexOf(bar[c])]; for (const d of ds) { if (d < 0) continue; const q = level.mid ? d % 2 : d; notes.push({ beat, beat0: beat, q, up: !!level.mid && d >= 2, quad: true, right: !!level.mid && q === 1, len: 0, lane: 0 }); } } });
+  if (QD) QD.bars.forEach((bar, k) => { const div = bar.length / 4; for (let c = 0; c < bar.length; c++) { const beat = (QD.from + k) * 4 + c / div; const ds = level.mid && 'xyzw'.includes(bar[c]) ? { x: [0, 1], y: [0, 3], z: [2, 1], w: [2, 3] }[bar[c]] : ['1234'.indexOf(bar[c])]; for (const d of ds) { if (d < 0) continue; const q = level.mid ? d % 2 : d; notes.push({ beat, beat0: beat, q, up: !!level.mid && d >= 2, quad: true, right: !!level.mid && q === 1, len: 0, lane: 0 }); } } });
   notes.sort((a, b) => a.beat - b.beat || a.lane - b.lane);
   // jams: a run of 'j' boxes (half a beat apart or closer) piles up behind the stuck roller and is let go one by one
   if (level.jam) { let grp = []; const flush = () => { grp.forEach((n, k) => { n.jk = k; n.jg = grp; }); grp = []; };
@@ -2074,7 +2131,7 @@ function faceFx(cx, top, ex, ey, pose, nowMs, hairColor, active) {
     const p = age / 900, x = cx + 9 + p * 10, y = top + 10 - p * 6;
     g.globalAlpha = 1 - p; R(x, y, 3, 2, '#e9e4da'); R(x + 2, y - 1, 3, 2, '#e9e4da'); R(x + 4, y, 2, 2, '#e9e4da'); g.globalAlpha = 1;
   }
-  if (active && stats.combo >= 16 && !pose.doze) {
+  if (active && stats.combo >= 16 && !pose.doze && !pose.mute) {
     for (let k = 0; k < 2; k++) {
       const p = ((nowMs / 1000) / (SPB * 2) + k * 0.5) % 1;
       g.globalAlpha = Math.sin(Math.PI * p); eighthNote(cx + 8 + p * 10, top - 6 - p * 16, '#ffe9a8'); g.globalAlpha = 1;
@@ -3652,7 +3709,7 @@ const cvHi = document.getElementById('cvhi'), gHi = cvHi.getContext('2d');
 // 마르코's corners in the floor's coordinates: the lower ends of the two lines (rl, and ll squeezed in beside 반장), the upper
 // belts' loading ends behind them (ru, lu; he stands lower there, the upper belt hides his legs), and c, beside you
 const MARCO_SPOTS = () => ({ bx: { x: MID.ww - 90, dy: 0, mir: true }, rl: { x: MID.ww - BOSS_X, dy: 0, mir: true }, ru: { x: MID.ww - (BOSS_X + LANE_DX[0] + 22), dy: -22, mir: true },
-  lu: { x: BOSS_X + LANE_DX[0] + 22, dy: -22, mir: false }, ll: { x: BOSS_X + 24, dy: 0, mir: false }, c: { x: MID.ax + 64, dy: -2, mir: true } });
+  lu: { x: BOSS_X + LANE_DX[0] + 22, dy: -22, mir: false }, ll: { x: BOSS_X + 24, dy: 0, mir: false }, lk: { x: BOSS_X + 42, dy: 0, mir: true }, c: { x: MID.ax + 64, dy: -2, mir: true } });
 const midSpotAt = bb => { let sp = L.mid.route[0][1]; for (const [rb, s] of L.mid.route) if (bb >= rb) sp = s; return sp; };
 function midMarco(b) {
   const R0 = L.mid.route, S = MARCO_SPOTS(); let i = 0; for (let k = 0; k < R0.length; k++) if (b >= R0[k][0]) i = k;
@@ -3889,6 +3946,129 @@ function rbFront(b, bReal, nowMs, active, live) {
   else if (boom >= 0.28 && boom < 1.1) { g.fillStyle = `rgba(4,3,5,${boom < 0.75 || (boom > 0.85 && boom < 0.95) ? 0.86 : 0.25})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
   if (alarm) { const k = 0.5 + 0.5 * Math.sin(bReal * Math.PI * 2); g.fillStyle = `rgba(255,110,25,${0.12 * k * Math.min(1, (D.boom + 12 - bReal) / 2)})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
 }
+// ---------- 2-3 합주 (L.ht) ----------
+// The cold war is the warehouse under a chill; once the song is in, a lake beach at dawn under a city's skyline (반장's Chicago
+// and 마르코's beach in one picture) comes in from both ends of the floor at once and meets in the middle.
+const htClamp = x => x < 0 ? 0 : x > 1 ? 1 : x;
+const htIn = (b, r) => !!r && b >= r[0] && b < r[1];
+const htCutAt = b => (L.ht.cuts || []).find(c => b >= c[0] - 0.5 && b < c[1]);
+// the belts stand still from the jam until the song (and run on from where they stopped)
+function htBeltT(T) { const D = L.ht, tj = timeAt(D.jam), ts = timeAt(D.song); return T < tj ? T : T < ts ? tj : T - (ts - tj); }
+// 반장's last pat on the box at or before b: the two before the song, the song's own, then one every half bar
+function htTap(b) { const D = L.ht; let last = null; for (const x of D.taps) if (b >= x) last = x; if (b >= D.tapFrom) last = D.tapFrom + Math.floor((b - D.tapFrom) / 2) * 2; return last; }
+const htDawn = b => htClamp((b - L.ht.dawn[0]) / (L.ht.dawn[1] - L.ht.dawn[0]));
+const htFuse = b => ease((b - L.ht.fuse[0]) / (L.ht.fuse[1] - L.ht.fuse[0]));
+function htLake(nowMs, dn, sunY) {
+  const WW = MID.ww, t = nowMs / 1000, top = -MID.oy, HZ = 62;
+  const sky = g.createLinearGradient(0, top, 0, HZ);
+  sky.addColorStop(0, mixC('#10163a', '#5c7cbc', dn)); sky.addColorStop(0.6, mixC('#36305e', '#e8a08a', dn)); sky.addColorStop(1, mixC('#8a5266', '#ffd8a4', dn));
+  g.fillStyle = sky; g.fillRect(0, top, WW, HZ - top);
+  g.globalAlpha = Math.max(0, 1 - dn * 1.8); for (let i = 0; i < 34; i++) R(rnd(i, 91) * WW, top + rnd(i, 92) * 130, 1, 1, '#c8d0f0'); g.globalAlpha = 1;
+  // the sun over the far shore, its glow on the sky
+  if (sunY != null) { const sg = g.createRadialGradient(560, sunY, 6, 560, sunY, 90); sg.addColorStop(0, 'rgba(255,236,190,.7)'); sg.addColorStop(1, 'rgba(255,200,150,0)'); g.fillStyle = sg; g.fillRect(470, sunY - 90, 180, 180); g.fillStyle = '#fff1c6'; g.beginPath(); g.arc(560, sunY, 13, 0, Math.PI * 2); g.fill(); }
+  // a gull or two
+  for (let k = 0; k < 3; k++) { const x = (k * 230 + t * (14 + k * 4)) % (WW + 40) - 20, y = 6 + k * 14 + Math.round(Math.sin(t * 1.3 + k) * 3), up = Math.floor(t * 3 + k) % 2; const c = mixC('#2a2a44', '#5a4a5a', dn); R(x - 4, y + (up ? 0 : 1), 3, 1, c); R(x - 1, y + 1, 2, 1, c); R(x + 1, y + (up ? 0 : 1), 3, 1, c); }
+  // the skyline across the water: towers (one tall pair of antennas), windows going dark as it gets light
+  const bc = mixC('#0c1030', '#3e3e68', dn), bc2 = mixC('#141a40', '#4e4a74', dn);
+  for (let i = 0, x = 6; x < WW - 6; i++) {
+    const tall = i === 9 || i === 14, w = tall ? 22 : 14 + Math.floor(rnd(i, 93) * 22), h = tall ? 58 : 12 + Math.floor(rnd(i, 94) * 34), y0 = HZ - h;
+    R(x, y0, w, h, i % 2 ? bc : bc2); R(x, y0, w, 1, mixC('#2a2e58', '#8a7a96', dn));
+    if (i === 9) { R(x + 5, y0 - 12, 1, 12, bc); R(x + 15, y0 - 12, 1, 12, bc); if (Math.floor(t * 1.2) % 2) { R(x + 5, y0 - 13, 1, 1, '#ff5040'); R(x + 15, y0 - 13, 1, 1, '#ff5040'); } }
+    for (let wy = y0 + 3; wy < HZ - 3; wy += 4) for (let wx = x + 2; wx < x + w - 2; wx += 3) if (rnd(wx * 7 + wy, 95) < 0.32 * (1 - dn)) R(wx, wy, 1, 2, '#ffd890');
+    x += w + 1 + Math.floor(rnd(i, 96) * 6);
+  }
+  // the lake: deep enough to sit behind both belts (the boxes stand out on it), the sun's path on it, slow ripples
+  const lake = g.createLinearGradient(0, HZ, 0, 178); lake.addColorStop(0, mixC('#28305a', '#e0a890', dn)); lake.addColorStop(0.12, mixC('#1a2650', '#6a8cc0', dn)); lake.addColorStop(1, mixC('#121c3c', '#2e5a96', dn));
+  g.fillStyle = lake; g.fillRect(0, HZ, WW, 178 - HZ);
+  for (let k = 0; k < 22; k++) { const y = HZ + 3 + k * 5, w = 6 + (k % 4) * 5, x = (rnd(k, 97) * WW + t * (4 + k % 3)) % WW; R(x, y, w, 1, mixC('#3a4a7a', '#a8c4e8', dn)); }
+  if (sunY != null) for (let k = 0; k < 16; k++) { const y = HZ + 2 + k * 6, w = 18 - k * 0.7 + Math.sin(t * 3 + k) * 4; g.fillStyle = `rgba(255,226,170,${0.55 - k * 0.03})`; g.fillRect(Math.round(560 - w / 2 + Math.sin(t * 2 + k * 1.7) * 3), y, Math.round(w), 2); }
+  // the shore: foam coming in and going out, wet sand, then the beach
+  const fo = Math.sin(t * 0.9) * 3;
+  R(0, 176 + fo, WW, 3, mixC('#8aa0c8', '#f4f0e6', dn));
+  const sand = g.createLinearGradient(0, 178, 0, 372); sand.addColorStop(0, mixC('#4a4252', '#b89a80', dn)); sand.addColorStop(1, mixC('#2a2430', '#8a6e5a', dn));
+  g.fillStyle = sand; g.fillRect(0, 179 + fo, WW, 372 - 179);
+  for (let k = 0; k < 40; k++) R(rnd(k, 98) * WW, 186 + rnd(k, 99) * 160, 2, 1, mixC('#3a3440', '#a08670', dn));
+  // a lifeguard's chair and a closed parasol on the sand, a pier with a lamp on the left
+  const wd = mixC('#3a2e30', '#c8a070', dn);
+  R(612, 150, 2, 30, wd); R(628, 150, 2, 30, wd); R(610, 148, 22, 3, wd); R(612, 140, 18, 2, mixC('#5a2a2a', '#e04a3a', dn)); R(616, 162, 10, 1, wd);
+  R(96, 140, 1, 40, mixC('#3a3440', '#7a6a6a', dn)); g.fillStyle = mixC('#3a2a4a', '#2d8ab0', dn); g.beginPath(); g.moveTo(92, 142); g.lineTo(96, 132); g.lineTo(100, 142); g.closePath(); g.fill();
+  R(0, 118, 46, 3, mixC('#2a2430', '#6a5048', dn)); for (const x of [6, 22, 38]) R(x, 121, 2, 56, mixC('#221c26', '#5a4038', dn)); R(40, 104, 1, 14, mixC('#221c26', '#5a4038', dn));
+  { const on = 1 - dn; g.fillStyle = `rgba(255,220,150,${0.45 * on})`; g.beginPath(); g.arc(40, 104, 7, 0, Math.PI * 2); g.fill(); R(39, 103, 3, 2, on > 0.3 ? '#ffe6a8' : '#8a7a6a'); }
+}
+// the back of the floor: the chill, the beach coming in, 반장's radio (switched off) with the can 마르코 left beside it, the
+// notice board with the request on it, 마르코's boombox (unplugged until he plugs it back in), the backlog on its board
+function htBack(b, bReal, nowMs, active, live) {
+  const D = L.ht, WW = MID.ww, bb = live ? bReal : 0, t = nowMs / 1000;
+  const cold = !live ? 0 : bb < D.song ? 1 : htClamp(1 - (bb - D.song) / (D.fuse[0] - D.song));
+  if (cold > 0) { g.fillStyle = `rgba(26,52,110,${0.18 * cold})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
+  const fw = live ? WW / 2 * htFuse(bb) : 0;
+  if (fw > 0) {
+    const dn = htDawn(bb), sunY = bb >= D.sun[0] ? lerp(70, 16, ease(htClamp((bb - D.sun[0]) / (D.sun[1] - D.sun[0])))) : null;
+    g.save(); g.beginPath(); g.rect(0, -MID.oy, Math.ceil(fw), MID.wh); g.rect(Math.floor(WW - fw), -MID.oy, Math.ceil(fw), MID.wh); g.clip();
+    htLake(nowMs, dn, sunY); g.fillStyle = `rgba(14,22,46,${0.3 - 0.14 * dn})`; g.fillRect(0, -MID.oy, WW, MID.wh); g.restore();
+    if (fw < WW / 2) for (const [x, d] of [[fw, 1], [WW - fw, -1]]) { const gr = g.createLinearGradient(x - 14 * d, 0, x, 0); gr.addColorStop(0, 'rgba(255,214,160,0)'); gr.addColorStop(1, 'rgba(255,214,160,.5)'); g.fillStyle = gr; g.fillRect(Math.min(x, x - 14 * d), -MID.oy, 14, MID.wh); R(x - 1, -MID.oy, 2, MID.wh, 'rgba(255,236,200,.8)'); }
+  }
+  // 반장's radio, off all night, and the can of coffee 마르코 left by it
+  { const { x, y } = RB_RADIO; R(x + 18, y - 9, 1, 9, '#3a332c'); R(x, y, 24, 12, '#6b4a2e'); R(x, y, 24, 1, '#8a6a42'); R(x + 2, y + 3, 9, 5, '#2a1a10'); for (let k = 0; k < 3; k++) R(x + 14 + k * 3, y + 3, 2, 6, '#3a2a1c');
+    R(x + 27, y + 4, 5, 8, '#c8302a'); R(x + 27, y + 4, 5, 1, '#d8dde2'); R(x + 27, y + 7, 5, 2, '#f4efe2'); R(x + 27, y + 11, 5, 1, '#8a2420'); }
+  // the notice board on its stand by the line's end, the request pinned to it (white, a red stamp)
+  { const x = 30, y = 46; R(x + 14, y + 26, 2, 30, '#4a4038'); R(x, y, 30, 26, '#6a4a2e'); R(x + 1, y + 1, 28, 24, '#8a6440'); R(x + 3, y + 3, 9, 7, '#e8dcc0');
+    R(x + 14, y + 3, 13, 18, '#f4f1ea'); for (let k = 0; k < 5; k++) R(x + 16, y + 6 + k * 3, 9 - (k % 2) * 3, 1, '#7a7470'); R(x + 21, y + 16, 5, 4, 'rgba(200,40,40,.8)'); R(x + 20, y + 3, 1, 1, '#c8302a'); }
+  // 마르코's boombox: unplugged until he plugs it back in; then the song comes out of it
+  { const { x, y } = RB_BOX, plugged = live && bb >= D.plug, on = plugged && bb >= D.song, pump = on ? Math.max(0, 1 - (bb % 1) * 3) : 0;
+    R(x + 6, y - 4, 12, 1, '#2a2d33'); R(x + 6, y - 4, 1, 4, '#2a2d33'); R(x + 17, y - 4, 1, 4, '#2a2d33'); R(x, y, 24, 12, '#1b1b1f'); R(x, y, 24, 1, '#3a3d45');
+    for (const sx of [x + 2, x + 16]) { const o = pump > 0.5 ? 1 : 0; R(sx, y + 3, 6, 6, '#2a2d33'); R(sx + 1 - o, y + 4 - o, 4 + 2 * o, 4 + 2 * o, '#4a4d55'); R(sx + 2, y + 5, 2, 2, '#14151a'); }
+    R(x + 10, y + 3, 4, 2, on ? (pump > 0.3 ? '#8fe3f0' : '#5fb0c0') : '#3d6b78'); R(x + 10, y + 7, 4, 1, plugged ? '#d8463b' : '#3a2020');
+    if (!plugged) { R(x + 24, y + 10, 10, 1, '#222'); R(x + 34, y + 10, 2, 2, '#555'); }
+    if (on) for (let k = 0; k < 3; k++) { const p = ((nowMs / 1400) + k * 0.37) % 1, nx = x + 6 + k * 6 + Math.sin(p * 6 + k) * 4, ny = y - 4 - p * 26; g.globalAlpha = Math.min(1, (1 - p) * 1.6); R(nx, ny, 2, 2, '#9ff0ff'); R(nx + 1, ny - 5, 1, 5, '#9ff0ff'); R(nx + 2, ny - 5, 2, 1, '#9ff0ff'); g.globalAlpha = 1; } }
+  // the backlog on its board over the cart: red while there is some, green at nothing
+  if (live && bb >= D.left[0]) {
+    if (D._tot == null) D._tot = notes.filter(n => n.quad && n.beat < D.left[2]).length;
+    const done = notes.filter(n => n.quad && n.beat < D.left[2] && n.state === 'hit').length, n0 = D.left[1], left = Math.max(0, Math.round(n0 * (1 - done / Math.max(1, D._tot))));
+    const show = bb >= D.left[2] && done >= D._tot - 2 ? 0 : left, str = String(show), x0 = MID.ax - 30, y0 = 28, a = htClamp((bb - D.left[0]) / 1.5);
+    g.globalAlpha = a; R(x0, y0, 60, 22, '#141012'); R(x0, y0, 60, 1, '#3a3238'); R(x0 + 4, y0 + 6, 9, 9, '#d6a06a'); R(x0 + 4, y0 + 6, 9, 2, '#e9bb83'); R(x0 + 8, y0 + 6, 1, 9, '#a0703f');
+    g.save(); g.translate(x0 + 18, y0 + 6); g.scale(2, 2); const col = show === 0 ? '#5aff8a' : bb >= D.rush[0] && bb < D.song && Math.floor(t * 3) % 2 ? '#ff8a6a' : '#ff4a3a'; pixText(str, 0, 0, col); g.restore(); g.globalAlpha = 1;
+  }
+}
+// the cuts' letterbox: black bars close in over a beat and open again at the end of each cut
+function htCine(c, w, h, b, active) {
+  const live = active || state === 'outro', C = live ? htCutAt(b) : null, on = !!C;
+  if (hud.classList.contains('cine') !== on) { hud.classList.toggle('cine', on); judgeEl.classList.toggle('cine', on); $('devbtn').classList.toggle('cine', on); }
+  if (!C) return;
+  const k = ease(Math.min((b - C[0] + 1) / 1.5, (C[1] - b) / 1)); if (k <= 0) return;
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = '#000'; c.fillRect(0, 0, w, Math.round(h * 0.14 * k)); c.fillRect(0, Math.round(h - h * 0.14 * k), w, Math.ceil(h * 0.14 * k)); c.restore();
+}
+// 반장: hurrying (a quicker bob), heaving the heavy box up, his back going (a hand to it, sinking down onto the box), then sitting,
+// his other hand patting the box at his belt's end in time
+function htBossPose(b, pose, held) {
+  const D = L.ht; if (b < D.fuse[0]) pose.mute = true;
+  if (htIn(b, D.rush) && b < D.lift[0]) pose.bob = Math.floor(b * 4) % 2;
+  if (htIn(b, D.lift)) { const k = htClamp((b - D.lift[0]) / (D.lift[1] - D.lift[0])); pose.hand = { x: BOSS_X + 16, y: Math.round(lerp(140, 96, ease(k * 1.4))) }; pose.dip = Math.round(lerp(8, 0, ease(k * 1.4))); pose.bob = 0; }
+  if (b >= D.back) {
+    const k = b - D.back; pose.wince = k < 12; pose.bob = 0;
+    if (k < 4) { pose.dip = Math.round(lerp(2, 14, ease(k / 4))); if (!held) pose.hand = { x: BOSS_X - 2, y: 126 }; }
+    else { pose.dip = 14; if (!held) { const tp = htTap(b), d = tp == null ? 9 : b - tp; pose.hand = { x: BOSS_X + 20, y: d >= 0 && d < 0.2 ? 135 : 127 }; } }
+  }
+}
+function htBossExtra(b, pose) {
+  const D = L.ht, hb = (x, y) => { R(x, y, 18, 14, '#2a2a2e'); for (let k = 0; k < 4; k++) R(x + 1 + k * 5, y + 5, 3, 4, '#f0c020'); R(x, y, 18, 1, '#4a4a52'); };
+  if (htIn(b, D.lift)) hb(pose.hand.x - 9, pose.hand.y - 15);
+  if (b >= D.back && b < D.back + 0.6) { const k = (b - D.back) / 0.6; hb(BOSS_X + 6 - 9, Math.round(lerp(96, 150, k * k))); }
+  // the box he pats, at his belt's end: it gives a little under his hand, a puff of dust
+  if (b >= D.back + 3) { const tp = htTap(b), d = tp == null ? 9 : b - tp, sq = d >= 0 && d < 0.15 ? 1 : 0, x = BOSS_X + 13, y = 134 + sq;
+    R(x, y, 15, 12 - sq, '#d6a06a'); R(x, y, 15, 2, '#e9bb83'); R(x + 7, y, 1, 12 - sq, '#a0703f');
+    if (d >= 0 && d < 0.3) { g.globalAlpha = 1 - d / 0.3; R(x - 2 - d * 10, y + 8, 2, 2, '#c8b8a0'); R(x + 15 + d * 10, y + 8, 2, 2, '#c8b8a0'); g.globalAlpha = 1; } }
+}
+// over the floor: the boxes spilled round the cart when it jams, lying there until the band comes in
+function htFront(b, bReal, nowMs, active, live) {
+  if (!live) return;
+  const D = L.ht, AX = MID.ax, j = bReal - D.jam;
+  if (j >= 0 && j < 0.25) { g.fillStyle = `rgba(255,250,235,${0.35 * (1 - j / 0.25)})`; g.fillRect(0, -MID.oy, MID.ww, MID.wh); }
+  if (j >= 0 && bReal < D.fuse[0] + 4) { const fade = htClamp((D.fuse[0] + 4 - bReal) / 4);
+    [[-58, 186, -0.5], [-36, 196, 0.4], [-14, 182, 0.1], [10, 198, -0.6], [30, 186, 0.3], [52, 196, 0.2], [-70, 200, 0.7], [70, 200, -0.3], [0, 205, -0.2], [-24, 206, 0.5]].forEach(([dx, y, r], k) => {
+      const fall = htClamp((j - k * 0.04) / 0.45); g.save(); g.globalAlpha = fade; g.translate(AX + dx, y - (1 - fall) * 40); g.rotate(r * fall);
+      g.fillStyle = '#d6a06a'; g.fillRect(-7, -6, 14, 11); g.fillStyle = '#e9bb83'; g.fillRect(-7, -6, 14, 3); g.fillStyle = '#a0703f'; g.fillRect(-1, -6, 2, 11); g.restore(); }); }
+}
 function drawMid(t, nowMs, active) {
   const F = L.phaseFx, M = L.mid, bReal = active ? beatAt(t) : castBeatAt(t, active), live = active || state === 'outro' || state === 'result';
   // the last hit holds the picture still for a moment (a hitstop) before the lights start going out
@@ -3901,7 +4081,7 @@ function drawMid(t, nowMs, active) {
   const ph = b - Math.floor(b), pk = i => Math.max(0, 1 - (nowMs - QUADFX.press[i]) / 140);
   const marco = midMarco(b);
   // who loads a box: 반장 the left lower line's, unless 마르코 has squeezed in there; 마르코 throws all the rest from wherever he is
-  const bossLoads = n => n.q === 0 && !n.up && midSpotAt(n.place ? beatAt(n.place) : n.beat) !== 'll';
+  const bossLoads = n => n.q === 0 && !n.up && !['ll', 'lk'].includes(midSpotAt(n.place ? beatAt(n.place) : n.beat));
   let held = null;
   if (live) for (const n of notes) { if (!n.quad || !bossLoads(n)) continue; const k = (T - (n.place - n.carry)) / n.carry; if (k >= 0 && k < 1) { const f = { x: 16, y: 112 }, x = lerp(f.x, PLACE_X, k), y = lerp(f.y, BELT_Y - n.h / 2, ease(k)) - Math.sin(Math.PI * k) * 14; held = { n, x, y }; break; } }
   const mirror = (q, fn) => { g.save(); if (q) { g.translate(WW, 0); g.scale(-1, 1); } g.beginPath(); g.rect(0, -MID.oy, AX, MID.wh); g.clip(); fn(); g.restore(); };
@@ -3933,7 +4113,7 @@ function drawMid(t, nowMs, active) {
   const hitRings = [];
   const belt = (q, up) => {
     BELT_L = up ? 14 : 48; g.save(); if (up) { g.translate(0, LANE_DY[0]); farXform(); }
-    drawScannerBack(0); drawBeltTop(L.rb ? rbBeltT(T) : T, live);
+    drawScannerBack(0); drawBeltTop(L.rb ? rbBeltT(T) : L.ht ? htBeltT(T) : T, live);
     if (live) drawLaserGlow(flashOf(q, up) * 0.6);
     // the square rings that go out from the scanner on a hit (as on the one-belt screen) are drawn after the belts, unclipped
     if (live) for (const n of notes) if (n.quad && n.q === q && !!n.up === up && n.state === 'hit' && n.hitAt != null && n.judge != null && T - n.hitAt < 0.42 && T >= n.hitAt) hitRings.push(n);
@@ -3953,7 +4133,7 @@ function drawMid(t, nowMs, active) {
       else if (T >= f.ta) { if (T - f.ta < 0.42) hitRings.push({ q, up, hitAt: f.ta, judge: 'perfect', beat: f.sb }); x = SCAN_X + (T - f.ta) * f.v; if (x > end) continue; }
       drawBox(f, x, BELT_Y + dy, '', T, !f.jam && T >= f.ta && T - f.ta < 0.1 ? 0.8 : 0);
     }
-    drawBeltFront(L.rb ? rbBeltT(T) : T, live); if (up) drawBeltLegs();
+    drawBeltFront(L.rb ? rbBeltT(T) : L.ht ? htBeltT(T) : T, live); if (up) drawBeltLegs();
     drawScannerFront(flashOf(q, up), false, missOf(q, up), 0);
     g.restore(); BELT_L = 48;
   };
@@ -3966,7 +4146,7 @@ function drawMid(t, nowMs, active) {
   const drawMarco = () => {
     const pose = { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: active && (marco.walking ? ph < 0.5 : ph < 0.18) ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
     let sway = 0, lift = 0, mir = marco.mir;
-    const on = L.rb ? active && rbFunkOn(b) : active && M.boombox != null && b >= M.boombox + 0.5;
+    const on = L.rb ? active && rbFunkOn(b) : L.ht ? active && b >= L.ht.fuse[0] : active && M.boombox != null && b >= M.boombox + 0.5;
     if (toss) pose.hand = { x: BOSS_X + 16, y: 104 };
     else if (on && marco.walking) {
       lift = Math.round(Math.sin(Math.PI * Math.min(1, marco.p * 1.4)) * 7); pose.hand = { x: BOSS_X + 10, y: 80 };
@@ -3995,6 +4175,16 @@ function drawMid(t, nowMs, active) {
     if (L.rb && active) { const tn = rbTurn(b); if (tn && tn[1] === 'v' && L.rb.cut && b >= L.rb.cut[0] && b - tn[0] < 0.7 && !marco.walking) { pose.hand = { x: BOSS_X + 16, y: 98 + (b - tn[0] < 0.2 ? 4 : 0) }; lift = Math.max(lift, 2); } }
     if (L.rb && active && b >= L.rb.boom + 1) { pose.sad = true; if (!marco.walking) pose.hand = { x: BOSS_X + 10, y: 138 }; }
     if (F && b >= F.last) { pose.hand = { x: BOSS_X + 11, y: 70 }; if (b < F.last + 1) lift = Math.max(lift, Math.round(Math.sin(Math.PI * (b - F.last)) * 9)); }
+    // 2-3: no grin until the song; kneeling by 반장 in the first cut; hands to his head at the jam; down at the boombox's plug;
+    // turned to 반장 while he follows his pats
+    if (L.ht && active) { const D = L.ht;
+      if (b < D.song) pose.sad = true;
+      if (marco.spot === 'lk' && !marco.walking && b >= D.back && b < D.cuts[0][1]) { pose.dip = 10; pose.hand = { x: BOSS_X + 22, y: 116 }; mir = true; sway = 0; }
+      if (b >= D.jam && b < D.jam + 3.5 && !marco.walking && !toss) { pose.hand = { x: BOSS_X + 6, y: 76 + (Math.floor(b * 3) % 2) * 2 }; sway = 0; }
+      if (marco.spot === 'bx' && !marco.walking && b >= D.plug - 1.2 && b < D.plug + 0.8) { pose.dip = 6; pose.hand = { x: BOSS_X + 22, y: 144 }; }
+      if (marco.spot === 'lk' && !marco.walking && b >= D.song && b < D.tapFrom) mir = true;
+      if (b < D.song) pose.mute = true;
+    }
     FX.react[2] = FX.react[2] || { type: '', at: nowMs };
     g.save(); if (marco.up) { g.beginPath(); g.rect(0, -MID.oy, WW, farY(BELT_Y) + 2 + MID.oy); g.clip(); }
     g.translate(sway, Math.round(marco.dy) - lift); drawActor('marco', Math.round(marco.x), mir, pose, nowMs, active, () => PARTNERS.marco.arm(pose)); g.restore();
@@ -4015,6 +4205,7 @@ function drawMid(t, nowMs, active) {
   }
   mirror(0, () => back(0)); mirror(1, () => back(1));
   if (L.rb) rbBack(b, bReal, nowMs, active, live);
+  if (L.ht) htBack(b, bReal, nowMs, active, live);
   if (marco.up) drawMarco();
   mirror(0, () => belt(0, true)); mirror(1, () => belt(1, true));
   // 반장 at line 3's lower end, carrying his boxes
@@ -4024,6 +4215,7 @@ function drawMid(t, nowMs, active) {
     const bx0 = L.rb && live ? rbBossX(bReal) : BOSS_X, stepping = L.rb && L.rb.step && live && bReal >= L.rb.step && bReal < L.rb.step + 1.5;
     if (stepping) pose.bob = Math.floor(bReal * 2.5) % 2;
     if (L.rb && live) { const tn = rbTurn(bReal); if (tn && tn[1] === 'b' && L.rb.cut && bReal >= L.rb.cut[0] && bReal - tn[0] < 0.7) pose.hand = { x: BOSS_X + 12, y: 102 }; }
+    if (L.ht && live) { htBossPose(bReal, pose, held); drawActor('boss', BOSS_X, false, pose, nowMs, active, () => { PARTNERS.boss.arm(pose); htBossExtra(bReal, pose); }); return; }
     // 2-2: after the boom he calls it a night and walks out to the left, unhurried, gone off the floor
     const lv = L.rb && L.rb.leave, lp = lv && live ? (bReal - lv[0]) / (lv[1] - lv[0]) : -1;
     if (lp >= 1) return;
@@ -4066,6 +4258,7 @@ function drawMid(t, nowMs, active) {
   }
   drawParticles(nowMs);
   if (L.rb) rbFront(b, bReal, nowMs, active, live);
+  if (L.ht) htFront(b, bReal, nowMs, active, live);
   // the lamps: line 4 dark until its three lamps click on (nearest you first); at the end every lamp goes out from the far
   // ends in, both lines at once, and only the one over you is left
   if (F) {
@@ -4087,7 +4280,8 @@ function drawMid(t, nowMs, active) {
     if (F.blackout && bReal >= F.blackout[0] && bReal < F.blackout[1]) dark(0, AX, 0.86);
     if (F.blackout && bReal >= F.blackout[1] && bReal < F.blackout[1] + 0.7 && !reduce) flash(0, AX, 0.2 * (1 - (bReal - F.blackout[1]) / 0.7));
     const outs = [[[0, AX - 226], [AX + 226, WW]], [[AX - 226, AX - 113], [AX + 113, AX + 226]], [[AX - 113, AX - 40], [AX + 40, AX + 113]]];
-    outs.forEach((pair, i) => { if (bReal >= F.out[i] || !active && state !== 'play' && live) for (const [x0, x1] of pair) dark(x0, x1, 0.8); });
+    // (2-3 ends at sunrise on the beach: no lamps going out)
+    if (!L.ht) outs.forEach((pair, i) => { if (bReal >= F.out[i] || !active && state !== 'play' && live) for (const [x0, x1] of pair) dark(x0, x1, 0.8); });
   }
   g = g0;
   // the camera. Before it moves it draws into the game canvas like any frame; once it pulls back it draws into a canvas the size
@@ -4097,10 +4291,11 @@ function drawMid(t, nowMs, active) {
   let sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
   // 2-2: the cutscene's camera (rb.zoom): close on whoever speaks, panning between shots that touch, easing in from the wide
   // view and back out to it, never past the floor's ends
-  if (L.rb && L.rb.zoom && (active || state === 'outro')) {
-    const Z = L.rb.zoom, wide = { s: V.s, cx: V.cx, cy: V.cy }, mc = midMarco(b), lv = L.rb.leave, lp = lv ? Math.max(0, Math.min(1, (bReal - lv[0]) / (lv[1] - lv[0]))) : 0;
+  const ZD = L.rb || L.ht;
+  if (ZD && ZD.zoom && (active || state === 'outro')) {
+    const Z = ZD.zoom, wide = { s: V.s, cx: V.cx, cy: V.cy }, mc = midMarco(b), lv = ZD.leave, lp = lv ? Math.max(0, Math.min(1, (bReal - lv[0]) / (lv[1] - lv[0]))) : 0;
     const at = w => { if (!w) return wide; const zs = V.s * w[3];
-      if (w[2] === 'b') return { s: zs, cx: rbBossX(bReal) + 60, cy: 114 };
+      if (w[2] === 'b') return { s: zs, cx: (L.rb ? rbBossX(bReal) : BOSS_X) + 60, cy: 114 };
       if (w[2] === 'v') return { s: zs, cx: mc.x + (mc.mir ? -48 : 48), cy: 112 + mc.dy };
       if (w[2] === 'two') return { s: zs, cx: (mc.x + MID.ax) / 2, cy: 112 };
       return { s: zs, cx: MID.ax, cy: 122 }; };
@@ -4114,11 +4309,11 @@ function drawMid(t, nowMs, active) {
   let [jx, jy] = phaseJolt(bReal);
   if (FX.midPair && nowMs - FX.midPair.at < 170 && !reduce) { const k = FX.midPair.both ? 2 : 1; jx += Math.round((Math.random() * 2 - 1) * k); jy += Math.round((Math.random() * 2 - 1) * k); }
   MIDCAM = { sx, sy, sw, sh };
-  if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx + jx, sy + jy, sw, sh, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); if (L.rb) rbCine(g, W, H, bReal, active); return; }
+  if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx + jx, sy + jy, sw, sh, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); if (L.rb) rbCine(g, W, H, bReal, active); if (L.ht) htCine(g, W, H, active ? bReal : END_BEAT, active); return; }
   if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
   cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#0c0a09'; gHi.fillRect(0, 0, hw, hh);
   gHi.drawImage(midCv, sx + jx / V.s, sy + jy / V.s, sw, sh, 0, 0, hw, hh);
-  phaseLook(gHi, hw, hh, bReal, active); if (L.rb) rbCine(gHi, hw, hh, active ? bReal : END_BEAT, active);
+  phaseLook(gHi, hw, hh, bReal, active); if (L.rb) rbCine(gHi, hw, hh, active ? bReal : END_BEAT, active); if (L.ht) htCine(gHi, hw, hh, active ? bReal : END_BEAT, active);
   if (active) { midGuide(b, T, nowMs, { sx, sy, sw, sh, hw, hh, k }); midAdlib(nowMs, { sx, sy, sw, sh, hw, hh }); }
   // the game canvas under it still gets the plain floor colour (nothing else shows through)
   g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
@@ -5901,6 +6096,16 @@ function fanfare21(t) {
   for (const f of [311.13, 392, 466.16, 622.25]) brass(f, t + 0.25, 0.7, 0.035);
 }
 function levelSfx(t, kind) {
+  // 2-3: the belt motor's clunk (the only clock in the cold war); the announcement's chime and its speaker's hiss; 반장 heaving
+  // the heavy box up and it landing; four belts jamming (boxes crashing into each other and down); a palm on a cardboard box;
+  // the boombox's plug going back in (a click and a hum)
+  if (kind === 'motor') { osc('sine', 58, t, 0.004, 0.08, 0.14, bus); noise(t, 'lowpass', 260, 0.06, 0.05, 0.8, bus); return; }
+  if (kind === 'pa') { noise(t, 'bandpass', 1800, 0.025, 4.2, 0.6, bus); osc('sine', 659.3, t + 0.05, 0.01, 0.1, 0.7, bus); osc('sine', 523.3, t + 0.55, 0.01, 0.1, 1, bus); return; }
+  if (kind === 'heave') { noise(t, 'lowpass', 500, 0.08, 0.3, 0.8, bus); return; }
+  if (kind === 'thud') { const o = osc('sine', 110, t, 0.002, 0.4, 0.3, bus); o.frequency.exponentialRampToValueAtTime(42, t + 0.25); noise(t, 'lowpass', 700, 0.25, 0.12, 0.7, bus); return; }
+  if (kind === 'jam') { for (let k = 0; k < 7; k++) { const tk = t + k * 0.07 + Math.random() * 0.03, o = osc('sine', 90 + Math.random() * 60, tk, 0.002, 0.25, 0.18, bus); o.frequency.exponentialRampToValueAtTime(40, tk + 0.16); noise(tk, 'lowpass', 900 + Math.random() * 900, 0.18, 0.08, 0.7, bus); } osc('square', 160, t, 0.005, 0.03, 0.5, bus); return; }
+  if (kind === 'thump') { const o = osc('sine', 120, t, 0.002, 0.32, 0.12, bus); o.frequency.exponentialRampToValueAtTime(55, t + 0.1); noise(t, 'bandpass', 420, 0.22, 0.05, 1.2, bus); return; }
+  if (kind === 'plug') { osc('square', 1700, t, 0.0005, 0.06, 0.012, bus); noise(t, 'bandpass', 2500, 0.1, 0.02, 3, bus); osc('sine', 60, t + 0.02, 0.05, 0.05, 0.6, bus); osc('sine', 120, t + 0.02, 0.05, 0.02, 0.5, bus); return; }
   // 2-2: the radio's volume knob turned up (a click and a breath of static); the motor blowing (a crack, a deep thump and a
   // hiss of steam); the line's alarm (a two-tone buzzer); the radio being switched back on (a crackle tuning in)
   if (kind === 'step') { noise(t, 'lowpass', 420, 0.2, 0.07, 0.7, bus); osc('sine', 70, t, 0.003, 0.08, 0.08, bus); return; }
@@ -5931,8 +6136,10 @@ function levelSfx(t, kind) {
   if (kind === 'drill') { const o = osc('sawtooth', 140, t, 0.02, 0.05, 0.7, bus); o.frequency.setValueAtTime(140, t); o.frequency.linearRampToValueAtTime(230, t + 0.25); o.frequency.linearRampToValueAtTime(190, t + 0.7); noise(t, 'bandpass', 2400, 0.05, 0.7, 2, bus); }
 }
 // 2-1's chutes play the band's percussion: D a kick, F claps, J a rim, K a cowbell (quieter on a 좋아)
-function quadHit(q, j) {
+function quadHit(q, j, n) {
   const t = ctx.currentTime, v = j === 'good' ? 0.7 : 1;
+  // 2-3's cold war (no song yet): each scanner beeps its own note, so what you scan is the only tune on the floor
+  if (L.ht && n && n.beat < L.ht.song) { const f = [[415.3, 523.25], [622.25, 698.46]][q][n.up ? 1 : 0]; osc('sine', f, t, 0.002, 0.12 * v, 0.18, bus); osc('sine', f * 2, t, 0.002, 0.025 * v, 0.08, bus); return; }
   if (L.mid) { if (q === 0) { osc('sine', 820, t, 0.001, 0.12 * v, 0.05, bus); noise(t, 'bandpass', 1300, 0.2 * v, 0.04, 2.2, bus); noise(t, 'lowpass', 400, 0.12 * v, 0.03, 0.7, bus); } else { osc('square', 2300, t, 0.001, 0.05 * v, 0.02, bus); noise(t, 'bandpass', 3400, 0.22 * v, 0.03, 3, bus); } return; }
   if (q === 0) { const o = osc('sine', 140, t, 0.002, 0.5 * v, 0.16, bus); o.frequency.exponentialRampToValueAtTime(50, t + 0.12); noise(t, 'lowpass', 900, 0.12 * v, 0.03, 0.7, bus); }
   else if (q === 1) { noise(t, 'bandpass', 1300, 0.3 * v, 0.07, 1.4, bus); noise(t + 0.011, 'bandpass', 1500, 0.24 * v, 0.09, 1.4, bus); }
@@ -7254,7 +7461,7 @@ function judgeNote(target, t) {
     const milestone = addCombo();
     const tones = CHORDS[chordIdx(target.beat)];
     const th = THEME[fxTheme(target.beat)];
-    if (target.quad) quadHit(target.q, j); else if (target.gtr) gtrSample(j, target.beat); else if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false, target.lane);
+    if (target.quad) quadHit(target.q, j, target); else if (target.gtr) gtrSample(j, target.beat); else if (!inRange(target.beat, L.hype) && !pairQuiet) hitSound(j, tones, target.beat, false, target.lane);
     const lightUp = phase3(target.beat);
     lastGood = now; FX.goodLane = target.lane; FX.glow = th.glow; ring(th.ring[(stats.combo + (j === 'good' ? 1 : 0)) % 2], target.lane);
     spawnBits(j === 'perfect' ? 14 : 6, th);
@@ -7471,7 +7678,7 @@ function updateHud(t) {
   if (s !== lastSay) {
     bubble.textContent = s; bubble.hidden = !s; lastSay = s;
     // 2-2: the line as a subtitle in the middle, where your eyes are; over the speaker's head only a small "…"
-    if (L.subs) { const sp = line && (line[4] || (L.mid ? 'b' : null)), nm = { b: ['반장', '#f0a050'], v: ['마르코', '#6fdcec'] }[sp];
+    if (L.subs) { const sp = line && (line[4] || (L.mid ? 'b' : null)), nm = { b: ['반장', '#f0a050'], v: ['마르코', '#6fdcec'], p: ['방송', '#a8bccc'] }[sp];
       subEl.hidden = !s; subEl.innerHTML = ''; if (s) { if (nm) { const k = document.createElement('b'); k.textContent = nm[0]; k.style.color = nm[1]; subEl.append(k); } subEl.append(s); }
       bubble.classList.toggle('dots', !!s); if (s) bubble.textContent = '…'; }
     const lane = line ? (line[3] || 0) : 0, spk = line && line[4];
