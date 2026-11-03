@@ -852,10 +852,10 @@ const LEVELS = [
     // he is bored stiff: he yawns (a box skipped), yawns again, dozes off (his boxes half a beat late, then none), 반장 wakes him
     // and he snaps, cutting in on the funk's own opening run (68). Then long turns, eight bars each, the floor changing over
     // two beats. The fast back-and-forth is a cutscene (cut: 164-220, letterboxed, no boxes): a bar each, then half bars, the
-    // belt motor red, both songs blasting and speeding up (188-196), and the motor blows (196): both tapes stop, the alarm,
-    // silence and the argument. Phase 2 (220-): the radio alone from the blues' third time round, the floor only the warehouse;
-    // 반장's shuffle on the left against 마르코's straight eighths on the right, never meeting; through the guitar solo 마르코
-    // stops; the last chord on 327. Nothing is settled.
+    // belt motor red, boxes pouring onto all four belts, both songs blasting and speeding up (188-196), and the motor blows
+    // (196): both tapes stop, the alarm. 반장 looks at the dead belt, switches his radio off, says they'll do it tomorrow and
+    // walks out through the spilt boxes; the lamps go out from the far ends; 마르코, left by you under the last one, pulls his
+    // boombox's plug and asks if you'll have a soju. The outro is the two of you at a 포장마차 at dawn. Nothing is settled.
     tempo: [[0, 107.97], [188, 109.27], [189, 110.56], [190, 111.86], [191, 113.15], [192, 114.45], [193, 115.74], [194, 117.04], [195, 118.34], [196, 107.97]], clock:'01:40', title:'천천히', partners:['boss'], hints:false,
     songs: [{ src: 'audio/2-2-monday-without-a-clock.mp3', at: 0, lead: 4.4977, gain: 0.9 },
             { src: 'audio/2-2-the-solstice-parade.mp3', at: 0, lead: 0.6277, gain: 0.8 }],
@@ -869,12 +869,12 @@ const LEVELS = [
     // [1]. boom: the motor blows; radio: [the static, the blues back on at this beat, from this many seconds in]
     rb: { turns: [[0, 'b'], [68, 'v'], [100, 'b'], [132, 'v', 48],
              [164, 'b'], [168, 'v'], [172, 'b'], [176, 'v'], [180, 'b'], [182, 'v'], [184, 'b'], [186, 'v'], [188, 'h']],
-      pokes: [], cut: [164, 220], heat: [100, 188], boom: 196, radio: [218.5, 220, 113.417], low: 0.07, bar: 2.22284 },
+      pokes: [], cut: [164, 236], heat: [100, 188], boom: 196, radio: [9998, 9999, 0], unplug: 222, leave: [209, 215.5], low: 0.07, bar: 2.22284 },
     mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 20,
       // 마르코 bored by the blues: yawning (hand to his open mouth, then a stretch), dozing (eyes shut, nodding, z's), jolted awake
       bore: { yawn: [[36, 40.5], [44, 47.5]], doze: [52, 64.5], jolt: 64.5 }, guide: [-9, -8], tags: [-9, -8, -7],
       shouts: [[36.5, 'none', '하아아암~'], [44.5, 'none', '하암…'], [53, 'none', 'Zzz…'], [57.5, 'none', '쿨… zzz'], [64.5, 'none', '헉!'], [67.5, 'fanfare', '빠바밤~!'], [68, 'hey', '헤이!'], [132, 'hey', '노노노~!'], [168, 'hey', '볼륨 업!'], [176, 'hey', '업!!'], [188, 'hey', '더!!']],
-      route: [[0, 'rl'], [86, 'ru'], [98, 'rl'], [138, 'ru'], [146, 'rl'], [154, 'ru'], [222, 'rl'], [230, 'ru'], [238, 'rl'], [246, 'ru'], [274, 'rl'], [278, 'ru'], [286, 'rl'], [294, 'ru'], [298, 'rl']],
+      route: [[0, 'rl'], [86, 'ru'], [98, 'rl'], [138, 'ru'], [146, 'rl'], [154, 'ru'], [214, 'rl'], [215.5, 'c']],
       bars: [
         '................................................', '1...............1.......1.......................',
         '1...............1.......1...............1.......', '1...............1.......x.......................',
@@ -904,31 +904,18 @@ const LEVELS = [
         '................................................', '................................................',
         '................................................', '................................................',
         '................................................', '................................................',
-        '1.....2.....2.....2.....1.....2.........1.......', '1.....2.........1.......1.....2.....2.....2.....',
-        '1.....4.....4.....4.....1.....4.........1.......', '1.....4.........1.......1.....4.....4.....4.....',
-        '1.....2.....2.....2.....1.....2.........1.......', '1.....2.........1.......1.....2.....2.....2.....',
-        '1.....4.....4.....4.....1.....4.........1.......', '1...............1.......1...............1.......',
-        '1...............1.......1...............1.......', '1...............1.......1...............1.......',
-        '1...............1.......1...............1.......', '1...............1.......1...............1.......',
-        '1...............1.......1...............1.......', '1.....2.........1.......1.....2.....2.....2.....',
-        '1.....4.....4.....4.....1.....4.........1.......', '1.....4.........1.......1.....4.....4.....4.....',
-        '1.....2.....2.....2.....1.....2.........1.......', '1.....2.........1.......1.....2.....2.....2.....',
-        '1.....4.....4.....4.....1.....4.........1.......', '1...........2...........1...........2...........',
-        '1...........2...........1...........2...........', '1...........2...........1...........2...........',
-        '1...........2...........1...........2...........', '1...............................................',
-        '................................................', '....................................x...........',
-        '................................................'
+        '................................................', '................................................'
     ] },
     comfort: ['…다음 거.', '손 봐, 손.'],
-    phaseFx: { amber: [], lineOn: [-9, -9, -9], drop: 68, drop2: 196, last: 327, out: [328.4, 329.1, 329.8] },
+    phaseFx: { amber: [], lineOn: [-9, -9, -9], drop: 68, drop2: 196, last: 1e9, out: [218.4, 219.1, 1e9] },
     sfx: [[100, 'knob'], [164, 'knob'], [172, 'knob'], [180, 'knob'], [184, 'knob'],
-          [196, 'boom'], [196.6, 'alarm'], [198.6, 'alarm'], [200.6, 'alarm'], [217.5, 'switchOff'], [218.5, 'static'],
-          [328.4, 'lampOff'], [329.1, 'lampOff'], [329.8, 'lampOff']],
+          [196, 'boom'], [196.6, 'alarm'], [198.6, 'alarm'], [200.6, 'alarm'], [207.5, 'knob'], [209.4, 'step'], [210.2, 'step'], [211, 'step'], [211.8, 'step'], [212.6, 'step'], [213.4, 'step'], [214.2, 'step'],
+          [218.4, 'lampOff'], [219.1, 'lampOff'], [222, 'switchOff']],
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
-    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 328,
+    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 230,
     special:['마르코가 보낸 상자', 'right', '받아냄'],
-    sections: [[0, 'intro'], [9, 'bored'], [13, 'doze'], [17, 'tug'], [33, 'tug2'], [41, 'cut'], [49, 'boom'], [55, 'radio'], [63, 'solo'], [69, 'radio2'], [75, 'last']],
-    bars: Array(83).fill('................'),
+    sections: [[0, 'intro'], [9, 'bored'], [13, 'doze'], [17, 'tug'], [33, 'tug2'], [41, 'cut'], [49, 'boom'], [52, 'alone']],
+    bars: Array(58).fill('................'),
     // 'b' 반장, 'v' 마르코
     say: [[0.5, '…천천히 가자.', 3, 0, 'b'], [8, '오~ 블루스! 좋죠, 좋죠~', 3, 0, 'v'], [16, '천천히~ 이렇게요?', 3, 0, 'v'], [24, '…그래.', 2, 0, 'b'],
           [41, '…반장님, 이거 몇 절까지 있어요?', 3, 0, 'v'], [48.5, '…끝까지.', 2, 0, 'b'],
@@ -937,20 +924,23 @@ const LEVELS = [
           [118, '반장님~ 이건 너무 느려요!', 3, 0, 'v'], [132.5, '이거죠, 이거!', 2.5, 0, 'v'], [140, '에이스는 안 멈춰요~', 2.5, 0, 'v'], [152, '…천천히 하라고.', 2.5, 0, 'b'],
           [164.3, '…내 라인이다.', 1.6, 0, 'b'], [168.2, '볼륨 업~!', 1.4, 0, 'v'], [172.2, '(딸깍)', 1.4, 0, 'b'], [176.2, '업!!', 1.4, 0, 'v'],
           [180.1, '(딸깍)', 0.9, 0, 'b'], [182.1, '업!', 0.9, 0, 'v'], [188.5, '더! 더!', 2, 0, 'v'],
-          [196.6, '어, 어?', 2, 0, 'v'], [200, '…어제 빨랐지.', 3, 0, 'b'], [204, '(실적표를 본다) 그래서 오늘 이거다.', 3.5, 0, 'b'],
-          [208.5, '빠르면 다들 좋아하잖아요.', 3.5, 0, 'v'], [213, '(빈자리를 잠깐 본다) …위에서나.', 3.5, 0, 'b'],
-          [220.3, '…천천히 가자.', 3, 0, 'b'], [254, '…이게 더 느리잖아.', 3, 0, 'v']],
+          [196.6, '어, 어?', 2, 0, 'v'], [200, '(멈춘 벨트를 본다) …다 섰네.', 3.5, 0, 'b'], [204, '반장님, 이건 제가…', 2.5, 0, 'v'],
+          [207.5, '(라디오를 끈다) …내일 하자.', 3, 0, 'b'], [216, '…반장님?', 2.5, 0, 'v'], [222, '(붐박스 플러그를 뽑는다)', 2.5, 0, 'v'],
+          [225, '…신입, 소주 한잔할래요?', 4, 0, 'v']],
     intro: [
       { who:'', text:'둘째 밤, 새벽 1시 40분. 실적표 목표 수량 옆에 빨간 펜으로 고친 숫자. 반장은 집에서 낡은 라디오를 하나 들고 왔다.' },
       { who:'마르코', text:'반장님! 우리 어제 1등이래요!' },
       { who:'반장', text:'…목표도 올랐네.' }],
     outro: good => good ? [
-      { who:'', text:'새벽 5시. 실적표의 숫자는 어제보다 조금 모자랐다.' },
-      { who:'반장', text:'…이 정도면 된다.' },
-      { who:'', text:'마르코는 대꾸하지 않았다.' },
-      { who:'', text:'그날 마르코는 붐박스를 켜지 않고 퇴근했다.' }] : [
-      { who:'반장', text:'…오늘은 접자.' },
-      { who:'', text:'마르코는 말이 없었다.' }],
+      { who:'', text:'새벽 5시 반. 센터 앞 포장마차. 둘 말고는 아무도 없다.', scene:'pocha' },
+      { who:'마르코', text:'(잔을 채운다) …신입은 한 잔만.', scene:'pocha' },
+      { who:'마르코', text:'우리 동네에선 다들 음악 틀고 일했거든요. 시끄러울수록 잘되는 줄 알았지.', scene:'pocha' },
+      { who:'', text:'마르코는 한참 잔만 돌렸다.', scene:'pocha' },
+      { who:'마르코', text:'…반장님 그 노래, 사실 나쁘지 않더라.', scene:'pocha' },
+      { who:'마르코', text:'(잔을 든다) 짠. …내일 또 봐요, 신입.', scene:'pocha' }] : [
+      { who:'', text:'새벽 5시 반. 센터 앞 포장마차.', scene:'pocha' },
+      { who:'마르코', text:'(잔을 채운다) …오늘은 다 엉망이었네요.', scene:'pocha' },
+      { who:'마르코', text:'…내일 다시 해요, 신입.', scene:'pocha' }],
   }
   ,{
     id:'s2-3', stageNo:'2-3', who:'반장 + 지우', role:'반장 · 지우 · 순자 이모 · 96 BPM · 벨트 둘', tag:'레게톤 · 버튼 둘 · 본선 사흘 전', bpm:96, style:'dembow23', fxTheme:'neon', inspector: true,
@@ -2227,6 +2217,7 @@ const PARTNERS = {
       for (const [hx, hy] of [[-8, -4], [-4, -5], [0, -5], [4, -4], [-10, 2], [-10, 6]]) R(cx + hx, top + hy, 3, 2, hairL);
       // a yawn: eyes screwed shut, the mouth wide open; otherwise the eyes as usual and the grin (a dark mouth, teeth across it)
       if (pose.yawn) { R(cx + 2, top + 7, 4, 1, C.ink); R(cx + 1, top + 10, 6, 4, '#5a2a22'); R(cx + 2, top + 13, 4, 1, '#b8645a'); }
+      else if (pose.sad) { faceFx(cx, top, cx + 3, top + 6, pose, nowMs, hair, active); R(cx + 2, top + 12, 4, 1, '#5a2a22'); R(cx + 2, top + 5, 4, 1, hair); }
       else { faceFx(cx, top, cx + 3, top + 6, pose, nowMs, hair, active); R(cx + 1, top + 11, 6, 2, '#5a2a22'); R(cx + 2, top + 11, 4, 1, '#f4f1ea'); }
     },
     arm(pose) {
@@ -3783,7 +3774,7 @@ function rbBack(b, bReal, nowMs, active, live) {
   // 반장's radio on the left, 마르코's boombox on the right; whichever is playing out loud gives off notes
   const D = L.rb, tn = live ? rbTurn(bReal) : null, ph = bReal - Math.floor(bReal);
   const radioOn = !live || bReal < D.boom || bReal >= D.radio[1], pk = live && tn ? rbPoke(bReal) : null, radioLoud = live && ((tn && (pk ? pk[1] === 'b' : tn[1] !== 'v')) || bReal >= D.radio[1]);
-  const boxOn = live && rbFunkOn(bReal), boxPlugged = !live || bReal < D.radio[0] - 1;
+  const boxOn = live && rbFunkOn(bReal), boxPlugged = !live || bReal < (D.unplug != null ? D.unplug : D.radio[0] - 1);
   { const { x, y } = RB_RADIO; R(x + 18, y - 9, 1, 9, '#3a332c'); R(x, y, 24, 12, '#6b4a2e'); R(x, y, 24, 1, '#8a6a42'); R(x + 2, y + 3, 9, 5, '#2a1a10');
     if (radioOn) { R(x + 3, y + 4, 7, 3, '#f0a040'); R(x + 3 + Math.floor((nowMs / 900) % 6), y + 4, 1, 3, '#fff0c0'); }
     if (live && bReal >= D.radio[0] && bReal < D.radio[1]) R(x + 3 + Math.floor(Math.random() * 6), y + 4, 1, 3, '#fff0c0');
@@ -3952,6 +3943,7 @@ function drawMid(t, nowMs, active) {
       if (b >= BO.doze[0] && b < BO.doze[1]) { pose.doze = true; pose.bob = 0; sway = 0; lift = -(Math.floor(b / 2) % 2 ? 2 : 0); if (!toss) pose.hand = { x: BOSS_X + 12, y: 140 }; }
       if (b >= BO.jolt && b < BO.jolt + 1) { lift = Math.round(Math.sin(Math.PI * (b - BO.jolt)) * 8); pose.hand = { x: BOSS_X + 18, y: 80 }; }
     }
+    if (L.rb && active && b >= L.rb.boom + 1) { pose.sad = true; if (!marco.walking) pose.hand = { x: BOSS_X + 10, y: 138 }; }
     if (F && b >= F.last) { pose.hand = { x: BOSS_X + 11, y: 70 }; if (b < F.last + 1) lift = Math.max(lift, Math.round(Math.sin(Math.PI * (b - F.last)) * 9)); }
     FX.react[2] = FX.react[2] || { type: '', at: nowMs };
     g.save(); if (marco.up) { g.beginPath(); g.rect(0, -MID.oy, WW, farY(BELT_Y) + 2 + MID.oy); g.clip(); }
@@ -3979,6 +3971,10 @@ function drawMid(t, nowMs, active) {
   mirror(0, () => {
     const pose = { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: active && ph < 0.18 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 0 };
     if (held) pose.hand = { x: held.x - held.n.w / 2 + 1, y: held.y + 2 };
+    // 2-2: after the boom he calls it a night and walks out to the left, unhurried, gone off the floor
+    const lv = L.rb && L.rb.leave, lp = lv && live ? (bReal - lv[0]) / (lv[1] - lv[0]) : -1;
+    if (lp >= 1) return;
+    if (lp > 0) { pose.bob = Math.floor(bReal * 2.5) % 2; drawActor('boss', Math.round(BOSS_X - lp * 90), true, pose, nowMs, active, () => PARTNERS.boss.arm(pose)); return; }
     drawActor('boss', BOSS_X, false, pose, nowMs, active, () => PARTNERS.boss.arm(pose));
   });
   if (!marco.up) drawMarco();
@@ -4671,6 +4667,37 @@ function drawOffice(nowMs) {
       drawStandingBoss(Math.round(x), nowMs, q < 1 ? (Math.floor(nowMs / 190) % 2) : bob, true);
     }
   }
+  drawSceneFade(nowMs);
+}
+// 2-2's outro: a 포장마차 outside the centre at dawn. The orange tarp lit from inside by one bulb, a steel table with two
+// bottles of soju, two glasses and a plate, plastic stools; 마르코 on the left, quiet, a glass in his hand, you on the right
+function drawPocha(nowMs) {
+  const t = nowMs / 1000;
+  const sky = g.createLinearGradient(0, 0, 0, 120); sky.addColorStop(0, '#141c3a'); sky.addColorStop(0.6, '#3a4672'); sky.addColorStop(1, '#c4876a'); g.fillStyle = sky; g.fillRect(0, 0, W, 120);
+  for (let i = 0; i < 18; i++) R(rnd(i, 81) * W, rnd(i, 82) * 50, 1, 1, '#9aa4cc');
+  for (let i = 0, x = -4; x < W; i++) { const w = 26 + Math.floor(rnd(i, 83) * 30), top = 50 + Math.floor(rnd(i, 84) * 40); R(x, top, w, 120 - top, '#161a2c'); for (let wy = top + 5; wy < 112; wy += 7) for (let wx = x + 3; wx < x + w - 3; wx += 6) if (rnd(wx + wy * 5, 85) < 0.12) R(wx, wy, 2, 3, '#e8b868'); x += w + 2; }
+  R(0, 120, W, 96, '#22232c'); R(0, 120, W, 3, '#3a3a44'); R(0, 168, W, 48, '#1a1b22'); for (let x = 0; x < W; x += 30) R(x, 190, 16, 1, 'rgba(200,170,80,.2)');
+  // the tent: a frame, the tarp roof and sides glowing orange, the clear front flap rolled up, the inside warm
+  R(54, 40, 276, 6, '#c8501e'); for (let x = 54; x < 330; x += 12) R(x, 40, 6, 6, '#e06a2a');
+  g.fillStyle = 'rgba(214,96,34,.92)'; g.fillRect(58, 46, 268, 124); g.fillStyle = '#3a1c12'; g.fillRect(76, 60, 232, 110);
+  const warm = g.createRadialGradient(192, 70, 4, 192, 92, 150); warm.addColorStop(0, 'rgba(255,214,150,.55)'); warm.addColorStop(1, 'rgba(255,150,70,0)'); g.fillStyle = warm; g.fillRect(76, 60, 232, 110);
+  R(76, 60, 232, 4, 'rgba(240,220,200,.5)'); R(58, 46, 18, 124, 'rgba(240,130,60,.6)'); R(308, 46, 18, 124, 'rgba(240,130,60,.6)');
+  R(191, 46, 1, 18, '#1a1010'); const fl = 0.85 + 0.15 * Math.sin(t * 13) * Math.sin(t * 5.3); g.fillStyle = `rgba(255,236,180,${0.35 * fl})`; g.beginPath(); g.arc(191.5, 66, 10, 0, Math.PI * 2); g.fill(); R(189, 64, 5, 5, '#fff3c8');
+  // a little steam off something on the burner behind
+  for (let k = 0; k < 4; k++) { const p = ((t / 2.2) + k / 4) % 1, sz = 2 + p * 6; g.fillStyle = `rgba(230,220,210,${0.25 * (1 - p)})`; g.fillRect(Math.round(219 + Math.sin(p * 5 + k) * 3 - sz / 2), Math.round(104 - p * 26), Math.round(sz), Math.round(sz)); }
+  R(207, 104, 24, 5, '#2a2a30'); R(209, 109, 20, 3, '#3a3a42');
+  // stools, then the two of them sitting (the table in front hides their legs)
+  for (const sx of [112, 272]) { R(sx - 9, 150, 18, 4, '#c8302a'); R(sx - 8, 154, 3, 16, '#a02420'); R(sx + 5, 154, 3, 16, '#a02420'); }
+  const bobM = Math.sin(t * 1.3) > 0.9 ? 1 : 0;
+  const pose = { hand: { x: BOSS_X + 18, y: 122 }, carry: null, wince: false, dip: 2, bob: bobM, nod: 0, doze: false, phone: false, lane: 2, sad: true };
+  FX.react[2] = FX.react[2] || { type: '', at: nowMs };
+  g.save(); g.translate(0, 22); drawActor('marco', 118, false, pose, nowMs, false, () => { PARTNERS.marco.arm(pose); R(pose.hand.x - 1, pose.hand.y - 6, 4, 6, '#e9eef0'); R(pose.hand.x, pose.hand.y - 4, 2, 3, '#cfe8d8'); }); g.restore();
+  g.save(); g.translate(266 - PLAYER_X, 26); drawPlayer(0, nowMs); g.restore();
+  // the table: a steel top, two green bottles, two glasses, a plate
+  R(140, 140, 104, 6, '#a8aeb6'); R(140, 146, 104, 2, '#6a7078'); R(150, 148, 4, 24, '#5a6068'); R(230, 148, 4, 24, '#5a6068');
+  for (const bx of [176, 186]) { R(bx, 120, 6, 20, '#2e8a4a'); R(bx + 1, 116, 4, 4, '#2e8a4a'); R(bx + 1, 114, 4, 2, '#d8e8d0'); R(bx, 127, 6, 5, '#e9f0e0'); R(bx + 1, 121, 1, 16, '#5ab87a'); }
+  R(160, 134, 5, 6, '#eef4f4'); R(220, 134, 5, 6, '#eef4f4'); R(161, 136, 3, 3, '#d8ecdc'); R(221, 136, 3, 3, '#d8ecdc');
+  g.fillStyle = '#e9e4da'; g.beginPath(); g.ellipse(204, 138, 11, 3, 0, 0, Math.PI * 2); g.fill(); R(198, 135, 12, 3, '#d8643a');
   drawSceneFade(nowMs);
 }
 // 지우 standing in the office, one earbud hanging: head down, a hand at his chin, or flustered (a hand up, sweating); he turns
@@ -5629,6 +5656,7 @@ function fanfare21(t) {
 function levelSfx(t, kind) {
   // 2-2: the radio's volume knob turned up (a click and a breath of static); the motor blowing (a crack, a deep thump and a
   // hiss of steam); the line's alarm (a two-tone buzzer); the radio being switched back on (a crackle tuning in)
+  if (kind === 'step') { noise(t, 'lowpass', 420, 0.2, 0.07, 0.7, bus); osc('sine', 70, t, 0.003, 0.08, 0.08, bus); return; }
   if (kind === 'knob') { osc('square', 1300, t, 0.0005, 0.05, 0.012, bus); noise(t, 'bandpass', 3000, 0.12, 0.018, 3, bus); noise(t + 0.02, 'bandpass', 2200, 0.05, 0.22, 0.8, bus); return; }
   if (kind === 'boom') {
     noise(t, 'lowpass', 2500, 0.9, 0.08, 0.7, bus); noise(t + 0.01, 'bandpass', 5200, 0.5, 0.05, 1.5, bus);
@@ -7748,9 +7776,10 @@ function frame(now) {
     else if (tReal > timeAt(END_BEAT)) finishPlay();
   }
   sceneTick(now);
-  if (!(L.mid && castBeatAt(t, active) >= L.mid.at && state !== 'select' && state !== 'title') && !cvHi.hidden) cvHi.hidden = true;
+  if (!(L.mid && castBeatAt(t, active) >= L.mid.at && state !== 'select' && state !== 'title' && (SCENE.kind === 'line' || active)) && !cvHi.hidden) cvHi.hidden = true;
   if (SCENE.kind === 'office' && !active) { drawOffice(now); if (!hud.hidden) hud.hidden = true; }
   else if (SCENE.kind === 'wings' && !active) drawWings(now);
+  else if (SCENE.kind === 'pocha' && !active) { drawPocha(now); if (!hud.hidden) hud.hidden = true; }
   else if (L.mid && castBeatAt(t, active) >= L.mid.at && state !== 'select' && state !== 'title') { drawMid(t, now, active); drawSceneFade(now); }
   else if (L.quad && quadP(castBeatAt(t, active)) >= 1) { drawQuad(t, now, active); drawSceneFade(now); }
   else { drawScene(t, now / 1000, active, now); if (L.quad && quadP(castBeatAt(t, active)) > 0) drawQuadTurn(t, now, active); if (L.phaseFx) phaseLook(g, W, H, castBeatAt(t, active), active); drawSceneFade(now); }
