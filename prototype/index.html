@@ -1059,7 +1059,7 @@ const LEVELS = [
     // down; every new layer brings back something from the night. It ends when he presses stop and saves it.
     lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
     hitKit: 'ticktock', bareBand: true, observer: 'boss', observerIntro: true, noCount: true, observerAt: [[21, 35]], obsCue: { enter: [21, 23], leave: [30.6, 34.6] },   // 반장 by the line for the intro only
-    heads: { j: [104, 58], h: [52, 90], r: [140, 52], b: [168, 84] },
+    heads: { j: [104, 58], h: [52, 90], r: [132, 64], b: [168, 84] },
     clock:'02:50', title:'첫눈에', hints: false, special:['떨어진 상자', 'drop', '받아냄'],
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 368,
     chords: [[277.18, 349.23, 415.3], [233.08, 277.18, 349.23], [185, 233.08, 277.18], [207.65, 261.63, 311.13]], roots: [69.3, 58.27, 92.5, 103.83], chordAt: bar => bar % 4,
@@ -1098,7 +1098,7 @@ const LEVELS = [
     act: { lookUp: [[56, 59], [96, 99], [162, 165]], upAtDrops: true, alarmAt: [[92, 93.5], [164.6, 166], [13.4, 15], [23.7, 25.5]] },
     camPlay: [[0.3, 4, { x: 80, y: 96, k: 1.5 }], [4, 13.2, { x: 58, y: 104, k: 2.6 }], [13.2, 18, { x: 104, y: 80, k: 2.6 }], [18, 21, { x: 102, y: 82, k: 2.2 }], [21, 30.6, { x: 122, y: 90, k: 1.6 }],
       [91.5, 95, { x: 84, y: 100, k: 1.4 }], [95, 98.5, { x: 58, y: 104, k: 2.4 }], [98.5, 102, { x: 104, y: 84, k: 2.4 }]],
-    cutscene: [[0, 39.5], [91.5, 102], [202, 234], [360, 368]],
+    cutscene: [[0, 39.5], [91.5, 102], [202, 234]],   // (no bars at the save: they would cover the app's bottom rows)
     devMarks: [[0, '처음 · 만남'], [15, '여운'], [31, '봄바람'], [40, 'Pink Belt'], [80, '자랑'], [92, '받아내기'], [104, '후렴 1'], [136, '2절'], [160, '빌드업'], [168, '마지막 후렴'], [202, '퇴근길'], [217, '귀갓길'], [232, '지우의 방'], [248, '피아노'], [264, '킥'], [280, '스네어'], [296, '베이스'], [312, '기타'], [328, '멜로디'], [344, '반짝이']],
     // phase 1 (8 cells a bar): upper 지우 (in the choruses his heartbeat: a beat and its 'and'), lower 하은 and his boxes
     // that fall onto her belt while he stares at her ('d'); phase 2 (16 cells a bar): the clips on his timeline, four bars of
@@ -2747,36 +2747,68 @@ function drawLove15(t, nowMs) {
 // row and growing a row at a time, a half row up and a half row down (L.room.tracks). Its clips slide in from the right and
 // you set each one down as it reaches the playhead (the same one button); from then on it loops on its row while the next one
 // goes in; with each, something from the night comes back over his head. At the stop he saves it: '하은', deleted, '새 비트'.
-const ROOM = { pw: 300, cy: 170, rh: 9, head: 11, names: 32, play: 58, jx: 138 };
+const ROOM = { pw: 300, cy: 169, rh: 9, head: 15, names: 32, play: 58, hip: [124, 119] };
 const bgRoom15 = document.createElement('canvas'); bgRoom15.width = W; bgRoom15.height = H;
-const ROOM_WIN = { x: 238, y: 34, w: 66, h: 60 };
+const ROOM_WIN = { x: 250, y: 34, w: 62, h: 58 };
 (() => {
   const b = bgRoom15.getContext('2d'), r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
-  // the building cut open: walls, ceiling and floor slabs, the dark below
-  r(0, 0, W, H, '#0c0a12'); r(0, 12, W, 7, '#1c1826'); r(0, 18, W, 1, '#2a2436');
-  r(0, 146, W, 7, '#1c1826'); r(0, 146, W, 1, '#2e2840');
-  for (let x = 4; x < W; x += 9) { r(x, 13, 3, 1, '#252032'); r(x + 4, 148, 3, 1, '#252032'); }
-  r(0, 19, 10, 127, '#1c1826'); r(374, 19, 10, 127, '#1c1826'); for (let y = 24; y < 146; y += 9) { r(3, y, 4, 1, '#252032'); r(377, y + 4, 4, 1, '#252032'); }
-  // the back wall, its paper, the skirting and the floorboards
-  r(10, 19, 364, 127, '#2b2438'); for (let x = 16; x < 374; x += 12) r(x, 19, 1, 121, '#30283e');
-  r(10, 136, 364, 4, '#231c2c'); r(10, 140, 364, 6, '#4a3530'); r(10, 140, 364, 1, '#5e4438'); for (let x = 24; x < 374; x += 30) r(x, 141, 1, 5, '#3a2a26');
-  // left: a poster, a shelf of records and books, a guitar against the wall
-  r(30, 28, 34, 26, '#1c2236'); r(32, 30, 30, 22, '#2a3354'); r(35, 35, 24, 3, '#ff7fae'); r(35, 41, 16, 2, '#6fd8ff'); r(35, 46, 20, 2, '#6fd8ff');
-  r(22, 74, 72, 3, '#3a2c3a'); for (let k = 0; k < 9; k++) r(24 + k * 7, 60 + (k % 3), 5, 14 - (k % 3), ['#3a2a4a', '#2a3a4a', '#4a2a3a', '#5a4a2a'][k % 4]);
-  r(66, 62, 12, 12, '#1a1a22'); r(70, 66, 4, 4, '#3a3a44');
-  r(20, 108, 14, 32, '#8a4e30'); r(18, 114, 18, 20, '#a0603a'); r(22, 112, 10, 4, '#a0603a'); r(25, 120, 4, 4, '#2a1a14'); r(26, 70, 3, 40, '#5a3a24'); r(25, 66, 5, 6, '#3a2418');
-  for (let k = 0; k < 4; k++) r(27, 72 + k * 8, 1, 1, '#d8c8a0');
-  // the window frame (its glass is drawn live: the sky), a sill
-  const Wn = ROOM_WIN; r(Wn.x - 4, Wn.y - 4, Wn.w + 8, Wn.h + 8, '#3a3350'); b.clearRect(Wn.x, Wn.y, Wn.w, Wn.h); r(Wn.x + Wn.w / 2 - 1, Wn.y, 2, Wn.h, '#3a3350'); r(Wn.x - 6, Wn.y + Wn.h + 4, Wn.w + 12, 3, '#4a4262');
-  // the bed
-  r(300, 116, 70, 4, '#3a2c3a'); r(300, 120, 70, 14, '#5a6a9a'); r(300, 118, 52, 10, '#7a5a8a'); r(300, 118, 52, 2, '#8e6c9e'); r(352, 112, 16, 8, '#d8d0e0'); r(352, 112, 16, 2, '#efe8f2');
-  r(300, 134, 70, 3, '#2a2030'); r(302, 137, 3, 3, '#2a2030'); r(365, 137, 3, 3, '#2a2030'); r(366, 98, 4, 36, '#3a2c3a');
-  // the desk: top, legs, a drawer; a mug; the lamp
-  r(150, 106, 96, 4, '#5a4030'); r(150, 106, 96, 1, '#6e5038'); r(152, 110, 3, 30, '#4a3426'); r(241, 110, 3, 30, '#4a3426'); r(206, 110, 34, 12, '#4e3828'); r(220, 115, 6, 1, '#8a6a4a');
-  r(212, 99, 6, 7, '#d8d0c8'); r(218, 101, 2, 3, '#d8d0c8'); r(213, 100, 4, 1, '#6a4030');
-  r(228, 103, 12, 3, '#2a2c36'); r(233, 80, 2, 23, '#2a2c36'); r(233, 80, 12, 2, '#2a2c36'); r(240, 82, 9, 4, '#3a3c48');
-  // the chair
-  r(112, 120, 30, 3, '#2c2c38'); r(110, 92, 4, 31, '#2c2c38'); r(110, 92, 4, 2, '#3a3a48'); r(125, 123, 3, 14, '#22222c'); r(114, 137, 26, 2, '#22222c'); r(114, 139, 3, 2, '#111118'); r(137, 139, 3, 2, '#111118');
+  const h2 = (x, y) => { const v = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return v - Math.floor(v); };
+  // the building cut open: concrete slabs and walls (hatched), the dark below
+  r(0, 0, W, H, '#0b0910');
+  const slab = (x, y, w, h) => { r(x, y, w, h, '#1d1927'); for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) if ((xx + yy) % 5 === 0) r(xx, yy, 1, 1, '#17141f'); r(x, y, w, 1, '#2c2639'); };
+  slab(0, 11, W, 8); slab(0, 146, W, 8); slab(0, 19, 10, 127); slab(374, 19, 10, 127);
+  // the back wall: paper with a faint print, a picture rail, the skirting; the floorboards' edge
+  r(10, 19, 364, 127, '#2a2337');
+  for (let y = 26; y < 132; y += 10) for (let x = 16 + ((y / 10) % 2) * 6; x < 372; x += 12) r(x, y, 1, 1, '#342b44');
+  r(10, 19, 364, 2, '#1f1a2a'); r(10, 30, 364, 1, '#332a42');
+  r(10, 132, 364, 6, '#382d42'); r(10, 132, 364, 1, '#4a3d56'); r(10, 137, 364, 1, '#2a2132');
+  r(10, 138, 364, 8, '#553a30'); r(10, 138, 364, 1, '#6e4c3e'); for (let x = 22; x < 374; x += 28) { r(x, 139, 1, 7, '#45302a'); r(x + 13, 142, 1, 4, '#45302a'); }
+  // a rug under the chair and the desk (seen edge-on), its fringe
+  r(92, 137, 150, 3, '#7a3a5a'); r(92, 137, 150, 1, '#94506e'); for (let x = 92; x < 242; x += 3) r(x, 140, 1, 1, '#94506e');
+  // left: a poster (taped), a shelf with books, a round clock and a little plant; a guitar against the wall
+  r(30, 36, 36, 28, '#18172a'); r(31, 37, 34, 26, '#2d2c52'); r(33, 39, 30, 14, '#3b3a6a');
+  for (const [x, y] of [[44, 42], [46, 41], [48, 42], [43, 43], [49, 43], [44, 44], [48, 44], [45, 45], [47, 45], [46, 46]]) r(x, y, 1, 1, '#ff7fae');
+  r(42, 43, 1, 1, '#ff7fae'); r(50, 43, 1, 1, '#ff7fae'); r(46, 43, 1, 1, '#ffc6d9');
+  r(34, 55, 22, 2, '#ff7fae'); r(34, 59, 14, 1, '#6fd8ff'); r(29, 35, 4, 2, '#e8e0c8'); r(63, 35, 4, 2, '#e8e0c8'); r(29, 63, 4, 2, '#e8e0c8'); r(63, 63, 4, 2, '#e8e0c8');
+  r(20, 86, 80, 3, '#5a4030'); r(20, 86, 80, 1, '#6e5038'); r(24, 89, 2, 4, '#3a2a22'); r(94, 89, 2, 4, '#3a2a22');
+  const books = [[8, 16, '#7a3a4a'], [6, 14, '#3a5a7a'], [7, 17, '#5a4a7a'], [5, 12, '#8a6a3a'], [7, 15, '#3a6a5a'], [6, 13, '#6a3a5a']];
+  let bx = 23; for (const [w, h, c] of books) { r(bx, 86 - h, w, h, c); r(bx, 86 - h, 1, h, '#a89cb8'); r(bx + 1, 86 - h + 3, w - 2, 1, '#e8d8b0'); bx += w + 1; }
+  r(bx + 1, 77, 7, 9, '#4a3a5a'); r(bx + 1, 86 - 9, 7, 1, '#5e4e70');   // a leaning book
+  const cx0 = 76, cy0 = 76; for (let y = -5; y <= 5; y++) for (let x = -5; x <= 5; x++) { const d = Math.hypot(x, y); if (d <= 5.4) r(cx0 + x, cy0 + y, 1, 1, d > 4.3 ? '#c8c0b0' : '#efe8da'); }
+  r(cx0, cy0 - 3, 1, 3, '#2a2430'); r(cx0, cy0, 3, 1, '#2a2430'); r(cx0 - 1, cy0 + 5, 3, 1, '#a09888'); r(cx0 - 3, cy0 + 6, 7, 4, '#a09888');
+  r(86, 80, 8, 6, '#a0603a'); r(86, 80, 8, 1, '#b8744a'); for (const [x, y, w] of [[89, 72, 2], [86, 74, 3], [91, 74, 3], [85, 77, 4], [90, 76, 4], [88, 70, 2]]) { r(x, y, w, 2, '#4f8a4a'); r(x, y, 1, 1, '#6fae5a'); }
+  // the guitar: an acoustic, body two rounds, the sound hole, frets, the headstock
+  const gx = 26, gy = 122;
+  for (let y = -16; y <= 16; y++) for (let x = -11; x <= 11; x++) { const up = Math.hypot(x / 8, (y + 7) / 8), lo = Math.hypot(x / 11, (y - 6) / 10); if (up <= 1 || lo <= 1) r(gx + x, gy + y, 1, 1, (x > 5 || y > 12) ? '#7a4426' : x < -6 ? '#c47a48' : '#a8613a'); }
+  for (let y = -3; y <= 3; y++) for (let x = -3; x <= 3; x++) if (Math.hypot(x, y) <= 3) r(gx + x, gy - 2 + y, 1, 1, '#241410');
+  r(gx - 4, gy + 9, 9, 2, '#3a2418'); r(gx - 1, gy - 58, 3, 42, '#5a3a24'); r(gx, gy - 58, 1, 42, '#7a5234'); for (let k = 0; k < 7; k++) r(gx - 1, gy - 54 + k * 6, 3, 1, '#c8b890');
+  r(gx - 2, gy - 66, 5, 8, '#3a2418'); r(gx - 3, gy - 64, 1, 1, '#d8d0c0'); r(gx + 3, gy - 62, 1, 1, '#d8d0c0'); r(gx - 3, gy - 60, 1, 1, '#d8d0c0');
+  r(gx - 10, gy + 15, 22, 2, '#1a1220');
+  // the window: frame, a cross bar, the sill, curtains either side (their folds)
+  const Wn = ROOM_WIN; r(Wn.x - 4, Wn.y - 4, Wn.w + 8, Wn.h + 8, '#3e3656'); r(Wn.x - 4, Wn.y - 4, Wn.w + 8, 1, '#544a72'); b.clearRect(Wn.x, Wn.y, Wn.w, Wn.h);
+  r(Wn.x + Wn.w / 2 - 1, Wn.y, 2, Wn.h, '#3e3656'); r(Wn.x, Wn.y + 24, Wn.w, 2, '#3e3656'); r(Wn.x - 7, Wn.y + Wn.h + 4, Wn.w + 14, 3, '#55496e'); r(Wn.x - 7, Wn.y + Wn.h + 4, Wn.w + 14, 1, '#6a5c86');
+  r(Wn.x - 14, Wn.y - 8, Wn.w + 28, 2, '#2a2436');
+  for (const [cx, w] of [[Wn.x - 13, 11], [Wn.x + Wn.w + 2, 11]]) { r(cx, Wn.y - 6, w, Wn.h + 18, '#4a3a6a'); for (let k = 1; k < w; k += 3) r(cx + k, Wn.y - 6, 1, Wn.h + 18, '#3a2c56'); r(cx, Wn.y - 6, w, 1, '#5e4c82'); }
+  // the bed: frame, mattress, a duvet with its folds, the pillow, a headboard
+  r(318, 104, 4, 34, '#4a3628'); r(318, 104, 4, 1, '#5e4634');
+  r(320, 120, 52, 4, '#4a3628'); r(322, 124, 3, 12, '#3a2a20'); r(366, 124, 3, 12, '#3a2a20');
+  r(320, 113, 52, 7, '#c8c0d8'); r(320, 113, 52, 1, '#e0dae8');
+  r(334, 108, 38, 9, '#6a4c86'); r(334, 108, 38, 1, '#8466a0'); for (const x of [344, 356]) r(x, 109, 1, 8, '#56397a'); r(334, 116, 38, 2, '#56397a');
+  r(322, 106, 13, 7, '#efe8f2'); r(322, 106, 13, 1, '#ffffff'); r(323, 112, 11, 1, '#c8c0d8');
+  // the desk: top (a lit edge), legs, a drawer unit with handles
+  r(148, 106, 100, 4, '#5e4232'); r(148, 106, 100, 1, '#7a5a44'); r(148, 109, 100, 1, '#3e2a20');
+  r(150, 110, 3, 28, '#4a3426'); r(150, 110, 1, 28, '#5a4030'); r(244, 110, 3, 28, '#4a3426');
+  r(210, 110, 32, 26, '#4e3828'); r(210, 110, 32, 1, '#5e4634'); r(210, 122, 32, 1, '#3a2a20'); r(224, 115, 5, 1, '#9a7a5a'); r(224, 128, 5, 1, '#9a7a5a');
+  // on the desk: a speaker, the mug (steam is drawn live), the lamp's base and arm
+  r(204, 92, 10, 14, '#22242e'); r(205, 93, 8, 12, '#2c2f3a'); for (const [y, rr] of [[96, 2], [102, 3]]) for (let yy = -rr; yy <= rr; yy++) for (let xx = -rr; xx <= rr; xx++) if (Math.hypot(xx, yy) <= rr) r(209 + xx, y + yy, 1, 1, yy < 0 ? '#4a4e5e' : '#16171e');
+  r(219, 99, 7, 7, '#e8dcd0'); r(219, 99, 7, 1, '#ffffff'); r(226, 101, 2, 3, '#e8dcd0'); r(220, 100, 5, 1, '#5a3424');
+  r(232, 103, 12, 3, '#2a2c36'); r(232, 103, 12, 1, '#3a3c48'); r(236, 82, 2, 21, '#2a2c36'); r(236, 82, 10, 2, '#2a2c36'); r(242, 84, 8, 4, '#3a3c48'); r(242, 84, 8, 1, '#4e5060');
+  // the chair: star base on wheels, the gas lift, the seat cushion, the back; his work vest hung on it
+  r(108, 136, 34, 2, '#1e1e28'); r(108, 138, 3, 2, '#111118'); r(124, 138, 3, 2, '#111118'); r(139, 138, 3, 2, '#111118');
+  r(123, 123, 4, 13, '#2a2a34'); r(124, 123, 1, 13, '#3a3a46');
+  r(108, 119, 36, 5, '#2e2e3c'); r(108, 119, 36, 1, '#40404f'); r(109, 123, 34, 1, '#22222c');
+  r(108, 86, 6, 34, '#2e2e3c'); r(108, 86, 6, 1, '#40404f'); r(109, 88, 1, 30, '#3a3a48');
+  r(104, 88, 12, 22, '#a8b43a'); r(104, 88, 12, 1, '#c4d04c'); r(104, 98, 12, 2, '#c8c8b8'); r(106, 110, 8, 4, '#a8b43a'); r(115, 89, 1, 20, '#848e2c'); r(104, 89, 1, 20, '#bcc84a'); r(108, 92, 1, 16, '#8e9830');
 })();
 function drawRoomSky(p) {
   // night going to dawn in the window, as the beat fills up (p 0-1)
@@ -2800,39 +2832,80 @@ function drawRoomMemory(kind, a, x, y, nowMs) {
   g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(255,110,160,.18)'; g.fillRect(x + 1, y + 1, 56, 32);
   g.restore();
 }
+// 지우 sitting at his desk, from the side, facing right (his own sprite for this scene: the standing one cannot sit). Hoodie,
+// jeans, slippers; headphones; his hand on the pad. (hx, hy) = the back of his seat; nod drops his head a pixel on the beat,
+// press pushes the hand down a pixel as he sets a clip down
+function drawJiwooSeated(hx, hy, nod, press) {
+  const P = (x, y, w, h, c) => R(hx + x, hy + y, w, h, c);
+  const HD = '#6b2f3f', HDd = '#4a2030', HDl = '#86405a', JE = '#4a5f8f', JEd = '#34446c', JEl = '#6a80b0', SK = C.skin, SKd = '#c98e6c', HA = '#2a1d1a';
+  // the legs: thigh along the seat, the shin down to the floor, a slipper
+  P(0, -6, 18, 6, JE); P(0, -6, 18, 1, JEl); P(0, -1, 16, 1, JEd); P(17, -5, 3, 5, JE); P(19, -4, 1, 4, JEd);   // the thigh, the knee
+  P(15, 0, 5, 16, JE); P(19, 0, 1, 16, JEd); P(16, 0, 1, 15, JEl); P(15, 3, 4, 1, JEd); P(14, 15, 6, 3, JEd); P(14, 15, 6, 1, JE);   // the shin, a fold, the turn-up
+  P(13, 18, 10, 3, '#e8e4dc'); P(13, 18, 10, 1, '#ffffff'); P(13, 20, 10, 1, '#b8b4ac');
+  // the hoodie: a slight lean forward, the pocket, the hem, a drawstring
+  for (let y = -32; y < -4; y++) { const lean = Math.floor((-4 - y) / 9), w = 12; P(-1 + lean, y, w, 1, HD); P(-1 + lean, y, 1, 1, HDd); P(w - 2 + lean, y, 1, 1, HDl); }
+  P(-1, -6, 13, 2, HDd); P(3, -14, 8, 1, HDd); P(3, -14, 1, 6, HDd);
+  P(9, -30 + nod, 1, 6, '#e8e0d0');
+  // the hood bunched at the back of his neck
+  P(-2, -36 + nod, 8, 6, HDd); P(-1, -35 + nod, 6, 4, HD);
+  // the head: hair, ear (under the headphones), face in profile: eye, brow, nose, mouth
+  const y0 = -50 + nod;
+  P(2, y0 + 3, 12, 12, SK); P(2, y0 + 3, 3, 12, SKd);
+  P(1, y0, 13, 5, HA); P(0, y0 + 2, 4, 9, HA); P(12, y0 + 1, 3, 3, HA); P(3, y0 - 1, 9, 1, HA); P(13, y0 + 4, 1, 1, HA);
+  P(14, y0 + 8, 1, 2, SK); P(12, y0 + 7, 1, 2, '#1b1716'); P(11, y0 + 6, 3, 1, HA); P(12, y0 + 12, 2, 1, '#b86a58');
+  P(3, y0 + 15, 7, 2, SKd);
+  // headphones: the band over the top, the cup over his ear (a pink ring)
+  P(4, y0 - 2, 8, 1, '#1e2028'); P(3, y0 - 1, 1, 3, '#1e2028'); P(12, y0 - 1, 1, 3, '#1e2028');
+  P(3, y0 + 4, 6, 8, '#1e2028'); P(4, y0 + 5, 4, 6, '#30333e'); P(5, y0 + 6, 2, 4, '#ff7fae');
+  // the arm: shoulder, elbow down by his side, the forearm out to the pad, the hand
+  const sx = hx + 6, sy = hy - 28 + nod, ex = hx + 12, ey = hy - 17, wx = hx + 27, wy = hy - 16 + press;
+  thick(sx, sy, ex, ey, 4, HD); thick(ex, ey, wx - 2, wy, 4, HD); R(sx - 1, sy - 2, 4, 2, HDl);
+  R(wx - 3, wy - 2, 4, 3, SK); R(wx + 1, wy - 1, 2, 2, SK); R(wx - 3, wy + 1, 4, 1, SKd);
+}
 function drawRoom15(t, nowMs, b, post) {
   const Rm = L.room, spb = 60 / 90, beatK = post ? 0 : Math.max(0, 1 - (b % 1) * 3), stopped = b >= Rm.stop;
   const prog = Math.max(0, Math.min(1, (b - Rm.from) / (Rm.stop - Rm.from))), press = Math.max(0, 1 - (nowMs - lastPress) / 140);
   g.save();
   // the room, cut open; the sky in its window
   drawRoomSky(prog); g.drawImage(bgRoom15, 0, 0);
-  // the lamp's warm light on the desk, the laptop's cold light on him
+  // the dawn coming in through the window: a pale slant of light on the wall and the floor, stronger as it gets light
+  g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.05 + 0.13 * prog;
+  g.fillStyle = '#ffb8a0'; g.beginPath(); g.moveTo(ROOM_WIN.x, ROOM_WIN.y + ROOM_WIN.h); g.lineTo(ROOM_WIN.x + ROOM_WIN.w, ROOM_WIN.y + ROOM_WIN.h); g.lineTo(ROOM_WIN.x + ROOM_WIN.w - 40, 140); g.lineTo(ROOM_WIN.x - 70, 140); g.closePath(); g.fill(); g.restore();
+  // fairy lights along the ceiling, twinkling slowly
+  for (let k = 0; k < 24; k++) {
+    const x = 16 + k * 15, sag = Math.sin(((x - 16) % 90) / 90 * Math.PI) * 5, y = Math.round(22 + sag);
+    if (k < 23) { const nx = x + 15, ny = 22 + Math.sin(((nx - 16) % 90) / 90 * Math.PI) * 5; for (let q = 1; q < 15; q += 2) R(x + q, Math.round(lerp(y, ny, q / 15)), 1, 1, '#151320'); }
+    const c = ['#ffd27a', '#ff9cc2', '#9fe0ff', '#c8f0a0'][k % 4], tw = 0.55 + 0.45 * Math.sin(nowMs / 700 + k * 1.7);
+    R(x, y + 1, 2, 2, c); g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.25 * tw; R(x - 2, y - 1, 6, 6, c); g.restore();
+  }
+  // the lamp's warm light on the desk (dust drifting in it), the laptop's cold light on him
   g.save(); g.globalCompositeOperation = 'lighter';
-  const lc = g.createLinearGradient(0, 86, 0, 108); lc.addColorStop(0, 'rgba(255,214,150,.3)'); lc.addColorStop(1, 'rgba(255,214,150,.05)');
-  g.fillStyle = lc; g.beginPath(); g.moveTo(240, 86); g.lineTo(249, 86); g.lineTo(256, 106); g.lineTo(212, 106); g.closePath(); g.fill();
-  const sg = g.createRadialGradient(160, 90, 4, 160, 90, 64); sg.addColorStop(0, `rgba(110,170,255,${0.28 + 0.08 * beatK + 0.12 * press})`); sg.addColorStop(1, 'rgba(110,170,255,0)'); g.fillStyle = sg; g.fillRect(90, 30, 140, 120);
+  const lc = g.createLinearGradient(0, 88, 0, 106); lc.addColorStop(0, 'rgba(255,214,150,.32)'); lc.addColorStop(1, 'rgba(255,214,150,.06)');
+  g.fillStyle = lc; g.beginPath(); g.moveTo(242, 88); g.lineTo(250, 88); g.lineTo(258, 106); g.lineTo(216, 106); g.closePath(); g.fill();
+  for (let k = 0; k < 5; k++) { const q = (nowMs / 6000 + k / 5) % 1; g.globalAlpha = Math.sin(Math.PI * q) * 0.6; R(Math.round(226 + k * 6 + Math.sin(q * 6 + k) * 3), Math.round(104 - q * 14), 1, 1, '#fff0d0'); }
+  g.globalAlpha = 1;
+  const sg = g.createRadialGradient(166, 88, 4, 166, 88, 60); sg.addColorStop(0, `rgba(110,170,255,${0.3 + 0.08 * beatK + 0.12 * press})`); sg.addColorStop(1, 'rgba(110,170,255,0)'); g.fillStyle = sg; g.fillRect(100, 30, 130, 116);
   g.restore();
-  // the pad and the laptop (from the side: its screen edge-on, lit toward him)
-  const pd = Math.round(press * 1);
-  R(150, 103 + pd, 16, 3, '#2a2c36'); for (let k = 0; k < 3; k++) R(152 + k * 5, 102 + pd, 3, 1, k === 1 && press > 0 ? '#ffffff' : ['#ff9cc2', '#6fd8ff', '#ffe27a'][k]);
-  R(170, 104, 30, 2, '#9aa0b0'); R(170, 103, 30, 1, '#b8bcc8');
-  g.save(); g.translate(171, 104); g.rotate(-0.22); R(-2, -22, 2, 22, '#3a3d4a'); R(-3, -22, 1, 22, `rgba(160,200,255,${0.7 + 0.3 * beatK})`); g.restore();
-  // 지우 on his chair, headphones on, nodding on the beat, his hand on the pad
-  const nod = post || stopped ? 0 : Math.round(beatK * 1.4), jx = ROOM.jx;
-  g.save(); g.translate(0, -24);
-  drawActor('jiwoo', jx, false, { ...standPose(0), nod }, nowMs, false, top => {
-    R(BOSS_X - 6, top + 56, 20, 7, '#2a2530'); R(BOSS_X + 9, top + 62, 6, 18, '#2a2530'); R(BOSS_X + 9, top + 79, 9, 3, '#1b1716');
-    const hx = 158 - (jx - BOSS_X), hy = 102 + 24 - nod + pd;
-    thick(BOSS_X + 3, top + 24, hx, hy - 1, 4, '#6b2f3f'); R(hx - 1, hy - 3, 4, 3, C.skin);
-    R(BOSS_X - 7, top - 4, 14, 2, '#22262e'); R(BOSS_X - 8, top - 3, 2, 6, '#22262e'); R(BOSS_X - 3, top + 4, 5, 8, '#22262e'); R(BOSS_X - 2, top + 6, 3, 4, '#ff7fae');
-  });
-  g.restore();
+  // steam off the mug
+  for (let k = 0; k < 3; k++) { const q = (nowMs / 2200 + k / 3) % 1; g.globalAlpha = Math.sin(Math.PI * q) * 0.35; R(Math.round(222 + Math.sin(q * 7 + k) * 2), Math.round(97 - q * 12), 1, 2, '#e8e0f0'); }
+  g.globalAlpha = 1;
+  // the pad (three pads light as he plays) and the laptop, open, from the side: the screen tilted back, lit toward him
+  const pd = press > 0.3 ? 1 : 0, hit = Math.floor(lastPress / 7) % 3;
+  R(150, 103, 18, 3, '#22242e'); R(150, 103, 18, 1, '#3a3c48'); for (let k = 0; k < 3; k++) R(152 + k * 5, 102, 4, 1, press > 0 && k === hit ? '#ffffff' : ['#ff9cc2', '#6fd8ff', '#ffe27a'][k]);
+  R(174, 104, 28, 2, '#a8acb8'); R(174, 104, 28, 1, '#c8ccd6'); R(175, 106, 26, 0.5, '#5a5e6a');
+  g.save(); g.translate(175, 104); g.rotate(-0.26);
+  R(-2, -23, 3, 23, '#3a3d4a'); R(-3, -23, 1, 23, `rgba(170,210,255,${0.75 + 0.25 * beatK})`); R(-2, -23, 3, 1, '#5a5e6a'); g.restore();
+  // his headphone cable, down to the laptop
+  { const [hx, hy] = ROOM.hip; for (let q = 0; q <= 1; q += 0.01) R(Math.round(lerp(hx + 6, 176, q)), Math.round(lerp(hy - 39, 103, q) + Math.sin(q * Math.PI) * 10), 1, 1, '#101018'); }
+  // 지우
+  const nod = post || stopped ? 0 : beatK > 0.5 ? 1 : 0;
+  drawJiwooSeated(ROOM.hip[0], ROOM.hip[1], nod, pd);
   // the night coming back: a thought over his head, up by the ceiling
   const mem = Rm.memories.find(([mb]) => b >= mb && b < mb + 7);
   if (mem && !stopped) {
     const ma = Math.min(1, (b - mem[0]) / 0.6) * Math.min(1, (mem[0] + 7 - b) / 1);
-    g.save(); g.globalAlpha = ma; for (const [dx, dy, r] of [[118, 56, 3], [123, 50, 2], [127, 46, 2]]) R(dx, dy, r, r, '#c8a0b8'); g.restore();
-    drawRoomMemory(mem[1], ma, 58, 22, nowMs);
+    g.save(); g.globalAlpha = ma; for (const [dx, dy, r] of [[118, 62, 3], [113, 57, 2], [109, 53, 2]]) R(dx, dy, r, r, '#c8a0b8'); g.restore();
+    drawRoomMemory(mem[1], ma, 48, 26, nowMs);
   }
   // ---- the music app, down below, centred, a row per instrument
   const tk = Rm.tracks, rh = ROOM.rh, PW = ROOM.pw, x0 = Math.round((W - PW) / 2), x1 = x0 + PW, px = x0 + ROOM.play, lx = x0 + ROOM.names;
@@ -2842,37 +2915,50 @@ function drawRoom15(t, nowMs, b, post) {
   const recK = tk.reduce((m, tr, k) => (b >= tr[0] ? k : m), -1), shown = grow.filter(q => q > 0).length;
   const rowOf = beat => { let k = 0; tk.forEach((tr, i) => { if (beat >= tr[0]) k = i; }); return k; };
   const colOf = lane => (lane ? '#6fd8ff' : '#ff9cc2');
-  // the window: a soft shadow, the frame, its title bar
-  g.save(); g.globalAlpha = 0.5; R(x0 + 2, y0 + 3, PW, ph, '#000000'); g.globalAlpha = 1; g.restore();
-  R(x0 - 1, y0 - 1, PW + 2, ph + 2, '#0a0c12'); R(x0, y0, PW, ph, '#121a2c'); R(x0, y0, PW, ROOM.head - 1, '#0c111e');
+  // the window: a soft shadow, the frame (corners cut), its title bar, and a ruler with the bar numbers going by
+  const ry0 = ry, rowsH = Math.max(1, rowsF) * rh;
+  g.save(); g.globalAlpha = 0.45; R(x0 + 3, y0 + 4, PW, ph, '#000000'); g.restore();
+  R(x0, y0 - 1, PW, ph + 2, '#2c3858'); R(x0 - 1, y0, PW + 2, ph, '#2c3858'); R(x0, y0, PW, ph, '#111827');
+  R(x0, y0, PW, 9, '#1a2238'); R(x0, y0, PW, 1, '#3a4870'); R(x0, y0 + 9, PW, 1, '#0a0e18');
   R(x0 + 4, y0 + 3, 3, 3, '#ff5f57'); R(x0 + 9, y0 + 3, 3, 3, '#febc2e'); R(x0 + 14, y0 + 3, 3, 3, '#28c840');
+  R(x0, y0 + 10, PW, 4, '#0d1322');
   g.save(); g.font = '700 6px sans-serif'; g.fillStyle = '#9aa6c8';
   g.fillText(stopped ? (b - Rm.stop >= 4.8 ? '■ 정지  새 비트.prj' : '■ 정지') : '● 녹음  제목 없음.prj', x0 + 22, y0 + 7);
   g.fillStyle = '#55607e'; g.fillText(`트랙 ${Math.max(0, recK + 1)}/${tk.length}`, x1 - 34, y0 + 7);
+  g.restore();
+  g.save(); g.beginPath(); g.rect(lx, y0 + 10, x1 - 2 - lx, 4); g.clip();
+  for (let bb = Math.floor(b) - 4; bb < b + 8; bb++) { if (bb < Rm.from) continue; const x = Math.round(px + (bb - b) * bpx); R(x, y0 + 12 + ((bb - Rm.from) % 4 ? 1 : 0), 1, (bb - Rm.from) % 4 ? 1 : 2, (bb - Rm.from) % 4 ? '#2a3452' : '#5a6890'); }
+  g.restore();
+  // the rows: name tab (lit when it plays), a red dot while it is recording, a level meter at the right
+  g.save(); g.font = '700 6px sans-serif';
   for (let k = 0; k < shown; k++) {
     const [at, name, pat, lane] = tk[k], y = ry + k * rh, rec = !stopped && k === recK && b < at + 16;
-    const live = b >= at, cell = Math.floor((b - at) * 4), hitNow = live && !rec && !stopped && pat[((cell % pat.length) + pat.length) % pat.length] === 'x' && ((b - at) * 4) % 1 < 0.8;
+    const live = b >= at, cell = Math.floor((b - at) * 4), on = pat[((cell % pat.length) + pat.length) % pat.length] === 'x', hitNow = live && !rec && !stopped && on && ((b - at) * 4) % 1 < 0.8;
     g.globalAlpha = grow[k];
-    R(x0 + 2, y, PW - 4, rh - 1, rec ? '#1e2c48' : '#172033');
-    R(x0 + 3, y + 1, 26, rh - 3, live ? colOf(lane) : '#2e3650'); g.globalAlpha = grow[k] * (live ? (hitNow ? 1 : 0.6) : 0.6);
-    g.fillStyle = '#121a2c'; g.fillText(name, x0 + 5, y + 6); g.globalAlpha = grow[k];
-    if (hitNow) R(x0 + 3, y + 1, 26, 1, '#ffffff');
-    if (rec && Math.floor(nowMs / 350) % 2) R(x0 + 26, y + 3, 2, 2, '#ff5040');
-    if (live && b < at + 1 && !post) { g.globalAlpha = (1 - (b - at)) * 0.6; R(x0 + 2, y, PW - 4, rh - 1, '#ffffff'); }
+    R(x0 + 2, y, PW - 4, rh - 1, rec ? '#1c2a46' : k % 2 ? '#141d30' : '#162034'); R(x0 + 2, y + rh - 1, PW - 4, 1, '#0c111e');
+    R(x0 + 3, y + 1, 26, rh - 3, live ? colOf(lane) : '#2e3650'); R(x0 + 3, y + 1, 26, 1, live ? '#ffffff' : '#3a4462'); R(x0 + 3, y + rh - 3, 26, 1, live ? (lane ? '#3a9ac8' : '#c86a92') : '#262c44');
+    g.globalAlpha = grow[k] * (live ? (hitNow || (rec && press > 0) ? 1 : 0.7) : 0.6); g.fillStyle = '#121a2c'; g.fillText(name, x0 + 5, y + 6); g.globalAlpha = grow[k];
+    if (rec && Math.floor(nowMs / 350) % 2) R(x0 + 25, y + 3, 2, 2, '#ff5040');
+    const lvl = !live || stopped ? 0 : rec ? press : hitNow ? 1 - (((b - at) * 4) % 1) : 0.12;
+    R(x1 - 6, y + 1, 3, rh - 3, '#0a0e18'); const lh = Math.round((rh - 3) * lvl); if (lh > 0) R(x1 - 6, y + rh - 2 - lh, 3, lh, lh > rh - 5 ? '#ffe27a' : '#8fd694');
+    if (live && b < at + 1 && !post) { g.globalAlpha = (1 - (b - at)) * 0.5; R(x0 + 2, y, PW - 4, rh - 1, '#ffffff'); }
     g.globalAlpha = 1;
   }
   g.restore();
-  const rowsH = Math.max(1, rowsF) * rh;
-  g.save(); g.beginPath(); g.rect(lx, ry, x1 - 2 - lx, rowsH); g.clip();
+  // a clip: a small region with rounded ends and a little waveform in it
+  const clip = (x, y, w, h, col, a, seed) => { g.globalAlpha = a; R(x + 1, y, w - 2, h, col); R(x, y + 1, 1, h - 2, col); R(x + w - 1, y + 1, 1, h - 2, col); R(x + 1, y, w - 2, 1, '#ffffff');
+    for (let k = 1; k < w - 1; k++) { const amp = Math.max(1, Math.round((h - 3) / 2 * (0.4 + 0.6 * Math.abs(Math.sin(seed * 3.1 + k * 1.7))) * (1 - k / w * 0.6))); R(x + k, y + Math.floor(h / 2) - Math.floor(amp / 2) + 1, 1, amp, '#121a2c'); }
+    g.globalAlpha = 1; };
+  g.save(); g.beginPath(); g.rect(lx, ry, x1 - 8 - lx, rowsH); g.clip();
   // the bar lines going by
-  for (let bb = Math.floor(b) - 4; bb < b + 8; bb++) { if (bb < Rm.from || bb % 4) continue; R(Math.round(px + (bb - b) * bpx), ry, 1, rowsH, '#253150'); }
+  for (let bb = Math.floor(b) - 4; bb < b + 8; bb++) { if (bb < Rm.from || (bb - Rm.from) % 4) continue; R(Math.round(px + (bb - b) * bpx), ry, 1, rowsH, '#253150'); }
   // the recorded loops: each row's pattern after its four bars, up to the stop
   for (let k = 0; k < shown; k++) {
     const [at, , pat, lane] = tk[k], y = ry + k * rh;
     for (let c = Math.floor((b - 2) * 4); c <= Math.ceil((b + TRAVEL + 0.5) * 4); c++) {
       const bb = c / 4; if (bb < at + 16 || bb >= Rm.stop) continue;
       const pc = ((Math.round((bb - at) * 4) % pat.length) + pat.length) % pat.length; if (pat[pc] !== 'x') continue;
-      g.globalAlpha = bb <= b ? 0.55 : 0.32; R(Math.round(px + (bb - b) * bpx) - 3, y + 2, 6, rh - 5, colOf(lane)); g.globalAlpha = 1;
+      clip(Math.round(px + (bb - b) * bpx) - 3, y + 1, 7, rh - 3, colOf(lane), (bb <= b ? 0.5 : 0.3) * grow[k], c);
     }
   }
   // the clips you set down: on the row of the instrument going in
@@ -2882,15 +2968,14 @@ function drawRoom15(t, nowMs, b, post) {
     const x = px + (n.arr - t) * v; if (x < lx - 10) continue;
     const y = ry + rowOf(n.beat) * rh + 1, col = n.state === 'miss' ? '#d8463b' : colOf(n.lane);
     const done = n.state === 'hit', ha = done ? t - n.hitAt : 9;
-    g.globalAlpha = done ? Math.max(0.55, 1 - ha * 1.2) : n.state === 'miss' ? 0.6 : 1;
-    R(Math.round(x - 4), y, 8, rh - 3, col); R(Math.round(x - 4), y, 8, 1, '#ffffff');
-    if (done && ha < 0.12) { g.globalAlpha = 1 - ha / 0.12; R(Math.round(x - 6), y - 2, 12, rh + 1, '#ffffff'); }
-    g.globalAlpha = 1;
+    clip(Math.round(x - 5), y, 10, rh - 3, col, done ? Math.max(0.55, 1 - ha * 1.2) : n.state === 'miss' ? 0.6 : 1, n.i);
+    if (done && ha < 0.12) { g.globalAlpha = 1 - ha / 0.12; R(Math.round(x - 7), y - 2, 14, rh + 1, '#ffffff'); g.globalAlpha = 1; }
   }
   g.restore();
-  // the playhead
-  R(px - 1, ry - 1, 2, rowsH + 1, miss ? '#ff5040' : flash > 0 ? '#ffffff' : '#ffe27a'); R(px - 3, ry - 3, 6, 2, miss ? '#ff5040' : '#ffe27a');
-  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(px - 6, ry, 12, rowsH, '#fff2b0'); g.restore(); }
+  // the playhead: a line with a little flag on the ruler
+  const phc = miss ? '#ff5040' : flash > 0 ? '#ffffff' : '#ffe27a';
+  R(px, y0 + 10, 1, rowsH + 5, phc); R(px - 2, y0 + 10, 5, 2, phc); R(px - 1, y0 + 12, 3, 1, phc);
+  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(px - 6, ry, 13, rowsH, '#fff2b0'); g.restore(); }
   // at the stop: saving it, over the app
   if (stopped) {
     const q = b - Rm.stop, name = q < 1.5 ? '하은'.slice(0, Math.min(2, Math.floor(q * 3) + 1)) : q < 2.6 ? (q < 2.1 ? '하' : '') : q < 4.5 ? '새 비트'.slice(0, Math.min(4, Math.floor((q - 2.6) * 4) + 1)) : '새 비트';
