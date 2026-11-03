@@ -2123,7 +2123,9 @@ const PARTNERS = {
       // her loading arm from the near shoulder (she faces the belt: the shoulder is at the right side of her body) or, for the
       // lower belt when she feeds both, the far one; her own size (it cannot stretch past its reach), 3 px sleeves; the hand,
       // the watch on the wrist
-      const sx = BOSS_X + (pose.left ? -7 : 7), sy = top + 17;
+      // (from whichever shoulder is on the hand's side: a box picked off the pile behind her is held from the back shoulder,
+      // so the arm never folds across her chest)
+      const left = pose.left || pose.hand.x < BOSS_X - 1, sx = BOSS_X + (left ? -7 : 7), sy = top + 17;
       if (pose.wave && !pose.carry) { thick(sx, sy, BOSS_X + 9, top + 2, 3, shirt); R(BOSS_X + 7, top - 2, 5, 5, glove); return; }
       const h = reachArm(sx, sy, pose.hand.x, pose.hand.y, shirt, pose.reach || 22, 3); R(h.x - 2, h.y - 2, 4, 4, glove);
       R(lerp(sx, h.x, 0.8) - 1, lerp(sy, h.y, 0.8) - 1, 3, 3, '#d8dde0');
