@@ -1068,19 +1068,20 @@ const LEVELS = [
     // the moment (love): his fumble (72, the song's near-silence) floats down at her and she catches it (59) and holds it up
     // (to 63); pink comes up round them; from then on he is smitten (hearts rising off him, his cheeks pink); his boxes in the
     // choruses carry hearts
-    // the meeting before the song (meet): he asks her to pass a box up (1); she lifts it up to him, slowly (3-8.5), holds it
-    // up there till he takes it, and as she lifts it her cap tips back and her face comes up out of its shadow (6-12; her eyes
-    // are never drawn): the camera close on her, a glockenspiel rising, a warm swell, his heart; then him, red to the ears (12)
-    meet: { lift: [3, 8.5], reveal: [6, 12] },
-    love: { fumble: 72, catch: 75, hold: [75, 79], moment: [71.5, 84], glow: [[84, 116], [148, 181]], smit: [[11.5, 200]], heart: [[84, 116], [148, 180]] },
+    // the meeting before the song (meet): he asks her to pass a box up (0.5); "박스? 그래." (3.4); she digs one out of the pile
+    // by her (4-7), lifts it up to him, slowly, her hand going with it (7-10.5), and holds it up there till he takes it
+    // (to 13.5); as she looks up with it her cap tips back and her face comes out of its shadow (8.5-14; her eyes are dots):
+    // the camera close on her, a glockenspiel rising, a warm swell, his heart; then him, red to the ears (13.6)
+    meet: { rummage: [4, 7], lift: [7, 10.5], hold: [10.5, 13.5], reveal: [8.5, 14] },
+    love: { fumble: 72, catch: 75, hold: [75, 79], moment: [71.5, 84], glow: [[84, 116], [148, 181]], smit: [[13, 200]], heart: [[84, 116], [148, 180]] },
     // the room (drawRoom15): from 200, the walk out fading to black before it (196-200); the stop at 328. Each layer that goes
     // in lights its name on the timeline, and a moment of the night comes back in the laptop's corner
     room: { from: 200, stop: 328, layers: [[204, '시계'], [216, '기타'], [232, '드럼'], [248, '베이스'], [264, '멜로디']],
       memories: [[216, 'face'], [232, 'catch'], [248, 'cap'], [264, 'watch'], [312, 'face']] },
-    act: { lookUp: [[36, 39], [76, 79], [142, 145]], upAtDrops: true, alarmAt: [[72, 73.5], [144.6, 146], [11.8, 13.6]] },
-    camPlay: [[0.5, 3, { x: 80, y: 96, k: 1.5 }], [3, 11.5, { x: 60, y: 96, k: 2.8 }], [11.5, 15.5, { x: 104, y: 80, k: 2.6 }],
+    act: { lookUp: [[36, 39], [76, 79], [142, 145]], upAtDrops: true, alarmAt: [[72, 73.5], [144.6, 146], [13.4, 15]] },
+    camPlay: [[0.3, 4, { x: 80, y: 96, k: 1.5 }], [4, 13.2, { x: 58, y: 104, k: 2.6 }], [13.2, 17.5, { x: 104, y: 80, k: 2.6 }],
       [71.5, 75, { x: 84, y: 100, k: 1.4 }], [75, 78.5, { x: 58, y: 104, k: 2.4 }], [78.5, 82, { x: 104, y: 84, k: 2.4 }]],
-    cutscene: [[0, 16], [71.5, 82], [182, 202], [328, 336]],
+    cutscene: [[0, 17.5], [71.5, 82], [182, 202], [328, 336]],
     devMarks: [[0, '처음 · 만남'], [20, 'Pink Belt'], [60, '자랑'], [72, '받아내기'], [84, '후렴 1'], [116, '2절'], [140, '빌드업'], [148, '마지막 후렴'], [182, '퇴근길'], [200, '지우의 방'], [232, '드럼'], [264, '멜로디'], [312, '마지막 네 마디']],
     // phase 1 (8 cells a bar): upper 지우 (in the choruses his heartbeat: a beat and its 'and'), lower 하은 and his boxes
     // that fall onto her belt while he stares at her ('d'); phase 2 (16 cells a bar): the clips on his timeline, the top
@@ -1112,7 +1113,7 @@ const LEVELS = [
       'xx..x...x...x...', 'xx..x...x...x...', 'xx..x...x...x.x.', 'xx..x...x...x.x.', 'xx..x...x...x.x.', 'xx..x...x...x.x.', 'x...............', '................'
     ],
     // [beat, text, beats shown, lane, speaker] ('r': 지우 in his room)
-    say: [[1, '누나, 혹시 박스 좀 올려줄래요?', 2.8, 0, 'j'], [12, '어… 어, 고… 고마워요.', 3.4, 0, 'j'],
+    say: [[0.5, '누나, 혹시 박스 좀 올려줄래요?', 2.7, 0, 'j'], [3.4, '박스? 그래.', 1.8, 1, 'h'], [13.6, '어… 어, 고… 고마워요.', 3.4, 0, 'j'],
           [29, '형… 하은 누나요. 원래 2라인이에요?', 3, 0, 'j'], [36.5, '…일해.', 1.8, 1, 'h'], [40, '아, 넵! 일해요, 일!', 2.5, 0, 'j'],
           [48, '(와… 손 진짜 빠르다…)', 3, 0, 'j'], [60.5, '형, 봐요. 저도 빨라요—', 3, 0, 'j'],
           // the moment
@@ -1902,7 +1903,8 @@ function act15(p, t, lane) {
     if (inRange(b, A.tap)) p.tapK = Math.max(0, 1 - ph * 4);
     if (inRange(b, A.lookUp)) p.up = true;
     // 1-5's meeting: her arm up passing him the box; her face as it comes up
-    if (L.meet && b >= L.meet.lift[0] && b < L.meet.reveal[1]) { p.wave = true; p.carry = null; p.up = true; }
+    if (L.meet && inRange(b, [L.meet.rummage])) { p.hand = rummageHand(b, 1); p.dip = 3; p.wave = false; p.carry = null; p.bob = 0; }
+    if (L.meet && b >= L.meet.lift[0] && b < L.meet.hold[1]) { const q = meetBox(b); p.hand = { x: q.x - 2, y: q.y + 4 }; p.reach = 34; p.wave = false; p.carry = null; p.up = b >= L.meet.lift[0] + 1; }
     if (L.meet && b >= L.meet.reveal[0] && b < L.meet.reveal[1]) p.reveal = true;
     // 1-5: her hand up, holding the box she caught
     if (L.love && b >= L.love.hold[0] && b < L.love.hold[1]) { p.wave = true; p.carry = null; }
@@ -2347,7 +2349,7 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
   else if (o.up) { R(cx - 13, top + 3, 7, 2, brim); R(cx - 13, top + 3, 7, 1, cap); R(cx - 13, top + 5, 7, 1, capD); }
   else { R(cx - 13, top + 4, 7, 2, brim); R(cx - 13, top + 4, 7, 1, cap); R(cx - 13, top + 6, 7, 1, capD); }
   // the cap's shadow over her eyes, always: deep under the brim, softening down to the cheeks
-  if (o.reveal) { R(cx - 5, top + 4, 10, 1, '#5a3a32'); R(cx - 5, top + 5, 10, 1, '#8a5a44'); R(cx - 5, top + 6, 10, 3, C.skin); R(cx - 1, top + 8, 2, 1, '#e0a898'); }
+  if (o.reveal) { R(cx - 5, top + 4, 10, 1, '#5a3a32'); R(cx - 5, top + 5, 10, 1, '#8a5a44'); R(cx - 5, top + 6, 10, 3, C.skin); R(cx - 4, top + 7, 2, 2, C.ink); R(cx - 1, top + 9, 2, 1, '#e0a898'); }
   else if (o.up) { R(cx - 5, top + 6, 10, 1, '#3a2622'); R(cx - 5, top + 7, 10, 1, '#8a5a44'); R(cx - 4, top + 8, 2, 2, C.ink); }
   else { R(cx - 5, top + 6, 10, 3, '#3a2622'); R(cx - 5, top + 9, 10, 1, '#8a5a44'); }
   // a thin dark line down the front of her face, from under the brim to the chin
@@ -2419,6 +2421,14 @@ const sectionStart = name => { const x = (L.sections || []).find(z => z[1] === n
 const secStartAt = bar => { let s0 = -1; for (const [b0] of (L.sections || [])) if (bar >= b0) s0 = b0; return s0; };
 const battleAt = bar => { const B = L.battle; if (!B) return 'both'; if (B.h.some(([a, z]) => bar >= a && bar < z)) return 'h'; if (B.j.some(([a, z]) => bar >= a && bar < z)) return 'j'; return 'both'; };
 const sh15 = sec => sec === 'metal' || sec === 'together' || sec === 'finale' || sec === 'end' || sec === 'outro' ? (L.metalShift || 0) * 4 : 0;
+// 1-5's meeting: where the box she passes up to him is (lane-frame), from the pile by her, up over her head and onto the end
+// of the upper belt in front of her, slowly; her hand stays on it till he takes it
+function meetBox(b) {
+  const M = L.meet, p0 = Math.min(1, Math.max(0, (b - M.lift[0]) / (M.lift[1] - M.lift[0]))), p = p0 * p0 * (3 - 2 * p0);
+  // (all within her reach and clear of her face: up in front of her, then set down on the end of the upper belt, where he takes it)
+  const a = { x: 26, y: 122 }, c = { x: 70, y: 84 }, e = { x: 82, y: 103 };
+  return { x: Math.round((1 - p) * (1 - p) * a.x + 2 * (1 - p) * p * c.x + p * p * e.x), y: Math.round((1 - p) * (1 - p) * a.y + 2 * (1 - p) * p * c.y + p * p * e.y) };
+}
 // 1-5: falling for her. The box he fumbles floats down to her in slow motion and she catches it one-handed (L.love.fumble ->
 // catch) and holds it up; pink comes up round the room for the moment, and in the choruses a soft pink that beats like a
 // heart; hearts rise off him from the moment on
@@ -2442,7 +2452,9 @@ function drawLove15(t, nowMs) {
   const M = L.meet;
   if (M && b < M.reveal[1] + 2) {
     const o = placerOff(1), hx = BOSS_X + 9 + o.dx, hy = 86 + o.dy + 2, x1 = farX(PLACE_X), y1 = farY(BELT_Y) - 4;
-    if (b >= M.lift[0] && b < M.reveal[1]) { const p0 = Math.min(1, (b - M.lift[0]) / (M.lift[1] - M.lift[0])), p = p0 * p0 * (3 - 2 * p0); drawBox(STG.box, Math.round(lerp(hx, x1, p)), Math.round(lerp(hy + 2, y1, p) - Math.sin(Math.PI * p) * 10), '', t); }
+    // the pile by her stirring while she digs in it; then the box in her hand, going up to him
+    if (inRange(b, [M.rummage])) { const dx = Math.round(Math.sin(b * 17) * 2), dy = -Math.round(Math.abs(Math.sin(b * 9)) * 3); R(9 + dx, 119 + dy, 15, 13, C.kraft); R(9 + dx, 119 + dy, 15, 2, C.kraftTop); R(22 + dx, 121 + dy, 2, 11, C.kraftDark); R(15 + dx, 119 + dy, 3, 13, C.tape); }
+    if (b >= M.lift[0] && b < M.hold[1]) { const q = meetBox(b); drawBox(STG.box, q.x, q.y, '', t); }
     if (b >= M.reveal[0] && b < M.reveal[1] + 2) {
       const a = Math.min(1, (b - M.reveal[0]) / 1.2) * Math.min(1, (M.reveal[1] + 2 - b) / 2);
       g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(hx - 8, hy - 2, 2, hx - 8, hy - 2, 70); gr.addColorStop(0, `rgba(255,214,190,${0.35 * a})`); gr.addColorStop(1, 'rgba(255,150,190,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
