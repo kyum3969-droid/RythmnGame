@@ -1607,6 +1607,8 @@ const STAGE1 = [
   { level: LEVELS[3] },
   { level: LEVELS.find(l => l.id === 's1-5') },
   { level: LEVELS.find(l => l.id === 's1-6') },
+  // the finale is a page of its own (the opening, the heartbeat tutorial, the cutscene and its heartbeat lines): its card opens it
+  { no: '1-7', title: '하은의 새벽', role: '하은 · 반장 · 지우 · 62 BPM · 컷씬', tag: '피날레 · 심박 · 마지막 새벽', pid: 'haeun', href: 'cutscene-1-7.html' },
   ...LEVELS.filter(l => l.lab).map(level => ({ level, lab: true })),
   { level: LEVELS[4], stage2: true },
   { level: LEVELS[5] },
@@ -8559,7 +8561,7 @@ const cardsEl = $('cards');
 function buildCards() {
   cardsEl.innerHTML = '';
   STAGE1.forEach((it, i) => {
-    const lv = it.level, locked = !lv;
+    const lv = it.level, locked = !lv && !it.href;
     if (it.stage2) { const dv = document.createElement('div'); dv.className = 'divider'; dv.textContent = '스테이지 2 · 본선'; cardsEl.append(dv); }
     if (it.lab && !(STAGE1[i - 1] || {}).lab) { const dv = document.createElement('div'); dv.className = 'divider'; dv.textContent = '시안 · 벨트 변주'; cardsEl.append(dv); }
     const b = document.createElement('button'); b.type = 'button'; b.className = 'card' + (it.boss ? ' boss' : ''); b.style.setProperty('--tilt', ((i * 7) % 5 - 2) * 0.5 + 'deg');
@@ -8574,6 +8576,7 @@ function buildCards() {
     if (locked) { const lk = document.createElement('span'); lk.className = 'lock'; lk.textContent = '준비 중'; b.append(lk); }
     if (lv && progress[lv.id] != null) { const best = document.createElement('span'); best.className = 'best'; best.textContent = (progress[lv.id] * 100).toFixed(0) + '%'; b.append(best); }
     if (lv) b.addEventListener('click', e => { e.stopPropagation(); beginShift(lv); });
+    else if (it.href) b.addEventListener('click', e => { e.stopPropagation(); stopSong(); location.href = it.href; });
     cardsEl.append(b);
     const saved = g; g = c.getContext('2d'); g.fillStyle = it.boss ? '#3a1e1a' : '#2a211c'; g.fillRect(0, 0, 40, 64);
     const pid = lv ? lv.partners[0] : it.pid, P = PARTNERS[pid];
