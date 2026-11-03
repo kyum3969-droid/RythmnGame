@@ -1475,6 +1475,8 @@ function loadLevel(level) {
   notes.forEach((n, i) => prepNote(n, i, level));
   // 2-1's two lines are seen from further back: their boxes are made bigger so they still read
   if (level.mid) notes.forEach(n => { if (n.quad) { n.w = Math.round(n.w * 1.4); n.h = Math.round(n.h * 1.4); } });
+  // 2-1/2-2: a box with a mate on the other side on the same beat (both hands at once) is marked, and the two together hit big
+  if (level.mid) notes.forEach(n => { if (n.quad) n.mate = notes.find(m => m !== n && m.quad && m.q !== n.q && Math.abs(m.beat - n.beat) < 1e-6) || null; });
   // an X-ray box goes down whole: when its last item is at the loading end, the first is a span further on. Every item shares
   // the box's size and set-down; the hand carries it to the middle of that span.
   for (const gp of new Set(notes.filter(n => n.grp).map(n => n.grp))) {
@@ -3797,19 +3799,13 @@ function drawMid(t, nowMs, active) {
   // A scanned box rides on to the end and drops into the cart between the lines; a missed one tumbles off the end
   const flashOf = (q, up) => live && notes.some(n => n.quad && n.q === q && !!n.up === up && n.state === 'hit' && T - n.hitAt < 0.16) ? 1 : 0;
   const missOf = (q, up) => live && notes.some(n => n.quad && n.q === q && !!n.up === up && n.state === 'miss' && T - n.hitAt < 0.25);
+  const hitRings = [];
   const belt = (q, up) => {
     BELT_L = up ? 14 : 48; g.save(); if (up) { g.translate(0, LANE_DY[0]); farXform(); }
     drawScannerBack(0); drawBeltTop(L.rb ? rbBeltT(T) : T, live);
     if (live) drawLaserGlow(flashOf(q, up) * 0.6);
-    // the square rings that go out from the scanner on a hit (as on the one-belt screen), on the belt that was hit
-    if (live) for (const n of notes) {
-      if (!n.quad || n.q !== q || !!n.up !== up || n.state !== 'hit' || n.hitAt == null || n.judge == null) continue;
-      const a = (T - n.hitAt) / 0.42; if (a < 0 || a >= 1) continue;
-      const e = 1 - (1 - a) * (1 - a), s_ = 8 + e * 58, rc = THEME[fxTheme(n.beat)].ring[n.judge === 'good' ? 1 : 0];
-      g.globalAlpha = (1 - a) * 0.9; g.strokeStyle = rc; g.lineWidth = 2; g.strokeRect(Math.round(SCAN_X - s_) + 0.5, Math.round(BELT_Y - 8 - s_ * 0.6) + 0.5, Math.round(s_ * 2), Math.round(s_ * 1.2));
-      if (a < 0.5) { const s2 = 4 + e * 30; g.globalAlpha = (0.5 - a) * 1.4; g.lineWidth = 1; g.strokeRect(Math.round(SCAN_X - s2) + 0.5, Math.round(BELT_Y - 8 - s2 * 0.6) + 0.5, Math.round(s2 * 2), Math.round(s2 * 1.2)); }
-      g.globalAlpha = 1;
-    }
+    // the square rings that go out from the scanner on a hit (as on the one-belt screen) are drawn after the belts, unclipped
+    if (live) for (const n of notes) if (n.quad && n.q === q && !!n.up === up && n.state === 'hit' && n.hitAt != null && n.judge != null && T - n.hitAt < 0.42 && T >= n.hitAt) hitRings.push(n);
     const end = up ? SCAN_X + (AX - 8 - SCAN_X) / FAR.k : AX - 8;
     if (live) for (const n of notes) {
       if (!n.quad || n.q !== q || !!n.up !== up || T < n.place) continue;
@@ -3817,6 +3813,10 @@ function drawMid(t, nowMs, active) {
       if (n.state === 'hit') { if (x < end) drawBox(n, x, BELT_Y, '', T, T - n.hitAt < 0.1 ? 0.8 : 0); else { const dt = (x - end) / SPEED; if (dt < 0.5) { g.globalAlpha = 1 - dt / 0.5; drawBox(n, end, BELT_Y + 0.5 * 900 * dt * dt, '', T); g.globalAlpha = 1; } } continue; }
       if (n.state === 'miss') { if (x < end) drawBox(n, x, BELT_Y, 'miss', T); else { const dt = (x - end) / SPEED; if (dt < 0.6) { g.save(); g.globalAlpha = 1 - dt / 0.6; g.translate(end, BELT_Y + 0.5 * 700 * dt * dt - n.h / 2); g.rotate(dt * 5); drawBox(n, 0, n.h / 2, 'miss', T); g.restore(); } } continue; }
       drawBox(n, x, BELT_Y, '', T);
+      // a box with a mate on the other side: a bright edge and a little ◀▶ over it, bobbing on the beat
+      if (n.mate) { const w = n.w, h = n.h, x0 = Math.round(x - w / 2), y0 = BELT_Y - h, bob = Math.max(0, 1 - (b - Math.floor(b)) * 4) > 0.5 ? 1 : 0, ty = y0 - 7 - bob, cx = Math.round(x);
+        g.strokeStyle = '#fff3a8'; g.lineWidth = 1; g.strokeRect(x0 - 0.5, y0 - 0.5, w + 1, h + 1);
+        R(cx - 7, ty, 1, 1, '#fff3a8'); R(cx - 6, ty - 1, 1, 3, '#fff3a8'); R(cx - 5, ty - 2, 1, 5, '#fff3a8'); R(cx + 4, ty - 2, 1, 5, '#fff3a8'); R(cx + 5, ty - 1, 1, 3, '#fff3a8'); R(cx + 6, ty, 1, 1, '#fff3a8'); }
     }
     if (!up && q === 0 && held) drawBox(held.n, held.x, held.y + held.n.h / 2, '', T);
     drawBeltFront(L.rb ? rbBeltT(T) : T, live); if (up) drawBeltLegs();
@@ -3890,6 +3890,16 @@ function drawMid(t, nowMs, active) {
   if (!marco.up) drawMarco();
   drawPlayer(Math.max(pk(0), pk(1)), nowMs);
   mirror(0, () => belt(0, false)); mirror(1, () => belt(1, false));
+  // each hit's square rings out of its own scanner, over the floor (not cut at the middle); a pair's white and bigger, with a
+  // white flash in the scanner, so both hands at once show two
+  for (const n of hitRings) {
+    const a = (T - n.hitAt) / 0.42, pr = n.pairAt != null, e = 1 - (1 - a) * (1 - a), s_ = 8 + e * (pr ? 64 : 50), rc = pr ? '#ffffff' : THEME[fxTheme(n.beat)].ring[n.judge === 'good' ? 1 : 0];
+    g.save(); if (n.q) { g.translate(WW, 0); g.scale(-1, 1); } if (n.up) { g.translate(0, LANE_DY[0]); farXform(); }
+    if (pr && a < 0.35) { g.globalAlpha = 0.5 * (1 - a / 0.35); R(SCAN_X - 9, 108, 18, 40, '#ffffff'); }
+    g.globalAlpha = (1 - a) * 0.9; g.strokeStyle = rc; g.lineWidth = pr ? 3 : 2; g.strokeRect(Math.round(SCAN_X - s_) + 0.5, Math.round(BELT_Y - 8 - s_ * 0.6) + 0.5, Math.round(s_ * 2), Math.round(s_ * 1.2));
+    if (a < 0.5) { const s2 = 4 + e * (pr ? 40 : 30); g.globalAlpha = (0.5 - a) * 1.4; g.lineWidth = pr ? 2 : 1; g.strokeRect(Math.round(SCAN_X - s2) + 0.5, Math.round(BELT_Y - 8 - s2 * 0.6) + 0.5, Math.round(s2 * 2), Math.round(s2 * 1.2)); }
+    g.restore();
+  }
   // a thrown box in the air, from his hands to the belt it is meant for
   if (toss) {
     const k = Math.max(0, Math.min(1, (T - (toss.place - 0.3)) / 0.3)), side = toss.q ? -1 : 1, fx = marco.x + side * 10 * (marco.mir ? -1 : 1), fy = marco.dy + 104;
@@ -3941,7 +3951,8 @@ function drawMid(t, nowMs, active) {
   // of the screen in device pixels laid over it (each dot of the floor a whole number of device pixels where the framing allows)
   const dpr = window.devicePixelRatio || 1, hw = Math.max(W, Math.round(cv.clientWidth * dpr)), hh = Math.round(hw * H / W), k = hw / W;
   const want = W / (MID.ww - 70), mInt = Math.round(k * want), sEnd = mInt >= 2 && Math.abs(mInt / k - want) / want < 0.06 ? mInt / k : want, V = midView(b, sEnd), sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
-  const [jx, jy] = phaseJolt(bReal);
+  let [jx, jy] = phaseJolt(bReal);
+  if (FX.midPair && nowMs - FX.midPair.at < 170 && !reduce) { const k = FX.midPair.both ? 2 : 1; jx += Math.round((Math.random() * 2 - 1) * k); jy += Math.round((Math.random() * 2 - 1) * k); }
   MIDCAM = { sx, sy, sw, sh };
   if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx + jx, sy + jy, sw, sh, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); if (L.rb) rbCine(g, W, H, bReal, active); return; }
   if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
@@ -6890,6 +6901,7 @@ function judgeNote(target, t) {
     const dark = blackout(target.beat);
     const hype = inRange(target.beat, L.hype);
     if (!pairQuiet) popJudge(hype ? (isBam(target) ? 'bam' : 'hook') : j, milestone || (dark ? '소리로' : target.heavy ? '두 손' : j === 'good' ? (d < 0 ? '빠름' : '늦음') : ''), target.lane);
+    if (target.quad && target.mate && !target.len) { target.state = 'hit'; if (target.mate.state === 'hit' && target.mate.judge) midPairFx(target, target.mate); }
     if (target.len) { target.state = 'holding'; target.holdSide = L.oneButton ? PRESS_SIDE : null; if (inRange(target.beat, L.hype)) { startHypeHold(target.end - target.arr); } else startHold(target.beat); } else target.state = 'hit';
     if (inRange(target.beat, L.hype) && !target.len) hypeHit(target, j === 'perfect' && stats.combo % 4 === 0);
     if (L.practiceOf && TUT.phase === 'run' && TUT.run.includes(target) && TUT.run.every(n => n === target || n.state === 'hit')) tutSlow(target, t);
@@ -6919,6 +6931,13 @@ let pairQuiet = false;
 function hitPair(a, b, t) {
   judgeNote(a, t); pairQuiet = true; judgeNote(b, t); pairQuiet = false;
   if (a.state !== 'miss' && b.state !== 'miss') pairFx(a, b);
+}
+// 2-1/2-2: both hands on the same beat: big white rings out of both scanners, a white flash in both, the floor jolts, a thump
+function midPairFx(a, b) {
+  const now = performance.now(), both = a.judge === 'perfect' && b.judge === 'perfect';
+  a.pairAt = b.pairAt = a.hitAt; FX.midPair = { at: now, both };
+  popJudge('both', both ? '양손 딱!' : '양손', 0);
+  const tc = ctx.currentTime; thud(tc, both ? 1.3 : 0.9); noise(tc, 'bandpass', 2400, 0.18, 0.05, 1.5, bus);
 }
 // both gates fire at once: white rings on both belts, a flash, the room jolts, sparks from both scanners, and a chord on the organ
 function pairFx(a, b) {
