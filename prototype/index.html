@@ -1069,7 +1069,8 @@ const LEVELS = [
             { src: 'audio/1-5-new-beat.mp3', at: 208, lead: 0.1, gain: 1.0, sec: 'room' }],
     // the moment (love): his fumble (80, the song's near-silence) floats down at her and she catches it (59) and holds it up
     // (to 63); pink comes up round them; from then on he is smitten (hearts rising off him, his cheeks pink); his boxes in the
-    // choruses carry hearts
+    // choruses carry hearts; a spring breeze blows through as the song starts (breeze.gust), and petals drift for the rest of
+    // the shift (breeze.drift)
     // the meeting before the song (meet): he asks her to pass a box up (0.5); "박스? 그래." (3.4); she digs one out of the pile
     // by her (4-7), lifts it up to him, slowly, her hand going with it (7-10.5), and holds it up there till he takes it
     // (to 13.5); as she looks up with it her cap tips back and her face comes out of its shadow (8.5-14; her eyes are dots):
@@ -1078,7 +1079,8 @@ const LEVELS = [
     // pulling back, his heart beating and quietening, one thought; then 반장 walks in and snaps him out of it (23.1), and goes
     // off again muttering (27.5, the bubble going with him)
     meet: { rummage: [4, 7], lift: [7, 10.5], hold: [10.5, 13.5], reveal: [8.5, 14], linger: [15.5, 23.6] },
-    love: { fumble: 80, catch: 83, hold: [83, 87], moment: [79.5, 92], glow: [[92, 124], [156, 189]], smit: [[13, 208]], heart: [[92, 124], [156, 188]] },
+    love: { fumble: 80, catch: 83, hold: [83, 87], moment: [79.5, 92], glow: [[92, 124], [156, 189]], smit: [[13, 208]], heart: [[92, 124], [156, 188]],
+      breeze: { gust: [27.6, 33], drift: [31, 203] } },
     // the room (drawRoom15): from 208, the walk out fading to black before it (204-208); the stop at 336. He builds the beat an
     // instrument at a time, a new one every four bars (tracks: [beat it comes in, name, its pattern in 16ths, lane]): its row
     // appears on his timeline, you play it in for four bars (its clips), and from then on it loops on its row while the next
@@ -2453,6 +2455,59 @@ function meetBox(b) {
 // catch) and holds it up; pink comes up round the room for the moment, and in the choruses a soft pink that beats like a
 // heart; hearts rise off him from the moment on
 const LOVE = { fx: new Set(), lastB: -1e9 };
+// 1-5: a spring breeze through the loading bay as the song starts (love.breeze.gust): a gust of petals and a few wind lines
+// sweeping across from the left, a warm wash, the air and a few chimes; then, for the rest of the shift (drift), petals
+// drifting down across the line, a few more in the pink choruses. Every petal is a function of the beat (seeking works).
+const hash15 = (i, k) => { const v = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return v - Math.floor(v); };
+const PETAL15 = ['#ffb3cf', '#ff9cc2', '#ffc6d9', '#ffa8c6'];
+function petal15(x, y, spin, col, m = 1) {
+  // a petal turning over in the wind: wide (a little teardrop with a light edge), then edge-on, then wide again; m is its
+  // pixel size (2 for the few close to us)
+  x = Math.round(x); y = Math.round(y); const a = Math.abs(spin), P = (dx, dy, w, h, c) => R(x + dx * m, y + dy * m, w * m, h * m, c);
+  if (a > 0.6) { P(1, 0, 2, 1, col); P(0, 1, 4, 1, col); P(1, 2, 2, 1, col); P(spin > 0 ? 3 : 0, 1, 1, 1, '#fff0f5'); P(1, 0, 1, 1, '#ffe3ec'); }
+  else if (a > 0.25) { P(0, 0, 2, 1, col); P(0, 1, 3, 1, col); P(1, 2, 1, 1, col); }
+  else { P(0, 0, 1, 3, col); }
+}
+function breezeAir(T) {
+  // the air moving: soft band-passed noise swelling in and out, its colour sweeping up and back down
+  const s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), gn = ctx.createGain(), d = 2.6;
+  s.buffer = nbuf; s.loop = true; fl.type = 'bandpass'; fl.Q.value = 0.8;
+  fl.frequency.setValueAtTime(450, T); fl.frequency.exponentialRampToValueAtTime(1500, T + d * 0.45); fl.frequency.exponentialRampToValueAtTime(600, T + d);
+  gn.gain.setValueAtTime(0.0001, T); gn.gain.exponentialRampToValueAtTime(0.14, T + d * 0.4); gn.gain.exponentialRampToValueAtTime(0.0001, T + d);
+  s.connect(fl); fl.connect(gn); gn.connect(mus); s.start(T); s.stop(T + d + 0.05);
+  [[0.5, 1661.22], [0.75, 2217.46], [1.05, 1864.66], [1.4, 2793.83]].forEach(([dt, f], k) => bell15(T + dt, f, 1.1, 0.022 - k * 0.003));
+}
+function drawBreeze15(B, b, nowMs) {
+  const [g0, g1] = B.gust, few = reduce ? 0.3 : 1;
+  if (b >= g0 - 0.3 && b < g0 + 1 && !LOVE.fx.has('breeze') && ctx) { LOVE.fx.add('breeze'); breezeAir(ctx.currentTime + Math.max(0, (g0 - b) * SPB)); }
+  // the gust
+  if (b >= g0 - 0.5 && b < g1) {
+    const wash = Math.min(1, (b - g0) / 1) * Math.min(1, (g1 - b) / 1.5);
+    if (wash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,150,180,${0.07 * wash})`; g.fillRect(0, 0, W, H); g.restore(); }
+    for (let j = 0; j < 9; j++) {
+      const st = g0 - 0.3 + hash15(j, 7) * (g1 - g0 - 2), p = (b - st) / (0.9 + hash15(j, 8) * 0.6); if (p < 0 || p > 1) continue;
+      const hx = -40 + p * (W + 80), y = 20 + hash15(j, 9) * 160, len = 24 + Math.round(hash15(j, 10) * 30);
+      g.save(); g.globalAlpha = Math.sin(Math.PI * p) * 0.4; for (let k = 0; k < len; k += 2) R(Math.round(hx - k), Math.round(y + Math.sin((hx - k) * 0.05 + j) * 2), 2, 1, '#fff4f8'); g.restore();
+    }
+    const n = Math.round(56 * few);
+    for (let i = 0; i < n; i++) {
+      const st = g0 + hash15(i, 1) * (g1 - g0 - 2.4), p = (b - st) / (2.2 + hash15(i, 2) * 1.6); if (p < 0 || p > 1) continue;
+      const x = -12 + p * (W + 24), y = 8 + hash15(i, 3) * 176 + Math.sin(p * Math.PI * 2 * (1 + hash15(i, 4)) + i) * (6 + hash15(i, 5) * 10) + p * 14;
+      const m = i % 6 === 0 ? 2 : 1;   // a few close ones, bigger and quicker
+      g.globalAlpha = Math.min(1, p * 8, (1 - p) * 8); petal15(m === 2 ? x * 1.15 - 20 : x, y, Math.sin((b * 2 + i) * (3 + hash15(i, 6) * 3)), PETAL15[i % 4], m); g.globalAlpha = 1;
+    }
+  }
+  // the drift, for the rest of the shift
+  const [d0, d1] = B.drift; if (b < d0 || b >= d1) return;
+  const inA = Math.min(1, (b - d0) / 2) * Math.min(1, (d1 - b) / 4);
+  const glowA = (L.love.glow || []).reduce((m, [a, z]) => Math.max(m, Math.max(0, Math.min(1, (b - a) / 2, (z - b) / 2))), 0);
+  for (let i = 0; i < 14; i++) {
+    const a = inA * (i < 6 ? 1 : glowA) * (reduce && i % 3 ? 0 : 1); if (a <= 0) continue;
+    const P = 7 + hash15(i, 11) * 5, q = ((b / P) + hash15(i, 12)) % 1;
+    const x = -10 + q * (W + 20), y = -6 + q * (150 + hash15(i, 13) * 60) + Math.sin(q * Math.PI * 3 + i) * 8;
+    g.globalAlpha = a * Math.min(1, Math.sin(Math.PI * q) * 3) * 0.9; petal15(x, y, Math.sin((b + i) * (2 + hash15(i, 14) * 2)), PETAL15[i % 4], i === 3 || i === 9 ? 2 : 1); g.globalAlpha = 1;
+  }
+}
 const pxHeart = (x, y, c) => { R(x - 2, y, 2, 1, c); R(x + 1, y, 2, 1, c); R(x - 2, y + 1, 5, 1, c); R(x - 1, y + 2, 3, 1, c); R(x, y + 3, 1, 1, c); };
 function drawLove15(t, nowMs) {
   const V = L.love, b = beatAt(t), ph = b - Math.floor(b);
@@ -2468,6 +2523,7 @@ function drawLove15(t, nowMs) {
     const gr = g.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, 230); gr.addColorStop(0, 'rgba(255,120,170,0)'); gr.addColorStop(1, `rgba(255,120,170,${0.45 * k})`);
     g.fillStyle = gr; g.fillRect(0, 0, W, H); g.restore();
   }
+  if (V.breeze) drawBreeze15(V.breeze, b, nowMs);
   // the meeting: the box she passes up to him, and the moment her face shows - a warm light on her, sparkles, pink coming up
   const M = L.meet;
   if (M && b < M.reveal[1] + 2) {
