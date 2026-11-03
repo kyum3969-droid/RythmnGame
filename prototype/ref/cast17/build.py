@@ -1,159 +1,118 @@
-# Builds prototype/assets/cast17.png + cast17.json: the 1-7 cutscene's cast (지우, 하은, 반장, 신입) cut from the approved design
-# references in docs/art into rig parts and stills, all at 4x the game's dot size (1-7 draws at 4x: see RS in index.html).
+# Builds prototype/assets/cast17.png + cast17.json: 1-7's cast (지우, 하은, 반장, 신입) from the rookie-style pixel study
+# (docs/art/cast-rookie-style-study.png, read to its own dot grid by dots.py). One dot of the study is one dot of the game.
+# 지우 and 하은 are cut into rig parts (torso, thighs, shins, upper and lower arms); 반장 is a still (the coffee); 신입 is a
+# still with his scanner arm as its own layer. The study faces left; the rigs are flipped to face right (the game mirrors).
 # Run from the repo root:  python3 prototype/ref/cast17/build.py
-import json
+import json, re, sys
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
+sys.path.insert(0, 'prototype/ref/cast17')
+from dots import cut
 
-ART = 'docs/art/'
 OUT_PNG, OUT_JSON = 'prototype/assets/cast17.png', 'prototype/assets/cast17.json'
+FIG = {n: cut(n)[0] for n in ['rookie', 'jiwoo', 'haeun', 'boss']}
 
-def load(name, flip=False):
-    im = Image.open(ART + name).convert('RGBA')
-    return im.transpose(Image.FLIP_LEFT_RIGHT) if flip else im
+def rect_mask(shape, rects):
+    m = np.zeros(shape[:2], bool)
+    for x0, y0, x1, y1 in rects: m[y0:y1 + 1, x0:x1 + 1] = True
+    return m
 
-def shrink(im, size):
-    # premultiplied resize (no dark fringes), then a hard alpha edge like the rest of the game's dots
-    a = np.asarray(im).astype(np.float32) / 255
-    a[..., :3] *= a[..., 3:4]
-    s = np.asarray(Image.fromarray((a * 255 + 0.5).astype(np.uint8), 'RGBA').resize(size, Image.LANCZOS)).astype(np.float32) / 255
-    al = s[..., 3:4]
-    rgb = np.where(al > 0.004, s[..., :3] / np.maximum(al, 1e-3), 0)
-    return np.clip(np.concatenate([rgb, al], 2), 0, 1)
+def rig(fig, spec):
+    # spec in the study's own (left-facing) dot coordinates; every part is the figure's pixels inside its rects (minus
+    # 'not' rects); the torso is what no limb took (plus its own overlap rows). Flipped to face right at the end.
+    H, W = fig.shape[:2]; X = lambda x: W - 1 - x
+    taken = np.zeros((H, W), bool); parts = {}
+    def take(name, rects, minus=(), pivot=None, **pts):
+        m = rect_mask(fig.shape, rects) & (fig[..., 3] > 0)
+        if minus: m &= ~rect_mask(fig.shape, minus)
+        a = np.zeros_like(fig); a[m] = fig[m]
+        parts[name] = (a, pivot, pts); return m
+    # (arms first; the legs then leave out whatever the arms took, so a hanging hand is not cut into a thigh)
+    for name, (rects, minus, pivot, pts) in spec['limbs'].items():
+        leg = name.startswith('thigh') or name.startswith('shin')
+        if leg: minus = list(minus) + [(x, y, x, y) for y, x in zip(*np.nonzero(taken))]
+        m = take(name, rects, minus, pivot, **pts)
+        if not leg: taken |= m
+    legs_top = spec['legsTop']
+    t = fig.copy(); t[taken] = 0; t[legs_top + 2:] = 0
+    parts['torso'] = (t, spec['hip'], spec['torsoPts'])
+    # the far arm is mostly hidden behind the body in the study (a sliver at its side): drawn as the near arm, shaded, so it
+    # keeps its width when it swings out
+    for k in ('uarm', 'farm'):
+        a, pivot, pts = parts[k + 'N']; f = a.copy(); f[..., :3] = (f[..., :3] * 0.78).astype(np.uint8); parts[k + 'F'] = (f, pivot, pts)
+    out = {}
+    for name, (a, pivot, pts) in parts.items():
+        a = a[:, ::-1]   # face right
+        ys, xs = np.nonzero(a[..., 3])
+        x0, y0, x1, y1 = xs.min(), ys.min(), xs.max(), ys.max()
+        crop = a[y0:y1 + 1, x0:x1 + 1]
+        loc = lambda p: [X(p[0]) - x0 + 0.5, p[1] - y0 + 0.5]
+        e = {'arr': crop, 'pivot': loc(pivot)}
+        for k, v in pts.items(): e[k] = loc(v)
+        # a joint cap: the limb's colour at the joint, about half its width
+        jy, jx = int(e['pivot'][1]), int(e['pivot'][0])
+        if 0 <= jy < crop.shape[0]:
+            row = np.nonzero(crop[jy, :, 3])[0]
+            if len(row) >= 2:
+                c = crop[jy, (row[0] + row[-1]) // 2, :3]
+                e['cap'] = ['#%02x%02x%02x' % tuple(int(v) for v in c), round((row[-1] - row[0] + 1) * 0.45, 2), [jx, jy]]
+        out[name] = e
+    return out
 
-def to_img(arr, hard=None):
-    arr = arr.copy()
-    if hard is not None: arr[..., 3] = (arr[..., 3] > hard).astype(np.float32)
-    return Image.fromarray((arr * 255 + 0.5).astype(np.uint8), 'RGBA')
-
-def poly_mask(size, polys, off):
-    m = Image.new('L', size, 0); d = ImageDraw.Draw(m)
-    for p in polys: d.polygon([(x - off[0], y - off[1]) for x, y in p], fill=255)
-    return np.asarray(m) > 0
-
-class Char:
-    def __init__(self, src, k, flip=False):
-        self.im = load(src, flip); self.W = self.im.width; self.k = k; self.flip = flip; self.parts = {}
-    def X(self, x): return (self.W - 1 - x) if self.flip else x
-    def P(self, p): return (self.X(p[0]), p[1])
-    def poly(self, pts): return [self.P(p) for p in pts]
-
-    def part(self, name, rect, pivot, keep=None, cut=None, fill=None, shade=1.0, img=None, **pts):
-        # rect/keep/cut/pivot/pts are in the reference's own (unflipped) pixels
-        x0, y0, x1, y1 = rect
-        if self.flip: x0, x1 = self.X(x1), self.X(x0)
-        src = np.asarray((img or self.im).crop((x0, y0, x1, y1))).astype(np.float32) / 255
-        src = src.copy()
-        if keep is not None:
-            m = poly_mask((x1 - x0, y1 - y0), [self.poly(p) for p in keep], (x0, y0)); src[~m, 3] = 0
-        if cut is not None:
-            m = poly_mask((x1 - x0, y1 - y0), [self.poly(p) for p in cut], (x0, y0)); src[m, 3] = 0
-        if fill is not None: fill(src, (x0, y0))
-        if shade != 1.0: src[..., :3] *= shade
-        w, h = round((x1 - x0) * self.k), round((y1 - y0) * self.k)
-        arr = shrink(Image.fromarray((np.clip(src, 0, 1) * 255 + 0.5).astype(np.uint8), 'RGBA'), (w, h))
-        loc = lambda p: [round((self.P(p)[0] - x0) * self.k, 2), round((p[1] - y0) * self.k, 2)]
-        e = {'arr': arr, 'pivot': loc(pivot), **{k: loc(v) for k, v in pts.items()}}
-        # a joint cap (a disc of the cloth's own colour over the joint, so a bent knee or elbow shows no seam): its colour from
-        # the middle of the limb at the joint, its radius a little under half the limb's width there
-        jy = int(e['pivot'][1]); row = arr[min(arr.shape[0] - 1, jy + 2), :, 3] > 0.5; xs = np.nonzero(row)[0]
-        if len(xs):
-            mid = (xs[0] + xs[-1]) // 2; win = arr[max(0, jy - 2):jy + 6, max(0, mid - 3):mid + 4]; win = win[win[..., 3] > 0.5]
-            if len(win): e['cap'] = ['#%02x%02x%02x' % tuple(int(v * 255 + 0.5) for v in np.median(win[:, :3], 0)), round((xs[-1] - xs[0]) * 0.42, 1), [int(mid), jy]]
-        self.parts[name] = e
-        return self
-
-# ---------------- 지우 (faces right in the reference; the armless body and the two loose arms) ----------------
-J = Char('jiwoo-proportion-concept.png', 4 * 81 / 896)
-LEG_SPLIT = 720
-J.part('torso', (600, 60, 860, 600), (720, 578), keep=[[(600, 60), (860, 60), (860, 556), (600, 556)], [(630, 556), (810, 556), (810, 600), (630, 600)]],
-       nearSh=(660, 342), farSh=(792, 336), head=(745, 70), ear=(722, 212), hipN=(680, 578), hipF=(762, 578))
-J.part('thighN', (630, 552, LEG_SPLIT + 1, 745), (680, 578), knee=(680, 732))
-J.part('shinN', (630, 720, LEG_SPLIT + 4, 962), (680, 732), sole=(684, 958), toe=(716, 945))
-J.part('thighF', (LEG_SPLIT - 1, 552, 808, 745), (762, 578), knee=(762, 732), shade=0.82)
-J.part('shinF', (LEG_SPLIT - 1, 720, 836, 962), (762, 732), sole=(770, 958), toe=(826, 945), shade=0.82)
-J.part('uarmN', (1028, 294, 1124, 478), (1080, 336), elbow=(1080, 466))
-J.part('farmN', (1028, 452, 1124, 664), (1080, 466), hand=(1086, 630))
-J.part('uarmF', (1262, 294, 1370, 478), (1304, 336), elbow=(1304, 466), shade=0.8)
-J.part('farmF', (1262, 452, 1370, 664), (1304, 466), hand=(1306, 630), shade=0.8)
-
-# ---------------- 하은 (faces left in the reference: flipped here so every rig faces right) ----------------
-H = Char('haeun-concept.png', 4 * 74 / 720, flip=True)
-near_arm = [(434, 290), (484, 288), (486, 380), (488, 440), (490, 497), (430, 497), (428, 440), (434, 380)]
-far_arm = [(316, 290), (349, 292), (350, 330), (350, 400), (354, 440), (354, 497), (310, 497), (314, 420), (318, 330)]
-def haeun_fill(src, off):
-    # behind her near arm, row by row: blend from what is beside the arm on the body's side to what is on the far side
-    # (her hair, over the shoulder); where nothing is on the far side, the body's side carries on a little and stops
-    x0, y0 = off; h, w = src.shape[:2]
-    m = poly_mask((w, h), [H.poly(near_arm)], off)
-    for y in range(h):
-        xs = np.nonzero(m[y])[0]
-        if not len(xs): continue
-        a, z = xs[0], xs[-1]
-        # (flipped: the body's side is to the right of the arm in this array)
-        inner = src[y, min(w - 1, z + 2)].copy(); outer = src[y, max(0, a - 2)].copy()
-        for x in range(a, z + 1):
-            q = (z - x) / max(1, z - a)          # 0 at the body's side, 1 at the far side
-            if outer[3] > 0.5: src[y, x] = inner if q < 0.45 else outer
-            else: src[y, x] = inner if q < 0.55 else [0, 0, 0, 0]
-H.part('torso', (270, 40, 525, 445), (405, 432), keep=[[(270, 40), (525, 40), (525, 418), (270, 418)], [(330, 418), (480, 418), (480, 445), (330, 445)]],
-       cut=[far_arm], fill=haeun_fill, nearSh=(458, 302), farSh=(338, 302), head=(400, 50), ear=(420, 170), hipN=(437, 432), hipF=(372, 432))
-H.part('shinN', (404, 575, 502, 770), (440, 592), sole=(452, 766), toe=(420, 760))
-def thighF_fill(src, off):
-    # her far hand hangs over the side of this thigh: trouser behind it
-    m = poly_mask(src.shape[1::-1], [H.poly(far_arm)], off); ys, xs = np.nonzero(m)
-    for y, x in zip(ys, xs):
-        rx = (H.W - 1 - (x + off[0])) if H.flip else x + off[0]
-        src[y, x] = [0.17, 0.17, 0.20, 1] if rx > 341 else [0, 0, 0, 0]
-H.part('thighF', (334, 412, 407, 600), (372, 432), knee=(370, 592), fill=thighF_fill, shade=0.82)
-H.part('shinF', (300, 575, 407, 770), (370, 592), sole=(360, 766), toe=(306, 760), shade=0.82)
-H.part('uarmN', (424, 286, 494, 382), (458, 302), keep=[near_arm], elbow=(457, 370))
-H.part('farmN', (424, 356, 494, 500), (457, 370), keep=[near_arm], hand=(458, 470))
-H.part('uarmF', (306, 286, 360, 382), (338, 302), keep=[far_arm], elbow=(336, 370), shade=0.8)
-H.part('farmF', (306, 356, 360, 500), (336, 370), keep=[far_arm], hand=(335, 470), shade=0.8)
-# her near thigh: the trouser pocket hidden under her hand, filled with trouser colour
-def thigh_fill(src, off):
-    m = poly_mask(src.shape[1::-1], [H.poly(near_arm)], off); ys, xs = np.nonzero(m)
-    for y, x in zip(ys, xs):
-        rx = (H.W - 1 - (x + off[0])) if H.flip else x + off[0]
-        src[y, x] = [0.17, 0.17, 0.20, 1] if rx < 470 else [0, 0, 0, 0]
-H.part('thighN', (404, 412, 476, 600), (437, 432), knee=(440, 592), fill=thigh_fill)
-
-# ---------------- 반장 (two stills: standing, the coffee) and 신입 (the game's player: standing, scanning), at 4x too ----------------
-B = load('foreman-concept.png')
-def still(im, rect, foot, height, full_h):
-    x0, y0, x1, y1 = rect; k = 4 * height / full_h
-    arr = shrink(im.crop(rect), (round((x1 - x0) * k), round((y1 - y0) * k)))
-    return {'arr': arr, 'foot': [round((foot[0] - x0) * k, 1), round((foot[1] - y0) * k, 1)]}
-BS = {'stand': still(B, (222, 10, 510, 832), (360, 827), 80, 812), 'coffee': still(B, (1350, 10, 1710, 832), (1490, 827), 80, 812)}
-# 신입: prototype/assets/rookie-sprites.png (main's sheet from docs/art/rookie-approved.png; faces left): idle, scan, flinch.
-# The frames and foot anchors are rookie-art.js's own
-RK = Image.open('prototype/assets/rookie-sprites.png').convert('RGBA')
-ra = np.asarray(RK).copy(); ra[..., 3] = np.where(ra[..., 3] < 160, 0, ra[..., 3]); RK = Image.fromarray(ra, 'RGBA')
-RKS = {'idle': still(RK, (208, 16, 528, 720), (425, 704), 80, 679), 'scan': still(RK, (824, 16, 1224, 720), (1119, 704), 80, 679),
-       'flinch': still(RK, (1560, 16, 1912, 720), (1795, 704), 80, 679)}
+# 지우 (20 x 72): the hood sleeve arms at either side, the legs split down the middle
+J = rig(FIG['jiwoo'], {
+    'hip': (9.5, 48), 'legsTop': 47,
+    'torsoPts': {'nearSh': (16, 22), 'farSh': (2, 22), 'head': (8, 0), 'ear': (11, 11), 'hipN': (13, 48), 'hipF': (6, 48)},
+    'limbs': {
+        'uarmN': ([(15, 20, 19, 32)], [], (16, 22), {'elbow': (16, 31)}),
+        'farmN': ([(15, 30, 19, 40), (14, 41, 17, 45)], [], (16, 31), {'hand': (16, 43)}),
+        'uarmF': ([(0, 20, 3, 32)], [], (2, 22), {'elbow': (2, 31)}),
+        'farmF': ([(0, 30, 3, 45)], [], (2, 31), {'hand': (2, 43)}),
+        'thighN': ([(10, 45, 19, 60)], [], (13, 48), {'knee': (13, 59)}),
+        'shinN': ([(10, 58, 19, 71)], [], (13, 59), {'sole': (13, 71), 'toe': (11, 71)}),
+        'thighF': ([(0, 45, 9, 60)], [], (6, 48), {'knee': (6, 59)}),
+        'shinF': ([(0, 58, 9, 71)], [], (6, 59), {'sole': (6, 71), 'toe': (2, 71)}),
+    }})
+# 하은 (23 x 64): her hair down her back stays on the torso; the watch is on the back (near) arm
+Hh = rig(FIG['haeun'], {
+    'hip': (10.5, 37), 'legsTop': 36,
+    'torsoPts': {'nearSh': (16, 24), 'farSh': (5, 23), 'head': (11, 0), 'ear': (12, 13), 'hipN': (14, 37), 'hipF': (6, 37)},
+    'limbs': {
+        'uarmN': ([(15, 22, 18, 31)], [], (16, 24), {'elbow': (16, 30)}),
+        'farmN': ([(15, 29, 18, 34), (14, 35, 19, 40)], [], (16, 30), {'hand': (16, 37)}),
+        'uarmF': ([(3, 21, 6, 31)], [], (5, 23), {'elbow': (5, 30)}),
+        'farmF': ([(3, 29, 6, 40)], [], (5, 30), {'hand': (5, 37)}),
+        'thighN': ([(11, 33, 22, 51)], [], (14, 37), {'knee': (14, 50)}),
+        'shinN': ([(11, 49, 22, 63)], [], (14, 50), {'sole': (15, 63), 'toe': (12, 63)}),
+        'thighF': ([(0, 33, 10, 51)], [], (6, 37), {'knee': (6, 50)}),
+        'shinF': ([(0, 49, 10, 63)], [], (6, 50), {'sole': (6, 63), 'toe': (1, 63)}),
+    }})
+# 반장 (30 x 67): the coffee, standing; his feet at the bottom middle
+def still(fig, foot): return {'arr': fig, 'foot': list(foot)}
+B = {'coffee': still(FIG['boss'], (FIG['boss'].shape[1] / 2, FIG['boss'].shape[0]))}
+# 신입 (30 x 67): the body, and his scanner arm (the gun, the hand, the sleeve to the shoulder) as its own layer
+R = FIG['rookie']; arm = rect_mask(R.shape, [(0, 16, 13, 31)]) & (R[..., 3] > 0)
+Ra = np.zeros_like(R); Ra[arm] = R[arm]; Rb = R.copy(); Rb[arm] = 0
+RK = {'body': still(Rb, (R.shape[1] * 0.6, R.shape[0])), 'arm': still(Ra, (R.shape[1] * 0.6, R.shape[0]))}
+red = np.nonzero((Ra[..., 0] > 170) & (Ra[..., 1] < 90) & (Ra[..., 3] > 0)); RK['arm']['light'] = [[int(x), int(y)] for y, x in zip(*red)]   # the scanner's red light
 
 # ---------------- pack ----------------
-items = [('jiwoo', n, p['arr'], p) for n, p in J.parts.items()] + [('haeun', n, p['arr'], p) for n, p in H.parts.items()] + [('boss', n, s['arr'], s) for n, s in BS.items()] + [('rookie', n, s['arr'], s) for n, s in RKS.items()]
-PAD, ROWW = 2, 1024
+items = [('jiwoo', n, p) for n, p in J.items()] + [('haeun', n, p) for n, p in Hh.items()] + [('boss', n, p) for n, p in B.items()] + [('rookie', n, p) for n, p in RK.items()]
+PAD, ROWW = 1, 160
 x = y = rowh = 0; place = []
-for who, n, arr, p in sorted(items, key=lambda it: -it[2].shape[0]):
-    h, w = arr.shape[:2]
+for who, n, p in sorted(items, key=lambda it: -it[2]['arr'].shape[0]):
+    h, w = p['arr'].shape[:2]
     if x + w + PAD > ROWW: x = 0; y += rowh + PAD; rowh = 0
-    place.append((who, n, arr, p, x, y)); x += w + PAD; rowh = max(rowh, h)
+    place.append((who, n, p, x, y)); x += w + PAD; rowh = max(rowh, h)
 atlas = Image.new('RGBA', (ROWW, y + rowh), (0, 0, 0, 0))
-meta = {'jiwoo': {'scale': 4, 'parts': {}}, 'haeun': {'scale': 4, 'parts': {}}, 'boss': {'scale': 4, 'parts': {}}, 'rookie': {'scale': 4, 'parts': {}}}
-for who, n, arr, p, px, py in place:
-    atlas.alpha_composite(to_img(arr), (px, py))
-    e = {'r': [px, py, arr.shape[1], arr.shape[0]]}
-    e.update({k: v for k, v in p.items() if k not in ('arr', 'k')})
+meta = {w: {'scale': 1, 'parts': {}} for w in ['jiwoo', 'haeun', 'boss', 'rookie']}
+for who, n, p, px, py in place:
+    atlas.alpha_composite(Image.fromarray(p['arr'], 'RGBA'), (px, py))
+    e = {'r': [px, py, p['arr'].shape[1], p['arr'].shape[0]]}; e.update({k: v for k, v in p.items() if k != 'arr'})
     meta[who]['parts'][n] = e
 atlas.save(OUT_PNG, optimize=True)
 json.dump(meta, open(OUT_JSON, 'w'), separators=(',', ':'))
 print(atlas.size, {w: len(m['parts']) for w, m in meta.items()})
-
-# the game keeps the parts' numbers inline (const CAST17_META = ...;): rewrite that line
-import re
 p = 'prototype/index.html'; s = open(p, encoding='utf-8').read()
 s2, n = re.subn(r'^const CAST17_META = .*;$', lambda m: 'const CAST17_META = ' + json.dumps(meta, separators=(',', ':')) + ';', s, flags=re.M)
 if n == 1: open(p, 'w', encoding='utf-8').write(s2); print('index.html: CAST17_META updated')

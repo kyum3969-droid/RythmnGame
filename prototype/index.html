@@ -1962,18 +1962,19 @@ function drawBoot15(b, nowMs) {
   g.restore();
   const fo = Math.max(0, Math.min(1, (b - (L.room.from - 0.6)) / 0.6)); if (fo > 0) { g.fillStyle = `rgba(0,0,0,${fo})`; g.fillRect(0, 0, W, H); }
 }
-// ---------- 1-7's cast in the approved designs (docs/art/*-concept.png): 지우 and 하은 as rigs, 반장 as two stills ----------
-// Only 1-7 (a cutscene) uses these; every other stage keeps the simple dots. assets/cast17.png holds the parts, cut from the
-// design references by ref/cast17/build.py at 4x the game's dot size; a pose is put together at that size, shrunk to the
-// game's dots with a hard edge, and kept (by its quantised angles) so a walk cycle is drawn once. Angles are the canvas's
-// own (radians, absolute, every rig facing right); a limb at 0 hangs as it does in the reference.
-const CAST17_META = {"jiwoo":{"scale":4,"parts":{"torso":{"r":[771,0,94,195],"pivot":[43.39,187.31],"nearSh":[21.7,101.97],"farSh":[69.43,99.8],"head":[52.43,3.62],"ear":[44.12,54.96],"hipN":[28.93,187.31],"hipF":[58.58,187.31],"cap":["#393740",23.1,[44,187]]},"shinN":{"r":[974,0,34,88],"pivot":[18.08,4.34],"sole":[19.53,86.06],"toe":[31.1,81.36],"cap":["#34333c",10.9,[18,4]]},"shinF":{"r":[0,334,42,88],"pivot":[15.55,4.34],"sole":[18.44,86.06],"toe":[38.69,81.36],"cap":["#34343c",10.5,[13,4]]},"farmN":{"r":[132,334,35,77],"pivot":[18.8,5.06],"hand":[20.97,64.37],"cap":["#7c3b4d",10.1,[15,5]]},"farmF":{"r":[169,334,39,77],"pivot":[15.19,5.06],"hand":[15.91,64.37],"cap":["#47222d",10.5,[23,5]]},"thighN":{"r":[274,334,33,70],"pivot":[18.08,9.4],"knee":[18.08,65.09],"cap":["#35343d",10.9,[19,9]]},"thighF":{"r":[309,334,32,70],"pivot":[15.55,9.4],"knee":[15.55,65.09],"cap":["#27262d",12.2,[14,9]]},"uarmN":{"r":[343,334,35,67],"pivot":[18.8,15.19],"elbow":[18.8,62.2],"cap":["#7d3a4d",11.8,[20,15]]},"uarmF":{"r":[380,334,39,67],"pivot":[15.19,15.19],"elbow":[15.19,62.2],"cap":["#632e3e",12.2,[16,15]]}}},"haeun":{"scale":4,"parts":{"torso":{"r":[867,0,105,166],"pivot":[49.33,161.16],"nearSh":[27.54,107.71],"farSh":[76.88,107.71],"head":[51.39,4.11],"ear":[43.17,53.44],"hipN":[36.18,161.16],"hipF":[62.9,161.16],"cap":["#393a3f",17.6,[48,161]]},"shinN":{"r":[44,334,40,80],"pivot":[25.49,6.99],"sole":[20.56,78.52],"toe":[33.71,76.06],"cap":["#2e2e35",10.5,[20,6]]},"shinF":{"r":[86,334,44,80],"pivot":[15.21,6.99],"sole":[19.32,78.52],"toe":[41.52,76.06],"cap":["#24252a",10.5,[13,6]]},"thighF":{"r":[210,334,30,77],"pivot":[14.39,8.22],"knee":[15.21,74.0],"cap":["#202025",10.9,[13,8]]},"thighN":{"r":[242,334,30,77],"pivot":[16.03,8.22],"knee":[14.8,74.0],"cap":["#2b2b33",10.9,[16,8]]},"farmN":{"r":[421,334,29,59],"pivot":[15.21,5.76],"hand":[14.8,46.87],"cap":["#2c2b2b",8.4,[14,5]]},"farmF":{"r":[452,334,22,59],"pivot":[9.87,5.76],"hand":[10.28,46.87],"cap":["#1e1c1d",1.7,[6,5]]},"uarmN":{"r":[476,334,29,39],"pivot":[14.8,6.58],"elbow":[15.21,34.53],"cap":["#71a7ca",8.4,[14,6]]},"uarmF":{"r":[507,334,22,39],"pivot":[9.04,6.58],"elbow":[9.87,34.53],"cap":["#1a2630",1.3,[5,6]]}}},"boss":{"scale":4,"parts":{"stand":{"r":[512,0,113,324],"foot":[54.4,322.0]},"coffee":{"r":[627,0,142,324],"foot":[55.2,322.0]}}},"rookie":{"scale":4,"parts":{"idle":{"r":[0,0,151,332],"foot":[102.3,324.2]},"scan":{"r":[153,0,189,332],"foot":[139.0,324.2]},"flinch":{"r":[344,0,166,332],"foot":[110.8,324.2]}}}};
+// ---------- 1-7's cast in the rookie-style dot designs (docs/art/cast-rookie-style-study.png) ----------
+// Only 1-7 (a cutscene) uses these; every other stage keeps its own dots. assets/cast17.png holds the parts at the game's
+// own dot size (one dot of the study is one dot here), read off the study by ref/cast17/build.py: 지우 and 하은 as rigs,
+// 반장 a still, 신입 a still with his scanner arm apart. A pose is put together at 8x with no smoothing (each dot an 8x8
+// block, turned) and read back one dot per block, so a turned limb stays on the game's dot grid; it is kept by its angles.
+// Angles are the canvas's own (radians, absolute, every rig facing right); a limb at 0 hangs as it does in the study.
+const CAST17_META = {"jiwoo":{"scale":1,"parts":{"torso":{"r":[93,0,19,49],"pivot":[10.0,48.5],"nearSh":[3.5,22.5],"farSh":[17.5,22.5],"head":[11.5,0.5],"ear":[8.5,11.5],"hipN":[6.5,48.5],"hipF":[13.5,48.5],"cap":["#3e3c4d",5.85,[10,48]]},"farmN":{"r":[0,68,6,16],"pivot":[3.5,1.5],"hand":[3.5,13.5],"cap":["#843651",2.25,[3,1]]},"farmF":{"r":[7,68,6,16],"pivot":[3.5,1.5],"hand":[3.5,13.5],"cap":["#662a3f",2.25,[3,1]]},"thighN":{"r":[14,68,8,16],"pivot":[4.5,3.5],"knee":[4.5,14.5],"cap":["#403e4e",3.15,[4,3]]},"thighF":{"r":[23,68,7,16],"pivot":[3.5,3.5],"knee":[3.5,14.5],"cap":["#3f3e4f",2.7,[3,3]]},"shinN":{"r":[52,68,9,14],"pivot":[5.5,1.5],"sole":[5.5,13.5],"toe":[7.5,13.5],"cap":["#3f3e4e",3.6,[5,1]]},"shinF":{"r":[62,68,10,14],"pivot":[3.5,1.5],"sole":[3.5,13.5],"toe":[7.5,13.5],"cap":["#403e4e",2.7,[3,1]]},"uarmN":{"r":[73,68,5,13],"pivot":[3.5,2.5],"elbow":[3.5,11.5],"cap":["#80364f",1.8,[3,2]]},"uarmF":{"r":[79,68,5,13],"pivot":[3.5,2.5],"elbow":[3.5,11.5],"cap":["#632a3d",1.8,[3,2]]}}},"haeun":{"scale":1,"parts":{"torso":{"r":[113,0,23,38],"pivot":[12.0,37.5],"nearSh":[6.5,24.5],"farSh":[17.5,23.5],"head":[11.5,0.5],"ear":[10.5,13.5],"hipN":[8.5,37.5],"hipF":[16.5,37.5],"cap":["#141319",3.15,[12,37]]},"thighN":{"r":[137,0,10,19],"pivot":[6.5,4.5],"knee":[6.5,17.5],"cap":["#3d3c47",1.35,[6,4]]},"thighF":{"r":[148,0,6,19],"pivot":[4.5,4.5],"knee":[4.5,17.5],"cap":["#3c3b45",1.8,[4,4]]},"shinN":{"r":[31,68,10,15],"pivot":[6.5,1.5],"sole":[5.5,14.5],"toe":[8.5,14.5],"cap":["#2e2e34",4.05,[6,1]]},"shinF":{"r":[42,68,9,15],"pivot":[4.5,1.5],"sole":[4.5,14.5],"toe":[9.5,14.5],"cap":["#2b2b31",2.25,[4,1]]},"farmN":{"r":[85,68,6,12],"pivot":[3.5,1.5],"hand":[3.5,8.5],"cap":["#33323a",1.8,[3,1]]},"farmF":{"r":[92,68,6,12],"pivot":[3.5,1.5],"hand":[3.5,8.5],"cap":["#27272d",1.8,[3,1]]},"uarmN":{"r":[99,68,4,10],"pivot":[2.5,2.5],"elbow":[2.5,8.5],"cap":["#26242b",1.8,[2,2]]},"uarmF":{"r":[104,68,4,10],"pivot":[2.5,2.5],"elbow":[2.5,8.5],"cap":["#1d1c21",1.8,[2,2]]}}},"boss":{"scale":1,"parts":{"coffee":{"r":[0,0,30,67],"foot":[15.0,67]}}},"rookie":{"scale":1,"parts":{"body":{"r":[31,0,30,67],"foot":[18.0,67]},"arm":{"r":[62,0,30,67],"foot":[18.0,67],"light":[[1,18],[1,19],[1,20]]}}}};
 const CAST17 = { img: null, ok: false, cache: new Map(), work: null, half: null };
 function cast17Ready() {
   if (!CAST17.img) { const im = new Image(); im.onload = () => { CAST17.ok = true; }; im.src = CAST17.src || 'assets/cast17.png'; CAST17.img = im; }
   return CAST17.ok;
 }
-const RIG_W = 400, RIG_H = 440, RIG_OX = 200, RIG_OY = 250;   // the 4x working canvas, the hip at (RIG_OX, RIG_OY)
+const RIG_W = 100, RIG_H = 110, RIG_OX = 50, RIG_OY = 64, RIG_K = 8;   // a pose's box in dots, the hip at (RIG_OX, RIG_OY); drawn at RIG_K
 const rigRot = (p, a) => ({ x: p.x * Math.cos(a) - p.y * Math.sin(a), y: p.x * Math.sin(a) + p.y * Math.cos(a) });
 // where every joint is (at 4x, relative to the hip) for a set of angles
 function rigJoints(who, A) {
@@ -2000,24 +2001,16 @@ function rigFrame(who, A, only) {
   const q = v => Math.round((v || 0) / 0.035);
   const key = who + (only || '') + ['torso', 'thighN', 'shinN', 'thighF', 'shinF', 'uarmN', 'farmN', 'uarmF', 'farmF'].map(k => q(A[k])).join(',');
   const hit = CAST17.cache.get(key); if (hit) return hit;
-  if (!CAST17.work) {
-    CAST17.work = document.createElement('canvas'); CAST17.work.width = RIG_W; CAST17.work.height = RIG_H;
-    CAST17.half = document.createElement('canvas'); CAST17.half.width = RIG_W / 2; CAST17.half.height = RIG_H / 2;
-  }
+  if (!CAST17.work) { CAST17.work = document.createElement('canvas'); CAST17.work.width = RIG_W * RIG_K; CAST17.work.height = RIG_H * RIG_K; }
   const c = CAST17.work.getContext('2d');
-  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, RIG_W, RIG_H); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+  c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, RIG_W * RIG_K, RIG_H * RIG_K); c.imageSmoothingEnabled = false;
+  c.setTransform(RIG_K, 0, 0, RIG_K, 0, 0);
   const J = rigCompose(c, who, A, only, RIG_OX, RIG_OY);
-  // shrink to the game's dots in two halvings, then a hard edge
-  const h = CAST17.half.getContext('2d'); h.imageSmoothingEnabled = true; h.imageSmoothingQuality = 'high';
-  h.clearRect(0, 0, RIG_W / 2, RIG_H / 2); h.drawImage(CAST17.work, 0, 0, RIG_W / 2, RIG_H / 2);
-  const out = document.createElement('canvas'); out.width = RIG_W / 4; out.height = RIG_H / 4;
-  const o = out.getContext('2d', { willReadFrequently: true }); o.imageSmoothingEnabled = true; o.imageSmoothingQuality = 'high';
-  o.drawImage(CAST17.half, 0, 0, RIG_W / 4, RIG_H / 4);
-  const id = o.getImageData(0, 0, out.width, out.height), d = id.data;
-  for (let i = 3; i < d.length; i += 4) d[i] = d[i] > 118 ? 255 : 0;
-  o.putImageData(id, 0, 0);
-  const S = CAST17_META[who].scale, Js = {}; for (const k in J) Js[k] = { x: J[k].x / S, y: J[k].y / S };
-  const fr = { cv: out, ox: RIG_OX / S, oy: RIG_OY / S, J: Js };
+  // (one dot per 8x8 block: the block's middle)
+  const out = document.createElement('canvas'); out.width = RIG_W; out.height = RIG_H;
+  const o = out.getContext('2d'); o.imageSmoothingEnabled = false;
+  o.drawImage(CAST17.work, 0, 0, RIG_W * RIG_K, RIG_H * RIG_K, 0, 0, RIG_W, RIG_H);
+  const fr = { cv: out, ox: RIG_OX, oy: RIG_OY, J };
   if (CAST17.cache.size > 900) CAST17.cache.delete(CAST17.cache.keys().next().value);
   CAST17.cache.set(key, fr);
   return fr;
@@ -2044,21 +2037,10 @@ function rigFoot(who, A) { const J = rigJoints(who, A), S = CAST17_META[who].sca
 // Returns the joints on the screen.
 function rigDraw(who, A, x, footY, mirror, o = {}) {
   if (!cast17Ready()) return null;
-  const Sc = CAST17_META[who].scale;
-  if (RS > 1) {
-    // (in detail: the parts straight onto the screen at the canvas's own resolution, placed to its pixel)
-    const hy = o.hipY != null ? o.hipY : footY - rigFoot(who, A), X = Math.round(x * RS) / RS, Y = Math.round(hy * RS) / RS;
-    g.save(); if (o.alpha != null) g.globalAlpha = o.alpha; g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
-    g.translate(X, Y); if (mirror) g.scale(-1, 1); g.scale(1 / Sc, 1 / Sc);
-    const J4 = rigCompose(g, who, A, o.only, 0, 0, false);
-    g.restore();
-    const S = {}; for (const k in J4) S[k] = { x: X + (mirror ? -J4[k].x : J4[k].x) / Sc, y: Y + J4[k].y / Sc };
-    return S;
-  }
   const fr = rigFrame(who, A, o.only), J = fr.J;
   const hy = o.hipY != null ? o.hipY : footY - Math.max(J.soleN.y, J.soleF.y);
   const X = Math.round(x), Y = Math.round(hy);
-  g.save(); if (o.alpha != null) g.globalAlpha = o.alpha;
+  g.save(); if (o.alpha != null) g.globalAlpha = o.alpha; g.imageSmoothingEnabled = false;
   if (mirror) { g.translate(X, Y); g.scale(-1, 1); g.drawImage(fr.cv, -fr.ox, -fr.oy); }
   else g.drawImage(fr.cv, X - fr.ox, Y - fr.oy);
   g.restore();
@@ -2114,13 +2096,13 @@ function rigSit(who, seatY, footY, extra = {}) {
 function castStill(who, kind, x, footY, mirror) {
   if (!cast17Ready()) return false;
   const m = CAST17_META[who].parts[kind], r = m.r, k = 1 / CAST17_META[who].scale;
-  g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
-  g.translate(Math.round(x * RS) / RS, Math.round(footY * RS) / RS); if (mirror) g.scale(-1, 1); g.scale(k, k);
+  g.save(); g.imageSmoothingEnabled = false;
+  g.translate(Math.round(x), Math.round(footY)); if (mirror) g.scale(-1, 1); g.scale(k, k);
   g.drawImage(CAST17.img, r[0], r[1], r[2], r[3], -m.foot[0], -m.foot[1], r[2], r[3]);
   g.restore();
   return true;
 }
-const bossStill = (kind, x, footY, mirror) => castStill('boss', kind, x, footY, mirror);
+const bossStill = (kind, x, footY, mirror) => castStill('boss', 'coffee', x, footY, mirror);   // (the study has him with his coffee)
 // ---------- end of 1-7's cast ----------
 // ---------- 1-7 하은의 새벽: the cutscene past the line (L.cine.out on) ----------
 // Four places, each painted once: the dawn street (1-5's bgCommute, at its bluest), the underground platform, inside the
@@ -2199,7 +2181,7 @@ function cineCast(b) {
 const CINE_FEET = { jiwoo: 163, haeun: 142 };
 const CINE_SEAT = 156;   // the hospital bench's seat
 // (a walk's phase from how far they have gone, so the feet never slide: a stride every 46 px walking, 66 running)
-const gaitPh = (c, stride) => ((((c.mirror ? -c.x : c.x) / stride) % 1) + 1) % 1;
+const gaitPh = (c, stride) => ((((c.mirror ? -c.x : c.x) / (stride * 0.89)) % 1) + 1) % 1;   // (strides for the dot cast, a little shorter)
 // 지우 in the new design: walking, running, at the pole (the train), standing, sitting (the bench); the near hand on the
 // phone, held out (giving the earphones back) or holding them. Returns his joints on the screen (null until the art is in)
 function jiwoo17(c, ground, b) {
@@ -2208,7 +2190,7 @@ function jiwoo17(c, ground, b) {
   if (move) A = rigGait(gaitPh(c, c.mode === 'run' ? 66 : 46), c.mode === 'run');
   else if (sit) { const songB = (b - 190) / 0.6667, nod = c.nod && (songB % 1) < 0.3; const st = rigSit('jiwoo', CINE_SEAT, ground, { lean: nod ? 2 : -4 }); A = st.A; o.hipY = st.hipY; }
   else A = rigPose({ sF: -3, eF: 6, sN: 2, eN: 6 });
-  const t = c.mode === 'strap' ? [5, -46] : c.phone ? [12, -22] : c.give ? [19, -14] : c.holding ? (sit ? [12, -6] : [13, -12]) : null;
+  const t = c.mode === 'strap' ? [5, -44] : c.phone ? [10, -20] : c.give ? [17, -12] : c.holding ? (sit ? [10, -5] : [11, -10]) : null;
   if (t) Object.assign(A, rigReach('jiwoo', 'N', A, t[0], t[1]));
   const S = rigDraw('jiwoo', A, c.x, ground, !!c.mirror, o); if (!S) return null;
   const hd = S.handN;
@@ -2224,7 +2206,7 @@ function haeun17(x, footY, o = {}) {
   else if (o.sit) { const st = rigSit('haeun', CINE_SEAT, footY); A = st.A; d.hipY = st.hipY; }
   else A = rigPose({ sF: -2, eF: 6, sN: 2, eN: 8 });
   const ear = o.ear ? rigJoints('haeun', A).ear : null;
-  const t = o.watch ? [9, -10] : ear ? [ear.x / 4 + 2, ear.y / 4 + 1] : o.tap != null ? [4, o.tap ? 3 : -1] : o.give ? [14, -8] : null;
+  const t = o.watch ? [8, -9] : ear ? [ear.x + 2, ear.y + 1] : o.tap != null ? [4, o.tap ? 3 : -1] : o.give ? [12, -6] : null;
   if (t) Object.assign(A, rigReach('haeun', 'N', A, t[0], t[1]));
   return rigDraw('haeun', A, x, footY, !o.right, { ...d, only: o.body && !t ? 'body' : null });
 }
@@ -2262,7 +2244,7 @@ function cineHead(spk, b) {
   const ground = CINE_GROUND[c.scene];
   if (CAST17.ok) {
     // (standing: the head's top at the height of the design; sitting: from the hip on the seat)
-    const sit = who.mode === 'sit', top = spk === 'J' ? (sit ? CINE_SEAT - 50 : ground - 81) : (sit ? CINE_SEAT - 43 : ground - 74);
+    const sit = who.mode === 'sit', top = spk === 'J' ? (sit ? CINE_SEAT - 51 : ground - 72) : (sit ? CINE_SEAT - 41 : ground - 64);
     return { x: who.x + (who.mirror ? -2 : 2), y: top - 3 };
   }
   if (spk === 'J') return { x: who.x + (who.mirror ? -2 : 2), y: ground - 82 + (who.mode === 'sit' ? 5 : 0) };
@@ -4132,7 +4114,12 @@ function haeunHead(beat) {
 }
 const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
 function drawPlayer(kick, nowMs) {
-  if (L.cine && cast17Ready()) { const fl = nowMs - FX.flinch; castStill('rookie', fl < 500 ? 'flinch' : kick > 0.15 ? 'scan' : 'idle', PLAYER_X + 3, 173, false); return; }
+  if (L.cine && cast17Ready()) {
+    const fl = nowMs - FX.flinch, x = PLAYER_X + 3 + (fl < 160 ? 1 : 0), reach = kick > 0.15 ? (kick > 0.6 ? 2 : 1) : 0;
+    castStill('rookie', 'body', x, 173, false); castStill('rookie', 'arm', x - reach, 173, false);
+    if (reach) { const m = CAST17_META.rookie.parts.arm; for (const [lx, ly] of m.light) R(Math.round(x - reach) - m.foot[0] + lx, 173 - m.foot[1] + ly, 1, 1, C.ok); }
+    return;
+  }
   const fl = nowMs - FX.flinch, cx = PLAYER_X + (fl < 160 ? 1 : 0), top = playerTop(kick, nowMs);
   R(cx - 9, top + 18, 18, 36, C.hoodie);
   R(cx - 9, top + 20, 18, 22, C.vest2); R(cx - 9, top + 32, 18, 2, C.reflect);
