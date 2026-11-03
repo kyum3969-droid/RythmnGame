@@ -880,12 +880,12 @@ const LEVELS = [
       firstIn: { at: 68, pre: 0.6277, xf: 2.4 },
       // the volume war (172 on) as a tug of war: each push shoves the edge between their looks over to the other side
       tug: 172,
-      pokes: [], cut: [164, 236], heat: [100, 188], boom: 196, radio: [9998, 9999, 0], unplug: 222, leave: [209, 215.5], low: 0.07, bar: 2.22284 },
+      pokes: [], cut: [164, 236], heat: [100, 188], boom: 196, radio: [9998, 9999, 0], unplug: 222, leave: [209, 215.5], step: 162.5, low: 0.07, bar: 2.22284 },
     mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 20,
       // 마르코 bored by the blues: yawning (hand to his open mouth, then a stretch), dozing (eyes shut, nodding, z's), jolted awake
       bore: { yawn: [[36, 40.5], [44, 47.5]], doze: [52, 64.5], jolt: 64.5 }, guide: [-9, -8], tags: [-9, -8, -7],
       shouts: [[36.5, 'none', '하아아암~'], [44.5, 'none', '하암…'], [53, 'none', 'Zzz…'], [57.5, 'none', '쿨… zzz'], [64.5, 'none', '헉!'], [67.5, 'fanfare', '빠바밤~!'], [68, 'hey', '헤이!'], [132, 'hey', '노노노~!'], [168, 'hey', '헤이~'], [174, 'hey', '업!'], [178, 'hey', '업!!'], [188, 'hey', '더!!']],
-      route: [[0, 'rl'], [86, 'ru'], [98, 'rl'], [138, 'ru'], [146, 'rl'], [154, 'ru'], [214, 'rl'], [223.5, 'c']],
+      route: [[0, 'rl'], [86, 'ru'], [98, 'rl'], [138, 'ru'], [146, 'rl'], [154, 'ru'], [162.5, 'bx'], [223.5, 'c']],
       bars: [
         '................................................', '1...............1.......1.......................',
         '1...............1.......1...............1.......', '1...............1.......x.......................',
@@ -945,6 +945,27 @@ const LEVELS = [
     // the 포장마차 (scene 'pocha'): 마르코's song on his phone under it (`pocha`, played small, once the scene is up);
     // mpose: what 마르코's hands do on the line (pour, drink, spin the glass, head down, raise it)
     pocha: { src: 'audio/2-2-pocha.mp3', gain: 0.75 },
+    // the epilogue, on the song's clock (seconds; no presses): lines [t, who, text, seconds]; cam [t, zoom, x, y] keyframes;
+    // poses [from, to, 마르코's hands]; smile (his old grin, briefly); flash (the sepia memory) and vanish (when each coworker in
+    // it goes); truck (the first one by); raise2 (you raise your glass); clink; dawn (the sky from night to morning); sun
+    epilogue: { len: 170,
+      lines: [[2, '', '새벽 5시 반. 센터 앞 포장마차. 둘 말고는 아무도 없다.', 6], [12, 'v', '(잔을 채운다) …신입은 한 잔만.', 5], [20, 'v', '(원샷) 크으…', 4],
+              [31, 'v', '우리 동네 바닷가에 통조림 공장이 있었거든요.', 5], [37, 'v', '다들 라디오 틀고 일했어요.', 4.5],
+              [44, 'v', '내가 제일 빨랐어. 노래 크게 틀고, 다들 따라오라고.', 6], [54, 'v', '그렇게 빨라지니까… 위에서 사람을 줄이더라고요.', 6],
+              [61.8, 'v', '하나, 둘.', 4], [69, '', '마르코는 한참 잔만 돌렸다.', 5], [77, 'v', '…마지막엔 내 친구들 자리까지.', 5],
+              [84, 'v', '나 혼자 남았어요. 에이스라고.', 5], [96, 'v', '오늘 반장님 얼굴 보니까… 그때 생각이 나더라.', 6],
+              [108, 'v', '(잔을 내려놓는다) 그래도요, 신입.', 5], [114, 'v', '나 여기선 도움이 되고 싶어요.', 5], [122, 'v', '진짜 에이스.', 4],
+              [127, 'v', '…그게 뭔지는 아직 모르겠지만.', 5], [135, 'v', '(잔을 든다) 짠.', 4], [141, 'v', '내일 또 봐요, 신입.', 5]],
+      cam: [[0, 1, 192, 108], [8, 1, 192, 108], [22, 1.35, 196, 112], [30, 1.35, 196, 112], [35, 1.75, 150, 112], [51, 1.75, 150, 112], [92, 1.12, 192, 110], [101, 1.12, 192, 110],
+            [107, 1.5, 192, 114], [132, 1.5, 192, 114], [136, 1.75, 192, 116], [145, 1.75, 192, 116], [160, 1, 192, 96], [170, 1, 192, 96]],
+      poses: [[12, 17.5, 'pour'], [20, 24.5, 'drink'], [26, 30, 'spin'], [54, 68, 'down'], [69, 75, 'spin'], [77, 90, 'down'], [96, 102, 'spin'], [135, 147, 'raise']],
+      smile: [[44, 50], [127, 132]], flash: [52, 91], vanish: [57, 59.2, 62.4, 63.6, 78.6, 80.4], truck: [92, 98], raise2: [136, 147], clink: 138.4,
+      dawn: [100, 160], sun: [140, 166],
+      fail: { len: 42,
+        lines: [[2, '', '새벽 5시 반. 센터 앞 포장마차.', 5], [9, 'v', '(잔을 채운다) …오늘은 다 엉망이었네요.', 5], [17, 'v', '…또 내가 망쳤어. 늘 이래.', 5],
+                [25, 'v', '그래도 도움이 되고 싶은데.', 4.5], [31, 'v', '…내일 다시 해요, 신입.', 5]],
+        cam: [[0, 1, 192, 108], [6, 1, 192, 108], [14, 1.6, 150, 112], [30, 1.6, 150, 112], [36, 1.2, 192, 110], [42, 1.2, 192, 110]],
+        poses: [[9, 14, 'pour'], [17, 23, 'down'], [25, 30, 'spin'], [31, 38, 'raise']], raise2: [32, 38], clink: 33.5, dawn: [20, 60] } },
     outro: good => good ? [
       { who:'', text:'새벽 5시 반. 센터 앞 포장마차. 둘 말고는 아무도 없다.', scene:'pocha' },
       { who:'마르코', text:'(잔을 채운다) …신입은 한 잔만.', scene:'pocha', mpose:'pour' },
@@ -3602,7 +3623,7 @@ function phaseLook(c, w, h, b, active) {
   const am = F.amber.find(([x, y]) => b >= x - 1 && b < y + 1);
   if (am) { const k = Math.min(1, b - (am[0] - 1), am[1] + 1 - b), ph = b - Math.floor(b); c.globalCompositeOperation = 'overlay'; c.fillStyle = `rgba(255,160,50,${(0.15 + 0.08 * Math.max(0, 1 - ph * 3)) * k})`; c.fillRect(0, 0, w, h); }
   // the drop, and the last hit: a white flash
-  for (const [at, v] of [[F.drop, 0.7], [F.drop2, 0.7], [F.last, 0.45]]) { const d = b - at; if (d >= 0 && d < 1.5) { c.globalCompositeOperation = 'lighter'; c.fillStyle = `rgba(255,250,235,${v * (1 - d / 1.5) ** 2})`; c.fillRect(0, 0, w, h); } }
+  for (const [at, v] of [[F.drop, 0.7], [F.drop2, L.rb ? 0 : 0.7], [F.last, 0.45]]) { const d = b - at; if (d >= 0 && d < 1.5) { c.globalCompositeOperation = 'lighter'; c.fillStyle = `rgba(255,250,235,${v * (1 - d / 1.5) ** 2})`; c.fillRect(0, 0, w, h); } }
   c.restore();
 }
 // the jolt on the drop: a few pixels, shrinking (in game pixels)
@@ -3628,7 +3649,7 @@ function midView(b, sEnd) {
 const cvHi = document.getElementById('cvhi'), gHi = cvHi.getContext('2d');
 // 마르코's corners in the floor's coordinates: the lower ends of the two lines (rl, and ll squeezed in beside 반장), the upper
 // belts' loading ends behind them (ru, lu; he stands lower there, the upper belt hides his legs), and c, beside you
-const MARCO_SPOTS = () => ({ rl: { x: MID.ww - BOSS_X, dy: 0, mir: true }, ru: { x: MID.ww - (BOSS_X + LANE_DX[0] + 22), dy: -22, mir: true },
+const MARCO_SPOTS = () => ({ bx: { x: MID.ww - 90, dy: 0, mir: true }, rl: { x: MID.ww - BOSS_X, dy: 0, mir: true }, ru: { x: MID.ww - (BOSS_X + LANE_DX[0] + 22), dy: -22, mir: true },
   lu: { x: BOSS_X + LANE_DX[0] + 22, dy: -22, mir: false }, ll: { x: BOSS_X + 24, dy: 0, mir: false }, c: { x: MID.ax + 64, dy: -2, mir: true } });
 const midSpotAt = bb => { let sp = L.mid.route[0][1]; for (const [rb, s] of L.mid.route) if (bb >= rb) sp = s; return sp; };
 function midMarco(b) {
@@ -3640,6 +3661,8 @@ function midMarco(b) {
 // ---------- 2-2 the tug of war on the floor (L.rb) ----------
 // Whoever has the line floods the floor with his look from his side: 마르코 a midsummer beach from the right (sky, sea,
 // sand, parasols), 반장 his warehouse back from the left. The belts, the scanners and the people stay as they are.
+// where 반장 stands: at his loading end, then (rb.step) a few steps over to his radio for the cutscene, then walking out
+function rbBossX(b) { const D = L.rb, st = D.step != null ? BOSS_X + 46 * ease((b - D.step) / 1.5) : BOSS_X, lv = D.leave; if (!lv || b < lv[0]) return st; return st - 140 * Math.min(1, (b - lv[0]) / (lv[1] - lv[0])); }
 const rbPoke = b => (L.rb.pokes || []).find(p => b >= p[0] && b < p[0] + p[2]);
 const rbFunkOn = b => { const tn = rbTurn(b), pk = tn && rbPoke(b); return !!tn && (pk ? pk[1] === 'v' : tn[1] !== 'b'); };
 function rbEdge(b) {
@@ -3865,7 +3888,8 @@ function rbFront(b, bReal, nowMs, active, live) {
     g.fillStyle = '#d6a06a'; g.fillRect(-7, -6, 14, 11); g.fillStyle = '#e9bb83'; g.fillRect(-7, -6, 14, 3); g.fillStyle = '#a0703f'; g.fillRect(-1, -6, 2, 11); g.restore(); });
   // the lights: a flicker as it overheats, black for a moment at the boom, the alarm's orange breathing over the floor
   if (boom < 0 && h > 0.85 && !reduce && Math.random() < 0.09) { g.fillStyle = 'rgba(4,3,5,.3)'; g.fillRect(0, -MID.oy, WW, MID.wh); }
-  if (boom >= 0.05 && boom < 0.7) { g.fillStyle = `rgba(4,3,5,${boom < 0.35 || (boom > 0.45 && boom < 0.55) ? 0.8 : 0.3})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
+  if (boom >= 0 && boom < 0.28) { g.fillStyle = `rgba(255,250,235,${0.92 * (1 - boom / 0.28)})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
+  else if (boom >= 0.28 && boom < 1.1) { g.fillStyle = `rgba(4,3,5,${boom < 0.75 || (boom > 0.85 && boom < 0.95) ? 0.86 : 0.25})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
   if (alarm) { const k = 0.5 + 0.5 * Math.sin(bReal * Math.PI * 2); g.fillStyle = `rgba(255,110,25,${0.12 * k * Math.min(1, (D.boom + 12 - bReal) / 2)})`; g.fillRect(0, -MID.oy, WW, MID.wh); }
 }
 function drawMid(t, nowMs, active) {
@@ -3971,7 +3995,7 @@ function drawMid(t, nowMs, active) {
       if (b >= BO.doze[0] && b < BO.doze[1]) { pose.doze = true; pose.bob = 0; sway = 0; lift = -(Math.floor(b / 2) % 2 ? 2 : 0); if (!toss) pose.hand = { x: BOSS_X + 12, y: 140 }; }
       if (b >= BO.jolt && b < BO.jolt + 1) { lift = Math.round(Math.sin(Math.PI * (b - BO.jolt)) * 8); pose.hand = { x: BOSS_X + 18, y: 80 }; }
     }
-    if (L.rb && active) { const tn = rbTurn(b); if (tn && tn[1] === 'v' && L.rb.cut && b >= L.rb.cut[0] && b - tn[0] < 0.7 && !marco.walking) { pose.hand = { x: BOSS_X + 24, y: 98 + (b - tn[0] < 0.2 ? 4 : 0) }; lift = Math.max(lift, 2); } }
+    if (L.rb && active) { const tn = rbTurn(b); if (tn && tn[1] === 'v' && L.rb.cut && b >= L.rb.cut[0] && b - tn[0] < 0.7 && !marco.walking) { pose.hand = { x: BOSS_X + 16, y: 98 + (b - tn[0] < 0.2 ? 4 : 0) }; lift = Math.max(lift, 2); } }
     if (L.rb && active && b >= L.rb.boom + 1) { pose.sad = true; if (!marco.walking) pose.hand = { x: BOSS_X + 10, y: 138 }; }
     if (F && b >= F.last) { pose.hand = { x: BOSS_X + 11, y: 70 }; if (b < F.last + 1) lift = Math.max(lift, Math.round(Math.sin(Math.PI * (b - F.last)) * 9)); }
     FX.react[2] = FX.react[2] || { type: '', at: nowMs };
@@ -4000,12 +4024,14 @@ function drawMid(t, nowMs, active) {
   mirror(0, () => {
     const pose = { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: active && ph < 0.18 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 0 };
     if (held) pose.hand = { x: held.x - held.n.w / 2 + 1, y: held.y + 2 };
-    if (L.rb && live) { const tn = rbTurn(bReal); if (tn && tn[1] === 'b' && L.rb.cut && bReal >= L.rb.cut[0] && bReal - tn[0] < 0.7) pose.hand = { x: BOSS_X + 30, y: 103 }; }
+    const bx0 = L.rb && live ? rbBossX(bReal) : BOSS_X, stepping = L.rb && L.rb.step && live && bReal >= L.rb.step && bReal < L.rb.step + 1.5;
+    if (stepping) pose.bob = Math.floor(bReal * 2.5) % 2;
+    if (L.rb && live) { const tn = rbTurn(bReal); if (tn && tn[1] === 'b' && L.rb.cut && bReal >= L.rb.cut[0] && bReal - tn[0] < 0.7) pose.hand = { x: BOSS_X + 12, y: 102 }; }
     // 2-2: after the boom he calls it a night and walks out to the left, unhurried, gone off the floor
     const lv = L.rb && L.rb.leave, lp = lv && live ? (bReal - lv[0]) / (lv[1] - lv[0]) : -1;
     if (lp >= 1) return;
-    if (lp > 0) { pose.bob = Math.floor(bReal * 2.5) % 2; drawActor('boss', Math.round(BOSS_X - lp * 90), true, pose, nowMs, active, () => PARTNERS.boss.arm(pose)); return; }
-    drawActor('boss', BOSS_X, false, pose, nowMs, active, () => PARTNERS.boss.arm(pose));
+    if (lp > 0) { pose.bob = Math.floor(bReal * 2.5) % 2; drawActor('boss', Math.round(bx0), true, pose, nowMs, active, () => PARTNERS.boss.arm(pose)); return; }
+    drawActor('boss', Math.round(bx0), false, pose, nowMs, active, () => PARTNERS.boss.arm(pose));
   });
   if (!marco.up) drawMarco();
   drawPlayer(Math.max(pk(0), pk(1)), nowMs);
@@ -4077,7 +4103,7 @@ function drawMid(t, nowMs, active) {
   if (L.rb && L.rb.zoom && (active || state === 'outro')) {
     const Z = L.rb.zoom, wide = { s: V.s, cx: V.cx, cy: V.cy }, mc = midMarco(b), lv = L.rb.leave, lp = lv ? Math.max(0, Math.min(1, (bReal - lv[0]) / (lv[1] - lv[0]))) : 0;
     const at = w => { if (!w) return wide; const zs = V.s * w[3];
-      if (w[2] === 'b') return { s: zs, cx: BOSS_X - lp * 90 + 52, cy: 114 };
+      if (w[2] === 'b') return { s: zs, cx: rbBossX(bReal) + 60, cy: 114 };
       if (w[2] === 'v') return { s: zs, cx: mc.x + (mc.mir ? -48 : 48), cy: 112 + mc.dy };
       if (w[2] === 'two') return { s: zs, cx: (mc.x + MID.ax) / 2, cy: 112 };
       return { s: zs, cx: MID.ax, cy: 122 }; };
@@ -4716,44 +4742,115 @@ function drawOffice(nowMs) {
   }
   drawSceneFade(nowMs);
 }
-// 2-2's outro: a 포장마차 outside the centre at dawn. The orange tarp lit from inside by one bulb, a steel table with two
-// bottles of soju, two glasses and a plate, plastic stools; 마르코 on the left, quiet, a glass in his hand, you on the right
+// 2-2's epilogue: a 포장마차 outside the centre at dawn, played to 마르코's song ("Street Corner Dawn") with no presses: the
+// lines come up as subtitles on the song's clock (L.epilogue), the camera moves, 마르코's hands move, his story turns into a
+// sepia memory of the cannery by the sea where his coworkers vanish one by one, the first truck goes by, the sky lightens and
+// the sun comes up, and they clink glasses; it fades out with the song. A press shows a hint; a second one skips it.
+const EPI = { on: false, good: true, start: 0, skipAt: -1e9, done: false };
+function startEpilogue(good) {
+  Object.assign(EPI, { on: false, good, done: false, skipAt: -1e9, clinked: false, key: '' }); SCENE.mpose = null; dialogEl.hidden = true; hud.hidden = true;
+  sceneCut('pocha', () => { EPI.on = true; EPI.start = performance.now(); });
+}
+const epiT = () => POCHA.src && POCHA.t0 != null && ctx ? ctx.currentTime - POCHA.t0 : (performance.now() - EPI.start) / 1000;
+function epiEnd(quick) {
+  if (EPI.done) return; EPI.done = true; EPI.on = false; subEl.hidden = true; hint.hidden = true;
+  if (POCHA.src && POCHA.g && ctx) { const T = ctx.currentTime, d = quick ? 1.2 : 3; POCHA.g.gain.cancelScheduledValues(T); POCHA.g.gain.setValueAtTime(POCHA.g.gain.value, T); POCHA.g.gain.linearRampToValueAtTime(0.0001, T + d); try { POCHA.src.stop(T + d + 0.05); } catch (e) {} POCHA.src = null; }
+  showResult();
+}
+// the clink: two glasses, a bright ring
+function epiClink() { if (!ctx) return; const T = ctx.currentTime; for (const [f, v] of [[2650, 0.05], [3980, 0.035], [5200, 0.02]]) osc('sine', f, T, 0.001, v, 0.5, bus); noise(T, 'highpass', 6000, 0.08, 0.02, 0.7, bus); }
+function epiPress() { const now = performance.now(); if (now - EPI.skipAt < 2000) { epiEnd(true); return; } EPI.skipAt = now; hint.textContent = '한 번 더 누르면 건너뛰기'; hint.hidden = false; setTimeout(() => { if (performance.now() - EPI.skipAt >= 1950) hint.hidden = true; }, 2000); }
+// a value along keyframes [[t, ...values]], eased between them
+function keyAt(K, t) { if (t <= K[0][0]) return K[0].slice(1); for (let i = 1; i < K.length; i++) if (t < K[i][0]) { const a = K[i - 1], b = K[i], e = ease((t - a[0]) / (b[0] - a[0])); return a.slice(1).map((v, j) => lerp(v, b[j + 1], e)); } return K[K.length - 1].slice(1); }
+const mixC = (a, b, k) => { const p = x => [parseInt(x.slice(1, 3), 16), parseInt(x.slice(3, 5), 16), parseInt(x.slice(5, 7), 16)], A = p(a), B = p(b); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], k))).join(',')})`; };
 function drawPocha(nowMs) {
-  const t = nowMs / 1000;
-  const sky = g.createLinearGradient(0, 0, 0, 120); sky.addColorStop(0, '#141c3a'); sky.addColorStop(0.6, '#3a4672'); sky.addColorStop(1, '#c4876a'); g.fillStyle = sky; g.fillRect(0, 0, W, 120);
-  for (let i = 0; i < 18; i++) R(rnd(i, 81) * W, rnd(i, 82) * 50, 1, 1, '#9aa4cc');
-  for (let i = 0, x = -4; x < W; i++) { const w = 26 + Math.floor(rnd(i, 83) * 30), top = 50 + Math.floor(rnd(i, 84) * 40); R(x, top, w, 120 - top, '#161a2c'); for (let wy = top + 5; wy < 112; wy += 7) for (let wx = x + 3; wx < x + w - 3; wx += 6) if (rnd(wx + wy * 5, 85) < 0.12) R(wx, wy, 2, 3, '#e8b868'); x += w + 2; }
-  R(0, 120, W, 96, '#22232c'); R(0, 120, W, 3, '#3a3a44'); R(0, 168, W, 48, '#1a1b22'); for (let x = 0; x < W; x += 30) R(x, 190, 16, 1, 'rgba(200,170,80,.2)');
-  // the tent: a frame, the tarp roof and sides glowing orange, the clear front flap rolled up, the inside warm
+  const t = nowMs / 1000, E = L.epilogue, TL = E && (EPI.good ? E : E.fail), et = EPI.on || EPI.done ? epiT() : 0;
+  if (EPI.on) pochaSong();
+  if (EPI.on && TL && et >= TL.len) epiEnd(false);
+  if (EPI.on && TL && TL.clink != null && !EPI.clinked && et >= TL.clink) { EPI.clinked = true; epiClink(); }
+  const inR = rs => rs && rs.find(([a, z]) => et >= a && et < z), in1 = r => r && et >= r[0] && et < r[1] ? r : null;
+  const dawn = TL && TL.dawn ? Math.max(0, Math.min(1, (et - TL.dawn[0]) / (TL.dawn[1] - TL.dawn[0]))) : 0;
+  const [cz, ccx, ccy] = TL && TL.cam ? keyAt(TL.cam, et) : [1, W / 2, H / 2];
+  const hw = W / (2 * cz), hh = H / (2 * cz), cx = Math.max(hw, Math.min(W - hw, ccx)), cy = Math.max(hh, Math.min(H - hh, ccy));
+  g.save(); g.translate(W / 2, H / 2); g.scale(cz, cz); g.translate(-cx, -cy);
+  // the sky lightening from night into dawn, the stars going, the sun coming up behind the blocks
+  const sky = g.createLinearGradient(0, 0, 0, 120); sky.addColorStop(0, mixC('#141c3a', '#4a6aa8', dawn)); sky.addColorStop(0.6, mixC('#3a4672', '#e2a27e', dawn)); sky.addColorStop(1, mixC('#c4876a', '#ffd8a0', dawn)); g.fillStyle = sky; g.fillRect(0, 0, W, 120);
+  g.globalAlpha = 1 - dawn; for (let i = 0; i < 18; i++) R(rnd(i, 81) * W, rnd(i, 82) * 50, 1, 1, '#9aa4cc'); g.globalAlpha = 1;
+  if (TL && TL.sun && et > TL.sun[0]) { const sy = lerp(132, 60, ease((et - TL.sun[0]) / (TL.sun[1] - TL.sun[0]))); const sg = g.createRadialGradient(356, sy, 4, 356, sy, 44); sg.addColorStop(0, 'rgba(255,240,200,.65)'); sg.addColorStop(1, 'rgba(255,220,160,0)'); g.fillStyle = sg; g.fillRect(306, sy - 44, 100, 88); g.fillStyle = '#fff1c8'; g.beginPath(); g.arc(356, sy, 11, 0, Math.PI * 2); g.fill(); }
+  for (let i = 0, x = -4; x < W; i++) { const w = 26 + Math.floor(rnd(i, 83) * 30), top = 50 + Math.floor(rnd(i, 84) * 40); R(x, top, w, 120 - top, mixC('#161a2c', '#3a3a52', dawn)); for (let wy = top + 5; wy < 112; wy += 7) for (let wx = x + 3; wx < x + w - 3; wx += 6) if (rnd(wx + wy * 5, 85) < 0.12 * (1 - dawn)) R(wx, wy, 2, 3, '#e8b868'); x += w + 2; }
+  R(0, 120, W, 96, mixC('#22232c', '#3a3a44', dawn)); R(0, 120, W, 3, '#3a3a44'); R(0, 168, W, 48, mixC('#1a1b22', '#2e2e38', dawn)); for (let x = 0; x < W; x += 30) R(x, 190, 16, 1, 'rgba(200,170,80,.2)');
+  // the first truck of the morning going by in the street, its headlights sweeping over the tent
+  const tr = in1(TL && TL.truck); let sweep = 0;
+  if (tr) { const k = (et - tr[0]) / (tr[1] - tr[0]), x = lerp(W + 70, -150, k); g.fillStyle = 'rgba(255,240,190,.18)'; g.beginPath(); g.moveTo(x, 174); g.lineTo(x - 120, 160); g.lineTo(x - 120, 196); g.closePath(); g.fill();
+    R(x, 150, 66, 28, '#1c1e26'); R(x - 14, 160, 16, 18, '#23252e'); R(x - 12, 162, 8, 6, '#3a4a5a'); R(x - 15, 172, 3, 3, '#fff6d0'); R(x + 6, 178, 8, 6, '#0e0f14'); R(x + 48, 178, 8, 6, '#0e0f14');
+    sweep = Math.max(0, 1 - Math.abs(x - 192) / 120); }
+  // the tent: a frame, the tarp roof and sides glowing orange, the inside warm under the one bulb (less needed as day comes)
+  const bulb = 1 - 0.65 * dawn;
   R(54, 40, 276, 6, '#c8501e'); for (let x = 54; x < 330; x += 12) R(x, 40, 6, 6, '#e06a2a');
   g.fillStyle = 'rgba(214,96,34,.92)'; g.fillRect(58, 46, 268, 124); g.fillStyle = '#3a1c12'; g.fillRect(76, 60, 232, 110);
-  const warm = g.createRadialGradient(192, 70, 4, 192, 92, 150); warm.addColorStop(0, 'rgba(255,214,150,.55)'); warm.addColorStop(1, 'rgba(255,150,70,0)'); g.fillStyle = warm; g.fillRect(76, 60, 232, 110);
+  const warm = g.createRadialGradient(192, 70, 4, 192, 92, 150); warm.addColorStop(0, `rgba(255,214,150,${0.55 * bulb + 0.25 * sweep})`); warm.addColorStop(1, 'rgba(255,150,70,0)'); g.fillStyle = warm; g.fillRect(76, 60, 232, 110);
   R(76, 60, 232, 4, 'rgba(240,220,200,.5)'); R(58, 46, 18, 124, 'rgba(240,130,60,.6)'); R(308, 46, 18, 124, 'rgba(240,130,60,.6)');
-  R(191, 46, 1, 18, '#1a1010'); const fl = 0.85 + 0.15 * Math.sin(t * 13) * Math.sin(t * 5.3); g.fillStyle = `rgba(255,236,180,${0.35 * fl})`; g.beginPath(); g.arc(191.5, 66, 10, 0, Math.PI * 2); g.fill(); R(189, 64, 5, 5, '#fff3c8');
-  // a little steam off something on the burner behind
+  R(191, 46, 1, 18, '#1a1010'); const fl = (0.85 + 0.15 * Math.sin(t * 13) * Math.sin(t * 5.3)) * bulb; g.fillStyle = `rgba(255,236,180,${0.35 * fl})`; g.beginPath(); g.arc(191.5, 66, 10, 0, Math.PI * 2); g.fill(); R(189, 64, 5, 5, bulb > 0.5 ? '#fff3c8' : '#d8c8a0');
   for (let k = 0; k < 4; k++) { const p = ((t / 2.2) + k / 4) % 1, sz = 2 + p * 6; g.fillStyle = `rgba(230,220,210,${0.25 * (1 - p)})`; g.fillRect(Math.round(219 + Math.sin(p * 5 + k) * 3 - sz / 2), Math.round(104 - p * 26), Math.round(sz), Math.round(sz)); }
   R(207, 104, 24, 5, '#2a2a30'); R(209, 109, 20, 3, '#3a3a42');
-  // stools, then the two of them sitting (the table in front hides their legs)
   for (const sx of [112, 272]) { R(sx - 9, 150, 18, 4, '#c8302a'); R(sx - 8, 154, 3, 16, '#a02420'); R(sx + 5, 154, 3, 16, '#a02420'); }
+  // 마르코, his hands by the timeline (or by the line, when the scene runs as plain dialogue)
+  const pz = inR(TL && TL.poses), mp = pz ? pz[2] : EPI.on || EPI.done ? null : SCENE.mpose, clk = TL && TL.clink != null ? et - TL.clink : -9, cl = clk > -0.35 && clk < 0.4 ? Math.max(0, 1 - Math.abs(clk) / 0.35) : 0;
   const bobM = Math.sin(t * 1.3) > 0.9 ? 1 : 0;
-  pochaSong();
-  const mp = SCENE.mpose, pose = { hand: { x: BOSS_X + 18, y: 122 }, carry: null, wince: false, dip: 2, bob: bobM, nod: 0, doze: false, phone: false, lane: 2, sad: true };
+  const pose = { hand: { x: BOSS_X + 18, y: 122 }, carry: null, wince: false, dip: 2, bob: bobM, nod: 0, doze: false, phone: false, lane: 2, sad: !(TL && TL.smile && inR(TL.smile)) };
   if (mp === 'pour') pose.hand = { x: BOSS_X + 30, y: 112 };
   else if (mp === 'drink') { pose.hand = { x: BOSS_X + 8, y: 96 }; pose.dip = 0; }
   else if (mp === 'spin') pose.hand = { x: BOSS_X + 22 + Math.round(Math.sin(t * 3) * 2), y: 128 + Math.round(Math.cos(t * 3)) };
   else if (mp === 'down') { pose.dip = 4; pose.hand = { x: BOSS_X + 16, y: 130 }; }
-  else if (mp === 'raise') { pose.hand = { x: BOSS_X + 22, y: 92 }; pose.dip = 0; }
+  else if (mp === 'raise') { pose.hand = { x: BOSS_X + 30 + Math.round(cl * 8), y: 90 }; pose.dip = 0; }
   FX.react[2] = FX.react[2] || { type: '', at: nowMs };
   g.save(); g.translate(0, 22); drawActor('marco', 118, false, pose, nowMs, false, () => { PARTNERS.marco.arm(pose);
     if (mp === 'pour') { g.save(); g.translate(pose.hand.x + 2, pose.hand.y - 2); g.rotate(1.1); R(-3, -12, 6, 18, '#2e8a4a'); R(-2, -16, 4, 4, '#2e8a4a'); R(-3, -5, 6, 5, '#e9f0e0'); g.restore(); R(pose.hand.x + 10, pose.hand.y + 6, 1, 8, 'rgba(220,240,230,.7)'); }
     else { R(pose.hand.x - 1, pose.hand.y - 6, 4, 6, '#e9eef0'); R(pose.hand.x, pose.hand.y - 4, 2, 3, '#cfe8d8'); } }); g.restore();
   g.save(); g.translate(266 - PLAYER_X, 26); drawPlayer(0, nowMs); g.restore();
-  // the table: a steel top, two green bottles, two glasses, a plate
+  // you raise your glass to his
+  const r2 = in1(TL && TL.raise2);
+  if (r2) { const gx = 244 - Math.round(cl * 8), gy = 114; thick(262, 148, gx + 3, gy + 4, 4, C.hoodie); R(gx + 1, gy + 2, 4, 4, C.skin); R(gx, gy - 4, 4, 6, '#e9eef0'); R(gx + 1, gy - 2, 2, 3, '#cfe8d8'); }
+  if (clk >= 0 && clk < 0.45) { const k = clk / 0.45; g.globalAlpha = 1 - k; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, r = 3 + k * 10; R(158 + Math.cos(a) * r, 104 + Math.sin(a) * r, 2, 2, '#fff6c8'); R(244 + Math.cos(a) * r, 106 + Math.sin(a) * r, 2, 2, '#fff6c8'); } g.globalAlpha = 1; }
+  // the table: a steel top, two green bottles (one leaning empty once he has poured), two glasses (his in his hand), a plate
   R(140, 140, 104, 6, '#a8aeb6'); R(140, 146, 104, 2, '#6a7078'); R(150, 148, 4, 24, '#5a6068'); R(230, 148, 4, 24, '#5a6068');
-  for (const bx of [176, 186]) { R(bx, 120, 6, 20, '#2e8a4a'); R(bx + 1, 116, 4, 4, '#2e8a4a'); R(bx + 1, 114, 4, 2, '#d8e8d0'); R(bx, 127, 6, 5, '#e9f0e0'); R(bx + 1, 121, 1, 16, '#5ab87a'); }
-  R(160, 134, 5, 6, '#eef4f4'); R(220, 134, 5, 6, '#eef4f4'); R(161, 136, 3, 3, '#d8ecdc'); R(221, 136, 3, 3, '#d8ecdc');
+  for (const bx of mp === 'pour' ? [186] : [176, 186]) { R(bx, 120, 6, 20, '#2e8a4a'); R(bx + 1, 116, 4, 4, '#2e8a4a'); R(bx + 1, 114, 4, 2, '#d8e8d0'); R(bx, 127, 6, 5, '#e9f0e0'); R(bx + 1, 121, 1, 16, '#5ab87a'); }
+  if (!r2) { R(220, 134, 5, 6, '#eef4f4'); R(221, 136, 3, 3, '#d8ecdc'); }
   g.fillStyle = '#e9e4da'; g.beginPath(); g.ellipse(204, 138, 11, 3, 0, 0, Math.PI * 2); g.fill(); R(198, 135, 12, 3, '#d8643a');
+  g.restore();
+  // his memory: the cannery by the sea in sepia, the line of them at the table, the radio going; they vanish one by one
+  const fb = TL && TL.flash; if (fb && et > fb[0] && et < fb[1]) drawMemory(et, Math.min(1, (et - fb[0]) / 2.5, (fb[1] - et) / 2.5), TL.vanish || [], nowMs);
+  // the subtitles, on the song's clock
+  if (EPI.on && TL) { const ln = TL.lines.find(([a, , , d]) => et >= a && et < a + d), key = ln ? ln[0] + ln[2] : '';
+    if (key !== EPI.key) { EPI.key = key; subEl.innerHTML = ''; subEl.hidden = !ln; if (ln) { const nm = { v: ['마르코', '#6fdcec'], b: ['반장', '#f0a050'] }[ln[1]]; if (nm) { const k = document.createElement('b'); k.textContent = nm[0]; k.style.color = nm[1]; subEl.append(k); } subEl.append(ln[2]); } } }
+  // in from black, out to black with the song's end
+  if (TL && (EPI.on || EPI.done)) { const a = Math.max(et < 1.5 ? 1 - et / 1.5 : 0, et > TL.len - 7 ? Math.min(1, (et - (TL.len - 7)) / 6) : 0); if (a > 0) { g.fillStyle = `rgba(0,0,0,${a})`; g.fillRect(0, 0, W, H); } }
   drawSceneFade(nowMs);
+}
+function drawMemory(et, a, vanish, nowMs) {
+  g.save(); g.globalAlpha = a;
+  const sk = g.createLinearGradient(0, 0, 0, 110); sk.addColorStop(0, '#d8b88a'); sk.addColorStop(1, '#f0d6a8'); g.fillStyle = sk; g.fillRect(0, 0, W, 110);
+  g.fillStyle = 'rgba(255,244,214,.8)'; g.beginPath(); g.arc(300, 78, 14, 0, Math.PI * 2); g.fill();
+  R(0, 104, W, 30, '#a8845e'); for (let i = 0; i < 16; i++) R((i * 37 + et * 6) % (W + 20) - 10, 108 + (i % 4) * 6, 8, 1, '#c8a47a');
+  R(0, 134, W, 82, '#7a5a3e'); R(0, 134, W, 2, '#8a6a4a');
+  R(14, 46, 120, 90, '#5e4230'); R(14, 46, 120, 4, '#6e5038'); for (let y = 58; y < 120; y += 16) for (let x = 22; x < 126; x += 18) R(x, y, 10, 8, '#7a5a40'); R(104, 16, 12, 30, '#4e3626');
+  for (let k = 0; k < 5; k++) { const p = ((et / 3) + k / 5) % 1; g.fillStyle = `rgba(230,210,180,${0.5 * (1 - p)})`; g.fillRect(Math.round(108 + p * 18 - p * 6), Math.round(12 - p * 26), Math.round(4 + p * 10), Math.round(4 + p * 10)); }
+  R(150, 152, 220, 6, '#4e3626'); R(152, 158, 4, 24, '#3e2a1c'); R(362, 158, 4, 24, '#3e2a1c');
+  R(352, 136, 16, 10, '#5e4230'); R(354, 138, 7, 5, '#3e2a1c'); for (let k = 0; k < 3; k++) { const p = ((et / 1.6) + k / 3) % 1; g.globalAlpha = a * (1 - p); eighthNote(358 + Math.sin(p * 6 + k) * 4, 128 - p * 20, '#3e2a1c'); g.globalAlpha = a; }
+  // the line of them: six coworkers and, fourth from the left, 마르코 in his yellow shirt (the only colour in it)
+  const xs = [168, 194, 220, 246, 272, 298, 324];
+  xs.forEach((x, i) => {
+    const mar = i === 3, vi = mar ? null : vanish[[0, 1, 2, 4, 5, 6].indexOf(i)], fade = vi == null ? 1 : Math.max(0, 1 - (et - vi) / 0.9); if (fade <= 0) return;
+    g.globalAlpha = a * fade; const top = 116 + (i % 2), bob = Math.floor(nowMs / 400 + i) % 2;
+    R(x - 5, top + 10 + bob, 10, 18, mar ? '#e8c23a' : '#5a3e2a'); R(x - 3, top + bob, 7, 8, mar ? '#efc7a6' : '#c8a07a'); R(x - 4, top - 2 + bob, 9, 3, mar ? '#6b3f22' : '#4a3020');
+    if (mar) { R(x - 3, top + 5 + bob, 7, 3, '#6b3f22'); R(x - 3, top + 14 + bob, 2, 2, '#d8463b'); R(x + 1, top + 20 + bob, 2, 2, '#d8463b'); }
+    if (vi != null && et > vi && et < vi + 0.9) for (let k = 0; k < 6; k++) R(x - 6 + rnd(k, i) * 12, top + 4 + rnd(k, i + 9) * 22 - (et - vi) * 12, 1, 1, '#f0d6a8');
+  });
+  g.globalAlpha = a;
+  // the edges dark like an old photo, a little grain
+  const vg = g.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, 230); vg.addColorStop(0, 'rgba(40,24,12,0)'); vg.addColorStop(1, 'rgba(40,24,12,.75)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 60; i++) R(Math.random() * W, Math.random() * H, 1, 1, 'rgba(60,40,20,.25)');
+  g.restore();
 }
 // 지우 standing in the office, one earbud hanging: head down, a hand at his chin, or flustered (a hand up, sweating); he turns
 // to 반장 once 반장 is in the room
@@ -7438,12 +7535,12 @@ function loadSong(sp) {
 }
 const loadSongs = level => { (level.songs || []).forEach(loadSong); if (level.pocha) loadSong(level.pocha); };
 const songReady = (i = 0) => !!(L.songs && L.songs[i] && SONG.bufs[L.songs[i].src]);
-function stopSong() { if (SONG.src) { try { SONG.src.stop(); } catch (e) {} SONG.src = null; } if (typeof rbStop === 'function') rbStop(); if (POCHA.src) { try { POCHA.src.stop(); } catch (e) {} POCHA.src = null; } POCHA.started = false; }
+function stopSong() { if (SONG.src) { try { SONG.src.stop(); } catch (e) {} SONG.src = null; } if (typeof rbStop === 'function') rbStop(); if (POCHA.src) { try { POCHA.src.stop(); } catch (e) {} POCHA.src = null; } POCHA.started = false; POCHA.t0 = null; }
 const POCHA = { src: null, started: false };
 function pochaSong() {
   const sp = L.pocha; if (!sp || POCHA.started || !ctx) return; const buf = SONG.bufs[sp.src]; if (buf === null || buf === undefined) return; POCHA.started = true; if (!buf) return;
   const s_ = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(), g_ = ctx.createGain(); s_.buffer = buf; hp.type = 'highpass'; hp.frequency.value = 90; lp.type = 'lowpass'; lp.frequency.value = 11000;
-  s_.connect(hp); hp.connect(lp); lp.connect(g_); g_.connect(mus); const T = ctx.currentTime; g_.gain.setValueAtTime(0.0001, T); g_.gain.linearRampToValueAtTime(sp.gain || 0.55, T + 1.5); s_.start(T); POCHA.src = s_;
+  s_.connect(hp); hp.connect(lp); lp.connect(g_); g_.connect(mus); const T = ctx.currentTime; g_.gain.setValueAtTime(0.0001, T); g_.gain.linearRampToValueAtTime(sp.gain || 0.55, T + 1.5); s_.start(T); POCHA.src = s_; POCHA.g = g_; POCHA.t0 = T;
 }
 // start song i at audio time T, `into` seconds past its first downbeat
 function startSong(T, into = 0, i = 0) {
@@ -7751,7 +7848,7 @@ function finishPlay(force) {
   stopSong(); state = 'outro'; stopHum(); stopHold(); bubble.hidden = true; subEl.hidden = true; hint.hidden = true; hud.classList.remove('cine'); judgeEl.classList.remove('cine'); $('devbtn').classList.remove('cine'); CAM.to = null; SLOW.on = false; DEV.open = false; devSync();
   const acc = accuracy();
   if (force == null) try { if ((progress[L.id] || 0) < acc) { progress[L.id] = acc; localStorage.setItem('belt.progress', JSON.stringify(progress)); } } catch (e) {}
-  runDialog(L.outro(force != null ? force : acc >= 0.8, stats.special), showResult);
+  if (L.epilogue) startEpilogue(force != null ? force : acc >= 0.8); else runDialog(L.outro(force != null ? force : acc >= 0.8, stats.special), showResult);
 }
 let runNo = 0;
 function showResult() {
@@ -7783,6 +7880,7 @@ const KEYS = new Set(['Space', 'Enter', 'KeyJ', 'KeyF', 'KeyD', 'KeyK']);
 function laneOf(side) { if (L.oneButton) return side; return L.lanes === 2 ? (L.autoLane != null ? 1 - L.autoLane : side === 'L' ? 0 : 1) : 0; }
 function handLabels() {}
 function press(ts, key, lane) {
+  if (state === 'outro' && EPI.on && !dlg) { epiPress(); return; }
   if (state === 'play' && GUIDE.on) guidePress(ts, key, lane);
   else if (state === 'play' && TUT.on && TUT.phase === 'talk') tutAdvance();
   else if (state === 'play') onHit(ts, key, lane);
