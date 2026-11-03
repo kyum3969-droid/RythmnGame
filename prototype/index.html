@@ -81,7 +81,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .bubble.obs{background:#d9d0bd}
 .bubble.tr::after{left:auto;right:1.6em}
 .bubble.mid::after{left:var(--tx,1.6em);right:auto}
-.sub{position:absolute;left:50%;top:69%;transform:translateX(-50%);max-width:70cqw;text-align:center;pointer-events:none;
+.sub{position:absolute;left:50%;top:73%;transform:translateX(-50%);max-width:70cqw;text-align:center;pointer-events:none;
   font-weight:700;font-size:clamp(13px,2.4cqw,24px);line-height:1.35;color:#f4ead8;background:rgba(10,8,8,.74);padding:.3em .8em;border-radius:.4em;
   box-shadow:0 2px 0 rgba(0,0,0,.45);white-space:nowrap}
 .sub b{font-weight:800;margin-right:.45em}
@@ -2891,9 +2891,11 @@ function drawBox(n, cx, bottom, mark, t, sq = 0) {
   const w = n.w + Math.round(sq * 2), h = n.h - Math.round(sq * 2), x = Math.round(cx - w / 2), y = Math.round(bottom - h);
   R(x + 1, bottom, w, 1, 'rgba(0,0,0,.45)');
   // 2-1's floor: the boxes a shade lighter, so they don't sink into the warm lamps
-  const kr = L.mid ? ['#d6a06a', '#e9bb83', '#a0703f'] : [C.kraft, C.kraftTop, C.kraftDark];
+  // (a box with a mate on the other side on the same beat, both hands at once: a white box, red tape, a printed ↑↑ mark)
+  const pairBox = L.mid && n.mate, kr = pairBox ? ['#ebe7dc', '#faf8f1', '#c2bcae'] : L.mid ? ['#d6a06a', '#e9bb83', '#a0703f'] : [C.kraft, C.kraftTop, C.kraftDark];
   R(x, y, w, h, kr[0]); R(x, y, w, 2, kr[1]); R(x + w - 2, y + 2, 2, h - 2, kr[2]);
-  R(x + (w >> 1) - 1, y, 3, h, n.off && L.offTilt ? '#d8463b' : L.lanes === 2 ? (n.lane === 0 ? C.vest : C.vest2) : C.tape);
+  R(x + (w >> 1) - 1, y, 3, h, pairBox ? '#d8463b' : n.off && L.offTilt ? '#d8463b' : L.lanes === 2 ? (n.lane === 0 ? C.vest : C.vest2) : C.tape);
+  if (pairBox && w >= 18) ['0100010', '1110111', '0100010', '0100010', '1111111'].forEach((row, r) => [...row].forEach((v, c) => { if (v === '1') R(x + w - 10 + c, y + 3 + r, 1, 1, '#2a2522'); }));
   if (n.pair && L.oneButton) R(x, y, w, 2, '#ffe9a8');
   if (n.grab && t >= n.tRel) { R(x + 2, y + 2, 5, 4, '#d8463b'); R(x + 3, y + 3, 3, 2, '#f08a7a'); }
   if (n.stamp && t >= passAt(n)) { const sx = x + 2, sy = y + 2; R(sx + 1, sy, 3, 1, '#c8352a'); R(sx + 1, sy + 4, 3, 1, '#c8352a'); R(sx, sy + 1, 1, 3, '#c8352a'); R(sx + 4, sy + 1, 1, 3, '#c8352a'); R(sx + 2, sy + 2, 1, 1, '#c8352a'); }
@@ -3606,7 +3608,7 @@ function midView(b, sEnd) {
   const z = L.mid.zoom, e = b < z[0] ? 0 : b >= z[1] ? 1 : ease((b - z[0]) / (z[1] - z[0]));
   // (stage 2: the view sits low, so the belts ride in the upper part of the screen, clear of the thumbs on a phone, and the whole
   // floor's width shows, 반장 and 마르코 not cut at the ends)
-  let s = lerp(1, sEnd, e), cx = lerp(W / 2, MID.ax, e), cy = lerp(H / 2, H / 2 + 58, e);
+  let s = lerp(1, sEnd, e), cx = lerp(W / 2, MID.ax, e), cy = lerp(H / 2, H / 2 + 38, e);
   // while 마르코 introduces himself beside you the camera comes in on the two of you, and goes back out after
   // (no zoom while 마르코 talks: the whole floor stays in view)
   return { s, cx, cy, e };
@@ -3705,8 +3707,9 @@ function rbChicago(nowMs) {
   for (let i = 0; i < 50; i++) R(rnd(i, 41) * WW, 130 + rnd(i, 42) * 180, 6 + rnd(i, 43) * 10, 1, 'rgba(140,150,190,.18)');
 }
 function rbBack(b, bReal, nowMs, active, live) {
-  const WW = MID.ww, x0 = live ? rbEdge(bReal) : WW, chi = live && bReal < L.rb.boom ? ease((bReal - 2) / 8) : 0;
-  if (chi > 0 && x0 > 0) { g.save(); g.beginPath(); g.rect(0, -MID.oy, x0, MID.wh); g.clip(); g.globalAlpha = chi; rbChicago(nowMs); g.restore(); }
+  const WW = MID.ww, x0 = live ? rbEdge(bReal) : WW, cw = live && bReal < L.rb.boom ? Math.min(x0, WW * ease((bReal - 4) / 2)) : 0;
+  if (cw > 0) { g.save(); g.beginPath(); g.rect(0, -MID.oy, cw, MID.wh); g.clip(); rbChicago(nowMs); g.restore();
+    if (cw < x0) { const gr = g.createLinearGradient(cw, 0, cw + 14, 0); gr.addColorStop(0, 'rgba(255,190,120,.45)'); gr.addColorStop(1, 'rgba(255,190,120,0)'); g.fillStyle = gr; g.fillRect(cw, -MID.oy, 14, MID.wh); R(cw - 1, -MID.oy, 2, MID.wh, 'rgba(255,220,170,.8)'); } }
   if (x0 < WW) {
     g.save(); g.beginPath(); g.rect(x0, -MID.oy, WW - x0, MID.wh); g.clip(); rbBeach(nowMs); g.restore();
     if (x0 > 0) { const gr = g.createLinearGradient(x0 - 14, 0, x0, 0); gr.addColorStop(0, 'rgba(255,236,170,0)'); gr.addColorStop(1, 'rgba(255,236,170,.45)'); g.fillStyle = gr; g.fillRect(x0 - 14, -MID.oy, 14, MID.wh); R(x0 - 1, -MID.oy, 2, MID.wh, 'rgba(255,252,230,.8)'); }
@@ -3820,15 +3823,7 @@ function drawMid(t, nowMs, active) {
       const x = noteX(n, T);
       if (n.state === 'hit') { if (x < end) drawBox(n, x, BELT_Y, '', T, T - n.hitAt < 0.1 ? 0.8 : 0); else { const dt = (x - end) / SPEED; if (dt < 0.5) { g.globalAlpha = 1 - dt / 0.5; drawBox(n, end, BELT_Y + 0.5 * 900 * dt * dt, '', T); g.globalAlpha = 1; } } continue; }
       if (n.state === 'miss') { if (x < end) drawBox(n, x, BELT_Y, 'miss', T); else { const dt = (x - end) / SPEED; if (dt < 0.6) { g.save(); g.globalAlpha = 1 - dt / 0.6; g.translate(end, BELT_Y + 0.5 * 700 * dt * dt - n.h / 2); g.rotate(dt * 5); drawBox(n, 0, n.h / 2, 'miss', T); g.restore(); } } continue; }
-      // a box with a mate on the other side (both hands at once): the two glow softly together, breathing on the beat, and a
-      // gloss runs across both at the same moment, so the pair reads by its twin; no badge on it
-      if (n.mate) { const w = n.w, h = n.h, cy = BELT_Y - h / 2, pulse = 0.6 + 0.4 * Math.max(0, 1 - (b - Math.floor(b)) * 2.5), r = w * 1.1;
-        const gl = g.createRadialGradient(x, cy, 2, x, cy, r); gl.addColorStop(0, `rgba(255,238,180,${0.62 * pulse})`); gl.addColorStop(0.55, `rgba(255,232,170,${0.25 * pulse})`); gl.addColorStop(1, 'rgba(255,232,170,0)'); g.fillStyle = gl; g.fillRect(x - r, cy - r, r * 2, r * 2); }
       drawBox(n, x, BELT_Y, '', T);
-      if (n.mate) { const w = n.w, h = n.h, x0 = Math.round(x - w / 2), y0 = BELT_Y - h, ph = b - Math.floor(b);
-        R(x0, y0, w, 1, '#fff4d0'); R(x0, y0 + h - 1, w, 1, 'rgba(255,244,208,.5)');
-        if (ph < 0.6) { const sx = x0 - 6 + (ph / 0.6) * (w + 12); g.save(); g.beginPath(); g.rect(x0, y0, w, h); g.clip(); g.globalAlpha = 0.55 * Math.sin(Math.PI * ph / 0.6);
-          g.fillStyle = '#fffbe8'; g.beginPath(); g.moveTo(sx, y0); g.lineTo(sx + 4, y0); g.lineTo(sx - 2, y0 + h); g.lineTo(sx - 6, y0 + h); g.closePath(); g.fill(); g.restore(); } }
     }
     if (!up && q === 0 && held) drawBox(held.n, held.x, held.y + held.n.h / 2, '', T);
     drawBeltFront(L.rb ? rbBeltT(T) : T, live); if (up) drawBeltLegs();
@@ -6833,7 +6828,7 @@ function popJudge(kind, sub = '', lane = 0) {
   judgeEl.className = 'judge ' + cls;
   judgeEl.style.top = kind === 'both' ? '19%' : L.lanes === 2 && lane === 0 ? '12%' : '29%';
   // on the four chutes the word comes up over the middle of the highway
-  const bNow = castBeatAt(songAt(performance.now()), state === 'play'), qd = (L.quad && quadP(bNow) > 0.5) || (L.mid && bNow >= L.mid.zoom[1]); judgeEl.style.left = qd ? '50%' : ''; if (qd) judgeEl.style.top = L.mid ? '55%' : '44%';
+  const bNow = castBeatAt(songAt(performance.now()), state === 'play'), qd = (L.quad && quadP(bNow) > 0.5) || (L.mid && bNow >= L.mid.zoom[1]); judgeEl.style.left = qd ? '50%' : ''; if (qd) judgeEl.style.top = L.mid ? '60%' : '44%';
   judgeEl.innerHTML = '';
   judgeEl.append(txt);
   if (sub) { const s = document.createElement('small'); s.textContent = sub; judgeEl.append(s); }
