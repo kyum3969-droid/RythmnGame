@@ -956,8 +956,8 @@ const LEVELS = [
               [84, 'v', '…아쉽게 됐네요.', 4.5], [100, 'v', '…반장님한텐 내일 사과해야겠어요.', 5],
               [108, 'v', '(잔을 내려놓는다) 그래도요, 신입.', 5], [114, 'v', '나 여기선 도움이 되고 싶어요.', 5], [122, 'v', '진짜 에이스.', 4],
               [127, 'v', '…그게 뭔지는 아직 모르겠지만.', 5], [135, 'v', '(잔을 든다) 짠.', 4], [141, 'v', '내일 또 봐요, 신입.', 5]],
-      cam: [[0, 1, 192, 108], [8, 1, 192, 108], [20, 1.35, 196, 112], [25, 1.35, 196, 112], [29, 1.75, 150, 112], [33, 1.75, 150, 112], [93, 1.12, 192, 110], [99, 1.12, 192, 110],
-            [104, 1.5, 192, 114], [132, 1.5, 192, 114], [136, 1.75, 192, 116], [145, 1.75, 192, 116], [160, 1, 192, 96], [170, 1, 192, 96]],
+      cam: [[0, 1, 192, 108], [8, 1, 192, 108], [20, 1.5, 192, 116], [25, 1.5, 192, 116], [29, 2.1, 170, 118], [33, 2.1, 170, 118], [93, 1.2, 192, 112], [99, 1.2, 192, 112],
+            [104, 1.8, 192, 118], [132, 1.8, 192, 118], [136, 2.2, 193, 118], [145, 2.2, 193, 118], [160, 1, 192, 100], [170, 1, 192, 100]],
       poses: [[12, 17.5, 'pour'], [20, 24.5, 'drink'], [25, 28, 'spin'], [70, 76, 'spin'], [77, 92, 'down'], [100, 106, 'down'], [135, 147, 'raise']],
       // the memory (flash): his first days here, in sepia: the others in a knot at the far end with their backs to him, him alone
       // loading his belt; from `fast` his boxes fly; at `turn` they turn round to him (a cheer)
@@ -966,7 +966,7 @@ const LEVELS = [
       fail: { len: 42,
         lines: [[2, '', '새벽 5시 반. 센터 앞 포장마차.', 5], [9, 'v', '(잔을 채운다) …오늘은 다 엉망이었네요.', 5], [17, 'v', '…또 내가 망쳤어. 늘 이래.', 5],
                 [25, 'v', '그래도 도움이 되고 싶은데.', 4.5], [31, 'v', '…내일 다시 해요, 신입.', 5]],
-        cam: [[0, 1, 192, 108], [6, 1, 192, 108], [14, 1.6, 150, 112], [30, 1.6, 150, 112], [36, 1.2, 192, 110], [42, 1.2, 192, 110]],
+        cam: [[0, 1, 192, 108], [6, 1, 192, 108], [14, 2, 172, 118], [30, 2, 172, 118], [36, 1.5, 192, 114], [42, 1.5, 192, 114]],
         poses: [[9, 14, 'pour'], [17, 23, 'down'], [25, 30, 'spin'], [31, 38, 'raise']], raise2: [32, 38], clink: 33.5, dawn: [20, 60] } },
     outro: good => good ? [
       { who:'', text:'새벽 5시 반. 센터 앞 포장마차. 둘 말고는 아무도 없다.', scene:'pocha' },
@@ -3713,7 +3713,8 @@ function rbBeach(nowMs) {
 }
 // 반장's look: an old Chicago night. A dark sky, a skyline with lit windows, the L on its girders (a train going by now and
 // then), brick, a neon BLUES sign and a BAR one buzzing, lamp posts, and a wet street that throws the neon back
-const RB_GLYPH = { B: ['110', '101', '110', '101', '110'], L: ['100', '100', '100', '100', '111'], U: ['101', '101', '101', '101', '111'], E: ['111', '100', '110', '100', '111'],
+const RB_GLYPH = { H: ['101', '101', '111', '101', '101'], O: ['111', '101', '101', '101', '111'], F: ['111', '100', '110', '100', '100'], P: ['110', '101', '110', '100', '100'], C: ['111', '100', '100', '100', '111'],
+  2: ['111', '001', '111', '100', '111'], 4: ['101', '101', '111', '001', '001'], T: ['111', '010', '010', '010', '010'], X: ['101', '101', '010', '101', '101'], I: ['111', '010', '010', '010', '111'], N: ['101', '111', '111', '111', '101'], G: ['111', '100', '101', '101', '111'], K: ['101', '110', '100', '110', '101'], V: ['101', '101', '101', '101', '010'], B: ['110', '101', '110', '101', '110'], L: ['100', '100', '100', '100', '111'], U: ['101', '101', '101', '101', '111'], E: ['111', '100', '110', '100', '111'],
   S: ['111', '100', '111', '001', '111'], A: ['111', '101', '111', '101', '101'], R: ['110', '101', '110', '101', '101'] };
 function rbNeon(text, x, y, k, col, on) {
   [...text].forEach((ch, i) => RB_GLYPH[ch].forEach((row, r) => [...row].forEach((v, c) => { if (v === '1') { const px = x + i * 4 * k + c * k, py = y + r * k;
@@ -4759,58 +4760,58 @@ function epiPress() { const now = performance.now(); if (now - EPI.skipAt < 2000
 // a value along keyframes [[t, ...values]], eased between them
 function keyAt(K, t) { if (t <= K[0][0]) return K[0].slice(1); for (let i = 1; i < K.length; i++) if (t < K[i][0]) { const a = K[i - 1], b = K[i], e = ease((t - a[0]) / (b[0] - a[0])); return a.slice(1).map((v, j) => lerp(v, b[j + 1], e)); } return K[K.length - 1].slice(1); }
 const mixC = (a, b, k) => { const p = x => [parseInt(x.slice(1, 3), 16), parseInt(x.slice(3, 5), 16), parseInt(x.slice(5, 7), 16)], A = p(a), B = p(b); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], k))).join(',')})`; };
-// the 포장마차's still parts, drawn once each: the street behind (blocks with rooftop water tanks and lit windows, a
-// convenience store, a utility pole and its sagging wires, the pavement and the wet road), in a night and a dawn palette that
-// the scene crossfades as day comes; and the tent (the tarp roof with its scalloped edge and folds, clear plastic sides, the
-// back wall with menus, a soju fridge, the counter with the fish-cake pot, stacked stools, a gas can)
+// the 포장마차 at dawn, small, in the middle of a nightlife street: blocks hung with shop signs (HOF, PC, BAR, 24, KTV,
+// vertical banners) whose neon goes out one by one as the day comes, a utility pole and sagging wires, the night's rubbish
+// bags at the curb, a corner convenience store, a wet road. The still parts are drawn once (the street in a night and a dawn
+// palette, crossfaded as it gets light; the tent), the signs, lights, steam, the taxi and the two of them every frame.
 const POCHA_CV = {};
+// the shop signs: [x, y, text, rgb, vertical, the dawn at which it goes out]
+const POCHA_SIGNS = [[8, 66, 'HOF', '255,150,60', false, 0.35], [44, 34, 'BAR', '255,80,140', true, 0.6], [64, 58, 'PC', '90,220,255', false, 0.25], [82, 82, '24', '120,255,140', false, 0.95],
+  [280, 40, 'KTV', '200,120,255', true, 0.5], [300, 60, 'BAR', '255,80,140', false, 0.7], [338, 50, 'HOF', '255,190,80', false, 0.4]];
 function pochaLayer(kind) {
   if (POCHA_CV[kind]) return POCHA_CV[kind];
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g0 = g; g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
   if (kind === 'tent') {
-    // the back wall inside, warm and dim, with menus taped up; the fridge glowing; the counter and the pot; stools; a gas can
-    const wall = g.createLinearGradient(0, 60, 0, 170); wall.addColorStop(0, '#4a2416'); wall.addColorStop(1, '#2a140c'); g.fillStyle = wall; g.fillRect(76, 60, 232, 110);
-    for (let x = 80; x < 306; x += 9) R(x, 60, 1, 110, 'rgba(0,0,0,.12)');
-    [[88, 70], [112, 68], [136, 71], [244, 69]].forEach(([x, y], i) => { R(x, y, 18, 22, '#efe6d2'); R(x, y, 18, 2, '#d8cdb6'); for (let k = 0; k < 5; k++) R(x + 2, y + 4 + k * 3.5, 9 + ((k + i) % 3) * 2, 1, k === 0 ? '#c8302a' : '#3a2a22'); R(x + 13, y + 4, 3, 1, '#c8302a'); R(x + 8, y - 1, 2, 2, '#9a8a78'); });
-    R(278, 70, 28, 72, '#d8dde2'); R(280, 72, 24, 60, '#e9f6fa'); for (let r = 0; r < 4; r++) { R(281, 77 + r * 14, 22, 1, '#b8c4c8'); for (let c = 0; c < 5; c++) { R(282 + c * 4, 69 + r * 14 + 2, 3, 6, '#2e8a4a'); R(282 + c * 4, 69 + r * 14, 3, 2, '#d8e8d0'); } }
-    R(300, 98, 2, 10, '#9aa4a8'); R(278, 132, 28, 10, '#b8bec4'); R(280, 134, 10, 2, '#3a8a5a');
-    R(84, 104, 186, 4, '#7a4a2a'); R(84, 108, 186, 10, '#5a321c'); R(84, 108, 186, 1, '#8a5a36');
-    R(204, 94, 30, 12, '#8a9098'); R(204, 94, 30, 2, '#b8bec6'); R(206, 96, 26, 6, '#5a3020'); for (let k = 0; k < 6; k++) { R(208 + k * 4, 84 + (k % 2) * 3, 1, 12, '#c8a070'); R(207 + k * 4, 88 + (k % 2) * 3, 3, 5, '#d89a5a'); }
-    for (let k = 0; k < 4; k++) { R(86, 150 - k * 7, 16, 3, k % 2 ? '#2d7fd0' : '#c8302a'); R(88, 153 - k * 7, 2, 4, k % 2 ? '#1f5a98' : '#8a2420'); R(98, 153 - k * 7, 2, 4, k % 2 ? '#1f5a98' : '#8a2420'); }
-    R(254, 150, 8, 14, '#3a6ab0'); R(254, 150, 8, 2, '#5a8ad0'); R(256, 147, 4, 3, '#2a2a30'); R(255, 155, 6, 4, '#e8e0c8');
-    // the tarp: poles, the clear plastic sides (the inside showing through, warm), the roof with folds and a scalloped edge
-    for (const px of [58, 324]) { R(px, 40, 4, 132, '#6a7078'); R(px, 40, 1, 132, '#9aa0a8'); }
-    for (const [x0, x1] of [[58, 78], [306, 326]]) { g.fillStyle = 'rgba(255,190,130,.28)'; g.fillRect(x0, 46, x1 - x0, 124); for (let y = 52; y < 168; y += 11) R(x0 + 2, y, x1 - x0 - 4, 1, 'rgba(255,240,220,.18)'); R(x0, 46, 1, 124, 'rgba(255,230,200,.5)'); R(x1 - 1, 46, 1, 124, 'rgba(255,230,200,.5)'); }
-    g.fillStyle = '#d8551e'; g.beginPath(); g.moveTo(50, 46); g.lineTo(70, 30); g.lineTo(314, 30); g.lineTo(334, 46); g.closePath(); g.fill();
-    for (let x = 74; x < 312; x += 22) { g.fillStyle = 'rgba(120,30,10,.28)'; g.beginPath(); g.moveTo(x, 30); g.lineTo(x + 6, 30); g.lineTo(x + 2 - (x - 192) * 0.08, 46); g.lineTo(x - 4 - (x - 192) * 0.08, 46); g.closePath(); g.fill(); }
-    R(70, 30, 244, 2, '#f08a3a');
-    for (let x = 50; x < 334; x += 12) { R(x, 46, 12, 5, '#e0662a'); R(x + 1, 51, 10, 2, '#e0662a'); R(x + 3, 53, 6, 1, '#e0662a'); R(x, 46, 12, 1, '#f4f1ea'); }
-    R(50, 45, 284, 1, '#a8401a');
-    // the rolled-up front flap under the roof edge, tied with straps
-    R(76, 56, 232, 5, '#c8b8a0'); R(76, 56, 232, 1, '#e8dcc8'); for (const x of [96, 150, 234, 288]) R(x, 54, 3, 9, '#5a3a22');
+    // the back wall inside, warm and dim, menus taped up, the counter with the fish-cake pot, a soju fridge, a gas can
+    const wall = g.createLinearGradient(0, 76, 0, 170); wall.addColorStop(0, '#4a2416'); wall.addColorStop(1, '#2a140c'); g.fillStyle = wall; g.fillRect(128, 76, 128, 94);
+    for (let x = 130; x < 256; x += 8) R(x, 76, 1, 94, 'rgba(0,0,0,.12)');
+    [[132, 84], [150, 82]].forEach(([x, y], i) => { R(x, y, 14, 18, '#efe6d2'); for (let k = 0; k < 4; k++) R(x + 2, y + 3 + k * 3.5, 7 + ((k + i) % 3) * 2, 1, k === 0 ? '#c8302a' : '#3a2a22'); R(x + 6, y - 1, 2, 2, '#9a8a78'); });
+    R(236, 84, 18, 66, '#d8dde2'); R(238, 86, 14, 54, '#e9f6fa'); for (let r = 0; r < 4; r++) { R(239, 90 + r * 13, 12, 1, '#b8c4c8'); for (let c = 0; c < 3; c++) { R(240 + c * 4, 83 + r * 13 + 2, 3, 6, '#2e8a4a'); R(240 + c * 4, 83 + r * 13, 3, 2, '#d8e8d0'); } }
+    R(132, 114, 102, 3, '#7a4a2a'); R(132, 117, 102, 8, '#5a321c'); R(132, 117, 102, 1, '#8a5a36');
+    R(196, 104, 22, 10, '#8a9098'); R(196, 104, 22, 2, '#b8bec6'); R(198, 106, 18, 5, '#5a3020'); for (let k = 0; k < 4; k++) { R(200 + k * 4, 95 + (k % 2) * 3, 1, 11, '#c8a070'); R(199 + k * 4, 99 + (k % 2) * 3, 3, 4, '#d89a5a'); }
+    R(222, 152, 7, 12, '#3a6ab0'); R(222, 152, 7, 2, '#5a8ad0'); R(224, 149, 3, 3, '#2a2a30');
+    // the tarp: poles, clear plastic sides, the roof with folds and a scalloped edge, the front flap rolled up
+    for (const px of [112, 268]) { R(px, 56, 4, 116, '#6a7078'); R(px, 56, 1, 116, '#9aa0a8'); }
+    for (const [x0, x1] of [[114, 128], [256, 270]]) { g.fillStyle = 'rgba(255,190,130,.28)'; g.fillRect(x0, 62, x1 - x0, 108); for (let y = 68; y < 168; y += 10) R(x0 + 2, y, x1 - x0 - 4, 1, 'rgba(255,240,220,.18)'); R(x0, 62, 1, 108, 'rgba(255,230,200,.5)'); R(x1 - 1, 62, 1, 108, 'rgba(255,230,200,.5)'); }
+    g.fillStyle = '#d8551e'; g.beginPath(); g.moveTo(104, 62); g.lineTo(120, 48); g.lineTo(264, 48); g.lineTo(280, 62); g.closePath(); g.fill();
+    for (let x = 124; x < 262; x += 18) { g.fillStyle = 'rgba(120,30,10,.28)'; g.beginPath(); g.moveTo(x, 48); g.lineTo(x + 5, 48); g.lineTo(x + 2 - (x - 192) * 0.1, 62); g.lineTo(x - 3 - (x - 192) * 0.1, 62); g.closePath(); g.fill(); }
+    R(120, 48, 144, 2, '#f08a3a');
+    for (let x = 104; x < 280; x += 11) { R(x, 62, 11, 5, '#e0662a'); R(x + 1, 67, 9, 2, '#e0662a'); R(x + 3, 69, 5, 1, '#e0662a'); R(x, 62, 11, 1, '#f4f1ea'); }
+    R(104, 61, 176, 1, '#a8401a');
+    R(128, 72, 128, 4, '#c8b8a0'); R(128, 72, 128, 1, '#e8dcc8'); for (const x of [142, 186, 240]) R(x, 70, 3, 8, '#5a3a22');
   } else {
-    const day = kind === 'day', P = day ? { b1: '#3e3e58', b2: '#4a4a66', win: '#5a5a78', lit: 0.04, tank: '#5a8ab0', road: '#34343e', walk: '#5a5862', pole: '#2a2a30', wire: '#2a2a34', store: 'rgba(230,250,255,.5)' }
-      : { b1: '#161a2c', b2: '#1c2036', win: '#262a40', lit: 0.16, tank: '#2a4a6a', road: '#1c1d24', walk: '#2e2e38', pole: '#0e0e14', wire: '#0c0c12', store: 'rgba(230,250,255,.9)' };
-    // two rows of blocks: rooftop water tanks, antennas, windows (a few lit at night)
-    for (const [row, col, y0] of [[0, P.b1, 46], [1, P.b2, 62]]) for (let i = 0, x = -6; x < W; i++) {
-      const w = 28 + Math.floor(rnd(i, 83 + row) * 34), top = y0 + Math.floor(rnd(i, 84 + row) * 30);
-      R(x, top, w, 122 - top, col); R(x, top, w, 1, day ? '#5a5a76' : '#262a42');
-      if (rnd(i, 86 + row) < 0.5) { const tx = x + 4 + Math.floor(rnd(i, 87) * (w - 16)); R(tx, top - 9, 12, 8, P.tank); R(tx, top - 9, 12, 1, day ? '#7aaad0' : '#3a5a7a'); R(tx + 1, top - 1, 1, 1, P.pole); R(tx + 10, top - 1, 1, 1, P.pole); }
-      if (rnd(i, 88 + row) < 0.25) { R(x + w - 6, top - 14, 1, 14, P.pole); R(x + w - 9, top - 10, 7, 1, P.pole); }
-      for (let wy = top + 5; wy < 116; wy += 8) for (let wx = x + 3; wx < x + w - 4; wx += 6) { const k = rnd(wx + wy * 5, 85 + row); R(wx, wy, 3, 4, k < P.lit ? (k < P.lit / 2 ? '#e8b868' : '#c98a4a') : P.win); }
-      x += w + 1;
+    const day = kind === 'day', P = day ? { b: ['#3e3e58', '#46465e', '#504a64'], win: '#5a5a78', lit: 0.03, road: '#34343e', walk: '#5a5862', pole: '#2a2a30', wire: '#2a2a34', board: '#3a3644' }
+      : { b: ['#161a2c', '#1c1a30', '#221a2e'], win: '#262a40', lit: 0.18, road: '#1c1d24', walk: '#2e2e38', pole: '#0e0e14', wire: '#0c0c12', board: '#141018' };
+    // far blocks behind the tent's roof, then the near blocks either side of it, packed with sign boards
+    for (let i = 0, x = 96; x < 290; i++) { const w = 22 + Math.floor(rnd(i, 71) * 20), top = 22 + Math.floor(rnd(i, 72) * 22); R(x, top, w, 70 - top, P.b[0]); for (let wy = top + 4; wy < 66; wy += 7) for (let wx = x + 3; wx < x + w - 3; wx += 5) R(wx, wy, 2, 3, rnd(wx + wy * 3, 73) < P.lit ? '#e8b868' : P.win); x += w + 1; }
+    for (const [x0, x1, top, ci] of [[0, 40, 28, 1], [40, 62, 24, 2], [62, 112, 48, 0], [272, 296, 30, 2], [296, 334, 44, 1], [334, 384, 40, 0]]) {
+      R(x0, top, x1 - x0, 122 - top, P.b[ci]); R(x0, top, x1 - x0, 2, day ? '#5a5a76' : '#2a2a42');
+      for (let wy = top + 6; wy < 112; wy += 9) for (let wx = x0 + 3; wx < x1 - 5; wx += 7) R(wx, wy, 4, 5, rnd(wx * 3 + wy, 74) < P.lit ? '#c98a4a' : P.win);
     }
-    // a convenience store on the corner, its window bright, a stripe of sign over it
-    R(334, 74, 54, 48, day ? '#5a5a6a' : '#22242e'); R(334, 74, 54, 8, '#2a7ad0'); R(334, 80, 54, 2, '#3ab06a'); R(338, 86, 46, 30, P.store); for (let x = 340; x < 384; x += 9) R(x, 86, 1, 30, day ? '#7a8a96' : '#8aa4b4'); for (let k = 0; k < 5; k++) R(342 + k * 8, 104, 5, 10, day ? '#8a96a0' : '#c8d8e0');
-    // the utility pole with its crossarm and transformer, wires sagging across
-    R(28, 8, 5, 116, P.pole); R(18, 18, 26, 3, P.pole); R(36, 30, 7, 11, P.pole); R(37, 28, 5, 2, P.pole);
-    g.strokeStyle = P.wire; g.lineWidth = 1;
-    for (const [y0, y1, sag] of [[19, 26, 14], [19, 34, 18], [22, 44, 10]]) { g.beginPath(); g.moveTo(20, y0); g.quadraticCurveTo(200, y0 + sag + 20, 400, y1); g.stroke(); }
-    // the pavement (tiles), the curb, the wet road (a faded line, a manhole)
-    R(0, 120, W, 10, P.walk); for (let x = 0; x < W; x += 14) R(x, 120, 1, 10, day ? '#4a4852' : '#24242c'); R(0, 124, W, 1, day ? '#4a4852' : '#24242c');
-    R(0, 130, W, 3, day ? '#7a7882' : '#3a3a44'); R(0, 133, W, 83, P.road); for (let x = 6; x < W; x += 40) R(x, 196, 20, 2, 'rgba(200,170,80,.25)');
-    g.fillStyle = day ? '#44444e' : '#22222a'; g.beginPath(); g.ellipse(350, 186, 14, 4, 0, 0, Math.PI * 2); g.fill();
-    for (const [x, y, w] of [[40, 178, 50], [120, 204, 70], [300, 208, 60]]) { g.fillStyle = day ? 'rgba(160,170,200,.25)' : 'rgba(60,60,90,.35)'; g.beginPath(); g.ellipse(x, y, w / 2, 4, 0, 0, Math.PI * 2); g.fill(); }
+    for (const [x, y, txt, , vert] of POCHA_SIGNS) { const n = txt.length, w = vert ? 10 : n * 8 + 4, h = vert ? n * 12 + 4 : 14; R(x - 2, y - 2, w, h, P.board); R(x - 2, y - 2, w, 1, day ? '#5a5466' : '#2a2430'); }
+    // a corner convenience store on the right, its window bright, its sign band
+    R(338, 90, 46, 32, day ? '#5a5a6a' : '#22242e'); R(338, 90, 46, 6, '#2a7ad0'); R(338, 95, 46, 1, '#3ab06a'); R(341, 98, 40, 22, day ? 'rgba(230,250,255,.45)' : 'rgba(230,250,255,.9)'); for (let x = 343; x < 380; x += 8) R(x, 98, 1, 22, day ? '#7a8a96' : '#8aa4b4');
+    // the utility pole with its crossarm and transformer, the wires sagging across the street
+    R(94, 10, 5, 114, P.pole); R(84, 20, 26, 3, P.pole); R(100, 32, 7, 11, P.pole);
+    g.strokeStyle = P.wire; g.lineWidth = 1; for (const [y0, y1, sag] of [[21, 18, 16], [21, 30, 20], [24, 40, 12]]) { g.beginPath(); g.moveTo(-10, y0 + 6); g.quadraticCurveTo(40, y0 + sag, 86, y0); g.moveTo(108, y0); g.quadraticCurveTo(250, y0 + sag + 14, 400, y1); g.stroke(); }
+    // the pavement, the curb, the night's rubbish bags piled by the pole, the wet road with a faded line, puddles, a manhole
+    R(0, 122, W, 9, P.walk); for (let x = 0; x < W; x += 13) R(x, 122, 1, 9, day ? '#4a4852' : '#24242c');
+    R(0, 131, W, 3, day ? '#7a7882' : '#3a3a44'); R(0, 134, W, 82, P.road); for (let x = 6; x < W; x += 40) R(x, 196, 20, 2, 'rgba(200,170,80,.25)');
+    for (const [x, y, c] of [[70, 116, '#1a1a1e'], [80, 114, '#e8e8e0'], [88, 117, '#1a1a1e'], [76, 119, '#2a2a30'], [62, 119, '#d8d0c0']]) { g.fillStyle = day ? c : c === '#e8e8e0' || c === '#d8d0c0' ? '#6a6a70' : c; g.beginPath(); g.ellipse(x, y, 6, 5, 0, 0, Math.PI * 2); g.fill(); }
+    g.fillStyle = day ? '#44444e' : '#22222a'; g.beginPath(); g.ellipse(330, 188, 14, 4, 0, 0, Math.PI * 2); g.fill();
+    for (const [x, y, w] of [[40, 180, 50], [150, 206, 70], [300, 210, 60]]) { g.fillStyle = day ? 'rgba(160,170,200,.25)' : 'rgba(60,60,90,.35)'; g.beginPath(); g.ellipse(x, y, w / 2, 4, 0, 0, Math.PI * 2); g.fill(); }
+    // plastic stools stacked outside the tent
+    for (let k = 0; k < 3; k++) { R(282, 150 - k * 6, 14, 3, k % 2 ? '#2d7fd0' : '#c8302a'); R(283, 153 - k * 6, 2, 4, k % 2 ? '#1f5a98' : '#8a2420'); R(293, 153 - k * 6, 2, 4, k % 2 ? '#1f5a98' : '#8a2420'); }
   }
   g = g0; POCHA_CV[kind] = cv; return cv;
 }
@@ -4824,64 +4825,62 @@ function drawPocha(nowMs) {
   const [cz, ccx, ccy] = TL && TL.cam ? keyAt(TL.cam, et) : [1, W / 2, H / 2];
   const hw = W / (2 * cz), hh = H / (2 * cz), cx = Math.max(hw, Math.min(W - hw, ccx)), cy = Math.max(hh, Math.min(H - hh, ccy));
   g.save(); g.translate(W / 2, H / 2); g.scale(cz, cz); g.translate(-cx, -cy);
-  // the sky lightening from night into dawn, the stars going, the sun coming up behind the blocks
-  const sky = g.createLinearGradient(0, 0, 0, 120); sky.addColorStop(0, mixC('#141c3a', '#4a6aa8', dawn)); sky.addColorStop(0.6, mixC('#3a4672', '#e2a27e', dawn)); sky.addColorStop(1, mixC('#c4876a', '#ffd8a0', dawn)); g.fillStyle = sky; g.fillRect(0, 0, W, 120);
-  g.globalAlpha = 1 - dawn; for (let i = 0; i < 18; i++) R(rnd(i, 81) * W, rnd(i, 82) * 50, 1, 1, '#9aa4cc'); g.globalAlpha = 1;
-  if (TL && TL.sun && et > TL.sun[0]) { const sy = lerp(132, 60, ease((et - TL.sun[0]) / (TL.sun[1] - TL.sun[0]))); const sg = g.createRadialGradient(356, sy, 4, 356, sy, 44); sg.addColorStop(0, 'rgba(255,240,200,.65)'); sg.addColorStop(1, 'rgba(255,220,160,0)'); g.fillStyle = sg; g.fillRect(306, sy - 44, 100, 88); g.fillStyle = '#fff1c8'; g.beginPath(); g.arc(356, sy, 11, 0, Math.PI * 2); g.fill(); }
+  // the sky lightening from night into dawn, the stars going, the sun coming up between the blocks
+  const sky = g.createLinearGradient(0, 0, 0, 120); sky.addColorStop(0, mixC('#141c3a', '#4a6aa8', dawn)); sky.addColorStop(0.6, mixC('#3a4672', '#e2a27e', dawn)); sky.addColorStop(1, mixC('#c4876a', '#ffd8a0', dawn)); g.fillStyle = sky; g.fillRect(0, 0, W, 122);
+  g.globalAlpha = 1 - dawn; for (let i = 0; i < 18; i++) R(rnd(i, 81) * W, rnd(i, 82) * 40, 1, 1, '#9aa4cc'); g.globalAlpha = 1;
+  if (TL && TL.sun && et > TL.sun[0]) { const sy = lerp(120, 34, ease((et - TL.sun[0]) / (TL.sun[1] - TL.sun[0]))); const sg = g.createRadialGradient(318, sy, 4, 318, sy, 44); sg.addColorStop(0, 'rgba(255,240,200,.65)'); sg.addColorStop(1, 'rgba(255,220,160,0)'); g.fillStyle = sg; g.fillRect(270, sy - 44, 100, 88); g.fillStyle = '#fff1c8'; g.beginPath(); g.arc(318, sy, 10, 0, Math.PI * 2); g.fill(); }
   g.drawImage(pochaLayer('night'), 0, 0); if (dawn > 0) { g.globalAlpha = dawn; g.drawImage(pochaLayer('day'), 0, 0); g.globalAlpha = 1; }
-  // the tent's glow spilling on the wet road in front
-  { const gl = g.createRadialGradient(192, 176, 10, 192, 176, 150); gl.addColorStop(0, `rgba(255,150,70,${0.28 * (1 - 0.5 * dawn)})`); gl.addColorStop(1, 'rgba(255,150,70,0)'); g.fillStyle = gl; g.fillRect(40, 130, 304, 86); }
-  // the first truck of the morning going by in the street, its headlights sweeping over the tent
+  // the shop signs' neon, buzzing, going out one by one as it gets light (a stutter, then dark), smeared in the wet road
+  POCHA_SIGNS.forEach(([x, y, txt, col, vert, off], i) => {
+    const d = dawn - off, on = d < 0 ? Math.floor(t * 8 + i * 3) % 29 !== 0 : d < 0.04 ? Math.floor(t * 14 + i) % 2 === 0 : false;
+    if (vert) [...txt].forEach((ch, k) => rbNeon(ch, x, y + k * 12, 2, col, on)); else rbNeon(txt, x, y, 2, col, on);
+    if (on) for (let k = 0; k < 8; k++) { g.fillStyle = `rgba(${col},${0.1 * (1 - k / 8)})`; g.fillRect(x + Math.round(Math.sin(t * 2 + k + i) * 2), 138 + k * 8, vert ? 6 : txt.length * 8 - 2, 3); }
+  });
+  { const gl = g.createRadialGradient(192, 178, 10, 192, 178, 110); gl.addColorStop(0, `rgba(255,150,70,${0.28 * (1 - 0.5 * dawn)})`); gl.addColorStop(1, 'rgba(255,150,70,0)'); g.fillStyle = gl; g.fillRect(80, 134, 224, 82); }
+  // a taxi going by in the street, its roof sign lit, its headlights sweeping over the tent
   const tr = in1(TL && TL.truck); let sweep = 0;
-  if (tr) { const k = (et - tr[0]) / (tr[1] - tr[0]), x = lerp(W + 70, -150, k); g.fillStyle = 'rgba(255,240,190,.18)'; g.beginPath(); g.moveTo(x, 174); g.lineTo(x - 120, 160); g.lineTo(x - 120, 196); g.closePath(); g.fill();
-    R(x, 150, 66, 28, '#1c1e26'); R(x - 14, 160, 16, 18, '#23252e'); R(x - 12, 162, 8, 6, '#3a4a5a'); R(x - 15, 172, 3, 3, '#fff6d0'); R(x + 6, 178, 8, 6, '#0e0f14'); R(x + 48, 178, 8, 6, '#0e0f14');
-    sweep = Math.max(0, 1 - Math.abs(x - 192) / 120); }
-  // the tent: a frame, the tarp roof and sides glowing orange, the inside warm under the one bulb (less needed as day comes)
+  if (tr) { const k = (et - tr[0]) / (tr[1] - tr[0]), x = lerp(W + 50, -100, k); g.fillStyle = 'rgba(255,240,190,.18)'; g.beginPath(); g.moveTo(x, 170); g.lineTo(x - 110, 158); g.lineTo(x - 110, 192); g.closePath(); g.fill();
+    R(x, 160, 46, 12, '#e8963a'); R(x + 6, 152, 30, 9, '#e8963a'); R(x + 8, 154, 12, 6, '#2a3a5a'); R(x + 22, 154, 12, 6, '#2a3a5a'); R(x, 168, 46, 4, '#b86a2a'); R(x + 14, 148, 14, 4, '#fff2b0'); R(x - 1, 163, 2, 3, '#fff6d0'); R(x + 6, 172, 8, 5, '#0e0f14'); R(x + 32, 172, 8, 5, '#0e0f14');
+    sweep = Math.max(0, 1 - Math.abs(x - 192) / 90); }
+  // the tent and the warm light inside: the bulb (less needed as day comes), a string of little lights, the pot's steam
   const bulb = 1 - 0.65 * dawn;
   g.drawImage(pochaLayer('tent'), 0, 0);
-  // inside: the warm light of the bulb (brighter as a truck's lights sweep by), the string of little bulbs, the pot's steam
-  const warm = g.createRadialGradient(192, 70, 4, 192, 96, 150); warm.addColorStop(0, `rgba(255,214,150,${0.5 * bulb + 0.25 * sweep})`); warm.addColorStop(1, 'rgba(255,150,70,0)'); g.fillStyle = warm; g.fillRect(76, 60, 232, 110);
-  for (let k = 0; k < 22; k++) { const x = 82 + k * 10.5, y = 63 + Math.round(Math.sin(k * 0.6) * 1.5), on = (Math.floor(t * 2) + k) % 5 !== 0; R(x, y, 2, 2, on ? (k % 3 === 0 ? '#ffd27a' : k % 3 === 1 ? '#ff9a7a' : '#fff2c8') : '#7a5a3a'); }
-  g.strokeStyle = 'rgba(40,20,10,.6)'; g.lineWidth = 1; g.beginPath(); for (let k = 0; k < 22; k++) { const x = 83 + k * 10.5, y = 63 + Math.round(Math.sin(k * 0.6) * 1.5); if (k) g.lineTo(x, y); else g.moveTo(x, y); } g.stroke();
-  R(191, 46, 1, 18, '#1a1010'); const fl = (0.85 + 0.15 * Math.sin(t * 13) * Math.sin(t * 5.3)) * bulb; g.fillStyle = `rgba(255,236,180,${0.35 * fl})`; g.beginPath(); g.arc(191.5, 68, 12, 0, Math.PI * 2); g.fill(); R(189, 64, 5, 6, bulb > 0.5 ? '#fff3c8' : '#d8c8a0'); R(189, 63, 5, 1, '#5a5048');
-  for (let k = 0; k < 5; k++) { const p = ((t / 2.2) + k / 5) % 1, sz = 2 + p * 7; g.fillStyle = `rgba(240,230,220,${0.28 * (1 - p)})`; g.fillRect(Math.round(219 + Math.sin(p * 5 + k) * 4 - sz / 2), Math.round(90 - p * 30), Math.round(sz), Math.round(sz)); }
-  // the plastic stools they sit on (ribbed red)
-  for (const sx of [112, 272]) { R(sx - 10, 150, 20, 4, '#d8352a'); R(sx - 10, 150, 20, 1, '#f05a4a'); R(sx - 9, 154, 3, 16, '#a02420'); R(sx + 6, 154, 3, 16, '#a02420'); R(sx - 6, 160, 12, 2, '#a02420'); }
+  const warm = g.createRadialGradient(192, 84, 4, 192, 104, 110); warm.addColorStop(0, `rgba(255,214,150,${0.5 * bulb + 0.25 * sweep})`); warm.addColorStop(1, 'rgba(255,150,70,0)'); g.fillStyle = warm; g.fillRect(128, 76, 128, 94);
+  for (let k = 0; k < 13; k++) { const x = 132 + k * 9.6, y = 79 + Math.round(Math.sin(k * 0.7) * 1.2), on = (Math.floor(t * 2) + k) % 5 !== 0; R(x, y, 2, 2, on ? (k % 3 === 0 ? '#ffd27a' : k % 3 === 1 ? '#ff9a7a' : '#fff2c8') : '#7a5a3a'); }
+  R(191, 62, 1, 16, '#1a1010'); const fl = (0.85 + 0.15 * Math.sin(t * 13) * Math.sin(t * 5.3)) * bulb; g.fillStyle = `rgba(255,236,180,${0.35 * fl})`; g.beginPath(); g.arc(191.5, 82, 11, 0, Math.PI * 2); g.fill(); R(189, 78, 5, 6, bulb > 0.5 ? '#fff3c8' : '#d8c8a0'); R(189, 77, 5, 1, '#5a5048');
+  for (let k = 0; k < 5; k++) { const p = ((t / 2.2) + k / 5) % 1, sz = 2 + p * 6; g.fillStyle = `rgba(240,230,220,${0.28 * (1 - p)})`; g.fillRect(Math.round(207 + Math.sin(p * 5 + k) * 3 - sz / 2), Math.round(100 - p * 26), Math.round(sz), Math.round(sz)); }
+  for (const sx of [150, 236]) { R(sx - 9, 152, 18, 4, '#d8352a'); R(sx - 9, 152, 18, 1, '#f05a4a'); R(sx - 8, 156, 3, 14, '#a02420'); R(sx + 5, 156, 3, 14, '#a02420'); R(sx - 5, 162, 10, 2, '#a02420'); }
   // 마르코, his hands by the timeline (or by the line, when the scene runs as plain dialogue)
   const pz = inR(TL && TL.poses), mp = pz ? pz[2] : EPI.on || EPI.done ? null : SCENE.mpose, clk = TL && TL.clink != null ? et - TL.clink : -9, cl = clk > -0.35 && clk < 0.4 ? Math.max(0, 1 - Math.abs(clk) / 0.35) : 0;
   const bobM = Math.sin(t * 1.3) > 0.9 ? 1 : 0;
-  const pose = { hand: { x: BOSS_X + 18, y: 122 }, carry: null, wince: false, dip: 2, bob: bobM, nod: 0, doze: false, phone: false, lane: 2, sad: !(TL && TL.smile && inR(TL.smile)) };
-  if (mp === 'pour') pose.hand = { x: BOSS_X + 30, y: 112 };
+  const pose = { hand: { x: BOSS_X + 16, y: 122 }, carry: null, wince: false, dip: 2, bob: bobM, nod: 0, doze: false, phone: false, lane: 2, sad: !(TL && TL.smile && inR(TL.smile)) };
+  if (mp === 'pour') pose.hand = { x: BOSS_X + 24, y: 112 };
   else if (mp === 'drink') { pose.hand = { x: BOSS_X + 8, y: 96 }; pose.dip = 0; }
-  else if (mp === 'spin') pose.hand = { x: BOSS_X + 22 + Math.round(Math.sin(t * 3) * 2), y: 128 + Math.round(Math.cos(t * 3)) };
-  else if (mp === 'down') { pose.dip = 4; pose.hand = { x: BOSS_X + 16, y: 130 }; }
-  else if (mp === 'raise') { pose.hand = { x: BOSS_X + 30 + Math.round(cl * 8), y: 90 }; pose.dip = 0; }
+  else if (mp === 'spin') pose.hand = { x: BOSS_X + 18 + Math.round(Math.sin(t * 3) * 2), y: 128 + Math.round(Math.cos(t * 3)) };
+  else if (mp === 'down') { pose.dip = 4; pose.hand = { x: BOSS_X + 14, y: 130 }; }
+  else if (mp === 'raise') { pose.hand = { x: BOSS_X + 24 + Math.round(cl * 6), y: 92 }; pose.dip = 0; }
   FX.react[2] = FX.react[2] || { type: '', at: nowMs };
-  g.save(); g.translate(0, 22); drawActor('marco', 118, false, pose, nowMs, false, () => { PARTNERS.marco.arm(pose);
-    if (mp === 'pour') { g.save(); g.translate(pose.hand.x + 2, pose.hand.y - 2); g.rotate(1.1); R(-3, -12, 6, 18, '#2e8a4a'); R(-2, -16, 4, 4, '#2e8a4a'); R(-3, -5, 6, 5, '#e9f0e0'); g.restore(); R(pose.hand.x + 10, pose.hand.y + 6, 1, 8, 'rgba(220,240,230,.7)'); }
+  g.save(); g.translate(0, 22); drawActor('marco', 150, false, pose, nowMs, false, () => { PARTNERS.marco.arm(pose);
+    if (mp === 'pour') { g.save(); g.translate(pose.hand.x + 2, pose.hand.y - 2); g.rotate(1.1); R(-3, -12, 6, 18, '#2e8a4a'); R(-2, -16, 4, 4, '#2e8a4a'); R(-3, -5, 6, 5, '#e9f0e0'); g.restore(); R(pose.hand.x + 10, pose.hand.y + 6, 1, 7, 'rgba(220,240,230,.7)'); }
     else { R(pose.hand.x - 1, pose.hand.y - 6, 4, 6, '#e9eef0'); R(pose.hand.x, pose.hand.y - 4, 2, 3, '#cfe8d8'); } }); g.restore();
-  g.save(); g.translate(266 - PLAYER_X, 26); drawPlayer(0, nowMs); g.restore();
-  // you raise your glass to his
+  g.save(); g.translate(236 - PLAYER_X, 26); drawPlayer(0, nowMs); g.restore();
   const r2 = in1(TL && TL.raise2);
-  if (r2) { const gx = 244 - Math.round(cl * 8), gy = 114; thick(262, 148, gx + 3, gy + 4, 4, C.hoodie); R(gx + 1, gy + 2, 4, 4, C.skin); R(gx, gy - 4, 4, 6, '#e9eef0'); R(gx + 1, gy - 2, 2, 3, '#cfe8d8'); }
-  if (clk >= 0 && clk < 0.45) { const k = clk / 0.45; g.globalAlpha = 1 - k; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, r = 3 + k * 10; R(158 + Math.cos(a) * r, 104 + Math.sin(a) * r, 2, 2, '#fff6c8'); R(244 + Math.cos(a) * r, 106 + Math.sin(a) * r, 2, 2, '#fff6c8'); } g.globalAlpha = 1; }
-  // the table: a steel top with a lip and a cross-bar, labelled bottles (one leaning empty once he has poured), the glasses, a
-  // plate of rolled egg, chopsticks, and his phone lying face up with the song coming out of it
-  R(138, 139, 108, 2, '#d8dde2'); R(138, 141, 108, 5, '#a8aeb6'); R(138, 146, 108, 2, '#6a7078'); R(148, 148, 4, 24, '#5a6068'); R(232, 148, 4, 24, '#5a6068'); R(150, 162, 84, 2, '#4a5058');
-  for (const bx of mp === 'pour' ? [186] : [176, 186]) { R(bx, 121, 6, 18, '#2e8a4a'); R(bx + 1, 117, 4, 4, '#2e8a4a'); R(bx + 1, 115, 4, 2, '#e8e0c8'); R(bx, 127, 6, 6, '#eef2e6'); R(bx + 1, 129, 4, 1, '#2e8a4a'); R(bx + 1, 122, 1, 15, '#6ac88a'); }
-  if (mp !== 'pour') { g.save(); g.translate(166, 136); g.rotate(-1.35); R(-3, -12, 6, 16, '#2e8a4a'); R(-2, -15, 4, 3, '#2e8a4a'); R(-3, -6, 6, 5, '#eef2e6'); g.restore(); }
-  if (!r2) { R(220, 133, 5, 6, '#eef4f4'); R(221, 135, 3, 3, '#d8ecdc'); R(220, 133, 5, 1, '#ffffff'); }
-  g.fillStyle = '#efe9dc'; g.beginPath(); g.ellipse(204, 138, 12, 3.2, 0, 0, Math.PI * 2); g.fill(); for (let k = 0; k < 4; k++) { R(196 + k * 4, 134, 4, 4, '#f0c03a'); R(196 + k * 4, 134, 4, 1, '#f8dc7a'); R(197 + k * 4, 136, 2, 1, '#e8a02a'); }
-  R(212, 141, 14, 1, '#c8a070'); R(212, 143, 14, 1, '#c8a070');
-  R(150, 137, 10, 3, '#1b1b1f'); R(151, 137, 8, 2, `rgba(140,200,255,${0.6 + 0.2 * Math.sin(t * 3)})`);
-  if (POCHA.src) for (let k = 0; k < 2; k++) { const p = ((t / 2.4) + k / 2) % 1; g.globalAlpha = 1 - p; eighthNote(155 + Math.sin(p * 6 + k) * 3, 130 - p * 16, '#bfe6ff'); g.globalAlpha = 1; }
+  if (r2) { const gx = 214 - Math.round(cl * 6), gy = 114; thick(232, 148, gx + 3, gy + 4, 4, C.hoodie); R(gx + 1, gy + 2, 4, 4, C.skin); R(gx, gy - 4, 4, 6, '#e9eef0'); R(gx + 1, gy - 2, 2, 3, '#cfe8d8'); }
+  if (clk >= 0 && clk < 0.45) { const k = clk / 0.45; g.globalAlpha = 1 - k; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, r = 3 + k * 11; R(198 + Math.cos(a) * r, 106 + Math.sin(a) * r, 2, 2, '#fff6c8'); } g.globalAlpha = 1; }
+  // the little steel table between them: a lip and a cross-bar, the bottles (one lying empty), glasses, rolled egg, chopsticks,
+  // and his phone face up with the song coming out of it
+  R(160, 139, 64, 2, '#d8dde2'); R(160, 141, 64, 5, '#a8aeb6'); R(160, 146, 64, 2, '#6a7078'); R(166, 148, 3, 22, '#5a6068'); R(215, 148, 3, 22, '#5a6068'); R(168, 160, 48, 2, '#4a5058');
+  for (const bx of mp === 'pour' ? [196] : [188, 196]) { R(bx, 121, 6, 18, '#2e8a4a'); R(bx + 1, 117, 4, 4, '#2e8a4a'); R(bx + 1, 115, 4, 2, '#e8e0c8'); R(bx, 127, 6, 6, '#eef2e6'); R(bx + 1, 129, 4, 1, '#2e8a4a'); R(bx + 1, 122, 1, 15, '#6ac88a'); }
+  if (mp !== 'pour') { g.save(); g.translate(178, 136); g.rotate(-1.35); R(-3, -12, 6, 16, '#2e8a4a'); R(-2, -15, 4, 3, '#2e8a4a'); R(-3, -6, 6, 5, '#eef2e6'); g.restore(); }
+  if (!r2) { R(212, 133, 5, 6, '#eef4f4'); R(213, 135, 3, 3, '#d8ecdc'); R(212, 133, 5, 1, '#ffffff'); }
+  g.fillStyle = '#efe9dc'; g.beginPath(); g.ellipse(208, 140, 8, 2.4, 0, 0, Math.PI * 2); g.fill(); for (let k = 0; k < 3; k++) { R(203 + k * 4, 136, 4, 4, '#f0c03a'); R(203 + k * 4, 136, 4, 1, '#f8dc7a'); }
+  R(200, 143, 12, 1, '#c8a070'); R(164, 137, 10, 3, '#1b1b1f'); R(165, 137, 8, 2, `rgba(140,200,255,${0.6 + 0.2 * Math.sin(t * 3)})`);
+  if (POCHA.src) for (let k = 0; k < 2; k++) { const p = ((t / 2.4) + k / 2) % 1; g.globalAlpha = 1 - p; eighthNote(169 + Math.sin(p * 6 + k) * 3, 130 - p * 16, '#bfe6ff'); g.globalAlpha = 1; }
   g.restore();
-  // his memory: the cannery by the sea in sepia, the line of them at the table, the radio going; they vanish one by one
+  // his memory, the subtitles, the fades
   const fb = TL && TL.flash; if (fb && et > fb[0] && et < fb[1]) drawMemory(et, Math.min(1, (et - fb[0]) / 2.5, (fb[1] - et) / 2.5), TL.vanish || [], nowMs);
-  // the subtitles, on the song's clock
   if (EPI.on && TL) { const ln = TL.lines.find(([a, , , d]) => et >= a && et < a + d), key = ln ? ln[0] + ln[2] : '';
     if (key !== EPI.key) { EPI.key = key; subEl.innerHTML = ''; subEl.hidden = !ln; if (ln) { const nm = { v: ['마르코', '#6fdcec'], b: ['반장', '#f0a050'] }[ln[1]]; if (nm) { const k = document.createElement('b'); k.textContent = nm[0]; k.style.color = nm[1]; subEl.append(k); } subEl.append(ln[2]); } } }
-  // in from black, out to black with the song's end
   if (TL && (EPI.on || EPI.done)) { const a = Math.max(et < 1.5 ? 1 - et / 1.5 : 0, et > TL.len - 7 ? Math.min(1, (et - (TL.len - 7)) / 6) : 0); if (a > 0) { g.fillStyle = `rgba(0,0,0,${a})`; g.fillRect(0, 0, W, H); } }
   drawSceneFade(nowMs);
 }
