@@ -1537,6 +1537,69 @@ const LEVELS = [
       { who:'지우', text:'…형, 저 내일 일찍 올게요.', scene:'office', jpose:'down' }] : [
       { who:'지우', text:'…형, 오늘은 그냥 가요.' }]
   }
+  ,{
+    id:'s1-7', stageNo:'1-7', who:'지우 + 하은', role:'지우 · 하은 · 반장 · 컷씬', tag:'마지막 근무 · 두고 간 이어폰 · 새벽', bpm:60, style:'cine17', fxTheme:'blues',
+    // 1-7 하은의 새벽, all cutscene (no play: every box loads and scans by itself, a press does nothing). 하은's last shift;
+    // 반장 tells 지우 she used to make music too and put it down; her old earphones left on her belt's end cap; 지우 runs after
+    // her to give them back and sees her go into a hospital; he waits outside and texts; she comes out, he says sorry, and she
+    // asks to hear his beat. Timeline in seconds (60 BPM, a beat = a second): the line (0-105.5) is the game's own scene, the
+    // rest is drawn by drawCine17 (from L.cine.out).
+    lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
+    hitKit: 'ticktock', bareBand: true, noCount: true,
+    cine: { hGone: 58.5, jGone: 98.6, out: 105.5, end: 244 },
+    observer: 'boss', observerIntro: true, observerAt: [[0, 105.5]],   // 반장 stands by the line, arms folded, until 지우 runs out
+    heads: { j: [104, 58], h: [52, 90], b: [168, 84] },
+    clock: '05:30', title: '하은의 새벽', hints: false, special: ['상자', 'none', '개'],
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 246,
+    chords: [[220, 261.63, 329.63]], roots: [110], chordAt: () => 0,
+    sections: [[0, 'line'], [26, 'away'], [47, 'hosp'], [61, 'outro']],
+    beltStop: [[50, 400]], dim: [[50, 106]],
+    act: { phoneBy: [[12, 13.5, 1], [26, 27.5, 1], [40, 41.5, 1], [57.2, 58.4, 1]] },
+    songs: [{ src: 'audio/1-5-new-beat.mp3', at: 190, lead: 0.1, gain: 0.85, sec: 'none', into: 48.0 }],
+    cutscene: [[0, 246]],
+    camPlay: [[50.5, 60.5, { x: 120, y: 108, k: 1.3 }], [61, 68.4, { x: 136, y: 86, k: 1.6 }], [68.4, 91, { x: 158, y: 92, k: 1.8 }],
+      [91, 96, { x: 110, y: 72, k: 1.7 }], [96, 98.4, { x: 48, y: 142, k: 3 }], [98.4, 103.6, { x: 96, y: 118, k: 1.5 }]],
+    devMarks: [[0, '1막 마지막 근무'], [50, '오늘까지'], [61, '2막 반장과 지우'], [96, '이어폰'], [105.5, '3막 거리'], [116, '승강장'], [127, '열차'], [136, '4막 병원 앞'], [153, '메시지'], [165, '하은이 나옴'], [188, '5막 벤치'], [228, '엔딩']],
+    bars: [
+      '........', 'x.......', 'x.......', 'x.......', 'x.......', 'x.......', 'x.......', 'x.......', 'x.......', 'x.......',
+      'x.......', 'x.......', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........'
+    ],
+    bars2: [
+      '........', '....x...', '....x...', '....x...', '....x...', '....x...', '....x...', '....x...', '....x...', '....x...',
+      '....x...', '....x...', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
+      '........', '........'
+    ],
+    // [time, text, shown, lane, speaker]; 'b' 반장 (on his chair); 'J'/'H' 지우/하은 in the drawn scenes (cineHead)
+    say: [[24, '(…먼저 말 걸면 지는 거야.)', 3, 0, 'j'],
+          [51, '…하은아. 오늘까지지.', 2.6, 0, 'b'], [54, '…네. 그동안 감사했습니다.', 2.6, 1, 'h'], [57, '네?!', 1.4, 0, 'j'],
+          [62, '…말도 없이 그만두고. 제가 그렇게 싫었나 봐요.', 3.4, 0, 'j'], [65.8, '비트까지 만들어 줬는데.', 2.4, 0, 'j'],
+          [68.6, '…만들어 \'줬다\'라.', 2.6, 0, 'b'], [71.8, '그 애도 처음엔 너처럼 이어폰 끼고 다녔다.', 3.2, 0, 'b'], [75.4, '…네?', 1.4, 0, 'j'],
+          [77.2, '쉬는 시간마다 벨트 두드리면서 흥얼거리고.', 3.2, 0, 'b'], [80.8, '어느 날부터 빼더라. 왜인지는 나도 모른다.', 3.4, 0, 'b'],
+          [84.6, '꿈 없는 사람이 어딨냐. 내려놓은 사람이 있지.', 3.6, 0, 'b'], [88.6, '…나도 그랬고.', 2.2, 0, 'b'],
+          [91.2, '…아. 그래서 누나 자리에 이어폰이 있었구나.', 3.4, 0, 'j'], [96.6, '어…?', 1.2, 0, 'j'], [98.4, '어라, 누나 이어폰 두고 갔어요!', 2.4, 0, 'J'],
+          [101.2, '…그럼 갖다주던지.', 2.4, 0, 'b'],
+          [110.5, '누나! 이어폰—!', 2.2, 0, 'J'], [121.6, '…아!', 1.2, 0, 'J'], [124, '…누나!', 1.6, 0, 'J'],
+          [147.5, '(…그러니까 맨날 시계만 보죠.)', 3.4, 0, 'J'],
+          [168.5, '…봤어?', 1.6, 1, 'H'], [170.4, '…네. 죄송해요. 따라오려던 건 아닌데.', 3.2, 0, 'J'], [175, '…엄마. 작년부터.', 2.6, 1, 'H'],
+          [178, '어제, 꿈도 없냐고 한 거… 미안해요. 몰랐어요.', 3.4, 0, 'J'], [183, '…그 비트.', 1.6, 1, 'H'], [185, '한 번만 다시 들려줘.', 2.4, 1, 'H'],
+          [228, '…나도, 예전엔 이런 거 했었어.', 3, 1, 'H'], [231.4, '…알아요.', 1.6, 0, 'J'], [233.4, '…박자는 맞네.', 2.2, 1, 'H']],
+    comfort: [],
+    intro: [
+      { who:'', text:'명절 마지막 밤. 다툼 다음 날.' },
+      { who:'반장', text:'…사과는 했냐.' },
+      { who:'지우', text:'…제가 왜요. 누나가 먼저 그랬잖아요.' },
+      { who:'', text:'하은은 벌써 자기 벨트 앞에 서 있다. 시계를 본다.' }],
+    outro: () => []
+  }
 ];
 // the stage board. Locked entries show what is coming.
 const STAGE1 = [
@@ -1546,8 +1609,7 @@ const STAGE1 = [
   { level: LEVELS[3] },
   { level: LEVELS.find(l => l.id === 's1-5') },
   { level: LEVELS.find(l => l.id === 's1-6') },
-  // the finale is a page of its own (the opening, the heartbeat tutorial, the cutscene and its heartbeat lines): its card opens it
-  { no: '1-7', title: '하은의 새벽', role: '하은 · 반장 · 지우 · 62 BPM · 컷씬', tag: '피날레 · 심박 · 마지막 새벽', pid: 'haeun', href: 'cutscene-1-7.html' },
+  { level: LEVELS.find(l => l.id === 's1-7') },
   { level: LEVELS[4], stage2: true },
   { level: LEVELS[5] },
   { level: LEVELS[6] },
@@ -1845,6 +1907,235 @@ function drawBoot15(b, nowMs) {
   }
   g.restore();
   const fo = Math.max(0, Math.min(1, (b - (L.room.from - 0.6)) / 0.6)); if (fo > 0) { g.fillStyle = `rgba(0,0,0,${fo})`; g.fillRect(0, 0, W, H); }
+}
+// ---------- 1-7 하은의 새벽: the cutscene past the line (L.cine.out on) ----------
+// Four places, each painted once: the dawn street (1-5's bgCommute, at its bluest), the underground platform, inside the
+// next train, and the hospital's front with its bench. Who stands where, and when, comes from one place (cineCast), so the
+// drawing and the speech bubbles (cineHead) always agree. Times are seconds (1-7 runs at 60 BPM).
+const CINE_GROUND = { street: 163, platform: 170, train: 176, hosp: 174 };
+const bgPlatform = document.createElement('canvas'); bgPlatform.width = W; bgPlatform.height = H;
+const bgTrain = document.createElement('canvas'); bgTrain.width = W; bgTrain.height = H;
+const bgHosp = document.createElement('canvas'); bgHosp.width = W; bgHosp.height = H;
+const HOSP_DOOR = { x0: 238, x1: 286, y0: 118, y1: 174 }, HOSP_LIFT = { x0: 292, x1: 316, y0: 128, y1: 170 };
+(() => {
+  // the platform: tiled wall, the station board, a bench, the platform's edge with its yellow strip, the track below
+  let b = bgPlatform.getContext('2d'); const r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  r(0, 0, W, H, '#1a1d24'); r(0, 0, W, 22, '#22262e'); for (let x = 0; x < W; x += 24) r(x, 14, 12, 3, '#f2efe2');
+  r(0, 22, W, 128, '#cfd6d8'); for (let y = 26; y < 150; y += 8) r(0, y, W, 1, '#bcc4c6'); for (let y = 22; y < 150; y += 16) for (let x = (y / 16) % 2 ? 0 : 8; x < W; x += 16) r(x, y, 1, 8, '#bcc4c6');
+  r(0, 96, W, 6, '#2f6f8a');
+  r(60, 32, 112, 22, '#1e3a5a'); r(60, 32, 112, 2, '#2e5a8a'); b.fillStyle = '#ffffff'; b.font = '700 11px sans-serif'; b.fillText('물류단지', 70, 47); b.font = '600 6px sans-serif'; b.fillStyle = '#a8c4e0'; b.fillText('LOGISTICS PARK', 122, 47);
+  r(0, 18, 46, 132, '#9aa4a8'); for (let k = 0; k < 9; k++) { r(0, 150 - k * 14, 46 - k * 3, 2, '#7a8488'); r(0, 152 - k * 14, 46 - k * 3, 12, '#b8c0c2'); }   // the stairs down, on the left
+  r(4, 30, 3, 120, '#6a7478');
+  r(0, 150, W, 22, '#9a9890'); r(0, 150, W, 2, '#b8b6ac'); r(0, 158, W, 4, '#e8c838'); for (let x = 2; x < W; x += 6) r(x, 159, 3, 2, '#c8a828');
+  r(0, 172, W, 44, '#4a4a4c'); r(0, 172, W, 2, '#2a2a2c');
+  // inside the next train: the far wall with its windows (the tunnel goes by in them, drawn live), seats, poles, straps
+  b = bgTrain.getContext('2d'); const t = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  t(0, 0, W, H, '#d8dcd6'); t(0, 0, W, 20, '#c4c8c2'); for (let x = 10; x < W; x += 60) t(x, 4, 40, 6, '#f8f6e8');
+  for (const x0 of [24, 148, 272]) { t(x0, 40, 96, 64, '#3a3f46'); b.clearRect(x0 + 3, 43, 90, 58); t(x0 + 46, 43, 3, 58, '#3a3f46'); }
+  t(0, 110, W, 4, '#9aa0a0'); t(0, 140, W, 24, '#4a6aa8'); t(0, 140, W, 3, '#6a8ac8'); t(0, 164, W, 6, '#2a3a5a');
+  t(0, 170, W, 46, '#8a8c88'); t(0, 170, W, 2, '#a8aaa6');
+  for (const x of [70, 194, 318]) { t(x, 20, 3, 150, '#c8ccd0'); t(x, 20, 1, 150, '#ffffff'); }
+  t(0, 26, W, 2, '#a8acb0'); for (let x = 30; x < W; x += 34) { t(x, 28, 1, 10, '#7a7e82'); t(x - 3, 38, 7, 6, '#e8e8e0'); b.clearRect(x - 1, 40, 3, 2); }
+  // the hospital's front at dawn (the sky is drawn live behind it): far blocks, the building with its sign and windows, the
+  // canopy over the glass doors (the lobby behind them is drawn live), a planter and a tree, the bench, a lamp, the pavement
+  b = bgHosp.getContext('2d'); const h = (x, y, w, hh, c) => { b.fillStyle = c; b.fillRect(x, y, w, hh); };
+  for (const [x0, w, hh] of [[0, 40, 70], [34, 34, 52], [70, 50, 84], [120, 30, 60]]) { h(x0, 140 - hh, w, hh, '#3a3a5a'); for (let y = 140 - hh + 5; y < 136; y += 7) for (let x = x0 + 3; x < x0 + w - 3; x += 5) if (((x * 7 + y * 3) % 9) === 0) h(x, y, 2, 3, '#f2c878'); }
+  h(150, 24, 234, 150, '#c9cdd2'); h(150, 24, 234, 3, '#e4e7ea'); h(150, 24, 3, 150, '#aeb3b8');
+  for (let y = 66; y < 110; y += 14) for (let x = 162; x < 380; x += 20) { h(x, y, 12, 9, '#7a8a9a'); h(x, y, 12, 2, '#9aaaba'); if (((x + y) % 7) === 3) h(x + 1, y + 2, 10, 7, '#f2d898'); }
+  h(176, 34, 170, 22, '#2a6a8a'); h(176, 34, 170, 2, '#3a8aaa'); h(186, 39, 12, 12, '#ffffff'); h(190, 41, 4, 8, '#2a6a8a'); h(188, 43, 8, 4, '#2a6a8a');
+  b.fillStyle = '#ffffff'; b.font = '700 12px sans-serif'; b.fillText('한빛병원', 206, 50); b.font = '600 6px sans-serif'; b.fillStyle = '#bfe0ee'; b.fillText('HANBIT HOSPITAL', 268, 50);
+  h(226, 110, 72, 6, '#8a9098'); h(226, 110, 72, 1, '#b0b6bc'); h(230, 116, 2, 58, '#8a9098'); h(292, 116, 2, 58, '#8a9098');
+  h(HOSP_DOOR.x0 - 2, HOSP_DOOR.y0 - 2, HOSP_DOOR.x1 - HOSP_DOOR.x0 + 4, HOSP_DOOR.y1 - HOSP_DOOR.y0 + 2, '#6a7078'); b.clearRect(HOSP_DOOR.x0, HOSP_DOOR.y0, HOSP_DOOR.x1 - HOSP_DOOR.x0, HOSP_DOOR.y1 - HOSP_DOOR.y0);
+  h(0, 174, W, 42, '#a8a6a0'); h(0, 174, W, 2, '#c4c2bc'); for (let x = 0; x < W; x += 16) h(x, 176, 1, 40, '#96948e'); for (let y = 190; y < H; y += 12) h(0, y, W, 1, '#96948e');
+  h(20, 150, 30, 24, '#6a5a4a'); h(20, 150, 30, 3, '#8a7a6a'); for (const [cx, cy, rr] of [[35, 128, 18], [24, 140, 12], [46, 138, 12]]) for (let y = -rr; y <= rr; y++) for (let x = -rr; x <= rr; x++) if (Math.hypot(x, y) <= rr) h(cx + x, cy + y, 1, 1, ((x + y + 40) % 5) ? '#4a7a4a' : '#3a6a3a');
+  h(33, 140, 3, 12, '#5a4030');
+  h(62, 156, 64, 4, '#8a6a4a'); h(62, 156, 64, 1, '#a88a6a'); h(62, 146, 64, 3, '#8a6a4a'); h(66, 160, 3, 14, '#4a4a4c'); h(119, 160, 3, 14, '#4a4a4c'); h(64, 149, 2, 9, '#4a4a4c'); h(122, 149, 2, 9, '#4a4a4c');
+  h(140, 60, 3, 114, '#4a4e58'); h(140, 58, 12, 3, '#4a4e58'); h(147, 61, 8, 3, '#e8e4d0');
+})();
+// the earphones she left: two white buds and their cord, the cord mended with tape
+function drawEarphones(x, y, a = 1) {
+  g.save(); g.globalAlpha = a;
+  for (let k = 0; k < 8; k++) R(x + Math.round(Math.sin(k * 0.9) * 2), y + k, 1, 1, '#ece8e0');
+  R(x - 3, y - 2, 3, 3, '#f8f6f0'); R(x + 2, y - 3, 3, 3, '#f8f6f0'); R(x - 3, y - 2, 1, 1, '#c8c4bc'); R(x + 1, y + 3, 3, 2, '#b8a878');
+  g.restore();
+}
+// where everyone is: { scene, j: {...}, h: {...} } (x, ground, mirror, mode, walk phase), a pure function of the time
+function cineCast(b) {
+  const L7 = (a, z, p) => lerp(a, z, Math.max(0, Math.min(1, p)));
+  if (b < 116) return { scene: 'street', h: b < 111.5 ? { x: L7(30, 410, (b - 105.5) / 6), mode: 'walk', mirror: true } : null,
+    j: b >= 108.5 ? { x: L7(-30, 430, (b - 108.5) / 6.5), mode: 'run' } : null };
+  if (b < 127) return { scene: 'platform', h: b < 118.4 ? { x: L7(120, 252, (b - 116) / 2.2), mode: 'walk', mirror: true, into: b > 118 } : null,
+    j: b >= 118.5 ? { x: b < 121.4 ? L7(-20, 206, (b - 118.5) / 2.9) : 206, mode: b < 121.4 ? 'run' : 'stand' } : null };
+  if (b < 136) return { scene: 'train', j: { x: 190, mode: 'strap' } };
+  if (b < 188) {
+    const hIn = b < 140.6 ? { x: L7(-10, 262, (b - 136) / 4.6), mode: 'walk', mirror: true } : b < 146.5 ? { x: L7(262, 304, (b - 140.6) / 4.4), mode: b > 142.6 && b < 144.2 ? 'watch' : 'walk', mirror: true, inside: true, gone: b > 145.6 } : null;
+    const hOut = b >= 165 ? { x: b < 168 ? L7(262, 140, (b - 165) / 3) : b < 186 ? 140 : L7(140, 72, (b - 186) / 1.6), mode: b < 168 || (b >= 186 && b < 187.6) ? 'walk' : b >= 187.6 ? 'sit' : 'stand', mirror: true, give: b >= 174 && b < 175.4 } : null;
+    let j = null;
+    if (b >= 141.5) {
+      const x = b < 144.5 ? L7(-20, 200, (b - 141.5) / 3) : b < 151 ? 200 : b < 153.4 ? L7(200, 112, (b - 151) / 2.4) : 112;
+      const mode = b < 144.5 ? 'run' : b < 151 ? 'stand' : b < 153.4 ? 'walk' : b < 167.6 ? 'sit' : b < 186.6 ? 'stand' : 'sit';
+      j = { x: b >= 167.6 && b < 186.6 ? 160 : b >= 186.6 ? 114 : x, mode, mirror: b >= 151 && b < 153.4 ? true : b >= 153.4, phone: b >= 153.4 && b < 161.2, give: b >= 174 && b < 175.4 };
+    }
+    return { scene: 'hosp', h: hOut || hIn, j };
+  }
+  // the bench at sunrise; at the end she gets up and goes back in, the earphones in
+  const h = b < 236 ? { x: 72, mode: 'sit', mirror: true, tap: b >= 190 && b < 227.3 } : { x: L7(72, 262, (b - 236.4) / 3.6), mode: b < 236.4 ? 'stand' : 'walk', mirror: true, inside: b > 240, gone: b > 241.2, ear: b >= 236.8 && b < 237.8 };
+  return { scene: 'hosp', h, j: { x: 114, mode: 'sit', mirror: true, nod: b >= 190 && b < 227.3 } };
+}
+const CINE_FEET = { jiwoo: 163, haeun: 142 };
+// 지우, whole: the game's own sprite (drawActor) with legs to the ground and an arm; walking, running, at a strap, sitting
+function cineJiwoo(c, ground, b, nowMs) {
+  const run = c.mode === 'run', walk = c.mode === 'walk', sit = c.mode === 'sit', step = Math.floor(b * (run ? 6 : 3)) % 2;
+  const songB = (b - 190) / 0.6667, nod = c.nod && (songB % 1) < 0.3 ? 1 : 0;
+  const pose = { ...standPose(run || walk ? step : 0), nod };
+  g.save(); g.translate(0, ground - CINE_FEET.jiwoo + (sit ? 5 : 0));
+  drawActor('jiwoo', c.x, !!c.mirror, pose, nowMs, false, top => {
+    const P = BOSS_X, pants = '#2a2530', shoe = '#1b1716';
+    if (sit) { R(P - 4, top + 56, 18, 6, pants); R(P + 10, top + 60, 5, 18, pants); R(P + 9, top + 76, 8, 3, shoe); }
+    else if (run || walk) { const f = run ? 5 : 3, l1 = step ? -f : f; R(P - 5 + l1, top + 60, 5, 16, pants); R(P + 1 - l1, top + 60, 5, 16, pants); R(P - 6 + l1, top + 75, 7, 4, shoe); R(P + 1 - l1, top + 75, 7, 4, shoe); }
+    else { R(P - 5, top + 60, 5, 16, pants); R(P + 1, top + 60, 5, 16, pants); R(P - 6, top + 75, 7, 4, shoe); R(P + 1, top + 75, 7, 4, shoe); }
+    const sw = run ? (step ? 7 : -7) : walk ? (step ? 3 : -3) : 0;
+    const hand = c.mode === 'strap' ? { x: P + 6, y: top + 2 } : c.phone ? { x: P + 13, y: top + 34 } : c.give ? { x: P + 22, y: top + 32 } : sit ? { x: P + 12, y: top + 50 } : { x: P + 6 + sw, y: top + 46 };
+    PARTNERS.jiwoo.arm({ ...pose, hand });
+    if (c.holding && !c.give) drawEarphones(hand.x + 2, hand.y - 4);
+    if (c.phone) { R(hand.x - 1, hand.y - 8, 5, 8, '#1e1e24'); R(hand.x, hand.y - 7, 3, 5, '#8fd0f0'); }
+  });
+  g.restore();
+}
+// 하은, whole: drawHaeunAt (her own walk cycle, the watch check, the tap, sitting)
+function cineHaeun(c, ground, b, nowMs) {
+  const songB = (b - 190) / 0.6667, ph = songB - Math.floor(songB), k = Math.floor(songB);
+  // her taps on the bench: every other beat to begin with, then every beat, then the 'and's too in the last bars
+  const tapOn = c.tap && (k < 16 ? k % 2 === 0 : k < 40 ? true : true) && ph < 0.35, tapAnd = c.tap && k >= 40 && Math.abs(ph - 0.5) < 0.15;
+  const top = ground - 56 + (c.mode === 'sit' ? 2 : 0);
+  drawHaeunAt(c.x, top, nowMs, { mirror: !!c.mirror, step: c.mode === 'walk' ? 1 : null, sit: c.mode === 'sit', watch: c.mode === 'watch' || c.ear, rest: c.mode !== 'walk', tap: c.tap ? (tapOn || tapAnd ? 1 : 0) : null });
+}
+function cineHead(spk, b) {
+  const c = cineCast(b), who = spk === 'J' ? c.j : spk === 'H' ? c.h : null; if (!who) return null;
+  const ground = CINE_GROUND[c.scene];
+  if (spk === 'J') return { x: who.x + (who.mirror ? -2 : 2), y: ground - 82 + (who.mode === 'sit' ? 5 : 0) };
+  return { x: who.x - (who.mirror ? -1 : 1), y: ground - 60 + (who.mode === 'sit' ? 2 : 0) };
+}
+function cineSky(top, bot, p) {
+  const mix = (a, c, q) => '#' + [0, 2, 4].map(i => Math.round(parseInt(a.substr(1 + i, 2), 16) * (1 - q) + parseInt(c.substr(1 + i, 2), 16) * q).toString(16).padStart(2, '0')).join('');
+  const gr = g.createLinearGradient(0, 0, 0, bot); gr.addColorStop(0, mix('#1a2050', '#6a8ac8', p)); gr.addColorStop(0.6, mix('#4a3a6a', '#e8b8a0', p)); gr.addColorStop(1, mix('#8a5a7a', '#ffd8a0', p));
+  g.fillStyle = gr; g.fillRect(0, top, W, bot - top);
+}
+function drawCine17(b, t, nowMs) {
+  const c = cineCast(b), G = CINE_GROUND[c.scene];
+  g.save();
+  if (c.scene === 'street') {
+    // the street before dawn, its lamps still on, the sky starting to go
+    g.drawImage(bgCommute, 0, 0);
+    g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(90,110,170,.14)'; g.fillRect(0, 0, W, 150); g.restore();
+    for (let i = 0; i < 10; i++) { const P = 6 + hash15(i, 31) * 4, q = ((b / P) + hash15(i, 32)) % 1; g.globalAlpha = Math.sin(Math.PI * q) * 0.8; petal15(-10 + q * (W + 20), 30 + q * 140 + Math.sin(q * 9 + i) * 8, Math.sin((b + i) * 2.4), ['#e48ab4', '#ffb3cf'][i % 2]); g.globalAlpha = 1; }
+    if (c.h) cineHaeun(c.h, G, b, nowMs);
+    if (c.j) cineJiwoo({ ...c.j, holding: true }, G, b, nowMs);
+  } else if (c.scene === 'platform') {
+    g.drawImage(bgPlatform, 0, 0);
+    // the train: doors open, then shut (the two leaves sliding together), then it pulls out to the right
+    const go = b < 122.5 ? 0 : Math.pow((b - 122.5) / 4, 2) * 420, shut = Math.max(0, Math.min(1, (b - 121) / 0.5));
+    g.save(); g.translate(go, 0);
+    R(150, 60, 300, 100, '#d4d8dc'); R(150, 60, 300, 3, '#eef0f2'); R(150, 118, 300, 5, '#2f8a5a'); R(150, 152, 300, 8, '#6a7078');
+    for (let x = 160; x < 450; x += 40) if (Math.abs(x - 236) > 18) { R(x, 72, 26, 30, '#2a3038'); R(x + 1, 73, 24, 6, '#3a4250'); }
+    const dx0 = 236, gap = Math.round(12 * (1 - shut));
+    R(dx0 - 14, 66, 28, 86, '#2a3038'); R(dx0 - 14 - gap, 66, 14, 86, '#c4c8cc'); R(dx0 + gap, 66, 14, 86, '#c4c8cc'); R(dx0 - 12 - gap, 72, 10, 26, '#3a4250'); R(dx0 + 2 + gap, 72, 10, 26, '#3a4250');
+    g.restore();
+    if (c.h && !(c.h.into)) cineHaeun(c.h, G, b, nowMs);
+    if (c.j) cineJiwoo({ ...c.j, holding: true }, G, b, nowMs);
+  } else if (c.scene === 'train') {
+    // the tunnel's lamps going by in the windows
+    R(0, 40, W, 66, '#0a0c10'); for (let k = 0; k < 6; k++) { const x = ((k * 97 - b * 260) % 460 + 460) % 460 - 40; R(x, 66, 30, 3, '#f2d898'); R(x + 30, 66, 10, 3, '#a89058'); }
+    g.drawImage(bgTrain, 0, 0);
+    const sway = Math.round(Math.sin(b * 2.2) * 1);
+    g.save(); g.translate(sway, 0); cineJiwoo({ ...c.j, holding: true }, G, b, nowMs); g.restore();
+    drawEarphones(206 + sway, 128, 1);
+  } else {
+    // the hospital: the sky going from first light to sunrise (fast while he waits on the bench), the lobby behind the glass
+    const p = b < 161 ? 0.12 + 0.2 * (b - 136) / 25 : b < 165 ? 0.32 + 0.3 * (b - 161) / 4 : b < 188 ? 0.62 + 0.1 * (b - 165) / 23 : 0.72 + 0.28 * Math.min(1, (b - 188) / 40);
+    cineSky(0, 174, p);
+    if (b >= 188) { const sy = lerp(96, 26, Math.min(1, (b - 188) / 46)); for (let y = -10; y <= 10; y++) for (let x = -10; x <= 10; x++) if (Math.hypot(x, y) <= 10) R(102 + x, sy + y, 1, 1, '#fff2c8'); }
+    // the lobby behind the doors: warm light, the floor, the lift with its doors
+    const D = HOSP_DOOR, LF = HOSP_LIFT;
+    R(D.x0, D.y0, D.x1 - D.x0, D.y1 - D.y0, '#e8dcc0'); R(D.x0, 160, D.x1 - D.x0, 14, '#c8bca0');
+    g.drawImage(bgHosp, 0, 0);
+    // (the lift is at the far right of the lobby, seen past the doors' right edge; drawn on the building's wall as a lit opening)
+    const liftOpen = (b >= 144.8 && b < 146.8) ? Math.min(1, (b - 144.8) / 0.4) * Math.min(1, (146.8 - b) / 0.4) : 0;
+    R(LF.x0, LF.y0, LF.x1 - LF.x0, LF.y1 - LF.y0, '#8a9098'); R(LF.x0 + 2, LF.y0 + 2, LF.x1 - LF.x0 - 4, LF.y1 - LF.y0 - 2, liftOpen > 0 ? '#f2e2b8' : '#b8bec4'); const lg = Math.round(9 * liftOpen); R(LF.x0 + 2, LF.y0 + 2, 10 - lg, LF.y1 - LF.y0 - 2, '#a8aeb4'); R(LF.x1 - 12 + lg, LF.y0 + 2, 10 - lg, LF.y1 - LF.y0 - 2, '#a8aeb4'); R(LF.x0 + 10, LF.y0 - 6, 4, 3, '#ff8a5a');
+    // the glass doors: two leaves that slide apart as she comes and goes
+    const opens = [[139.6, 141.8], [164.6, 166.8], [239.4, 241.6]], o = opens.reduce((m, [a, z]) => Math.max(m, Math.min(1, (b - a) / 0.5) * Math.min(1, (z - b) / 0.5)), 0), gp = Math.round(20 * Math.max(0, o));
+    const leaf = (x) => { g.save(); g.globalAlpha = 0.5; R(x, D.y0, 24, D.y1 - D.y0, '#a8c8d8'); g.globalAlpha = 1; R(x, D.y0, 24, 1, '#e8f4f8'); R(x + 23, D.y0, 1, D.y1 - D.y0, '#6a7078'); g.restore(); };
+    // her, inside, seen through the glass
+    if (c.h && c.h.inside && !c.h.gone) { g.save(); g.beginPath(); g.rect(D.x0, D.y0, LF.x1 - D.x0, D.y1 - D.y0); g.clip(); cineHaeun(c.h, G - 2, b, nowMs); g.restore(); }
+    leaf(D.x0 - gp); leaf(D.x0 + 24 + gp);
+    if (c.h && !c.h.inside) cineHaeun(c.h, G, b, nowMs);
+    if (c.j) cineJiwoo({ ...c.j, holding: b < 174 }, G, b, nowMs);
+    // the earphones changing hands (174-175.4), then shared: a bud in each of their ears, the cord between them
+    if (b >= 174 && b < 175.4) drawEarphones(lerp(c.j ? c.j.x - 14 : 140, (c.h ? c.h.x : 140) + 6, (b - 174) / 1.4), 132);
+    if (b >= 188.8 && b < 236) {
+      const hx = (c.h ? c.h.x : 72), jx = c.j ? c.j.x : 114, hy = G - 50, jy = G - 82 + 5 + 10;
+      for (let q = 0; q <= 1; q += 0.04) R(Math.round(lerp(hx + 2, jx - 4, q)), Math.round(lerp(hy, jy, q) + Math.sin(q * Math.PI) * 16), 1, 1, '#ece8e0');
+      // the beat, rising off the buds while it plays
+      if (b >= 190 && b < 227.3) for (let i = 0; i < 3; i++) { const q = ((b - 190) / 2.6 + i / 3) % 1; g.globalAlpha = Math.sin(Math.PI * q) * 0.85; eighthNote(90 + i * 8 + Math.sin(q * 6 + i) * 3, hy - 10 - q * 30, i % 2 ? '#ffd1e0' : '#bfe6ff'); g.globalAlpha = 1; }
+    }
+  }
+  // his phone, close (153.4-161.2): the long message typed and wiped, the short one sent
+  if (b >= 153.4 && b < 161.8) drawCinePhone(b);
+  // the cut in from the line, and out at the end
+  const fin = Math.max(0, 1 - (b - L.cine.out) / 1), fout = Math.max(0, Math.min(1, (b - 241) / 2.5));
+  const cut = [116, 127, 136].reduce((m, x) => Math.max(m, Math.max(0, 1 - Math.abs(b - x) / 0.35)), 0);
+  const dk = Math.max(fin, fout, cut); if (dk > 0) { g.fillStyle = `rgba(0,0,0,${dk})`; g.fillRect(0, 0, W, H); }
+  g.restore();
+}
+function drawCinePhone(b) {
+  const long = '누나 저 진짜 몰랐어요 제가 그동안 누나한테', short = '누나, 이어폰 두고 가셨어요. 병원 앞 벤치에 있어요.';
+  const q = b - 153.4, a = Math.min(1, q / 0.4) * Math.min(1, (161.8 - b) / 0.4);
+  let text = '', sent = false;
+  if (q < 3) text = long.slice(0, Math.floor(q / 3 * long.length));
+  else if (q < 4.4) text = long.slice(0, Math.max(0, Math.floor(long.length * (1 - (q - 3) / 1.4))));
+  else if (q < 7) text = short.slice(0, Math.floor((q - 4.4) / 2.6 * short.length));
+  else { text = short; sent = q >= 7.2; }
+  const x0 = 228, y0 = 30, w = 120, hh = 150;
+  g.save(); g.globalAlpha = a;
+  R(x0 - 3, y0 - 3, w + 6, hh + 6, '#101014'); R(x0, y0, w, hh, '#f4f2f6'); R(x0, y0, w, 14, '#e4e0ea');
+  g.font = '700 7px sans-serif'; g.fillStyle = '#3a3448'; g.fillText('하은 누나', x0 + 6, y0 + 10);
+  g.font = '600 7px sans-serif';
+  const wrap = (s, maxW) => { const out = []; let line = ''; for (const ch of s) { if (g.measureText(line + ch).width > maxW) { out.push(line); line = ch; } else line += ch; } if (line) out.push(line); return out; };
+  if (sent) { const ls = wrap(short, 86); const bh = ls.length * 10 + 6; R(x0 + w - 96, y0 + 30, 92, bh, '#ffe27a'); g.fillStyle = '#2a2430'; ls.forEach((l, i) => g.fillText(l, x0 + w - 92, y0 + 40 + i * 10)); g.font = '600 6px sans-serif'; g.fillStyle = '#8a8494'; g.fillText('1', x0 + w - 102, y0 + 30 + bh); }
+  R(x0 + 4, y0 + hh - 34, w - 8, 28, '#ffffff'); g.fillStyle = '#2a2430';
+  if (!sent) { const ls = wrap(text + (Math.floor(b * 3) % 2 ? '|' : ''), w - 16).slice(-2); ls.forEach((l, i) => g.fillText(l, x0 + 8, y0 + hh - 22 + i * 10)); }
+  g.restore();
+}
+// 1-7 on the line (before L.cine.out): her earphones on her belt's end cap, 하은 walking out, 지우 coming down for them and
+// running off
+const CAP = { x: 45, y: 147 };   // the end post of her belt
+function drawCineLine17(b, nowMs) {
+  if (b < 99.6) drawEarphones(CAP.x, CAP.y, 1);
+  if (b >= 58.5 && b < 62) cineHaeun({ x: lerp(52, -20, (b - 58.5) / 3.2), mode: 'walk', mirror: false }, 169, b, nowMs);
+  if (b >= 98.6 && b < 105.5) {
+    const x = b < 99.6 ? lerp(84, 34, b - 98.6) : b < 103.6 ? 34 : lerp(34, -30, (b - 103.6) / 1.4);
+    cineJiwoo({ x, mode: b < 99.6 ? 'walk' : b < 103.6 ? 'stand' : 'run', mirror: true, holding: b >= 99.6 }, 169, b, nowMs);
+  }
+}
+// 1-7's sound: no band. The line's motor and its stop, the street, the station and the train, the hospital's doors, his
+// phone, and at the bench his beat (the 1-5 file, from bar 18 so it ends on its own stop)
+function cine17Events(b, E, s) {
+  if (b === 50) E(0, T => whoosh(T, 1.6, true));
+  if (b === 105) E(0.5, T => nightAir15(T, 11));
+  if (b >= 105 && b < 111) for (let k = 0; k < 2; k++) E(k * s / 2, T => noise(T, 'lowpass', 700, 0.035, 0.04));
+  if (b >= 108 && b < 115) for (let k = 0; k < 3; k++) E(k * s / 3, T => noise(T, 'lowpass', 560, 0.06, 0.05));
+  if (b === 116) E(0, T => noise(T, 'lowpass', 300, 0.05, 10, 0.7));
+  if (b === 121) E(0, T => { bell15(T, 1318.5, 0.8, 0.03); bell15(T + 0.25, 1046.5, 1, 0.03); thud(T + 0.6, 0.5); });
+  if (b === 122) E(0.5, T => whoosh(T, 3.5));
+  if (b >= 118 && b < 121) for (let k = 0; k < 3; k++) E(k * s / 3, T => noise(T, 'lowpass', 560, 0.06, 0.05));
+  if (b >= 127 && b < 136) { E(0, T => noise(T, 'lowpass', 180, 0.06, 1.1, 0.7)); E(s * 0.4, T => noise(T, 'bandpass', 900, 0.03, 0.05, 2)); E(s * 0.6, T => noise(T, 'bandpass', 900, 0.025, 0.05, 2)); }
+  if (b === 136 || b === 150 || b === 170 || b === 200 || b === 220) E(0.3, T => { for (const dt of [0, 0.13, 0.31]) { const o = osc('sine', 3000 + dt * 1800, T + dt, 0.005, 0.016, 0.08); o.frequency.exponentialRampToValueAtTime(4200, T + dt + 0.07); } });
+  if (b >= 136 && b < 141) for (let k = 0; k < 2; k++) E(k * s / 2, T => noise(T, 'lowpass', 700, 0.03, 0.04));
+  if (b >= 141 && b < 145) for (let k = 0; k < 3; k++) E(k * s / 3, T => noise(T, 'lowpass', 560, 0.055, 0.05));
+  for (const d of [139.6, 164.6, 239.4]) if (Math.floor(d) === b) E((d - b) * s, T => noise(T, 'bandpass', 1200, 0.04, 0.6, 0.6));
+  if (b >= 153 && b < 161) for (let k = 0; k < 4; k++) if ((b * 4 + k) % 3) E(k * s / 4, T => noise(T, 'highpass', 4000, 0.012, 0.015));
+  if (b === 160) E(0.6, T => { const o = osc('sine', 880, T, 0.005, 0.03, 0.15); o.frequency.exponentialRampToValueAtTime(1760, T + 0.12); });
+  if (b === 190) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(0)) startSong(T, L.songs[0].into || 0, 0); });
 }
 function drawSpring15(p) {
   if (p >= 1) { g.drawImage(bgSpring, 0, 0); return; }
@@ -2851,6 +3142,7 @@ function drawObserver(t, nowMs, active) {
   g.restore();
 }
 function drawPartnerArmOf(id, pose, lane = 0) {
+  if (L.cine && cineGone(lane ? 'hGone' : 'jGone', CINE_B)) return;
   if (SCENE.walk) return;
   if (L.cast && (L.lanes !== 2 || lane === castLane())) {
     if (CAST.hideArm) return; g.save();
@@ -2957,7 +3249,9 @@ function drawHaeunAt(cx, top, nowMs, o = {}) {
   // legs: weight on the near leg, or a stride
   // walking, one leg at a time: the moving leg lifts and swings forward in an arc and sets down while the other stays planted,
   // then the other leg's turn (a step every 0.3 s)
-  if (o.step != null) { const ph = (nowMs / 300) % 2, lg = Math.floor(ph), a = Math.sin(Math.PI * (ph - lg)), fw = Math.round(3 * a), li = Math.round(2 * a);
+  // sitting (1-7's bench), facing left: the thighs out along the seat, the shins down, the feet on the ground
+  if (o.sit) { R(cx - 13, top + 34, 14, 5, leg); R(cx - 13, top + 38, 5, 13, leg); R(cx - 15, top + 50, 6, 3, shoe); R(cx - 6, top + 34, 6, 5, leg); }
+  else   if (o.step != null) { const ph = (nowMs / 300) % 2, lg = Math.floor(ph), a = Math.sin(Math.PI * (ph - lg)), fw = Math.round(3 * a), li = Math.round(2 * a);
     const nx = lg === 0 ? -fw : 0, ny = lg === 0 ? -li : 0, fx = lg === 1 ? -fw : 0, fy = lg === 1 ? -li : 0;
     R(cx + 2 + fx, top + 38, 5, 15 + fy, leg); R(cx + 2 + fx, top + 52 + fy, 6, 3, shoe); R(cx - 5 + nx, top + 38, 5, 16 + ny, leg); R(cx - 6 + nx, top + 53 + ny, 6, 3, shoe); }
   else { R(cx - 5, top + 38, 5, 16, leg); R(cx + 2, top + 38, 5, 15, leg); R(cx - 6, top + 53, 6, 3, shoe); R(cx + 2, top + 52, 6, 3, shoe); }
@@ -3998,7 +4292,10 @@ const ONE = { dx: 0, dy: -14 };
 // 'two' = each belt has its own loader and you scan both. DUO is worked out once a frame from the beat the scene is showing.
 const DUO = { mode: 'two', p: 0 };
 function duoMode(beat) { if (L.soloFrom != null) return beat >= L.soloFrom ? 'one' : 'two'; if (!L.handover) return L.onePlacer ? 'one' : 'two'; return beat < L.handover[0] ? 'one' : beat < L.handover[1] ? 'walk' : 'two'; }
-const isAuto = n => n.victim || (n.lane === L.autoLane && (L.autoUntil == null || n.beat < L.autoUntil));
+// 1-7's cutscene: who has left the line by now (L.cine.hGone: 하은, jGone: 지우)
+const cineGone = (k, b) => !!(L.cine && L.cine[k] != null && b >= L.cine[k]);
+let CINE_B = -1;   // (the time this frame, for the arm drawn with each belt)
+const isAuto = n => (L.cine && !n.quad) || n.victim || (n.lane === L.autoLane && (L.autoUntil == null || n.beat < L.autoUntil));
 // where a belt's loader stands, in screen offsets from the single-belt spot
 function placerOff(lane) {
   if (DUO.mode === 'two') { if (lane === 0) { const h = haeunHome(); return { dx: h.x - BOSS_X, dy: h.top - 86 }; } return { dx: LANE_DX[lane], dy: LANE_DY[lane] + (L.nearLoaderDy || 0) }; }
@@ -4131,7 +4428,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   (L.daw ? drawDawTop : drawBeltTop)(beltT, active);
   if (L.xray && L.xray.lane === lane) drawXrayPanel(t, active);
   if (L.jam) drawJamRoller(t, nowMs, active);
-  if (L.beltStop) drawStopLamp(t, active);
+  if (L.beltStop && !L.cine) drawStopLamp(t, active);
   let holding = false;
   if (active) {
     drawRingsAt(dy, nowMs);
@@ -4217,7 +4514,7 @@ function drawLane(lane, pose, t, beltT, active, nowMs, laneFx) {
   g.restore();
   // the arm to the far belt is drawn in screen space so it stays on the body; only the hand goes through the perspective
   const castFar = far && L.cast && castLane() === 0;
-  if (far && DUO.mode === 'two' && !(castFar && CAST.hideArm) && !(active && shovedAt(castBeatAt(t, active)))) { const who = pid, o0 = placerOff(0), o = castFar ? { dx: o0.dx + CAST.dx, dy: o0.dy } : o0, h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
+  if (far && DUO.mode === 'two' && !(castFar && CAST.hideArm) && !(active && shovedAt(castBeatAt(t, active))) && !(L.cine && cineGone('jGone', CINE_B))) { const who = pid, o0 = placerOff(0), o = castFar ? { dx: o0.dx + CAST.dx, dy: o0.dy } : o0, h = { x: farX(pose.hand.x), y: farY(pose.hand.y) }; g.save(); g.translate(o.dx, o.dy); PARTNERS[who].arm({ ...pose, hand: { x: h.x - o.dx, y: h.y - o.dy } }); g.restore(); }
 }
 // one of hers knocked off the belt by his dropped box (1-6): it flies off the front of the belt, turning, and lands on the floor
 // in front of it, where it stays; a crash, a '쾅!', the floor jolting, dust, and her flinching
@@ -6368,6 +6665,8 @@ function drawScene(t, bt, active, nowMs) {
   if (sv && sv.stage) { STG.post = post; drawStage15(t, nowMs, sv); return; }
   if (L.room && (active || post) && (active ? beatAt(t) : END_BEAT) >= L.room.from) { STG.on = false; drawRoom15(t, nowMs, active ? beatAt(t) : END_BEAT, !active); return; }
   if (L.commute && active && beatAt(t) >= L.commute.from && beatAt(t) < L.room.from) { STG.on = false; drawCommute15(beatAt(t), nowMs); return; }
+  if (L.cine) CINE_B = active ? beatAt(t) : -1;
+  if (L.cine && active && beatAt(t) >= L.cine.out) { STG.on = false; drawCine17(beatAt(t), t, nowMs); return; }
   STG.on = false;
   g.save();
   if (sv) { g.translate(W / 2, H / 2); g.rotate(sv.rot); g.scale(sv.zoom, sv.zoom); g.translate(-W / 2, -H / 2); }
@@ -6404,7 +6703,7 @@ function drawScene(t, bt, active, nowMs) {
   if (L.lanes === 2) {
     const mb = castBeatAt(t, active); DUO.mode = duoMode(mb); if (L.cast) L.partners[castLane()] = castPlacer(mb); if (L.soloFrom != null) L.partners[1] = active && mb >= L.soloFrom ? 'haeun' : 'jiwoo'; DUO.p = L.handover ? Math.max(0, Math.min(1, (mb - L.handover[0]) / (L.handover[1] - L.handover[0]))) : 1;
     if (DUO.mode !== 'two' && L.coScanner) drawHaeunScene(mb, upperKick, nowMs, active);
-    if (DUO.mode === 'two') { const fa = active ? feverAura(mb) : 0; if (fa) drawHaeunAura(mb, fa, nowMs, false); if (L.show && active) { drawRage15(t, nowMs, 'h'); drawRage15(t, nowMs, 'j'); } if (active && shovedAt(mb)) drawShoved(mb, nowMs); else { g.save(); clipBehindUpper(); { const o = placerOff(0); g.translate(o.dx, o.dy); } if (L.cast && castLane() === 0) drawCast(t, nowMs, active, poses[0]); else drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); } if (fa) drawHaeunAura(mb, fa, nowMs, true); }
+    if (DUO.mode === 'two') { const fa = active ? feverAura(mb) : 0; if (fa) drawHaeunAura(mb, fa, nowMs, false); if (L.show && active) { drawRage15(t, nowMs, 'h'); drawRage15(t, nowMs, 'j'); } if (active && shovedAt(mb)) drawShoved(mb, nowMs); else if (!(active && cineGone('jGone', mb))) { g.save(); clipBehindUpper(); { const o = placerOff(0); g.translate(o.dx, o.dy); } if (L.cast && castLane() === 0) drawCast(t, nowMs, active, poses[0]); else drawPartnerBody(L.partners[0], poses[0], nowMs, active); g.restore(); } if (fa) drawHaeunAura(mb, fa, nowMs, true); }
     else if (!L.oneSpot) {
       // one loader between the belts: his body follows whichever belt is busy
       const o = placerOff(1), bp = { ...poses[1], wince: poses[0].wince || poses[1].wince, dip: Math.max(poses[0].dip, poses[1].dip), nod: Math.max(poses[0].nod, poses[1].nod) };
@@ -6424,6 +6723,7 @@ function drawScene(t, bt, active, nowMs) {
   // the cast changes hands on the one belt, or on the lower belt when there are two (2-1: 이모 keeps the upper one)
   if (L.cast && castLane() === lo) { L.partners[lo] = castPlacer(castBeatAt(t, active)); if (L.lanes === 2) { const o = placerOff(1); g.save(); g.translate(o.dx, o.dy); drawCast(t, nowMs, active, poses[lo]); g.restore(); } else drawCast(t, nowMs, active, poses[lo]); }
   else if (SCENE.walk && !active) drawWalkingBoss(nowMs);
+  else if (L.cine && active && cineGone('hGone', castBeatAt(t, active))) drawObserver(t, nowMs, active);
   else if (!(L.lanes === 2 && DUO.mode !== 'two') && !(active && visitAt(castBeatAt(t, active)))) { const o = L.lanes === 2 ? placerOff(1) : { dx: 0, dy: 0 }; g.save(); g.translate(laneSlide(lo, t, active) + o.dx, o.dy); drawPartnerBody(L.partners[lo], poses[lo], nowMs, active); g.restore(); drawObserver(t, nowMs, active); }
   if (L.daw) drawLaptop(t, active, nowMs);
   if (L.inspector) drawInspector(t, active, nowMs);
@@ -6442,6 +6742,7 @@ function drawScene(t, bt, active, nowMs) {
   for (const [n, f, dy] of laneFx.falling) { g.save(); g.translate(f.x, f.y + dy - n.h / 2); g.rotate(f.rot); drawBox(n, 0, n.h / 2, 'miss', t); g.restore(); }
   // (the dotted tether between a same-beat pair was tried and taken out: the stacked gates say it on their own)
   drawPlayerArm(kick, nowMs, nowMs - lastHeavy < 260, upperKick);
+  if (L.cine && active) drawCineLine17(beatAt(t), nowMs);
   drawParticles(nowMs);
   if (L.daw) { drawJudges(t, active, nowMs); drawGuests(t, active, nowMs); }
   if (al) { drawAlleyLight(al, t, nowMs); drawBeltString(al, t, nowMs); drawPuddleMirror(al, t, nowMs); }
@@ -7272,6 +7573,7 @@ function buildEvents() {
     if (L.songStart === b) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(0)) startSong(T, 0, 0); });
     if (b < 4 && !L.noCount) { E(0, T => rim(T, inBar === 0 ? 0.5 : 0.3)); continue; }
     if (b >= total - 4) continue;
+    if (style === 'cine17') { cine17Events(b, E, s); continue; }
     // combo layers shared by every track
     // (a level with bareBand has none: 1-6 plays recorded songs, and nothing of the engine's may sound under them)
     if (!L.bareBand) for (let k = 0; k < 4; k++) E(k * s / 4, T => { if (stats.combo >= 8) noise(T, 'highpass', 6000, k % 2 ? 0.035 : 0.06, 0.03); });
@@ -8475,6 +8777,7 @@ function pairFx(a, b) {
 // heavy boxes need two different keys inside a short window; one hand alone drops it
 let PRESS_SIDE = null;   // which hand pressed (one-button mode), so a long crate is held and let go by that hand
 function onHit(ts, key, lane = 0) {
+  if (L.cine) return;   // (1-7 is all cutscene: nothing to press)
   const t = songAt(ts) - offsetMs / 1000;
   // a chute (2-1's four lanes): lane 100 + chute
   if (L.mid && lane < 100) lane = 100;   // 2-1 before the floor opens: one belt, any key
@@ -8638,6 +8941,7 @@ function updateHud(t) {
   if (line && line[4] === 'd' && L.driver) placeHeadBubble(driverHead(beat));
   const spkNow = line ? line[4] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.spk : null;
   if (spkNow === 'w' && L.commute) placeHeadBubble(commuteHead(beat));
+  else if ((spkNow === 'J' || spkNow === 'H') && L.cine) { const hp = beat >= L.cine.out ? cineHead(spkNow, beat) : spkNow === 'J' ? { x: 32, y: 87 } : null; if (hp) placeHeadBubble(hp); }
   else if (spkNow && L.heads && L.heads[spkNow]) { const [hx, hy] = STG.on && STG.heads && STG.heads[spkNow] ? STG.heads[spkNow] : L.heads[spkNow], up = spkNow === 'b' && L.bossSeat && (inRange(beat, L.bossSeat.stand) || (TUT.on && TUT.stand)) ? 14 : 0, walk = spkNow === 'b' && L.obsCue ? obsX(beat) - OBS_X : 0; placeHeadBubble({ x: hx + (up ? 6 : 0) + walk, y: hy - up }); }
   let h = '';
   if (L.tutorial) for (let i = 0; i < 3; i++) { const n = notes[i]; if (n && n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 터치'; break; } }
@@ -9090,6 +9394,7 @@ function finishPlay(force) {
   stopSong(); state = 'outro'; stopHum(); stopHold(); bubble.hidden = true; subEl.hidden = true; hint.hidden = true; hud.classList.remove('cine'); judgeEl.classList.remove('cine'); $('devbtn').classList.remove('cine'); CAM.to = null; SLOW.on = false; DEV.open = false; devSync();
   const acc = accuracy();
   if (force == null) try { if ((progress[L.id] || 0) < acc) { progress[L.id] = acc; localStorage.setItem('belt.progress', JSON.stringify(progress)); } } catch (e) {}
+  if (L.cine) { runDialog(L.outro(true), openBoard); return; }   // (a cutscene: no result card)
   if (L.epilogue) startEpilogue(force != null ? force : acc >= 0.8); else runDialog(L.outro(force != null ? force : acc >= 0.8, stats.special), showResult);
 }
 let runNo = 0;
