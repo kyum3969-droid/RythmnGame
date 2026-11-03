@@ -3801,6 +3801,15 @@ function drawMid(t, nowMs, active) {
     BELT_L = up ? 14 : 48; g.save(); if (up) { g.translate(0, LANE_DY[0]); farXform(); }
     drawScannerBack(0); drawBeltTop(L.rb ? rbBeltT(T) : T, live);
     if (live) drawLaserGlow(flashOf(q, up) * 0.6);
+    // the square rings that go out from the scanner on a hit (as on the one-belt screen), on the belt that was hit
+    if (live) for (const n of notes) {
+      if (!n.quad || n.q !== q || !!n.up !== up || n.state !== 'hit' || n.hitAt == null || n.judge == null) continue;
+      const a = (T - n.hitAt) / 0.42; if (a < 0 || a >= 1) continue;
+      const e = 1 - (1 - a) * (1 - a), s_ = 8 + e * 58, rc = THEME[fxTheme(n.beat)].ring[n.judge === 'good' ? 1 : 0];
+      g.globalAlpha = (1 - a) * 0.9; g.strokeStyle = rc; g.lineWidth = 2; g.strokeRect(Math.round(SCAN_X - s_) + 0.5, Math.round(BELT_Y - 8 - s_ * 0.6) + 0.5, Math.round(s_ * 2), Math.round(s_ * 1.2));
+      if (a < 0.5) { const s2 = 4 + e * 30; g.globalAlpha = (0.5 - a) * 1.4; g.lineWidth = 1; g.strokeRect(Math.round(SCAN_X - s2) + 0.5, Math.round(BELT_Y - 8 - s2 * 0.6) + 0.5, Math.round(s2 * 2), Math.round(s2 * 1.2)); }
+      g.globalAlpha = 1;
+    }
     const end = up ? SCAN_X + (AX - 8 - SCAN_X) / FAR.k : AX - 8;
     if (live) for (const n of notes) {
       if (!n.quad || n.q !== q || !!n.up !== up || T < n.place) continue;
