@@ -21,7 +21,7 @@
 ## 프롬프트 (그대로 붙여 넣기)
 
 ```
-A bright, bouncy, feel-good Korean band-pop song with ONE solo young male singer: on a night shift in a warehouse, a cheerful guy falls for a cool, quiet coworker at first sight, the moment she catches a box he dropped without even looking, right on the beat. Sweet, playful and a little silly, like the first rush of a crush. Korean vocals with clear, natural Korean pronunciation, one male voice only, no female vocals, no rap. 1:25 long, 118 BPM, 4/4, A major. Clean lyrics.
+A bright, bouncy, feel-good Korean band-pop song with ONE solo young male singer: on a night shift in a warehouse, a cheerful guy falls for a cool, quiet coworker at first sight, the moment she catches a box he dropped without even looking, right on the beat. Sweet, playful and a little silly, like the first rush of a crush. Korean vocals with clear, natural Korean pronunciation, one male voice only from start to finish: no female vocals, no second singer, no spoken dialogue, no rap. The girl never sings or speaks; he only tells us what she said. 1:25 long, 118 BPM, 4/4, A major. Clean lyrics.
 
 The sound:
 - Bright, jangly clean electric guitars strumming open major chords, with a catchy guitar riff that comes back in every chorus.
@@ -30,13 +30,13 @@ The sound:
 - Sparkling synths and a glockenspiel on top.
 - Mixed bright and warm, youthful and upbeat.
 
-The singer: a young man of 21 with a sweet, soft, honey-toned voice, gentle and warm with a little airy breathiness, like he is smiling while he sings. Tender and cute rather than powerful, never shouting. Softly doubled in the choruses, with "oh-oh" backing vocals by the same voice.
+The singer: a young man of 21 with a sweet, soft, honey-toned voice, gentle and warm with a little airy breathiness, like he is smiling while he sings. Tender and cute rather than powerful, never shouting. Softly doubled in the choruses, with "oh-oh" backing vocals by the same male voice only.
 
 Structure (one bar = 2.03 seconds; every change lands exactly on the bar line):
 0:00-0:04 Intro (2 bars): the guitar riff and the drums come straight in, bright and happy. No vocals.
 0:04-0:18 Verse 1 (7 bars): one line per bar, chatty and cheerful.
 0:18-0:22 Build (2 bars): the drums build with a snare roll, everything rising, faster and faster.
-0:22-0:26 Breakdown (2 bars): almost everything stops. Only a soft twinkling glockenspiel and a slow, soft heartbeat kick (two thumps, ba-dum). One whispered word.
+0:22-0:26 Breakdown (2 bars): almost everything stops. Only a soft twinkling glockenspiel and a slow, soft heartbeat kick (two thumps, ba-dum). The male singer whispers one word.
 0:26-0:43 Chorus (8 bars): everything bursts back in at once, big and happy, the guitar riff, handclaps. One line per bar.
 0:43-0:59 Verse 2 (8 bars): one line per bar, playful.
 0:59-1:03 Bridge (2 bars): half-time and soft, just guitar, bass and glockenspiel, his voice almost a whisper.
@@ -60,7 +60,7 @@ Lyrics (all by the one male singer, in Korean):
 봐 봐, 봐 봐, 지금 봐 봐
 어어, 그 상자 말고!
 
-[Breakdown - whispered]
+[Breakdown - the male singer whispers]
 …아.
 
 [Chorus]
@@ -68,14 +68,14 @@ Lyrics (all by the one male singer, in Korean):
 한 손, 한 박, 내 심장은 박자를 놓쳤어
 두근, 두근, 천천히가 안 돼
 하역장 불빛이 분홍빛이야, 오오오
-"조심해" 그 한마디가 전부였는데
+조심하라는 그 한마디가 전부였는데
 그 상자보다 내가 더 빨리 떨어져
 딱 제때, 딱 제때
 이게 사랑일까, 밤샘이 날 홀린 걸까
 
 [Verse 2]
-내 이름을 말했더니 "상자" 한마디
-좋아하는 노래 물었더니 "시끄러"
+내 이름을 말했더니 상자나 보래
+좋아하는 노래 물었더니 시끄럽대
 차가운 말마저 노래처럼 들려
 밤새도록 흥얼거려, 라라라라
 눈 한 번 마주치려고 초를 세고
@@ -84,7 +84,7 @@ Lyrics (all by the one male singer, in Korean):
 그래도 좋아, 정말 괜찮아
 
 [Bridge - soft, almost a whisper]
-"박자는 맞네" 그 한마디가
+박자는 맞는대, 그 한마디가
 머릿속에서 계속 반복 재생 중
 
 [Final chorus]
@@ -92,7 +92,7 @@ Lyrics (all by the one male singer, in Korean):
 한 손, 한 박, 내 심장은 박자를 놓쳤어
 두근, 두근, 천천히가 안 돼
 하역장 불빛이 분홍빛이야, 오오오
-"조심해" 그 한마디가 전부였는데
+조심하라는 그 한마디가 전부였는데
 그 상자보다 내가 더 빨리 떨어져
 딱 제때, 딱 제때
 이게 사랑일까, 밤샘이 날 홀린 걸까
@@ -103,7 +103,7 @@ Lyrics (all by the one male singer, in Korean):
 
 **막히면**: 첫 문장의 "falls for a coworker"를 "has a crush on a coworker"로. 그래도 막히면 가사를 빼고 비트만 먼저 받는다(첫 문단의 "ONE solo young male singer"를 "instrumental, no vocals"로, 가사 블록 삭제). 목소리가 너무 세게 나오면 `The singer:` 문단 끝에 "soft and intimate, like singing close to the microphone"을 붙인다.
 
-**가사 원칙**: 하은이 게임에서 실제로 하는 말("…조심해.", "…상자.", "…시끄러.", "…박자는 맞네.")이 가사에 그대로 들어간다. "너는 늘 박 위에, 나는 늘 한 박 늦게"가 1-6 싸움과 1-7 지우의 뒤따라 걷기("Three Steps Behind")의 씨앗.
+**가사 원칙**: 하은 목소리는 넣지 않는다. 하은이 게임에서 하는 말("…조심해.", "…상자.", "…시끄러.", "…박자는 맞네.")은 지우가 전해 주는 간접 화법으로만 들어간다(따옴표로 인용하면 제미나이가 여자 목소리를 끼워 넣을 수 있다). "너는 늘 박 위에, 나는 늘 한 박 늦게"가 1-6 싸움과 1-7 지우의 뒤따라 걷기("Three Steps Behind")의 씨앗.
 
 ## 해외판 자막 (영어 뜻)
 
@@ -122,17 +122,17 @@ Lyrics (all by the one male singer, in Korean):
 | 한 손, 한 박, 내 심장은 박자를 놓쳤어 | One hand, one beat, and my heart lost the beat |
 | 두근, 두근, 천천히가 안 돼 | Ba-dum, ba-dum, I can't slow it down |
 | 하역장 불빛이 분홍빛이야, 오오오 | The loading dock lights are pink, oh-oh-oh |
-| "조심해" 그 한마디가 전부였는데 | "Careful", that one word was all |
+| 조심하라는 그 한마디가 전부였는데 | You told me to be careful, that was all |
 | 그 상자보다 내가 더 빨리 떨어져 | And I'm falling faster than that box |
 | 딱 제때, 딱 제때 | Right on time, right on time |
 | 이게 사랑일까, 밤샘이 날 홀린 걸까 | Is this love, or has the night shift got me? |
-| 내 이름을 말했더니 "상자" 한마디 | I told you my name, you said one word: "box" |
-| 좋아하는 노래 물었더니 "시끄러" | I asked what songs you like, you said "quiet" |
+| 내 이름을 말했더니 상자나 보래 | I told you my name, you told me to watch my box |
+| 좋아하는 노래 물었더니 시끄럽대 | I asked what songs you like, you told me to keep it down |
 | 차가운 말마저 노래처럼 들려 | Even your cold words sound like a song |
 | 밤새도록 흥얼거려, 라라라라 | I hum them all night long, la-la-la-la |
 | 눈 한 번 마주치려고 초를 세고 | Counting seconds just to catch your eye |
 | 네가 지나갈 때마다 상자를 떨궈 | Dropping boxes every time you pass |
 | 너는 늘 박 위에, 나는 늘 한 박 늦게 | You're always on the beat, I'm always a beat behind |
 | 그래도 좋아, 정말 괜찮아 | But I like it, really, it's fine |
-| "박자는 맞네" 그 한마디가 | "Your timing's right", those few words |
+| 박자는 맞는대, 그 한마디가 | You said my timing's right, those few words |
 | 머릿속에서 계속 반복 재생 중 | Keep playing on repeat in my head |
