@@ -3821,20 +3821,14 @@ function drawPlayer(kick, nowMs, showLegs = true) {
 }
 function drawGun(gx, gy, kick) { RookieArt.drawTool(g, gx, gy, kick); }
 function drawPlayerSleeve(sx, sy, hx, hy) { RookieArt.drawSleeve(g, sx, sy, hx, hy); }
-// two belts: the arm up to the upper belt's scanner is the far arm, drawn before the body so it rises from behind the torso
-// (both from the near shoulder it read as a third arm)
-function drawPlayerUpperArm(kick, nowMs) {
-  if (L.daw || L.lanes !== 2 || (L.coScanner && DUO.mode === 'one')) return;
-  const top = playerTop(kick, nowMs), fl = nowMs - FX.flinch;
-  const upperMotion = rookieScan(1, lastPressUpper, nowMs, notes.some(n => n.lane === 0 && n.state === 'holding'));
-  RookieArt.drawUpperArm(g, PLAYER_X, top, fl, upperMotion, true);
-}
 function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
   const top = playerTop(kick, nowMs), fl = nowMs - FX.flinch, cx = PLAYER_X + (fl < 160 ? 1 : 0);
   if (L.daw) { drawPadArm(kick, nowMs, top, twoHands); return; }
   const lowerLane = L.lanes === 2 ? 1 : 0;
   const motion = rookieScan(0, lastPress, nowMs, notes.some(n => n.lane === lowerLane && n.state === 'holding'));
+  const upperMotion = rookieScan(1, lastPressUpper, nowMs, L.lanes === 2 && notes.some(n => n.lane === 0 && n.state === 'holding'));
   const upper = L.lanes === 2 && (!L.coScanner || DUO.mode !== 'one');
+  if (upper) RookieArt.drawUpperArm(g, PLAYER_X, top, fl, upperMotion);
   if (twoHands && !upper) {
     const grip = RookieArt.gripPosition(PLAYER_X, top, kick, fl, motion);
     if (grip) drawPlayerSleeve(cx - 4, top + 24, grip.x + 1, grip.y + 1.5);
@@ -6649,7 +6643,6 @@ function drawScene(t, bt, active, nowMs) {
   if (L.inspector) drawInspector(t, active, nowMs);
   if (L.bossSeat && L.lanes !== 2) drawBossSeat(castBeatAt(t, active), nowMs, active);
   if (L.visit && active) drawVisit(beatAt(t), nowMs);
-  drawPlayerUpperArm(kick, nowMs);
   drawPlayer(kick, nowMs);
   drawLane(lo, poses[lo], t, beltT, active, nowMs, laneFx);
   if (L.toss && active) drawTosses(t);
