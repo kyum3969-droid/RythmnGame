@@ -1059,7 +1059,7 @@ const LEVELS = [
     // down; every new layer brings back something from the night. It ends when he presses stop and saves it.
     lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
     hitKit: 'ticktock', bareBand: true, observer: 'boss', observerIntro: true, noCount: true, observerAt: [[21, 35]], obsCue: { enter: [21, 23], leave: [30.6, 34.6] },   // 반장 by the line for the intro only
-    heads: { j: [104, 58], h: [52, 90], r: [24, 118], b: [168, 84] },
+    heads: { j: [104, 58], h: [52, 90], r: [140, 52], b: [168, 84] },
     clock:'02:50', title:'첫눈에', hints: false, special:['떨어진 상자', 'drop', '받아냄'],
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 368,
     chords: [[277.18, 349.23, 415.3], [233.08, 277.18, 349.23], [185, 233.08, 277.18], [207.65, 261.63, 311.13]], roots: [69.3, 58.27, 92.5, 103.83], chordAt: bar => bar % 4,
@@ -2740,13 +2740,52 @@ function drawLove15(t, nowMs) {
     }
   }
 }
-// 1-5 phase 2: 4 a.m., 지우's room (L.room). We look over his shoulder at his laptop: the timeline of the beat he is making,
-// a row for each instrument (L.room.tracks), the playhead near the left. A new instrument every four bars: its row appears,
-// its clips slide in from the right and you set each one down as it reaches the playhead (the same one button), and from
-// then on it loops on its row while the next one goes in; with each, something from the night comes back over his head.
-// A window with the city turning blue behind the laptop; the screen's light on him; his head nodding on the beat. At the
-// stop he saves it: '하은', deleted, '새 비트'.
-const ROOM = { x0: 70, x1: 292, y0: 22, y1: 142, ph: 112 };
+// 1-5 phase 2: 4 a.m., 지우's room (L.room), seen as the game sees everything: from the side, the room cut open like a
+// doll's house. Poster, shelf and a guitar on the left; 지우 on his desk chair, headphones on, nodding on the beat, his hand on
+// a pad in front of his laptop, a desk lamp; the window and his bed on the right, the sky in it going from night to dawn as
+// the beat fills up. Down below, the beat he is making (the music app): a row for each instrument, centred, starting as one
+// row and growing a row at a time, a half row up and a half row down (L.room.tracks). Its clips slide in from the right and
+// you set each one down as it reaches the playhead (the same one button); from then on it loops on its row while the next one
+// goes in; with each, something from the night comes back over his head. At the stop he saves it: '하은', deleted, '새 비트'.
+const ROOM = { pw: 300, cy: 170, rh: 9, head: 11, names: 32, play: 58, jx: 138 };
+const bgRoom15 = document.createElement('canvas'); bgRoom15.width = W; bgRoom15.height = H;
+const ROOM_WIN = { x: 238, y: 34, w: 66, h: 60 };
+(() => {
+  const b = bgRoom15.getContext('2d'), r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };
+  // the building cut open: walls, ceiling and floor slabs, the dark below
+  r(0, 0, W, H, '#0c0a12'); r(0, 12, W, 7, '#1c1826'); r(0, 18, W, 1, '#2a2436');
+  r(0, 146, W, 7, '#1c1826'); r(0, 146, W, 1, '#2e2840');
+  for (let x = 4; x < W; x += 9) { r(x, 13, 3, 1, '#252032'); r(x + 4, 148, 3, 1, '#252032'); }
+  r(0, 19, 10, 127, '#1c1826'); r(374, 19, 10, 127, '#1c1826'); for (let y = 24; y < 146; y += 9) { r(3, y, 4, 1, '#252032'); r(377, y + 4, 4, 1, '#252032'); }
+  // the back wall, its paper, the skirting and the floorboards
+  r(10, 19, 364, 127, '#2b2438'); for (let x = 16; x < 374; x += 12) r(x, 19, 1, 121, '#30283e');
+  r(10, 136, 364, 4, '#231c2c'); r(10, 140, 364, 6, '#4a3530'); r(10, 140, 364, 1, '#5e4438'); for (let x = 24; x < 374; x += 30) r(x, 141, 1, 5, '#3a2a26');
+  // left: a poster, a shelf of records and books, a guitar against the wall
+  r(30, 28, 34, 26, '#1c2236'); r(32, 30, 30, 22, '#2a3354'); r(35, 35, 24, 3, '#ff7fae'); r(35, 41, 16, 2, '#6fd8ff'); r(35, 46, 20, 2, '#6fd8ff');
+  r(22, 74, 72, 3, '#3a2c3a'); for (let k = 0; k < 9; k++) r(24 + k * 7, 60 + (k % 3), 5, 14 - (k % 3), ['#3a2a4a', '#2a3a4a', '#4a2a3a', '#5a4a2a'][k % 4]);
+  r(66, 62, 12, 12, '#1a1a22'); r(70, 66, 4, 4, '#3a3a44');
+  r(20, 108, 14, 32, '#8a4e30'); r(18, 114, 18, 20, '#a0603a'); r(22, 112, 10, 4, '#a0603a'); r(25, 120, 4, 4, '#2a1a14'); r(26, 70, 3, 40, '#5a3a24'); r(25, 66, 5, 6, '#3a2418');
+  for (let k = 0; k < 4; k++) r(27, 72 + k * 8, 1, 1, '#d8c8a0');
+  // the window frame (its glass is drawn live: the sky), a sill
+  const Wn = ROOM_WIN; r(Wn.x - 4, Wn.y - 4, Wn.w + 8, Wn.h + 8, '#3a3350'); b.clearRect(Wn.x, Wn.y, Wn.w, Wn.h); r(Wn.x + Wn.w / 2 - 1, Wn.y, 2, Wn.h, '#3a3350'); r(Wn.x - 6, Wn.y + Wn.h + 4, Wn.w + 12, 3, '#4a4262');
+  // the bed
+  r(300, 116, 70, 4, '#3a2c3a'); r(300, 120, 70, 14, '#5a6a9a'); r(300, 118, 52, 10, '#7a5a8a'); r(300, 118, 52, 2, '#8e6c9e'); r(352, 112, 16, 8, '#d8d0e0'); r(352, 112, 16, 2, '#efe8f2');
+  r(300, 134, 70, 3, '#2a2030'); r(302, 137, 3, 3, '#2a2030'); r(365, 137, 3, 3, '#2a2030'); r(366, 98, 4, 36, '#3a2c3a');
+  // the desk: top, legs, a drawer; a mug; the lamp
+  r(150, 106, 96, 4, '#5a4030'); r(150, 106, 96, 1, '#6e5038'); r(152, 110, 3, 30, '#4a3426'); r(241, 110, 3, 30, '#4a3426'); r(206, 110, 34, 12, '#4e3828'); r(220, 115, 6, 1, '#8a6a4a');
+  r(212, 99, 6, 7, '#d8d0c8'); r(218, 101, 2, 3, '#d8d0c8'); r(213, 100, 4, 1, '#6a4030');
+  r(228, 103, 12, 3, '#2a2c36'); r(233, 80, 2, 23, '#2a2c36'); r(233, 80, 12, 2, '#2a2c36'); r(240, 82, 9, 4, '#3a3c48');
+  // the chair
+  r(112, 120, 30, 3, '#2c2c38'); r(110, 92, 4, 31, '#2c2c38'); r(110, 92, 4, 2, '#3a3a48'); r(125, 123, 3, 14, '#22222c'); r(114, 137, 26, 2, '#22222c'); r(114, 139, 3, 2, '#111118'); r(137, 139, 3, 2, '#111118');
+})();
+function drawRoomSky(p) {
+  // night going to dawn in the window, as the beat fills up (p 0-1)
+  const Wn = ROOM_WIN, mix = (a, c, q) => '#' + [0, 2, 4].map(i => Math.round(parseInt(a.substr(1 + i, 2), 16) * (1 - q) + parseInt(c.substr(1 + i, 2), 16) * q).toString(16).padStart(2, '0')).join('');
+  const sky = g.createLinearGradient(0, Wn.y, 0, Wn.y + Wn.h); sky.addColorStop(0, mix('#0e1430', '#34407a', p)); sky.addColorStop(0.65, mix('#1e1c44', '#7a5a9a', p)); sky.addColorStop(1, mix('#3a2a58', '#ffb08a', p));
+  g.fillStyle = sky; g.fillRect(Wn.x, Wn.y, Wn.w, Wn.h);
+  g.globalAlpha = 1 - p; for (let k = 0; k < 8; k++) R(Wn.x + 4 + ((k * 23) % 58), Wn.y + 4 + ((k * 37) % 30), 1, 1, '#c8d0ff'); g.globalAlpha = 1;
+  for (const [bx, bw, bh] of [[0, 12, 20], [10, 10, 30], [20, 14, 16], [34, 10, 36], [44, 22, 24]]) { R(Wn.x + bx, Wn.y + Wn.h - bh, bw, bh, '#0d1020'); for (let yy = Wn.y + Wn.h - bh + 4; yy < Wn.y + Wn.h - 2; yy += 6) for (let xx = Wn.x + bx + 2; xx < Wn.x + bx + bw - 2; xx += 4) if (((xx * 7 + yy * 3) % 5) === 0) R(xx, yy, 1, 2, '#ffd98a'); }
+}
 function drawRoomMemory(kind, a, x, y, nowMs) {
   // a small pink-tinted picture of the night: her at her belt
   g.save(); g.globalAlpha = a;
@@ -2763,64 +2802,84 @@ function drawRoomMemory(kind, a, x, y, nowMs) {
 }
 function drawRoom15(t, nowMs, b, post) {
   const Rm = L.room, spb = 60 / 90, beatK = post ? 0 : Math.max(0, 1 - (b % 1) * 3), stopped = b >= Rm.stop;
+  const prog = Math.max(0, Math.min(1, (b - Rm.from) / (Rm.stop - Rm.from))), press = Math.max(0, 1 - (nowMs - lastPress) / 140);
   g.save();
-  // the wall and the window: the city going blue towards morning
-  g.fillStyle = '#121626'; g.fillRect(0, 0, W, H);
-  const wx = 300, wy = 18, ww = 72, wh = 104;
-  const sky = g.createLinearGradient(0, wy, 0, wy + wh); sky.addColorStop(0, '#16204a'); sky.addColorStop(0.7, '#3a3466'); sky.addColorStop(1, '#a8607a');
-  g.fillStyle = sky; g.fillRect(wx, wy, ww, wh);
-  for (let k = 0; k < 7; k++) R(wx + 6 + ((k * 23) % 60), wy + 6 + ((k * 37) % 40), 1, 1, '#c8d0ff');
-  for (const [bx, bw, bh] of [[0, 14, 30], [12, 10, 44], [22, 16, 26], [38, 12, 52], [50, 22, 34]]) { R(wx + bx, wy + wh - bh, bw, bh, '#0d1020'); for (let yy = wy + wh - bh + 4; yy < wy + wh - 2; yy += 6) for (let xx = wx + bx + 2; xx < wx + bx + bw - 2; xx += 4) if (((xx * 7 + yy * 3) % 5) === 0) R(xx, yy, 1, 2, '#ffd98a'); }
-  R(wx - 3, wy - 3, ww + 6, 3, '#2a2f44'); R(wx - 3, wy + wh, ww + 6, 4, '#2a2f44'); R(wx - 3, wy, 3, wh, '#2a2f44'); R(wx + ww, wy, 3, wh, '#2a2f44'); R(wx + ww / 2 - 1, wy, 2, wh, '#2a2f44');
-  // a poster and a shelf on the left
-  R(10, 20, 40, 52, '#1c2236'); R(12, 22, 36, 48, '#2a3354'); R(16, 30, 28, 4, '#ff7fae'); R(16, 38, 20, 2, '#6fd8ff'); R(16, 44, 24, 2, '#6fd8ff');
-  R(6, 84, 56, 3, '#2a2230'); for (let k = 0; k < 6; k++) R(9 + k * 8, 72, 6, 12, ['#3a2a4a', '#2a3a4a', '#4a2a3a'][k % 3]);
-  // the desk
-  R(0, 168, W, 48, '#241a1e'); R(0, 168, W, 2, '#3a2a2e');
-  // the laptop: the screen, the timeline
-  const { x0, x1, y0, y1, ph } = ROOM;
-  R(x0 - 4, y0 - 4, x1 - x0 + 8, y1 - y0 + 8, '#0a0c12'); R(x0, y0, x1 - x0, y1 - y0, '#121a2c');
-  R(x0 - 18, 168 - 22, x1 - x0 + 36, 22, '#1a1d26'); R(x0 - 18, 168 - 22, x1 - x0 + 36, 2, '#2c3040');   // the keyboard deck
-  g.save(); g.font = '700 7px sans-serif'; g.fillStyle = '#9aa6c8'; g.fillText(stopped ? (b - Rm.stop >= 4.8 ? '■ 정지  새 비트.prj' : '■ 정지') : '● 녹음  제목 없음.prj', x0 + 4, y0 + 9); g.restore();
-  // the tracks: a row for each instrument, appearing as its first clips come in (TRAVEL beats ahead); while it is being
-  // recorded (its four bars) the row is lit with a red dot and its clips are the ones you set down; after that it loops on
-  // its row, its pattern going by, its name blinking on its hits: the screen filling up a row at a time
-  const tk = Rm.tracks, rh = 11, ry = y0 + 28, lx = x0 + 32, v = (x1 - 6 - ph) / (TRAVEL * spb), bpx = spb * v;
-  const recK = tk.reduce((m, tr, k) => (b >= tr[0] ? k : m), -1), shown = tk.filter(tr => b >= tr[0] - TRAVEL).length;
+  // the room, cut open; the sky in its window
+  drawRoomSky(prog); g.drawImage(bgRoom15, 0, 0);
+  // the lamp's warm light on the desk, the laptop's cold light on him
+  g.save(); g.globalCompositeOperation = 'lighter';
+  const lc = g.createLinearGradient(0, 86, 0, 108); lc.addColorStop(0, 'rgba(255,214,150,.3)'); lc.addColorStop(1, 'rgba(255,214,150,.05)');
+  g.fillStyle = lc; g.beginPath(); g.moveTo(240, 86); g.lineTo(249, 86); g.lineTo(256, 106); g.lineTo(212, 106); g.closePath(); g.fill();
+  const sg = g.createRadialGradient(160, 90, 4, 160, 90, 64); sg.addColorStop(0, `rgba(110,170,255,${0.28 + 0.08 * beatK + 0.12 * press})`); sg.addColorStop(1, 'rgba(110,170,255,0)'); g.fillStyle = sg; g.fillRect(90, 30, 140, 120);
+  g.restore();
+  // the pad and the laptop (from the side: its screen edge-on, lit toward him)
+  const pd = Math.round(press * 1);
+  R(150, 103 + pd, 16, 3, '#2a2c36'); for (let k = 0; k < 3; k++) R(152 + k * 5, 102 + pd, 3, 1, k === 1 && press > 0 ? '#ffffff' : ['#ff9cc2', '#6fd8ff', '#ffe27a'][k]);
+  R(170, 104, 30, 2, '#9aa0b0'); R(170, 103, 30, 1, '#b8bcc8');
+  g.save(); g.translate(171, 104); g.rotate(-0.22); R(-2, -22, 2, 22, '#3a3d4a'); R(-3, -22, 1, 22, `rgba(160,200,255,${0.7 + 0.3 * beatK})`); g.restore();
+  // 지우 on his chair, headphones on, nodding on the beat, his hand on the pad
+  const nod = post || stopped ? 0 : Math.round(beatK * 1.4), jx = ROOM.jx;
+  g.save(); g.translate(0, -24);
+  drawActor('jiwoo', jx, false, { ...standPose(0), nod }, nowMs, false, top => {
+    R(BOSS_X - 6, top + 56, 20, 7, '#2a2530'); R(BOSS_X + 9, top + 62, 6, 18, '#2a2530'); R(BOSS_X + 9, top + 79, 9, 3, '#1b1716');
+    const hx = 158 - (jx - BOSS_X), hy = 102 + 24 - nod + pd;
+    thick(BOSS_X + 3, top + 24, hx, hy - 1, 4, '#6b2f3f'); R(hx - 1, hy - 3, 4, 3, C.skin);
+    R(BOSS_X - 7, top - 4, 14, 2, '#22262e'); R(BOSS_X - 8, top - 3, 2, 6, '#22262e'); R(BOSS_X - 3, top + 4, 5, 8, '#22262e'); R(BOSS_X - 2, top + 6, 3, 4, '#ff7fae');
+  });
+  g.restore();
+  // the night coming back: a thought over his head, up by the ceiling
+  const mem = Rm.memories.find(([mb]) => b >= mb && b < mb + 7);
+  if (mem && !stopped) {
+    const ma = Math.min(1, (b - mem[0]) / 0.6) * Math.min(1, (mem[0] + 7 - b) / 1);
+    g.save(); g.globalAlpha = ma; for (const [dx, dy, r] of [[118, 56, 3], [123, 50, 2], [127, 46, 2]]) R(dx, dy, r, r, '#c8a0b8'); g.restore();
+    drawRoomMemory(mem[1], ma, 58, 22, nowMs);
+  }
+  // ---- the music app, down below, centred, a row per instrument
+  const tk = Rm.tracks, rh = ROOM.rh, PW = ROOM.pw, x0 = Math.round((W - PW) / 2), x1 = x0 + PW, px = x0 + ROOM.play, lx = x0 + ROOM.names;
+  const v = (x1 - 6 - px) / (TRAVEL * spb), bpx = spb * v;
+  const grow = tk.map(([at]) => Math.max(0, Math.min(1, (b - (at - TRAVEL)) / 0.6))), rowsF = grow.reduce((a, c) => a + c, 0);
+  const ph = ROOM.head + Math.max(1, rowsF) * rh + 4, y0 = Math.round(ROOM.cy - ph / 2), ry = y0 + ROOM.head + 1;
+  const recK = tk.reduce((m, tr, k) => (b >= tr[0] ? k : m), -1), shown = grow.filter(q => q > 0).length;
   const rowOf = beat => { let k = 0; tk.forEach((tr, i) => { if (beat >= tr[0]) k = i; }); return k; };
   const colOf = lane => (lane ? '#6fd8ff' : '#ff9cc2');
-  g.save(); g.font = '700 7px sans-serif'; g.fillStyle = '#55607e'; g.fillText(`트랙 ${Math.max(0, recK + 1)}/${tk.length}`, x1 - 36, y0 + 9);
-  g.font = '700 6px sans-serif';
-  for (let k = 0; k < tk.length; k++) {
+  // the window: a soft shadow, the frame, its title bar
+  g.save(); g.globalAlpha = 0.5; R(x0 + 2, y0 + 3, PW, ph, '#000000'); g.globalAlpha = 1; g.restore();
+  R(x0 - 1, y0 - 1, PW + 2, ph + 2, '#0a0c12'); R(x0, y0, PW, ph, '#121a2c'); R(x0, y0, PW, ROOM.head - 1, '#0c111e');
+  R(x0 + 4, y0 + 3, 3, 3, '#ff5f57'); R(x0 + 9, y0 + 3, 3, 3, '#febc2e'); R(x0 + 14, y0 + 3, 3, 3, '#28c840');
+  g.save(); g.font = '700 6px sans-serif'; g.fillStyle = '#9aa6c8';
+  g.fillText(stopped ? (b - Rm.stop >= 4.8 ? '■ 정지  새 비트.prj' : '■ 정지') : '● 녹음  제목 없음.prj', x0 + 22, y0 + 7);
+  g.fillStyle = '#55607e'; g.fillText(`트랙 ${Math.max(0, recK + 1)}/${tk.length}`, x1 - 34, y0 + 7);
+  for (let k = 0; k < shown; k++) {
     const [at, name, pat, lane] = tk[k], y = ry + k * rh, rec = !stopped && k === recK && b < at + 16;
-    if (k >= shown) { if (k === shown && !stopped) { g.fillStyle = '#2e3650'; g.fillText('+', x0 + 6, y + 8); } continue; }
     const live = b >= at, cell = Math.floor((b - at) * 4), hitNow = live && !rec && !stopped && pat[((cell % pat.length) + pat.length) % pat.length] === 'x' && ((b - at) * 4) % 1 < 0.8;
-    R(x0 + 2, y, x1 - x0 - 4, rh - 1, rec ? '#1e2c48' : '#172033');
-    R(x0 + 4, y + 1, 26, rh - 3, live ? colOf(lane) : '#2e3650'); g.globalAlpha = live ? (hitNow ? 1 : 0.55) : 0.6;
-    g.fillStyle = '#121a2c'; g.fillText(name, x0 + 6, y + 7); g.globalAlpha = 1;
-    if (hitNow) R(x0 + 4, y + 1, 26, 1, '#ffffff');
-    if (rec && Math.floor(nowMs / 350) % 2) R(x0 + 27, y + 3, 2, 2, '#ff5040');
-    if (live && b < at + 1 && !post) { g.globalAlpha = (1 - (b - at)) * 0.6; R(x0 + 2, y, x1 - x0 - 4, rh - 1, '#ffffff'); g.globalAlpha = 1; }
+    g.globalAlpha = grow[k];
+    R(x0 + 2, y, PW - 4, rh - 1, rec ? '#1e2c48' : '#172033');
+    R(x0 + 3, y + 1, 26, rh - 3, live ? colOf(lane) : '#2e3650'); g.globalAlpha = grow[k] * (live ? (hitNow ? 1 : 0.6) : 0.6);
+    g.fillStyle = '#121a2c'; g.fillText(name, x0 + 5, y + 6); g.globalAlpha = grow[k];
+    if (hitNow) R(x0 + 3, y + 1, 26, 1, '#ffffff');
+    if (rec && Math.floor(nowMs / 350) % 2) R(x0 + 26, y + 3, 2, 2, '#ff5040');
+    if (live && b < at + 1 && !post) { g.globalAlpha = (1 - (b - at)) * 0.6; R(x0 + 2, y, PW - 4, rh - 1, '#ffffff'); }
+    g.globalAlpha = 1;
   }
   g.restore();
+  const rowsH = Math.max(1, rowsF) * rh;
+  g.save(); g.beginPath(); g.rect(lx, ry, x1 - 2 - lx, rowsH); g.clip();
   // the bar lines going by
-  g.save(); g.beginPath(); g.rect(lx, ry, x1 - 2 - lx, tk.length * rh); g.clip();
-  for (let bb = Math.floor(b) - 4; bb < b + 8; bb++) { if (bb < Rm.from || bb % 4) continue; const x = ph + (bb - b) * bpx; R(Math.round(x), ry, 1, Math.max(0, shown) * rh, '#253150'); }
+  for (let bb = Math.floor(b) - 4; bb < b + 8; bb++) { if (bb < Rm.from || bb % 4) continue; R(Math.round(px + (bb - b) * bpx), ry, 1, rowsH, '#253150'); }
   // the recorded loops: each row's pattern after its four bars, up to the stop
-  for (let k = 0; k < Math.min(tk.length, shown); k++) {
+  for (let k = 0; k < shown; k++) {
     const [at, , pat, lane] = tk[k], y = ry + k * rh;
     for (let c = Math.floor((b - 2) * 4); c <= Math.ceil((b + TRAVEL + 0.5) * 4); c++) {
       const bb = c / 4; if (bb < at + 16 || bb >= Rm.stop) continue;
       const pc = ((Math.round((bb - at) * 4) % pat.length) + pat.length) % pat.length; if (pat[pc] !== 'x') continue;
-      const x = Math.round(ph + (bb - b) * bpx), past = bb <= b;
-      g.globalAlpha = past ? 0.55 : 0.32; R(x - 3, y + 2, 6, rh - 5, colOf(lane)); g.globalAlpha = 1;
+      g.globalAlpha = bb <= b ? 0.55 : 0.32; R(Math.round(px + (bb - b) * bpx) - 3, y + 2, 6, rh - 5, colOf(lane)); g.globalAlpha = 1;
     }
   }
   // the clips you set down: on the row of the instrument going in
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160), miss = nowMs - FX.lastMiss < 260;
   for (const n of notes) {
     if (n.beat < Rm.from) continue; if (!post && t < n.place) break;
-    const x = ph + (n.arr - t) * v; if (x < lx - 10) continue;
+    const x = px + (n.arr - t) * v; if (x < lx - 10) continue;
     const y = ry + rowOf(n.beat) * rh + 1, col = n.state === 'miss' ? '#d8463b' : colOf(n.lane);
     const done = n.state === 'hit', ha = done ? t - n.hitAt : 9;
     g.globalAlpha = done ? Math.max(0.55, 1 - ha * 1.2) : n.state === 'miss' ? 0.6 : 1;
@@ -2830,32 +2889,17 @@ function drawRoom15(t, nowMs, b, post) {
   }
   g.restore();
   // the playhead
-  R(ph - 1, ry - 2, 2, tk.length * rh + 2, miss ? '#ff5040' : flash > 0 ? '#ffffff' : '#ffe27a'); R(ph - 4, ry - 4, 8, 3, miss ? '#ff5040' : '#ffe27a');
-  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(ph - 6, ry, 12, tk.length * rh, '#fff2b0'); g.restore(); }
-  // the night coming back: a thought over his head
-  const mem = Rm.memories.find(([mb]) => b >= mb && b < mb + 7);
-  if (mem && !stopped) {
-    const ma = Math.min(1, (b - mem[0]) / 0.6) * Math.min(1, (mem[0] + 7 - b) / 1);
-    g.save(); g.globalAlpha = ma; for (const [dx, dy, r] of [[44, 68, 3], [49, 79, 2], [53, 89, 2]]) R(dx, dy, r, r, '#c8a0b8'); g.restore();
-    drawRoomMemory(mem[1], ma, 4, 28, nowMs);
-  }
-  // at the stop: saving it
+  R(px - 1, ry - 1, 2, rowsH + 1, miss ? '#ff5040' : flash > 0 ? '#ffffff' : '#ffe27a'); R(px - 3, ry - 3, 6, 2, miss ? '#ff5040' : '#ffe27a');
+  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(px - 6, ry, 12, rowsH, '#fff2b0'); g.restore(); }
+  // at the stop: saving it, over the app
   if (stopped) {
     const q = b - Rm.stop, name = q < 1.5 ? '하은'.slice(0, Math.min(2, Math.floor(q * 3) + 1)) : q < 2.6 ? (q < 2.1 ? '하' : '') : q < 4.5 ? '새 비트'.slice(0, Math.min(4, Math.floor((q - 2.6) * 4) + 1)) : '새 비트';
-    g.save(); R(x0 + 46, y0 + 46, 130, 44, '#0c111e'); R(x0 + 46, y0 + 46, 130, 1, '#6fd8ff'); g.font = '700 8px sans-serif'; g.fillStyle = '#9aa6c8'; g.fillText('파일 이름', x0 + 54, y0 + 60);
-    R(x0 + 54, y0 + 64, 114, 14, '#182238'); g.fillStyle = '#ffffff'; g.fillText(name + (Math.floor(nowMs / 400) % 2 && q < 4.5 ? '|' : ''), x0 + 58, y0 + 74);
-    if (q >= 4.8) { g.fillStyle = '#8fd694'; g.fillText('저장됨', x0 + 136, y0 + 60); }
+    const dx = Math.round(W / 2 - 65), dy = Math.round(ROOM.cy - 22);
+    g.save(); R(dx - 1, dy - 1, 132, 46, '#0a0c12'); R(dx, dy, 130, 44, '#0c111e'); R(dx, dy, 130, 1, '#6fd8ff'); g.font = '700 8px sans-serif'; g.fillStyle = '#9aa6c8'; g.fillText('파일 이름', dx + 8, dy + 14);
+    R(dx + 8, dy + 18, 114, 14, '#182238'); g.fillStyle = '#ffffff'; g.fillText(name + (Math.floor(nowMs / 400) % 2 && q < 4.5 ? '|' : ''), dx + 12, dy + 28);
+    if (q >= 4.8) { g.fillStyle = '#8fd694'; g.fillText('저장됨', dx + 90, dy + 14); }
     g.restore();
   }
-  // the screen's glow on the room
-  g.save(); g.globalCompositeOperation = 'lighter'; const gl = g.createRadialGradient((x0 + x1) / 2, y1, 20, (x0 + x1) / 2, y1, 200); gl.addColorStop(0, `rgba(110,170,255,${0.1 + 0.05 * beatK})`); gl.addColorStop(1, 'rgba(110,170,255,0)'); g.fillStyle = gl; g.fillRect(0, 0, W, H); g.restore();
-  // 지우 from behind, in front of the laptop: the hood, headphones on, nodding on the beat; his hand on the pad as he sets
-  // each clip down
-  const nod = post || stopped ? 0 : Math.round(beatK * 1.5), jx = 58, jy = 122 + nod, press = Math.max(0, 1 - (nowMs - lastPress) / 140);
-  R(jx - 22, jy + 26, 44, 70, '#6b2f3f'); R(jx - 18, jy + 30, 36, 66, '#7a3a4a'); R(jx - 22, jy + 26, 44, 3, '#4a2030');
-  R(jx - 12, jy, 24, 28, '#6b2f3f'); R(jx - 10, jy + 2, 20, 24, '#7a3a4a'); R(jx - 12, jy + 22, 24, 6, '#4a2030');
-  R(jx - 14, jy - 2, 28, 3, '#22262e'); R(jx - 16, jy + 6, 5, 12, '#22262e'); R(jx + 11, jy + 6, 5, 12, '#22262e'); R(jx - 15, jy + 8, 3, 8, '#ff7fae');
-  R(jx + 18, 160 - Math.round(press * 3), 12, 6, C.skin); R(jx + 16, 152 - Math.round(press * 3), 8, 10, '#6b2f3f');
   // fading in from black
   const fin = post ? 0 : Math.max(0, 1 - (b - Rm.from) / 1.5);
   if (fin > 0) { g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(0,0,0,${fin})`; g.fillRect(0, 0, W, H); }
