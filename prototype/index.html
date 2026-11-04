@@ -5067,8 +5067,8 @@ function htDancers(b, nowMs) {
   // 소장 (cf) and the driver (dv); their arms as [forward, down] from the shoulder (an arm is about 22 long): forward is the way
   // each faces. Some reaches: up, up and forward, up and back, out, down, down across, a hand on the hip, on the knee
   const UP = [2, -23], UPF = [11, -20], UPB = [-7, -21], OUT = [21, -5], DOWNX = [-8, 20], HIP = [7, 13], KNEE = [9, 24];
-  const cf = { x: mx - 17, y: 0, r: 0, mir: false, dip: 0, f: HIP, b: HIP, wince: false };
-  const dv = { x: mx + 17, y: 0, r: 0, faceR: false, f: [6, 20], b: [6, 20], kick: false };
+  const cf = { x: mx - 17, y: 0, z: 0, r: 0, mir: false, dip: 0, f: HIP, b: HIP, wince: false };
+  const dv = { x: mx + 17, y: 0, z: 0, r: 0, faceR: false, f: [6, 20], b: [6, 20], kick: false };
   let spot = 0, spark = false, front = 'dv';
   if (!on) {
     cf.x = Math.round(lerp(fr ? fr[0] : -30, mx - 17, inP)); dv.x = Math.round(lerp(fr ? fr[1] : MID.ww + 30, mx + 17, inP));
@@ -5125,22 +5125,35 @@ function htDancers(b, nowMs) {
   } else if (mv === 'shock') {  // 반장 goes down in the ending: both turn to him, hands to their faces
     cf.mir = true; cf.f = [-4, -12]; cf.b = [12, -12]; dv.f = [2, -12]; dv.b = [-10, -12];
   }
-  g.save(); g.translate(0, ty); g.translate(mx, 152); g.scale(sc, sc); g.translate(-mx, -152);
+  // going wild (more in the louder parts): the pair careering all over the floor, left and right and to and fro, bouncing
+  // high on every beat; in the drops whirling round each other, arms flailing, flipping round on the eighths
+  const WILD = { sway: 0.35, disco: 0.55, freeze: 0, call: 0.45, dip: 0.15, side: 0.75, jump: 1, shimmy: 0.5, train: 0.3, pant: 0, finale: 1, pose: 0, shock: 0 };
+  const w = on ? (WILD[mv] || 0) : 0;
+  const gx = Math.round((Math.sin(b * Math.PI / 8) * 110 + Math.sin(b * Math.PI / 2) * 16) * w), gz = Math.round(Math.sin(b * Math.PI / 6 + 1) * 30 * w);
+  if (w > 0) { cf.y -= Math.round(Math.abs(Math.sin(b * Math.PI)) * 12 * w); dv.y -= Math.round(Math.abs(Math.sin(b * Math.PI + 0.9)) * 12 * w); }
+  if (w >= 0.75 && !(mv === 'jump' && bar % 2 === 1 && ib >= 2)) {
+    const th = b * Math.PI / 2; cf.x += Math.round(Math.cos(th) * 30 * w); dv.x -= Math.round(Math.cos(th) * 30 * w); cf.z = Math.round(Math.sin(th) * 18 * w); dv.z = -cf.z; front = cf.z > dv.z ? 'cf' : 'dv';
+    const P = [UP, UPF, OUT, UPB, [14, -12], [4, -18]], e = Math.floor(b * 2);
+    if (!(mv === 'jump' && ib === 0)) { cf.f = P[Math.floor(rnd(e, 81) * 6)]; cf.b = P[Math.floor(rnd(e, 82) * 6)]; dv.f = P[Math.floor(rnd(e, 83) * 6)]; dv.b = P[Math.floor(rnd(e, 84) * 6)]; }
+    if (rnd(e, 85) < 0.35) cf.mir = !cf.mir; if (rnd(e, 86) < 0.35) dv.faceR = !dv.faceR;
+    cf.r += Math.sin(b * Math.PI * 2) * 0.12; dv.r -= Math.sin(b * Math.PI * 2 + 1) * 0.12;
+  }
+  g.save(); g.translate(gx, ty + gz); g.translate(mx, 152); g.scale(sc, sc); g.translate(-mx, -152);
   // the floor under them: shadows, and in the drops a coloured spot under each, changing on the beat
   if (spot) { const cols = ['255,90,150', '90,200,255', '255,210,80'];
-    [cf.x, dv.x].forEach((x, i) => { const c = cols[(beat + i) % 3], gr = g.createLinearGradient(0, 40, 0, 152); gr.addColorStop(0, `rgba(${c},0)`); gr.addColorStop(1, `rgba(${c},.22)`);
+    [cf.x, dv.x].forEach((x, i) => { const c = cols[(beat + i) % 3], gr = g.createLinearGradient(0, 40, 0, 152); x += 0; gr.addColorStop(0, `rgba(${c},0)`); gr.addColorStop(1, `rgba(${c},.22)`);
       g.fillStyle = gr; g.beginPath(); g.moveTo(x - 4, 40); g.lineTo(x + 4, 40); g.lineTo(x + 20, 152); g.lineTo(x - 20, 152); g.closePath(); g.fill();
       g.fillStyle = `rgba(${c},.35)`; g.beginPath(); g.ellipse(x, 152, 20, 4, 0, 0, Math.PI * 2); g.fill(); }); }
-  g.fillStyle = 'rgba(0,0,0,.3)'; for (const x of [cf.x, dv.x]) { g.beginPath(); g.ellipse(x, 152, 13, 3, 0, 0, Math.PI * 2); g.fill(); }
+  g.fillStyle = 'rgba(0,0,0,.3)'; for (const [x, z] of [[cf.x, cf.z], [dv.x, dv.z]]) { g.beginPath(); g.ellipse(x, 152 + z, 13, 3, 0, 0, Math.PI * 2); g.fill(); }
   const drawC = () => {
-    g.save(); g.translate(cf.x, 150 + cf.y); g.rotate(cf.r); g.translate(-cf.x, -150);
+    g.save(); g.translate(cf.x, 150 + cf.y + cf.z); g.rotate(cf.r); g.translate(-cf.x, -150);
     const pose = { ...standPose(0), dip: cf.dip, wince: cf.wince }, st0 = bodyTop(86, pose) + 23;
     pose.hand = { x: BOSS_X + 8 + cf.f[0], y: st0 + cf.f[1] }; const h2 = { x: BOSS_X - 9 + cf.b[0], y: st0 + cf.b[1] };
     drawActor('chief', cf.x, cf.mir, pose, nowMs, false, top => {
       if (h2) { thick(BOSS_X - 9, top + 23, h2.x, h2.y + 1, 6, '#a8a194'); thick(BOSS_X - 9, top + 22, h2.x, h2.y, 5, '#dcd7cb'); R(h2.x - 2, h2.y - 2, 5, 4, C.skin); }
       PARTNERS.chief.arm(pose); });
     R(cf.x - 9, 150, 9, 3, '#1b1716'); R(cf.x + 1, 150, 9, 3, '#1b1716'); g.restore(); };
-  const drawD = () => { g.save(); g.translate(dv.x, 146 + dv.y); g.rotate(dv.r); g.translate(-dv.x, -146);
+  const drawD = () => { g.save(); g.translate(dv.x, 146 + dv.y + dv.z); g.rotate(dv.r); g.translate(-dv.x, -146);
     const arms = { f: { x: dv.x - 6 - dv.f[0], y: 110 + dv.f[1] }, b: { x: dv.x + 6 - dv.b[0], y: 110 + dv.b[1] } };
     htDriver(dv.x, !on, dv.faceR, step, 99, nowMs, null, { arms, kick: dv.kick }); g.restore(); };
   if (front === 'dv') { drawC(); drawD(); } else { drawD(); drawC(); }
@@ -8649,9 +8662,13 @@ function songAt(perfMs) {
 }
 function songRaw(perfMs) {
   if (!ctx) return -99;
+  // (a suspended clock, as after a held line until the audio has really started again: it stands still. Its output
+  // timestamp goes stale while suspended, and reading it as live would jump the shift forward by the whole pause, passing
+  // the next boxes by)
+  if (ctx.state !== 'running') return ctx.currentTime - (ctx.outputLatency || ctx.baseLatency || 0) - T0;
   if (ctx.getOutputTimestamp) {
     const ts = ctx.getOutputTimestamp();
-    if (ts.contextTime > 0 && ts.performanceTime > 0) return ts.contextTime + (perfMs - ts.performanceTime) / 1000 - T0;
+    if (ts.contextTime > 0 && ts.performanceTime > 0 && perfMs - ts.performanceTime < 250) return ts.contextTime + (perfMs - ts.performanceTime) / 1000 - T0;
   }
   return ctx.currentTime - (ctx.outputLatency || ctx.baseLatency || 0) + (perfMs - performance.now()) / 1000 - T0;
 }
