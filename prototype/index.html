@@ -1333,45 +1333,143 @@ const LEVELS = [
       { who:'마르코', text:'……' }],
   }
   ,{
-    id:'s2-6', stageNo:'2-6', who:'순자 이모 + 박씨', role:'소장 → 박씨 · 순자 이모 · 108 BPM', tag:'피날레 · 두 곡이 만난다', bpm:108, style:'finale26', fxTheme:'gold', inspector: true,
-    // 2-6 피날레: the last night before the holiday. The forklift's spot is empty and 소장 loads the pallets himself, late and
-    // crooked; 이모 pushes his late boxes straight ('Q': late, then pushed, so it lands on its beat). A horn: 박씨 is back on a
-    // contractor's night shift. From there it is heavies with her hands under them and both their songs at once.
-    tempo: [[0, 108]], clock:'01:20', title:'마지막 밤', partners:['chief'], hints:true,
-    cast: { first: 'chief', ids: ['chief', 'park'], seq: [[72, 'park', 'exit']], offUntil: { park: 72 } },
-    chords: FIN.chords, roots: FIN.roots,
-    chordAt: bar => bar < 2 ? 0 : bar < 10 ? DISCO.verse[(bar - 2) % 4] : bar < 18 ? DISCO.chorus[(bar - 10) % 4] : bar < 20 ? 0 : bar < 28 ? 6 : bar < 36 ? 6 + ROCK.chorus[(bar - 28) % 4] : bar < 40 ? 6 + ROCK.chorus[(bar - 36) % 4] : bar < 48 ? DISCO.chorus[(bar - 40) % 4] : 0,
-    win: { p: 0.065, g: 0.125, m: 0.19, release: 0.18, off: 1.3 }, endAt: 192,
-    lateHint: '소장님 손이 늦어요. 이모가 밀면 제자리로',
-    special:['늦게 실린 상자', 'late', '바로잡음'],
-    sections: [[0, 'intro'], [2, 'a1'], [10, 'a2'], [18, 'horn'], [20, 'd1'], [28, 'd2'], [36, 'fin'], [44, 'coda'], [48, 'outro']],
-    // 'L' late (소장), 'Q' late and pushed straight, 'H' heavy (박씨), 'P' pushed, 'R' grabbed
-    bars: [
-      '........', '........',
-      'L...x...', 'x...L...', 'Q...x...', 'x.L.x...', 'L...Q...', 'x...x...', 'Q...L...', 'x.x.x...',
-      'x.x.x...', 'L...x.Q.', 'x...R...', 'Q.x.x...', 'x.x.L...', 'P...x...', 'x...Q...', 'L.x.x...',
-      'x.......', '........',
-      'x...x...', 'H.......', 'x.x.x...', 'H...x...', 'x...x.x.', 'H...P...', 'x.x.x...', 'H...R...',
-      'x.x.x.x.', 'H...x.x.', 'x...P...', 'H.R.x...', 'x.x.x.x.', 'H...x...', 'P...x.P.', 'H...H...',
-      'x.x.x.x.', 'H...P...', 'x.R.x...', 'H...x.x.', 'x.x.x.x.', 'H.x.P...', 'x...R...', 'H...H...',
-      'x.x.x.x.', 'H...P...', 'x.x.x.x.', 'H...H...',
-      '........', '........'
-    ],
-    say: [[8, '(삐뚤게 싣는다) 자, 자. 돌아갑니다.', 3.5], [24, '…늦잖아. 내가 민다.', 3, 0, 's'], [44, '소장님, 손이 늦어요.', 3, 0, 's'], [66, '(경적) …?', 2, 0, 's'],
-          [76, '외주 야간. 제가 들어왔습니다.', 4], [84, '…뭘 봐.', 2.5, 0, 's'], [96, '무거운 건 두 손.', 2.5], [120, '(받치며) …느리네, 여전히.', 3, 0, 's'],
-          [144, '(카세트를 꺼낸다) …이거.', 3], [152, '(테이프에 "순자 씨") …', 3, 0, 's'], [160, '…내 박자 느려도, 같이 맞춰 줄래요.', 4.5], [168, '탁, 탁탁, 탁. 그 박자면 돼.', 4, 0, 's']],
-    comfort: ['괜찮아, 다음 거.', '총각! 손 봐, 손!'],
+    id:'s2-6', stageNo:'2-6', who:'마르코', role:'마르코 · 소장 · 106 BPM · 라인 넷', tag:'라디오와 붐박스 · 말대꾸 · 10년 만에', bpm:105.99, style:'funk21', fxTheme:'warm',
+    // 2-6 마지막 밤: back on the line the night after the sea, 반장's radio and 마르코's boombox both on, 반장's guitar case on
+    // the shelf. 소장 comes along the back aisle and has a go at him a line at a time; 마르코 answers every one ("왜요?
+    // 한국인!"). The song is 2-3's (the two of their musics in one), the back-and-forth in bars: 소장's bar pushes the song
+    // back and sends stiff boxes on the beat (his clipboard), 마르코's brings it up again with his offbeats; at the last drop
+    // 소장's foot is tapping. Only at the end does 마르코 tell you it was his last night: ten years, and he is going home. He
+    // leaves his boombox by 반장's radio, takes the guitar case, pats the belt once on his way (반장's habit) and goes.
+    tempo: [[0, 105.99]], clock:'01:00', title:'마지막 밤', partners:['marco'], hints:false,
+    songs: [{ src: 'audio/2-3-first-light-on-the-sand.mp3', at: 4, lead: 0.365, gain: 0.9 }],
+    songStart: -1, songCues: [[4, 0]], noCount: true, bareBand: true, hitKit: 'ticktock', subs: true,
+    // the boombox left playing by the radio as he goes (the song again, quietly)
+    pocha: { src: 'audio/2-3-first-light-on-the-sand.mp3', gain: 0.32, lo: 160, hi: 6000, into: 16.2, fade: 2 },
+    sd: { noBoss: true, radio: 0, zoom: [], boombox: [3.6, 9999], boxOnAfter: true, shelf: { can: false, case: true }, lampsStay: true,
+      visits: [['chief', 34, 9999, 236, 'tap']], chiefDance: [248, 9999], dance: [32, 9999], wave: [104, 107.5],
+      calls: [[40, "c"], [44, "v"], [48, "c"], [52, "v"], [56, "c"], [60, "v"], [64, "c"], [68, "v"], [72, "c"], [76, "v"], [80, "c"], [88, "v"], [92, "c"], [96, "v"], [100, "c"], [104, "v"], [108, "c"], [112, "v"], [120, "c"], [124, "v"], [132, "v"], [236, "c"], [248, "v"]] },
+    mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 180, guide: [-9, -8], tags: [-9, -8, -7],
+      shouts: [[180, 'hey', '헤이!'], [264, 'hey', '마지막!']],
+      route: [[0, "rl"], [30.5, "ru"], [46.5, "rl"], [62.5, "ru"], [78.5, "rl"], [94.5, "ru"], [110.5, "rl"], [126.5, "c"], [134.5, "rl"], [150.5, "ru"], [166.5, "rl"], [182.5, "lu"], [190.5, "rl"], [198.5, "lu"], [206.5, "rl"], [214.5, "ll"], [222.5, "rl"], [238.5, "c"], [254.5, "rl"], [262.5, "lu"], [270.5, "rl"]],
+      bars: [
+        '................................................',
+        '................................................',
+        '................................................',
+        '1.......................1.................1.....',
+        '..................2.....1.......................',
+        '2.......................1.....2.................',
+        '............1...........2...........2...........',
+        '2.......................1.......................',
+        '1.....2.....2...........1.....4.....2.....3.....',
+        '1...........2...........1.....4.....2...........',
+        '1...........2...........1...........2...........',
+        'x.....2.....2.....1.....1.....4.....2.....3.....',
+        '1...........2...........1...........2...........',
+        'x.....2.....4.....1.....1.....4.....4.....4.....',
+        '1...........2...........1...........2...........',
+        'x.....2.....4.....1.....1.....4.....4.....4.....',
+        '1...........2...........1...........2...........',
+        'x.....2.....2.....1.....1.....4.....2.....2.....',
+        '1...........2...........1...........2...........',
+        'x.....2.....2.....1.....1.....4.....2.....2.....',
+        '1...........2...........1...........2...........',
+        '1...........2...........1...........2...........',
+        'x.....2.....4...........1.....4.....4.....3.....',
+        '1...........2...........1...........2...........',
+        'x.....2.....2.....1.....1.....4.....2.....3.....',
+        '1...........2...........1...........2...........',
+        'x.....2.....2.....1...........4.....2.....4.....',
+        '1...........2...........1...........2...........',
+        'x.....2.....2.....1.....2.....3...........4.....',
+        'x.....2...........1.....1.....3...........3.....',
+        '1...........2...........1...........2...........',
+        'x.....2.....3.....2.....1.....4...........3.....',
+        'x.....2.....2.....1.....2.....3.....2.....3.....',
+        'x.................2.....1.....3...........3.....',
+        '1.....2.....2.....1...........4.....2.....4.....',
+        '1.....2...........1.....1.....3.....3.....3.....',
+        '1.....2.....2.....4.....2...........2.....3.....',
+        '1.....2.....3.....2.....1.....3...........3.....',
+        '1.....2.....2.....4...........3.....2.....4.....',
+        '1.....2.....3.....2.....1.....3...........3.....',
+        '1.....2.....2.....4.....2.....4...........3.....',
+        '......2.....3...........1.....3...........3.....',
+        '......2.....2.....4...........4...........4.....',
+        '......2.....3.....3...........3...........4.....',
+        '............2...........2.....4...........4.....',
+        'x.....1.....2.....4.....1.....4...........4.....',
+        'x.....1.................1.....2.....4.....2.....',
+        'x...........2.....4.....1.....4...........3.....',
+        'x.....1.....4.....2.....1.....2...........3.....',
+        'x.....1.....2.....1.....1.....4...........4.....',
+        'x.....1.....4.....1.....1.....2...........2.....',
+        'x.....1.....2.....4.....1.....4.................',
+        'x.....1...........2.....1.....2...........2.....',
+        'x.....1...........4.....1.....4...........4.....',
+        'x.....2.....4.....2.....1.....4...........3.....',
+        '1.......................1.....4.................',
+        '1.......................1.....4...........3.....',
+        '1.....2...........1.....1.................4.....',
+        '1.....2.................1.....4...........3.....',
+        '1...........2...........1...........2...........',
+        '1...........2...........1...........2.....3.....',
+        '1.....2.....2...........1.....4.....2.....4.....',
+        'x.....4.................x.....4.....2...........',
+        'x...........2.....1.....x.....4...........3.....',
+        'x...........2.....1.....x.....4.....2.....3.....',
+        'x...........2.....3.....x.....4...........3.....',
+        '........x.......................2...............',
+        '................1.2...........3...........4.....',
+        '..............2......1.....4....................',
+        '......x.........................................'
+      ] },
+    comfort: [],
+    phaseFx: { amber: [], lineOn: [-9, -9, -9], drop: 180, drop2: 248, last: 276.5, out: [1e9, 1e9, 1e9] },
+    sfx: [...Array(4).keys()].map(b => [b, 'motor']).concat([[3.6, 'plug']]),
+    chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
+    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 282,
+    special:['마르코 차례에 받은 상자', 'range', '받아냄', [132, 236]],
+    sections: [[0, 'intro'], [8, 'groove'], [10, 'trade'], [33, 'groove2'], [45, 'drop'], [55, 'breakdown'], [59, 'build'], [62, 'last']],
+    devMarks: [[0, '시작'], [40, '소장 · 말대꾸'], [100, '위에서'], [132, '마르코 그루브'], [180, '드롭'], [236, '발 까딱'], [264, '마지막']],
+    bars: Array(70).fill('................'),
+    say: [[40, '마르코! 어제 라인 누가 껐어!', 3.8, 0, 'c'],
+          [44, '저요! 덕분에 바다 봤어요!', 3.8, 0, 'v'],
+          [48, '바다? 지금 바다 얘기가 나와?', 3.8, 0, 'c'],
+          [52, '네! 엄청 넓던데요?', 3.8, 0, 'v'],
+          [56, '시말서 써 와!', 3.8, 0, 'c'],
+          [60, '시는 못 쓰는데, 노래는 돼요!', 3.8, 0, 'v'],
+          [64, '음악 꺼!', 3.8, 0, 'c'],
+          [68, '끄면 손도 꺼져요~', 3.8, 0, 'v'],
+          [72, '목표 수량은 어쩔 거야!', 3.8, 0, 'c'],
+          [76, '즐겁게 일하죠!', 3.8, 0, 'v'],
+          [80, '일? 일이 즐거워?', 3.8, 0, 'c'],
+          [84, '이래서 외국인들은 안 돼…', 3.8, 0, 'c'],
+          [88, '왜요? 한국인!', 3.8, 0, 'v'],
+          [92, '…너 방금 뭐라 그랬어?', 3.8, 0, 'c'],
+          [96, '소장님이 먼저 외국인이라 그랬잖아요~', 3.8, 0, 'v'],
+          [100, '위에서 다 보고 있어!', 3.8, 0, 'c'],
+          [104, '안녕하세요~!', 3.8, 0, 'v'],
+          [108, '반장 없다고 라인이 놀이터야?', 3.8, 0, 'c'],
+          [112, '반장님이 천천히 하랬어요.', 3.8, 0, 'v'],
+          [116, '즐겁게는 제가 붙였어요.', 3.8, 0, 'v'],
+          [120, '실적 떨어지면 네 책임이야!', 3.8, 0, 'c'],
+          [124, '딱 맞췄는데요?', 3.8, 0, 'v'],
+          [128, '…이 정도면 돼요.', 3.8, 0, 'v'],
+          [236, '……', 3.8, 0, 'c'],
+          [248, '소장님, 발 까딱거리시는데요?', 3.8, 0, 'v'],
+          [252, '…안 까딱거렸어.', 3.8, 0, 'c']],
     intro: [
-      { who:'', text:'명절 전 마지막 밤, 새벽 1시 20분. 지게차 자리가 비었다. 소장이 직접 팔레트를 내린다.' },
-      { who:'소장', text:'지게차 없어도 돌아갑니다. 제가 싣죠.' },
-      { who:'순자 이모', text:'…삐뚤잖아.' },
-      { who:'소장', text:'검수나 하세요.' }],
-    outro: good => good ? [
-      { who:'', text:'마지막 상자가 게이트를 지났다. 둘은 아무 말이 없었다.' },
-      { who:'반장', text:'(사무실에서 나오며) …새벽이다. 집에들 가.' },
-      { who:'', text:'지게차가 이모를 태우고 주차장으로 갔다. 카세트는 이모 앞치마 주머니에 있었다. B면은 비어 있었다.' }] : [
-      { who:'박씨', text:'…다시 해도 돼요?' },
-      { who:'순자 이모', text:'…내일.' }]
+      { who:'', text:'다음 날 밤. 새벽 1시. 3라인.' },
+      { who:'마르코', text:'신입, 오늘은 둘 다 켜요. 라디오도, 붐박스도.' }],
+    // 05:50: the line stopped; then he says it, and goes (act: the boombox to the radio, the case, a pat on the belt, out)
+    outro: good => (good ? [
+      { who:'', text:'새벽 5시 50분. 라인이 멈췄다.', pocha: true }] : [
+      { who:'', text:'새벽 6시. 실적이 조금 모자랐다.', pocha: true },
+      { who:'소장', text:'…내일 다시 얘기해.', cam:{ x: 256, y: 96 } }]).concat([
+      { who:'마르코', text:'신입, 오늘 저 마지막이에요.', cam:'v' },
+      { who:'마르코', text:'10년 만에 고향으로 가거든요.', cam:'v' },
+      { who:'마르코', text:'오고 싶으면 얘기해요. 소주 한잔해요.', cam:'v' },
+      { who:'', text:'마르코는 붐박스를 반장의 라디오 옆에 두고 갔다.', act:'goodbye' }]),
   }
   ,{
     id:'s2-stage', stageNo:'2-무대', who:'지우', role:'지우 · 본선 · 112 BPM', tag:'가스펠 스톰프 · 반장 기타 클립 · 정박', bpm:112, style:'final21', daw:true, place:'본선 무대',
@@ -5300,7 +5398,7 @@ function midMarco(b) {
     const last = S[R0[R0.length - 1][1]], k = S.lk, p = Math.min(1, (performance.now() - SCENE.act.at - 250) / 800), e = ease(Math.max(0, p));
     return { x: lerp(last.x, k.x, e), dy: lerp(last.dy, k.dy, e), mir: true, walking: p < 1, p: Math.max(0, p), up: false, spot: p < 1 ? 'run' : 'lk' };
   }
-  if (L.sd && state === 'outro' && SCENE.act) { const last = S[R0[R0.length - 1][1]] || MARCO_SPOTS().rl, m = sdOutMarco(last); if (m) { SD_OUT.from = SD_OUT.from || last; return m; } }
+  if (L.sd && (state === 'outro' || state === 'result') && SCENE.act) { const last = S[R0[R0.length - 1][1]] || MARCO_SPOTS().rl, m = sdOutMarco(last); if (m) { SD_OUT.from = SD_OUT.from || last; return m; } }
   if (L.sd && (state === 'outro' || state === 'result') && SD_OUT.left) return { x: -60, dy: 0, mir: true, walking: false, p: 1, up: false, spot: 'out' };
   let i = 0; for (let k = 0; k < R0.length; k++) if (b >= R0[k][0]) i = k;
   const cur = S[R0[i][1]], prev = S[R0[Math.max(0, i - 1)][1]], p = i === 0 ? 1 : Math.min(1, (b - R0[i][0]) / 1.5), e = ease(p);
@@ -5666,7 +5764,7 @@ function htVisitors(b, nowMs) {
   const D = L.ht || L.sd, WW = MID.ww; if (!D.visits) return;
   for (const [who, a, z, xs, how] of D.visits) {
     if (b < a || b >= z) continue;
-    const dance = how === 'dance', bt = b - Math.floor(b), hop = dance && b >= a + 2 ? (bt < 0.3 ? -2 : 0) : 0;
+    const dance = how === 'dance' || (L.sd && sdIn(b, L.sd.chiefDance)), bt = b - Math.floor(b), hop = dance && b >= a + 2 ? (bt < 0.3 ? -2 : 0) : 0;
     const fromL = who === 'chief', x0 = fromL ? -24 : WW + 24, inP = Math.min(1, (b - a) / 2), outP = Math.max(0, (b - (z - 2)) / 2), walking = inP < 1 || outP > 0;
     const x = Math.round(lerp(x0, xs, ease(inP)) + lerp(0, x0 - xs, ease(outP))), step = walking ? Math.floor(nowMs / 150) % 2 : 0;
     g.save(); g.beginPath(); g.rect(0, -MID.oy, WW, farY(BELT_Y) + 2 + MID.oy); g.clip(); g.translate(0, -22 + (walking ? step : 0) + hop);
@@ -6390,7 +6488,7 @@ function drawMid(t, nowMs, active) {
     if (F.blackout && bReal >= F.blackout[1] && bReal < F.blackout[1] + 0.7 && !reduce) flash(0, AX, 0.2 * (1 - (bReal - F.blackout[1]) / 0.7));
     const outs = [[[0, AX - 226], [AX + 226, WW]], [[AX - 226, AX - 113], [AX + 113, AX + 226]], [[AX - 113, AX - 40], [AX + 40, AX + 113]]];
     // (2-3 ends at sunrise on the beach: no lamps going out)
-    if (!L.ht) outs.forEach((pair, i) => { if (bReal >= F.out[i] || !active && state !== 'play' && live) for (const [x0, x1] of pair) dark(x0, x1, 0.8); });
+    if (!L.ht && !(L.sd && L.sd.lampsStay)) outs.forEach((pair, i) => { if (bReal >= F.out[i] || !active && state !== 'play' && live) for (const [x0, x1] of pair) dark(x0, x1, 0.8); });
   }
   g = g0;
   // the camera. Before it moves it draws into the game canvas like any frame; once it pulls back it draws into a canvas the size
@@ -10082,6 +10180,7 @@ function showLine() {
   if (sc === 'dock') { SCENE.dockWho = ln.who === '기사' ? 'd' : ''; if (ln.dock && ln.dock !== SCENE.dock) { SCENE.dock = ln.dock; SCENE.dockAt = performance.now(); } }
   if (sc === 'market' && 'smile' in ln) SCENE.mktSmile = !!ln.smile;
   if (ln.beach) SCENE.beach = ln.beach;
+  if (ln.pocha && L.pocha) pochaSong();
   if (ln.o17 && ln.o17 !== SCENE.o17) { SCENE.o17 = ln.o17; SCENE.o17At = performance.now(); if (ln.o17 === 'pass' && ctx) { const t0 = ctx.currentTime; noise(t0, 'bandpass', 900, 0.12, 0.1, 1.5, bus); for (let k = 0; k < 6; k++) noise(t0 + 0.2 + k * 0.4, 'lowpass', 420, 0.14, 0.07, 0.7, bus); } }
   if ('cam' in ln) SCENE.cam = ln.cam ? { who: ln.cam, z: ln.zoom || 1.9 } : null;
   if (ln.act !== undefined && (!SCENE.act || SCENE.act.name !== ln.act)) { SCENE.act = ln.act ? { name: ln.act, at: performance.now() } : null; if (ln.act === 'fall' && ctx) levelSfx(ctx.currentTime, 'thud'); }
