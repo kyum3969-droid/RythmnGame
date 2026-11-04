@@ -1028,7 +1028,9 @@ const LEVELS = [
       // their moves, a new one for each part of the song: a couple's sway, disco points, frozen on the break, a belly shake and an
       // air guitar taking turns (as 반장 and 마르코 do), a dip (소장 is heavy), side steps, jumps and circles on the drop, back to back,
       // a conga, out of breath in the breakdown, lifts and spins on the last drop, ta-da
-      moves: [[256, 'sway'], [272, 'disco'], [288, 'freeze'], [292, 'call'], [320, 'dip'], [328, 'side'], [352, 'jump'], [384, 'shimmy'], [396, 'train'], [428, 'pant'], [444, 'finale'], [456, 'pose']],
+      moves: [[256, 'sway'], [272, 'disco'], [288, 'freeze'], [292, 'call'], [320, 'dip'], [328, 'side'], [352, 'jump'], [384, 'shimmy'], [396, 'train'], [428, 'pant'], [444, 'finale'], [456, 'pose'], [458, 'scurry'], [465.3, 'crouch'], [466, 'leap']],
+      // the fanfare's "빰!!!" on the last box
+      bam: 466,
       stand: 82, roll: [0, 0], clap: 82.3,
       // 마르코 alone, dashing between the four belts: boxes he flings on in his hurry that ride partway and fall off the front
       // of the belt before the scanner (drops: [set down at, belt '1'-'4', how far along it falls]; not boxes you scan): one now
@@ -1107,7 +1109,7 @@ const LEVELS = [
     ] },
     comfort: ['…다음 거.'],
     phaseFx: { amber: [], lineOn: [-9, -9, -9], drop: 256, drop2: null, last: 466, out: [469, 469.7, 1e9] },
-    sfx: [...Array(228).keys()].map(b => [b, 'motor']).concat([[9.5, 'pa'], [43.6, 'pa'], [82.3, 'clap'], [24.2, 'step'], [24.9, 'step'], [25.6, 'step'], [32.6, 'step'], [33.3, 'step'], [46.2, 'step'], [46.9, 'step'], [47.6, 'step'], [53.4, 'step'], [54.1, 'step'], [67.2, 'step'], [67.9, 'step'], [68.6, 'step'], [69.3, 'heave'], [72, 'thud'], [228, 'jam'], [229.3, 'thud'], [237.4, 'knob'], [237.5, 'static']]),
+    sfx: [...Array(228).keys()].map(b => [b, 'motor']).concat([[9.5, 'pa'], [43.6, 'pa'], [82.3, 'clap'], [24.2, 'step'], [24.9, 'step'], [25.6, 'step'], [32.6, 'step'], [33.3, 'step'], [46.2, 'step'], [46.9, 'step'], [47.6, 'step'], [53.4, 'step'], [54.1, 'step'], [67.2, 'step'], [67.9, 'step'], [68.6, 'step'], [69.3, 'heave'], [72, 'thud'], [228, 'jam'], [229.3, 'thud'], [237.4, 'knob'], [237.5, 'static'], [465.5, 'fanfare1'], [465.75, 'fanfare1'], [466, 'fanfare']]),
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 472,
     special:['마르코가 보낸 상자', 'right', '받아냄'],
@@ -1137,7 +1139,7 @@ const LEVELS = [
           [246, '어… 어라…?', 2.2, 0, 'c'], [248.6, '어, 어어…?', 2.2, 0, 'd'], [252.3, '내 다리가 왜 이래!!!', 2, 0, 'c'], [254.3, '멈춰! 멈추라고!!', 1.8, 0, 'd'],
           [262, '…그래. 그거.', 2.5, 0, 'b'], [284.4, '반장님, 누워 계세요!', 2.6, 0, 'v'], [288.2, '…왼쪽은 내가 한다.', 3, 0, 'b'],
           [321.5, '소, 소장님… 무거워요…!', 2.4, 0, 'd'], [336, '반장님, 이 노래 괜찮죠?', 3, 0, 'v'], [340, '…시끄러.', 2.5, 0, 'b'], [397, '칙칙폭폭~!', 2, 0, 'c'],
-          [429, '…윽.', 1.4, 0, 'b'], [430.6, '반장님?', 1.6, 0, 'v'], [432.4, '…괜찮아.', 2.4, 0, 'b'], [436, '헉… 헉…', 2, 0, 'c'], [438.8, '아직… 안 끝났어…!', 2.4, 0, 'd']],
+          [429, '…윽.', 1.4, 0, 'b'], [430.6, '반장님?', 1.6, 0, 'v'], [432.4, '…괜찮아.', 2.4, 0, 'b'], [436, '헉… 헉…', 2, 0, 'c'], [438.8, '아직… 안 끝났어…!', 2.4, 0, 'd'], [458.4, '도도도도도…!', 2.6, 0, 'c'], [461.4, '도도도도도도도…!!', 3, 0, 'd']],
     // the office before the shift: 반장 at the notice board with his back to 마르코, 마르코 behind him with two cans of coffee
     intro: [
       { who:'', text:'셋째 밤. 새벽 1시.', scene:'office', office: { b: 150, bm: true, m: 246, cans: 2 } },
@@ -5055,6 +5057,7 @@ function htDropBox(d, T, falling) {
 // at the last drop 소장 and the truck's driver come out onto the empty floor in front of the belts and dance together, a
 // couple: hands joined between them, swaying on the beat, a little hop, and every fourth beat 소장 lifts their hands and the
 // driver twirls under them
+const HT_DSM = { t: 0, b: -99, v: {} };
 function htDancers(b, nowMs) {
   const D = L.ht, [a, z, mx] = D.dance; if (b < a || b >= z) return;
   const inP = ease(Math.min(1, (b - a) / 2.5)), on = inP >= 1, fr = D.danceFrom;
@@ -5069,7 +5072,7 @@ function htDancers(b, nowMs) {
   const UP = [2, -23], UPF = [11, -20], UPB = [-7, -21], OUT = [21, -5], DOWNX = [-8, 20], HIP = [7, 13], KNEE = [9, 24];
   const cf = { x: mx - 17, y: 0, z: 0, r: 0, mir: false, dip: 0, f: HIP, b: HIP, wince: false };
   const dv = { x: mx + 17, y: 0, z: 0, r: 0, faceR: false, f: [6, 20], b: [6, 20], kick: false };
-  let spot = 0, spark = false, front = 'dv';
+  let spot = 0, spark = false, front = 'dv', burst = -1;
   if (!on) {
     cf.x = Math.round(lerp(fr ? fr[0] : -30, mx - 17, inP)); dv.x = Math.round(lerp(fr ? fr[1] : MID.ww + 30, mx + 17, inP));
     cf.f = UPF; cf.b = UPB; dv.f = UPF; dv.b = UPB;
@@ -5121,7 +5124,17 @@ function htDancers(b, nowMs) {
     dv.r = lerp(-0.25, 0, up); dv.y = br; dv.f = up < 0.5 ? KNEE : [14, 2]; dv.b = up < 0.5 ? KNEE : HIP;
   } else if (mv === 'pose') {   // the last hits: ta-da
     cf.r = -0.06; cf.f = UPF; cf.b = UPB; dv.y = 5; dv.r = 0.05; dv.kick = true; dv.f = UPF; dv.b = UPB;
-    spark = (b >= 456 && b < 457) || (b >= 466 && b < 467); spot = 1;
+    spark = b < m0 + 1; spot = 1;
+  } else if (mv === 'scurry') { // before the last box: scurrying to the middle, tiny quick steps (도도도도), leaning in, arms pumping
+    const k = (b - m0) / (465.3 - m0), j = Math.round(Math.sin(b * Math.PI * (4 + 4 * k)) * (10 + 14 * k));
+    cf.x = mx - 15 + j; dv.x = mx + 15 - j; cf.y = -(Math.floor(b * 8) % 2) * 2; dv.y = -(Math.floor(b * 8 + 1) % 2) * 2; cf.walk = dv.walk = true;
+    cf.r = 0.12; dv.r = -0.12; const pm = Math.floor(b * 8) % 2; cf.f = pm ? [14, 2] : [6, 10]; cf.b = pm ? [4, 10] : [12, 2]; dv.f = pm ? [6, 10] : [14, 2]; dv.b = pm ? [12, 2] : [4, 10];
+  } else if (mv === 'crouch') { // ...crouching for it
+    cf.x = mx - 15; dv.x = mx + 15; cf.dip = 7; dv.y = 6; cf.f = [-6, 16]; cf.b = [-8, 16]; dv.f = [-6, 16]; dv.b = [-8, 16]; cf.r = 0.08; dv.r = -0.08;
+  } else if (mv === 'leap') {   // 빰: a huge leap, arms up, a burst of confetti; then the pose
+    const k = (b - m0) / 1.6; cf.x = mx - 15; dv.x = mx + 15; spot = 1; burst = b - m0;
+    if (k < 1) { const jy = -Math.round(Math.sin(Math.PI * k) * 48); cf.y = jy; dv.y = jy; cf.f = UP; cf.b = UPB; dv.f = UP; dv.b = UPB; cf.r = -0.1 * Math.sin(Math.PI * k); dv.r = 0.1 * Math.sin(Math.PI * k); dv.kick = true; }
+    else { cf.r = -0.06; cf.f = UPF; cf.b = UPB; dv.y = 5; dv.r = 0.05; dv.kick = true; dv.f = UPF; dv.b = UPB; }
   } else if (mv === 'shock') {  // 반장 goes down in the ending: both turn to him, hands to their faces
     cf.mir = true; cf.f = [-4, -12]; cf.b = [12, -12]; dv.f = [2, -12]; dv.b = [-10, -12];
   }
@@ -5138,7 +5151,11 @@ function htDancers(b, nowMs) {
     if (rnd(e, 85) < 0.35) cf.mir = !cf.mir; if (rnd(e, 86) < 0.35) dv.faceR = !dv.faceR;
     cf.r += Math.sin(b * Math.PI * 2) * 0.12; dv.r -= Math.sin(b * Math.PI * 2 + 1) * 0.12;
   }
-  g.save(); g.translate(gx, ty + gz); g.translate(mx, 152); g.scale(sc, sc); g.translate(-mx, -152);
+  const S = HT_DSM, dts = (nowMs - S.t) / 1000, reset = !(dts > 0 && dts < 0.5) || Math.abs(b - S.b) > 1.5; S.t = nowMs; S.b = b;
+  const sm = (key, v, rate) => (S.v[key] = reset || S.v[key] == null ? v : S.v[key] + (v - S.v[key]) * (1 - Math.exp(-dts * rate)));
+  cf.x = sm('cx', cf.x, 8); dv.x = sm('dx', dv.x, 8); cf.z = sm('cz', cf.z, 8); dv.z = sm('dz', dv.z, 8); cf.r = sm('cr', cf.r, 16); dv.r = sm('dr', dv.r, 16);
+  const gxs = sm('gx', gx, 4), gzs = sm('gz', gz, 4);
+  g.save(); g.translate(gxs, ty + gzs); g.translate(mx, 152); g.scale(sc, sc); g.translate(-mx, -152);
   // the floor under them: shadows, and in the drops a coloured spot under each, changing on the beat
   if (spot) { const cols = ['255,90,150', '90,200,255', '255,210,80'];
     [cf.x, dv.x].forEach((x, i) => { const c = cols[(beat + i) % 3], gr = g.createLinearGradient(0, 40, 0, 152); x += 0; gr.addColorStop(0, `rgba(${c},0)`); gr.addColorStop(1, `rgba(${c},.22)`);
@@ -5152,11 +5169,15 @@ function htDancers(b, nowMs) {
     drawActor('chief', cf.x, cf.mir, pose, nowMs, false, top => {
       if (h2) { thick(BOSS_X - 9, top + 23, h2.x, h2.y + 1, 6, '#a8a194'); thick(BOSS_X - 9, top + 22, h2.x, h2.y, 5, '#dcd7cb'); R(h2.x - 2, h2.y - 2, 5, 4, C.skin); }
       PARTNERS.chief.arm(pose); });
-    R(cf.x - 9, 150, 9, 3, '#1b1716'); R(cf.x + 1, 150, 9, 3, '#1b1716'); g.restore(); };
+    const st_ = cf.walk ? Math.floor(b * 8) % 2 : 0; R(cf.x - 9, 150 - st_ * 2, 9, 3, '#1b1716'); R(cf.x + 1, 150 - (1 - st_) * 2 * (cf.walk ? 1 : 0), 9, 3, '#1b1716'); g.restore(); };
   const drawD = () => { g.save(); g.translate(dv.x, 146 + dv.y + dv.z); g.rotate(dv.r); g.translate(-dv.x, -146);
     const arms = { f: { x: dv.x - 6 - dv.f[0], y: 110 + dv.f[1] }, b: { x: dv.x + 6 - dv.b[0], y: 110 + dv.b[1] } };
-    htDriver(dv.x, !on, dv.faceR, step, 99, nowMs, null, { arms, kick: dv.kick }); g.restore(); };
+    htDriver(dv.x, !on || !!dv.walk, dv.faceR, dv.walk ? Math.floor(b * 8) % 2 : step, 99, nowMs, null, { arms, kick: dv.kick }); g.restore(); };
   if (front === 'dv') { drawC(); drawD(); } else { drawD(); drawC(); }
+  // 빰: confetti bursting out of them and raining down
+  if (burst >= 0 && burst < 3.2) { const cols = ['#ff5a8f', '#5ad7ff', '#ffd84a', '#8fe36a', '#ffffff', '#ff9a3a'];
+    for (let i = 0; i < 46; i++) { const an = rnd(i, 91) * Math.PI * 2, sp = 40 + rnd(i, 92) * 70, tt = burst * 0.55, x = mx + Math.cos(an) * sp * tt, y = 96 + Math.sin(an) * sp * tt * 0.8 + 60 * tt * tt;
+      g.globalAlpha = Math.max(0, Math.min(1, (3.2 - burst) / 1.2)); R(Math.round(x), Math.round(y), (i % 3) + 1, 2 + (i % 2), cols[i % cols.length]); } g.globalAlpha = 1; }
   // sparkles flying out on the drops' downbeats and the last hits
   if (spark) for (let i = 0; i < 14; i++) { const an = i / 14 * Math.PI * 2 + rnd(i, 71), r = 14 + bt * 46 * (0.7 + rnd(i, 72) * 0.6);
     g.globalAlpha = Math.max(0, 1 - bt * 1.3); R(Math.round(mx + Math.cos(an) * r * 1.4), Math.round(104 + Math.sin(an) * r * 0.8), 2, 2, i % 3 ? '#fff4c0' : '#ffd060'); }
@@ -5242,6 +5263,7 @@ function htFront(b, bReal, nowMs, active, live) {
   if (j >= 0 && j < 0.25) { g.fillStyle = `rgba(255,250,235,${0.35 * (1 - j / 0.25)})`; g.fillRect(0, -MID.oy, MID.ww, MID.wh); }
   if (D.dance) htDancers(bReal, nowMs);
   // 마르코 starts alone with a flash
+  const bm = D.bam != null ? bReal - D.bam : -1; if (bm >= 0 && bm < 0.35) { g.fillStyle = `rgba(255,248,220,${0.55 * (1 - bm / 0.35)})`; g.fillRect(0, -MID.oy, MID.ww, MID.wh); }
   const a0 = D.alone ? bReal - D.alone[0] : -1; if (a0 >= 0 && a0 < 0.3) { g.fillStyle = `rgba(255,252,240,${0.3 * (1 - a0 / 0.3)})`; g.fillRect(0, -MID.oy, MID.ww, MID.wh); }
 }
 function drawMid(t, nowMs, active) {
@@ -5517,7 +5539,7 @@ function drawMid(t, nowMs, active) {
   cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#0c0a09'; gHi.fillRect(0, 0, hw, hh);
   gHi.drawImage(midCv, sx + jx / V.s, sy + jy / V.s, sw, sh, 0, 0, hw, hh);
   phaseLook(gHi, hw, hh, bReal, active); if (L.rb) rbCine(gHi, hw, hh, active ? bReal : END_BEAT, active); if (L.ht) htCine(gHi, hw, hh, active ? bReal : END_BEAT, active);
-  if (active) { midGuide(b, T, nowMs, { sx, sy, sw, sh, hw, hh, k }); midAdlib(nowMs, { sx, sy, sw, sh, hw, hh }); }
+  if (active) { midGuide(b, T, nowMs, { sx, sy, sw, sh, hw, hh, k }); midAdlib(nowMs, { sx, sy, sw, sh, hw, hh }); if (L.ht && L.ht.bam != null) htBam(bReal, { hw, hh }); }
   // the game canvas under it still gets the plain floor colour (nothing else shows through)
   g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
 }
@@ -5525,6 +5547,15 @@ function drawMid(t, nowMs, active) {
 // 반장's orange, the right in 마르코's teal, lit while that hand is pressed), and over the first bars' boxes a small arrow tag
 // saying which hand, fading out (L.mid.guide: when the labels show; L.mid.tags: [from, fade from, gone by])
 // 마르코's ad-libs: a short shout that pops out over his head, rises and fades
+// 2-3's last box: a huge "빰!!!" slammed in over the floor, shaking, then gone
+function htBam(b, v) {
+  const k = b - L.ht.bam; if (k < 0 || k > 2.4) return;
+  const u = v.hw / W, pop = k < 0.12 ? 2.2 - k / 0.12 * 1.2 : k < 0.3 ? 1 + 0.08 * Math.sin((k - 0.12) * 40) : 1, a = Math.min(1, (2.4 - k) * 1.5);
+  gHi.save(); gHi.globalAlpha = a; gHi.translate(v.hw / 2 + (k < 0.5 ? Math.sin(k * 90) * u * 2 : 0), v.hh * 0.27); gHi.rotate(-0.06); gHi.scale(pop, pop);
+  gHi.textAlign = 'center'; gHi.textBaseline = 'middle'; gHi.font = `900 ${Math.round(u * 44)}px "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; gHi.lineJoin = 'round';
+  gHi.lineWidth = u * 7; gHi.strokeStyle = '#2a1408'; gHi.strokeText('빰!!!', 0, 0); gHi.fillStyle = '#ffd84a'; gHi.fillText('빰!!!', 0, 0);
+  gHi.lineWidth = u * 1.5; gHi.strokeStyle = '#fff6c8'; gHi.strokeText('빰!!!', 0, -u * 1.5); gHi.restore();
+}
 function midAdlib(nowMs, v) {
   if (!FX.adlibs || !FX.adlibs.length) return;
   const u = v.hw / W; gHi.save(); gHi.textAlign = 'center'; gHi.textBaseline = 'bottom'; gHi.font = `900 ${Math.round(u * 9)}px "Black Han Sans", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif`; gHi.lineJoin = 'round';
@@ -7334,6 +7365,9 @@ function levelSfx(t, kind) {
   if (kind === 'sigh') { const f = ctx.createBiquadFilter(), gn = ctx.createGain(), src = ctx.createBufferSource(); src.buffer = nbuf; f.type = 'bandpass'; f.Q.value = 0.8; f.frequency.setValueAtTime(900, t); f.frequency.exponentialRampToValueAtTime(320, t + 1.1);
     gn.gain.setValueAtTime(0.0001, t); gn.gain.linearRampToValueAtTime(0.09, t + 0.15); gn.gain.linearRampToValueAtTime(0.0001, t + 1.2); src.connect(f); f.connect(gn); gn.connect(bus); src.start(t); src.stop(t + 1.3); return; }
   if (kind === 'drop') { const o = osc('sine', 95, t, 0.002, 0.22, 0.14, bus); o.frequency.exponentialRampToValueAtTime(48, t + 0.12); noise(t, 'lowpass', 1100, 0.16, 0.07, 0.8, bus); noise(t + 0.05, 'bandpass', 1600, 0.05, 0.04, 2, bus); return; }
+  // the last box's fanfare: two quick blasts and the big chord (A-flat), a kick and a long cymbal under it
+  if (kind === 'fanfare1') { brassStab(t, [311.13, 415.3, 523.25], 0.11, 0.05); return; }
+  if (kind === 'fanfare') { brassStab(t, [207.65, 261.63, 311.13, 415.3, 523.25, 622.25], 1.6, 0.055); kick(t, 1); noise(t, 'highpass', 4500, 0.22, 1.4, 0.7, bus); noise(t, 'bandpass', 900, 0.2, 0.25, 0.8, bus); return; }
   if (kind === 'clap') { noise(t, 'bandpass', 1500, 0.32, 0.05, 1.2, bus); noise(t + 0.012, 'bandpass', 2400, 0.2, 0.04, 1.4, bus); return; }
   if (kind === 'thump') { const o = osc('sine', 120, t, 0.002, 0.32, 0.12, bus); o.frequency.exponentialRampToValueAtTime(55, t + 0.1); noise(t, 'bandpass', 420, 0.22, 0.05, 1.2, bus); return; }
   if (kind === 'plug') { osc('square', 1700, t, 0.0005, 0.06, 0.012, bus); noise(t, 'bandpass', 2500, 0.1, 0.02, 3, bus); osc('sine', 60, t + 0.02, 0.05, 0.05, 0.6, bus); osc('sine', 120, t + 0.02, 0.05, 0.02, 0.5, bus); return; }
