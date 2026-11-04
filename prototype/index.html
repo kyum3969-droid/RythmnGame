@@ -1128,43 +1128,143 @@ const LEVELS = [
       { who:'마르코', text:'반장님!! 신입, 119!', act:'fall', cam:'b' }],
   }
   ,{
-    id:'s2-4', stageNo:'2-4', who:'박씨', role:'박씨 · 순자 이모 · 84→96→104 BPM', tag:'하드 록 · 중량물 두 손 · 템포 상승', bpm:84, style:'rock22', fxTheme:'rock', inspector: true,
-    // 2-2 중량: peak season starts and 박씨 brings the pallets. Heavy boxes take both hands (two keys at once); the line speeds
-    // up twice as the backlog grows, and the song, 박씨's cassette, moves up with it. The music comes first; the chart below is a
-    // placeholder with heavies and a few crates.
-    tempo: [[0, 84], [96, 96], [176, 104]], clock:'00:50', title:'중량', partners:['park'], hints:true,
-    chords: ROCK.chords, roots: ROCK.roots,
-    chordAt: bar => bar < 8 ? 0 : bar < 16 ? ROCK.verse[(bar - 8) % 4] : bar < 24 ? ROCK.chorus[(bar - 16) % 4] : bar < 28 ? ROCK.bridge[(bar - 24) % 4] : bar < 36 ? ROCK.verse[(bar - 28) % 4] : bar < 44 ? ROCK.chorus[(bar - 36) % 4] : bar < 52 ? ROCK.verse[(bar - 44) % 4] : bar < 60 ? 6 + ROCK.chorus[(bar - 52) % 4] : 6,
-    win: { p: 0.06, g: 0.115, m: 0.18, release: 0.16 }, endAt: 240,
-    special:['중량물', 'heavy', '두 손'],
-    sections: [[0, 'intro'], [4, 'riff'], [8, 'verse1'], [16, 'chorus1'], [24, 'bridge'], [28, 'verse2'], [36, 'chorus2'], [44, 'solo'], [52, 'chorus3'], [60, 'outro']],
-    bars: [
-      '........', '........', '........', '........',
-      'x.......', 'x...x...', 'x.......', 'x...H...',
-      'x...x...', 'x.......', 'x...x...', 'H.......', 'x...x...', 'x.x.x...', 'x...x...', 'H.......',
-      'x.x.x...', 'H...x...', 'x.x.x...', 'H...x.x.', 'x.x.x...', 'H...x...', 'x.x.x.x.', 'H.......',
-      'x.......', 'x...x...', 'x.x.x.x.', 'x.x.x.x.',
-      'x...x.x.', 'H...x...', 'x.x.x...', 'H...x.x.', 'x...x.x.', 'H...x...', 'x.x.x.x.', 'H.......',
-      'x.x.x.x.', 'H...x.x.', 'x.x.x.x.', 'H...x...', 'x.x.x.x.', 'H.x.x...', 'x.x.x.x.', 'H...H...',
-      'x.x.x.x.', 'x.x.x.x.', 'h===..x.', 'x.x.x.x.', 'x.x.x.x.', 'x...x.x.', 'h===..x.', 'x.x.x.x.',
-      'H.x.x.x.', 'H...x.x.', 'x.x.x.x.', 'H...H...', 'x.x.x.x.', 'H.x.x...', 'x.x.x.x.', 'H...H...',
-      '........', '........'
-    ],
-    say: [[16, '두 손이다, 총각.', 3], [40, '(받치며) 무겁네. 뭘 이렇게 실었어.', 3.5, 0, 's'], [64, '내 거니까 건드리지 마요.', 3], [96, '물량 밀린다. 올려!', 3], [120, '…이 노래, 뭐야.', 3, 0, 's'], [176, '한 단 더!', 2.5], [184, '(흥얼) 탁, 탁탁, 탁…', 4, 0, 's'], [208, '…따라 부르지 마요.', 3], [212, '(웃음) 느린 박자네.', 3, 0, 's']],
-    comfort: ['괜찮아. 다음 거.', '총각, 두 손!'],
+    id:'s2-4', stageNo:'2-4', who:'마르코', role:'마르코 · 108 BPM · 라인 넷', tag:'반장 없는 라인 · 에이스 · 같이 내리는 레버', bpm:107.97, style:'funk21', fxTheme:'warm',
+    // 2-4 멈춤: 반장 wakes up in hospital (과로), says it is time he retired, asks where 마르코 is from and, given his old guitar
+    // from his locker, pats it once and gives it to 마르코. That night the line has no 반장: 소장 puts 마르코 in charge
+    // ("역시 에이스야") and 마르코, not smiling, runs all four belts alone to his own boombox (the beach funk) and does it
+    // well, until he catches himself with a hand to his back (반장's gesture) and the camera finds the shelf: 반장's radio,
+    // the can he left there, the guitar case. 소장 comes back for more; 마르코 asks if he has been to see 반장 ("위에서 보고
+    // 받았어"), goes to the main switch and the last note is the two of you pulling it down: the song dies on the spot, the
+    // lamps go out from the ends in. In the dark he switches 반장's radio on, takes the can and the case, and asks you to
+    // come and see the sea; at the dock the 04:40 truck is going to 속초.
+    tempo: [[0, 107.97]], clock:'01:00', title:'멈춤', partners:['marco'], hints:false,
+    songs: [{ src: 'audio/2-2-the-solstice-parade.mp3', at: 8, lead: 0.06, gain: 0.85 }],
+    songStart: -1, songCues: [[8, 0], [200, 'cut']], noCount: true, bareBand: true, hitKit: 'ticktock', subs: true,
+    // 반장's blues on his radio, switched on in the dark after the switch (a radio's narrow sound)
+    pocha: { src: 'audio/2-2-monday-without-a-clock.mp3', gain: 0.5, lo: 420, hi: 2800, into: 6.0, fade: 1.2 },
+    sd: { noBoss: true, sad: [0, 999], sadOut: true, cuts: [[186, 201]],
+      zoom: [[93, 95.5, 'v', 1.8], [95.5, 100, { x: 112, y: 100 }, 2.0], [186, 192, 'v', 1.6], [192, 201, { x: 400, y: 100 }, 1.7]],
+      touch: [[93.2, 96.6]], visits: [['chief', 0, 13, 236], ['chief', 148, 400, 236]],
+      boombox: [8, 200], lever: 200, shelf: { can: true, case: true } },
+    mid: { at: -99, zoom: [-99, -98], keys: 0, from: 0, adFrom: 9999, guide: [-9, -8], tags: [-9, -8, -7], shouts: [],
+      route: [[0, "bx"], [9, "rl"], [17, "ru"], [25, "lu"], [33, "ll"], [41, "rl"], [49, "ru"], [57, "lu"], [65, "ll"], [73, "rl"], [81, "ru"], [89, "rl"], [101, "ll"], [105, "rl"], [113, "ru"], [121, "lu"], [129, "ll"], [137, "rl"], [145, "ru"], [153, "lu"], [161, "ll"], [169, "rl"], [177, "ru"], [182, "lv"]],
+      bars: [
+        '................................................',
+        '................................................',
+        '................................................',
+        '1...........2...........3...........4...........',
+        '1...........2...........3...........4...........',
+        '1...........2...........3...........4...........',
+        '2.....1.....2.....1.....4.....3.....4.....3.....',
+        '2.....1.....2...........4...........4...........',
+        '1...........1.....2.....3.....4.....3.....4.....',
+        '1.....2.....1.....2.....3.....4.....3.....4.....',
+        '2.....1.....2.....1.....4.....3.....4.....3.....',
+        '2...........2...........4...........4.....3.....',
+        '1...........1.....2.....3.....4.....3.....4.....',
+        '1.....2.....1...........3.....4.....3.....4.....',
+        'w.....1.....2.....1.....4.....3.....4.....3.....',
+        '2.....1.....2.....1.....4.....3.....4.....3.....',
+        'x...........1.....2.....3.....4.....3.....4.....',
+        '1.....2.....1.....2.....3.....4.....3.....4.....',
+        'w.....1.....2.....1.....4.....3.....4.....3.....',
+        '2.....1.....2...........4.....3.....4...........',
+        'x.....2.....1.....2.....3...........3.....4.....',
+        '1.....2.....1.....2.....3.....4.....3...........',
+        'w...........2.....1.....4.....3.....4.....3.....',
+        '................................................',
+        '................................................',
+        '1...........2...........3...........4...........',
+        '2.....1.....2.....1.....4.....3.....4.....3.....',
+        '2.....1.....2...........4.....3.....4.....3.....',
+        '1.....2.....1.....2.....3...........3.....4.....',
+        '1...........1...........3.....4.....3.....4.....',
+        'w.....1.....2.....1.....4.....3.....4.....3.....',
+        'w.....1.....2...........4...........4.....3.....',
+        'x...........1.....2.....3...........3.....4.....',
+        'x.....2.....1.....2.....3...........3.....4.....',
+        'w.....1.....2.....1.....4...........4.....3.....',
+        'w.....1.....2.....1.....4.....3.....4...........',
+        'x...........1.....2.....3...........3...........',
+        'x.....2.....1.....2.....3...........3.....4.....',
+        '1...........2...........3...........4...........',
+        '1...........2...........3...........4...........',
+        '1...........2...........3...........4...........',
+        '1...........2...........3...........4...........',
+        '1...........2.....1.....3...........4...........',
+        '1...........2...........3...........4...........',
+        '1...........2...........3...........4...........',
+        '1...........2.....1.....3...........4...........',
+        '1...........2...................................',
+        '................................................',
+        '................................................',
+        '................................................',
+        'x...............................................'
+      ] },
+    comfort: [],
+    phaseFx: { amber: [], lineOn: [-9, -9, -9], drop: 120, drop2: null, last: 200, out: [200.8, 201.5, 202.2] },
+    sfx: [...Array(8).keys()].map(b => [b, 'motor']).concat([[0.2, 'step'], [0.9, 'step'], [1.6, 'step'], [7.6, 'plug'], [148.2, 'step'], [148.9, 'step'], [149.6, 'step'], [200, 'lever']]),
+    chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
+    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 203.5,
+    special:['혼자 돌린 상자', 'range', '받아냄', [12, 199]],
+    sections: [[0, 'intro'], [3, 'groove'], [6, 'groove'], [14, 'build'], [23, 'build'], [30, 'drop'], [38, 'chorus'], [46, 'last']],
+    devMarks: [[0, '소장 · 시작'], [24, '그루브'], [88, '허리'], [104, '빌드업'], [120, '드롭'], [150, '소장 다시'], [180, '레버']],
+    bars: Array(51).fill('................'),
+    hold: [[2.5, [{ who:'소장', text:'마르코, 오늘부터 3라인은 자네가 봐.', cam:{ x: 256, y: 96 } }, { who:'소장', text:'역시 에이스야.', cam:{ x: 256, y: 96 } },
+                  { who:'소장', text:'반장 빈자리만큼만 더 빼 줘.', cam:{ x: 256, y: 96 } }, { who:'마르코', text:'…네.', cam:'v' }]]],
+    say: [[156, '좋아, 좋아. 이 속도면 내일부터 목표 올려도 되겠네.', 5, 0, 'c'], [162, '…소장님. 반장님 병원 가 보셨어요?', 4, 0, 'v'],
+          [167, '위에서 보고 받았어. 일이나 해.', 4.5, 0, 'c'], [172.5, '……', 3, 0, 'v'], [176.5, '…다 꺼요, 그냥.', 4, 0, 'v'],
+          [187, '신입. 같이 내려요.', 5, 0, 'v']],
+    // the hospital in the morning: 반장 asleep, 마르코 at the foot of the bed, the guitar by the window (you brought it)
     intro: [
-      { who:'', text:'넷째 밤, 새벽 0시 50분. 성수기 피크. 팔레트가 산처럼 쌓였다. 반장은 무릎 때문에 사무실.' },
-      { who:'박씨', text:'무거운 건 두 손. 카세트는 내 거니까 건드리지 말고.' },
-      { who:'순자 이모', text:'…무거운 건 내가 받쳐 줄게.' },
-      { who:'박씨', text:'…고맙습니다.' }],
+      { who:'', text:'한빛병원. 아침 7시.', scene:'hosp', hosp:'sleep' },
+      { who:'마르코', text:'반장님!!!', scene:'hosp', hosp:'wake' },
+      { who:'반장', text:'마르코..? 자네야?', scene:'hosp' },
+      { who:'마르코', text:'제가 얼마나 걱정했는지 몰라요.', scene:'hosp' },
+      { who:'반장', text:'뭐, 내가 쓰러졌나 보구만.', scene:'hosp' },
+      { who:'마르코', text:'과로래요. 당분간 무조건 쉬셔야 한대요.', scene:'hosp' },
+      { who:'마르코', text:'깨어나셔서 다행이에요.', scene:'hosp' },
+      { who:'반장', text:'그래… 이제 나도 슬슬 한계구만.', scene:'hosp' },
+      { who:'반장', text:'이제 은퇴할 때가 되었어.', scene:'hosp' },
+      { who:'마르코', text:'반장님 무슨 말이에요.', scene:'hosp' },
+      { who:'마르코', text:'반장님 없는 3라인은…', scene:'hosp' },
+      { who:'반장', text:'나도 이제 쉬어야지.', scene:'hosp' },
+      { who:'마르코', text:'……', scene:'hosp' },
+      { who:'반장', text:'자네 고향이 어디랬지?', scene:'hosp' },
+      { who:'마르코', text:'바다 건너 먼 데요. 바닷가 시장 동네.', scene:'hosp' },
+      { who:'마르코', text:'거긴 다들 노래하면서 일해요. 생선 팔면서도.', scene:'hosp' },
+      { who:'반장', text:'…시끄럽겠네.', scene:'hosp' },
+      { who:'마르코', text:'엄청요.', scene:'hosp' },
+      { who:'반장', text:'죽기 전에 거기나 한번 가야겠네.', scene:'hosp' },
+      { who:'마르코', text:'아, 그런 말 하지 마요!', scene:'hosp' },
+      { who:'반장', text:'…말이 그렇다는 거지.', scene:'hosp' },
+      { who:'반장', text:'어이, 신입. 거기 기타나 좀 줘봐.', scene:'hosp' },
+      { who:'', text:'반장의 사물함에서 나온 낡은 기타. 줄이 녹슬어 있었다.', scene:'hosp', hosp:'guitar' },
+      { who:'반장', text:'……', scene:'hosp', hosp:'tap' },
+      { who:'반장', text:'…마르코. 자네 가져.', scene:'hosp', hosp:'give' },
+      { who:'마르코', text:'네? 저 기타 못 치는데요.', scene:'hosp' },
+      { who:'반장', text:'……', scene:'hosp' },
+      { who:'마르코', text:'…반장님?', scene:'hosp', hosp:'shut' },
+      { who:'마르코', text:'…일단 받을게요.', scene:'hosp', hosp:'take' },
+      { who:'', text:'그날 밤. 3라인.' }],
+    // the ending in the dark (only the lamp over you left): 마르코 at 반장's radio, the can and the case, then the dock
     outro: good => good ? [
-      { who:'박씨', text:'…테이프 늘어지기 전에 끝났네.' },
-      { who:'순자 이모', text:'지게차 태워 줘. 주차장까지.' },
-      { who:'박씨', text:'…네.' },
-      { who:'', text:'새벽. 지게차가 주차장까지 천천히 갔다. 손주 줄 장난감 하나가 이모 손에 들려 있었다.' },
-      { who:'박씨', text:'…내일도 나와요?' },
-      { who:'순자 이모', text:'…일이니까.' }] : [
-      { who:'박씨', text:'…내일은 허리 조심해.' }]
+      { who:'마르코', text:'……', act:'radio', cam:'shelf', zoom: 1.9 },
+      { who:'마르코', text:'신입, 바다 보러 갈래요?', act:'pack', cam:'shelf', zoom: 1.9 },
+      { who:'소장', text:'마르코! 이거 다시 안 켜?!', cam:{ x: 256, y: 96 } },
+      { who:'마르코', text:'내일 할게요!', act:'go', cam:'v' },
+      { who:'', text:'04시 40분. 도크.', scene:'dock' },
+      { who:'기사', text:'저기요! 물건 안 실어요?', scene:'dock' },
+      { who:'마르코', text:'기사님, 이거 어디 가요?', scene:'dock' },
+      { who:'기사', text:'…속초요.', scene:'dock' },
+      { who:'마르코', text:'타요, 신입!', scene:'dock', dock:'go' }] : [
+      { who:'소장', text:'에이스가 이게 뭐야. 내일은 제대로 해.', cam:{ x: 256, y: 96 } },
+      { who:'마르코', text:'……', act:'radio', cam:'shelf', zoom: 1.9 },
+      { who:'마르코', text:'…신입, 바다 보러 갈래요?', act:'pack', cam:'shelf', zoom: 1.9 },
+      { who:'', text:'04시 40분. 도크.', scene:'dock' },
+      { who:'마르코', text:'기사님, 이거 어디 가요?', scene:'dock' },
+      { who:'기사', text:'…속초요.', scene:'dock' },
+      { who:'마르코', text:'타요, 신입!', scene:'dock', dock:'go' }],
   }
   ,{
     id:'s2-5', stageNo:'2-5', who:'반장', role:'반장 · 순자 이모 · 112 BPM · 라디오', tag:'본선 생중계 · 정전 16박 · 헤드라이트', bpm:112, style:'final21', fxTheme:'chill', inspector: true, radio: true, lofi: 2600,
@@ -1771,6 +1871,8 @@ function loadLevel(level) {
   // 2-1's two lines are seen from further back: their boxes are made bigger so they still read
   if (level.mid) notes.forEach(n => { if (n.quad) { n.w = Math.round(n.w * 1.4); n.h = Math.round(n.h * 1.4); } });
   // 2-1/2-2: a box with a mate on the other side on the same beat (both hands at once) is marked, and the two together hit big
+  sdOutReset();
+  if (level.sd && level.sd.lever != null) notes.forEach(n => { if (n.quad && Math.abs(n.beat - level.sd.lever) < 1e-6) n.lever = true; });
   if (level.ht && level.ht.slips) for (const sb of level.ht.slips) { const n = notes.find(m => m.quad && !m.up && Math.abs(m.beat - sb) < 0.01); if (n) n.slip = true; }
   if (level.mid) notes.forEach(n => { if (n.quad) n.mate = notes.find(m => m !== n && m.quad && m.q !== n.q && Math.abs(m.beat - n.beat) < 1e-6) || null; });
   // an X-ray box goes down whole: when its last item is at the loading end, the first is a span further on. Every item shares
@@ -5166,14 +5268,17 @@ const cvHi = document.getElementById('cvhi'), gHi = cvHi.getContext('2d');
 // 마르코's corners in the floor's coordinates: the lower ends of the two lines (rl, and ll squeezed in beside 반장), the upper
 // belts' loading ends behind them (ru, lu; he stands lower there, the upper belt hides his legs), and c, beside you
 const MARCO_SPOTS = () => ({ bx: { x: MID.ww - 90, dy: 0, mir: true }, rl: { x: MID.ww - BOSS_X, dy: 0, mir: true }, ru: { x: MID.ww - (BOSS_X + LANE_DX[0] + 22), dy: -22, mir: true },
-  lu: { x: BOSS_X + LANE_DX[0] + 22, dy: -22, mir: false }, ll: { x: BOSS_X + 24, dy: 0, mir: false }, lk: { x: BOSS_X + 42, dy: 0, mir: true }, c: { x: MID.ax + 64, dy: -2, mir: true } });
+  lu: { x: BOSS_X + LANE_DX[0] + 22, dy: -22, mir: false }, ll: { x: BOSS_X + 24, dy: 0, mir: false }, lk: { x: BOSS_X + 42, dy: 0, mir: true }, c: { x: MID.ax + 64, dy: -2, mir: true }, lv: { x: MID.ax + 76, dy: 0, mir: true } });
 const midSpotAt = bb => { let sp = L.mid.route[0][1]; for (const [rb, s] of L.mid.route) if (bb >= rb) sp = s; return sp; };
 function midMarco(b) {
   const R0 = L.mid.route, S = MARCO_SPOTS();
   if (L.ht && state === 'outro' && SCENE.act && SCENE.act.name === 'fall') {
     const last = S[R0[R0.length - 1][1]], k = S.lk, p = Math.min(1, (performance.now() - SCENE.act.at - 250) / 800), e = ease(Math.max(0, p));
     return { x: lerp(last.x, k.x, e), dy: lerp(last.dy, k.dy, e), mir: true, walking: p < 1, p: Math.max(0, p), up: false, spot: p < 1 ? 'run' : 'lk' };
-  } let i = 0; for (let k = 0; k < R0.length; k++) if (b >= R0[k][0]) i = k;
+  }
+  if (L.sd && state === 'outro' && SCENE.act) { const last = S[R0[R0.length - 1][1]] || MARCO_SPOTS().rl, m = sdOutMarco(last); if (m) { SD_OUT.from = SD_OUT.from || last; return m; } }
+  if (L.sd && (state === 'outro' || state === 'result') && SD_OUT.left) return { x: -60, dy: 0, mir: true, walking: false, p: 1, up: false, spot: 'out' };
+  let i = 0; for (let k = 0; k < R0.length; k++) if (b >= R0[k][0]) i = k;
   const cur = S[R0[i][1]], prev = S[R0[Math.max(0, i - 1)][1]], p = i === 0 ? 1 : Math.min(1, (b - R0[i][0]) / 1.5), e = ease(p);
   const up = (cur.dy < -10 && p > 0.6) || (prev.dy < -10 && p < 0.4);
   return { x: lerp(prev.x, cur.x, e), dy: lerp(prev.dy, cur.dy, e), mir: p < 0.5 ? prev.x > cur.x || (prev.x === cur.x && prev.mir) : cur.mir, walking: p < 1, p, up, spot: R0[i][1] };
@@ -5437,7 +5542,7 @@ function htEvents(ev) {
 // and 마르코's beach in one picture) comes in from both ends of the floor at once and meets in the middle.
 const htClamp = x => x < 0 ? 0 : x > 1 ? 1 : x;
 const htIn = (b, r) => !!r && b >= r[0] && b < r[1];
-const htCutAt = b => (L.ht.cuts || []).find(c => b >= c[0] - 0.5 && b < c[1]);
+const htCutAt = b => ((L.ht || L.sd).cuts || []).find(c => b >= c[0] - 0.5 && b < c[1]);
 // the belts stand still from the jam until the song (and run on from where they stopped)
 function htBeltT(T) { const D = L.ht, tj = timeAt(D.jam), ts = timeAt(D.song); return T < tj ? T : T < ts ? tj : T - (ts - tj); }
 // 반장's last pat on the box at or before b: the two before the song, the song's own, then one every half bar
@@ -5534,7 +5639,7 @@ function htBack(b, bReal, nowMs, active, live) {
 // 소장 and the truck's driver, along the back aisle behind the upper belts (the belt hides them from the waist down): they walk
 // in from the end of the floor, stop to have their say, and walk back out
 function htVisitors(b, nowMs) {
-  const D = L.ht, WW = MID.ww; if (!D.visits) return;
+  const D = L.ht || L.sd, WW = MID.ww; if (!D.visits) return;
   for (const [who, a, z, xs, how] of D.visits) {
     if (b < a || b >= z) continue;
     const dance = how === 'dance', bt = b - Math.floor(b), hop = dance && b >= a + 2 ? (bt < 0.3 ? -2 : 0) : 0;
@@ -5543,7 +5648,7 @@ function htVisitors(b, nowMs) {
     g.save(); g.beginPath(); g.rect(0, -MID.oy, WW, farY(BELT_Y) + 2 + MID.oy); g.clip(); g.translate(0, -22 + (walking ? step : 0) + hop);
     if (who === 'chief') {
       // dancing: his clipboard up and down on the beat, swaying side to side every two
-      const pose = { ...standPose(0), hand: walking ? { x: BOSS_X + 10 + step * 2, y: 128 } : dance ? { x: BOSS_X + 12, y: Math.floor(b) % 2 ? 84 : 102 } : { x: BOSS_X + 14, y: 112 } };
+      const tapC = how === 'tap' && !walking && sdCallAt(b) === 'c', pose = { ...standPose(0), hand: walking ? { x: BOSS_X + 10 + step * 2, y: 128 } : dance ? { x: BOSS_X + 12, y: Math.floor(b) % 2 ? 84 : 102 } : tapC ? { x: BOSS_X + 14, y: (b % 1) < 0.25 ? 104 : 112 } : { x: BOSS_X + 14, y: 112 } };
       drawActor('chief', x + (dance && !walking ? (Math.floor(b / 2) % 2 ? 2 : -2) : 0), outP > 0 || (dance && !walking && Math.floor(b / 2) % 2 === 1), pose, nowMs, false, () => PARTNERS.chief.arm(pose));
     } else htDriver(x + (dance && !walking ? (Math.floor(b / 2) % 2 ? -2 : 2) : 0), walking, outP > 0, step, dance ? 99 : b - a, nowMs);
     g.restore();
@@ -5663,6 +5768,367 @@ function htFront(b, bReal, nowMs, active, live) {
       const fall = htClamp((j - k * 0.04) / 0.45); g.save(); g.globalAlpha = fade; g.translate(AX + dx, y - (1 - fall) * 40); g.rotate(r * fall);
       g.fillStyle = '#d6a06a'; g.fillRect(-7, -6, 14, 11); g.fillStyle = '#e9bb83'; g.fillRect(-7, -6, 14, 3); g.fillStyle = '#a0703f'; g.fillRect(-1, -6, 2, 11); g.restore(); }); }
 }
+// ---------- 2-4 · 2-6: the floor without 반장 (L.sd) ----------
+// 반장 is in hospital: 마르코 loads all four belts from wherever he is. sd: noBoss; sad (no grin); touch (his hand to his
+// back, 반장's gesture); visits (소장, the truck's driver along the back aisle, as in 2-3); cuts (letterboxed, no boxes) and
+// zoom (the camera's shots, as in 2-3); boombox [on, off]; lever (the main switch's beat: both hands, the last note); shelf
+// (what sits by 반장's radio: the can 마르코 left in 2-3, 반장's guitar case); radio (the radio on from this beat);
+// calls (2-6: [beat, 'c' 소장 | 'v' 마르코] the bars of the back-and-forth); dance (2-6: when he hams it up); wave (2-6)
+const SD_LEVER = { x: MID.ax + 52, y: 74 };
+const sdIn = (b, r) => !!r && b >= r[0] && b < r[1];
+// whose bar it is in 2-6's back-and-forth
+function sdCallAt(b) { const D = L.sd; if (!D || !D.calls) return null; let w = null; for (const [cb, who] of D.calls) if (b >= cb) w = who; return w; }
+// the guitar case standing on end (an acoustic's shape, dark, a worn handle), at its foot (x, y)
+function sdCase(x, y, rot) {
+  g.save(); g.translate(Math.round(x), Math.round(y)); if (rot) g.rotate(rot);
+  R(-6, -30, 12, 13, '#2a1d17'); R(-5, -36, 10, 7, '#2a1d17'); R(-3, -50, 6, 15, '#2a1d17'); R(-4, -54, 8, 5, '#2a1d17');
+  R(-7, -17, 14, 17, '#2a1d17'); R(-6, -16, 1, 15, '#3e2c22'); R(-5, -29, 1, 12, '#3e2c22'); R(-2, -49, 1, 13, '#3e2c22');
+  R(3, -24, 3, 2, '#8a7a5a'); R(-7, -9, 14, 1, '#1a120e'); R(-1, -40, 2, 1, '#8a7a5a');
+  g.restore();
+}
+// the back of the floor: 반장's radio with the can and his guitar case by it, the boombox, the main switch on its post
+function sdBack(b, bReal, nowMs, active, live) {
+  const D = L.sd, bb = live ? bReal : 0, t = nowMs / 1000, A = state === 'outro' && SCENE.act ? SCENE.act : null, ak = A ? (performance.now() - A.at) / 1000 : 0;
+  const outro = state === 'outro' || state === 'result';
+  // the radio: off, unless the level has it on or 마르코 has switched it on (2-4's ending)
+  const radioOn = (D.radio != null && bb >= D.radio) || (outro && SD_OUT.radio);
+  { const { x, y } = RB_RADIO; R(x + 18, y - 9, 1, 9, '#3a332c'); R(x, y, 24, 12, '#6b4a2e'); R(x, y, 24, 1, '#8a6a42'); R(x + 2, y + 3, 9, 5, '#2a1a10');
+    if (radioOn) { R(x + 3, y + 4, 7, 3, '#f0a040'); R(x + 3 + Math.floor((nowMs / 900) % 6), y + 4, 1, 3, '#fff0c0');
+      const gl = g.createRadialGradient(x + 7, y + 6, 1, x + 7, y + 6, 26); gl.addColorStop(0, 'rgba(255,170,80,.35)'); gl.addColorStop(1, 'rgba(255,170,80,0)'); g.fillStyle = gl; g.fillRect(x - 20, y - 20, 54, 50);
+      for (let k = 0; k < 2; k++) { const p = ((nowMs / 1800) + k * 0.5) % 1; g.globalAlpha = Math.min(1, (1 - p) * 1.6); R(x + 6 + k * 8 + Math.sin(p * 6) * 3, y - 4 - p * 22, 2, 2, '#ffd08a'); R(x + 7 + k * 8 + Math.sin(p * 6) * 3, y - 9 - p * 22, 1, 5, '#ffd08a'); g.globalAlpha = 1; } }
+    for (let k = 0; k < 3; k++) R(x + 14 + k * 3, y + 3, 2, 6, '#3a2a1c');
+    if (D.shelf && D.shelf.can && !SD_OUT.can) { R(x + 27, y + 4, 5, 8, '#c8302a'); R(x + 27, y + 4, 5, 1, '#d8dde2'); R(x + 27, y + 7, 5, 2, '#f4efe2'); R(x + 27, y + 11, 5, 1, '#8a2420'); }
+    if (D.shelf && D.shelf.case && !SD_OUT.case) sdCase(x - 10, y + 12, -0.12);
+  }
+  // 마르코's boombox: in its place (pumping while it plays), or carried, or set down by the radio (2-6's goodbye)
+  { const carried = SD_OUT.boxCarry, placed = SD_OUT.boxDown;
+    let x = RB_BOX.x, y = RB_BOX.y;
+    if (placed) { x = RB_RADIO.x + 34; y = RB_RADIO.y; }
+    if (!carried) {
+      const on = (D.boombox && bb >= D.boombox[0] && bb < D.boombox[1] && (active || !outro)) || (outro && D.boxOnAfter), pump = on ? Math.max(0, 1 - (((nowMs / 1000) / SPB) % 1) * 3) : 0;
+      R(x + 6, y - 4, 12, 1, '#2a2d33'); R(x + 6, y - 4, 1, 4, '#2a2d33'); R(x + 17, y - 4, 1, 4, '#2a2d33'); R(x, y, 24, 12, '#1b1b1f'); R(x, y, 24, 1, '#3a3d45');
+      for (const sx of [x + 2, x + 16]) { const o = pump > 0.5 ? 1 : 0; R(sx, y + 3, 6, 6, '#2a2d33'); R(sx + 1 - o, y + 4 - o, 4 + 2 * o, 4 + 2 * o, '#4a4d55'); R(sx + 2, y + 5, 2, 2, '#14151a'); }
+      R(x + 10, y + 3, 4, 2, on ? (pump > 0.3 ? '#8fe3f0' : '#5fb0c0') : '#3d6b78'); R(x + 10, y + 7, 4, 1, on ? '#d8463b' : '#3a2020');
+      if (on) for (let k = 0; k < 3; k++) { const p = ((nowMs / 1400) + k * 0.37) % 1, nx = x + 6 + k * 6 + Math.sin(p * 6 + k) * 4, ny = y - 4 - p * 26; g.globalAlpha = Math.min(1, (1 - p) * 1.6); R(nx, ny, 2, 2, '#9ff0ff'); R(nx + 1, ny - 5, 1, 5, '#9ff0ff'); R(nx + 2, ny - 5, 2, 1, '#9ff0ff'); g.globalAlpha = 1; }
+    }
+  }
+  // the main switch: a grey box on a post behind the cart, its red handle up; down once 마르코 (and you) pull it
+  if (D.lever != null) {
+    const { x, y } = SD_LEVER, down = (live && bReal >= D.lever) || outro, k = live && !outro ? Math.min(1, Math.max(0, (bReal - D.lever) / 0.15)) : down ? 1 : 0;
+    R(x - 1, y + 16, 3, 74, '#4a4d55'); R(x - 9, y - 2, 18, 22, '#6a7078'); R(x - 9, y - 2, 18, 1, '#9aa2aa'); R(x - 7, y, 14, 18, '#565c64');
+    R(x - 6, y + 2, 5, 3, '#f0c020'); for (let q = 0; q < 3; q++) R(x - 6 + q * 2, y + 2, 1, 3, '#1b1716');
+    const hy = Math.round(lerp(y + 2, y + 16, ease(k)));
+    R(x + 2, y + 9, 2, 2, '#2a2d33'); thick(x + 3, y + 10, x + 6, hy, 2, '#8a9098'); R(x + 4, hy - 2, 5, 4, '#d8352a'); R(x + 4, hy - 2, 5, 1, '#f05a4a');
+    // coming up on it: a ring closing in on the handle over two beats (both hands)
+    if (live && active && bReal >= D.lever - 2 && bReal < D.lever) { const p = (bReal - (D.lever - 2)) / 2, r = Math.round(lerp(22, 5, p));
+      g.globalAlpha = 0.35 + 0.65 * p; g.strokeStyle = '#ffe9a8'; g.lineWidth = 1; g.strokeRect(x + 6 - r + 0.5, y + 9 - r + 0.5, r * 2, r * 2); g.globalAlpha = 1;
+      if (Math.floor(bReal * 4) % 2) { R(x - 22, y + 4, 8, 8, '#ffe9a8'); R(x + 22, y + 4, 8, 8, '#ffe9a8'); } }
+    if (live && bReal >= D.lever && bReal < D.lever + 0.5) { const p = (bReal - D.lever) / 0.5; g.globalAlpha = 1 - p; for (let q = 0; q < 8; q++) { const a = q * Math.PI / 4, rr = 3 + p * 14; R(x + 6 + Math.cos(a) * rr, y + 12 + Math.sin(a) * rr, 2, 2, '#fff2a8'); } g.globalAlpha = 1; }
+  }
+}
+// what 마르코 does in an ending on the floor (state 'outro', SCENE.act): 2-4 'radio' (over to 반장's radio, switches it on),
+// 'pack' (the can into his pocket, the guitar case onto his back), 'go' (over to you); 2-6 'goodbye' (the boombox picked up
+// and set down by the radio, the case taken, a pat on the belt on his way, out to the left)
+const SD_OUT = { radio: false, can: false, case: false, boxCarry: false, boxDown: false, tapAt: null };
+function sdOutReset() { Object.assign(SD_OUT, { left: false, radio: false, can: false, case: false, boxCarry: false, boxDown: false, tapAt: null, from: null }); }
+const SD_SPOTS = () => ({ rd: { x: RB_RADIO.x + 40, dy: 0, mir: true }, bx: { x: MID.ww - 90, dy: 0, mir: true }, c: { x: MID.ax + 64, dy: -2, mir: true }, belt: { x: 160, dy: 0, mir: true }, out: { x: -40, dy: 0, mir: true } });
+// 마르코's position through an ending's act: [from spot, to spot, walk seconds] (the act's clock is its own)
+function sdOutMarco(last) {
+  const A = SCENE.act, S = SD_SPOTS(), k = (performance.now() - A.at) / 1000, walk = (a, z, t0, dur) => { const p = Math.min(1, Math.max(0, (k - t0) / dur)), e = ease(p); return { x: lerp(a.x, z.x, e), dy: lerp(a.dy, z.dy, e), mir: z.x < a.x, walking: p > 0 && p < 1, p, up: false }; };
+  if (A.name === 'radio') { const m = walk(last, S.rd, 0.2, 1.6); if (k > 1.9 && !SD_OUT.radio) { SD_OUT.radio = true; if (ctx) levelSfx(ctx.currentTime, 'static'); if (L.pocha) pochaSong(); } return { ...m, spot: m.walking ? 'run' : 'rd', mir: m.walking ? m.mir : true }; }
+  if (A.name === 'pack') { if (k > 0.6) SD_OUT.can = true; if (k > 1.4) SD_OUT.case = true; return { ...S.rd, walking: false, p: 1, up: false, spot: 'rd', mir: k < 1.2 }; }
+  if (A.name === 'go') { const m = walk(S.rd, S.c, 0.2, 2.2); return { ...m, spot: m.walking ? 'run' : 'c', mir: m.walking ? m.mir : true }; }
+  if (A.name === 'goodbye') {
+    // to the boombox, with it over to the radio, set it down, the case up, along the belt (a pat), out
+    if (k < 1.8) { const m = walk(last, S.bx, 0, 1.8); return { ...m, spot: 'run' }; }
+    if (k < 4.2) { SD_OUT.boxCarry = true; const m = walk(S.bx, S.rd, 1.9, 2.2); return { ...m, spot: 'carry' }; }
+    if (k < 5.0) { SD_OUT.boxCarry = false; SD_OUT.boxDown = true; if (k > 4.6) SD_OUT.case = true; return { ...S.rd, walking: false, p: 1, up: false, spot: 'rd', mir: true }; }
+    if (k < 6.2) { const m = walk(S.rd, S.belt, 5.0, 1.2); return { ...m, mir: false, spot: 'run' }; }
+    if (k < 6.8) { if (SD_OUT.tapAt == null) { SD_OUT.tapAt = performance.now(); if (ctx) levelSfx(ctx.currentTime, 'thump'); } return { ...S.belt, walking: false, p: 1, up: false, spot: 'tap', mir: false }; }
+    if (k > 9.9) SD_OUT.left = true; const m = walk(S.belt, S.out, 6.8, 3.2); return { ...m, spot: 'run' };
+  }
+  return null;
+}
+// his pose on the floor in an sd level (after the usual): no grin, his hand to his back (반장's gesture), reaching up to the
+// switch, waving at the ceiling, the ending's acts; returns overrides for his sway, lift and facing
+function sdMarcoPose(b, marco, pose, toss, active) {
+  const D = L.sd, out = state === 'outro' || state === 'result', A = out && SCENE.act ? SCENE.act.name : null, ak = A ? (performance.now() - SCENE.act.at) / 1000 : 0;
+  if (sdIn(b, D.sad) || (out && D.sadOut)) pose.sad = true;
+  if (D.touch && D.touch.some(r => sdIn(b, r)) && !toss && active) { pose.hand = { x: BOSS_X - 2, y: 126 }; pose.dip += 2; pose.wince = true; pose.bob = 0; return { sway: 0, lift: 0 }; }
+  if (D.wave && sdIn(b, D.wave) && active && !toss) { pose.hand = { x: BOSS_X + 8 + (Math.floor(b * 4) % 2) * 6, y: 66 }; pose.sad = false; return { sway: 0, lift: 1 }; }
+  if (D.lever != null && marco.spot === 'lv' && !marco.walking && (b >= D.lever - 10 || out) && !A) {
+    const down = (active && b >= D.lever) || out; pose.hand = { x: BOSS_X + 18, y: down ? 96 : 84 }; pose.bob = 0; pose.dip = down ? 2 : 0; return { sway: 0, lift: 0, mir: true };
+  }
+  if (A === 'radio' && marco.spot === 'rd') { pose.hand = { x: BOSS_X + 30, y: 104 }; return { sway: 0, lift: 0, mir: true }; }
+  if (A === 'pack') { pose.hand = ak < 1.2 ? { x: BOSS_X + 26, y: 104 } : { x: BOSS_X + 6, y: 108 }; return { sway: 0, lift: 0 }; }
+  if (A === 'go' && !marco.walking) { pose.hand = { x: BOSS_X + 12, y: 120 }; return { sway: 0, lift: 0, mir: true }; }
+  if (A === 'goodbye') {
+    if (marco.spot === 'carry') { pose.hand = { x: BOSS_X + 12, y: 116 }; return { sway: 0, lift: 0 }; }
+    if (marco.spot === 'tap') { const tp = SD_OUT.tapAt ? (performance.now() - SD_OUT.tapAt) / 1000 : 9; pose.hand = { x: BOSS_X + 22, y: tp < 0.15 ? 140 : 132 }; return { sway: 0, lift: 0, mir: false }; }
+    pose.hand = { x: BOSS_X + 10, y: 126 }; return { sway: 0, lift: 0 };
+  }
+  if (out && !A) { pose.hand = { x: BOSS_X + 12, y: 128 }; return { sway: 0, lift: 0 }; }
+  return null;
+}
+// drawn over 마르코: what he carries (the boombox under his arm, the guitar case on his back once he has it)
+function sdMarcoExtra(marco, pose) {
+  if (SD_OUT.case && (L.sd && L.sd.caseOnBack !== false)) { const back = marco.mir ? 9 : -9; sdCase(Math.round(marco.x + back), Math.round(marco.dy + 150), marco.mir ? 0.35 : -0.35); }
+}
+function sdBoxInHand(marco, pose) {
+  if (!SD_OUT.boxCarry) return;
+  const hx = marco.mir ? marco.x - (pose.hand.x - BOSS_X) : marco.x + (pose.hand.x - BOSS_X), hy = pose.hand.y + marco.dy;
+  R(hx - 12, hy - 6, 24, 12, '#1b1b1f'); R(hx - 12, hy - 6, 24, 1, '#3a3d45'); R(hx - 10, hy - 3, 6, 6, '#2a2d33'); R(hx + 4, hy - 3, 6, 6, '#2a2d33');
+}
+// the song cut dead on the switch: no tape slowing, the power just goes (the lights follow in the floor's lamps)
+function songCut(T) { const s = SONG.src, gn = SONG.gn; if (!s) return; gn.gain.cancelScheduledValues(T); gn.gain.setValueAtTime(gn.gain.value, T); gn.gain.linearRampToValueAtTime(0.0001, T + 0.03); try { s.stop(T + 0.05); } catch (e) {} SONG.src = null; levelSfx(T, 'power'); }
+// 2-6: 소장's bars push the song back (as if he were talking over it), 마르코's bring it up again
+function sdDuck(T, who) { const lp = SONG.lp, gn = SONG.gn; if (!lp || !gn) return; const c = who === 'c';
+  lp.frequency.cancelScheduledValues(T); lp.frequency.setTargetAtTime(c ? 900 : 20000, T, 0.05); gn.gain.cancelScheduledValues(T); gn.gain.setTargetAtTime(SONG.g0 * (c ? 0.62 : 1), T, 0.05); }
+
+// ---------- scenes for 2-4 and 2-5 (talk only: dialogue lines with scene:'hosp' | 'dock' | 'road' | 'market' | 'beach') ----------
+// a guitar (acoustic, the old one from 반장's locker): body centre (x, y), angle; rusty: dull strings
+function sdGuitar(x, y, rot, s = 1) {
+  g.save(); g.translate(Math.round(x), Math.round(y)); g.rotate(rot || 0); g.scale(s, s);
+  g.fillStyle = '#7a4a24'; g.beginPath(); g.ellipse(-4, 0, 8, 7, 0, 0, Math.PI * 2); g.fill(); g.beginPath(); g.ellipse(6, 0, 6, 5.5, 0, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#c8924e'; g.beginPath(); g.ellipse(-4, 0, 7, 6, 0, 0, Math.PI * 2); g.fill(); g.beginPath(); g.ellipse(6, 0, 5, 4.5, 0, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#2a1a10'; g.beginPath(); g.arc(2, 0, 2.4, 0, Math.PI * 2); g.fill();
+  R(-10, -1, 3, 3, '#3a2414'); R(10, -1.5, 26, 3, '#4a2e1a'); R(36, -2.5, 6, 5, '#3a2414'); for (let k = 0; k < 4; k++) R(14 + k * 5, -1.5, 1, 3, '#b8b0a0');
+  R(-8, -0.5, 46, 1, 'rgba(200,190,170,.55)');
+  g.restore();
+}
+// 반장 sitting up in the hospital bed (from the waist: the blanket over the rest), with the guitar by the line's act
+function sdBedBoss(x, nowMs, act) {
+  const pose = { ...standPose(0), hand: { x: BOSS_X + 12, y: 140 }, doze: act === 'sleep' || act === 'shut', wince: false };
+  if (act === 'guitar' || act === 'tap') pose.hand = { x: BOSS_X + 14, y: 132 };
+  if (act === 'tap') { const k = (performance.now() - (SCENE.hospAt || 0)) / 1000; pose.hand = { x: BOSS_X + 8, y: k % 1.2 < 0.15 ? 136 : 130 }; }
+  if (act === 'give') pose.hand = { x: BOSS_X + 30, y: 122 };
+  drawActor('boss', x, false, pose, nowMs, false, () => PARTNERS.boss.arm(pose));
+}
+function drawHosp(nowMs) {
+  const t = nowMs / 1000, act = SCENE.hosp || 'wake', guitarAt = act === 'take' || act === 'shut' && SCENE.hospTook ? 'marco' : ['guitar', 'tap', 'give', 'shut'].includes(act) ? 'boss' : 'wall';
+  if (act === 'take') SCENE.hospTook = true;
+  // the room: a pale mint wall, a window with the morning in it, the curtain rail, the floor
+  R(0, 0, W, 170, '#cfdcd2'); R(0, 0, W, 6, '#b8c8bc'); R(0, 126, W, 2, '#b2c2b6'); R(0, 128, W, 42, '#c4d2c8');
+  const sky = g.createLinearGradient(0, 22, 0, 96); sky.addColorStop(0, '#a8c8e8'); sky.addColorStop(1, '#f4d8b8'); g.fillStyle = sky; g.fillRect(262, 22, 96, 74);
+  for (let k = 0; k < 6; k++) R(262 + k * 16, 70 - (k % 3) * 9, 14, 26 + (k % 3) * 9, k % 2 ? '#8a9cb4' : '#9aaabc');
+  R(258, 18, 104, 4, '#e8eee8'); R(258, 96, 104, 4, '#e8eee8'); R(258, 18, 4, 82, '#e8eee8'); R(358, 18, 4, 82, '#e8eee8'); R(308, 18, 3, 82, '#e8eee8');
+  g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(255,230,190,.12)'; g.beginPath(); g.moveTo(262, 96); g.lineTo(358, 96); g.lineTo(300, 170); g.lineTo(190, 170); g.closePath(); g.fill(); g.restore();
+  R(0, 10, 250, 2, '#9aa8a0'); for (let k = 0; k < 7; k++) R(4 + k * 6, 12, 6, 118, k % 2 ? '#bcd4e0' : '#acc6d4');
+  R(0, 170, W, 46, '#b4bcbe'); for (let x = 0; x < W; x += 24) R(x, 170, 1, 46, '#a4acae');
+  // the IV stand and its bag, the bedside cabinet (a cup, the box of his things from the locker)
+  R(54, 30, 2, 140, '#9aa0a8'); R(46, 30, 18, 2, '#9aa0a8'); R(48, 32, 8, 14, 'rgba(220,240,250,.8)'); R(51, 46, 2, 30, 'rgba(200,220,230,.7)');
+  R(196, 132, 34, 38, '#e8e4dc'); R(196, 132, 34, 2, '#f4f0ea'); R(198, 146, 30, 1, '#c8c4bc'); R(210, 124, 6, 8, '#f0f0f0'); R(204, 118, 22, 14, '#c89a62'); R(204, 118, 22, 3, '#d8aa72');
+  // the bed: the head raised, a white sheet, the rails
+  R(60, 140, 130, 12, '#e8eef0'); R(60, 152, 130, 4, '#9aa4ac'); R(62, 156, 3, 14, '#8a949c'); R(184, 156, 3, 14, '#8a949c'); R(56, 110, 6, 46, '#9aa4ac'); R(186, 132, 4, 24, '#9aa4ac');
+  R(66, 118, 28, 24, '#f4f6f6');
+  sdBedBoss(98, nowMs, act === 'wake' || act === 'take' ? 'wake' : act);
+  g.fillStyle = '#dce8f0'; g.beginPath(); g.moveTo(80, 152); g.lineTo(84, 134); g.quadraticCurveTo(120, 128, 150, 136); g.quadraticCurveTo(168, 126, 186, 138); g.lineTo(190, 152); g.closePath(); g.fill();
+  R(84, 134, 3, 18, '#eef4f8'); for (let k = 0; k < 4; k++) R(100 + k * 22, 146, 12, 1, '#c4d4e0');
+  // the guitar: leaning by the window (신입 brought it), on his lap, held out, in 마르코's hands
+  if (guitarAt === 'wall') { sdGuitar(344, 150, -1.35, 1.1); }
+  else if (guitarAt === 'boss') { const k = (performance.now() - (SCENE.hospAt || 0)) / 1000; sdGuitar(act === 'give' ? 140 + Math.min(1, k * 2) * 18 : 116, act === 'give' ? 124 : 136, act === 'give' ? -0.3 : -0.15); }
+  // 마르코 at the foot of the bed, facing it; 신입 by the window
+  { const pose = { ...standPose(Math.sin(t * 1.7) > 0.85 ? 1 : 0), hand: { x: BOSS_X + 14, y: 128 }, sad: !SCENE.hospSmile };
+    if (act === 'wake' && SCENE.hospLine === 0) pose.hand = { x: BOSS_X + 20, y: 104 };
+    if (guitarAt === 'marco') pose.hand = { x: BOSS_X + 10, y: 124 };
+    FX.react[2] = FX.react[2] || { type: '', at: nowMs };
+    g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(232, 171, 15, 3, 0, 0, Math.PI * 2); g.fill();
+    drawActor('marco', 232, true, pose, nowMs, false, top => { R(BOSS_X - 8, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X + 1, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X - 9, top + 75, 9, 4, '#1b1716'); R(BOSS_X + 1, top + 75, 9, 4, '#1b1716'); PARTNERS.marco.arm(pose); });
+    if (guitarAt === 'marco') sdGuitar(222, 132, 0.25, 1); }
+  sdStandPlayer(304, 171, nowMs, true);
+  drawSceneFade(nowMs);
+}
+// the dock at 04:40: the bay's lit door, the truck backed up to it with its doors open, the driver by his cab; 마르코 (the
+// case on his back) and you on the dock's edge; on 'go' the two of you walk to the truck
+function drawDock(nowMs) {
+  const t = nowMs / 1000, go = SCENE.dock === 'go', gk = go ? Math.min(1, (performance.now() - (SCENE.dockAt || 0)) / 2600) : 0;
+  const sky = g.createLinearGradient(0, 0, 0, 120); sky.addColorStop(0, '#0e1430'); sky.addColorStop(1, '#3a3456'); g.fillStyle = sky; g.fillRect(0, 0, W, 120);
+  for (let i = 0; i < 14; i++) R(rnd(i, 61) * W, rnd(i, 62) * 50, 1, 1, '#8a94bc');
+  R(0, 30, 150, 110, '#3a3c44'); R(0, 30, 150, 2, '#5a5c64'); R(14, 54, 72, 76, '#1e1e24'); R(16, 56, 68, 72, '#ffd890'); R(16, 56, 68, 72, 'rgba(0,0,0,.25)');
+  for (let k = 0; k < 6; k++) R(16, 58 + k * 12, 68, 1, 'rgba(120,90,40,.4)'); R(96, 40, 40, 8, '#2a2c34'); g.fillStyle = '#d8b040'; g.font = 'bold 7px sans-serif'; g.fillText('3', 112, 47);
+  const glow = g.createRadialGradient(50, 128, 6, 50, 128, 90); glow.addColorStop(0, 'rgba(255,214,140,.35)'); glow.addColorStop(1, 'rgba(255,214,140,0)'); g.fillStyle = glow; g.fillRect(0, 60, 180, 110);
+  R(0, 130, 168, 10, '#5a5c60'); for (let x = 0; x < 168; x += 12) R(x, 130, 7, 2, '#d8b040'); R(0, 140, 168, 30, '#2a2c30');
+  R(0, 170, W, 46, '#1e2024'); for (let x = 0; x < W; x += 30) R(x + ((t * 0) | 0), 190, 14, 1, '#3a3c40');
+  // the truck: its box at the dock, doors open, the cab to the right
+  R(168, 64, 150, 70, '#d8dce0'); R(168, 64, 150, 3, '#f0f2f4'); R(168, 64, 4, 70, '#a8acb0'); R(176, 70, 134, 58, '#2a2a30');
+  for (let k = 0; k < 5; k++) R(186 + k * 24, 106 - (k % 2) * 10, 18, 22 + (k % 2) * 10, '#b9814a');
+  R(318, 82, 46, 52, '#c84a2a'); R(322, 86, 28, 20, '#1a2440'); R(322, 86, 10, 3, 'rgba(255,255,255,.3)'); R(360, 100, 6, 12, '#ffe6a8'); R(318, 120, 50, 6, '#3a3a40');
+  for (const wx of [196, 288, 340]) { R(wx, 130, 16, 16, '#141418'); R(wx + 5, 135, 6, 6, '#6a7078'); }
+  if (Math.floor(t * 1.5) % 2) R(166, 120, 3, 4, '#ff5a3a');
+  const exh = (t * 0.8) % 1; g.fillStyle = `rgba(200,200,210,${0.25 * (1 - exh)})`; g.fillRect(372 + exh * 6, 128 - exh * 14, 4 + exh * 6, 4 + exh * 6);
+  // the driver by his cab
+  g.save(); g.translate(0, 24); htDriver(334, false, true, 0, SCENE.dockWho === 'd' ? 0 : 99, nowMs); g.restore();
+  // 마르코 and you on the dock
+  const mx = Math.round(lerp(96, 210, ease(gk))), px = Math.round(lerp(130, 240, ease(Math.max(0, gk * 1.15 - 0.15))));
+  { const pose = { ...standPose(go ? Math.floor(nowMs / 160) % 2 : 0), hand: { x: BOSS_X + 12, y: 126 }, sad: !go };
+    FX.react[2] = FX.react[2] || { type: '', at: nowMs };
+    g.save(); g.translate(0, -36); sdCase(mx - 9, 150, -0.35);
+    drawActor('marco', mx, false, pose, nowMs, false, top => { R(BOSS_X - 8, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X + 1, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X - 9, top + 75, 9, 4, '#1b1716'); R(BOSS_X + 1, top + 75, 9, 4, '#1b1716'); PARTNERS.marco.arm(pose); }); g.restore(); }
+  sdStandPlayer(px, 134, nowMs, false);
+  drawSceneFade(nowMs);
+}
+// 2-5: the back of the truck on the highway: half-empty, a few boxes, the doors ajar on the road falling away behind; the
+// tunnel's lamps sweep over the two of them, the driver's trot on the radio up front (a muffled thump)
+function drawRoad(nowMs) {
+  const t = nowMs / 1000;
+  R(0, 0, W, H, '#16141a'); R(0, 0, W, 14, '#0e0c10'); R(0, 168, W, 48, '#221e22'); for (let x = 0; x < W; x += 16) R(x, 168, 1, 48, '#2a2428');
+  // the doors ajar on the right: the road behind, its lines running away, the tunnel's lamps
+  R(300, 30, 70, 138, '#0a0a12'); const sp = (t * 3) % 1;
+  for (let k = 0; k < 6; k++) { const p = (k / 6 + sp / 6) % 1, y = 168 - p * 80, w = 2 + (1 - p) * 10; R(334 - w / 2, y, w, 3 * (1 - p) + 1, '#d8c870'); }
+  for (let k = 0; k < 5; k++) { const p = (k / 5 + (t * 1.6) % 1 / 5) % 1; R(312 + p * 40, 40 + p * 6, 6 - p * 4, 2, '#ffb050'); }
+  R(296, 26, 6, 146, '#3a3640'); R(366, 26, 6, 146, '#3a3640');
+  for (const [x, y, w, h] of [[24, 112, 30, 26], [52, 120, 26, 20], [36, 92, 22, 20], [210, 130, 34, 30], [244, 140, 24, 20]]) { R(x, y + 48 - h, w, h, '#b9814a'); R(x, y + 48 - h, w, 3, '#d29a5e'); R(x + w / 2 - 1, y + 48 - h, 2, h, '#e2c08a'); }
+  // the two of them on boxes, 마르코 with the case beside him
+  { const pose = { ...standPose(0), hand: { x: BOSS_X + 12, y: 132 }, sad: true, dip: 2 }; FX.react[2] = FX.react[2] || { type: '', at: nowMs };
+    sdCase(150, 166, 0.1); R(110, 152, 34, 18, '#b9814a'); drawActor('marco', 128, false, pose, nowMs, false, () => PARTNERS.marco.arm(pose)); }
+  R(176, 152, 30, 18, '#b9814a'); g.save(); g.translate(190 - PLAYER_X, 6); drawPlayer(0, nowMs); g.restore();
+  // a tunnel lamp sweeping over everything every so often (orange), and the truck's sway
+  const sw = (t * 0.9) % 1; if (sw < 0.4) { const x = lerp(W + 60, -120, sw / 0.4), gr = g.createLinearGradient(x - 60, 0, x + 60, 0); gr.addColorStop(0, 'rgba(255,170,70,0)'); gr.addColorStop(0.5, 'rgba(255,170,70,.28)'); gr.addColorStop(1, 'rgba(255,170,70,0)'); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = gr; g.fillRect(x - 60, 0, 120, H); g.restore(); }
+  if (!SCENE.roadHum && ctx) { SCENE.roadHum = true; const T = ctx.currentTime; for (let k = 0; k < 24; k++) { osc('sine', 52, T + k * 0.5, 0.01, 0.05, 0.3, bus); if (k % 2) noise(T + k * 0.5 + 0.25, 'bandpass', 900, 0.03, 0.06, 2, bus); } }
+  drawSceneFade(nowMs);
+}
+// 2-5: the fish market at first light: tarp roofs, bulbs, red tubs and ice boxes, the stall keepers busy and loud, an
+// auctioneer's raised hand; 마르코 laughing at last
+function drawMarket(nowMs) {
+  const t = nowMs / 1000;
+  const sky = g.createLinearGradient(0, 0, 0, 80); sky.addColorStop(0, '#3a4a7a'); sky.addColorStop(1, '#e8a888'); g.fillStyle = sky; g.fillRect(0, 0, W, 80);
+  R(0, 60, W, 20, '#5a6a8a'); for (let k = 0; k < 9; k++) R(k * 44, 44 - (k % 3) * 6, 30, 36, '#4a5274');
+  R(0, 80, W, 136, '#6a6a70'); R(0, 150, W, 66, '#4a4e54'); for (let x = 0; x < W; x += 6) R(x, 150 + (x * 7) % 5, 3, 1, 'rgba(160,190,220,.25)');
+  [[0, '#2a7ab0'], [128, '#d84a3a'], [256, '#2a9a6a']].forEach(([x, c], i) => {
+    R(x + 4, 70, 120, 8, c); for (let k = 0; k < 6; k++) R(x + 4 + k * 20, 78, 10, 4, c); R(x + 8, 78, 2, 60, '#5a5a60'); R(x + 118, 78, 2, 60, '#5a5a60');
+    const on = (Math.floor(t * 2) + i) % 7 !== 0; R(x + 62, 82, 4, 5, on ? '#fff2c8' : '#8a7a5a'); if (on) { g.fillStyle = 'rgba(255,230,170,.18)'; g.beginPath(); g.arc(x + 64, 86, 22, 0, Math.PI * 2); g.fill(); }
+    R(x + 12, 120, 104, 18, '#e8ecee'); R(x + 12, 120, 104, 2, '#ffffff'); for (let k = 0; k < 6; k++) { R(x + 18 + k * 16, 114, 10, 5, '#9ab0c0'); R(x + 18 + k * 16, 114, 3, 2, '#c8d8e4'); }
+    R(x + 20, 138, 18, 12, '#d8352a'); R(x + 90, 138, 18, 12, '#d8352a');
+  });
+  // the stall keepers: rubber aprons and boots, an arm up shouting, the auctioneer's hand going on the beat of his patter
+  const keeper = (x, k, c) => { const up = Math.floor(t * 2.4 + k) % 3 === 0; R(x - 5, 100, 10, 12, '#efc7a6'); R(x - 6, 96, 12, 5, c); R(x - 7, 112, 14, 22, '#e8e0d0'); R(x - 6, 112, 12, 22, '#3a6a8a'); R(x - 6, 134, 5, 12, '#d8c020'); R(x + 1, 134, 5, 12, '#d8c020');
+    thick(x + 6, 116, x + (up ? 12 : 10), up ? 92 : 128, 3, '#e8e0d0'); if (up) { g.fillStyle = '#fff'; g.font = 'bold 8px sans-serif'; g.fillText(['자!', '싸요!', '오징어!', '헤이!'][k % 4], x + 8, 88); } };
+  keeper(70, 0, '#2a2a30'); keeper(200, 1, '#c84a2a'); keeper(326, 2, '#2a2a30');
+  if (!SCENE.mktNoise && ctx) { SCENE.mktNoise = true; const T = ctx.currentTime; for (let k = 0; k < 10; k++) { blipAt(T + k * 0.42, 300 + rnd(k, 71) * 300); noise(T + k * 0.42, 'bandpass', 1200 + rnd(k, 72) * 1400, 0.05, 0.12, 2, bus); } }
+  { const pose = { ...standPose(Math.floor(t * 2) % 2), hand: { x: BOSS_X + 14, y: SCENE.mktSmile ? 112 : 128 }, sad: !SCENE.mktSmile }; FX.react[2] = FX.react[2] || { type: '', at: nowMs };
+    g.save(); g.translate(0, 18); sdCase(142, 150, -0.35); drawActor('marco', 150, false, pose, nowMs, false, top => { R(BOSS_X - 8, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X + 1, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X - 9, top + 75, 9, 4, '#1b1716'); R(BOSS_X + 1, top + 75, 9, 4, '#1b1716'); PARTNERS.marco.arm(pose); }); g.restore(); }
+  sdStandPlayer(236, 186, nowMs, true);
+  drawSceneFade(nowMs);
+}
+// a short blip at audio time T (the stall keepers' voices, far off)
+function blipAt(T, f) { osc('square', f, T, 0.005, 0.02, 0.08, bus); osc('square', f * 1.2, T + 0.09, 0.005, 0.016, 0.08, bus); }
+// the beach before dawn (and through the guitar's sunrise): sky, sea, foam, sand, by dawn (0 night .. 1 sun up) and sun y
+function sdBeachBack(dawn, sunY, nowMs, beatPulse) {
+  const t = nowMs / 1000;
+  const sky = g.createLinearGradient(0, 0, 0, 74); sky.addColorStop(0, mixC('#0e1636', '#4a7ac0', dawn)); sky.addColorStop(0.7, mixC('#3a3460', '#f0a88a', dawn)); sky.addColorStop(1, mixC('#7a4a6a', '#ffd8a0', dawn)); g.fillStyle = sky; g.fillRect(0, 0, W, 74);
+  g.globalAlpha = 1 - dawn; for (let i = 0; i < 26; i++) R(rnd(i, 51) * W, rnd(i, 52) * 54, 1, 1, '#c8d0f0'); g.globalAlpha = 1;
+  if (sunY != null) { const sg = g.createRadialGradient(268, sunY, 4, 268, sunY, 60); sg.addColorStop(0, 'rgba(255,236,190,.75)'); sg.addColorStop(1, 'rgba(255,200,150,0)'); g.fillStyle = sg; g.fillRect(200, sunY - 60, 140, 120); g.fillStyle = '#fff1c6'; g.beginPath(); g.arc(268, sunY, 9, 0, Math.PI * 2); g.fill(); }
+  const sea = g.createLinearGradient(0, 74, 0, 100); sea.addColorStop(0, mixC('#1a2650', '#6a8cc0', dawn)); sea.addColorStop(1, mixC('#121c3c', '#2e5a96', dawn)); g.fillStyle = sea; g.fillRect(0, 74, W, 28);
+  R(0, 74, W, 2, mixC('#3a3a6a', '#ffd8b0', dawn));
+  if (sunY != null) for (let k = 0; k < 8; k++) { const w = 20 - k * 2 + Math.sin(t * 3 + k) * 3; g.fillStyle = `rgba(255,226,170,${0.5 - k * 0.05})`; g.fillRect(Math.round(268 - w / 2), 76 + k * 3, Math.round(w), 1); }
+  for (let k = 0; k < 14; k++) { const y = 78 + k * 2, x = (rnd(k, 53) * W + t * (6 + k % 3)) % W; R(x, y, 6 + (k % 3) * 4, 1, mixC('#3a4a7a', '#a8c4e8', dawn)); }
+  const sand = g.createLinearGradient(0, 100, 0, 216); sand.addColorStop(0, mixC('#4a4252', '#c8aa88', dawn)); sand.addColorStop(1, mixC('#2a2430', '#8a6e5a', dawn)); g.fillStyle = sand; g.fillRect(0, 102, W, 114);
+  const fo = Math.round(Math.sin(t * 0.9) * 2 + (beatPulse || 0) * 4); R(0, 100 + fo, W, 3, mixC('#8aa0c8', '#f4f0e6', dawn)); R(0, 103 + fo, W, 1, mixC('#6a7aa0', '#e0dcd0', dawn));
+  for (let k = 0; k < 3; k++) { const x = (k * 140 + t * (10 + k * 3)) % (W + 40) - 20, y = 18 + k * 9 + Math.round(Math.sin(t * 1.3 + k) * 2), up = Math.floor(t * 3 + k) % 2, c = mixC('#2a2a44', '#5a4a5a', dawn); R(x - 3, y + (up ? 0 : 1), 3, 1, c); R(x, y + 1, 2, 1, c); R(x + 2, y + (up ? 0 : 1), 3, 1, c); }
+}
+// 마르코 sitting on the sand (from the side), the guitar in his lap (playing: his right hand at the soundhole), or the case
+function sdSitMarco(x, y, nowMs, opt) {
+  const pose = { ...standPose(0), hand: opt.play ? { x: BOSS_X + 20, y: 134 + (opt.strum ? 2 : 0) } : { x: BOSS_X + 14, y: 132 }, sad: !opt.smile, dip: 0 };
+  FX.react[2] = FX.react[2] || { type: '', at: nowMs };
+  g.save(); g.translate(x - 150, y - 150);
+  R(150 - 8, 146, 22, 6, '#3a4a6a'); R(150 + 10, 146, 6, 16, '#3a4a6a'); R(150 + 9, 160, 9, 3, '#1b1716');
+  drawActor('marco', 150, false, pose, nowMs, false, () => { if (opt.play) sdGuitar(BOSS_X + 18, 138, -0.25, 1); PARTNERS.marco.arm(pose); });
+  g.restore();
+}
+function drawBeachScene(nowMs) {
+  const act = SCENE.beach || '';
+  sdBeachBack(0.12, null, nowMs, 0);
+  sdSitMarco(150, 150, nowMs, { play: false, smile: false });
+  if (act !== 'open') sdCase(178, 168, 1.35); else { R(166, 160, 34, 10, '#2a1d17'); R(168, 161, 30, 8, '#7a2a3a'); }
+  R(161, 150, 4, 6, '#c8302a'); R(161, 150, 4, 1, '#d8dde2');
+  g.save(); g.translate(236 - PLAYER_X, 22); drawPlayer(0, nowMs); g.restore();
+  drawSceneFade(nowMs);
+}
+// you, standing in a scene (the game draws you from the waist up behind your scanner): legs, shoes and arms added
+function sdStandPlayer(x, floorY, nowMs, mir) {
+  g.save(); if (mir) { g.translate(x, 0); g.scale(-1, 1); g.translate(-x, 0); } g.translate(x - PLAYER_X, floorY - 172);
+  g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(PLAYER_X, 172, 12, 3, 0, 0, Math.PI * 2); g.fill();
+  R(PLAYER_X - 8, 146, 7, 22, '#2c3440'); R(PLAYER_X + 1, 146, 7, 22, '#2c3440'); R(PLAYER_X - 9, 167, 9, 4, '#1b1716'); R(PLAYER_X + 1, 167, 9, 4, '#1b1716');
+  drawPlayer(0, nowMs); thick(PLAYER_X - 8, 114, PLAYER_X - 10, 138, 4, C.hoodie); R(PLAYER_X - 12, 137, 4, 4, C.skin); thick(PLAYER_X + 8, 114, PLAYER_X + 10, 138, 4, C.hoodie); R(PLAYER_X + 8, 137, 4, 4, C.skin);
+  g.restore();
+}
+const SD_SCENES = { hosp: drawHosp, dock: drawDock, road: drawRoad, market: drawMarket, beach: drawBeachScene };
+
+// ---------- 2-5: the guitar's strings for belts (L.gtr) ----------
+// The lower half of the screen is the guitar's neck lying across it, its six strings the belts: the three thick ones at the
+// bottom for the thumb (left hand: F/D, the left of the screen), the three thin ones over them for the fingers (right hand:
+// J/K, the right). Little lights ride along a string from the headstock on the left to the soundhole on the right; play it
+// as it gets there. Above: the beach, 마르코 on the sand with the old guitar, you beside him, the phone with 반장 on it.
+const GTR = { hitX: 316, y0: 128, gap: 15, fx: [0, 0, 0, 0, 0, 0].map(() => ({ at: -1e9, j: '' })), tuned: [false, false, false, false, false, false] };
+const GTR_HZ = [329.6, 246.9, 196.0, 146.8, 110.0, 82.4];   // high e .. low E (string 0 at the top)
+function gtrString(n) {
+  if (n.gs != null) return n.gs;
+  const T = L.gtr.tune && L.gtr.tune.find(([b]) => Math.abs(b - n.beat) < 1e-6);
+  n.gs = T ? T[1] : n.lane === 0 ? (Math.floor(n.beat / 2) % 2 ? 4 : 5) - (Math.round(n.beat) % 4 === 2 && n.beat >= 136 ? 1 : 0) : [2, 1, 0, 1][Math.floor(n.beat * 2) % 4];
+  return n.gs;
+}
+const gtrY = s => GTR.y0 + s * GTR.gap;
+function gtrPluck(T, f, v, bad) {
+  const o = osc('triangle', f, T, 0.002, 0.16 * v, 0.9, bus); osc('sine', f * 2, T, 0.002, 0.05 * v, 0.5, bus); noise(T, 'bandpass', 2400, 0.06 * v, 0.02, 3, bus);
+  if (bad) { o.frequency.setValueAtTime(f * 0.97, T); osc('sawtooth', f * 1.03, T, 0.002, 0.05, 0.4, bus); noise(T + 0.01, 'bandpass', 5200, 0.05, 0.25, 6, bus); }
+}
+function gtrHitSound(j, beat, lane) {
+  const n = notes.find(m => m.lane === lane && Math.abs(m.beat - beat) < 1e-6), s = n ? gtrString(n) : lane === 0 ? 5 : 0, T = ctx.currentTime, D = L.gtr;
+  GTR.fx[s] = { at: performance.now(), j };
+  const tuneIdx = D.tune ? D.tune.findIndex(([b]) => Math.abs(b - beat) < 1e-6) : -1;
+  if (tuneIdx >= 0) { GTR.tuned[s] = true; const f = GTR_HZ[s], o = osc('triangle', f * 0.92, T, 0.002, 0.18, 1.2, bus); o.frequency.exponentialRampToValueAtTime(f, T + 0.35); osc('sine', f * 2, T, 0.002, 0.05, 0.8, bus); return; }
+  if (beat < D.song) { gtrPluck(T, GTR_HZ[s] * (0.94 + rnd(Math.round(beat * 4), 13) * 0.1), 1, true); return; }
+  // with the song in, the song is the guitar: a pick's soft tick (the thumb a little lower), so it never plays against it
+  const v = j === 'good' ? 0.7 : 1;
+  if (lane === 0) { noise(T, 'lowpass', 600, 0.14 * v, 0.03, 0.8, bus); osc('sine', 160, T, 0.001, 0.06 * v, 0.05, bus); } else { noise(T, 'bandpass', 3200, 0.12 * v, 0.02, 3, bus); osc('sine', 1200, T, 0.001, 0.03 * v, 0.03, bus); }
+}
+function drawGtr(t, nowMs, active) {
+  const D = L.gtr, live = active || state === 'outro' || state === 'result', b = active ? beatAt(t) : live ? END_BEAT : 0, T = active ? t : timeAt(END_BEAT), now = performance.now();
+  const dawn = Math.max(0, Math.min(1, (b - D.dawn[0]) / (D.dawn[1] - D.dawn[0]))), sunY = b >= D.sun[0] ? lerp(78, 30, ease(Math.min(1, (b - D.sun[0]) / (D.sun[1] - D.sun[0])))) : null;
+  const ph = b - Math.floor(b), pulse = b >= D.waves ? Math.max(0, 1 - ph * 2.5) : 0;
+  g.save();
+  sdBeachBack(0.12 + 0.88 * dawn, sunY, nowMs, pulse);
+  // the open case, the phone propped in it (반장 in his bed while the call is on), 마르코 playing, you with the can
+  const call = b >= D.call || !active;
+  R(166, 92, 34, 10, '#2a1d17'); R(168, 93, 30, 8, '#7a2a3a');
+  if (call) { R(178, 76, 11, 17, '#1a1a20'); R(179, 77, 9, 14, '#a8c4d8'); R(181, 80, 5, 5, '#efc7a6'); R(181, 79, 5, 2, '#8a8a90'); R(181, 86, 5, 5, '#5a6a7a');
+    const tap = b >= D.song && !(b >= D.endTap) && ph < 0.2 && Math.floor(b) % 2 === 0; R(184, tap ? 89 : 87, 3, 2, '#efc7a6'); }
+  const thumbNow = live && notes.some(n => n.lane === 0 && n.state === 'hit' && T - n.hitAt < 0.12), fingNow = live && notes.some(n => n.lane === 1 && n.state === 'hit' && T - n.hitAt < 0.12);
+  g.save(); g.translate(0, -58); g.scale(1, 1);
+  sdSitMarco(138, 150, nowMs, { play: true, strum: thumbNow || fingNow, smile: b >= D.smile }); g.restore();
+  { const can = b >= D.waves && ph < 0.15; g.save(); g.translate(226 - PLAYER_X, -64); drawPlayer(0, nowMs); g.restore(); R(214, can ? 92 : 90, 4, 6, '#c8302a'); R(214, can ? 92 : 90, 4, 1, '#d8dde2'); }
+  // the neck: the fretboard across, frets going by (it moves the way the lights do), the body and its soundhole on the right
+  const top = GTR.y0 - 10, bot = gtrY(5) + 10;
+  R(0, top - 3, W, bot - top + 6, '#2a1a12'); R(0, top, 300, bot - top, '#3a2416'); R(0, top, 300, 1, '#5a3a24'); R(0, bot - 1, 300, 1, '#1a0e08');
+  const spd = (GTR.hitX - 8) / (D.travel * SPB), off = (T * spd) % 46;
+  for (let x = -off; x < 300; x += 46) { R(Math.round(x), top, 2, bot - top, '#b8b0a0'); R(Math.round(x) + 2, top, 1, bot - top, '#6a6258'); }
+  for (let x = -off + 23; x < 300; x += 92) { g.fillStyle = '#e8e0c8'; g.beginPath(); g.arc(Math.round(x), (top + bot) / 2, 2, 0, Math.PI * 2); g.fill(); }
+  R(300, top - 6, 84, bot - top + 12, '#c89a5e'); R(300, top - 6, 84, 2, '#e0b878'); R(300, top - 6, 3, bot - top + 12, '#8a5a2e');
+  g.fillStyle = '#1a0e08'; g.beginPath(); g.arc(344, (top + bot) / 2, 28, 0, Math.PI * 2); g.fill(); g.strokeStyle = '#6a3a1a'; g.lineWidth = 3; g.beginPath(); g.arc(344, (top + bot) / 2, 31, 0, Math.PI * 2); g.stroke();
+  // the line you play on (over the soundhole), a soft column of light
+  { const gl = g.createLinearGradient(GTR.hitX - 8, 0, GTR.hitX + 8, 0); gl.addColorStop(0, 'rgba(255,230,160,0)'); gl.addColorStop(0.5, `rgba(255,230,160,${0.22 + 0.15 * Math.max(0, 1 - ph * 3)})`); gl.addColorStop(1, 'rgba(255,230,160,0)'); g.fillStyle = gl; g.fillRect(GTR.hitX - 8, top, 16, bot - top); R(GTR.hitX, top, 1, bot - top, 'rgba(255,240,200,.55)'); }
+  // the strings: rusty until each is tuned, then bright; thick at the bottom; a struck one shakes
+  for (let s = 0; s < 6; s++) {
+    const y = gtrY(s), w = s >= 3 ? 2 : 1, f = GTR.fx[s], age = (now - f.at) / 1000, amp = age < 0.5 ? (1 - age / 0.5) * 2.2 : 0, bright = GTR.tuned[s] || b >= D.song, miss = f.j === 'miss' && age < 0.3;
+    const col = miss ? '#e05040' : bright ? (s >= 3 ? '#d8c8a0' : '#e8e8ec') : '#8a6a4a';
+    if (amp > 0) for (let x = 0; x < W; x += 3) R(x, y + Math.round(Math.sin(x * 0.2 + age * 60) * amp * Math.sin(Math.PI * x / W)), 3, w, col); else R(0, y, W, w, col);
+    if (age < 0.2 && f.j !== 'miss') { g.globalAlpha = 1 - age / 0.2; R(GTR.hitX - 6, y - 4, 13, 8 + w, '#fff6d8'); g.globalAlpha = 1; }
+  }
+  // the lights riding the strings in
+  if (live) for (const n of notes) {
+    if (n.lane == null || n.victim) continue;
+    const s = gtrString(n), y = gtrY(s), x = GTR.hitX - (n.arr - T) * spd;
+    if (n.state === 'pending') { if (x < -6 || x > GTR.hitX + 30) continue; const thumb = n.lane === 0, c = thumb ? '#ffb060' : '#8fe8ff';
+      g.globalAlpha = 0.35; g.fillStyle = c; g.beginPath(); g.arc(x, y + 0.5, thumb ? 7 : 6, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1;
+      R(x - 3, y - 2, 6, 5, c); R(x - 2, y - 1, 4, 3, '#ffffff'); }
+    else if (n.state === 'hit' && T - n.hitAt < 0.35) { const k = (T - n.hitAt) / 0.35; g.globalAlpha = 1 - k; g.strokeStyle = n.lane === 0 ? '#ffd090' : '#c8f6ff'; g.lineWidth = 2; g.beginPath(); g.arc(GTR.hitX, y, 4 + k * 14, 0, Math.PI * 2); g.stroke(); g.globalAlpha = 1; }
+    else if (n.state === 'miss' && T - n.hitAt < 0.4) { GTR.fx[s] = GTR.fx[s].at > now - 400 ? GTR.fx[s] : { at: now - (T - n.hitAt) * 1000, j: 'miss' }; }
+  }
+  // which hand: the labels at the start of each (the thumb's when the song comes in, the fingers' when they first come)
+  const lab = (txt, y, c, a) => { if (a <= 0) return; g.globalAlpha = a; g.fillStyle = 'rgba(10,6,4,.7)'; g.fillRect(4, y - 8, 64, 12); g.fillStyle = c; g.font = 'bold 9px sans-serif'; g.fillText(txt, 8, y + 1); g.globalAlpha = 1; };
+  if (active) { const fa = x => Math.max(0, Math.min(1, x)); lab('엄지 · F', gtrY(4), '#ffb060', fa(Math.min((b - D.labels[0] + 1), (D.labels[0] + 10 - b) / 2)) ); lab('손가락 · J', gtrY(1), '#8fe8ff', fa(Math.min((b - D.labels[1] + 1), (D.labels[1] + 10 - b) / 2))); }
+  g.restore();
+}
 function drawMid(t, nowMs, active) {
   const F = L.phaseFx, M = L.mid, bReal = active ? beatAt(t) : castBeatAt(t, active), live = active || state === 'outro' || state === 'result';
   // the last hit holds the picture still for a moment (a hitstop) before the lights start going out
@@ -5675,7 +6141,7 @@ function drawMid(t, nowMs, active) {
   const ph = b - Math.floor(b), pk = i => Math.max(0, 1 - (nowMs - QUADFX.press[i]) / 140);
   const marco = midMarco(b);
   // who loads a box: 반장 the left lower line's, unless 마르코 has squeezed in there; 마르코 throws all the rest from wherever he is
-  const bossLoads = n => n.q === 0 && !n.up && !['ll', 'lk'].includes(midSpotAt(n.place ? beatAt(n.place) : n.beat));
+  const bossLoads = n => !(L.sd && L.sd.noBoss) && n.q === 0 && !n.up && !['ll', 'lk'].includes(midSpotAt(n.place ? beatAt(n.place) : n.beat));
   let held = null;
   if (live) for (const n of notes) { if (!n.quad || !bossLoads(n)) continue; const k = (T - (n.place - n.carry)) / n.carry; if (k >= 0 && k < 1) { const f = { x: 16, y: 112 }, x = lerp(f.x, PLACE_X, k), y = lerp(f.y, BELT_Y - n.h / 2, ease(k)) - Math.sin(Math.PI * k) * 14; held = { n, x, y }; break; } }
   const mirror = (q, fn) => { g.save(); if (q) { g.translate(WW, 0); g.scale(-1, 1); } g.beginPath(); g.rect(0, -MID.oy, AX, MID.wh); g.clip(); fn(); g.restore(); };
@@ -5713,7 +6179,7 @@ function drawMid(t, nowMs, active) {
     if (live) for (const n of notes) if (n.quad && n.q === q && !!n.up === up && n.state === 'hit' && n.hitAt != null && n.judge != null && T - n.hitAt < 0.42 && T >= n.hitAt) hitRings.push(n);
     const end = up ? SCAN_X + (AX - 8 - SCAN_X) / FAR.k : AX - 8;
     if (live) for (const n of notes) {
-      if (!n.quad || n.q !== q || !!n.up !== up || T < n.place) continue;
+      if (!n.quad || n.q !== q || !!n.up !== up || T < n.place || n.lever) continue;
       const x = noteX(n, T);
       if (n.state === 'hit' && n.slip && L.ht) { htSlipBox(n, T); continue; }
       if (n.state === 'hit') { if (x < end) drawBox(n, x, BELT_Y, '', T, T - n.hitAt < 0.1 ? 0.8 : 0); else { const dt = (x - end) / SPEED; if (dt < 0.5) { g.globalAlpha = 1 - dt / 0.5; drawBox(n, end, BELT_Y + 0.5 * 900 * dt * dt, '', T); g.globalAlpha = 1; } } continue; }
@@ -5733,7 +6199,7 @@ function drawMid(t, nowMs, active) {
     g.restore(); BELT_L = 48;
   };
   // 마르코, where the route has him: walking between corners, throwing the boxes he loads
-  const toss = live ? notes.find(n => n.quad && !bossLoads(n) && T >= n.place - 0.3 && T < n.place + 0.05) : null;
+  const toss = live ? notes.find(n => n.quad && !n.lever && !bossLoads(n) && T >= n.place - 0.3 && T < n.place + 0.05) : null;
   // 마르코 hams it up. Standing at a belt and not throwing, he dances on the beat, a move a bar: a fist pumped on the beat,
   // finger guns at you, a lasso over his head; while he talks beside you his hand waves about, between lines he plays air bass.
   // He skips from corner to corner (after the second drop he spins as he goes), jumps on both drops and ends arms up.
@@ -5741,7 +6207,7 @@ function drawMid(t, nowMs, active) {
   const drawMarco = () => {
     const pose = { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: active && (marco.walking ? ph < 0.5 : ph < 0.18) ? 1 : 0, nod: 0, doze: false, phone: false, lane: 2 };
     let sway = 0, lift = 0, mir = marco.mir;
-    const on = L.rb ? active && rbFunkOn(b) : L.ht ? active && b >= L.ht.fuse[0] : active && M.boombox != null && b >= M.boombox + 0.5;
+    const on = L.rb ? active && rbFunkOn(b) : L.ht ? active && b >= L.ht.fuse[0] : L.sd ? active && sdIn(b, L.sd.dance) && sdCallAt(b) !== 'c' : active && M.boombox != null && b >= M.boombox + 0.5;
     if (toss) pose.hand = { x: BOSS_X + 16, y: 104 };
     else if (on && marco.walking) {
       lift = Math.round(Math.sin(Math.PI * Math.min(1, marco.p * 1.4)) * 7); pose.hand = { x: BOSS_X + 10, y: 80 };
@@ -5791,9 +6257,12 @@ function drawMid(t, nowMs, active) {
       if (marco.spot === 'lk' && !marco.walking && b >= D.song && b < D.tapFrom) mir = true;
       if (b < D.song) pose.mute = true;
     }
+    if (L.sd && (active || state === 'outro' || state === 'result')) { const r = sdMarcoPose(b, marco, pose, toss, active); if (r) { if (r.sway != null) sway = r.sway; if (r.lift != null) lift = r.lift; if (r.mir != null) mir = r.mir; } }
     FX.react[2] = FX.react[2] || { type: '', at: nowMs };
+    if (L.sd) sdMarcoExtra({ ...marco, mir }, pose);
     g.save(); if (marco.up) { g.beginPath(); g.rect(0, -MID.oy, WW, farY(BELT_Y) + 2 + MID.oy); g.clip(); }
     g.translate(sway, Math.round(marco.dy) - lift); drawActor('marco', Math.round(marco.x), mir, pose, nowMs, active, () => PARTNERS.marco.arm(pose)); g.restore();
+    if (L.sd) sdBoxInHand({ ...marco, mir }, pose);
   };
   // his ad-libs (drawn crisp over the floor, in midAdlib) and the sparks off his hands when you hit one of his boxes
   const adFrom = M.adFrom != null ? M.adFrom : 62;
@@ -5813,10 +6282,13 @@ function drawMid(t, nowMs, active) {
   if (L.rb) rbBack(b, bReal, nowMs, active, live);
   if (L.ht) htBack(b, bReal, nowMs, active, live);
   if (L.ht && live) htVisitors(bReal, nowMs);
+  if (L.sd) sdBack(b, bReal, nowMs, active, live);
+  if (L.sd && live) htVisitors(bReal, nowMs);
   if (marco.up) drawMarco();
   mirror(0, () => belt(0, true)); mirror(1, () => belt(1, true));
   // 반장 at line 3's lower end, carrying his boxes
   mirror(0, () => {
+    if (L.sd && L.sd.noBoss) return;
     const pose = { hand: { x: BOSS_X + 13, y: 134 }, carry: null, wince: false, dip: 0, bob: active && ph < 0.18 ? 1 : 0, nod: 0, doze: false, phone: false, lane: 0 };
     if (held) pose.hand = { x: held.x - held.n.w / 2 + 1, y: held.y + 2 };
     const bx0 = L.rb && live ? rbBossX(bReal) : BOSS_X, stepping = L.rb && L.rb.step && live && bReal >= L.rb.step && bReal < L.rb.step + 1.5;
@@ -5904,7 +6376,7 @@ function drawMid(t, nowMs, active) {
   let sw = W / V.s, sh = H / V.s, sx = V.cx - sw / 2, sy = V.cy - sh / 2 + MID.oy;
   // 2-2: the cutscene's camera (rb.zoom): close on whoever speaks, panning between shots that touch, easing in from the wide
   // view and back out to it, never past the floor's ends
-  const ZD = L.rb || L.ht;
+  const ZD = L.rb || L.ht || L.sd;
   if (ZD && ZD.zoom && (active || state === 'outro')) {
     const Z = ZD.zoom, wide = { s: V.s, cx: V.cx, cy: V.cy }, mc = midMarco(b), lv = ZD.leave, lp = lv ? Math.max(0, Math.min(1, (bReal - lv[0]) / (lv[1] - lv[0]))) : 0;
     const at = w => { if (!w) return wide; const zs = V.s * w[3];
@@ -5918,7 +6390,7 @@ function drawMid(t, nowMs, active) {
     if (i >= 0) { const prev = i > 0 && Z[i - 1][1] === Z[i][0] ? Z[i - 1] : null; c = mix(at(prev), at(Z[i]), ease((bReal - Z[i][0]) / (prev ? 1 : 1.2))); }
     else { const last = Z.filter(w => bReal >= w[1]).pop(); if (last && bReal - last[1] < 1) c = mix(at(last), wide, ease(bReal - last[1])); }
     // a line's camera (cam) during held lines and the ending: eased to whoever speaks, and back out after
-    { const tgt = (HOLD.on || state === 'outro') && SCENE.cam ? at([0, 0, SCENE.cam.who === 'c' ? { x: 170, y: 96 } : SCENE.cam.who === 'd' ? { x: 520, y: 96 } : SCENE.cam.who === 'board' ? { x: 340, y: 60 } : SCENE.cam.who, SCENE.cam.z]) : null,
+    { const tgt = (HOLD.on || state === 'outro') && SCENE.cam ? at([0, 0, SCENE.cam.who === 'c' ? { x: 170, y: 96 } : SCENE.cam.who === 'd' ? { x: 520, y: 96 } : SCENE.cam.who === 'board' ? { x: 340, y: 60 } : SCENE.cam.who === 'shelf' ? { x: RB_RADIO.x + 26, y: 100 } : SCENE.cam.who === 'lever' ? { x: SD_LEVER.x + 20, y: 90 } : SCENE.cam.who, SCENE.cam.z]) : null,
         dt = Math.min(0.1, Math.max(0, (nowMs - (FX.htCamT || nowMs)) / 1000)), K = 1 - Math.exp(-dt * 5); FX.htCamT = nowMs;
       if (tgt || FX.htCam) { const to = tgt || c, cur = FX.htCam || { ...c }; FX.htCam = { s: lerp(cur.s, to.s, K), cx: lerp(cur.cx, to.cx, K), cy: lerp(cur.cy, to.cy, K) };
         if (!tgt && Math.abs(FX.htCam.s - c.s) < 0.01 && Math.abs(FX.htCam.cx - c.cx) < 1) FX.htCam = null; else c = FX.htCam; } }
@@ -5928,11 +6400,11 @@ function drawMid(t, nowMs, active) {
   let [jx, jy] = phaseJolt(bReal);
   if (FX.midPair && nowMs - FX.midPair.at < 170 && !reduce) { const k = FX.midPair.both ? 2 : 1; jx += Math.round((Math.random() * 2 - 1) * k); jy += Math.round((Math.random() * 2 - 1) * k); }
   MIDCAM = { sx, sy, sw, sh };
-  if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx + jx, sy + jy, sw, sh, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); if (L.rb) rbCine(g, W, H, bReal, active); if (L.ht) htCine(g, W, H, active ? bReal : END_BEAT, active); return; }
+  if (V.e <= 0) { cvHi.hidden = true; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(midCv, sx + jx, sy + jy, sw, sh, 0, 0, W, H); g.restore(); phaseLook(g, W, H, bReal, active); if (L.rb) rbCine(g, W, H, bReal, active); if (L.ht || L.sd) htCine(g, W, H, active ? bReal : END_BEAT, active); return; }
   if (cvHi.width !== hw || cvHi.height !== hh) { cvHi.width = hw; cvHi.height = hh; }
   cvHi.hidden = false; gHi.setTransform(1, 0, 0, 1, 0, 0); gHi.imageSmoothingEnabled = false; gHi.fillStyle = '#0c0a09'; gHi.fillRect(0, 0, hw, hh);
   gHi.drawImage(midCv, sx + jx / V.s, sy + jy / V.s, sw, sh, 0, 0, hw, hh);
-  phaseLook(gHi, hw, hh, bReal, active); if (L.rb) rbCine(gHi, hw, hh, active ? bReal : END_BEAT, active); if (L.ht) htCine(gHi, hw, hh, active ? bReal : END_BEAT, active);
+  phaseLook(gHi, hw, hh, bReal, active); if (L.rb) rbCine(gHi, hw, hh, active ? bReal : END_BEAT, active); if (L.ht || L.sd) htCine(gHi, hw, hh, active ? bReal : END_BEAT, active);
   if (active) { midGuide(b, T, nowMs, { sx, sy, sw, sh, hw, hh, k }); midAdlib(nowMs, { sx, sy, sw, sh, hw, hh }); }
   // the game canvas under it still gets the plain floor colour (nothing else shows through)
   g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0c0a09'; g.fillRect(0, 0, W, H); g.restore();
@@ -6504,7 +6976,7 @@ function drawPairBolt(nowMs) {
 // and on the line 반장 walks from the middle of the room over to his spot behind the belt before the next line shows.
 const SCENE = { kind: 'line', trans: null, walk: null };
 const OFFICE_X = 192, WALK_FROM = 200;
-function sceneReset(kind = 'line') { SCENE.kind = kind; SCENE.trans = null; SCENE.walk = null; SCENE.office = null; SCENE.enter = null; SCENE.jpose = null; SCENE.o17 = null; SCENE.act = null; SCENE.cam = null; }
+function sceneReset(kind = 'line') { SCENE.kind = kind; SCENE.trans = null; SCENE.walk = null; SCENE.office = null; SCENE.enter = null; SCENE.jpose = null; SCENE.o17 = null; SCENE.act = null; SCENE.cam = null; Object.assign(SCENE, { hosp: null, hospAt: 0, hospTook: false, hospSmile: false, dock: null, dockAt: 0, dockWho: '', beach: null, mktSmile: false, roadHum: false, mktNoise: false }); }
 function sceneCut(to, done) {
   const now = performance.now(), out = reduce ? 200 : L.cine ? 700 : 320, walk = reduce || L.daw || L.cine || to !== 'line' ? 0 : 2600;   // 반장's walk to the line only on the way in
   SCENE.trans = { at: now, out, to, done, swapped: false, walk };
@@ -7821,6 +8293,10 @@ function levelSfx(t, kind) {
   // 2-3: the belt motor's clunk (the only clock in the cold war); the announcement's chime and its speaker's hiss; 반장 heaving
   // the heavy box up and it landing; four belts jamming (boxes crashing into each other and down); a palm on a cardboard box;
   // the boombox's plug going back in (a click and a hum)
+  // 2-4: the main switch thrown (a heavy clunk) and the power going (the hum falling away); 2-6: 소장's pen on his clipboard
+  if (kind === 'lever') { const o = osc('sine', 85, t, 0.001, 0.5, 0.22, bus); o.frequency.exponentialRampToValueAtTime(38, t + 0.2); noise(t, 'bandpass', 1800, 0.45, 0.04, 2, bus); osc('square', 900, t, 0.0005, 0.07, 0.02, bus); return; }
+  if (kind === 'power') { const h = osc('sawtooth', 120, t, 0.001, 0.05, 1.8, bus); h.frequency.exponentialRampToValueAtTime(28, t + 1.7); const h2 = osc('sine', 60, t, 0.001, 0.12, 1.4, bus); h2.frequency.exponentialRampToValueAtTime(20, t + 1.3); noise(t, 'lowpass', 300, 0.25, 1.1, 0.7, bus); return; }
+  if (kind === 'clip') { noise(t, 'bandpass', 2600, 0.16, 0.02, 3, bus); osc('square', 1400, t, 0.0005, 0.03, 0.012, bus); return; }
   if (kind === 'motor') { osc('sine', 58, t, 0.004, 0.08, 0.14, bus); noise(t, 'lowpass', 260, 0.06, 0.05, 0.8, bus); return; }
   if (kind === 'pa') { noise(t, 'bandpass', 1800, 0.025, 4.2, 0.6, bus); osc('sine', 659.3, t + 0.05, 0.01, 0.1, 0.7, bus); osc('sine', 523.3, t + 0.55, 0.01, 0.1, 1, bus); return; }
   if (kind === 'heave') { noise(t, 'lowpass', 500, 0.08, 0.3, 0.8, bus); return; }
@@ -7871,6 +8347,7 @@ function quadHit(q, j, n) {
   else { const fl = ctx.createBiquadFilter(); fl.type = 'bandpass'; fl.frequency.value = 900; fl.Q.value = 1.5; fl.connect(bus); osc('square', 545, t, 0.001, 0.07 * v, 0.12, fl); osc('square', 815, t, 0.001, 0.05 * v, 0.1, fl); }
 }
 function hitSound(j, tones, beat, done, lane = -1) {
+  if (L.gtr && lane >= 0) { gtrHitSound(j, beat, lane); return; }
   const t = ctx.currentTime, th = fxTheme(beat), f = tones[(stats.combo + (done ? 1 : 0)) % Math.min(3, tones.length)], good = j === 'good';
   if (L.hitKit === 'ticktock' && lane >= 0) {
     const v = good ? 0.75 : 1;
@@ -8121,7 +8598,8 @@ function buildEvents() {
     const quiet = inRange(b, L.quiet), doze = inRange(b, L.doze), phone = inRange(b, L.phone), dark = blackout(b);
     const E = (dt, fn) => ev.push([t + dt, fn]);
     if (L.sfx) for (const [sb, kind] of L.sfx) if (Math.floor(sb) === b) E((sb - b) * s, T => levelSfx(T, kind));
-    if (L.songCues) for (const [cb, cue] of L.songCues) if (Math.floor(cb) === b) E((cb - b) * s, cue === 'tape' ? T => tapeStop(T) : T => { if (songReady(cue)) startSong(T, 0, cue); });
+    if (L.songCues) for (const [cb, cue] of L.songCues) if (Math.floor(cb) === b) E((cb - b) * s, cue === 'tape' ? T => tapeStop(T) : cue === 'cut' ? T => songCut(T) : T => { if (songReady(cue)) startSong(T, 0, cue); });
+    if (L.sd && L.sd.calls) for (const [cb, who] of L.sd.calls) if (Math.floor(cb) === b) E((cb - b) * s, T => sdDuck(T, who));
     if (L.mid && L.mid.shouts) for (const [sb, kind] of L.mid.shouts) if (Math.floor(sb) === b) E((sb - b) * s, T => levelSfx(T, kind));
     if (L.songDuck) { if (b === L.songDuck[0]) E(0, T => duckSong(T, true, 2 * s)); if (b === L.songDuck[1] - 1) E(0, T => duckSong(T, false, s)); }
     if (L.songStart === b) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(0)) startSong(T, 0, 0); });
@@ -9502,6 +9980,7 @@ function updateHud(t) {
     bubble.classList.remove('loud');
     if (line && line[5] === 'loud') { void bubble.offsetWidth; bubble.classList.add('loud'); FX.shakeUntil = performance.now() + 240; FX.shakeAmp = 2; }
   }
+  if (L.gtr && !bubble.hidden) bubble.hidden = true;
   if (L.mid) { const sp = line ? line[4] || 'b' : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.spk || 'b' : null; if (sp === 'v' || sp === 'b') placeMidBubble(sp, beat); else bubble.classList.remove('mid'); }
   if (line && line[4] === 'h' && L.coScanner) placeHaeunBubble(beat);
   if (line && line[4] === 'd' && L.driver) placeHeadBubble(driverHead(beat));
@@ -9573,6 +10052,12 @@ function showLine() {
   if (ln.office) SCENE.office = { ...ln.office };
   if (sc === 'office') SCENE.jpose = ln.jpose || null;
   if (sc === 'pocha') SCENE.mpose = ln.mpose || null;
+  // (2-4, 2-5's talk scenes: what the line has them doing; 2-4's ending switches 반장's radio on)
+  if (ln.hosp && ln.hosp !== SCENE.hosp) { SCENE.hosp = ln.hosp; SCENE.hospAt = performance.now(); if (ln.hosp === 'tap' && ctx) levelSfx(ctx.currentTime + 0.25, 'thump'); }
+  if (sc === 'hosp') { SCENE.hospLine = dlg.i; if ('smile' in ln) SCENE.hospSmile = !!ln.smile; }
+  if (sc === 'dock') { SCENE.dockWho = ln.who === '기사' ? 'd' : ''; if (ln.dock && ln.dock !== SCENE.dock) { SCENE.dock = ln.dock; SCENE.dockAt = performance.now(); } }
+  if (sc === 'market' && 'smile' in ln) SCENE.mktSmile = !!ln.smile;
+  if (ln.beach) SCENE.beach = ln.beach;
   if (ln.o17 && ln.o17 !== SCENE.o17) { SCENE.o17 = ln.o17; SCENE.o17At = performance.now(); if (ln.o17 === 'pass' && ctx) { const t0 = ctx.currentTime; noise(t0, 'bandpass', 900, 0.12, 0.1, 1.5, bus); for (let k = 0; k < 6; k++) noise(t0 + 0.2 + k * 0.4, 'lowpass', 420, 0.14, 0.07, 0.7, bus); } }
   if ('cam' in ln) SCENE.cam = ln.cam ? { who: ln.cam, z: ln.zoom || 1.9 } : null;
   if (ln.act !== undefined && (!SCENE.act || SCENE.act.name !== ln.act)) { SCENE.act = ln.act ? { name: ln.act, at: performance.now() } : null; if (ln.act === 'fall' && ctx) levelSfx(ctx.currentTime, 'thud'); }
@@ -9658,8 +10143,8 @@ function stopSong() { if (SONG.src) { try { SONG.src.stop(); } catch (e) {} SONG
 const POCHA = { src: null, started: false };
 function pochaSong() {
   const sp = L.pocha; if (!sp || POCHA.started || !ctx) return; const buf = SONG.bufs[sp.src]; if (buf === null || buf === undefined) return; POCHA.started = true; if (!buf) return;
-  const s_ = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(), g_ = ctx.createGain(); s_.buffer = buf; hp.type = 'highpass'; hp.frequency.value = 90; lp.type = 'lowpass'; lp.frequency.value = 11000;
-  s_.connect(hp); hp.connect(lp); lp.connect(g_); g_.connect(mus); const T = ctx.currentTime; g_.gain.setValueAtTime(0.0001, T); g_.gain.linearRampToValueAtTime(sp.gain || 0.55, T + 1.5); s_.start(T); POCHA.src = s_; POCHA.g = g_; POCHA.t0 = T;
+  const s_ = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), lp = ctx.createBiquadFilter(), g_ = ctx.createGain(); s_.buffer = buf; hp.type = 'highpass'; hp.frequency.value = sp.lo || 90; lp.type = 'lowpass'; lp.frequency.value = sp.hi || 11000;
+  s_.connect(hp); hp.connect(lp); lp.connect(g_); g_.connect(mus); const T = ctx.currentTime; g_.gain.setValueAtTime(0.0001, T); g_.gain.linearRampToValueAtTime(sp.gain || 0.55, T + (sp.fade || 1.5)); s_.start(T, sp.into || 0); POCHA.src = s_; POCHA.g = g_; POCHA.t0 = T;
 }
 // start song i at audio time T, `into` seconds past its first downbeat
 function startSong(T, into = 0, i = 0) {
@@ -10068,6 +10553,8 @@ function frame(now) {
   else if (SCENE.kind === 'wings' && !active) drawWings(now);
   else if (SCENE.kind === 'hook16' && !active) { drawHook16(now); if (!hud.hidden) hud.hidden = true; }
   else if (SCENE.kind === 'pocha' && !active) { drawPocha(now); if (!hud.hidden) hud.hidden = true; }
+  else if (SD_SCENES[SCENE.kind] && !active) { SD_SCENES[SCENE.kind](now); if (!hud.hidden) hud.hidden = true; }
+  else if (L.gtr && state !== 'select' && state !== 'title' && (active || SCENE.kind === 'line')) { drawGtr(t, now, active); drawSceneFade(now); }
   else if (L.mid && castBeatAt(t, active) >= L.mid.at && state !== 'select' && state !== 'title') { drawMid(t, now, active); drawSceneFade(now); }
   else if (L.quad && quadP(castBeatAt(t, active)) >= 1) { drawQuad(t, now, active); drawSceneFade(now); }
   else { drawScene(t, now / 1000, active, now); if (L.quad && quadP(castBeatAt(t, active)) > 0) drawQuadTurn(t, now, active); if (L.phaseFx) phaseLook(g, W, H, castBeatAt(t, active), active); drawSceneFade(now); }
