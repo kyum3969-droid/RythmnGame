@@ -7384,8 +7384,22 @@ function brassHit(ac, dest, t, vol = 1) {
   ng.gain.setValueAtTime(0.05, t); ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.1); ns.connect(nf); nf.connect(ng); ng.connect(out); ns.start(t);
   // and the drummer's kick and cymbal with it
   const kk = ac.createOscillator(), kg = ac.createGain(); kk.frequency.setValueAtTime(130, t); kk.frequency.exponentialRampToValueAtTime(45, t + 0.12); kg.gain.setValueAtTime(0.32, t); kg.gain.exponentialRampToValueAtTime(0.0001, t + 0.3); kk.connect(kg); kg.connect(out); kk.start(t); kk.stop(t + 0.32);
-  const cb = ac.createBuffer(1, Math.round(ac.sampleRate * 1.4), ac.sampleRate), cd = cb.getChannelData(0); for (let i = 0; i < cd.length; i++) cd[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / cd.length, 2.5);
-  const cs = ac.createBufferSource(), cf_ = ac.createBiquadFilter(), cg = ac.createGain(); cs.buffer = cb; cf_.type = 'highpass'; cf_.frequency.value = 5000; cg.gain.value = 0.09; cs.connect(cf_); cf_.connect(cg); cg.connect(out); cs.start(t);
+  // a crash cymbal: a wash of noise (left and right a little different) and the metal's own ring (six square waves at
+  // clashing ratios, as drum machines make their cymbals), bright and splashing at once, ringing out over two seconds
+  for (const [pan, sd] of [[-0.45, 1], [0.45, 2]]) {
+    const len = Math.round(ac.sampleRate * 2.4), cb = ac.createBuffer(1, len, ac.sampleRate), cd = cb.getChannelData(0);
+    for (let i = 0; i < len; i++) cd[i] = (Math.random() * 2 - 1);
+    const cs = ac.createBufferSource(), hp = ac.createBiquadFilter(), pk = ac.createBiquadFilter(), cg = ac.createGain(), cp = ac.createStereoPanner();
+    cs.buffer = cb; hp.type = 'highpass'; hp.frequency.value = 3200; pk.type = 'peaking'; pk.frequency.value = 6500 + sd * 900; pk.gain.value = 6; pk.Q.value = 0.8;
+    cg.gain.setValueAtTime(0.0001, t); cg.gain.exponentialRampToValueAtTime(0.15, t + 0.004); cg.gain.exponentialRampToValueAtTime(0.055, t + 0.25); cg.gain.exponentialRampToValueAtTime(0.0001, t + 2.3);
+    cp.pan.value = pan; cs.connect(hp); hp.connect(pk); pk.connect(cg); cg.connect(cp); cp.connect(out); cp.connect(cv); cs.start(t); }
+  { const mg = ac.createGain(), mh = ac.createBiquadFilter(); mh.type = 'highpass'; mh.frequency.value = 7000; mg.gain.setValueAtTime(0.0001, t); mg.gain.exponentialRampToValueAtTime(0.03, t + 0.003); mg.gain.exponentialRampToValueAtTime(0.01, t + 0.3); mg.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
+    mh.connect(mg); mg.connect(out);
+    for (const r of [2, 3, 4.16, 5.43, 6.79, 8.21]) { const o = ac.createOscillator(); o.type = 'square'; o.frequency.value = 40 * r * 4.1; o.connect(mh); o.start(t); o.stop(t + 1.9); } }
+  // and a snare crack under the stab
+  { const len = Math.round(ac.sampleRate * 0.25), sb_ = ac.createBuffer(1, len, ac.sampleRate), sd_ = sb_.getChannelData(0); for (let i = 0; i < len; i++) sd_[i] = Math.random() * 2 - 1;
+    const ss = ac.createBufferSource(), sf = ac.createBiquadFilter(), sg = ac.createGain(); ss.buffer = sb_; sf.type = 'bandpass'; sf.frequency.value = 1900; sf.Q.value = 0.6;
+    sg.gain.setValueAtTime(0.18, t); sg.gain.exponentialRampToValueAtTime(0.0001, t + 0.2); ss.connect(sf); sf.connect(sg); sg.connect(out); sg.connect(cv); ss.start(t); }
 }
 function levelSfx(t, kind) {
   // 2-3: the belt motor's clunk (the only clock in the cold war); the announcement's chime and its speaker's hiss; 반장 heaving
