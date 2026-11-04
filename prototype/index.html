@@ -3754,75 +3754,95 @@ function drawRoom15(t, nowMs, b, post) {
   g.restore();
   // the black band the app lives in, fixed
   R(0, ROOM.band, W, H - ROOM.band, '#000000'); R(0, ROOM.band, W, 1, '#1a1724');
-  // ---- the music app, down below, centred, a row per instrument
-  const tk = Rm.tracks, rh = ROOM.rh, PW = ROOM.pw, x0 = Math.round((W - PW) / 2), x1 = x0 + PW, px = x0 + ROOM.play, lx = x0 + ROOM.names;
+  // ---- the music app, down below: one window filling the band (title bar with the transport, the time and the tempo, a
+  // ruler with bar numbers), and ONE track. The blocks you set down come along its top lane to the playhead; each one you
+  // catch drops into the stack under it, and every instrument, once its four bars are in, stays there as a layer of its own
+  // colour, so the stack grows from the bottom as the beat builds. Everything square, nothing greyed out.
+  const tk = Rm.tracks, x0 = 22, x1 = W - 22, PW = x1 - x0, y0 = ROOM.band + 4, y1 = H - 4;
+  const hdW = 64, lx = x0 + hdW, px = lx + 34;
   const v = (x1 - 6 - px) / (TRAVEL * spb), bpx = spb * v;
-  const grow = tk.map(([at]) => Math.max(0, Math.min(1, (b - (at - TRAVEL)) / 0.6))), rowsF = grow.reduce((a, c) => a + c, 0);
-  const cy = (ROOM.band + 1 + H) / 2, ph = ROOM.head + Math.max(1, rowsF) * rh + 3, y0 = Math.round(cy - ph / 2), ry = y0 + ROOM.head + 1;
-  const recK = tk.reduce((m, tr, k) => (b >= tr[0] ? k : m), -1), shown = grow.filter(q => q > 0).length;
+  const recK = tk.reduce((m, tr, k) => (b >= tr[0] ? k : m), -1);
   const rowOf = beat => { let k = 0; tk.forEach((tr, i) => { if (beat >= tr[0]) k = i; }); return k; };
-  const colOf = lane => (lane ? '#6fd8ff' : '#ff9cc2');
-  // the window: a soft shadow, the frame (corners cut), its title bar, and a ruler with the bar numbers going by
-  const ry0 = ry, rowsH = Math.max(1, rowsF) * rh;
-  g.save(); g.globalAlpha = 0.45; R(x0 + 3, y0 + 4, PW, ph, '#000000'); g.restore();
-  R(x0, y0 - 1, PW, ph + 2, '#2c3858'); R(x0 - 1, y0, PW + 2, ph, '#2c3858'); R(x0, y0, PW, ph, '#111827');
-  R(x0, y0, PW, 8, '#1a2238'); R(x0, y0, PW, 1, '#3a4870'); R(x0, y0 + 8, PW, 1, '#0a0e18');
-  R(x0 + 4, y0 + 3, 2, 2, '#ff5f57'); R(x0 + 8, y0 + 3, 2, 2, '#febc2e'); R(x0 + 12, y0 + 3, 2, 2, '#28c840');
-  R(x0, y0 + 9, PW, 3, '#0d1322');
-  g.save(); g.font = '700 6px sans-serif'; g.fillStyle = '#9aa6c8';
-  g.fillText(stopped ? (b - Rm.stop >= 4.8 ? '■ 정지  새 비트.prj' : '■ 정지') : '● 녹음  제목 없음.prj', x0 + 20, y0 + 6);
-  g.fillStyle = '#55607e'; g.fillText(`트랙 ${Math.max(0, recK + 1)}/${tk.length}`, x1 - 34, y0 + 6);
-  g.restore();
-  g.save(); g.beginPath(); g.rect(lx, y0 + 9, x1 - 2 - lx, 3); g.clip();
-  for (let bb = Math.floor(b) - 4; bb < b + 8; bb++) { if (bb < Rm.from) continue; const x = Math.round(px + (bb - b) * bpx); R(x, y0 + 10 + ((bb - Rm.from) % 4 ? 1 : 0), 1, (bb - Rm.from) % 4 ? 1 : 2, (bb - Rm.from) % 4 ? '#2a3452' : '#5a6890'); }
-  g.restore();
-  // the rows: name tab (lit when it plays), a red dot while it is recording, a level meter at the right
+  const TCOL = ['#ffe27a', '#e8e4f0', '#ff7a6a', '#6fd8ff', '#a98cff', '#8fd694', '#ff9cc2', '#fff2b0'];
+  const layers = tk.map(([at]) => Math.max(0, Math.min(1, (b - (at + 16)) / 0.5)));
+  // the window
+  g.save(); g.globalAlpha = 0.45; R(x0 + 3, y0 + 3, PW, y1 - y0, '#000000'); g.restore();
+  R(x0 - 1, y0 - 1, PW + 2, y1 - y0 + 2, '#2c3858'); R(x0, y0, PW, y1 - y0, '#121826');
+  // title bar: the three dots, the transport (record lit while it records), the project, the tempo and the clock
+  R(x0, y0, PW, 11, '#1b2236'); R(x0, y0, PW, 1, '#3a4870'); R(x0, y0 + 11, PW, 1, '#0a0e18');
+  R(x0 + 4, y0 + 4, 3, 3, '#ff5f57'); R(x0 + 9, y0 + 4, 3, 3, '#febc2e'); R(x0 + 14, y0 + 4, 3, 3, '#28c840');
+  const recOn = !stopped && Math.floor(nowMs / 400) % 2 === 0;
+  R(x0 + 24, y0 + 2, 9, 7, '#0e1320'); R(x0 + 27, y0 + 4, 3, 3, recOn ? '#ff4d3d' : '#5a2a2a');
+  R(x0 + 35, y0 + 2, 9, 7, '#0e1320'); g.fillStyle = stopped ? '#55607e' : '#8fd694'; g.beginPath(); g.moveTo(x0 + 38, y0 + 3); g.lineTo(x0 + 42, y0 + 5.5); g.lineTo(x0 + 38, y0 + 8); g.fill();
+  R(x0 + 46, y0 + 2, 9, 7, '#0e1320'); R(x0 + 49, y0 + 4, 3, 3, stopped ? '#e8e4f0' : '#55607e');
   g.save(); g.font = '700 6px sans-serif';
-  for (let k = 0; k < shown; k++) {
-    const [at, name, pat, lane] = tk[k], y = ry + k * rh, rec = !stopped && k === recK && b < at + 16;
-    const live = b >= at, cell = Math.floor((b - at) * 4), on = pat[((cell % pat.length) + pat.length) % pat.length] === 'x', hitNow = live && !rec && !stopped && on && ((b - at) * 4) % 1 < 0.8;
-    g.globalAlpha = grow[k];
-    R(x0 + 2, y, PW - 4, rh - 1, rec ? '#1c2a46' : k % 2 ? '#141d30' : '#162034'); R(x0 + 2, y + rh - 1, PW - 4, 1, '#0c111e');
-    R(x0 + 3, y + 1, 26, rh - 3, live ? colOf(lane) : '#2e3650'); R(x0 + 3, y + 1, 26, 1, live ? '#ffffff' : '#3a4462'); R(x0 + 3, y + rh - 3, 26, 1, live ? (lane ? '#3a9ac8' : '#c86a92') : '#262c44');
-    g.globalAlpha = grow[k] * (live ? (hitNow || (rec && press > 0) ? 1 : 0.7) : 0.6); g.fillStyle = '#121a2c'; g.fillText(name, x0 + 5, y + 6); g.globalAlpha = grow[k];
-    if (rec && Math.floor(nowMs / 350) % 2) R(x0 + 25, y + 3, 2, 2, '#ff5040');
-    const lvl = !live || stopped ? 0 : rec ? press : hitNow ? 1 - (((b - at) * 4) % 1) : 0.12;
-    R(x1 - 6, y + 1, 3, rh - 3, '#0a0e18'); const lh = Math.round((rh - 3) * lvl); if (lh > 0) R(x1 - 6, y + rh - 2 - lh, 3, lh, lh > rh - 5 ? '#ffe27a' : '#8fd694');
-    if (live && b < at + 1 && !post) { g.globalAlpha = (1 - (b - at)) * 0.5; R(x0 + 2, y, PW - 4, rh - 1, '#ffffff'); }
+  g.fillStyle = '#9aa6c8'; g.fillText(stopped && b - Rm.stop >= 4.8 ? '새 비트.prj' : '제목 없음.prj', x0 + 62, y0 + 8);
+  const secs = Math.max(0, (Math.min(b, Rm.stop) - Rm.from) * spb), clock = `${String(Math.floor(secs / 60)).padStart(2, '0')}:${(secs % 60).toFixed(1).padStart(4, '0')}`;
+  R(x1 - 78, y0 + 2, 44, 7, '#0a0e18'); g.fillStyle = '#ffe27a'; g.fillText(clock, x1 - 74, y0 + 8);
+  g.fillStyle = '#9aa6c8'; g.fillText('90 BPM', x1 - 28, y0 + 8);
+  g.restore();
+  // the ruler: bar numbers going by
+  const ryR = y0 + 12; R(x0, ryR, PW, 8, '#0e1322'); R(lx, ryR, 1, y1 - ryR, '#0a0e18');
+  g.save(); g.beginPath(); g.rect(lx + 1, ryR, x1 - lx - 1, 8); g.clip(); g.font = '600 5px sans-serif';
+  for (let bb = Math.floor(b) - 8; bb < b + 12; bb++) {
+    if (bb < Rm.from) continue; const x = Math.round(px + (bb - b) * bpx), bar = (bb - Rm.from) % 4 === 0;
+    R(x, ryR + (bar ? 3 : 6), 1, bar ? 5 : 2, bar ? '#5a6890' : '#2a3452');
+    if (bar) { g.fillStyle = '#7a86a8'; g.fillText(String((bb - Rm.from) / 4 + 1), x + 2, ryR + 6); }
+  }
+  g.restore();
+  // the track: its header (the instrument going in now, its colour, a meter, the layer count) and its body
+  const ty = ryR + 9, tb = y1 - 1, th = tb - ty, laneH = 13, stackY = ty + laneH + 2, bandH = Math.max(3, Math.floor((tb - stackY - 1) / tk.length));
+  R(x0 + 1, ty, hdW - 1, th, '#182036'); R(x0 + 1, ty, hdW - 1, 1, '#24304c');
+  const cur = Math.max(0, recK), curCol = recK >= 0 ? TCOL[cur] : '#55607e';
+  R(x0 + 4, ty + 3, 4, 8, curCol);
+  g.save(); g.font = '700 7px sans-serif'; g.fillStyle = '#e8ecf8'; g.fillText(recK >= 0 ? tk[cur][1] : '—', x0 + 11, ty + 10);
+  g.font = '600 5px sans-serif'; g.fillStyle = '#7a86a8'; g.fillText(`레이어 ${Math.max(0, layers.filter(q => q > 0).length)}/${tk.length}`, x0 + 5, ty + 20);
+  if (!stopped && recK >= 0 && b < tk[recK][0] + 16 && Math.floor(nowMs / 350) % 2) R(x0 + 52, ty + 4, 4, 4, '#ff4d3d');
+  g.restore();
+  // the layer swatches stacked in the header, bottom up, as they go in
+  for (let k = 0; k < tk.length; k++) if (layers[k] > 0) { g.globalAlpha = layers[k]; R(x0 + 5 + k * 7, tb - 6, 6, 4, TCOL[k]); g.globalAlpha = 1; }
+  // the meter
+  const lvl = stopped ? 0 : Math.min(1, 0.25 + press * 0.75 + 0.15 * beatK);
+  R(x1 - 6, ty + 1, 3, th - 2, '#0a0e18'); const lh = Math.round((th - 2) * lvl); if (lh > 0) R(x1 - 6, tb - 1 - lh, 3, lh, lh > th - 6 ? '#ffe27a' : '#8fd694');
+  // the body: the lane on top, the stack under it
+  R(lx + 1, ty, x1 - 8 - lx, laneH, '#162034'); R(lx + 1, ty + laneH, x1 - 8 - lx, 1, '#0a0e18'); R(lx + 1, stackY - 1, x1 - 8 - lx, tb - stackY + 1, '#10172a');
+  g.save(); g.beginPath(); g.rect(lx + 1, ty, x1 - 8 - lx, th); g.clip();
+  for (let bb = Math.floor(b) - 8; bb < b + 12; bb++) { if (bb < Rm.from || (bb - Rm.from) % 4) continue; R(Math.round(px + (bb - b) * bpx), ty, 1, th, '#222c48'); }
+  const bandY = k => tb - 1 - (k + 1) * bandH;
+  // the layers: each instrument's pattern as little squares along its band, once its four bars are in
+  for (let k = 0; k < tk.length; k++) {
+    if (layers[k] <= 0) continue;
+    const [at, , pat] = tk[k], y = bandY(k);
+    g.globalAlpha = layers[k]; R(lx + 1, y, x1 - 8 - lx, bandH - 1, TCOL[k] + '22');
+    for (let c = Math.floor((b - 8) * 4); c <= Math.ceil((b + TRAVEL + 0.5) * 4); c++) {
+      const bb = c / 4; if (bb < at || bb >= Rm.stop) continue;
+      const pc = ((Math.round((bb - at) * 4) % pat.length) + pat.length) % pat.length; if (pat[pc] !== 'x') continue;
+      R(Math.round(px + (bb - b) * bpx) - 1, y, 3, bandH - 1, TCOL[k]);
+    }
     g.globalAlpha = 1;
   }
-  g.restore();
-  // a clip: a small region with rounded ends and a little waveform in it
-  const clip = (x, y, w, h, col, a, seed) => { g.globalAlpha = a; R(x + 1, y, w - 2, h, col); R(x, y + 1, 1, h - 2, col); R(x + w - 1, y + 1, 1, h - 2, col); R(x + 1, y, w - 2, 1, '#ffffff');
-    for (let k = 1; k < w - 1; k++) { const amp = Math.max(1, Math.round((h - 3) / 2 * (0.4 + 0.6 * Math.abs(Math.sin(seed * 3.1 + k * 1.7))) * (1 - k / w * 0.6))); R(x + k, y + Math.floor(h / 2) - Math.floor(amp / 2) + 1, 1, amp, '#121a2c'); }
-    g.globalAlpha = 1; };
-  g.save(); g.beginPath(); g.rect(lx, ry, x1 - 8 - lx, rowsH); g.clip();
-  // the bar lines going by
-  for (let bb = Math.floor(b) - 4; bb < b + 8; bb++) { if (bb < Rm.from || (bb - Rm.from) % 4) continue; R(Math.round(px + (bb - b) * bpx), ry, 1, rowsH, '#253150'); }
-  // the recorded loops: each row's pattern after its four bars, up to the stop
-  for (let k = 0; k < shown; k++) {
-    const [at, , pat, lane] = tk[k], y = ry + k * rh;
-    for (let c = Math.floor((b - 2) * 4); c <= Math.ceil((b + TRAVEL + 0.5) * 4); c++) {
-      const bb = c / 4; if (bb < at + 16 || bb >= Rm.stop) continue;
-      const pc = ((Math.round((bb - at) * 4) % pat.length) + pat.length) % pat.length; if (pat[pc] !== 'x') continue;
-      clip(Math.round(px + (bb - b) * bpx) - 3, y + 1, 7, rh - 3, colOf(lane), (bb <= b ? 0.5 : 0.3) * grow[k], c);
-    }
-  }
-  // the clips you set down: on the row of the instrument going in
+  // the blocks you set down: square, the colour of the instrument going in; caught ones drop into its band
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160), miss = nowMs - FX.lastMiss < 260;
   for (const n of notes) {
     if (n.beat < Rm.from) continue; if (!post && t < n.place) break;
-    const x = px + (n.arr - t) * v; if (x < lx - 10) continue;
-    const y = ry + rowOf(n.beat) * rh + 1, col = n.state === 'miss' ? '#d8463b' : colOf(n.lane);
-    const done = n.state === 'hit', ha = done ? t - n.hitAt : 9;
-    clip(Math.round(x - 5), y, 10, rh - 3, col, done ? Math.max(0.55, 1 - ha * 1.2) : n.state === 'miss' ? 0.6 : 1, n.i);
-    if (done && ha < 0.12) { g.globalAlpha = 1 - ha / 0.12; R(Math.round(x - 7), y - 2, 14, rh + 1, '#ffffff'); g.globalAlpha = 1; }
+    const x = px + (n.arr - t) * v; if (x < lx - 12) continue;
+    const k = rowOf(n.beat), col = n.state === 'miss' ? '#d8463b' : TCOL[k];
+    if (n.state === 'hit') {
+      const ha = t - n.hitAt, q = Math.min(1, ha / 0.28), yy = lerp(ty + 2, bandY(k), q * q);
+      if (layers[k] >= 1 && q >= 1) continue;   // (in the layer now, drawn with it)
+      R(Math.round(x) - 3, Math.round(yy), 7, Math.max(bandH - 1, Math.round(lerp(9, bandH - 1, q))), col);
+      if (ha < 0.12) { g.globalAlpha = 1 - ha / 0.12; R(Math.round(x) - 5, ty, 11, laneH, '#ffffff'); g.globalAlpha = 1; }
+    } else {
+      g.globalAlpha = n.state === 'miss' ? 0.6 : 1;
+      R(Math.round(x) - 4, ty + 2, 9, 9, col); R(Math.round(x) - 4, ty + 2, 9, 1, '#ffffff'); R(Math.round(x) - 4, ty + 10, 9, 1, '#00000055');
+      g.globalAlpha = 1;
+    }
   }
   g.restore();
-  // the playhead: a line with a little flag on the ruler
+  // the playhead: a line down the track with a flag on the ruler
   const phc = miss ? '#ff5040' : flash > 0 ? '#ffffff' : '#ffe27a';
-  R(px, y0 + 9, 1, rowsH + 4, phc); R(px - 2, y0 + 9, 5, 1, phc); R(px - 1, y0 + 10, 3, 1, phc);
-  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(px - 6, ry, 13, rowsH, '#fff2b0'); g.restore(); }
+  R(px, ryR + 2, 1, tb - ryR - 2, phc); R(px - 2, ryR + 1, 5, 2, phc);
+  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(px - 6, ty, 13, laneH, '#fff2b0'); g.restore(); }
   // at the stop: saving it, over the app
   if (stopped) {
     const q = b - Rm.stop, name = q < 1.5 ? '하은'.slice(0, Math.min(2, Math.floor(q * 3) + 1)) : q < 2.6 ? (q < 2.1 ? '하' : '') : q < 4.5 ? '새 비트'.slice(0, Math.min(4, Math.floor((q - 2.6) * 4) + 1)) : '새 비트';
