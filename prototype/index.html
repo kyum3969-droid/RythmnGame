@@ -1327,14 +1327,14 @@ const LEVELS = [
     // the walk home (drawCommute15, 217-232): the warehouse fades out (215.5-217), he walks home before dawn humming his tune
     // and planning the beat, breaks into a run (run), and is gone; his laptop's screen comes up in the dark (boot); his room
     commute: { from: 217, run: 226.6, boot: 229.5, x0: -16, x1: 250 },
-    room: { from: 232, stop: 360, tutorial: { card: [232.6, 237], until: 248 },
+    room: { from: 232, stop: 360, tutorial: { card: [232.6, 235.6], take: [232, 248], need: 9, hold: 2 },
       tracks: [[232, '시계', 'x...x...x...x...', 0], [248, '피아노', 'x.....x...x.....', 0], [264, '킥', 'xx......x.......xx......x.....x.', 1], [280, '스네어', '....x...x...x.x.', 1],
                [296, '베이스', 'x.......x.....x.', 1], [312, '기타', 'x.....x...x.x...', 0], [328, '멜로디', 'x...x.x.x...x...x...x...x.x...x.', 0], [344, '반짝이', '..x.......x.x.....x...x.....x...', 0]],
       memories: [[248, 'face'], [264, 'catch'], [280, 'cap'], [296, 'watch'], [312, 'look'], [344, 'face']] },
     act: { lookUp: [[56, 59], [96, 99], [162, 165]], upAtDrops: true, alarmAt: [[92, 93.5], [164.6, 166], [13.4, 15], [23.7, 25.5]] },
     camPlay: [[0.3, 4, { x: 80, y: 96, k: 1.5 }], [4, 13.2, { x: 58, y: 104, k: 2.6 }], [13.2, 18, { x: 104, y: 80, k: 2.6 }], [18, 21, { x: 102, y: 82, k: 2.2 }], [21, 30.6, { x: 122, y: 90, k: 1.6 }],
       [91.5, 95, { x: 84, y: 100, k: 1.4 }], [95, 98.5, { x: 58, y: 104, k: 2.4 }], [98.5, 102, { x: 104, y: 84, k: 2.4 }]],
-    cutscene: [[0, 39.5], [91.5, 102], [202, 234]],   // (no bars at the save: they would cover the app's bottom rows)
+    cutscene: [[0, 39.5], [91.5, 102], [202, 232]],   // (no bars at the save: they would cover the app's bottom rows)
     devMarks: [[0, '처음 · 만남'], [15, '여운'], [31, '봄바람'], [40, 'Pink Belt'], [80, '자랑'], [92, '받아내기'], [104, '후렴 1'], [136, '2절'], [160, '빌드업'], [168, '마지막 후렴'], [202, '퇴근길'], [217, '귀갓길'], [232, '지우의 방'], [248, '피아노'], [264, '킥'], [280, '스네어'], [296, '베이스'], [312, '기타'], [328, '멜로디'], [344, '반짝이']],
     // phase 1 (8 cells a bar): upper 지우 (in the choruses his heartbeat: a beat and its 'and'), lower 하은 and his boxes
     // that fall onto her belt while he stares at her ('d'); phase 2 (16 cells a bar): the clips on his timeline, four bars of
@@ -3793,7 +3793,8 @@ function drawRoom15(t, nowMs, b, post) {
   // the tracks: one row per instrument, added at the bottom as each one goes in (they share the height, so the stack of
   // rows fills up as the beat builds); the row being recorded is lit, with a red dot; nothing is shown before it starts
   const ty = ryR + 9, tb = y1 - 1, th = tb - ty;
-  const grow = tk.map(([at]) => Math.max(0, Math.min(1, (b - (at - TRAVEL * 0.5)) / 0.6)));
+  const gate = Rm.tutorial && !post && !RT.passed ? Rm.tutorial.take[1] : Infinity;   // (the rows past the tutorial's take wait for it)
+  const grow = tk.map(([at]) => at >= gate ? 0 : Math.max(0, Math.min(1, (b - (at - TRAVEL * 0.5)) / 0.6)));
   const rowsF = Math.max(1, grow.reduce((a, c) => a + c, 0)), rowH = Math.min(16, th / rowsF);
   const rowY = k => ty + grow.slice(0, k).reduce((a, c) => a + c, 0) * rowH;
   R(x0 + 1, ty, hdW - 1, th, '#151c30');
@@ -3826,7 +3827,7 @@ function drawRoom15(t, nowMs, b, post) {
   for (let bb = Math.floor(b) - 8; bb < b + 12; bb++) { if (bb < Rm.from || (bb - Rm.from) % 4) continue; R(Math.round(px + (bb - b) * bpx), ty, 1, th, '#222c48'); }
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160), miss = nowMs - FX.lastMiss < 260;
   for (const n of notes) {
-    if (n.beat < Rm.from) continue; if (!post && t < n.place) break;
+    if (n.beat < Rm.from) continue; if (!post && t < n.place) break; if (!post && roomLocked(n)) continue;
     const x = px + (n.arr - t) * v; if (x < lx - 12) continue;
     const k = rowOf(n.beat), y = rowY(k), h = rowH * grow[k], sz = Math.max(3, Math.min(10, Math.round(h) - 3)), col = n.state === 'miss' ? '#d8463b' : TCOL[k];
     const done = n.state === 'hit', ha = done ? t - n.hitAt : 9;
@@ -3837,23 +3838,55 @@ function drawRoom15(t, nowMs, b, post) {
     g.globalAlpha = 1;
   }
   g.restore();
-  // the tutorial, over the app (it doesn't stop anything): what this is and what to do while the room comes up, then a
-  // '▼ 지금!' over the playhead for each of the first blocks until one is caught, and '+ 악기' as each new row goes in
+  // the tutorial, over the app: the first instrument is a take you have to get (roomTutTick). A card says what this is
+  // (on a retake: how the last one went and what it needs); then a strip counts the blocks caught against the ones needed;
+  // the first blocks stop at the playhead until you press ('지금 누르세요!'); '▼ 지금!' over the playhead for every block of
+  // the take; on getting it, '녹음 완료'; then '+ 악기' as each new row goes in
   const tut = Rm.tutorial;
   if (tut && !post) {
-    const card = Math.min(1, Math.max(0, (b - tut.card[0]) / 0.5)) * Math.min(1, Math.max(0, (tut.card[1] - b) / 0.6));
-    if (card > 0) {
-      const cw = 210, ch = 34, cx = Math.round((W - cw) / 2), cy = ROOM.band - ch - 8;   // (over the room, above the app, so the app stays in view)
-      g.save(); g.globalAlpha = card; R(cx - 1, cy - 1, cw + 2, ch + 2, '#ffd27a'); R(cx, cy, cw, ch, '#0c111e');
-      g.font = '700 8px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText('지우의 작업 화면', cx + 8, cy + 11);
-      g.font = '600 7px sans-serif'; g.fillStyle = '#e8ecf8'; g.fillText('블록이 노란 선에 닿을 때 누르면 그 악기가 녹음돼요.', cx + 8, cy + 21);
-      g.fillStyle = '#9aa6c8'; g.fillText('한 악기를 네 마디 채우면, 다음 악기 트랙이 아래에 쌓여요.', cx + 8, cy + 30);
+    const held = GUIDE.on && GUIDE.room, cw = 226, cx = Math.round((W - cw) / 2);
+    const box = (y, h, edge, a) => { R(cx - 1, y - 1, cw + 2, h + 2, edge); R(cx, y, cw, h, '#0c111e'); };
+    const card = held ? 0 : Math.min(1, Math.max(0, (b - tut.card[0]) / 0.5)) * Math.min(1, Math.max(0, (tut.card[1] - b) / 0.6));
+    if (card > 0 && !RT.passed) {
+      const ch = 34, cy = ROOM.band - ch - 8;   // (over the room, above the app, so the app stays in view)
+      g.save(); g.globalAlpha = card;
+      if (RT.take === 1) {
+        box(cy, ch, '#ffd27a'); g.font = '700 8px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText('지우의 작업 화면 · 첫 악기: 시계', cx + 8, cy + 11);
+        g.font = '600 7px sans-serif'; g.fillStyle = '#e8ecf8'; g.fillText('블록이 노란 선에 닿는 순간 누르면 그 소리가 녹음돼요.', cx + 8, cy + 21);
+        g.fillStyle = '#9aa6c8'; g.fillText(`${tut.need}개 이상 맞혀야 다음 악기 트랙이 열려요.`, cx + 8, cy + 30);
+      } else {
+        box(cy, ch, '#ff7a6a'); g.font = '700 8px sans-serif'; g.fillStyle = '#ff9a8a'; g.fillText(`↺ 다시 녹음 · 테이크 ${RT.take}`, cx + 8, cy + 11);
+        g.font = '600 7px sans-serif'; g.fillStyle = '#e8ecf8'; g.fillText(`지난 테이크 ${RT.failHits}/${roomTake().length} · ${tut.need}개 이상 맞혀야 넘어가요.`, cx + 8, cy + 21);
+        g.fillStyle = '#9aa6c8'; g.fillText('블록이 노란 선에 겹치는 순간에 누르세요. 미리 누르면 빗나가요.', cx + 8, cy + 30);
+      }
       g.restore();
     }
-    if (b < tut.until && !notes.some(n => n.beat >= Rm.from && n.state === 'hit')) {
-      const nx = notes.find(n => n.state === 'pending' && n.beat >= Rm.from && Math.abs((n.arr - t) / spb) < 0.6);
+    // the count: the take's blocks caught, out of the ones needed
+    const take = roomTake(), got = take.filter(n => n.state === 'hit').length;
+    if (!RT.passed && !held && b >= tut.card[1] - 0.6 && b < tut.take[1]) {
+      const a = Math.min(1, (b - tut.card[1] + 0.6) / 0.6), cy = ROOM.band - 18;
+      g.save(); g.globalAlpha = a; R(cx + 38, cy - 1, cw - 76, 12, '#2c3858'); R(cx + 39, cy, cw - 78, 10, '#0c111e');
+      g.font = '700 7px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText(`● 시계 녹음 중 ${Math.min(got, tut.need)} / ${tut.need}`, cx + 44, cy + 7.5);
+      for (let k = 0; k < tut.need; k++) R(cx + 122 + k * 7, cy + 3, 5, 5, k < got ? '#ffe27a' : '#2a3452');
+      g.restore();
+    }
+    if (RT.passed && RT.passAt != null && b - RT.passAt < 3.2) {
+      const q = b - RT.passAt, a = Math.min(1, q / 0.25) * Math.min(1, (3.2 - q) / 0.6), cy = ROOM.band - 18;
+      g.save(); g.globalAlpha = a; R(cx + 38, cy - 1, cw - 76, 12, '#8fd694'); R(cx + 39, cy, cw - 78, 10, '#0c111e');
+      g.font = '700 7px sans-serif'; g.fillStyle = '#8fd694'; g.fillText('✓ 시계 녹음 완료! 다음 악기가 쌓여요', cx + 58, cy + 7.5); g.restore();
+    }
+    // held at a block: everything else dimmed, the block and the playhead lit, and what to do
+    if (held) {
+      const pulse = 0.6 + 0.4 * Math.sin(nowMs / 130);
+      g.save(); g.globalAlpha = 0.55; R(0, 0, W, ROOM.band, '#000000'); g.restore();
+      const ch = 30, cy = ROOM.band - ch - 8; box(cy, ch, '#ffe27a');
+      g.save(); g.font = '700 9px sans-serif'; g.fillStyle = '#ffe27a'; g.globalAlpha = pulse; g.fillText('지금 누르세요!', cx + 8, cy + 13); g.globalAlpha = 1;
+      g.font = '600 7px sans-serif'; g.fillStyle = '#e8ecf8'; g.fillText('블록이 노란 선에 닿았어요. 바로 이 순간이에요. (스페이스 · 터치)', cx + 8, cy + 24); g.restore();
+      g.save(); g.globalAlpha = pulse; R(px - 7, ty - 1, 15, 1, '#ffe27a'); R(px - 7, tb, 15, 1, '#ffe27a'); R(px - 7, ty - 1, 1, th + 2, '#ffe27a'); R(px + 7, ty - 1, 1, th + 2, '#ffe27a');
+      g.font = '700 8px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText('▼', px - 3, ty - 2); g.restore();
+    } else if (!RT.passed && b < tut.take[1]) {
+      const nx = take.find(n => n.state === 'pending' && Math.abs((n.arr - t) / spb) < 0.6);
       if (nx) { const q = 1 - Math.abs((nx.arr - t) / spb) / 0.6; g.save(); g.globalAlpha = q; g.font = '700 8px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText('▼ 지금!', px - 14, ty - 1); g.restore(); }
-      else if (b >= tut.card[1]) { g.save(); g.globalAlpha = 0.7; g.font = '600 6px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText('노란 선에서 누르기', px + 4, ty + Math.round(rowH) + 7); g.restore(); }
     }
     for (let k = 1; k < tk.length; k++) { const q = b - tk[k][0]; if (q < 0 || q > 2.4) continue;
       const a = Math.min(1, q / 0.3) * Math.min(1, (2.4 - q) / 0.5); g.save(); g.globalAlpha = a; g.font = '700 7px sans-serif'; g.fillStyle = TCOL[k];
@@ -9126,7 +9159,7 @@ const FEVER_LATE = 0.2, FEVER_EARLY = 0.15, FEVER_PERFECT = 0.08;
 function findTargetAny(t) {
   let best = null, bd = Infinity;
   for (const n of notes) {
-    if (n.state !== 'pending' || isAuto(n)) continue;
+    if (n.state !== 'pending' || isAuto(n) || roomLocked(n)) continue;
     const d = t - n.arr, fev = inFever(n.beat);
     if (d > (fev ? FEVER_LATE : WIN_M * winK(n))) continue;
     if (d < -WIN_M * WIN_OFF) break;
@@ -9627,7 +9660,7 @@ function skipPractice() {
   if (!TUT.on || state !== 'play') return;
   guideOff(); TUT.on = false; TUT.line = null; TUT.count = null; CAM.to = null; SLOW.on = false; stopHum(); stopHold(); loadLevel(TUT.lvl); startPlay();
 }
-function guideOff() { if (!GUIDE.on) return; guideResume(); $('guide').hidden = true; }
+function guideOff() { if (!GUIDE.on) return; if (GUIDE.room) { GUIDE.on = false; GUIDE.room = false; return; } guideResume(); $('guide').hidden = true; }
 $('tutskip').addEventListener('click', e => { e.stopPropagation(); skipPractice(); $('tutskip').blur(); });
 // ---------- developer mode ----------
 // The DEV button (corner, during a shift) opens a panel: jump to a part of the shift (the level's devMarks, else the starts of
@@ -9643,6 +9676,7 @@ function devSeek(beat) {
   if (state !== 'play' || !ctx) return;
   if (TUT.on) { skipPractice(); if (state !== 'play') return; }
   const tB = timeAt(beat);
+  guideOff(); roomTutReset(); if (L.room && L.room.tutorial && beat >= L.room.tutorial.take[1]) RT.passed = true;
   stopHold(); CAM.to = null; SLOW.on = false;
   notes.forEach(n => { const past = n.arr < tB - 0.02; Object.assign(n, { state: past ? 'hit' : 'pending', judge: past ? 'perfect' : null, hitAt: past ? n.arr : null, doneAt: past ? n.end : null, binSfx: past, missKind: '', jamFx: past, tossFx: past, letGo: false, holdSide: null }); });
   const done = notes.filter(n => !isAuto(n) && n.state === 'hit');
@@ -9745,6 +9779,56 @@ function drawSlowFx(now) {
   // letterbox bars while it is slowed
   const lb = Math.min(1, (now - SLOW.at) / 150) * Math.min(1, (SLOW.until - now) / 200) * 14; g.fillStyle = '#000'; g.fillRect(0, 0, W, lb); g.fillRect(0, H - lb, W, lb);
 }
+// 1-5's music app tutorial (L.room.tutorial: { card, take: [from, to], need, hold }): the first instrument is a take you
+// have to get. Its first `hold` blocks stop at the playhead (the clock held, the song faded) until you press; and when the
+// take ends with fewer than `need` of its blocks caught, it goes round again (four bars back, the song looped on the bar:
+// '다시 녹음'), the next instrument's blocks locked away until it is in. RT: the take's state
+const RT = { take: 1, passed: false, holds: 0, snap: null, rewindAt: null, failHits: 0, passAt: null };
+function roomTutReset() { Object.assign(RT, { take: 1, passed: false, holds: 0, snap: null, rewindAt: null, failHits: 0, passAt: null }); }
+const roomLocked = n => !!(L.room && L.room.tutorial && !RT.passed && n.beat >= L.room.tutorial.take[1]);
+const roomTake = () => { const tk = L.room.tutorial.take; return notes.filter(n => n.beat >= tk[0] && n.beat < tk[1] && !isAuto(n)); };
+const roomSong = () => L.songs ? L.songs.findIndex(sp => sp.sec === 'room') : -1;
+function roomTutTick(tR) {
+  const tut = L.room.tutorial, b = beatAt(tR); if (RT.passed || b < tut.take[0] - 1) return;
+  if (!RT.snap && b >= tut.take[0]) RT.snap = { ...stats };
+  const take = roomTake(), hits = take.filter(n => n.state === 'hit').length;
+  if (hits >= tut.need) { RT.passed = true; RT.passAt = b; return; }
+  // the hold: the take's next block at the playhead, still to be pressed
+  if (!GUIDE.on && RT.holds < (RT.take === 1 || RT.failHits < 3 ? tut.hold : 0)) {
+    const n = take.find(m => m.state === 'pending' && !m.guided && tR >= m.arr - 0.004);
+    if (n) {
+      n.guided = true; RT.holds++; Object.assign(GUIDE, { on: true, room: true, t: n.arr, n, side: '' });
+      if (ctx) { const T = ctx.currentTime; mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(mus.gain.value, T); mus.gain.linearRampToValueAtTime(0.0001, T + 0.08); }
+      return;
+    }
+  }
+  // the take's end, short: the song looped on the bar line, then (on it) everything four bars back
+  const D = timeAt(tut.take[1]) - timeAt(tut.take[0]);
+  if (RT.rewindAt == null && b >= tut.take[1] - 0.25 && !GUIDE.on) {
+    RT.rewindAt = timeAt(tut.take[1]); RT.failHits = hits;
+    const si = roomSong(), Tb = T0 + RT.rewindAt;
+    if (si >= 0 && songReady(si) && SONG.src) { const old = SONG.src; SONG.src = null; try { old.stop(Tb); } catch (e) {} startSong(Tb, 0, si); }
+  }
+  if (RT.rewindAt != null && tR >= RT.rewindAt) {
+    T0 += D; const tN = tR - D;
+    for (const n of take) Object.assign(n, { state: 'pending', judge: null, hitAt: null, doneAt: null, guided: false, missKind: '' });
+    if (RT.snap) stats = { ...RT.snap };
+    evI = events.findIndex(e => e[0] >= tN); if (evI < 0) evI = events.length;
+    RT.take++; RT.holds = 0; RT.rewindAt = null;
+  }
+}
+// the press at a held block: judged on the held clock, and the take runs on from there, the song picked up where it was
+function roomResume() {
+  if (!GUIDE.on) return;
+  const tH = GUIDE.t;
+  if (ctx) {
+    T0 += songRaw(performance.now()) - tH;
+    const si = roomSong(), lat = ctx.outputLatency || ctx.baseLatency || 0, tB = tH + 0.06 + lat, T = T0 + tB;
+    mus.gain.cancelScheduledValues(ctx.currentTime); mus.gain.setValueAtTime(0.0001, ctx.currentTime); mus.gain.linearRampToValueAtTime(1, T + 0.04);
+    if (si >= 0 && songReady(si)) startSong(T, tB - timeAt(L.songs[si].at), si);
+  }
+  GUIDE.on = false; GUIDE.room = false; GUIDE.resuming = false;
+}
 // a guided practice run (drill.guide): as each box reaches its gate the shift stops (the clock is held, nothing new is
 // scheduled and the music fades out; the audio itself keeps running, so its clock stays true), the camera closes on that gate and a prompt says which side to press - the lower belt's box with the right hand,
 // the upper's with the left; the right press scans it and the shift runs on, the wrong side shakes the prompt
@@ -9759,6 +9843,7 @@ function guideTick(t) {
 }
 function guidePress(ts, key, lane) {
   if (GUIDE.resuming) return;
+  if (GUIDE.room) { onHit(ts, key, lane); roomResume(); return; }
   const el = $('guide');
   if (lane !== GUIDE.side) { el.classList.remove('no'); void el.offsetWidth; el.classList.add('no'); return; }
   CAM.to = null; onHit(ts, key, lane);   // judged on the held clock: right on the beat (a run's last hit then goes slow-mo)
@@ -9781,7 +9866,7 @@ function tutTick(t) {
   }
 }
 function startPlay() {
-  guideOff(); stopSong(); ensureAudio(); loadSongs(L); resetRun(); sceneReset();
+  guideOff(); roomTutReset(); stopSong(); ensureAudio(); loadSongs(L); resetRun(); sceneReset();
   $('title').hidden = true; $('result').hidden = true; $('select').hidden = true;
   events = buildEvents(); evI = 0; T0 = ctx.currentTime + 0.8;
   lastClock = ''; lastCombo = -1; lastSay = ''; lastHint = ''; bubble.hidden = true; bubble.textContent = ''; subEl.hidden = true; bubble.classList.remove('dots');
@@ -9878,6 +9963,7 @@ addEventListener('blur', () => { for (const k of [...held.keys()]) releaseKey(pe
 function frame(now) {
   requestAnimationFrame(frame);
   const active = state === 'play';
+  if (active && L.room && L.room.tutorial && !TUT.on) roomTutTick(songAt(now));
   const tReal = active ? songAt(now) : -99;
   const t = active ? viewTime(tReal, now) : -99;
   if (active) {
