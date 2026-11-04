@@ -999,8 +999,12 @@ const LEVELS = [
     // the song (a blues funk, "First Light on the Sand", 105.99 BPM): the two of them in one groove at last, the floor a lake
     // beach at dawn under a city's skyline (his Chicago and the beach in one picture), the backlog counted down to nothing.
     tempo: [[0, 105.99]], clock:'01:00', title:'합주', partners:['boss'], hints:false,
-    songs: [{ src: 'audio/2-3-first-light-on-the-sand.mp3', at: 124, lead: 0.365, gain: 0.9 }],
-    songStart: -1, songCues: [[124, 0]], songDuck: [124, 151, 1800, 0.8, 0.15], noCount: true, bareBand: true, hitKit: 'ticktock', subs: true,
+    // 마르코 alone (84-116): "Stumbling Through the Vault" (107.98 BPM, slowed to the game's tempo): its sneaking groove (its
+    // bars 4-7) then its last, wildest build (bars 31-34), so that its stop hit (bar 35) lands on the jam
+    songs: [{ src: 'audio/2-3-stumbling-through-the-vault.mp3', at: 84, until: 100, lead: 10.107, rate: 0.9816, gain: 0.7 },
+      { src: 'audio/2-3-stumbling-through-the-vault.mp3', at: 100, until: 116.5, lead: 70.119, rate: 0.9816, gain: 0.7 },
+      { src: 'audio/2-3-first-light-on-the-sand.mp3', at: 124, lead: 0.365, gain: 0.9 }],
+    songStart: -1, songCues: [[84, 0], [100, 1], [116.5, 'cut'], [124, 2]], songDuck: [124, 151, 1800, 0.8, 0.15], noCount: true, bareBand: true, hitKit: 'ticktock', subs: true,
     // ht: the cold war (each scanner its own note until `song`); cuts [from, to] (letterboxed, no boxes) and the camera's shots
     // in them ('b' 반장, 'v' 마르코, 'mid'); rush (반장 hurrying), lift (the heavy box), back (his back goes, he sits on it);
     // jam (마르코's four belts jam: the belts stop, boxes spill, until the song); plug (the boombox back in); taps (his pats on a
@@ -4842,13 +4846,15 @@ function htEvents(ev) {
   at(al[0], T => htWhine(T, timeAt(D.jam) - timeAt(al[0]), 60, 118, 0.008, 0.026, true));
   // 마르코 alone: a spy-caper cue in E minor (his panic as a heist), cut dead at the jam: a stab to start, a bass ostinato on
   // the eighths, ticking sixteenth hats, rim on 2 and 4, brass stabs every two bars, rising an octave and a snare roll at the end
+  // (the stand-in for the recorded spy track: quiet while that is loaded)
+  const at0 = at; { const at = (b, fn) => at0(b, T => { if (!(L.songs && L.songs.some((sp, k) => sp.at === al[0] && songReady(k)))) fn(T); });
   const E = [82.41, 82.41, 98, 82.41, 110, 82.41, 116.54, 123.47], N = al[1] - al[0];
   at(al[0], T => { brassStab(T, [164.8, 196, 246.9, 329.6], 0.35, 0.05); kick(T, 0.8); });
   for (let k = 0; k < N * 2; k++) { const bb = al[0] + k / 2, up = bb >= al[1] - 4 ? 2 : 1;
     at(bb, T => { bass(T, E[k % 8] * up, SPB * 0.42, 700); if (k % 2 === 0 && (k / 2) % 2 === 0) kick(T, 0.6); if ((k / 2) % 2 === 1 && k % 2 === 0) rim(T, 0.22); });
     for (const f of [0, 0.25]) at(bb + f, T => hat(T, f ? 0.025 : 0.04)); }
   for (let bar = 0; bar < N / 4; bar++) { const b0 = al[0] + bar * 4; if (bar % 2 === 1) for (const off of [1.5, 2]) at(b0 + off, T => brassStab(T, [164.8, 233.1, 293.7], 0.18, 0.035)); }
-  for (let k = 0; k < 16; k++) at(al[1] - 1 + k / 16, T => snare(T, 0.06 + k * 0.012));
+  for (let k = 0; k < 16; k++) at(al[1] - 1 + k / 16, T => snare(T, 0.06 + k * 0.012)); }
 }
 // The cold war is the warehouse under a chill; once the song is in, a lake beach at dawn under a city's skyline (반장's Chicago
 // and 마르코's beach in one picture) comes in from both ends of the floor at once and meets in the middle.
@@ -7457,7 +7463,7 @@ function buildEvents() {
     const quiet = inRange(b, L.quiet), doze = inRange(b, L.doze), phone = inRange(b, L.phone), dark = blackout(b);
     const E = (dt, fn) => ev.push([t + dt, fn]);
     if (L.sfx) for (const [sb, kind] of L.sfx) if (Math.floor(sb) === b) E((sb - b) * s, T => levelSfx(T, kind));
-    if (L.songCues) for (const [cb, cue] of L.songCues) if (Math.floor(cb) === b) E((cb - b) * s, cue === 'tape' ? T => tapeStop(T) : T => { if (songReady(cue)) startSong(T, 0, cue); });
+    if (L.songCues) for (const [cb, cue] of L.songCues) if (Math.floor(cb) === b) E((cb - b) * s, cue === 'tape' ? T => tapeStop(T) : cue === 'cut' ? T => songOut(T, 0.12) : T => { if (songReady(cue)) startSong(T, 0, cue); });
     if (L.mid && L.mid.shouts) for (const [sb, kind] of L.mid.shouts) if (Math.floor(sb) === b) E((sb - b) * s, T => levelSfx(T, kind));
     if (L.songDuck) { if (b === L.songDuck[0]) E(0, T => duckSong(T, true, 2 * s)); if (b === L.songDuck[1] - 1) E(0, T => duckSong(T, false, s)); }
     if (L.songStart === b) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(0)) startSong(T, 0, 0); });
@@ -8991,15 +8997,22 @@ function pochaSong() {
 }
 // start song i at audio time T, `into` seconds past its first downbeat
 function startSong(T, into = 0, i = 0) {
-  stopSong(); const sp = L.songs && L.songs[i], buf = sp && SONG.bufs[sp.src]; if (!buf || !ctx) return;
-  const off = sp.lead + into; if (off >= buf.duration) return;
+  const sp = L.songs && L.songs[i], buf = sp && SONG.bufs[sp.src]; if (!buf || !ctx) { stopSong(); return; }
+  if (SONG.src && T > ctx.currentTime + 0.005) songOut(T, 0.03); else stopSong();
+  const rate = sp.rate || 1, off = sp.lead + into * rate; if (off >= buf.duration) return;
   const s = ctx.createBufferSource(), gn = ctx.createGain(), lp = ctx.createBiquadFilter(), wet = ctx.createGain(); s.buffer = buf; gn.gain.value = sp.gain || 0.9;
   lp.type = 'lowpass'; lp.frequency.value = 20000; lp.Q.value = 0.5; wet.gain.value = 0;
   const cv = ctx.createConvolver(), vlp = ctx.createBiquadFilter(); cv.buffer = songVerbBuf(); vlp.type = 'lowpass'; vlp.frequency.value = 2400;
-  s.connect(lp); lp.connect(gn); lp.connect(wet); wet.connect(cv); cv.connect(vlp); vlp.connect(gn); gn.connect(mus);
+  s.connect(lp); lp.connect(gn); lp.connect(wet); wet.connect(cv); cv.connect(vlp); vlp.connect(gn); gn.connect(mus); s.playbackRate.value = rate;
   s.start(Math.max(T, ctx.currentTime), off); SONG.src = s; SONG.gn = gn; SONG.lp = lp; SONG.wet = wet; SONG.g0 = gn.gain.value;
   // started (or sought) inside the pushed-back stretch: start there
   const d = L.songDuck, bb = beatAt(timeAt(sp.at) + into); if (d && bb >= d[0] && bb < d[1]) { lp.frequency.value = d[2]; gn.gain.value = SONG.g0 * d[3]; wet.gain.value = d[4] || 0; }
+}
+// the playing song fades out over `dur` from T and stops (a hand-over to the next song, or a cut dead)
+function songOut(T, dur = 0.08) {
+  const s = SONG.src, gn = SONG.gn; if (!s) return; SONG.src = null;
+  gn.gain.cancelScheduledValues(T); gn.gain.setValueAtTime(gn.gain.value, T); gn.gain.linearRampToValueAtTime(0.0001, T + dur);
+  try { s.stop(T + dur + 0.01); } catch (e) {}
 }
 // a room for the song (a warehouse: a long, dark tail): decaying noise, made once per audio context
 function songVerbBuf() {
