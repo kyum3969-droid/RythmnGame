@@ -103,6 +103,7 @@ body{background:#0a0807;color:var(--ink);font-family:var(--body);font-size:15px;
 .judge{position:absolute;left:78.1%;top:29%;transform:translateX(-50%);font-family:var(--display);font-size:clamp(20px,5.4cqw,54px);line-height:1;
   text-shadow:0 2px 0 #000,0 0 12px rgba(0,0,0,.7);pointer-events:none;white-space:nowrap;text-align:center;opacity:0}
 .judge small{display:block;font-family:var(--mono);font-size:.36em;letter-spacing:.1em;margin-top:.35em;color:var(--ink)}
+.judge.gtrj{font-size:clamp(14px,3.2cqw,30px)}
 .judge.perfect{color:var(--ok)} .judge.good{color:var(--tube)} .judge.miss{color:var(--laser)}
 .judge.hook{color:#4fe3ff;text-shadow:0 3px 0 #000,0 0 14px rgba(79,227,255,.7)}
 .judge.both{color:#ffe9a8;font-size:clamp(26px,7cqw,72px);text-shadow:0 3px 0 #000,0 0 16px rgba(240,180,41,.85),0 0 36px rgba(255,255,255,.35)}
@@ -1286,11 +1287,13 @@ const LEVELS = [
     songStart: -1, songCues: [[21, 0]], noCount: true, bareBand: true, hitKit: 'ticktock', subs: true,
     // gtr: song (in from), call (the phone propped up from), tune ([beat, string]: each tuning note's string, 0 = high e),
     // labels (when each hand's label shows), dawn and sun (the sky), waves (the foam on the beat, the can), smile (from)
-    gtr: { song: 21, ring: 6.2, call: 7, tune: [[9, 5], [10.5, 4], [12, 3], [13.5, 2], [15, 1], [16.5, 0]],
-      dawn: [118, 200], sun: [136, 200], quiet: [122, 134], waves: 136, smile: 136, endTap: 216, end: 216, travel: 2.5 },
+    gtr: { song: 21, ring: 5.2, call: 7, tune: [[9, 5], [10.5, 4], [12, 3], [13.5, 2], [15, 1], [16.5, 0]],
+      dawn: [118, 200], sun: [136, 200], quiet: [122, 134], waves: 136, smile: 136, tapFrom: 19, approve: [58, 60], endTap: 216, end: 216, travel: 2.5 },
+    // the camera: in on 반장's hand on the rail as he shows the thumb; once the neck has slid away, the two of them on the sand
+    camPlay: [[19, 22.6, { x: 66, y: 60, k: 1.9 }], [216.6, 9999, { x: 200, y: 84, k: 1.6 }]],
     comfort: [],
     // the phone ringing (two rings), the call picking up
-    sfx: [[6.2, 'ring'], [6.75, 'ring']],
+    sfx: [[5.2, 'ring'], [5.75, 'ring']],
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 222,
     special:['해 뜨는 동안 친 줄', 'range', '맞춤', [136, 200]],
@@ -1315,37 +1318,37 @@ const LEVELS = [
         'xxxx.x.x', '.x.x.xxx', 'xxxx.x.x', '.x.x.xxx', 'xxxx.x.x', '.xxx.x.x', 'xxxx.x.x', '.xxx.x.x',
         'xxxx.x.x', '.xxx.x.x', '.x.x....', '.x......', '.x......', '.x...x..', 'x.......', '........'
     ],
-    hold: [[7, [{ who:'반장', text:'…라인은.', cam:{ x: 66, y: 56, k: 2.6 } }, { who:'마르코', text:'껐어요.', cam:{ x: 262, y: 74, k: 2.2 } }, { who:'반장', text:'……', cam:{ x: 66, y: 56, k: 2.6 } }, { who:'반장', text:'…천천히 하랬지, 끄랬냐.', cam:{ x: 66, y: 56, k: 2.6 } },
-                { who:'마르코', text:'…헤.', cam:{ x: 262, y: 74, k: 2.2 } }, { who:'마르코', text:'반장님, 이거 어떻게 쳐요?', cam:{ x: 262, y: 74, k: 2.2 } }, { who:'반장', text:'줄부터 맞춰. 하나씩.', cam:{ x: 66, y: 56, k: 2.6 } }]],
-           [18.5, [{ who:'반장', text:'엄지는 굵은 줄만. …내 손 봐.', cam:{ x: 66, y: 56, k: 2.6 } }]]],
-    say: [[5.5, '…이거 왜 이래요.', 2.5, 0, 'v'], [58, '…그래. 그거.', 3, 0, 'b']],
+    hold: [[7, [{ who:'반장', text:'…라인은.', cam:{ x: 66, y: 62, k: 2.6 } }, { who:'마르코', text:'껐어요.', cam:{ x: 240, y: 78, k: 2.2 } }, { who:'반장', text:'……', boss:'window', cam:{ x: 66, y: 62, k: 2.6 } }, { who:'반장', text:'…천천히 하랬지, 끄랬냐.', cam:{ x: 66, y: 62, k: 2.6 } },
+                { who:'마르코', text:'…헤.', face:'grin', cam:{ x: 240, y: 78, k: 2.2 } }, { who:'마르코', text:'반장님, 이거 어떻게 쳐요?', cam:{ x: 240, y: 78, k: 2.2 } }, { who:'반장', text:'줄부터 맞춰. 하나씩.', cam:{ x: 66, y: 62, k: 2.6 } }]],
+           [18.5, [{ who:'반장', text:'엄지는 굵은 줄만. …내 손 봐.', cam:{ x: 66, y: 62, k: 2.6 } }]]],
+    say: [[5.5, '…이거 왜 이래요.', 1.4, 0, 'v'], [58, '…그래. 그거.', 3, 0, 'b']],
     // the truck, the market, the beach (talk scenes), then the guitar
     intro: [
       { who:'', text:'', scene:'road', road:'out', silent: 3.4 },
       { who:'', text:'속초 가는 길.', scene:'road', road:'out' },
       { who:'', text:'', scene:'road', road:'in', silent: 1.6 },
-      { who:'기사', text:'졸리면 자요. 도착하면 깨울게.', scene:'road', road:'in' },
+      { who:'기사', text:'졸리면 자요. 도착하면 깨울게요.', scene:'road', road:'in' },
       { who:'', text:'', scene:'road', road:'in', silent: 2.6, cam:{ x: 334, y: 80, k: 2.0 } },
       { who:'', text:'', scene:'market', mkt:'open', silent: 2.8 },
       { who:'', text:'속초, 어시장.', scene:'market', mkt:'open' },
       { who:'마르코', text:'…시끄럽네.', scene:'market', mkt:'smile', cam:{ x: 78, y: 90, k: 2.2 } },
       { who:'', text:'', scene:'beach', beach:'sit', silent: 3.0 },
       { who:'', text:'바닷가, 동트기 전.', scene:'beach', beach:'sit' },
-      { who:'', text:'', scene:'beach', beach:'can', silent: 2.6, cam:{ x: 196, y: 96, k: 1.8 } },
-      { who:'', text:'', scene:'beach', beach:'back', silent: 2.0, cam:{ x: 214, y: 96, k: 1.8 } },
-      { who:'마르코', text:'…아.', scene:'beach', beach:'case', cam:{ x: 216, y: 100, k: 2.0 } },
-      { who:'', text:'', scene:'beach', beach:'open', silent: 2.2, cam:{ x: 198, y: 118, k: 3.4 } }],
+      { who:'', text:'', scene:'beach', beach:'can', silent: 2.6, cam:{ x: 206, y: 96, k: 1.9 } },
+      { who:'', text:'', scene:'beach', beach:'back', silent: 2.0, cam:{ x: 220, y: 100, k: 1.7 } },
+      { who:'마르코', text:'…아.', scene:'beach', beach:'case', cam:{ x: 214, y: 108, k: 1.9 } },
+      { who:'', text:'', scene:'beach', beach:'open', silent: 2.2, cam:{ x: 206, y: 118, k: 3.2 } }],
     // after the last chord: the beach and the call; then without a word his grin goes, he looks down at the guitar and pats
     // its body once (반장's pat), the waves, black
     outro: good => (good ? [
-      { who:'반장', text:'…바다는 어떠냐.', cam:{ x: 66, y: 56, k: 2.6 } },
-      { who:'마르코', text:'…시끄러워요. 좋아요.', cam:{ x: 262, y: 74, k: 2.2 } },
-      { who:'반장', text:'……', cam:{ x: 66, y: 56, k: 2.6 } }] : [
-      { who:'마르코', text:'…아직 잘 안 되네요.', cam:{ x: 262, y: 74, k: 2.2 } },
-      { who:'반장', text:'…처음엔 다 그래.', cam:{ x: 66, y: 56, k: 2.6 } },
-      { who:'반장', text:'……', cam:{ x: 66, y: 56, k: 2.6 } }]).concat([
-      { who:'반장', text:'…거기선 다들 노래하면서 일한다며.', cam:{ x: 66, y: 56, k: 2.6 } },
-      { who:'', text:'', silent: 4.2, gtr:'tap', cam:{ x: 262, y: 74, k: 2.2 } },
+      { who:'반장', text:'…바다는 어떠냐.', cam:{ x: 66, y: 62, k: 2.6 } },
+      { who:'마르코', text:'…시끄러워요. 좋아요.', cam:{ x: 240, y: 78, k: 2.2 } },
+      { who:'반장', text:'……', boss:'window', cam:{ x: 66, y: 62, k: 2.6 } }] : [
+      { who:'마르코', text:'…아직 잘 안 되네요.', cam:{ x: 240, y: 78, k: 2.2 } },
+      { who:'반장', text:'…처음엔 다 그래.', cam:{ x: 66, y: 62, k: 2.6 } },
+      { who:'반장', text:'……', boss:'window', cam:{ x: 66, y: 62, k: 2.6 } }]).concat([
+      { who:'반장', text:'…거기선 다들 노래하면서 일한다며.', boss:'window', cam:{ x: 66, y: 62, k: 2.6 } },
+      { who:'', text:'', silent: 4.2, gtr:'tap', cam:{ x: 240, y: 78, k: 2.2 } },
       { who:'', text:'', silent: 2.6, gtr:'fade', cam:{ x: 192, y: 70, k: 1.2 } }]),
   }
   ,{
@@ -3254,6 +3257,7 @@ function zzz(x, y, nowMs) {
 function faceFx(cx, top, ex, ey, pose, nowMs, hairColor, active) {
   const r = FX.react[pose.lane], age = nowMs - r.at;
   if (pose.doze) { R(ex - 1, ey + 1, 4, 1, C.ink); zzz(cx + 10, top + 2, nowMs); }
+  else if (pose.shut) R(ex - 1, ey + 1, 4, 1, C.ink);
   else if (pose.wince) { R(ex - 1, ey + 1, 4, 1, C.ink); R(cx - 9, top + 5, 2, 3, C.sweat); }
   else if (r.type === 'glance' && age < 700) { R(ex - 2, ey - 1, 5, 1, hairColor); R(ex - 1, ey + 1, 3, 1, C.ink); }
   else R(ex, ey, 2, 2, C.ink);
@@ -6076,13 +6080,15 @@ function sdDuck(T, who) { const lp = SONG.lp, gn = SONG.gn; if (!lp || !gn) retu
 
 // ---------- scenes for 2-4 and 2-5 (talk only: dialogue lines with scene:'hosp' | 'dock' | 'road' | 'market' | 'beach') ----------
 // a guitar (acoustic, the old one from 반장's locker): body centre (x, y), angle; rusty: dull strings
-function sdGuitar(x, y, rot, s = 1) {
-  g.save(); g.translate(Math.round(x), Math.round(y)); if (rot) g.rotate(Math.round(rot / (Math.PI / 2)) * (Math.PI / 2)); g.scale(s, s);
-  g.fillStyle = '#7a4a24'; g.beginPath(); g.ellipse(-4, 0, 8, 7, 0, 0, Math.PI * 2); g.fill(); g.beginPath(); g.ellipse(6, 0, 6, 5.5, 0, 0, Math.PI * 2); g.fill();
-  g.fillStyle = '#c8924e'; g.beginPath(); g.ellipse(-4, 0, 7, 6, 0, 0, Math.PI * 2); g.fill(); g.beginPath(); g.ellipse(6, 0, 5, 4.5, 0, 0, Math.PI * 2); g.fill();
-  g.fillStyle = '#2a1a10'; g.beginPath(); g.arc(2, 0, 2.4, 0, Math.PI * 2); g.fill();
-  R(-10, -1, 3, 3, '#3a2414'); R(10, -1.5, 26, 3, '#4a2e1a'); R(36, -2.5, 6, 5, '#3a2414'); for (let k = 0; k < 4; k++) R(14 + k * 5, -1.5, 1, 3, '#b8b0a0');
-  R(-8, -0.5, 46, 1, 'rgba(200,190,170,.55)');
+function sdGuitar(x, y, rot, s = 1, rise = 0) {
+  g.save(); g.translate(Math.round(x), Math.round(y)); if (rot) g.rotate(Math.round(rot / (Math.PI / 2)) * (Math.PI / 2));
+  const dk = '#6a3e1c', md = '#a8703a', lt = '#c8924e';
+  for (const [rx, ry, rw, rh, c] of [[-11, -4, 16, 9, dk], [-10, -6, 14, 13, dk], [-8, -7, 10, 15, dk], [3, -4, 10, 9, dk], [4, -5, 8, 11, dk],
+    [-10, -3, 14, 7, lt], [-9, -5, 12, 11, lt], [-7, -6, 8, 13, lt], [4, -3, 8, 7, lt], [5, -4, 6, 9, lt]]) R(rx, ry, rw, rh, c);
+  R(-9, 2, 12, 2, md); R(5, 2, 6, 1, md); R(1, -2, 4, 4, '#2a1a10'); R(-9, -1, 3, 2, '#3a2414');
+  for (let k = 0; k < 6; k++) { const yy = -1 - Math.round(rise * k / 6); R(12 + k * 4, yy, 4, 3, '#4a2e1a'); if (k % 2) R(13 + k * 4, yy, 1, 3, '#b8b0a0'); }
+  const hy = -2 - rise; R(36, hy, 6, 5, '#3a2414'); R(37, hy - 1, 1, 1, '#b8b0a0'); R(39, hy - 1, 1, 1, '#b8b0a0'); R(37, hy + 5, 1, 1, '#b8b0a0'); R(39, hy + 5, 1, 1, '#b8b0a0');
+  R(-8, 0, 20, 1, 'rgba(210,200,180,.5)');
   g.restore();
 }
 // 반장 sitting up in the hospital bed in a patient's gown, his cap off, the blanket over his legs. pose by the line's hosp act
@@ -6215,28 +6221,34 @@ function sdAmb(kind) {
 // 마르코 sitting: on the sand (knees up) or on a box (legs down off its edge); facing right unless mir; the guitar on his knee
 // (play), the can in his hand (can), the case on his back (caseBack); eyes shut, a wince, his hand where it's put (hand)
 function sdSitMarco(x, y, nowMs, opt) {
-  const pose = { ...standPose(0), hand: opt.hand || (opt.play ? { x: BOSS_X + 20, y: 127 + (opt.strum ? 2 : 0) } : { x: BOSS_X + 20, y: 132 }), sad: !opt.smile, dip: 8 + (opt.dip || 0), doze: !!opt.eyesShut, wince: !!opt.wince };
+  const pick = opt.thumb ? 3 : opt.finger ? -2 : 0, rest = opt.box ? { x: BOSS_X + 18, y: 140 } : { x: BOSS_X + 20, y: 132 };
+  const pose = { ...standPose(0), hand: opt.hand || (opt.play ? { x: BOSS_X + 15, y: 128 + pick } : rest), sad: !opt.smile, dip: 8 + (opt.dip || 0) + (opt.bob ? 1 : 0), shut: !!opt.eyesShut, wince: !!opt.wince };
   FX.react[2] = FX.react[2] || { type: '', at: nowMs };
   g.save(); if (opt.mir) { g.translate(x, 0); g.scale(-1, 1); g.translate(-x, 0); } g.translate(x - 150, y - 150);
-  if (opt.caseBack) sdCase(138, 148, 0);
-  g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(156, 150, 20, 3, 0, 0, Math.PI * 2); g.fill();
+  if (opt.caseBack) sdCase(138, 148 - (opt.caseLift || 0), 0);
+  if (!opt.box) { g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(156, 150, 20, 3, 0, 0, Math.PI * 2); g.fill(); }
   if (opt.box) { thick(146, 144, 164, 144, 7, '#3a4a6a'); thick(164, 144, 166, 162, 6, '#3a4a6a'); R(162, 161, 10, 4, '#1b1716'); thick(150, 145, 160, 145, 6, '#2c3a56'); thick(160, 145, 159, 161, 5, '#2c3a56'); R(156, 160, 8, 3, '#1b1716'); }
   else { thick(146, 144, 166, 132, 7, '#3a4a6a'); thick(166, 132, 170, 148, 6, '#3a4a6a'); R(166, 147, 10, 4, '#1b1716'); thick(150, 145, 160, 136, 6, '#2c3a56'); thick(160, 136, 162, 148, 5, '#2c3a56'); R(158, 147, 8, 3, '#1b1716'); }
   g.save(); g.beginPath(); g.rect(100, 0, 100, 146); g.clip();
-  drawActor('marco', 150, false, pose, nowMs, false, () => { if (opt.play) sdGuitar(BOSS_X + 18, 130, 0, 1); PARTNERS.marco.arm(pose); if (opt.can) { R(pose.hand.x - 1, pose.hand.y - 7, 4, 7, '#c8302a'); R(pose.hand.x - 1, pose.hand.y - 7, 4, 1, '#d8dde2'); R(pose.hand.x - 1, pose.hand.y - 4, 4, 2, '#f4efe2'); } });
+  drawActor('marco', 150, false, pose, nowMs, false, top => {
+    if (opt.play) { sdGuitar(BOSS_X + 12, 130, 0, 1, 6); const fx = BOSS_X + 34, fy = 126; const h = elbowArm(BOSS_X + 4, top + 22, fx, fy, '#d8b02e'); R(h.x - 2, h.y - 2, 4, 4, '#efc7a6'); }
+    PARTNERS.marco.arm(pose);
+    if (opt.can) { R(pose.hand.x - 1, pose.hand.y - 7, 4, 7, '#c8302a'); R(pose.hand.x - 1, pose.hand.y - 7, 4, 1, '#d8dde2'); R(pose.hand.x - 1, pose.hand.y - 4, 4, 2, '#f4efe2'); } });
   g.restore(); g.restore();
 }
 // you sitting (facing left, or right with mir): cross-legged on the sand, or on a box with your legs down; the can in hand
 function sdSitPlayer(x, groundY, nowMs, opt = {}) {
   g.save(); if (opt.mir) { g.translate(x, 0); g.scale(-1, 1); g.translate(-x, 0); } g.translate(x - PLAYER_X, groundY - 156);
-  g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(PLAYER_X, 156, 16, 3, 0, 0, Math.PI * 2); g.fill();
-  g.save(); g.beginPath(); g.rect(PLAYER_X - 30, 0, 60, 150); g.clip(); g.translate(0, 2); drawPlayer(0, nowMs); g.restore();
-  if (opt.box) { R(PLAYER_X - 14, 148, 18, 6, '#2c3440'); R(PLAYER_X - 16, 148, 6, 14, '#2c3440'); R(PLAYER_X - 8, 148, 6, 14, '#2c3440'); R(PLAYER_X - 18, 161, 8, 3, '#1b1716'); R(PLAYER_X - 10, 161, 8, 3, '#1b1716'); }
-  else { R(PLAYER_X - 15, 148, 30, 6, '#2c3440'); R(PLAYER_X - 15, 148, 30, 1, '#3a4452'); R(PLAYER_X - 17, 151, 5, 4, '#1b1716'); R(PLAYER_X + 12, 151, 5, 4, '#1b1716'); }
-  const hy = opt.canUp ? 124 : 138;
-  thick(PLAYER_X + 7, 116, PLAYER_X + 10, 140, 4, C.hoodie); R(PLAYER_X + 8, 139, 4, 4, C.skin);
-  thick(PLAYER_X - 7, 116, PLAYER_X - 13, hy, 4, C.hoodie); R(PLAYER_X - 15, hy - 1, 4, 4, C.skin);
-  if (opt.can) { R(PLAYER_X - 15, hy - 8, 4, 7, '#c8302a'); R(PLAYER_X - 15, hy - 8, 4, 1, '#d8dde2'); R(PLAYER_X - 15, hy - 5, 4, 2, '#f4efe2'); }
+  const P = PLAYER_X;
+  if (!opt.box) { g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(P - 4, 156, 18, 3, 0, 0, Math.PI * 2); g.fill(); }
+  if (opt.box) { R(P - 14, 148, 18, 6, '#2c3440'); R(P - 16, 148, 6, 14, '#2c3440'); R(P - 8, 148, 6, 14, '#2c3440'); R(P - 18, 161, 8, 3, '#1b1716'); R(P - 10, 161, 8, 3, '#1b1716'); }
+  else { thick(P + 2, 150, P - 14, 138, 7, '#2c3440'); thick(P - 14, 138, P - 18, 153, 6, '#2c3440'); R(P - 23, 152, 9, 4, '#1b1716'); thick(P - 1, 151, P - 10, 141, 6, '#222a34'); thick(P - 10, 141, P - 12, 153, 5, '#222a34'); R(P - 16, 152, 8, 3, '#1b1716'); }
+  g.save(); g.beginPath(); g.rect(P - 30, 0, 60, 150); g.clip(); g.translate(0, 2); drawPlayer(0, nowMs); g.restore();
+  const rch = opt.reach || 0, rest = opt.box ? { x: P - 13, y: 140 } : { x: P - 14, y: 136 }, up = { x: P - 8, y: 114 }, out = { x: P - 26, y: 124 };
+  let h = rch > 0 ? { x: lerp(rest.x, out.x, rch), y: lerp(rest.y, out.y, rch) } : opt.canUp ? up : rest;
+  thick(P + 7, 116, opt.box ? P + 10 : P - 12, opt.box ? 140 : 136, 4, C.hoodie); R(opt.box ? P + 8 : P - 14, opt.box ? 139 : 135, 4, 4, C.skin);
+  const hh = reachArm(P - 6, 116, h.x, h.y, C.hoodie, 26); R(hh.x - 2, hh.y - 2, 4, 4, C.skin);
+  if (opt.can) { R(hh.x - 2, hh.y - 8, 4, 7, '#c8302a'); R(hh.x - 2, hh.y - 8, 4, 1, '#d8dde2'); R(hh.x - 2, hh.y - 5, 4, 2, '#f4efe2'); }
   g.restore();
 }
 // the truck: out on the highway at night (out), then its back (in): half-empty, a few boxes, the doors ajar on the road
@@ -6258,15 +6270,15 @@ function drawRoad(nowMs) {
     const sp = Math.floor(t * 14) % 2; for (const wx of [110, 210, 262]) { R(wx, 120, 16, 16, '#0e0e12'); R(wx + 5, 125, 6, 6, '#5a6068'); R(wx + 7 + sp, 127, 2, 2, '#22242a'); }
   } else {
     R(0, 0, W, H, '#16141a'); R(0, 0, W, 14, '#0e0c10'); R(0, 132, W, 84, '#221e22'); for (let x = 0; x < W; x += 16) R(x, 132, 1, 84, '#2a2428');
-    R(300, 22, 70, 110, '#0a0a12'); const sp = (t * 3) % 1;
-    for (let q = 0; q < 6; q++) { const p = (q / 6 + sp / 6) % 1, y = 132 - p * 66, w = 2 + (1 - p) * 10; R(334 - w / 2, y, w, 3 * (1 - p) + 1, '#d8c870'); }
-    for (let q = 0; q < 5; q++) { const p = (q / 5 + (t * 1.6) % 1 / 5) % 1; R(312 + p * 40, 32 + p * 6, 6 - p * 4, 2, '#ffb050'); }
-    R(296, 18, 6, 116, '#3a3640'); R(366, 18, 6, 116, '#3a3640');
-    for (const [x, w, h] of [[16, 30, 26], [44, 26, 20], [26, 22, 18], [232, 30, 24], [262, 26, 18]]) { const y = (x === 26 ? 106 : 132) - h; R(x, y, w, h, '#b9814a'); R(x, y, w, 3, '#d29a5e'); R(x + w / 2 - 1, y, 2, h, '#e2c08a'); }
-    R(104, 112, 36, 20, '#b9814a'); R(104, 112, 36, 3, '#d29a5e'); R(166, 112, 32, 20, '#b9814a'); R(166, 112, 32, 3, '#d29a5e');
-    sdCase(152, 132, Math.PI / 2);
-    sdSitMarco(122, 116, nowMs, { box: true, mir: false });
-    sdSitPlayer(182, 116, nowMs, { box: true });
+    R(14, 22, 70, 110, '#0a0a12'); const sp = (t * 3) % 1;
+    for (let q = 0; q < 6; q++) { const p = (q / 6 + sp / 6) % 1, y = 132 - p * 66, w = 2 + (1 - p) * 10; R(50 - w / 2, y, w, 3 * (1 - p) + 1, '#d8c870'); }
+    for (let q = 0; q < 5; q++) { const p = (q / 5 + (t * 1.6) % 1 / 5) % 1; R(74 - p * 40 - 6, 32 + p * 6, 6 - p * 4, 2, '#ffb050'); }
+    R(10, 18, 6, 116, '#3a3640'); R(82, 18, 6, 116, '#3a3640'); R(88, 20, 10, 100, '#2e2a34');
+    for (const [x, w, h] of [[300, 30, 26], [332, 26, 20], [312, 22, 18], [120, 30, 24]]) { const y = (x === 312 ? 106 : 132) - h; R(x, y, w, h, '#b9814a'); R(x, y, w, 3, '#d29a5e'); R(x + w / 2 - 1, y, 2, h, '#e2c08a'); }
+    R(240, 112, 36, 20, '#b9814a'); R(240, 112, 36, 3, '#d29a5e'); R(180, 112, 32, 20, '#b9814a'); R(180, 112, 32, 3, '#d29a5e');
+    sdCase(104, 130, Math.PI / 2);
+    sdSitMarco(262, 116, nowMs, { box: true, mir: true });
+    sdSitPlayer(204, 116, nowMs, { box: true });
     const sw = (t * 0.9) % 1; if (sw < 0.4) { const x = lerp(W + 60, -120, sw / 0.4), gr = g.createLinearGradient(x - 60, 0, x + 60, 0); gr.addColorStop(0, 'rgba(255,170,70,0)'); gr.addColorStop(0.5, 'rgba(255,170,70,.28)'); gr.addColorStop(1, 'rgba(255,170,70,0)'); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = gr; g.fillRect(x - 60, 0, 120, H); g.restore(); }
   }
   drawSceneFade(nowMs);
@@ -6293,32 +6305,52 @@ function drawMarket(nowMs) {
   // the auctioneer on his crate in the middle, his hand chopping out the bids
   { const x = 270, ch = Math.floor(t * 8) % 2; R(x - 10, 116, 20, 16, '#7a5a3a'); R(x - 10, 116, 20, 2, '#9a7a5a'); R(x - 5, 66, 10, 12, '#efc7a6'); R(x - 6, 62, 12, 5, '#f0c020'); R(x - 7, 78, 14, 30, '#2a3a5a'); R(x - 6, 108, 5, 8, '#1b1716'); R(x + 1, 108, 5, 8, '#1b1716');
     thick(x + 6, 82, x + 14, ch ? 62 : 70, 3, '#2a3a5a'); R(x + 12, ch ? 58 : 66, 4, 4, '#efc7a6'); for (let q = 0; q < 3; q++) R(x - 30 + q * 9, 98, 6, 18, '#3a3a44'); }
+  const inTruck = act === 'open' && k < 1.5;
   // 마르코 and you in front, his case on his back
-  { const pose = { ...standPose(Math.floor(t * 2) % 2), hand: { x: BOSS_X + 14, y: act === 'smile' ? 112 : 126 }, sad: act !== 'smile' }; FX.react[2] = FX.react[2] || { type: '', at: nowMs };
+  if (!inTruck) { const pose = { ...standPose(Math.floor(t * 2) % 2), hand: { x: BOSS_X + 14, y: act === 'smile' ? 112 : 126 }, sad: act !== 'smile' }; FX.react[2] = FX.react[2] || { type: '', at: nowMs };
     g.save(); g.translate(0, -40); sdCase(52, 168, 0); drawActor('marco', 60, false, pose, nowMs, false, top => { R(BOSS_X - 8, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X + 1, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X - 9, top + 75, 9, 4, '#1b1716'); R(BOSS_X + 1, top + 75, 9, 4, '#1b1716'); PARTNERS.marco.arm(pose); }); g.restore(); }
-  sdStandPlayer(104, 132, nowMs, true);
-  // the doors swinging open on it all: light rushing in
-  if (act === 'open' && k < 0.9) { const p = ease(Math.min(1, k / 0.6)); R(0, 0, Math.round(W / 2 * (1 - p)), H, '#c8ccd0'); R(Math.round(W / 2 + W / 2 * p), 0, W, H, '#c8ccd0'); g.fillStyle = `rgba(255,248,226,${0.55 * (1 - k / 0.9)})`; g.fillRect(0, 0, W, H); }
+  if (!inTruck) sdStandPlayer(104, 132, nowMs, true);
+  // from the truck's dark inside, the doors swinging open on it all: light and din rushing in, the market behind them
+  if (inTruck) { const p = ease(Math.max(0, Math.min(1, (k - 0.2) / 0.7))), gw = Math.round(8 + 150 * p);
+    g.fillStyle = '#121014'; g.fillRect(0, 0, W, 18); g.fillRect(0, 150, W, H - 150); g.fillRect(0, 0, 192 - gw, H); g.fillRect(192 + gw, 0, W, H);
+    R(192 - gw - 6, 18, 6, 132, '#c8ccd0'); R(192 + gw, 18, 6, 132, '#c8ccd0'); g.fillStyle = `rgba(255,248,226,${0.5 * Math.max(0, 1 - k / 1.0) * p})`; g.fillRect(192 - gw, 18, gw * 2, 132); }
   drawSceneFade(nowMs);
 }
 // the beach before dawn: they sit on the sand; 마르코 hands you the can; his hand to his back and the case off it onto the
 // sand; "…아."; the case opens on the old guitar, its strings rusty (the camera goes in on them)
+// the case lying on the sand (its foot at x, y; open: 0..1 the lid tilting back on its red lining and the old guitar in it)
+function sdCaseOpen(x, y, open, empty) {
+  R(x, y - 10, 60, 11, '#2a1d17'); R(x, y - 10, 60, 1, '#3e2c22'); R(x + 1, y, 58, 1, '#1a120e');
+  if (open > 0) { R(x + 2, y - 8, 56, 7, '#7a2a3a'); if (empty) { R(x + 6, y - 7, 22, 5, '#5a1e2a'); R(x + 30, y - 6, 24, 3, '#5a1e2a'); } else { sdGuitar(x + 47, y - 5, Math.PI, 1, 0); for (let q = 0; q < 3; q++) R(x + 8, y - 6 + q, 34, 1, q % 2 ? '#b07a4a' : '#8a5a34'); }
+    const lh = Math.round(14 * open); g.fillStyle = '#2a1d17'; g.beginPath(); g.moveTo(x, y - 10); g.lineTo(x + 60, y - 10); g.lineTo(x + 56, y - 10 - lh); g.lineTo(x + 4, y - 10 - lh); g.closePath(); g.fill();
+    if (lh > 3) { g.fillStyle = '#5a1e2a'; g.beginPath(); g.moveTo(x + 3, y - 11); g.lineTo(x + 57, y - 11); g.lineTo(x + 54, y - 9 - lh); g.lineTo(x + 6, y - 9 - lh); g.closePath(); g.fill(); } }
+  else { R(x + 27, y - 12, 7, 2, '#c8b890'); R(x + 8, y - 8, 6, 4, '#e8e0c8'); R(x + 9, y - 7, 4, 1, '#c8302a'); }
+}
+// the beach before dawn: they sit facing each other on the sand; he holds the can out and you take it; his hand to his back,
+// the case off his shoulder, round to the front and down on the sand; "…아."; the case opens on the old guitar
 function drawBeachScene(nowMs) {
   const t = nowMs / 1000, act = SCENE.beach || 'sit', k = (performance.now() - (SCENE.beachAt || 0)) / 1000;
   sdAmb('beach');
   sdBeachBack(0.14, null, nowMs, 0, 200);
-  const caseOff = ['case', 'open'].includes(act) || (act === 'back' && k > 1.0), canGiven = act !== 'sit' && !(act === 'can' && k < 1.0);
-  // the case on the sand between them (lid open on the guitar for 'open')
-  if (caseOff) { const lid = act === 'open' ? ease(Math.min(1, k / 0.6)) : 0, cx = 200, cy = 122;
-    R(cx - 26, cy - 8, 52, 12, '#2a1d17'); R(cx - 24, cy - 6, 48, 8, '#7a2a3a');
-    if (lid > 0) { sdGuitar(cx - 2, cy - 2, Math.PI, 0.95); for (let s = 0; s < 4; s++) R(cx - 20, cy - 4 + s, 36, 1, s % 2 ? '#a07040' : '#8a5a34'); R(cx - 26, cy - 8 - Math.round(12 * lid), 52, Math.round(12 * lid), '#3a2a20'); }
-    else { R(cx - 26, cy - 8, 52, 2, '#3e2c22'); R(cx - 6, cy - 6, 5, 3, '#e8e0c8'); } }
-  // 마르코 (facing left), you (facing right)
-  const back = act === 'back' && k < 1.0, hand = back ? { x: BOSS_X - 9, y: 134 } : act === 'can' && k < 1.2 ? { x: BOSS_X + 30, y: 122 } : act === 'case' ? { x: BOSS_X + 22, y: 136 } : null;
-  sdSitMarco(236, 120, nowMs, { mir: true, caseBack: !caseOff, can: !canGiven, hand, wince: back, dip: act === 'case' || act === 'open' ? 2 : 0 });
-  // the can going from his hand to yours
-  if (act === 'can' && k >= 1.0 && k < 1.3) { const p = (k - 1.0) / 0.3; R(lerp(206, 170, p), 102, 4, 7, '#c8302a'); }
-  sdSitPlayer(150, 121, nowMs, { mir: true, can: canGiven, canUp: act === 'can' && k > 1.6 && k < 2.2 });
+  const MX = 240, MY = 118, toLocal = (wx, wy) => ({ x: BOSS_X + (MX - wx), y: wy + (150 - MY) });
+  // the can: in his hand, held out, taken at 1.0, his hand back, your drink at 1.6-2.2
+  const canAct = act === 'can', mine = !(act === 'sit' || (canAct && k < 1.0));
+  let mHand = null, reach = 0, canUp = false;
+  if (canAct) { const out = toLocal(210, 92);
+    mHand = k < 0.7 ? { x: lerp(BOSS_X + 20, out.x, ease(k / 0.7)), y: lerp(132, out.y, ease(k / 0.7)) } : k < 1.0 ? out : k < 1.4 ? { x: lerp(out.x, BOSS_X + 20, ease((k - 1.0) / 0.4)), y: lerp(out.y, 132, ease((k - 1.0) / 0.4)) } : null;
+    reach = k < 0.5 ? 0 : k < 1.0 ? ease((k - 0.5) / 0.5) : k < 1.4 ? 1 - ease((k - 1.0) / 0.4) : 0; canUp = k > 1.6 && k < 2.2; }
+  // the case: on his back; (back) a hand to his back, the strap off, round to the front, down on the sand
+  let caseBack = !['back', 'case', 'open'].includes(act), caseLift = 0, carry = null, wince = false;
+  const FOOT = { x: 176, y: 126 };
+  if (act === 'back') {
+    if (k < 0.5) { caseBack = true; caseLift = Math.round(3 * ease(k / 0.5)); mHand = { x: BOSS_X - 9, y: 128 }; wince = true; }
+    else if (k < 1.0) { const e = ease((k - 0.5) / 0.5); carry = { x: lerp(232, FOOT.x, e), y: lerp(100, 110, e) }; }
+    else if (k < 1.4) { const e = ease((k - 1.0) / 0.4); carry = { x: FOOT.x, y: lerp(110, FOOT.y, e) }; if (k > 1.38 && !SCENE.caseThud && ctx) { SCENE.caseThud = true; thud(ctx.currentTime, 0.4); } }
+    if (carry) { const hnd = toLocal(carry.x + 30, carry.y - 12); mHand = hnd; } }
+  sdSitMarco(MX, MY, nowMs, { mir: true, caseBack, caseLift, can: !mine, hand: mHand, wince, dip: act === 'case' || act === 'open' ? 2 : 0 });
+  sdSitPlayer(172, 119, nowMs, { mir: true, can: mine, reach, canUp });
+  if (carry) sdCaseOpen(Math.round(carry.x), Math.round(carry.y), 0);
+  else if (!caseBack) sdCaseOpen(FOOT.x, FOOT.y, act === 'open' ? ease(Math.min(1, k / 0.6)) : 0);
   drawSceneFade(nowMs);
 }
 // a short blip at audio time T (the stall keepers' voices, far off)
@@ -6358,7 +6390,7 @@ const GTR_HZ = [329.6, 246.9, 196.0, 146.8, 110.0, 82.4];   // high e .. low E (
 function gtrString(n) {
   if (n.gs != null) return n.gs;
   const T = L.gtr.tune && L.gtr.tune.find(([b]) => Math.abs(b - n.beat) < 1e-6);
-  n.gs = T ? T[1] : n.lane === 0 ? (Math.floor(n.beat / 2) % 2 ? 4 : 5) - (Math.round(n.beat) % 4 === 2 && n.beat >= 136 ? 1 : 0) : [2, 1, 0, 1][Math.floor(n.beat * 2) % 4];
+  n.gs = T ? T[1] : n.lane === 0 ? (Math.floor(n.beat / 2) % 2 ? 4 : 5) - (Math.round(n.beat) % 4 === 2 && n.beat >= 136 ? 1 : 0) : n.beat % 1 ? [2, 0, 1][Math.floor(n.beat) % 3] : 0;
   return n.gs;
 }
 const gtrY = s => GTR.y0 + s * GTR.gap;
@@ -6378,18 +6410,30 @@ function gtrHitSound(j, beat, lane) {
 }
 // 반장 on the phone: a video call in the sky's corner (his room: the mint wall, the window going light with ours, him in
 // his gown against the pillow, his hand tapping the bed rail on the thumb's beats while the song plays)
+// 반장 on the phone. The phone is propped in the open case's lid: it lights and buzzes (ring), 마르코 looks down and taps it,
+// and the call grows out of it into the sky's corner (his room: the mint wall, his window going light with ours, him in his
+// gown against the pillow, his hand on the bed rail on the thumb's beats; turned to his window on the lines that want it,
+// a nod when 마르코 gets it right)
+const GTR_PHONE = { x: 204, y: 100 };
 function gtrPhone(b, dawn, active, nowMs) {
-  const D = L.gtr, slide = active ? Math.min(1, Math.max(0, (b - D.ring) / 0.6)) : 1; if (slide <= 0) return;
-  const x0 = 28, y0 = Math.round(lerp(-60, 30, ease(slide))), w = 76, h = 50;
-  R(x0 - 2, y0 - 2, w + 4, h + 4, '#0e0e12'); R(x0 - 2, y0 - 2, w + 4, 1, '#3a3a44');
+  const D = L.gtr, P = GTR_PHONE, ring = active && b >= D.ring && b < D.call - 1, open = active ? Math.min(1, Math.max(0, (b - (D.call - 0.8)) / 0.6)) : 1;
+  // the phone itself in the lid
+  { const sh = ring ? (Math.floor(nowMs / 45) % 2 ? 1 : -1) : 0; R(P.x + 3, P.y + 6, 4, 5, '#3a3a44'); R(P.x - 1 + sh, P.y - 1, 7, 10, '#0e0e12'); R(P.x + sh, P.y, 5, 8, ring || open > 0 ? '#a8d8f0' : '#1a2430'); if (ring && Math.floor(nowMs / 200) % 2) { g.fillStyle = 'rgba(168,216,240,.35)'; g.beginPath(); g.arc(P.x + 2.5, P.y + 4, 9, 0, Math.PI * 2); g.fill(); } }
+  if (open <= 0) return;
+  const e = ease(open), x0 = Math.round(lerp(P.x, 28, e)), y0 = Math.round(lerp(P.y, 30, e)), w = Math.round(lerp(5, 76, e)), h = Math.round(lerp(8, 50, e));
+  R(x0 - 2, y0 - 2, w + 4, h + 4, '#0e0e12'); if (open < 1) { R(x0, y0, w, h, '#a8d8f0'); return; }
+  R(x0 - 2, y0 - 2, w + 4, 1, '#3a3a44');
   R(x0, y0, w, h, '#cfdcd2'); R(x0, y0 + h - 12, w, 12, '#c4d2c8');
   const ws = mixC('#26305a', '#f4d8b8', dawn); R(x0 + 50, y0 + 6, 20, 22, ws); R(x0 + 49, y0 + 5, 22, 1, '#e8eee8'); R(x0 + 59, y0 + 5, 1, 24, '#e8eee8');
   R(x0 + 4, y0 + 22, 22, 26, '#f4f6f6');
-  const cx = x0 + 24, top = y0 + 12;
+  const look = SCENE.gtrBoss === 'window' && (state === 'outro' || HOLD.on), nod = active && D.approve && b >= D.approve[0] && b < D.approve[1] && (b % 1) < 0.35 ? 1 : 0;
+  const cx = x0 + 24, top = y0 + 12 + nod;
   R(cx - 7, top + 12, 16, 20, '#a9c6da'); R(cx - 2, top + 12, 5, 3, '#efc7a6');
-  R(cx - 5, top, 10, 12, '#efc7a6'); R(cx - 5, top, 10, 3, '#5e5850'); R(cx - 5, top + 2, 2, 5, '#5e5850'); R(cx + 2, top + 5, 2, 2, '#1d1815'); R(cx + 1, top + 9, 4, 1, '#5e5850');
+  R(cx - 5, top, 10, 12, '#efc7a6'); R(cx - 5, top, 10, 3, '#5e5850'); R(cx - 5, top + 2, look ? 4 : 2, 5, '#5e5850');
+  if (look) { R(cx + 3, top + 5, 2, 2, '#1d1815'); R(cx + 2, top + 9, 3, 1, '#5e5850'); } else { R(cx + 2, top + 5, 2, 2, '#1d1815'); R(cx + 1, top + 9, 4, 1, '#5e5850'); }
+  if (look) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,200,130,${0.08 + 0.12 * dawn})`; g.fillRect(cx + 2, y0 + 4, x0 + w - cx - 4, h - 8); g.restore(); }
   R(x0 + 4, y0 + h - 6, w - 8, 2, '#9aa4ac');
-  const tap = active && b >= D.song && b < D.endTap && Math.floor(b) % 2 === 0 && (b % 1) < 0.22;
+  const tap = active && b >= D.tapFrom && b < D.endTap && Math.floor(b) % 2 === 0 && (b % 1) < 0.22;
   thick(cx + 7, top + 16, cx + 18, tap ? y0 + h - 7 : y0 + h - 11, 3, '#a9c6da'); R(cx + 16, (tap ? y0 + h - 9 : y0 + h - 13), 4, 4, '#efc7a6');
   if (tap) { g.globalAlpha = 0.7; R(cx + 13, y0 + h - 5, 10, 1, '#ffffff'); g.globalAlpha = 1; }
   R(x0 + w - 8, y0 + 3, 5, 3, '#d8352a');
@@ -6404,24 +6448,28 @@ function drawGtr(t, nowMs, active) {
   g.save();
   sdBeachBack(0.12 + 0.88 * dawn, sunY, nowMs, pulse, 200);
   // the moment the sun's rim breaks the sea: a warm flash
-  if (active && b >= D.sun[0] && b < D.sun[0] + 1.2) { g.fillStyle = `rgba(255,230,170,${0.45 * (1 - (b - D.sun[0]) / 1.2)})`; g.fillRect(0, 0, W, H); }
-  gtrPhone(b, dawn, active, nowMs);
+  if (active && b >= D.sun[0] && b < D.sun[0] + 2.4) { g.fillStyle = `rgba(255,224,160,${0.5 * (1 - (b - D.sun[0]) / 2.4) ** 2})`; g.fillRect(0, 0, W, H); }
   // the open case on the sand between them; 마르코 (right, facing left: the guitar's head to the left like the neck below),
   // eyes shut through the quiet part, smiling from the sunrise; you with the can, lifted on the beat once the waves come
-  R(176, 102, 44, 9, '#2a1d17'); R(178, 103, 40, 7, '#7a2a3a');
+  sdCaseOpen(82, 112, 1, true);
   const thumbNow = live && notes.some(n => n.lane === 0 && n.state === 'hit' && T - n.hitAt < 0.12), fingNow = live && notes.some(n => n.lane === 1 && n.state === 'hit' && T - n.hitAt < 0.12);
-  const tapBody = GA === 'tap' && gk > 1.6 && gk < 1.85;
-  sdSitMarco(262, 112, nowMs, { mir: true, play: true, strum: thumbNow || fingNow || tapBody, smile: (b >= D.smile && !(GA === 'tap' && gk > 0.4)) || false, eyesShut: active && b >= D.quiet[0] && b < D.quiet[1], dip: GA === 'tap' && gk > 0.6 ? 3 : 0, hand: GA === 'tap' && gk > 1.2 ? { x: BOSS_X + 14, y: tapBody ? 131 : 126 } : null });
+  // the ending's pat: the grin goes, he looks down, lifts his hand and brings it down flat on the guitar's body, and leaves it there
+  const patY = GA === 'tap' ? (gk < 1.2 ? 128 : gk < 1.5 ? lerp(128, 120, (gk - 1.2) / 0.3) : gk < 1.6 ? lerp(120, 130, (gk - 1.5) / 0.1) : 130) : null;
+  const ring = active && b >= D.ring && b < D.call - 1, reachPhone = active && b >= D.call - 1.3 && b < D.call - 0.6;
+  const smile = (b >= D.smile && !(GA === 'tap' && gk > 0.4)) || SCENE.gtrFace === 'grin' || (active && D.approve && b >= D.approve[0] && b < D.approve[1]);
+  sdSitMarco(240, 116, nowMs, { mir: true, play: true, thumb: thumbNow, finger: fingNow && !thumbNow, bob: active && b >= D.song && (b % 4) < 0.2, smile, eyesShut: active && b >= D.quiet[0] && b < D.quiet[1],
+    dip: (GA === 'tap' && gk > 0.6 ? 3 : 0) + (ring || reachPhone ? 2 : 0), hand: patY != null ? { x: BOSS_X + 13, y: patY } : reachPhone ? { x: BOSS_X + 33, y: 138 } : null });
   if (GA === 'tap' && !SCENE.gtrTapped && gk > 1.6 && ctx) { SCENE.gtrTapped = true; levelSfx(ctx.currentTime, 'thump'); }
-  sdSitPlayer(150, 113, nowMs, { mir: true, can: true, canUp: b >= D.waves && b < D.end && ph < 0.15 });
+  sdSitPlayer(172, 117, nowMs, { mir: true, can: true, canUp: b >= D.waves && b < D.end && ph < 0.15 });
+  gtrPhone(b, dawn, active, nowMs);
   // the neck: slides away down once the last chord has rung (the beach is left)
   const drop = b >= D.end + 0.6 ? Math.round(ease(Math.min(1, (b - D.end - 0.6) / 2)) * 120) : 0;
   g.save(); g.translate(0, drop);
   const top = GTR.y0 - 10, bot = gtrY(5) + 10;
   R(0, top - 3, W, bot - top + 6, '#2a1a12'); R(0, top, 300, bot - top, '#3a2416'); R(0, top, 300, 1, '#5a3a24'); R(0, bot - 1, 300, 1, '#1a0e08');
   const spd = (GTR.hitX - 8) / (D.travel * SPB), off = (T * spd) % 46;
-  for (let x = -off; x < 300; x += 46) { R(Math.round(x), top, 2, bot - top, '#b8b0a0'); R(Math.round(x) + 2, top, 1, bot - top, '#6a6258'); }
-  for (let x = -off + 23; x < 300; x += 92) { g.fillStyle = '#e8e0c8'; g.beginPath(); g.arc(Math.round(x), (top + bot) / 2, 2, 0, Math.PI * 2); g.fill(); }
+  for (let x = off - 46; x < 300; x += 46) { R(Math.round(x), top, 2, bot - top, '#b8b0a0'); R(Math.round(x) + 2, top, 1, bot - top, '#6a6258'); }
+  for (let x = ((T * spd + 23) % 92) - 92; x < 300; x += 92) R(Math.round(x) - 1, Math.round((top + bot) / 2) - 1, 3, 3, '#6a5a44');
   R(300, top - 6, 84, bot - top + 12, '#c89a5e'); R(300, top - 6, 84, 2, '#e0b878'); R(300, top - 6, 3, bot - top + 12, '#8a5a2e');
   g.fillStyle = '#1a0e08'; g.beginPath(); g.arc(344, (top + bot) / 2, 28, 0, Math.PI * 2); g.fill(); g.strokeStyle = '#6a3a1a'; g.lineWidth = 3; g.beginPath(); g.arc(344, (top + bot) / 2, 31, 0, Math.PI * 2); g.stroke();
   // the two groups of strings in their own colours (the thumb's warm, the fingers' cool), a soft band behind each
@@ -6430,7 +6478,7 @@ function drawGtr(t, nowMs, active) {
   // the last chord: every string shaking at once
   if (active && b >= D.end && !GTR.endFx) { GTR.endFx = true; for (let s = 0; s < 6; s++) GTR.fx[s] = { at: now, j: 'perfect' }; }
   if (b < D.end) GTR.endFx = false;
-  const gold = active && b >= D.sun[0] && b < D.sun[0] + 0.8;
+  const gold = active && b >= D.sun[0] && b < D.sun[0] + 1.5;
   for (let s = 0; s < 6; s++) {
     const y = gtrY(s), w = s >= 3 ? 2 : 1, f = GTR.fx[s], age = (now - f.at) / 1000, amp = age < (b >= D.end ? 1.4 : 0.5) ? (1 - age / (b >= D.end ? 1.4 : 0.5)) * 2.2 : 0, bright = GTR.tuned[s] || b >= D.song, miss = f.j === 'miss' && age < 0.3;
     const col = gold ? '#ffd870' : miss ? '#e05040' : bright ? (s >= 3 ? '#e8c890' : '#d8eef4') : '#b0784a';
@@ -6448,9 +6496,10 @@ function drawGtr(t, nowMs, active) {
     else if (n.state === 'miss' && T - n.hitAt < 0.4) { GTR.fx[s] = GTR.fx[s].at > now - 400 ? GTR.fx[s] : { at: now - (T - n.hitAt) * 1000, j: 'miss' }; }
   }
   // which keys: caps by the strings they play, at the line (pulsing until the first box of each hand is played)
-  if (active || state === 'outro') { const cap = (x, y, ch, c, on) => { R(x, y, 10, 10, '#141012'); R(x, y, 10, 1, c); R(x + 1, y + 9, 8, 1, '#000'); g.fillStyle = on ? c : '#d8d0c0'; g.font = 'bold 8px monospace'; g.fillText(ch, x + 2, y + 8); };
-    const p1 = notes.some(n => n.lane === 0 && n.state === 'hit'), p2 = notes.some(n => n.lane === 1 && n.state === 'hit'), bl = Math.floor(now / 300) % 2;
-    cap(372, gtrY(4) - 11, 'F', '#ffb060', !p1 && bl); cap(372, gtrY(4) + 1, 'D', '#ffb060', !p1 && bl); cap(372, gtrY(1) - 11, 'J', '#8fe8ff', !p2 && bl); cap(372, gtrY(1) + 1, 'K', '#8fe8ff', !p2 && bl); }
+  if (active || state === 'outro') { const p1 = notes.some(n => n.lane === 0 && n.state === 'hit'), p2 = notes.some(n => n.lane === 1 && n.state === 'hit'), bl = Math.floor(now / 300) % 2;
+    const bracket = (s0, s1, txt, c, on) => { const y0 = gtrY(s0) - 3, y1 = gtrY(s1) + 4; R(366, y0, 1, y1 - y0, c); R(363, y0, 3, 1, c); R(363, y1, 3, 1, c); R(369, Math.round((y0 + y1) / 2) - 7, 14, 14, '#141012'); R(369, Math.round((y0 + y1) / 2) - 7, 14, 1, c);
+      g.fillStyle = on ? c : '#d8d0c0'; g.font = 'bold 6px monospace'; g.fillText(txt[0], 371, Math.round((y0 + y1) / 2) - 1); g.fillText(txt[1], 376, Math.round((y0 + y1) / 2) + 5); };
+    bracket(3, 5, 'DF', '#ffb060', !p1 && bl); bracket(0, 2, 'JK', '#8fe8ff', !p2 && bl); }
   g.restore();
   if (drop > 0) { const sand = g.createLinearGradient(0, 100, 0, 216); sand.addColorStop(0, mixC('#4a4252', '#c8aa88', 1)); sand.addColorStop(1, mixC('#2a2430', '#8a6e5a', 1)); g.fillStyle = sand; g.fillRect(0, Math.max(118, top - 3), W, Math.min(drop, H)); }
   // the ending's last beat: to black
@@ -6460,8 +6509,9 @@ function drawGtr(t, nowMs, active) {
   if (active && b < 1.8) { const zk = ease(Math.max(0, b / 1.8)); if (!GTR.buf) { GTR.buf = document.createElement('canvas'); }
     if (GTR.buf.width !== cv.width) { GTR.buf.width = cv.width; GTR.buf.height = cv.height; }
     const c = GTR.buf.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height); c.drawImage(cv, 0, 0);
-    const sx = lerp(130, 0, zk), sy = lerp(gtrY(3) - 20, 0, zk), sw = lerp(96, W, zk), sh = lerp(54, H, zk), kx = cv.width / W;
-    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.drawImage(GTR.buf, sx * kx, sy * kx, sw * kx, sh * kx, 0, 0, cv.width, cv.height); g.restore(); }
+    const sx = lerp(232, 0, zk), sy = lerp(GTR.y0 - 6, 0, zk), sw = lerp(144, W, zk), sh = lerp(81, H, zk), kx = cv.width / W;
+    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.drawImage(GTR.buf, sx * kx, sy * kx, sw * kx, sh * kx, 0, 0, cv.width, cv.height);
+    if (b < 0.6) { g.fillStyle = `rgba(0,0,0,${1 - b / 0.6})`; g.fillRect(0, 0, cv.width, cv.height); } g.restore(); }
 }
 function drawMid(t, nowMs, active) {
   const F = L.phaseFx, M = L.mid, bReal = active ? beatAt(t) : castBeatAt(t, active), live = active || state === 'outro' || state === 'result';
@@ -7315,7 +7365,7 @@ function drawPairBolt(nowMs) {
 // and on the line 반장 walks from the middle of the room over to his spot behind the belt before the next line shows.
 const SCENE = { kind: 'line', trans: null, walk: null };
 const OFFICE_X = 192, WALK_FROM = 200;
-function sceneReset(kind = 'line') { SCENE.kind = kind; SCENE.trans = null; SCENE.walk = null; SCENE.office = null; SCENE.enter = null; SCENE.jpose = null; SCENE.o17 = null; SCENE.act = null; SCENE.cam = null; Object.assign(SCENE, { hospBrought: false, hospStrum: false, dockLeave: false, hosp: null, hospAt: 0, hospTook: false, hospSmile: false, dock: null, dockAt: 0, dockWho: '', beach: null, beachAt: 0, road: null, mkt: null, mktAt: 0, gtr: null, gtrAt: 0, gtrTapped: false, amb_road: false, amb_market: false, amb_beach: false }); }
+function sceneReset(kind = 'line') { SCENE.kind = kind; SCENE.trans = null; SCENE.walk = null; SCENE.office = null; SCENE.enter = null; SCENE.jpose = null; SCENE.o17 = null; SCENE.act = null; SCENE.cam = null; Object.assign(SCENE, { hospBrought: false, hospStrum: false, dockLeave: false, hosp: null, hospAt: 0, hospTook: false, hospSmile: false, dock: null, dockAt: 0, dockWho: '', beach: null, beachAt: 0, road: null, mkt: null, mktAt: 0, gtr: null, gtrAt: 0, gtrTapped: false, amb_road: false, amb_market: false, amb_beach: false, caseThud: false, gtrFace: null, gtrBoss: null }); }
 function sceneCut(to, done) {
   const now = performance.now(), out = reduce ? 200 : L.cine ? 700 : 320, walk = reduce || L.daw || L.cine || L.sd || L.gtr || to !== 'line' ? 0 : 2600;   // 반장's walk to the line only on the way in
   SCENE.trans = { at: now, out, to, done, swapped: false, walk };
@@ -10019,6 +10069,7 @@ function popJudge(kind, sub = '', lane = 0) {
   judgeEl.style.top = STG.on ? '67%' : kind === 'both' ? '19%' : L.lanes === 2 && lane === 0 ? '12%' : '29%';
   // on the four chutes the word comes up over the middle of the highway
   const bNow = castBeatAt(songAt(performance.now()), state === 'play'), qd = (L.quad && quadP(bNow) > 0.5) || (L.mid && bNow >= L.mid.zoom[1]); judgeEl.style.left = qd ? '50%' : ''; if (qd) judgeEl.style.top = L.mid ? '65%' : '44%';
+  if (L.gtr && state === 'play') { judgeEl.style.left = '83%'; judgeEl.style.top = '52%'; judgeEl.classList.add('gtrj'); }
   judgeEl.innerHTML = '';
   judgeEl.append(txt);
   if (sub) { const s = document.createElement('small'); s.textContent = sub; judgeEl.append(s); }
@@ -10402,6 +10453,7 @@ function showLine() {
   if (sc === 'hosp') { SCENE.hospLine = dlg.i; if ('smile' in ln) SCENE.hospSmile = !!ln.smile; }
   if (sc === 'dock') { SCENE.dockWho = ln.who === '기사' ? 'd' : ''; if (ln.dock && ln.dock !== SCENE.dock) { SCENE.dock = ln.dock; SCENE.dockAt = performance.now(); } }
   for (const key of ['road', 'mkt', 'beach', 'gtr']) if (ln[key] && ln[key] !== SCENE[key]) { SCENE[key] = ln[key]; SCENE[key + 'At'] = performance.now(); }
+  if (L.gtr) { SCENE.gtrFace = ln.face || null; SCENE.gtrBoss = ln.boss || null; }
   if (ln.pocha && L.pocha) pochaSong();
   if (ln.o17 && ln.o17 !== SCENE.o17) { SCENE.o17 = ln.o17; SCENE.o17At = performance.now(); if (ln.o17 === 'pass' && ctx) { const t0 = ctx.currentTime; noise(t0, 'bandpass', 900, 0.12, 0.1, 1.5, bus); for (let k = 0; k < 6; k++) noise(t0 + 0.2 + k * 0.4, 'lowpass', 420, 0.14, 0.07, 0.7, bus); } }
   if ('cam' in ln) SCENE.cam = ln.cam ? { who: ln.cam, z: ln.zoom || 1.9 } : null;
@@ -10887,7 +10939,7 @@ function frame(now) {
   const t = active ? viewTime(tReal, now) : -99;
   if (active) {
     holdTick(tReal); schedule(); judgeTick(tReal); updateHud(t);
-    if (L.camPlay && !L.practiceOf && !SLOW.on) { const bv = beatAt(t), c = L.camPlay.find(([a, z]) => bv >= a && bv < z); CAM.to = c ? c[2] : null; }
+    if (L.camPlay && !L.practiceOf && !SLOW.on && !HOLD.on) { const bv = beatAt(t), c = L.camPlay.find(([a, z]) => bv >= a && bv < z); CAM.to = c ? c[2] : null; }
     CAM.lbTo = L.cutscene && !L.practiceOf && L.cutscene.some(([a, z]) => beatAt(t) >= a && beatAt(t) < z) ? 1 : 0;
     if (TUT.on && L.practiceOf) tutTick(tReal);
     else if (tReal > timeAt(END_BEAT)) finishPlay();
