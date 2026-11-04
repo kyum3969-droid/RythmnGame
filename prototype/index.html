@@ -1327,7 +1327,7 @@ const LEVELS = [
     // the walk home (drawCommute15, 217-232): the warehouse fades out (215.5-217), he walks home before dawn humming his tune
     // and planning the beat, breaks into a run (run), and is gone; his laptop's screen comes up in the dark (boot); his room
     commute: { from: 217, run: 226.6, boot: 229.5, x0: -16, x1: 250 },
-    room: { from: 232, stop: 360, tutorial: { card: [232.6, 235.6], take: [232, 248], need: 9, hold: 2 },
+    room: { from: 232, stop: 360, tutorial: { intro: 233.6, take: [232, 248], need: 9, hold: 2 },
       tracks: [[232, '시계', 'x...x...x...x...', 0], [248, '피아노', 'x.....x...x.....', 0], [264, '킥', 'xx......x.......xx......x.....x.', 1], [280, '스네어', '....x...x...x.x.', 1],
                [296, '베이스', 'x.......x.....x.', 1], [312, '기타', 'x.....x...x.x...', 0], [328, '멜로디', 'x...x.x.x...x...x...x...x.x...x.', 0], [344, '반짝이', '..x.......x.x.....x...x.....x...', 0]],
       memories: [[248, 'face'], [264, 'catch'], [280, 'cap'], [296, 'watch'], [312, 'look'], [344, 'face']] },
@@ -3790,112 +3790,90 @@ function drawRoom15(t, nowMs, b, post) {
     if (bar) { g.fillStyle = '#7a86a8'; g.fillText(String((bb - Rm.from) / 4 + 1), x + 2, ryR + 6); }
   }
   g.restore();
-  // the tracks: one row per instrument, added at the bottom as each one goes in (they share the height, so the stack of
-  // rows fills up as the beat builds); the row being recorded is lit, with a red dot; nothing is shown before it starts
-  const ty = ryR + 9, tb = y1 - 1, th = tb - ty;
-  const gate = Rm.tutorial && !post && !RT.passed ? Rm.tutorial.take[1] : Infinity;   // (the rows past the tutorial's take wait for it)
-  const grow = tk.map(([at]) => at >= gate ? 0 : Math.max(0, Math.min(1, (b - (at - TRAVEL * 0.5)) / 0.6)));
-  const rowsF = Math.max(1, grow.reduce((a, c) => a + c, 0)), rowH = Math.min(16, th / rowsF);
-  const rowY = k => ty + grow.slice(0, k).reduce((a, c) => a + c, 0) * rowH;
-  R(x0 + 1, ty, hdW - 1, th, '#151c30');
-  g.save(); g.beginPath(); g.rect(x0 + 1, ty, x1 - 8 - x0, th); g.clip();
-  for (let k = 0; k < tk.length; k++) {
-    if (grow[k] <= 0) continue;
-    const [at, name, pat] = tk[k], y = Math.round(rowY(k)), h = Math.max(1, Math.round(rowH * grow[k])), rec = !stopped && k === recK && b < at + 16;
-    g.globalAlpha = grow[k];
-    // the row: header (colour chip, name, the red dot while recording) and its lane
-    R(x0 + 1, y, x1 - 8 - x0, h - 1, rec ? '#1e2a46' : k % 2 ? '#141c30' : '#172036'); R(x0 + 1, y + h - 1, x1 - 8 - x0, 1, '#0a0e18');
-    R(x0 + 3, y + 1, 3, Math.max(1, h - 3), TCOL[k]);
-    if (h >= 7) { g.font = `700 ${h >= 11 ? 7 : 5}px sans-serif`; g.fillStyle = rec ? '#ffffff' : '#b8c2dc'; g.fillText(name, x0 + 9, y + Math.min(h - 2, h / 2 + (h >= 11 ? 3 : 2))); }
-    if (rec && Math.floor(nowMs / 350) % 2) R(x0 + hdW - 8, y + Math.max(1, (h >> 1) - 1), 3, 3, '#ff4d3d');
-    // its loop, once its four bars are in: little squares of its colour along the lane
-    if (b >= at + 16) for (let c = Math.floor((b - 8) * 4); c <= Math.ceil((b + TRAVEL + 0.5) * 4); c++) {
-      const bb = c / 4; if (bb < at + 16 || bb >= Rm.stop) continue;
-      const pc = ((Math.round((bb - at) * 4) % pat.length) + pat.length) % pat.length; if (pat[pc] !== 'x') continue;
-      const sz = Math.max(2, Math.min(7, h - 3)), xx = Math.round(px + (bb - b) * bpx) - (sz >> 1);
-      if (xx > lx) R(xx, y + Math.round((h - 1 - sz) / 2), sz, sz, TCOL[k]);
-    }
-    g.globalAlpha = 1;
-  }
+  // the track: its header (the instrument going in now, its colour, a meter, the layer count) and its body
+  const ty = ryR + 9, tb = y1 - 1, th = tb - ty, laneH = 13, stackY = ty + laneH + 2, bandH = Math.max(3, Math.floor((tb - stackY - 1) / tk.length));
+  R(x0 + 1, ty, hdW - 1, th, '#182036'); R(x0 + 1, ty, hdW - 1, 1, '#24304c');
+  const cur = Math.max(0, recK), curCol = recK >= 0 ? TCOL[cur] : '#55607e';
+  R(x0 + 4, ty + 3, 4, 8, curCol);
+  g.save(); g.font = '700 7px sans-serif'; g.fillStyle = '#e8ecf8'; g.fillText(recK >= 0 ? tk[cur][1] : '—', x0 + 11, ty + 10);
+  g.font = '600 5px sans-serif'; g.fillStyle = '#7a86a8'; g.fillText(`레이어 ${Math.max(0, layers.filter(q => q > 0).length)}/${tk.length}`, x0 + 5, ty + 20);
+  if (!stopped && recK >= 0 && b < tk[recK][0] + 16 && Math.floor(nowMs / 350) % 2) R(x0 + 52, ty + 4, 4, 4, '#ff4d3d');
   g.restore();
-  R(lx, ty, 1, th, '#0a0e18');
+  // the layer swatches stacked in the header, bottom up, as they go in
+  for (let k = 0; k < tk.length; k++) if (layers[k] > 0) { g.globalAlpha = layers[k]; R(x0 + 5 + k * 7, tb - 6, 6, 4, TCOL[k]); g.globalAlpha = 1; }
   // the meter
   const lvl = stopped ? 0 : Math.min(1, 0.25 + press * 0.75 + 0.15 * beatK);
   R(x1 - 6, ty + 1, 3, th - 2, '#0a0e18'); const lh = Math.round((th - 2) * lvl); if (lh > 0) R(x1 - 6, tb - 1 - lh, 3, lh, lh > th - 6 ? '#ffe27a' : '#8fd694');
-  // the bar lines, and the blocks you set down: square, on the row of the instrument going in, staying where you set them
+  // the body: the lane on top, the stack under it
+  R(lx + 1, ty, x1 - 8 - lx, laneH, '#162034'); R(lx + 1, ty + laneH, x1 - 8 - lx, 1, '#0a0e18'); R(lx + 1, stackY - 1, x1 - 8 - lx, tb - stackY + 1, '#10172a');
   g.save(); g.beginPath(); g.rect(lx + 1, ty, x1 - 8 - lx, th); g.clip();
   for (let bb = Math.floor(b) - 8; bb < b + 12; bb++) { if (bb < Rm.from || (bb - Rm.from) % 4) continue; R(Math.round(px + (bb - b) * bpx), ty, 1, th, '#222c48'); }
+  const bandY = k => tb - 1 - (k + 1) * bandH;
+  // the layers: each instrument's pattern as little squares along its band, once its four bars are in
+  for (let k = 0; k < tk.length; k++) {
+    if (layers[k] <= 0) continue;
+    const [at, , pat] = tk[k], y = bandY(k);
+    g.globalAlpha = layers[k]; R(lx + 1, y, x1 - 8 - lx, bandH - 1, TCOL[k] + '22');
+    for (let c = Math.floor((b - 8) * 4); c <= Math.ceil((b + TRAVEL + 0.5) * 4); c++) {
+      const bb = c / 4; if (bb < at || bb >= Rm.stop) continue;
+      const pc = ((Math.round((bb - at) * 4) % pat.length) + pat.length) % pat.length; if (pat[pc] !== 'x') continue;
+      R(Math.round(px + (bb - b) * bpx) - 1, y, 3, bandH - 1, TCOL[k]);
+    }
+    g.globalAlpha = 1;
+  }
+  // the blocks you set down: square, the colour of the instrument going in; caught ones drop into its band
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160), miss = nowMs - FX.lastMiss < 260;
   for (const n of notes) {
     if (n.beat < Rm.from) continue; if (!post && t < n.place) break; if (!post && roomLocked(n)) continue;
     const x = px + (n.arr - t) * v; if (x < lx - 12) continue;
-    const k = rowOf(n.beat), y = rowY(k), h = rowH * grow[k], sz = Math.max(3, Math.min(10, Math.round(h) - 3)), col = n.state === 'miss' ? '#d8463b' : TCOL[k];
-    const done = n.state === 'hit', ha = done ? t - n.hitAt : 9;
-    g.globalAlpha = n.state === 'miss' ? 0.55 : 1;
-    const yy = Math.round(y + (h - 1 - sz) / 2);
-    R(Math.round(x) - (sz >> 1), yy, sz, sz, col); if (!done) R(Math.round(x) - (sz >> 1), yy, sz, 1, '#ffffff');
-    if (done && ha < 0.12) { g.globalAlpha = 1 - ha / 0.12; R(Math.round(x) - (sz >> 1) - 2, yy - 2, sz + 4, sz + 4, '#ffffff'); }
-    g.globalAlpha = 1;
+    const k = rowOf(n.beat), col = n.state === 'miss' ? '#d8463b' : TCOL[k];
+    if (n.state === 'hit') {
+      const ha = t - n.hitAt, q = Math.min(1, ha / 0.28), yy = lerp(ty + 2, bandY(k), q * q);
+      if (layers[k] >= 1 && q >= 1) continue;   // (in the layer now, drawn with it)
+      R(Math.round(x) - 3, Math.round(yy), 7, Math.max(bandH - 1, Math.round(lerp(9, bandH - 1, q))), col);
+      if (ha < 0.12) { g.globalAlpha = 1 - ha / 0.12; R(Math.round(x) - 5, ty, 11, laneH, '#ffffff'); g.globalAlpha = 1; }
+    } else {
+      g.globalAlpha = n.state === 'miss' ? 0.6 : 1;
+      R(Math.round(x) - 4, ty + 2, 9, 9, col); R(Math.round(x) - 4, ty + 2, 9, 1, '#ffffff'); R(Math.round(x) - 4, ty + 10, 9, 1, '#00000055');
+      g.globalAlpha = 1;
+    }
   }
   g.restore();
-  // the tutorial, over the app: the first instrument is a take you have to get (roomTutTick). A card says what this is
-  // (on a retake: how the last one went and what it needs); then a strip counts the blocks caught against the ones needed;
-  // the first blocks stop at the playhead until you press ('지금 누르세요!'); '▼ 지금!' over the playhead for every block of
-  // the take; on getting it, '녹음 완료'; then '+ 악기' as each new row goes in
+  // the tutorial's marks in the app itself (the rest of it is drawn over the camera, roomTutOverlay): the demo block of
+  // its explanation, the held block boxed, '▼ 지금!' over the playhead for the take's blocks, and '+ 악기' as each one opens
   const tut = Rm.tutorial;
   if (tut && !post) {
-    const held = GUIDE.on && GUIDE.room, cw = 226, cx = Math.round((W - cw) / 2);
-    const box = (y, h, edge, a) => { R(cx - 1, y - 1, cw + 2, h + 2, edge); R(cx, y, cw, h, '#0c111e'); };
-    const card = held ? 0 : Math.min(1, Math.max(0, (b - tut.card[0]) / 0.5)) * Math.min(1, Math.max(0, (tut.card[1] - b) / 0.6));
-    if (card > 0 && !RT.passed) {
-      const ch = 34, cy = ROOM.band - ch - 8;   // (over the room, above the app, so the app stays in view)
-      g.save(); g.globalAlpha = card;
-      if (RT.take === 1) {
-        box(cy, ch, '#ffd27a'); g.font = '700 8px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText('지우의 작업 화면 · 첫 악기: 시계', cx + 8, cy + 11);
-        g.font = '600 7px sans-serif'; g.fillStyle = '#e8ecf8'; g.fillText('블록이 노란 선에 닿는 순간 누르면 그 소리가 녹음돼요.', cx + 8, cy + 21);
-        g.fillStyle = '#9aa6c8'; g.fillText(`${tut.need}개 이상 맞혀야 다음 악기 트랙이 열려요.`, cx + 8, cy + 30);
+    const take = roomTake();
+    if (GUIDE.on && GUIDE.intro && RT.steps === ROOM_INTRO && RT.step >= 1 && RT.step <= 3) {
+      if (RT.step === 1) for (let k = 0; k < 4; k++) {   // blocks flowing in along the lane
+        const x = px + (((k - nowMs / 1000 / spb) % 4 + 4) % 4) * bpx;
+        if (x > px + 4 && x < x1 - 10) { R(Math.round(x) - 4, ty + 2, 9, 9, TCOL[0]); R(Math.round(x) - 4, ty + 2, 9, 1, '#ffffff'); }
       } else {
-        box(cy, ch, '#ff7a6a'); g.font = '700 8px sans-serif'; g.fillStyle = '#ff9a8a'; g.fillText(`↺ 다시 녹음 · 테이크 ${RT.take}`, cx + 8, cy + 11);
-        g.font = '600 7px sans-serif'; g.fillStyle = '#e8ecf8'; g.fillText(`지난 테이크 ${RT.failHits}/${roomTake().length} · ${tut.need}개 이상 맞혀야 넘어가요.`, cx + 8, cy + 21);
-        g.fillStyle = '#9aa6c8'; g.fillText('블록이 노란 선에 겹치는 순간에 누르세요. 미리 누르면 빗나가요.', cx + 8, cy + 30);
+        const q = (nowMs % 2200) / 2200, arrive = 0.62, x = q < arrive ? lerp(x1 - 14, px, q / arrive) : px;
+        if (q < arrive) { R(Math.round(x) - 4, ty + 2, 9, 9, TCOL[0]); R(Math.round(x) - 4, ty + 2, 9, 1, '#ffffff'); }
+        else {
+          const d = (q - arrive) / (1 - arrive), dr = Math.min(1, d / 0.35), yy = lerp(ty + 2, tb - 1 - bandH, dr * dr);
+          R(px - 3, Math.round(yy), 7, Math.round(lerp(9, bandH - 1, dr)), TCOL[0]);
+          if (d < 0.3) { g.save(); g.globalAlpha = 1 - d / 0.3; R(px - 5, ty, 11, laneH, '#ffffff'); g.restore(); }
+          g.save(); g.globalAlpha = Math.min(1, (1 - d) * 3); g.font = '700 8px sans-serif'; g.fillStyle = '#8fd694'; g.fillText('딱!', px + 7, ty + 10); g.restore();
+        }
       }
-      g.restore();
     }
-    // the count: the take's blocks caught, out of the ones needed
-    const take = roomTake(), got = take.filter(n => n.state === 'hit').length;
-    if (!RT.passed && !held && b >= tut.card[1] - 0.6 && b < tut.take[1]) {
-      const a = Math.min(1, (b - tut.card[1] + 0.6) / 0.6), cy = ROOM.band - 18;
-      g.save(); g.globalAlpha = a; R(cx + 38, cy - 1, cw - 76, 12, '#2c3858'); R(cx + 39, cy, cw - 78, 10, '#0c111e');
-      g.font = '700 7px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText(`● 시계 녹음 중 ${Math.min(got, tut.need)} / ${tut.need}`, cx + 44, cy + 7.5);
-      for (let k = 0; k < tut.need; k++) R(cx + 122 + k * 7, cy + 3, 5, 5, k < got ? '#ffe27a' : '#2a3452');
-      g.restore();
-    }
-    if (RT.passed && RT.passAt != null && b - RT.passAt < 3.2) {
-      const q = b - RT.passAt, a = Math.min(1, q / 0.25) * Math.min(1, (3.2 - q) / 0.6), cy = ROOM.band - 18;
-      g.save(); g.globalAlpha = a; R(cx + 38, cy - 1, cw - 76, 12, '#8fd694'); R(cx + 39, cy, cw - 78, 10, '#0c111e');
-      g.font = '700 7px sans-serif'; g.fillStyle = '#8fd694'; g.fillText('✓ 시계 녹음 완료! 다음 악기가 쌓여요', cx + 58, cy + 7.5); g.restore();
-    }
-    // held at a block: everything else dimmed, the block and the playhead lit, and what to do
-    if (held) {
+    if (GUIDE.on && GUIDE.room && !GUIDE.intro) {
       const pulse = 0.6 + 0.4 * Math.sin(nowMs / 130);
-      g.save(); g.globalAlpha = 0.55; R(0, 0, W, ROOM.band, '#000000'); g.restore();
-      const ch = 30, cy = ROOM.band - ch - 8; box(cy, ch, '#ffe27a');
-      g.save(); g.font = '700 9px sans-serif'; g.fillStyle = '#ffe27a'; g.globalAlpha = pulse; g.fillText('지금 누르세요!', cx + 8, cy + 13); g.globalAlpha = 1;
-      g.font = '600 7px sans-serif'; g.fillStyle = '#e8ecf8'; g.fillText('블록이 노란 선에 닿았어요. 바로 이 순간이에요. (스페이스 · 터치)', cx + 8, cy + 24); g.restore();
-      g.save(); g.globalAlpha = pulse; R(px - 7, ty - 1, 15, 1, '#ffe27a'); R(px - 7, tb, 15, 1, '#ffe27a'); R(px - 7, ty - 1, 1, th + 2, '#ffe27a'); R(px + 7, ty - 1, 1, th + 2, '#ffe27a');
-      g.font = '700 8px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText('▼', px - 3, ty - 2); g.restore();
-    } else if (!RT.passed && b < tut.take[1]) {
+      g.save(); g.globalAlpha = pulse; R(px - 8, ty - 2, 17, 1, '#ffe27a'); R(px - 8, ty + laneH + 1, 17, 1, '#ffe27a'); R(px - 8, ty - 2, 1, laneH + 4, '#ffe27a'); R(px + 8, ty - 2, 1, laneH + 4, '#ffe27a'); g.restore();
+    } else if (!GUIDE.on && !RT.passed && b < tut.take[1]) {
       const nx = take.find(n => n.state === 'pending' && Math.abs((n.arr - t) / spb) < 0.6);
-      if (nx) { const q = 1 - Math.abs((nx.arr - t) / spb) / 0.6; g.save(); g.globalAlpha = q; g.font = '700 8px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText('▼ 지금!', px - 14, ty - 1); g.restore(); }
+      if (nx) { const q = 1 - Math.abs((nx.arr - t) / spb) / 0.6; g.save(); g.globalAlpha = q; g.font = '700 7px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText('▼ 지금!', px - 12, ty - 1); g.restore(); }
     }
     for (let k = 1; k < tk.length; k++) { const q = b - tk[k][0]; if (q < 0 || q > 2.4) continue;
       const a = Math.min(1, q / 0.3) * Math.min(1, (2.4 - q) / 0.5); g.save(); g.globalAlpha = a; g.font = '700 7px sans-serif'; g.fillStyle = TCOL[k];
-      g.fillText('+ ' + tk[k][1], x1 - 70, Math.round(rowY(k) + Math.min(rowH, 12) - 3) + 1); g.restore(); }
+      g.fillText('+ ' + tk[k][1], x1 - 52, ty + 10); g.restore(); }
   }
   // the playhead: a line down the track with a flag on the ruler
   const phc = miss ? '#ff5040' : flash > 0 ? '#ffffff' : '#ffe27a';
   R(px, ryR + 2, 1, tb - ryR - 2, phc); R(px - 2, ryR + 1, 5, 2, phc);
-  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(px - 6, ty, 13, th, '#fff2b0'); g.restore(); }
+  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(px - 6, ty, 13, laneH, '#fff2b0'); g.restore(); }
   // at the stop: saving it, over the app
   if (stopped) {
     const q = b - Rm.stop, name = q < 1.5 ? '하은'.slice(0, Math.min(2, Math.floor(q * 3) + 1)) : q < 2.6 ? (q < 2.1 ? '하' : '') : q < 4.5 ? '새 비트'.slice(0, Math.min(4, Math.floor((q - 2.6) * 4) + 1)) : '새 비트';
@@ -9660,7 +9638,7 @@ function skipPractice() {
   if (!TUT.on || state !== 'play') return;
   guideOff(); TUT.on = false; TUT.line = null; TUT.count = null; CAM.to = null; SLOW.on = false; stopHum(); stopHold(); loadLevel(TUT.lvl); startPlay();
 }
-function guideOff() { if (!GUIDE.on) return; if (GUIDE.room) { GUIDE.on = false; GUIDE.room = false; return; } guideResume(); $('guide').hidden = true; }
+function guideOff() { if (!GUIDE.on) return; if (GUIDE.room) { GUIDE.on = false; GUIDE.room = false; GUIDE.intro = false; return; } guideResume(); $('guide').hidden = true; }
 $('tutskip').addEventListener('click', e => { e.stopPropagation(); skipPractice(); $('tutskip').blur(); });
 // ---------- developer mode ----------
 // The DEV button (corner, during a shift) opens a panel: jump to a part of the shift (the level's devMarks, else the starts of
@@ -9783,14 +9761,33 @@ function drawSlowFx(now) {
 // have to get. Its first `hold` blocks stop at the playhead (the clock held, the song faded) until you press; and when the
 // take ends with fewer than `need` of its blocks caught, it goes round again (four bars back, the song looped on the bar:
 // '다시 녹음'), the next instrument's blocks locked away until it is in. RT: the take's state
-const RT = { take: 1, passed: false, holds: 0, snap: null, rewindAt: null, failHits: 0, passAt: null };
-function roomTutReset() { Object.assign(RT, { take: 1, passed: false, holds: 0, snap: null, rewindAt: null, failHits: 0, passAt: null }); }
+const RT = {};
+function roomTutReset() { Object.assign(RT, { take: 1, passed: false, holds: 0, snap: null, rewindAt: null, failHits: 0, passAt: null, introTake: 0, steps: null, step: 0, stepAt: 0 }); }
+roomTutReset();
+// the explanation before the first take, a step a press, the camera on the part of the app it is about: [camera
+// { x, k } (it sits at the bottom of the picture), the part lit (x, y, w, h in the picture), the lines]
+const ROOM_APP = { x0: 22, x1: 362, y0: 142, lane: 163, laneH: 13, stack: 178, tb: 211, px: 120 };
+const ROOM_INTRO = [
+  [{ x: 192, k: 1.12 }, [22, 142, 340, 70], ['지우의 작업 화면이에요.', '오늘 밤 떠오른 비트를, 악기 하나씩 녹음해서 쌓아 갈 거예요.']],
+  [{ x: 210, k: 1.45 }, [86, 162, 270, 15], ['맨 위 칸이 지금 녹음하는 악기예요. 첫 악기는 \'시계\'.', '블록이 오른쪽에서 왼쪽으로 흘러와요.']],
+  [{ x: 175, k: 1.6 }, [112, 152, 17, 60], ['이 노란 선이 재생선이에요.', '블록이 노란 선에 닿는 순간 누르세요!  (스페이스 · 화면 터치)']],
+  [{ x: 210, k: 1.45 }, [86, 177, 270, 34], ['맞힌 블록은 아래로 떨어져 쌓여요.', '한 악기를 다 녹음하면, 다음 악기 칸이 열려요.']],
+  [{ x: 192, k: 1.12 }, [22, 142, 340, 70], ['먼저 \'시계\'부터 녹음해 봐요!', '블록 12개 중 9개 이상 맞히면 다음 악기로 넘어가요.']]];
+const ROOM_RETRY = [[{ x: 200, k: 1.3 }, [86, 162, 270, 15], null]];
+
 const roomLocked = n => !!(L.room && L.room.tutorial && !RT.passed && n.beat >= L.room.tutorial.take[1]);
 const roomTake = () => { const tk = L.room.tutorial.take; return notes.filter(n => n.beat >= tk[0] && n.beat < tk[1] && !isAuto(n)); };
 const roomSong = () => L.songs ? L.songs.findIndex(sp => sp.sec === 'room') : -1;
 function roomTutTick(tR) {
   const tut = L.room.tutorial, b = beatAt(tR); if (RT.passed || b < tut.take[0] - 1) return;
   if (!RT.snap && b >= tut.take[0]) RT.snap = { ...stats };
+  // the explanation (the first take) or a word on the last one (a retake), held before the take's first block comes in
+  if (!GUIDE.on && RT.introTake !== RT.take && tut.intro != null && b >= tut.intro) {
+    RT.introTake = RT.take; RT.steps = RT.take === 1 ? ROOM_INTRO : ROOM_RETRY; RT.step = 0; RT.stepAt = performance.now();
+    Object.assign(GUIDE, { on: true, room: true, intro: true, t: timeAt(tut.intro), n: null, side: '' });
+    if (ctx) { const T = ctx.currentTime; mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(mus.gain.value, T); mus.gain.linearRampToValueAtTime(0.0001, T + 0.25); }
+    return;
+  }
   const take = roomTake(), hits = take.filter(n => n.state === 'hit').length;
   if (hits >= tut.need) { RT.passed = true; RT.passAt = b; return; }
   // the hold: the take's next block at the playhead, still to be pressed
@@ -9817,6 +9814,50 @@ function roomTutTick(tR) {
     RT.take++; RT.holds = 0; RT.rewindAt = null;
   }
 }
+// the camera through the tutorial: on the part being explained; close on the playhead at a held block; on the app through
+// the take (the playhead and the blocks coming in); back out once it is in
+const roomCamAt = (x, k) => ({ x, y: H - H / k / 2, k });
+function roomTutCam(b) {
+  const tut = L.room.tutorial;
+  if (GUIDE.on && GUIDE.room && GUIDE.intro) { const c = RT.steps[RT.step][0]; CAM.to = roomCamAt(c.x, c.k); return; }
+  if (GUIDE.on && GUIDE.room) { CAM.to = roomCamAt(ROOM_APP.px + 60, 1.6); return; }
+  if (b >= tut.take[0] + 1 && !RT.passed && b < tut.take[1] + 1) CAM.to = roomCamAt(205, 1.3);
+  else if (RT.passed && RT.passAt != null && b - RT.passAt < 1.2) CAM.to = roomCamAt(205, 1.3);
+}
+// and its words, over the camera (so they stay sharp and in place): a panel at the top, the rest dimmed but the lit part
+function roomTutOverlay(b, nowMs) {
+  const tut = L.room.tutorial; if (b < L.room.from) return;
+  const k = CAM.k || 1, sx = CAM.sx || 0, sy = CAM.sy || 0, toS = (x, y) => [(x - sx) * k, (y - sy) * k];
+  const panel = (lines, edge, foot, dots) => {
+    const pw = 300, px0 = Math.round((W - pw) / 2), py0 = 8, ph = foot ? 42 : 32;
+    g.save(); g.globalAlpha = 0.96; R(px0 - 1, py0 - 1, pw + 2, ph + 2, edge); R(px0, py0, pw, ph, '#0c111e'); g.globalAlpha = 1;
+    g.font = '700 8px sans-serif'; g.fillStyle = edge; g.fillText(lines[0], px0 + 9, py0 + 13);
+    g.font = '600 7px sans-serif'; g.fillStyle = '#e8ecf8'; g.fillText(lines[1], px0 + 9, py0 + 24);
+    if (foot) { const bl = 0.55 + 0.45 * Math.sin(nowMs / 220); g.globalAlpha = bl; g.fillStyle = '#9aa6c8'; g.fillText(foot, px0 + pw - 9 - g.measureText(foot).width, py0 + 36); g.globalAlpha = 1; }
+    if (dots) for (let i = 0; i < dots[1]; i++) R(px0 + 9 + i * 7, py0 + 33, 4, 4, i === dots[0] ? edge : '#2a3452');
+    g.restore();
+  };
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0);   // (the game's own coordinates, unzoomed)
+  if (GUIDE.on && GUIDE.room && GUIDE.intro) {
+    const [, hl, ln] = RT.steps[RT.step], [hx, hy] = toS(hl[0], hl[1]), hw = hl[2] * k, hh = hl[3] * k;
+    g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillRect(0, 0, W, hy); g.fillRect(0, hy + hh, W, H - hy - hh); g.fillRect(0, hy, hx, hh); g.fillRect(hx + hw, hy, W - hx - hw, hh);
+    const pu = 0.6 + 0.4 * Math.sin(nowMs / 200); g.globalAlpha = pu; g.strokeStyle = '#ffe27a'; g.lineWidth = 1; g.strokeRect(Math.round(hx) - 0.5, Math.round(hy) - 0.5, Math.round(hw) + 1, Math.round(hh) + 1); g.globalAlpha = 1;
+    if (RT.steps === ROOM_INTRO) panel(ln, '#ffe27a', RT.step === RT.steps.length - 1 ? '▶ 누르면 녹음 시작' : '▶ 누르면 다음', [RT.step, RT.steps.length]);
+    else panel([`아깝다! 이번 테이크 ${RT.failHits}/${roomTake().length}개  (${tut.need}개 필요)`, '블록이 노란 선에 겹치는 순간에 누르세요. 미리 누르면 빗나가요.'], '#ff9a8a', `▶ 누르면 다시 녹음 · 테이크 ${RT.take}`);
+  } else if (GUIDE.on && GUIDE.room) {
+    const pu = 0.65 + 0.35 * Math.sin(nowMs / 130);
+    g.globalAlpha = pu; panel(['지금 누르세요!', '블록이 노란 선에 닿았어요. 바로 이 순간이에요.  (스페이스 · 화면 터치)'], '#ffe27a'); g.globalAlpha = 1;
+  } else if (!RT.passed && b >= tut.take[0] && b < tut.take[1]) {
+    const got = roomTake().filter(n => n.state === 'hit').length, cw = 150, cx = Math.round((W - cw) / 2), cy = 8;
+    R(cx - 1, cy - 1, cw + 2, 14, '#2c3858'); R(cx, cy, cw, 12, '#0c111e'); g.font = '700 7px sans-serif'; g.fillStyle = '#ffe27a';
+    g.fillText(`● 시계 녹음 중  ${Math.min(got, tut.need)} / ${tut.need}`, cx + 7, cy + 9);
+    for (let i = 0; i < tut.need; i++) R(cx + 82 + i * 7, cy + 4, 5, 5, i < got ? '#ffe27a' : '#2a3452');
+  } else if (RT.passed && RT.passAt != null && b - RT.passAt < 3.2) {
+    const q = b - RT.passAt, cw = 176, cx = Math.round((W - cw) / 2), cy = 8; g.globalAlpha = Math.min(1, q / 0.25) * Math.min(1, (3.2 - q) / 0.6);
+    R(cx - 1, cy - 1, cw + 2, 14, '#8fd694'); R(cx, cy, cw, 12, '#0c111e'); g.font = '700 7px sans-serif'; g.fillStyle = '#8fd694'; g.fillText('✓ 시계 녹음 완료! 다음 악기가 열려요', cx + 9, cy + 9);
+  }
+  g.restore();
+}
 // the press at a held block: judged on the held clock, and the take runs on from there, the song picked up where it was
 function roomResume() {
   if (!GUIDE.on) return;
@@ -9827,7 +9868,7 @@ function roomResume() {
     mus.gain.cancelScheduledValues(ctx.currentTime); mus.gain.setValueAtTime(0.0001, ctx.currentTime); mus.gain.linearRampToValueAtTime(1, T + 0.04);
     if (si >= 0 && songReady(si)) startSong(T, tB - timeAt(L.songs[si].at), si);
   }
-  GUIDE.on = false; GUIDE.room = false; GUIDE.resuming = false;
+  GUIDE.on = false; GUIDE.room = false; GUIDE.intro = false; GUIDE.resuming = false;
 }
 // a guided practice run (drill.guide): as each box reaches its gate the shift stops (the clock is held, nothing new is
 // scheduled and the music fades out; the audio itself keeps running, so its clock stays true), the camera closes on that gate and a prompt says which side to press - the lower belt's box with the right hand,
@@ -9843,6 +9884,12 @@ function guideTick(t) {
 }
 function guidePress(ts, key, lane) {
   if (GUIDE.resuming) return;
+  if (GUIDE.room && GUIDE.intro) {   // the explanation: a step a press (not too fast, so a held key doesn't skip it)
+    const now = performance.now(); if (now - RT.stepAt < 380) return; RT.step++; RT.stepAt = now;
+    if (RT.step >= RT.steps.length) { GUIDE.intro = false; roomResume(); }
+    else if (ctx) osc('sine', 880, ctx.currentTime, 0.003, 0.06, 0.05, bus);
+    return;
+  }
   if (GUIDE.room) { onHit(ts, key, lane); roomResume(); return; }
   const el = $('guide');
   if (lane !== GUIDE.side) { el.classList.remove('no'); void el.offsetWidth; el.classList.add('no'); return; }
@@ -9969,6 +10016,7 @@ function frame(now) {
   if (active) {
     schedule(); judgeTick(tReal); updateHud(t);
     if (L.camPlay && !L.practiceOf && !SLOW.on) { const bv = beatAt(t), c = L.camPlay.find(([a, z]) => bv >= a && bv < z); CAM.to = c ? c[2] : null; }
+    if (L.room && L.room.tutorial && !TUT.on && beatAt(t) >= L.room.from) roomTutCam(beatAt(tReal));
     CAM.lbTo = L.cutscene && !L.practiceOf && L.cutscene.some(([a, z]) => beatAt(t) >= a && beatAt(t) < z) ? 1 : 0;
     if (TUT.on && L.practiceOf) tutTick(tReal);
     else if (tReal > timeAt(END_BEAT)) finishPlay();
@@ -9985,6 +10033,7 @@ function frame(now) {
   FX.rumble = 0; if (active && L.show && !L.practiceOf) drawShow15(t, now);
   if (active && L.love && !L.practiceOf) drawLove15(t, now);
   drawCamera(now);
+  if (active && L.room && L.room.tutorial && !TUT.on) roomTutOverlay(beatAt(t), now);
   if (!active) CAM.lbTo = 0;
   drawLetterbox(now);
   drawSlowFx(now);
