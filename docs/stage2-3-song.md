@@ -56,13 +56,34 @@ Ending: one big final hit, and one last thump on the box.
 - **구간(마디)**: 0~2 상자 두드림만(아주 작게, 1·3박 + 밀어 치는 한 방) / 3~6 기타 혼자(6마디는 거의 빔) / **7 밴드가 들어옴**(16.2초) / 7~23 그루브 / 24~43 주고받기(짝수 마디 기타, 홀수 마디 브라스가 더 밝음) / 44~53 드롭 / 54~57 브레이크다운(고음이 빠짐), 58~60 다시 쌓임 / **61~64 마지막 드롭** / 65~67 끊어 치기 / **68마디의 마지막 한 방**(곡 박 272.5, 154.6초), 155.5초에 끝.
 - 게임에선 **게임 박 108 = 곡 박 0**(`songs.at` 108, `lead` 0.365). 곡의 두드림이 작아서 게임이 같은 자리에 두드림 소리를 더 깐다.
 
-## 마르코 혼자 구간의 첩보물 음악 (선택, 2026-11-04)
-지금은 엔진 악기로 만든 오리지널 큐가 깔려 있다. 녹음 곡으로 바꾸고 싶으면 아래 프롬프트로(특정 영화·곡 이름은 넣지 않음, 저작권). 길이는 16박(약 9초)이면 되지만 넉넉히 뽑아 앞부분만 씀. 106 BPM, 4/4(게임 격자에 맞춤), 마지막에 테이프 정지처럼 뚝 끊겨도 됨.
+## 마르코 혼자 구간의 첩보물 음악 (2026-11-04)
+지금은 엔진 악기로 만든 오리지널 큐가 깔려 있다(E단조, 84~116, 32박 ≈ 18초). 녹음 곡으로 바꾸려면 아래 프롬프트로. **특정 영화·곡·작곡가 이름은 넣지 않는다**(저작권 거절). 유명한 첩보 테마의 상징인 5/4 박자도 피하고 4/4로.
+
+- 106 BPM, 4/4(게임 격자 105.99에 맞춤). 첫 브라스 한 방 = 게임 박 84.
+- 1분 30초쯤으로 길게 뽑아 둔다: 지금은 앞 32박만 쓰지만, 구간이 길어지거나 다른 스테이지(마르코가 혼자 허둥대는 장면)에서 다시 쓸 수 있게 구간마다 성격을 다르게(잠입 → 추격 → 대혼란 → 뚝).
+- 마지막은 테이프가 멈추듯 뚝. 게임은 엉킴(116)에서 곡을 자른다.
+- 받으면: librosa로 첫 한 방 위치와 템포를 재서 `songs`에 넣고(at 84), 엔진 큐(`htEvents`의 spy cue)는 끈다.
 
 ```
-An original instrumental spy-caper cue. No vocals. 106 BPM, 4/4, E minor. About 30 seconds. Tense, fast-moving and a little comic, like a clumsy heist in a warehouse at night: someone dashing about trying to do everything at once.
+An original instrumental spy-caper track. No vocals, no humming, no spoken words. 106 BPM, steady from start to finish, 4/4 time throughout, E minor. About one minute and thirty seconds. Ends by stopping dead, like a tape being yanked, no fade-out and no final chord.
 
-Instruments: a driving electric bass ostinato on straight eighths, tight sixteenth hi-hats, a dry snare rim on 2 and 4, bongos, short muted brass stabs, a twangy baritone guitar answering the brass, a rising string tremolo.
+The mood: a clumsy one-man heist in a huge warehouse at night. One young man in a loud shirt is dashing between four conveyor belts, trying to do four people's work at once. Tense and fast, but comic and a little ridiculous: he is brave, he is fast, and he is slowly losing control. Never dark or scary; it should make you grin.
 
-Structure: one brass hit and straight into the ostinato; every two bars a brass stab figure; the last four bars get busier and climb (the bass an octave up, a snare roll) and then it stops dead.
+Sound: tight, dry and punchy, like a small studio band in a cramped room. Clear, separate instruments, lots of space between the hits, a big low end. Not orchestral, not epic, not electronic.
+
+Instruments: a driving electric bass ostinato on straight eighth notes, tight sixteenth-note closed hi-hats, a dry snare rim click on beats two and four, a punchy kick, bongos and a cabasa, short muted trumpet and trombone stabs, a twangy baritone guitar with tremolo that answers the brass, a vibraphone for sneaky moments, low pizzicato strings, and a rising string tremolo for tension.
+
+Structure:
+
+Intro: one sharp brass hit with a cymbal choke, then straight into the bass ostinato and the ticking hi-hats. No slow intro.
+
+Sneaking (8 bars): the bass ostinato, the hats, the rim click. Every two bars a short muted brass stab figure, and the baritone guitar answers it with a twangy two-note reply. Pizzicato strings tiptoe underneath. Sly and light on its feet.
+
+Chase (8 bars): the bongos come in busy, the kick doubles, the brass stabs come every bar, the vibraphone plays a nervous little run that keeps going up. Faster feeling but the same tempo.
+
+Close calls (8 bars): sudden stops: the whole band hits one stab and goes silent for half a bar, then the bass jumps back in, three times, as if he barely caught something falling. A comic trombone slide down after each stop.
+
+Chaos (8 bars): everything at once, getting messier and busier: the bass jumps up an octave, the brass stabs pile on top of each other, the string tremolo rises higher and higher, a snare roll builds over the last two bars.
+
+Ending: at the very top of the build, it stops dead, like a tape being yanked. Silence.
 ```
