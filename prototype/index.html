@@ -7363,20 +7363,24 @@ function brassHit(ac, dest, t, vol = 1) {
   for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3) * 0.12; }
   const cv = ac.createConvolver(), wet = ac.createGain(); cv.buffer = ir; cv.normalize = false; wet.gain.value = 0.5; cv.connect(wet); wet.connect(out);
   const dur = 1.15;
-  // [frequency, loudness, pan, delay]: trombones low, saxes in the middle, trumpets on top
+  // [frequency, loudness, pan, delay, a trumpet]: trombones low, saxes in the middle, trumpets high on top (bright and cutting:
+  // a lowpass opened right up with a sharp peak, driven a little hard so they blare)
   const V = [[77.78, 0.5, -0.3, 0.006], [116.54, 0.45, -0.25, 0], [155.56, 0.5, -0.2, 0.004], [196, 0.42, 0, 0.008], [277.18, 0.4, 0.1, 0.002],
-    [349.23, 0.32, 0.15, 0.01], [392, 0.38, 0.25, 0.004], [466.16, 0.42, 0.3, 0], [554.37, 0.32, 0.2, 0.006], [622.25, 0.36, 0.35, 0.003]];
-  for (const [f, v, pan, dl] of V) {
+    [349.23, 0.32, 0.15, 0.01], [392, 0.3, 0.2, 0.004], [466.16, 0.3, 0.25, 0],
+    [622.25, 0.34, 0.3, 0.003, 1], [783.99, 0.4, 0.35, 0, 1], [932.33, 0.42, 0.4, 0.002, 1], [1108.73, 0.34, 0.3, 0.004, 1], [1244.51, 0.38, 0.45, 0.001, 1]];
+  const blare = ac.createWaveShaper(), bc = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; bc[i] = Math.tanh(x * 2.6) / Math.tanh(2.6); } blare.curve = bc;
+  const tpOut = ac.createGain(); tpOut.gain.value = 0.6; blare.connect(tpOut); tpOut.connect(out); tpOut.connect(cv);
+  for (const [f, v, pan, dl, tp] of V) {
     const t0 = t + dl, gn = ac.createGain(), lp = ac.createBiquadFilter(), pn = ac.createStereoPanner(), lfo = ac.createOscillator(), lg = ac.createGain();
-    lp.type = 'lowpass'; lp.Q.value = 1.4; const top = Math.min(7500, f * 11);
-    lp.frequency.setValueAtTime(f * 1.5, t0); lp.frequency.exponentialRampToValueAtTime(top, t0 + 0.035); lp.frequency.exponentialRampToValueAtTime(Math.min(4000, f * 5.5), t0 + 0.3); lp.frequency.exponentialRampToValueAtTime(Math.min(2200, f * 3), t0 + dur);
-    gn.gain.setValueAtTime(0.0001, t0); gn.gain.exponentialRampToValueAtTime(v * 0.09, t0 + 0.014); gn.gain.exponentialRampToValueAtTime(v * 0.065, t0 + 0.2); gn.gain.setValueAtTime(v * 0.065, t0 + dur - 0.3); gn.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    lp.type = 'lowpass'; lp.Q.value = tp ? 3.2 : 1.4; const top = tp ? Math.min(13000, f * 12) : Math.min(7500, f * 11);
+    lp.frequency.setValueAtTime(f * 1.5, t0); lp.frequency.exponentialRampToValueAtTime(top, t0 + (tp ? 0.022 : 0.035)); lp.frequency.exponentialRampToValueAtTime(tp ? Math.min(9000, f * 7) : Math.min(4000, f * 5.5), t0 + 0.3); lp.frequency.exponentialRampToValueAtTime(tp ? Math.min(6000, f * 4.5) : Math.min(2200, f * 3), t0 + dur);
+    gn.gain.setValueAtTime(0.0001, t0); gn.gain.exponentialRampToValueAtTime(v * (tp ? 0.12 : 0.09), t0 + (tp ? 0.01 : 0.014)); gn.gain.exponentialRampToValueAtTime(v * 0.065, t0 + 0.2); gn.gain.setValueAtTime(v * 0.065, t0 + dur - 0.3); gn.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
     pn.pan.value = pan; lfo.frequency.value = 5.3; lg.gain.setValueAtTime(0, t0); lg.gain.linearRampToValueAtTime(f * 0.004, t0 + 0.45); lfo.connect(lg);
     for (const dt_ of [1, 1.0045]) { const o = ac.createOscillator(); o.type = 'sawtooth'; const fo = f * dt_;
       o.frequency.setValueAtTime(fo * 0.955, t0); o.frequency.exponentialRampToValueAtTime(fo, t0 + 0.055); o.frequency.setValueAtTime(fo, t0 + dur - 0.26); o.frequency.exponentialRampToValueAtTime(fo * 0.84, t0 + dur);
       lg.connect(o.frequency); o.connect(lp); o.start(t0); o.stop(t0 + dur + 0.05); }
     lfo.start(t0); lfo.stop(t0 + dur + 0.05);
-    lp.connect(gn); gn.connect(pn); pn.connect(out); pn.connect(cv);
+    lp.connect(gn); gn.connect(pn); if (tp) pn.connect(blare); else { pn.connect(out); pn.connect(cv); }
   }
   // the air of the attack: a short burst of breath through the bell
   const nb_ = ac.createBuffer(1, Math.round(ac.sampleRate * 0.12), ac.sampleRate), nd = nb_.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
@@ -7416,7 +7420,7 @@ function levelSfx(t, kind) {
   // the last box's 빰: a brass section's big E-flat seventh (the song's last chord), the song pushed down under it for a moment
   if (kind === 'bam') {
     if (SONG.gn) { const g0 = SONG.gn.gain.value; SONG.gn.gain.cancelScheduledValues(t); SONG.gn.gain.setValueAtTime(g0, t - 0.01); SONG.gn.gain.linearRampToValueAtTime(g0 * 0.35, t + 0.03); SONG.gn.gain.linearRampToValueAtTime(g0 * 0.6, t + 1.4); }
-    brassHit(ctx, mus, t, 1.6); return; }
+    brassHit(ctx, mus, t, 1.35); return; }
   if (kind === 'clap') { noise(t, 'bandpass', 1500, 0.32, 0.05, 1.2, bus); noise(t + 0.012, 'bandpass', 2400, 0.2, 0.04, 1.4, bus); return; }
   if (kind === 'thump') { const o = osc('sine', 120, t, 0.002, 0.32, 0.12, bus); o.frequency.exponentialRampToValueAtTime(55, t + 0.1); noise(t, 'bandpass', 420, 0.22, 0.05, 1.2, bus); return; }
   if (kind === 'plug') { osc('square', 1700, t, 0.0005, 0.06, 0.012, bus); noise(t, 'bandpass', 2500, 0.1, 0.02, 3, bus); osc('sine', 60, t + 0.02, 0.05, 0.05, 0.6, bus); osc('sine', 120, t + 0.02, 0.05, 0.02, 0.5, bus); return; }
