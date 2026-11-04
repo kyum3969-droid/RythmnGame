@@ -97,3 +97,35 @@ Ending: at the very top of the build, it stops dead, like a tape being yanked. S
 - 녹음 곡이 있으면 엔진 첩보물 큐는 소리를 안 냄(파일이 안 열리면 엔진 큐가 대신).
 - 차트 60개 중 52개가 곡의 소리 위(중앙값 +9ms), 나머지 8개는 베이스 리프의 쉼 자리(격자 위).
 - **(바뀜, 같은 날) 곡을 통째로 씀**: 84 = 곡 0마디(첫 브라스 한 방, `lead` 1.2165), 곡 36마디의 마지막 큰 한 방 = 228 엉킴, 반 박 뒤 끊음. 블루스 펑크는 236부터(게임 박 236 = 곡 박 0). 차트 186개 중 185개가 곡 소리 위(중앙값 +10ms).
+
+## 새 합주곡 (2026-11-04, 사용자: "처음부터 압도적으로 댄싱댄싱한 걸로")
+"First Light on the Sand"는 상자 두드림으로 조용히 시작해서, 반장이 쓰러지고 "라디오 틀어…" 한 뒤에 터지는 장면에 안 맞음. 첫 소리부터 브라스가 터지고 끝까지 춤추는 곡으로 바꿈.
+- 거절된 적 있는 말은 뺌: 지명, "half-time shuffle", "Chicago blues", "slap bass", 외치는 말 그대로("Hey!").
+- 템포 116 BPM: 지금 게임(106)보다 빠르게 해서 춤추는 느낌. 곡이 들어오는 236부터 게임 템포를 곡에 맞춤(템포 바꾸기는 2-4가 이미 씀).
+- 2분 안팎. 구간: 터지는 인트로 / 그루브 / 멈춤 브레이크(반장이 일어나는 자리) / 주고받기 / 드롭 / 브레이크다운 / 마지막 드롭 / 한 방으로 끝.
+
+```
+An instrumental dance track that explodes from the very first beat: an irresistible, joyful brass funk-disco party. No singing, no humming, no spoken words. 116 BPM, steady from start to finish, 4/4, A-flat major with bluesy dominant seventh chords. About two minutes. Ends with one huge final hit, no fade-out.
+
+The mood: dawn after a terrible night at work, and someone turns the radio up as loud as it goes. Everyone in the room, even the grumpy boss and the impatient truck driver, cannot help dancing. Euphoric, cheeky, funny, unstoppable. Not sad.
+
+Sound: huge, loud and bright from the first second, like a big live party band. Four-on-the-floor kick, open hi-hats on the off-beats, handclaps on two and four, a fat bouncy bass line, a big brass section (trumpets, saxophones, trombones), a gritty bluesy electric guitar, a funky rhythm guitar, a Hammond organ, congas and a cowbell. Group shouts on the big hits only.
+
+Structure:
+
+Intro: no build-up. On the very first beat a massive brass fanfare, five short blasts and a long one, with the whole band slamming in at full power together.
+
+Groove (8 bars): the full dance groove, the brass riff, the bass bouncing, the organ stabbing.
+
+Break (2 bars): the band stops dead on a brass hit and only the handclaps and the kick keep going, then the whole band crashes back in with the brass fanfare.
+
+Call and response (8 bars): the bluesy guitar plays a phrase, the brass answers it, back and forth bar by bar, getting cheekier each time.
+
+Drop (8 bars): a huge hit with a group shout, and the brass, the guitar and the organ play one big, singable hook together, everything at full power.
+
+Breakdown (4 bars): everything drops out except the bass and the handclaps, quiet, then a fast build back up with a snare roll and rising brass.
+
+Final drop (8 bars): the biggest part of the song, the hook again with the brass an octave higher, a crash on every bar, group shouts.
+
+Ending: one huge final hit and silence.
+```
