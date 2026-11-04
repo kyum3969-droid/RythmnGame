@@ -1267,46 +1267,70 @@ const LEVELS = [
       { who:'마르코', text:'타요, 신입!', scene:'dock', dock:'go' }],
   }
   ,{
-    id:'s2-5', stageNo:'2-5', who:'반장', role:'반장 · 순자 이모 · 112 BPM · 라디오', tag:'본선 생중계 · 정전 16박 · 헤드라이트', bpm:112, style:'final21', fxTheme:'chill', inspector: true, radio: true, lofi: 2600,
-    // 2-5 본선 날: 지우 is at the final, and her set plays on the line's radio (her song through a small speaker). 소장 has told
-    // 박씨 the forklift goes to a contractor after the season; 이모 is cold and only grabs tonight; his pallets come in crooked
-    // ('L'). Halfway through the blues the power goes: the radio runs on batteries, the boxes show only in the scanner's glow and
-    // in the forklift's headlights, and you play by the thud of each box being set down two beats ahead.
-    tempo: [[0, 112]], clock:'03:10', title:'본선 날', partners:['boss'], hints:true,
-    chords: GOS.chords, roots: GOS.roots,
-    chordAt: bar => bar < 2 ? 0 : bar < 28 ? (bar - 2) % 4 : bar < 40 ? 4 + BLUES.prog[(bar - 28) % 12] : bar < 52 ? (bar - 40) % 4 : bar < 60 ? 7 + (bar - 52) % 4 : 7,
-    win: { p: 0.065, g: 0.125, m: 0.19, release: 0.18, off: 1.3 }, endAt: 240,
-    crazy: [[128, 144]], headlight: true, lateHint: '팔레트가 삐뚤어요. 반장님 손이 늦어요',
-    special:['소리로 받은 상자', 'range', '받아냄', [128, 144]],
-    sections: [[0, 'intro'], [2, 'verse'], [10, 'build'], [18, 'drop'], [26, 'break'], [28, 'blues'], [40, 'drop2'], [48, 'vamp'], [52, 'lift'], [60, 'outro']],
+    id:'s2-5', stageNo:'2-5', who:'마르코', role:'마르코 · 반장(전화) · 90 BPM · 기타줄 여섯', tag:'바다 · 녹슨 줄 · 엄지와 손가락', bpm:90, style:'funk21', fxTheme:'warm',
+    // 2-5 바다: in the back of the 04:40 truck to 속초, the fish market at first light (the stall keepers singing out, 마르코
+    // laughing at last), the beach before dawn. Taking the case off his back he remembers the guitar 반장 gave him. The rusty
+    // strings sound awful; he calls 반장, who has him tune them (a string at a time) and play with his thumb on the low
+    // strings, steady, then his fingers on the high ones, his own way between. The strings are the belts: the guitar's neck
+    // across the lower half of the screen, the thumb's three thick strings (left hand) under the fingers' three (right hand);
+    // above, the beach getting light, 마르코 playing, you with the can, 반장 on the phone keeping time on his bed rail.
+    // The song: "Before the Tide Returns" (90 BPM, one guitar fingerpicked; its first bar at 2.43 s).
+    tempo: [[0, 90]], clock:'05:58', place:'속초 바닷가', title:'바다', partners:['marco'], hints:false, lanes: 2, travel: 2.5,
+    songs: [{ src: 'audio/2-5-before-the-tide-returns.mp3', at: 21, lead: 0.43, gain: 0.95 }],
+    songStart: -1, songCues: [[21, 0]], noCount: true, bareBand: true, hitKit: 'ticktock', subs: true,
+    // gtr: song (in from), call (the phone propped up from), tune ([beat, string]: each tuning note's string, 0 = high e),
+    // labels (when each hand's label shows), dawn and sun (the sky), waves (the foam on the beat, the can), smile (from)
+    gtr: { song: 21, call: 7, tune: [[9, 5], [10.5, 4], [12, 3], [13.5, 2], [15, 1], [16.5, 0]], labels: [24, 56],
+      dawn: [120, 200], sun: [136, 200], waves: 136, smile: 136, endTap: 216, travel: 2.5 },
+    comfort: [],
+    sfx: [],
+    chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
+    win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 222,
+    special:['해 뜨는 동안 친 줄', 'range', '맞춤', [136, 200]],
+    sections: [[0, 'intro'], [6, 'groove'], [14, 'chorus'], [22, 'groove2'], [30, 'breakdown'], [34, 'drop'], [50, 'last']],
+    devMarks: [[0, '혼자 · 전화'], [9, '줄 감기'], [24, '엄지'], [56, '손가락'], [120, '숨 고르기'], [136, '해돋이'], [200, '끝']],
+    // the thumb (lane 0, left hand) and the fingers (lane 1, right hand), eight cells a bar
     bars: [
-      '........', '........',
-      'x.......', 'x...x...', 'x.......', 'x...L...', 'x.......', 'x...x...', 'x...R...', 'x.......',
-      'x...x...', 'x.x.x...', 'x...L...', 'x.x.x...', 'x...R...', 'x...x...', 'x.x.x...', 'x.......',
-      'x.x.x...', 'x...R...', 'x.x.x.x.', 'h===....', 'x.x.x...', 'L...x...', 'x.x.x.x.', 'h=====..',
-      '........', '........',
-      'x...x...', 'x...R...', 'x.x.x...', 'L...x...', 'x...x...', 'x.......', 'x...x...', 'x.......', 'x...R...', 'x.x.x...', 'L...x...', 'h=====..',
-      'x.x.x...', 'x...R...', 'x.x.x.x.', 'h===..x.', 'x.x.x...', 'R...x...', 'x.x.x.x.', 'x.......',
-      'x...x...', 'x...x...', 'x.x.x...', 'x.x.x.x.',
-      'x.x.x.x.', 'x...R...', 'x.x.x...', 'h=o=....', 'x.x.x.x.', 'L...x...', 'x.x.x.x.', 'x.x.x.x.',
-      '........', '........'
+        '....x...', '....x...', '..x..x..', 'x.......', '........', '........', 'x...x...', 'x...x...',
+        'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...',
+        'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...',
+        'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x.......', 'x.......',
+        'x.......', 'x.......', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...',
+        'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...',
+        'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x...x...', 'x.......', '........'
     ],
-    say: [[4, '(라디오) 다음, 17번.', 3], [8, '(라디오) …시작할게요.', 2.5], [20, '(팔레트가 삐뚤다) …저 양반, 오늘은 왜.', 3.5, 0, 's'], [72, '(라디오 너머 박수)', 2.5],
-          [104, '(라디오) 반장님… 들리세요?', 3.5], [112, '(작게) …들린다.', 2.5], [124, '정전이다! 라디오는 배터리야.', 3], [129, '(헤드라이트가 켜진다) …저 양반.', 3.5, 0, 's'], [146, '…불 들어온다.', 2.5],
-          [160, '(라디오) 같이 가요!!', 3], [194, '(지게차가 나간다) …', 2.5, 0, 's'], [208, '(라디오) 끝까지!!', 3]],
-    comfort: ['괜찮아. 소리 들어.', '내 손 봐.'],
+    bars2: [
+        '.......x', '..x.....', '........', '...x..x.', '.x......', '........', '........', '........',
+        '........', '........', '........', '........', '........', '........', '.x.x....', '.x......',
+        '.x.x....', '.x.x....', '.x.....x', '.x......', '.x.....x', '.x...x..', '.x.x...x', '.x...x.x',
+        '.x.x.x..', '.x.....x', '.x.x...x', '.x.x...x', '.x.x...x', '.x.x.x..', '.x......', '.......x',
+        '.x......', '.......x', 'xxxx.x.x', '.xxx.x.x', 'xxxx.x.x', '.x.x.xxx', 'xxxx.x.x', '.xxx.x.x',
+        'xxxx.x.x', '.x.x.xxx', 'xxxx.x.x', '.x.x.xxx', 'xxxx.x.x', '.xxx.x.x', 'xxxx.x.x', '.xxx.x.x',
+        'xxxx.x.x', '.xxx.x.x', '.x.x....', '.x......', '.x......', '.x...x..', 'x.......', '........'
+    ],
+    hold: [[7, [{ who:'반장', text:'…라인은.' }, { who:'마르코', text:'껐어요.' }, { who:'반장', text:'……' }, { who:'반장', text:'…천천히 하랬지, 끄랬냐.' },
+                { who:'마르코', text:'헤헤.' }, { who:'마르코', text:'반장님, 이거 어떻게 쳐요?' }, { who:'반장', text:'줄부터 감아. 하나씩.' }]],
+           [18.5, [{ who:'반장', text:'엄지는 가만 두지 말고, 아래만 왔다 갔다.' }]]],
+    say: [[5.5, '…이거 왜 이래요.', 2.5, 0, 'v'], [58, '…그래. 그거.', 3, 0, 'b']],
+    // the truck, the market, the beach (talk scenes), then the guitar
     intro: [
-      { who:'', text:'다섯째 밤, 새벽 3시 10분. 지우는 본선. 라인 라디오를 켰다.' },
-      { who:'소장', text:'성수기 끝나면 지게차는 외주로 돌립니다. 박 기사는 이번 주까지.' },
-      { who:'순자 이모', text:'…가면 가는 거지.' },
-      { who:'반장', text:'…라디오 소리나 키워.' }],
+      { who:'', text:'새벽 4시 50분. 속초 가는 고속도로.', scene:'road' },
+      { who:'기사', text:'졸리면 자요. 도착하면 깨울게.', scene:'road' },
+      { who:'마르코', text:'……', scene:'road' },
+      { who:'', text:'새벽 5시 40분. 속초 어시장.', scene:'market' },
+      { who:'마르코', text:'…시끄럽네.', scene:'market', smile: true },
+      { who:'', text:'동트기 전. 바닷가.', scene:'beach' },
+      { who:'마르코', text:'…아.', scene:'beach', beach:'open' }],
     outro: good => good ? [
-      { who:'', text:'라디오 너머로 박수. 전화가 울렸다.' },
-      { who:'지우', text:'(전화) 반장님!!! 붙었어요!!! 기타 누구 거냐고 물어봤어요!!!' },
-      { who:'반장', text:'…마음대로 해.' },
-      { who:'', text:'이모는 비어 있는 지게차 자리를 보지 않았다.' }] : [
-      { who:'반장', text:'…라디오 꺼.' },
-      { who:'순자 이모', text:'…내일 또 보자.' }]
+      { who:'반장', text:'…바다는 어떠냐.' },
+      { who:'마르코', text:'…시끄러워요. 좋아요.' },
+      { who:'반장', text:'……' },
+      { who:'반장', text:'…거기선 다들 노래하면서 일한다며.' },
+      { who:'마르코', text:'……' }] : [
+      { who:'마르코', text:'…아직 잘 안 되네요.' },
+      { who:'반장', text:'…처음엔 다 그래.' },
+      { who:'반장', text:'…거기선 다들 노래하면서 일한다며.' },
+      { who:'마르코', text:'……' }],
   }
   ,{
     id:'s2-6', stageNo:'2-6', who:'순자 이모 + 박씨', role:'소장 → 박씨 · 순자 이모 · 108 BPM', tag:'피날레 · 두 곡이 만난다', bpm:108, style:'finale26', fxTheme:'gold', inspector: true,
@@ -5830,7 +5854,7 @@ function sdBack(b, bReal, nowMs, active, live) {
 // 'pack' (the can into his pocket, the guitar case onto his back), 'go' (over to you); 2-6 'goodbye' (the boombox picked up
 // and set down by the radio, the case taken, a pat on the belt on his way, out to the left)
 const SD_OUT = { radio: false, can: false, case: false, boxCarry: false, boxDown: false, tapAt: null };
-function sdOutReset() { Object.assign(SD_OUT, { left: false, radio: false, can: false, case: false, boxCarry: false, boxDown: false, tapAt: null, from: null }); }
+function sdOutReset() { Object.assign(SD_OUT, { left: false, radio: false, can: false, case: false, boxCarry: false, boxDown: false, tapAt: null, from: null });  if (typeof GTR !== 'undefined') { GTR.tuned.fill(false); GTR.fx.forEach(f => { f.at = -1e9; f.j = ''; }); } }
 const SD_SPOTS = () => ({ rd: { x: RB_RADIO.x + 40, dy: 0, mir: true }, bx: { x: MID.ww - 90, dy: 0, mir: true }, c: { x: MID.ax + 64, dy: -2, mir: true }, belt: { x: 160, dy: 0, mir: true }, out: { x: -40, dy: 0, mir: true } });
 // 마르코's position through an ending's act: [from spot, to spot, walk seconds] (the act's clock is its own)
 function sdOutMarco(last) {
