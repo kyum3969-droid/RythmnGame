@@ -1281,15 +1281,16 @@ const LEVELS = [
     // across the lower half of the screen, the thumb's three thick strings (left hand) under the fingers' three (right hand);
     // above, the beach getting light, 마르코 playing, you with the can, 반장 on the phone keeping time on his bed rail.
     // The song: "Before the Tide Returns" (90 BPM, one guitar fingerpicked; its first bar at 2.43 s).
-    tempo: [[0, 90]], clock:'05:58', place:'속초 바닷가', title:'바다', partners:['marco'], hints:false, lanes: 2, travel: 2.5,
+    tempo: [[0, 90]], clock:'05:58', noClock: true, place:'속초 바닷가', title:'바다', partners:['marco'], hints:false, lanes: 2, travel: 2.5,
     songs: [{ src: 'audio/2-5-before-the-tide-returns.mp3', at: 21, lead: 0.43, gain: 0.95 }],
     songStart: -1, songCues: [[21, 0]], noCount: true, bareBand: true, hitKit: 'ticktock', subs: true,
     // gtr: song (in from), call (the phone propped up from), tune ([beat, string]: each tuning note's string, 0 = high e),
     // labels (when each hand's label shows), dawn and sun (the sky), waves (the foam on the beat, the can), smile (from)
-    gtr: { song: 21, call: 7, tune: [[9, 5], [10.5, 4], [12, 3], [13.5, 2], [15, 1], [16.5, 0]], labels: [24, 56],
-      dawn: [120, 200], sun: [136, 200], waves: 136, smile: 136, endTap: 216, travel: 2.5 },
+    gtr: { song: 21, ring: 6.2, call: 7, tune: [[9, 5], [10.5, 4], [12, 3], [13.5, 2], [15, 1], [16.5, 0]],
+      dawn: [118, 200], sun: [136, 200], quiet: [122, 134], waves: 136, smile: 136, endTap: 216, end: 216, travel: 2.5 },
     comfort: [],
-    sfx: [],
+    // the phone ringing (two rings), the call picking up
+    sfx: [[6.2, 'ring'], [6.75, 'ring']],
     chords: SOUL.chords, roots: SOUL.roots, chordAt: () => 0,
     win: { p: 0.08, g: 0.15, m: 0.22, release: 0.2, off: 1.3 }, endAt: 222,
     special:['해 뜨는 동안 친 줄', 'range', '맞춤', [136, 200]],
@@ -1314,29 +1315,38 @@ const LEVELS = [
         'xxxx.x.x', '.x.x.xxx', 'xxxx.x.x', '.x.x.xxx', 'xxxx.x.x', '.xxx.x.x', 'xxxx.x.x', '.xxx.x.x',
         'xxxx.x.x', '.xxx.x.x', '.x.x....', '.x......', '.x......', '.x...x..', 'x.......', '........'
     ],
-    hold: [[7, [{ who:'반장', text:'…라인은.' }, { who:'마르코', text:'껐어요.' }, { who:'반장', text:'……' }, { who:'반장', text:'…천천히 하랬지, 끄랬냐.' },
-                { who:'마르코', text:'헤헤.' }, { who:'마르코', text:'반장님, 이거 어떻게 쳐요?' }, { who:'반장', text:'줄부터 감아. 하나씩.' }]],
-           [18.5, [{ who:'반장', text:'엄지는 가만 두지 말고, 아래만 왔다 갔다.' }]]],
+    hold: [[7, [{ who:'반장', text:'…라인은.', cam:{ x: 66, y: 56, k: 2.6 } }, { who:'마르코', text:'껐어요.', cam:{ x: 262, y: 74, k: 2.2 } }, { who:'반장', text:'……', cam:{ x: 66, y: 56, k: 2.6 } }, { who:'반장', text:'…천천히 하랬지, 끄랬냐.', cam:{ x: 66, y: 56, k: 2.6 } },
+                { who:'마르코', text:'…헤.', cam:{ x: 262, y: 74, k: 2.2 } }, { who:'마르코', text:'반장님, 이거 어떻게 쳐요?', cam:{ x: 262, y: 74, k: 2.2 } }, { who:'반장', text:'줄부터 맞춰. 하나씩.', cam:{ x: 66, y: 56, k: 2.6 } }]],
+           [18.5, [{ who:'반장', text:'엄지는 굵은 줄만. …내 손 봐.', cam:{ x: 66, y: 56, k: 2.6 } }]]],
     say: [[5.5, '…이거 왜 이래요.', 2.5, 0, 'v'], [58, '…그래. 그거.', 3, 0, 'b']],
     // the truck, the market, the beach (talk scenes), then the guitar
     intro: [
-      { who:'', text:'새벽 4시 50분. 속초 가는 고속도로.', scene:'road' },
-      { who:'기사', text:'졸리면 자요. 도착하면 깨울게.', scene:'road' },
-      { who:'마르코', text:'……', scene:'road' },
-      { who:'', text:'새벽 5시 40분. 속초 어시장.', scene:'market' },
-      { who:'마르코', text:'…시끄럽네.', scene:'market', smile: true },
-      { who:'', text:'동트기 전. 바닷가.', scene:'beach' },
-      { who:'마르코', text:'…아.', scene:'beach', beach:'open' }],
-    outro: good => good ? [
-      { who:'반장', text:'…바다는 어떠냐.' },
-      { who:'마르코', text:'…시끄러워요. 좋아요.' },
-      { who:'반장', text:'……' },
-      { who:'반장', text:'…거기선 다들 노래하면서 일한다며.' },
-      { who:'마르코', text:'……' }] : [
-      { who:'마르코', text:'…아직 잘 안 되네요.' },
-      { who:'반장', text:'…처음엔 다 그래.' },
-      { who:'반장', text:'…거기선 다들 노래하면서 일한다며.' },
-      { who:'마르코', text:'……' }],
+      { who:'', text:'', scene:'road', road:'out', silent: 3.4 },
+      { who:'', text:'속초 가는 길.', scene:'road', road:'out' },
+      { who:'', text:'', scene:'road', road:'in', silent: 1.6 },
+      { who:'기사', text:'졸리면 자요. 도착하면 깨울게.', scene:'road', road:'in' },
+      { who:'', text:'', scene:'road', road:'in', silent: 2.6, cam:{ x: 334, y: 80, k: 2.0 } },
+      { who:'', text:'', scene:'market', mkt:'open', silent: 2.8 },
+      { who:'', text:'속초, 어시장.', scene:'market', mkt:'open' },
+      { who:'마르코', text:'…시끄럽네.', scene:'market', mkt:'smile', cam:{ x: 78, y: 90, k: 2.2 } },
+      { who:'', text:'', scene:'beach', beach:'sit', silent: 3.0 },
+      { who:'', text:'바닷가, 동트기 전.', scene:'beach', beach:'sit' },
+      { who:'', text:'', scene:'beach', beach:'can', silent: 2.6, cam:{ x: 196, y: 96, k: 1.8 } },
+      { who:'', text:'', scene:'beach', beach:'back', silent: 2.0, cam:{ x: 214, y: 96, k: 1.8 } },
+      { who:'마르코', text:'…아.', scene:'beach', beach:'case', cam:{ x: 216, y: 100, k: 2.0 } },
+      { who:'', text:'', scene:'beach', beach:'open', silent: 2.2, cam:{ x: 198, y: 118, k: 3.4 } }],
+    // after the last chord: the beach and the call; then without a word his grin goes, he looks down at the guitar and pats
+    // its body once (반장's pat), the waves, black
+    outro: good => (good ? [
+      { who:'반장', text:'…바다는 어떠냐.', cam:{ x: 66, y: 56, k: 2.6 } },
+      { who:'마르코', text:'…시끄러워요. 좋아요.', cam:{ x: 262, y: 74, k: 2.2 } },
+      { who:'반장', text:'……', cam:{ x: 66, y: 56, k: 2.6 } }] : [
+      { who:'마르코', text:'…아직 잘 안 되네요.', cam:{ x: 262, y: 74, k: 2.2 } },
+      { who:'반장', text:'…처음엔 다 그래.', cam:{ x: 66, y: 56, k: 2.6 } },
+      { who:'반장', text:'……', cam:{ x: 66, y: 56, k: 2.6 } }]).concat([
+      { who:'반장', text:'…거기선 다들 노래하면서 일한다며.', cam:{ x: 66, y: 56, k: 2.6 } },
+      { who:'', text:'', silent: 4.2, gtr:'tap', cam:{ x: 262, y: 74, k: 2.2 } },
+      { who:'', text:'', silent: 2.6, gtr:'fade', cam:{ x: 192, y: 70, k: 1.2 } }]),
   }
   ,{
     id:'s2-6', stageNo:'2-6', who:'마르코', role:'마르코 · 소장 · 106 BPM · 라인 넷', tag:'라디오와 붐박스 · 말대꾸 · 10년 만에', bpm:105.99, style:'funk21', fxTheme:'warm',
@@ -6190,84 +6200,142 @@ function drawDock(nowMs) {
   if (lv && k > 5.4) { g.fillStyle = `rgba(0,0,0,${Math.min(1, (k - 5.4) / 1)})`; g.fillRect(0, 0, W, H); }
   drawSceneFade(nowMs);
 }
-// 2-5: the back of the truck on the highway: half-empty, a few boxes, the doors ajar on the road falling away behind; the
-// tunnel's lamps sweep over the two of them, the driver's trot on the radio up front (a muffled thump)
+// 2-5's talk scenes. Each line can carry road / mkt / beach (what is happening; SCENE.<x>At its start); silent lines let a
+// beat play without words. People sit above the dialogue box's top (y < ~128) so it never covers them.
+// a sound bed for a scene, started once: the truck's engine and the driver's trot through the cab wall, the market's din and
+// the auctioneer's patter, the waves
+function sdAmb(kind) {
+  if (!ctx || SCENE['amb_' + kind]) return; SCENE['amb_' + kind] = true; const T = ctx.currentTime;
+  if (kind === 'road') { for (let k = 0; k < 28; k++) { osc('sine', 50, T + k * 0.42, 0.02, 0.05, 0.36, bus); noise(T + k * 0.42, 'lowpass', 300, 0.04, 0.3, 0.7, bus); }
+    const tune = [392, 440, 392, 330, 294, 330, 392, 0, 440, 494, 440, 392, 330, 294, 262, 0]; for (let k = 0; k < 32; k++) { const tk = T + 0.3 + k * 0.3, f = tune[k % 16]; osc('square', k % 2 ? 196 : 131, tk, 0.005, 0.012, 0.1, bus); if (f) { const o = osc('triangle', f, tk, 0.01, 0.014, 0.26, bus); o.frequency.setValueAtTime(f, tk); } } }
+  if (kind === 'market') { for (let k = 0; k < 26; k++) { const tk = T + k * 0.23 + rnd(k, 71) * 0.1; noise(tk, 'bandpass', 700 + rnd(k, 72) * 1800, 0.05, 0.16, 1.5, bus); if (k % 3 === 0) blipAt(tk, 260 + rnd(k, 73) * 260); }
+    const pat = [440, 494, 440, 392, 440, 494, 523, 494]; for (let r = 0; r < 4; r++) for (let k = 0; k < 8; k++) osc('square', pat[k] * 0.75, T + 0.4 + r * 1.3 + k * 0.12, 0.004, 0.022, 0.09, bus); }
+  if (kind === 'beach') for (let k = 0; k < 6; k++) { const tk = T + k * 1.9; noise(tk, 'lowpass', 700, 0.09, 1.6, 0.7, bus); noise(tk + 0.5, 'bandpass', 2600, 0.03, 0.9, 1, bus); }
+}
+// 마르코 sitting: on the sand (knees up) or on a box (legs down off its edge); facing right unless mir; the guitar on his knee
+// (play), the can in his hand (can), the case on his back (caseBack); eyes shut, a wince, his hand where it's put (hand)
+function sdSitMarco(x, y, nowMs, opt) {
+  const pose = { ...standPose(0), hand: opt.hand || (opt.play ? { x: BOSS_X + 20, y: 127 + (opt.strum ? 2 : 0) } : { x: BOSS_X + 20, y: 132 }), sad: !opt.smile, dip: 8 + (opt.dip || 0), doze: !!opt.eyesShut, wince: !!opt.wince };
+  FX.react[2] = FX.react[2] || { type: '', at: nowMs };
+  g.save(); if (opt.mir) { g.translate(x, 0); g.scale(-1, 1); g.translate(-x, 0); } g.translate(x - 150, y - 150);
+  if (opt.caseBack) sdCase(138, 148, 0);
+  g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(156, 150, 20, 3, 0, 0, Math.PI * 2); g.fill();
+  if (opt.box) { thick(146, 144, 164, 144, 7, '#3a4a6a'); thick(164, 144, 166, 162, 6, '#3a4a6a'); R(162, 161, 10, 4, '#1b1716'); thick(150, 145, 160, 145, 6, '#2c3a56'); thick(160, 145, 159, 161, 5, '#2c3a56'); R(156, 160, 8, 3, '#1b1716'); }
+  else { thick(146, 144, 166, 132, 7, '#3a4a6a'); thick(166, 132, 170, 148, 6, '#3a4a6a'); R(166, 147, 10, 4, '#1b1716'); thick(150, 145, 160, 136, 6, '#2c3a56'); thick(160, 136, 162, 148, 5, '#2c3a56'); R(158, 147, 8, 3, '#1b1716'); }
+  g.save(); g.beginPath(); g.rect(100, 0, 100, 146); g.clip();
+  drawActor('marco', 150, false, pose, nowMs, false, () => { if (opt.play) sdGuitar(BOSS_X + 18, 130, 0, 1); PARTNERS.marco.arm(pose); if (opt.can) { R(pose.hand.x - 1, pose.hand.y - 7, 4, 7, '#c8302a'); R(pose.hand.x - 1, pose.hand.y - 7, 4, 1, '#d8dde2'); R(pose.hand.x - 1, pose.hand.y - 4, 4, 2, '#f4efe2'); } });
+  g.restore(); g.restore();
+}
+// you sitting (facing left, or right with mir): cross-legged on the sand, or on a box with your legs down; the can in hand
+function sdSitPlayer(x, groundY, nowMs, opt = {}) {
+  g.save(); if (opt.mir) { g.translate(x, 0); g.scale(-1, 1); g.translate(-x, 0); } g.translate(x - PLAYER_X, groundY - 156);
+  g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(PLAYER_X, 156, 16, 3, 0, 0, Math.PI * 2); g.fill();
+  g.save(); g.beginPath(); g.rect(PLAYER_X - 30, 0, 60, 150); g.clip(); g.translate(0, 2); drawPlayer(0, nowMs); g.restore();
+  if (opt.box) { R(PLAYER_X - 14, 148, 18, 6, '#2c3440'); R(PLAYER_X - 16, 148, 6, 14, '#2c3440'); R(PLAYER_X - 8, 148, 6, 14, '#2c3440'); R(PLAYER_X - 18, 161, 8, 3, '#1b1716'); R(PLAYER_X - 10, 161, 8, 3, '#1b1716'); }
+  else { R(PLAYER_X - 15, 148, 30, 6, '#2c3440'); R(PLAYER_X - 15, 148, 30, 1, '#3a4452'); R(PLAYER_X - 17, 151, 5, 4, '#1b1716'); R(PLAYER_X + 12, 151, 5, 4, '#1b1716'); }
+  const hy = opt.canUp ? 124 : 138;
+  thick(PLAYER_X + 7, 116, PLAYER_X + 10, 140, 4, C.hoodie); R(PLAYER_X + 8, 139, 4, 4, C.skin);
+  thick(PLAYER_X - 7, 116, PLAYER_X - 13, hy, 4, C.hoodie); R(PLAYER_X - 15, hy - 1, 4, 4, C.skin);
+  if (opt.can) { R(PLAYER_X - 15, hy - 8, 4, 7, '#c8302a'); R(PLAYER_X - 15, hy - 8, 4, 1, '#d8dde2'); R(PLAYER_X - 15, hy - 5, 4, 2, '#f4efe2'); }
+  g.restore();
+}
+// the truck: out on the highway at night (out), then its back (in): half-empty, a few boxes, the doors ajar on the road
+// running away, the tunnel's lamps sweeping over the two of them on their boxes, the driver's trot through the cab wall
 function drawRoad(nowMs) {
-  const t = nowMs / 1000;
-  R(0, 0, W, H, '#16141a'); R(0, 0, W, 14, '#0e0c10'); R(0, 168, W, 48, '#221e22'); for (let x = 0; x < W; x += 16) R(x, 168, 1, 48, '#2a2428');
-  // the doors ajar on the right: the road behind, its lines running away, the tunnel's lamps
-  R(300, 30, 70, 138, '#0a0a12'); const sp = (t * 3) % 1;
-  for (let k = 0; k < 6; k++) { const p = (k / 6 + sp / 6) % 1, y = 168 - p * 80, w = 2 + (1 - p) * 10; R(334 - w / 2, y, w, 3 * (1 - p) + 1, '#d8c870'); }
-  for (let k = 0; k < 5; k++) { const p = (k / 5 + (t * 1.6) % 1 / 5) % 1; R(312 + p * 40, 40 + p * 6, 6 - p * 4, 2, '#ffb050'); }
-  R(296, 26, 6, 146, '#3a3640'); R(366, 26, 6, 146, '#3a3640');
-  for (const [x, y, w, h] of [[24, 112, 30, 26], [52, 120, 26, 20], [36, 92, 22, 20], [210, 130, 34, 30], [244, 140, 24, 20]]) { R(x, y + 48 - h, w, h, '#b9814a'); R(x, y + 48 - h, w, 3, '#d29a5e'); R(x + w / 2 - 1, y + 48 - h, 2, h, '#e2c08a'); }
-  // the two of them on boxes, 마르코 with the case beside him
-  { const pose = { ...standPose(0), hand: { x: BOSS_X + 12, y: 132 }, sad: true, dip: 2 }; FX.react[2] = FX.react[2] || { type: '', at: nowMs };
-    sdCase(150, 166, 0.1); R(110, 152, 34, 18, '#b9814a'); drawActor('marco', 128, false, pose, nowMs, false, () => PARTNERS.marco.arm(pose)); }
-  R(176, 152, 30, 18, '#b9814a'); g.save(); g.translate(190 - PLAYER_X, 6); drawPlayer(0, nowMs); g.restore();
-  // a tunnel lamp sweeping over everything every so often (orange), and the truck's sway
-  const sw = (t * 0.9) % 1; if (sw < 0.4) { const x = lerp(W + 60, -120, sw / 0.4), gr = g.createLinearGradient(x - 60, 0, x + 60, 0); gr.addColorStop(0, 'rgba(255,170,70,0)'); gr.addColorStop(0.5, 'rgba(255,170,70,.28)'); gr.addColorStop(1, 'rgba(255,170,70,0)'); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = gr; g.fillRect(x - 60, 0, 120, H); g.restore(); }
-  if (!SCENE.roadHum && ctx) { SCENE.roadHum = true; const T = ctx.currentTime; for (let k = 0; k < 24; k++) { osc('sine', 52, T + k * 0.5, 0.01, 0.05, 0.3, bus); if (k % 2) noise(T + k * 0.5 + 0.25, 'bandpass', 900, 0.03, 0.06, 2, bus); } }
+  const t = nowMs / 1000, act = SCENE.road || 'out';
+  sdAmb('road');
+  if (act === 'out') {
+    const sky = g.createLinearGradient(0, 0, 0, 120); sky.addColorStop(0, '#080c22'); sky.addColorStop(1, '#1e2244'); g.fillStyle = sky; g.fillRect(0, 0, W, 120);
+    for (let i = 0; i < 30; i++) R(rnd(i, 31) * W, rnd(i, 32) * 70, 1, 1, '#9aa4cc');
+    g.fillStyle = '#121630'; g.beginPath(); g.moveTo(0, 100); for (let x = 0; x <= W; x += 24) g.lineTo(x, 84 - Math.abs(Math.sin(x * 0.03 + 1)) * 26); g.lineTo(W, 120); g.lineTo(0, 120); g.closePath(); g.fill();
+    R(0, 112, W, 40, '#1a1a22'); R(0, 112, W, 2, '#3a3a44'); R(0, 150, W, 66, '#10121a'); for (let q = 0; q < 30; q++) R(rnd(q, 41) * W, 160 + rnd(q, 42) * 50, 3, 1, '#1a1e28');
+    { const gs = (t * 300) % 40; R(0, 150, W, 3, '#7a7e88'); R(0, 153, W, 1, '#3a3c44'); for (let x = -gs; x < W; x += 40) R(Math.round(x), 150, 2, 12, '#5a5e68'); }
+    const sc = (t * 260) % 64; for (let x = -sc; x < W; x += 64) R(Math.round(x), 131, 26, 2, '#c8b860');
+    const ps = (t * 90) % 120; for (let x = -ps; x < W + 40; x += 120) { R(Math.round(x), 60, 2, 52, '#3a3a48'); R(Math.round(x), 60, 12, 2, '#3a3a48'); R(Math.round(x) + 10, 62, 4, 2, '#ffb050'); g.fillStyle = 'rgba(255,170,80,.12)'; g.beginPath(); g.moveTo(Math.round(x) + 12, 64); g.lineTo(Math.round(x) - 10, 112); g.lineTo(Math.round(x) + 34, 112); g.closePath(); g.fill(); }
+    const bob = Math.floor(t * 8) % 2;
+    R(96, 76 + bob, 150, 46, '#d8dce0'); R(96, 76 + bob, 150, 2, '#f0f2f4'); R(246, 88 + bob, 44, 34, '#c84a2a'); R(250, 92 + bob, 22, 14, '#1a2440'); R(286, 110 + bob, 4, 6, '#fff2c0');
+    g.fillStyle = 'rgba(255,240,190,.18)'; g.beginPath(); g.moveTo(290, 112); g.lineTo(W, 104); g.lineTo(W, 134); g.closePath(); g.fill(); R(94, 112 + bob, 3, 4, '#ff4a3a');
+    const sp = Math.floor(t * 14) % 2; for (const wx of [110, 210, 262]) { R(wx, 120, 16, 16, '#0e0e12'); R(wx + 5, 125, 6, 6, '#5a6068'); R(wx + 7 + sp, 127, 2, 2, '#22242a'); }
+  } else {
+    R(0, 0, W, H, '#16141a'); R(0, 0, W, 14, '#0e0c10'); R(0, 132, W, 84, '#221e22'); for (let x = 0; x < W; x += 16) R(x, 132, 1, 84, '#2a2428');
+    R(300, 22, 70, 110, '#0a0a12'); const sp = (t * 3) % 1;
+    for (let q = 0; q < 6; q++) { const p = (q / 6 + sp / 6) % 1, y = 132 - p * 66, w = 2 + (1 - p) * 10; R(334 - w / 2, y, w, 3 * (1 - p) + 1, '#d8c870'); }
+    for (let q = 0; q < 5; q++) { const p = (q / 5 + (t * 1.6) % 1 / 5) % 1; R(312 + p * 40, 32 + p * 6, 6 - p * 4, 2, '#ffb050'); }
+    R(296, 18, 6, 116, '#3a3640'); R(366, 18, 6, 116, '#3a3640');
+    for (const [x, w, h] of [[16, 30, 26], [44, 26, 20], [26, 22, 18], [232, 30, 24], [262, 26, 18]]) { const y = (x === 26 ? 106 : 132) - h; R(x, y, w, h, '#b9814a'); R(x, y, w, 3, '#d29a5e'); R(x + w / 2 - 1, y, 2, h, '#e2c08a'); }
+    R(104, 112, 36, 20, '#b9814a'); R(104, 112, 36, 3, '#d29a5e'); R(166, 112, 32, 20, '#b9814a'); R(166, 112, 32, 3, '#d29a5e');
+    sdCase(152, 132, Math.PI / 2);
+    sdSitMarco(122, 116, nowMs, { box: true, mir: false });
+    sdSitPlayer(182, 116, nowMs, { box: true });
+    const sw = (t * 0.9) % 1; if (sw < 0.4) { const x = lerp(W + 60, -120, sw / 0.4), gr = g.createLinearGradient(x - 60, 0, x + 60, 0); gr.addColorStop(0, 'rgba(255,170,70,0)'); gr.addColorStop(0.5, 'rgba(255,170,70,.28)'); gr.addColorStop(1, 'rgba(255,170,70,0)'); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = gr; g.fillRect(x - 60, 0, 120, H); g.restore(); }
+  }
   drawSceneFade(nowMs);
 }
-// 2-5: the fish market at first light: tarp roofs, bulbs, red tubs and ice boxes, the stall keepers busy and loud, an
-// auctioneer's raised hand; 마르코 laughing at last
+// the fish market before light, under its bulbs: the truck's doors swinging open on it (light and din rushing in), the stall
+// keepers singing out their prices behind ice-heaped tables, the auctioneer on a crate calling the bids with his hand; 마르코
+// laughing at last
 function drawMarket(nowMs) {
-  const t = nowMs / 1000;
-  const sky = g.createLinearGradient(0, 0, 0, 80); sky.addColorStop(0, '#3a4a7a'); sky.addColorStop(1, '#e8a888'); g.fillStyle = sky; g.fillRect(0, 0, W, 80);
-  R(0, 60, W, 20, '#5a6a8a'); for (let k = 0; k < 9; k++) R(k * 44, 44 - (k % 3) * 6, 30, 36, '#4a5274');
-  R(0, 80, W, 136, '#6a6a70'); R(0, 150, W, 66, '#4a4e54'); for (let x = 0; x < W; x += 6) R(x, 150 + (x * 7) % 5, 3, 1, 'rgba(160,190,220,.25)');
-  [[0, '#2a7ab0'], [128, '#d84a3a'], [256, '#2a9a6a']].forEach(([x, c], i) => {
-    R(x + 4, 70, 120, 8, c); for (let k = 0; k < 6; k++) R(x + 4 + k * 20, 78, 10, 4, c); R(x + 8, 78, 2, 60, '#5a5a60'); R(x + 118, 78, 2, 60, '#5a5a60');
-    const on = (Math.floor(t * 2) + i) % 7 !== 0; R(x + 62, 82, 4, 5, on ? '#fff2c8' : '#8a7a5a'); if (on) { g.fillStyle = 'rgba(255,230,170,.18)'; g.beginPath(); g.arc(x + 64, 86, 22, 0, Math.PI * 2); g.fill(); }
-    R(x + 12, 120, 104, 18, '#e8ecee'); R(x + 12, 120, 104, 2, '#ffffff'); for (let k = 0; k < 6; k++) { R(x + 18 + k * 16, 114, 10, 5, '#9ab0c0'); R(x + 18 + k * 16, 114, 3, 2, '#c8d8e4'); }
-    R(x + 20, 138, 18, 12, '#d8352a'); R(x + 90, 138, 18, 12, '#d8352a');
-  });
-  // the stall keepers: rubber aprons and boots, an arm up shouting, the auctioneer's hand going on the beat of his patter
-  const keeper = (x, k, c) => { const up = Math.floor(t * 2.4 + k) % 3 === 0; R(x - 5, 100, 10, 12, '#efc7a6'); R(x - 6, 96, 12, 5, c); R(x - 7, 112, 14, 22, '#e8e0d0'); R(x - 6, 112, 12, 22, '#3a6a8a'); R(x - 6, 134, 5, 12, '#d8c020'); R(x + 1, 134, 5, 12, '#d8c020');
-    thick(x + 6, 116, x + (up ? 12 : 10), up ? 92 : 128, 3, '#e8e0d0'); if (up) { g.fillStyle = '#fff'; g.font = 'bold 8px sans-serif'; g.fillText(['자!', '싸요!', '오징어!', '헤이!'][k % 4], x + 8, 88); } };
-  keeper(70, 0, '#2a2a30'); keeper(200, 1, '#c84a2a'); keeper(326, 2, '#2a2a30');
-  if (!SCENE.mktNoise && ctx) { SCENE.mktNoise = true; const T = ctx.currentTime; for (let k = 0; k < 10; k++) { blipAt(T + k * 0.42, 300 + rnd(k, 71) * 300); noise(T + k * 0.42, 'bandpass', 1200 + rnd(k, 72) * 1400, 0.05, 0.12, 2, bus); } }
-  { const pose = { ...standPose(Math.floor(t * 2) % 2), hand: { x: BOSS_X + 14, y: SCENE.mktSmile ? 112 : 128 }, sad: !SCENE.mktSmile }; FX.react[2] = FX.react[2] || { type: '', at: nowMs };
-    g.save(); g.translate(0, 18); sdCase(142, 150, -0.35); drawActor('marco', 150, false, pose, nowMs, false, top => { R(BOSS_X - 8, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X + 1, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X - 9, top + 75, 9, 4, '#1b1716'); R(BOSS_X + 1, top + 75, 9, 4, '#1b1716'); PARTNERS.marco.arm(pose); }); g.restore(); }
-  sdStandPlayer(236, 186, nowMs, true);
+  const t = nowMs / 1000, act = SCENE.mkt || 'open', k = (performance.now() - (SCENE.mktAt || 0)) / 1000;
+  sdAmb('market');
+  const sky = g.createLinearGradient(0, 0, 0, 60); sky.addColorStop(0, '#0c1230'); sky.addColorStop(1, '#2a3058'); g.fillStyle = sky; g.fillRect(0, 0, W, 60);
+  for (let q = 0; q < 9; q++) R(q * 44, 30 - (q % 3) * 6, 30, 30, '#161a34');
+  R(0, 56, W, 160, '#3a3a40'); R(0, 56, W, 6, '#2a2a30'); R(0, 132, W, 84, '#2e3034'); for (let x = 0; x < W; x += 6) R(x, 132 + (x * 7) % 5, 3, 1, 'rgba(160,190,220,.2)');
+  // the bulbs and their warm pools
+  for (let q = 0; q < 7; q++) { const x = 24 + q * 56, on = (Math.floor(t * 2) + q) % 9 !== 0; R(x, 56, 1, 10, '#1a1a1a'); R(x - 2, 66, 5, 4, on ? '#fff2c8' : '#8a7a5a'); if (on) { const gl = g.createRadialGradient(x, 70, 2, x, 70, 48); gl.addColorStop(0, 'rgba(255,214,150,.28)'); gl.addColorStop(1, 'rgba(255,214,150,0)'); g.fillStyle = gl; g.fillRect(x - 48, 22, 96, 96); } }
+  // the stall keepers behind their tables: different hats and aprons, an arm up shouting a price now and then
+  const KEEP = [[186, '#2a2a30', '#3a6a8a', '골라 골라!'], [212, '#d84a3a', '#5a7a4a', '떨이요!'], [336, '#e8e0c8', '#8a4a3a', '싱싱해요!']];
+  KEEP.forEach(([x, hat, apron, call], i) => { const up = Math.floor(t * 1.8 + i * 1.3) % 3 === 0;
+    R(x - 5, 76, 10, 12, '#efc7a6'); R(x - 6, 72, 12, 5, hat); if (i === 1) R(x - 6, 76, 12, 2, hat); R(x - 7, 88, 14, 26, '#e8e0d0'); R(x - 6, 88, 12, 26, apron);
+    thick(x + 6, 92, x + (up ? 12 : 10), up ? 70 : 104, 3, '#e8e0d0'); R(x + (up ? 10 : 8), up ? 66 : 103, 4, 4, '#efc7a6');
+    if (up) { g.fillStyle = '#fff6d8'; g.font = 'bold 8px sans-serif'; g.fillText(call, x + 10, 64); } });
+  // the tables: ice, fish laid out, red tubs, a styrofoam stack
+  for (const [x, w] of [[156, 82], [300, 76]]) { R(x, 108, w, 18, '#e8ecee'); R(x, 108, w, 2, '#ffffff'); for (let q = 0; q < w - 10; q += 14) { R(x + 4 + q, 104, 10, 4, '#9ab0c0'); R(x + 4 + q, 104, 3, 2, '#c8d8e4'); } R(x + 4, 126, 16, 10, '#d8352a'); R(x + w - 20, 126, 16, 10, '#d8352a'); }
+  // the auctioneer on his crate in the middle, his hand chopping out the bids
+  { const x = 270, ch = Math.floor(t * 8) % 2; R(x - 10, 116, 20, 16, '#7a5a3a'); R(x - 10, 116, 20, 2, '#9a7a5a'); R(x - 5, 66, 10, 12, '#efc7a6'); R(x - 6, 62, 12, 5, '#f0c020'); R(x - 7, 78, 14, 30, '#2a3a5a'); R(x - 6, 108, 5, 8, '#1b1716'); R(x + 1, 108, 5, 8, '#1b1716');
+    thick(x + 6, 82, x + 14, ch ? 62 : 70, 3, '#2a3a5a'); R(x + 12, ch ? 58 : 66, 4, 4, '#efc7a6'); for (let q = 0; q < 3; q++) R(x - 30 + q * 9, 98, 6, 18, '#3a3a44'); }
+  // 마르코 and you in front, his case on his back
+  { const pose = { ...standPose(Math.floor(t * 2) % 2), hand: { x: BOSS_X + 14, y: act === 'smile' ? 112 : 126 }, sad: act !== 'smile' }; FX.react[2] = FX.react[2] || { type: '', at: nowMs };
+    g.save(); g.translate(0, -40); sdCase(52, 168, 0); drawActor('marco', 60, false, pose, nowMs, false, top => { R(BOSS_X - 8, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X + 1, top + 60, 7, 16, '#3a4a6a'); R(BOSS_X - 9, top + 75, 9, 4, '#1b1716'); R(BOSS_X + 1, top + 75, 9, 4, '#1b1716'); PARTNERS.marco.arm(pose); }); g.restore(); }
+  sdStandPlayer(104, 132, nowMs, true);
+  // the doors swinging open on it all: light rushing in
+  if (act === 'open' && k < 0.9) { const p = ease(Math.min(1, k / 0.6)); R(0, 0, Math.round(W / 2 * (1 - p)), H, '#c8ccd0'); R(Math.round(W / 2 + W / 2 * p), 0, W, H, '#c8ccd0'); g.fillStyle = `rgba(255,248,226,${0.55 * (1 - k / 0.9)})`; g.fillRect(0, 0, W, H); }
+  drawSceneFade(nowMs);
+}
+// the beach before dawn: they sit on the sand; 마르코 hands you the can; his hand to his back and the case off it onto the
+// sand; "…아."; the case opens on the old guitar, its strings rusty (the camera goes in on them)
+function drawBeachScene(nowMs) {
+  const t = nowMs / 1000, act = SCENE.beach || 'sit', k = (performance.now() - (SCENE.beachAt || 0)) / 1000;
+  sdAmb('beach');
+  sdBeachBack(0.14, null, nowMs, 0, 200);
+  const caseOff = ['case', 'open'].includes(act) || (act === 'back' && k > 1.0), canGiven = act !== 'sit' && !(act === 'can' && k < 1.0);
+  // the case on the sand between them (lid open on the guitar for 'open')
+  if (caseOff) { const lid = act === 'open' ? ease(Math.min(1, k / 0.6)) : 0, cx = 200, cy = 122;
+    R(cx - 26, cy - 8, 52, 12, '#2a1d17'); R(cx - 24, cy - 6, 48, 8, '#7a2a3a');
+    if (lid > 0) { sdGuitar(cx - 2, cy - 2, Math.PI, 0.95); for (let s = 0; s < 4; s++) R(cx - 20, cy - 4 + s, 36, 1, s % 2 ? '#a07040' : '#8a5a34'); R(cx - 26, cy - 8 - Math.round(12 * lid), 52, Math.round(12 * lid), '#3a2a20'); }
+    else { R(cx - 26, cy - 8, 52, 2, '#3e2c22'); R(cx - 6, cy - 6, 5, 3, '#e8e0c8'); } }
+  // 마르코 (facing left), you (facing right)
+  const back = act === 'back' && k < 1.0, hand = back ? { x: BOSS_X - 9, y: 134 } : act === 'can' && k < 1.2 ? { x: BOSS_X + 30, y: 122 } : act === 'case' ? { x: BOSS_X + 22, y: 136 } : null;
+  sdSitMarco(236, 120, nowMs, { mir: true, caseBack: !caseOff, can: !canGiven, hand, wince: back, dip: act === 'case' || act === 'open' ? 2 : 0 });
+  // the can going from his hand to yours
+  if (act === 'can' && k >= 1.0 && k < 1.3) { const p = (k - 1.0) / 0.3; R(lerp(206, 170, p), 102, 4, 7, '#c8302a'); }
+  sdSitPlayer(150, 121, nowMs, { mir: true, can: canGiven, canUp: act === 'can' && k > 1.6 && k < 2.2 });
   drawSceneFade(nowMs);
 }
 // a short blip at audio time T (the stall keepers' voices, far off)
 function blipAt(T, f) { osc('square', f, T, 0.005, 0.02, 0.08, bus); osc('square', f * 1.2, T + 0.09, 0.005, 0.016, 0.08, bus); }
 // the beach before dawn (and through the guitar's sunrise): sky, sea, foam, sand, by dawn (0 night .. 1 sun up) and sun y
-function sdBeachBack(dawn, sunY, nowMs, beatPulse) {
+function sdBeachBack(dawn, sunY, nowMs, beatPulse, sunX = 268) {
   const t = nowMs / 1000;
   const sky = g.createLinearGradient(0, 0, 0, 74); sky.addColorStop(0, mixC('#0e1636', '#4a7ac0', dawn)); sky.addColorStop(0.7, mixC('#3a3460', '#f0a88a', dawn)); sky.addColorStop(1, mixC('#7a4a6a', '#ffd8a0', dawn)); g.fillStyle = sky; g.fillRect(0, 0, W, 74);
   g.globalAlpha = 1 - dawn; for (let i = 0; i < 26; i++) R(rnd(i, 51) * W, rnd(i, 52) * 54, 1, 1, '#c8d0f0'); g.globalAlpha = 1;
-  if (sunY != null) { const sg = g.createRadialGradient(268, sunY, 4, 268, sunY, 60); sg.addColorStop(0, 'rgba(255,236,190,.75)'); sg.addColorStop(1, 'rgba(255,200,150,0)'); g.fillStyle = sg; g.fillRect(200, sunY - 60, 140, 120); g.fillStyle = '#fff1c6'; g.beginPath(); g.arc(268, sunY, 9, 0, Math.PI * 2); g.fill(); }
+  if (sunY != null) { const sg = g.createRadialGradient(sunX, sunY, 4, sunX, sunY, 60); sg.addColorStop(0, 'rgba(255,236,190,.75)'); sg.addColorStop(1, 'rgba(255,200,150,0)'); g.fillStyle = sg; g.fillRect(sunX - 68, sunY - 60, 140, 120); g.fillStyle = '#fff1c6'; g.beginPath(); g.arc(sunX, sunY, 9, 0, Math.PI * 2); g.fill(); }
   const sea = g.createLinearGradient(0, 74, 0, 100); sea.addColorStop(0, mixC('#1a2650', '#6a8cc0', dawn)); sea.addColorStop(1, mixC('#121c3c', '#2e5a96', dawn)); g.fillStyle = sea; g.fillRect(0, 74, W, 28);
   R(0, 74, W, 2, mixC('#3a3a6a', '#ffd8b0', dawn));
-  if (sunY != null) for (let k = 0; k < 8; k++) { const w = 20 - k * 2 + Math.sin(t * 3 + k) * 3; g.fillStyle = `rgba(255,226,170,${0.5 - k * 0.05})`; g.fillRect(Math.round(268 - w / 2), 76 + k * 3, Math.round(w), 1); }
+  if (sunY != null) for (let k = 0; k < 8; k++) { const w = 20 - k * 2 + Math.sin(t * 3 + k) * 3; g.fillStyle = `rgba(255,226,170,${0.5 - k * 0.05})`; g.fillRect(Math.round(sunX - w / 2), 76 + k * 3, Math.round(w), 1); }
   for (let k = 0; k < 14; k++) { const y = 78 + k * 2, x = (rnd(k, 53) * W + t * (6 + k % 3)) % W; R(x, y, 6 + (k % 3) * 4, 1, mixC('#3a4a7a', '#a8c4e8', dawn)); }
   const sand = g.createLinearGradient(0, 100, 0, 216); sand.addColorStop(0, mixC('#4a4252', '#c8aa88', dawn)); sand.addColorStop(1, mixC('#2a2430', '#8a6e5a', dawn)); g.fillStyle = sand; g.fillRect(0, 102, W, 114);
   const fo = Math.round(Math.sin(t * 0.9) * 2 + (beatPulse || 0) * 4); R(0, 100 + fo, W, 3, mixC('#8aa0c8', '#f4f0e6', dawn)); R(0, 103 + fo, W, 1, mixC('#6a7aa0', '#e0dcd0', dawn));
   for (let k = 0; k < 3; k++) { const x = (k * 140 + t * (10 + k * 3)) % (W + 40) - 20, y = 18 + k * 9 + Math.round(Math.sin(t * 1.3 + k) * 2), up = Math.floor(t * 3 + k) % 2, c = mixC('#2a2a44', '#5a4a5a', dawn); R(x - 3, y + (up ? 0 : 1), 3, 1, c); R(x, y + 1, 2, 1, c); R(x + 2, y + (up ? 0 : 1), 3, 1, c); }
-}
-// 마르코 sitting on the sand (from the side), the guitar in his lap (playing: his right hand at the soundhole), or the case
-function sdSitMarco(x, y, nowMs, opt) {
-  const pose = { ...standPose(0), hand: opt.play ? { x: BOSS_X + 20, y: 127 + (opt.strum ? 2 : 0) } : { x: BOSS_X + 20, y: 132 }, sad: !opt.smile, dip: 8 };
-  FX.react[2] = FX.react[2] || { type: '', at: nowMs };
-  g.save(); g.translate(x - 150, y - 150);
-  g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(156, 150, 20, 3, 0, 0, Math.PI * 2); g.fill();
-  thick(146, 144, 166, 132, 7, '#3a4a6a'); thick(166, 132, 170, 148, 6, '#3a4a6a'); R(166, 147, 10, 4, '#1b1716');
-  thick(150, 145, 160, 136, 6, '#2c3a56'); thick(160, 136, 162, 148, 5, '#2c3a56'); R(158, 147, 8, 3, '#1b1716');
-  g.save(); g.beginPath(); g.rect(100, 0, 100, 146); g.clip();
-  drawActor('marco', 150, false, pose, nowMs, false, () => { if (opt.play) sdGuitar(BOSS_X + 18, 130, -0.3, 1); PARTNERS.marco.arm(pose); });
-  g.restore(); g.restore();
-}
-function drawBeachScene(nowMs) {
-  const act = SCENE.beach || '';
-  sdBeachBack(0.12, null, nowMs, 0);
-  sdSitMarco(150, 150, nowMs, { play: false, smile: false });
-  if (act !== 'open') sdCase(196, 160, 1.4); else { R(184, 152, 34, 10, '#2a1d17'); R(186, 153, 30, 8, '#7a2a3a'); sdGuitar(204, 150, 0, 1); }
-  sdSitPlayer(250, 151, nowMs); R(236, 132, 4, 6, '#c8302a'); R(236, 132, 4, 1, '#d8dde2');
-  drawSceneFade(nowMs);
 }
 // you, standing in a scene (the game draws you from the waist up behind your scanner): legs, shoes and arms added
 function sdStandPlayer(x, floorY, nowMs, mir, step) {
@@ -6276,14 +6344,6 @@ function sdStandPlayer(x, floorY, nowMs, mir, step) {
   const st = step == null ? 0 : step ? 2 : -2;
   R(PLAYER_X - 8 + st, 146, 7, 22, '#2c3440'); R(PLAYER_X + 1 - st, 146, 7, 22, '#2c3440'); R(PLAYER_X - 9 + st, 167, 9, 4, '#1b1716'); R(PLAYER_X + 1 - st, 167, 9, 4, '#1b1716');
   drawPlayer(0, nowMs); thick(PLAYER_X - 8, 114, PLAYER_X - 10, 138, 4, C.hoodie); R(PLAYER_X - 12, 137, 4, 4, C.skin); thick(PLAYER_X + 8, 114, PLAYER_X + 10, 138, 4, C.hoodie); R(PLAYER_X + 8, 137, 4, 4, C.skin);
-  g.restore();
-}
-function sdSitPlayer(x, groundY, nowMs) {
-  g.save(); g.translate(x - PLAYER_X, groundY - 156);
-  g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(PLAYER_X, 156, 16, 3, 0, 0, Math.PI * 2); g.fill();
-  g.save(); g.beginPath(); g.rect(PLAYER_X - 30, 0, 60, 150); g.clip(); g.translate(0, 2); drawPlayer(0, nowMs); g.restore();
-  R(PLAYER_X - 15, 148, 30, 6, '#2c3440'); R(PLAYER_X - 15, 148, 30, 1, '#3a4452'); R(PLAYER_X - 17, 151, 5, 4, '#1b1716'); R(PLAYER_X + 12, 151, 5, 4, '#1b1716');
-  thick(PLAYER_X - 7, 116, PLAYER_X - 12, 140, 4, C.hoodie); R(PLAYER_X - 14, 139, 4, 4, C.skin); thick(PLAYER_X + 7, 116, PLAYER_X + 10, 140, 4, C.hoodie); R(PLAYER_X + 8, 139, 4, 4, C.skin);
   g.restore();
 }
 const SD_SCENES = { black: drawBlack, hosp: drawHosp, dock: drawDock, road: drawRoad, market: drawMarket, beach: drawBeachScene };
@@ -6316,21 +6376,47 @@ function gtrHitSound(j, beat, lane) {
   const v = j === 'good' ? 0.7 : 1;
   if (lane === 0) { noise(T, 'lowpass', 600, 0.14 * v, 0.03, 0.8, bus); osc('sine', 160, T, 0.001, 0.06 * v, 0.05, bus); } else { noise(T, 'bandpass', 3200, 0.12 * v, 0.02, 3, bus); osc('sine', 1200, T, 0.001, 0.03 * v, 0.03, bus); }
 }
+// 반장 on the phone: a video call in the sky's corner (his room: the mint wall, the window going light with ours, him in
+// his gown against the pillow, his hand tapping the bed rail on the thumb's beats while the song plays)
+function gtrPhone(b, dawn, active, nowMs) {
+  const D = L.gtr, slide = active ? Math.min(1, Math.max(0, (b - D.ring) / 0.6)) : 1; if (slide <= 0) return;
+  const x0 = 28, y0 = Math.round(lerp(-60, 30, ease(slide))), w = 76, h = 50;
+  R(x0 - 2, y0 - 2, w + 4, h + 4, '#0e0e12'); R(x0 - 2, y0 - 2, w + 4, 1, '#3a3a44');
+  R(x0, y0, w, h, '#cfdcd2'); R(x0, y0 + h - 12, w, 12, '#c4d2c8');
+  const ws = mixC('#26305a', '#f4d8b8', dawn); R(x0 + 50, y0 + 6, 20, 22, ws); R(x0 + 49, y0 + 5, 22, 1, '#e8eee8'); R(x0 + 59, y0 + 5, 1, 24, '#e8eee8');
+  R(x0 + 4, y0 + 22, 22, 26, '#f4f6f6');
+  const cx = x0 + 24, top = y0 + 12;
+  R(cx - 7, top + 12, 16, 20, '#a9c6da'); R(cx - 2, top + 12, 5, 3, '#efc7a6');
+  R(cx - 5, top, 10, 12, '#efc7a6'); R(cx - 5, top, 10, 3, '#5e5850'); R(cx - 5, top + 2, 2, 5, '#5e5850'); R(cx + 2, top + 5, 2, 2, '#1d1815'); R(cx + 1, top + 9, 4, 1, '#5e5850');
+  R(x0 + 4, y0 + h - 6, w - 8, 2, '#9aa4ac');
+  const tap = active && b >= D.song && b < D.endTap && Math.floor(b) % 2 === 0 && (b % 1) < 0.22;
+  thick(cx + 7, top + 16, cx + 18, tap ? y0 + h - 7 : y0 + h - 11, 3, '#a9c6da'); R(cx + 16, (tap ? y0 + h - 9 : y0 + h - 13), 4, 4, '#efc7a6');
+  if (tap) { g.globalAlpha = 0.7; R(cx + 13, y0 + h - 5, 10, 1, '#ffffff'); g.globalAlpha = 1; }
+  R(x0 + w - 8, y0 + 3, 5, 3, '#d8352a');
+}
 function drawGtr(t, nowMs, active) {
   const D = L.gtr, live = active || state === 'outro' || state === 'result', b = active ? beatAt(t) : live ? END_BEAT : 0, T = active ? t : timeAt(END_BEAT), now = performance.now();
-  const dawn = Math.max(0, Math.min(1, (b - D.dawn[0]) / (D.dawn[1] - D.dawn[0]))), sunY = b >= D.sun[0] ? lerp(78, 30, ease(Math.min(1, (b - D.sun[0]) / (D.sun[1] - D.sun[0])))) : null;
+  const dawn = Math.max(0, Math.min(1, (b - D.dawn[0]) / (D.dawn[1] - D.dawn[0]))), sunY = b >= D.sun[0] - 2 ? lerp(80, 30, ease(Math.min(1, (b - (D.sun[0] - 2)) / (D.sun[1] - D.sun[0])))) : null;
   const ph = b - Math.floor(b), pulse = b >= D.waves ? Math.max(0, 1 - ph * 2.5) : 0;
+  const GA = state === 'outro' && SCENE.gtr ? SCENE.gtr : '', gk = GA ? (now - (SCENE.gtrAt || now)) / 1000 : 0;
+  // the HUD goes once the last chord has rung out (the scene is the beach again)
+  { const cine = !active || b >= D.end + 0.5; if (hud.classList.contains('cine') !== cine && (active || state === 'outro')) { hud.classList.toggle('cine', cine); judgeEl.classList.toggle('cine', cine); $('devbtn').classList.toggle('cine', cine); } }
   g.save();
-  sdBeachBack(0.12 + 0.88 * dawn, sunY, nowMs, pulse);
-  // the open case, the phone propped in it (반장 in his bed while the call is on), 마르코 playing, you with the can
-  const call = b >= D.call || !active;
-  R(170, 104, 34, 9, '#2a1d17'); R(172, 105, 30, 7, '#7a2a3a');
-  if (call) { R(182, 88, 11, 17, '#1a1a20'); R(183, 89, 9, 14, '#a8c4d8'); R(185, 92, 5, 5, '#efc7a6'); R(185, 91, 5, 2, '#8a8a90'); R(185, 98, 5, 5, '#5a6a7a');
-    const tap = b >= D.song && !(b >= D.endTap) && ph < 0.2 && Math.floor(b) % 2 === 0; R(188, tap ? 101 : 99, 3, 2, '#efc7a6'); }
+  sdBeachBack(0.12 + 0.88 * dawn, sunY, nowMs, pulse, 200);
+  // the moment the sun's rim breaks the sea: a warm flash
+  if (active && b >= D.sun[0] && b < D.sun[0] + 1.2) { g.fillStyle = `rgba(255,230,170,${0.45 * (1 - (b - D.sun[0]) / 1.2)})`; g.fillRect(0, 0, W, H); }
+  gtrPhone(b, dawn, active, nowMs);
+  // the open case on the sand between them; 마르코 (right, facing left: the guitar's head to the left like the neck below),
+  // eyes shut through the quiet part, smiling from the sunrise; you with the can, lifted on the beat once the waves come
+  R(176, 102, 44, 9, '#2a1d17'); R(178, 103, 40, 7, '#7a2a3a');
   const thumbNow = live && notes.some(n => n.lane === 0 && n.state === 'hit' && T - n.hitAt < 0.12), fingNow = live && notes.some(n => n.lane === 1 && n.state === 'hit' && T - n.hitAt < 0.12);
-  sdSitMarco(138, 112, nowMs, { play: true, strum: thumbNow || fingNow, smile: b >= D.smile });
-  { const can = b >= D.waves && ph < 0.15; sdSitPlayer(232, 113, nowMs); R(218, can ? 95 : 93, 4, 6, '#c8302a'); R(218, can ? 95 : 93, 4, 1, '#d8dde2'); }
-  // the neck: the fretboard across, frets going by (it moves the way the lights do), the body and its soundhole on the right
+  const tapBody = GA === 'tap' && gk > 1.6 && gk < 1.85;
+  sdSitMarco(262, 112, nowMs, { mir: true, play: true, strum: thumbNow || fingNow || tapBody, smile: (b >= D.smile && !(GA === 'tap' && gk > 0.4)) || false, eyesShut: active && b >= D.quiet[0] && b < D.quiet[1], dip: GA === 'tap' && gk > 0.6 ? 3 : 0, hand: GA === 'tap' && gk > 1.2 ? { x: BOSS_X + 14, y: tapBody ? 131 : 126 } : null });
+  if (GA === 'tap' && !SCENE.gtrTapped && gk > 1.6 && ctx) { SCENE.gtrTapped = true; levelSfx(ctx.currentTime, 'thump'); }
+  sdSitPlayer(150, 113, nowMs, { mir: true, can: true, canUp: b >= D.waves && b < D.end && ph < 0.15 });
+  // the neck: slides away down once the last chord has rung (the beach is left)
+  const drop = b >= D.end + 0.6 ? Math.round(ease(Math.min(1, (b - D.end - 0.6) / 2)) * 120) : 0;
+  g.save(); g.translate(0, drop);
   const top = GTR.y0 - 10, bot = gtrY(5) + 10;
   R(0, top - 3, W, bot - top + 6, '#2a1a12'); R(0, top, 300, bot - top, '#3a2416'); R(0, top, 300, 1, '#5a3a24'); R(0, bot - 1, 300, 1, '#1a0e08');
   const spd = (GTR.hitX - 8) / (D.travel * SPB), off = (T * spd) % 46;
@@ -6338,16 +6424,20 @@ function drawGtr(t, nowMs, active) {
   for (let x = -off + 23; x < 300; x += 92) { g.fillStyle = '#e8e0c8'; g.beginPath(); g.arc(Math.round(x), (top + bot) / 2, 2, 0, Math.PI * 2); g.fill(); }
   R(300, top - 6, 84, bot - top + 12, '#c89a5e'); R(300, top - 6, 84, 2, '#e0b878'); R(300, top - 6, 3, bot - top + 12, '#8a5a2e');
   g.fillStyle = '#1a0e08'; g.beginPath(); g.arc(344, (top + bot) / 2, 28, 0, Math.PI * 2); g.fill(); g.strokeStyle = '#6a3a1a'; g.lineWidth = 3; g.beginPath(); g.arc(344, (top + bot) / 2, 31, 0, Math.PI * 2); g.stroke();
-  // the line you play on (over the soundhole), a soft column of light
+  // the two groups of strings in their own colours (the thumb's warm, the fingers' cool), a soft band behind each
+  g.fillStyle = 'rgba(255,170,90,.07)'; g.fillRect(0, gtrY(3) - 7, 300, gtrY(5) - gtrY(3) + 14); g.fillStyle = 'rgba(120,210,240,.06)'; g.fillRect(0, gtrY(0) - 7, 300, gtrY(2) - gtrY(0) + 14);
   { const gl = g.createLinearGradient(GTR.hitX - 8, 0, GTR.hitX + 8, 0); gl.addColorStop(0, 'rgba(255,230,160,0)'); gl.addColorStop(0.5, `rgba(255,230,160,${0.22 + 0.15 * Math.max(0, 1 - ph * 3)})`); gl.addColorStop(1, 'rgba(255,230,160,0)'); g.fillStyle = gl; g.fillRect(GTR.hitX - 8, top, 16, bot - top); R(GTR.hitX, top, 1, bot - top, 'rgba(255,240,200,.55)'); }
-  // the strings: rusty until each is tuned, then bright; thick at the bottom; a struck one shakes
+  // the last chord: every string shaking at once
+  if (active && b >= D.end && !GTR.endFx) { GTR.endFx = true; for (let s = 0; s < 6; s++) GTR.fx[s] = { at: now, j: 'perfect' }; }
+  if (b < D.end) GTR.endFx = false;
+  const gold = active && b >= D.sun[0] && b < D.sun[0] + 0.8;
   for (let s = 0; s < 6; s++) {
-    const y = gtrY(s), w = s >= 3 ? 2 : 1, f = GTR.fx[s], age = (now - f.at) / 1000, amp = age < 0.5 ? (1 - age / 0.5) * 2.2 : 0, bright = GTR.tuned[s] || b >= D.song, miss = f.j === 'miss' && age < 0.3;
-    const col = miss ? '#e05040' : bright ? (s >= 3 ? '#d8c8a0' : '#e8e8ec') : '#8a6a4a';
+    const y = gtrY(s), w = s >= 3 ? 2 : 1, f = GTR.fx[s], age = (now - f.at) / 1000, amp = age < (b >= D.end ? 1.4 : 0.5) ? (1 - age / (b >= D.end ? 1.4 : 0.5)) * 2.2 : 0, bright = GTR.tuned[s] || b >= D.song, miss = f.j === 'miss' && age < 0.3;
+    const col = gold ? '#ffd870' : miss ? '#e05040' : bright ? (s >= 3 ? '#e8c890' : '#d8eef4') : '#b0784a';
+    if (!bright) R(0, y + w, W, 1, '#1a0e08');
     if (amp > 0) for (let x = 0; x < W; x += 3) R(x, y + Math.round(Math.sin(x * 0.2 + age * 60) * amp * Math.sin(Math.PI * x / W)), 3, w, col); else R(0, y, W, w, col);
     if (age < 0.2 && f.j !== 'miss') { g.globalAlpha = 1 - age / 0.2; R(GTR.hitX - 6, y - 4, 13, 8 + w, '#fff6d8'); g.globalAlpha = 1; }
   }
-  // the lights riding the strings in
   if (live) for (const n of notes) {
     if (n.lane == null || n.victim) continue;
     const s = gtrString(n), y = gtrY(s), x = GTR.hitX - (n.arr - T) * spd;
@@ -6357,10 +6447,21 @@ function drawGtr(t, nowMs, active) {
     else if (n.state === 'hit' && T - n.hitAt < 0.35) { const k = (T - n.hitAt) / 0.35; g.globalAlpha = 1 - k; g.strokeStyle = n.lane === 0 ? '#ffd090' : '#c8f6ff'; g.lineWidth = 2; g.beginPath(); g.arc(GTR.hitX, y, 4 + k * 14, 0, Math.PI * 2); g.stroke(); g.globalAlpha = 1; }
     else if (n.state === 'miss' && T - n.hitAt < 0.4) { GTR.fx[s] = GTR.fx[s].at > now - 400 ? GTR.fx[s] : { at: now - (T - n.hitAt) * 1000, j: 'miss' }; }
   }
-  // which hand: the labels at the start of each (the thumb's when the song comes in, the fingers' when they first come)
-  const lab = (txt, y, c, a) => { if (a <= 0) return; g.globalAlpha = a; g.fillStyle = 'rgba(10,6,4,.7)'; g.fillRect(4, y - 8, 64, 12); g.fillStyle = c; g.font = 'bold 9px sans-serif'; g.fillText(txt, 8, y + 1); g.globalAlpha = 1; };
-  if (active) { const fa = x => Math.max(0, Math.min(1, x)); lab('엄지 · F', gtrY(4), '#ffb060', fa(Math.min((b - D.labels[0] + 1), (D.labels[0] + 10 - b) / 2)) ); lab('손가락 · J', gtrY(1), '#8fe8ff', fa(Math.min((b - D.labels[1] + 1), (D.labels[1] + 10 - b) / 2))); }
+  // which keys: caps by the strings they play, at the line (pulsing until the first box of each hand is played)
+  if (active || state === 'outro') { const cap = (x, y, ch, c, on) => { R(x, y, 10, 10, '#141012'); R(x, y, 10, 1, c); R(x + 1, y + 9, 8, 1, '#000'); g.fillStyle = on ? c : '#d8d0c0'; g.font = 'bold 8px monospace'; g.fillText(ch, x + 2, y + 8); };
+    const p1 = notes.some(n => n.lane === 0 && n.state === 'hit'), p2 = notes.some(n => n.lane === 1 && n.state === 'hit'), bl = Math.floor(now / 300) % 2;
+    cap(372, gtrY(4) - 11, 'F', '#ffb060', !p1 && bl); cap(372, gtrY(4) + 1, 'D', '#ffb060', !p1 && bl); cap(372, gtrY(1) - 11, 'J', '#8fe8ff', !p2 && bl); cap(372, gtrY(1) + 1, 'K', '#8fe8ff', !p2 && bl); }
   g.restore();
+  if (drop > 0) { const sand = g.createLinearGradient(0, 100, 0, 216); sand.addColorStop(0, mixC('#4a4252', '#c8aa88', 1)); sand.addColorStop(1, mixC('#2a2430', '#8a6e5a', 1)); g.fillStyle = sand; g.fillRect(0, Math.max(118, top - 3), W, Math.min(drop, H)); }
+  // the ending's last beat: to black
+  if (GA === 'fade') { g.fillStyle = `rgba(0,0,0,${Math.min(1, gk / 2)})`; g.fillRect(0, 0, W, H); }
+  g.restore();
+  // into the guitar: from right in on its rusty strings (where the beach scene left off) out to the whole neck and the beach
+  if (active && b < 1.8) { const zk = ease(Math.max(0, b / 1.8)); if (!GTR.buf) { GTR.buf = document.createElement('canvas'); }
+    if (GTR.buf.width !== cv.width) { GTR.buf.width = cv.width; GTR.buf.height = cv.height; }
+    const c = GTR.buf.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height); c.drawImage(cv, 0, 0);
+    const sx = lerp(130, 0, zk), sy = lerp(gtrY(3) - 20, 0, zk), sw = lerp(96, W, zk), sh = lerp(54, H, zk), kx = cv.width / W;
+    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.drawImage(GTR.buf, sx * kx, sy * kx, sw * kx, sh * kx, 0, 0, cv.width, cv.height); g.restore(); }
 }
 function drawMid(t, nowMs, active) {
   const F = L.phaseFx, M = L.mid, bReal = active ? beatAt(t) : castBeatAt(t, active), live = active || state === 'outro' || state === 'result';
@@ -7214,7 +7315,7 @@ function drawPairBolt(nowMs) {
 // and on the line 반장 walks from the middle of the room over to his spot behind the belt before the next line shows.
 const SCENE = { kind: 'line', trans: null, walk: null };
 const OFFICE_X = 192, WALK_FROM = 200;
-function sceneReset(kind = 'line') { SCENE.kind = kind; SCENE.trans = null; SCENE.walk = null; SCENE.office = null; SCENE.enter = null; SCENE.jpose = null; SCENE.o17 = null; SCENE.act = null; SCENE.cam = null; Object.assign(SCENE, { hospBrought: false, hospStrum: false, dockLeave: false, hosp: null, hospAt: 0, hospTook: false, hospSmile: false, dock: null, dockAt: 0, dockWho: '', beach: null, mktSmile: false, roadHum: false, mktNoise: false }); }
+function sceneReset(kind = 'line') { SCENE.kind = kind; SCENE.trans = null; SCENE.walk = null; SCENE.office = null; SCENE.enter = null; SCENE.jpose = null; SCENE.o17 = null; SCENE.act = null; SCENE.cam = null; Object.assign(SCENE, { hospBrought: false, hospStrum: false, dockLeave: false, hosp: null, hospAt: 0, hospTook: false, hospSmile: false, dock: null, dockAt: 0, dockWho: '', beach: null, beachAt: 0, road: null, mkt: null, mktAt: 0, gtr: null, gtrAt: 0, gtrTapped: false, amb_road: false, amb_market: false, amb_beach: false }); }
 function sceneCut(to, done) {
   const now = performance.now(), out = reduce ? 200 : L.cine ? 700 : 320, walk = reduce || L.daw || L.cine || L.sd || L.gtr || to !== 'line' ? 0 : 2600;   // 반장's walk to the line only on the way in
   SCENE.trans = { at: now, out, to, done, swapped: false, walk };
@@ -8534,6 +8635,7 @@ function levelSfx(t, kind) {
   // 2-4: the main switch thrown (a heavy clunk) and the power going (the hum falling away); 2-6: 소장's pen on his clipboard
   if (kind === 'lever') { const o = osc('sine', 85, t, 0.001, 0.5, 0.22, bus); o.frequency.exponentialRampToValueAtTime(38, t + 0.2); noise(t, 'bandpass', 1800, 0.45, 0.04, 2, bus); osc('square', 900, t, 0.0005, 0.07, 0.02, bus); return; }
   if (kind === 'power') { const h = osc('sawtooth', 120, t, 0.001, 0.05, 1.8, bus); h.frequency.exponentialRampToValueAtTime(28, t + 1.7); const h2 = osc('sine', 60, t, 0.001, 0.12, 1.4, bus); h2.frequency.exponentialRampToValueAtTime(20, t + 1.3); noise(t, 'lowpass', 300, 0.25, 1.1, 0.7, bus); return; }
+  if (kind === 'ring') { for (let q = 0; q < 6; q++) { osc('sine', q % 2 ? 1320 : 1760, t + q * 0.06, 0.004, 0.05, 0.05, bus); } return; }
   if (kind === 'clip') { noise(t, 'bandpass', 2600, 0.16, 0.02, 3, bus); osc('square', 1400, t, 0.0005, 0.03, 0.012, bus); return; }
   if (kind === 'motor') { osc('sine', 58, t, 0.004, 0.08, 0.14, bus); noise(t, 'lowpass', 260, 0.06, 0.05, 0.8, bus); return; }
   if (kind === 'pa') { noise(t, 'bandpass', 1800, 0.025, 4.2, 0.6, bus); osc('sine', 659.3, t + 0.05, 0.01, 0.1, 0.7, bus); osc('sine', 523.3, t + 0.55, 0.01, 0.1, 1, bus); return; }
@@ -10184,7 +10286,8 @@ function updateHud(t) {
   // (1-5's room: his place and the hour there, counted from 4:12)
   const room = L.room && beat >= L.room.from, home = L.commute && beat >= L.commute.from && !room, [hh, mm] = (room ? '04:12' : home ? '04:01' : L.clock).split(':').map(Number);
   const mins = mm + Math.max(0, Math.floor((room ? beat - L.room.from : home ? (beat - L.commute.from) * 2 : beat) / 4)), c = `${room ? '지우의 방' : home ? '귀갓길' : L.place || 'B동 3번 라인'} · ${String(hh + Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
-  if (c !== lastClock) { clockEl.textContent = c; lastClock = c; }
+  const c2 = L.noClock ? L.place : c;
+  if (c2 !== lastClock) { clockEl.textContent = c2; lastClock = c2; }
   if (L.fever && ctx) {
     const cut = feverCut(beat);
     if (cut && performance.now() - (FX.muffleAt || -1e9) > 600) { musF.frequency.setTargetAtTime(cut, ctx.currentTime, 0.05); FX.feverF = true; }
@@ -10202,7 +10305,7 @@ function updateHud(t) {
     // 2-2: the line as a subtitle in the middle, where your eyes are; over the speaker's head only a small "…"
     if (L.subs) { const sp = line && (line[4] || (L.mid ? 'b' : null)), nm = { b: ['반장', '#f0a050'], v: ['마르코', '#6fdcec'], p: ['방송', '#a8bccc'], c: ['소장', '#c9ced6'], d: ['기사', '#e8946a'] }[sp];
       if (L.sd && nm && sp === 'c') nm[1] = '#b9a8ff';
-      subEl.hidden = !s; subEl.innerHTML = ''; subEl.classList.toggle('top', !!(L.sd && L.sd.subTop));
+      subEl.hidden = !s; subEl.innerHTML = ''; subEl.classList.toggle('top', !!((L.sd && L.sd.subTop) || L.gtr));
       if (s && L.sd && L.sd.calls) { const i = L.say.indexOf(line), pv = i > 0 ? L.say[i - 1] : null;
         if (pv && line[0] - pv[0] <= 6) { const d = document.createElement('div'); d.className = 'prev'; const pn = { v: ['마르코', '#6fdcec'], c: ['소장', '#b9a8ff'] }[pv[4]]; if (pn) { const k = document.createElement('b'); k.textContent = pn[0]; k.style.color = pn[1]; d.append(k); } d.append(pv[1]); subEl.append(d); } }
       if (s) { if (nm) { const k = document.createElement('b'); k.textContent = nm[0]; k.style.color = nm[1]; subEl.append(k); } subEl.append(s); }
@@ -10298,8 +10401,7 @@ function showLine() {
   if (ln.hosp && ln.hosp !== SCENE.hosp) { SCENE.hosp = ln.hosp; SCENE.hospAt = performance.now(); if (ln.hosp === 'tap' && ctx) levelSfx(ctx.currentTime + 0.25, 'thump'); }
   if (sc === 'hosp') { SCENE.hospLine = dlg.i; if ('smile' in ln) SCENE.hospSmile = !!ln.smile; }
   if (sc === 'dock') { SCENE.dockWho = ln.who === '기사' ? 'd' : ''; if (ln.dock && ln.dock !== SCENE.dock) { SCENE.dock = ln.dock; SCENE.dockAt = performance.now(); } }
-  if (sc === 'market' && 'smile' in ln) SCENE.mktSmile = !!ln.smile;
-  if (ln.beach) SCENE.beach = ln.beach;
+  for (const key of ['road', 'mkt', 'beach', 'gtr']) if (ln[key] && ln[key] !== SCENE[key]) { SCENE[key] = ln[key]; SCENE[key + 'At'] = performance.now(); }
   if (ln.pocha && L.pocha) pochaSong();
   if (ln.o17 && ln.o17 !== SCENE.o17) { SCENE.o17 = ln.o17; SCENE.o17At = performance.now(); if (ln.o17 === 'pass' && ctx) { const t0 = ctx.currentTime; noise(t0, 'bandpass', 900, 0.12, 0.1, 1.5, bus); for (let k = 0; k < 6; k++) noise(t0 + 0.2 + k * 0.4, 'lowpass', 420, 0.14, 0.07, 0.7, bus); } }
   if ('cam' in ln) SCENE.cam = ln.cam ? { who: ln.cam, z: ln.zoom || 1.9 } : null;
