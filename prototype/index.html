@@ -6024,7 +6024,13 @@ function sdBedBoss(x, nowMs, act) {
   if (act === 'guitar' || act === 'tap') pose.hand = { x: BOSS_X + 14, y: 132 };
   if (act === 'tap') { const k = (performance.now() - (SCENE.hospAt || 0)) / 1000; pose.hand = { x: BOSS_X + 8, y: k % 1.2 < 0.15 ? 136 : 130 }; }
   if (act === 'give') pose.hand = { x: BOSS_X + 30, y: 122 };
-  drawActor('boss', x, false, pose, nowMs, false, () => PARTNERS.boss.arm(pose));
+  pose.dip = 3;
+  drawActor('boss', x, false, pose, nowMs, false, top => {
+    const cx = BOSS_X, gown = '#a9c6da', gownD = '#86a8c0';
+    R(cx - 11, top + 18, 21, 40, gown); R(cx - 11, top + 18, 21, 1, '#c8dcea'); R(cx - 3, top + 18, 5, 5, C.skin); R(cx - 2, top + 21, 3, 2, gownD);
+    for (let k = 0; k < 9; k++) R(cx - 9 + (k % 3) * 7, top + 26 + Math.floor(k / 3) * 10, 1, 1, gownD);
+    const h = elbowArm(cx + 7, top + 22, pose.hand.x, pose.hand.y, gown); R(h.x - 2, h.y - 2, 4, 4, C.skin);
+  });
 }
 function drawHosp(nowMs) {
   const t = nowMs / 1000, act = SCENE.hosp || 'wake', guitarAt = act === 'take' || act === 'shut' && SCENE.hospTook ? 'marco' : ['guitar', 'tap', 'give', 'shut'].includes(act) ? 'boss' : 'wall';
@@ -6042,7 +6048,8 @@ function drawHosp(nowMs) {
   R(196, 132, 34, 38, '#e8e4dc'); R(196, 132, 34, 2, '#f4f0ea'); R(198, 146, 30, 1, '#c8c4bc'); R(210, 124, 6, 8, '#f0f0f0'); R(204, 118, 22, 14, '#c89a62'); R(204, 118, 22, 3, '#d8aa72');
   // the bed: the head raised, a white sheet, the rails
   R(60, 140, 130, 12, '#e8eef0'); R(60, 152, 130, 4, '#9aa4ac'); R(62, 156, 3, 14, '#8a949c'); R(184, 156, 3, 14, '#8a949c'); R(56, 110, 6, 46, '#9aa4ac'); R(186, 132, 4, 24, '#9aa4ac');
-  R(66, 118, 28, 24, '#f4f6f6');
+  g.fillStyle = '#d8dee2'; g.beginPath(); g.moveTo(62, 152); g.lineTo(70, 104); g.lineTo(86, 104); g.lineTo(80, 152); g.closePath(); g.fill();
+  g.fillStyle = '#f4f6f6'; g.beginPath(); g.moveTo(70, 132); g.lineTo(74, 106); g.lineTo(92, 108); g.lineTo(90, 134); g.closePath(); g.fill();
   sdBedBoss(98, nowMs, act === 'wake' || act === 'take' ? 'wake' : act);
   g.fillStyle = '#dce8f0'; g.beginPath(); g.moveTo(80, 152); g.lineTo(84, 134); g.quadraticCurveTo(120, 128, 150, 136); g.quadraticCurveTo(168, 126, 186, 138); g.lineTo(190, 152); g.closePath(); g.fill();
   R(84, 134, 3, 18, '#eef4f8'); for (let k = 0; k < 4; k++) R(100 + k * 22, 146, 12, 1, '#c4d4e0');
@@ -6150,20 +6157,22 @@ function sdBeachBack(dawn, sunY, nowMs, beatPulse) {
 }
 // 마르코 sitting on the sand (from the side), the guitar in his lap (playing: his right hand at the soundhole), or the case
 function sdSitMarco(x, y, nowMs, opt) {
-  const pose = { ...standPose(0), hand: opt.play ? { x: BOSS_X + 20, y: 134 + (opt.strum ? 2 : 0) } : { x: BOSS_X + 14, y: 132 }, sad: !opt.smile, dip: 0 };
+  const pose = { ...standPose(0), hand: opt.play ? { x: BOSS_X + 20, y: 127 + (opt.strum ? 2 : 0) } : { x: BOSS_X + 20, y: 132 }, sad: !opt.smile, dip: 8 };
   FX.react[2] = FX.react[2] || { type: '', at: nowMs };
   g.save(); g.translate(x - 150, y - 150);
-  R(150 - 8, 146, 22, 6, '#3a4a6a'); R(150 + 10, 146, 6, 16, '#3a4a6a'); R(150 + 9, 160, 9, 3, '#1b1716');
-  drawActor('marco', 150, false, pose, nowMs, false, () => { if (opt.play) sdGuitar(BOSS_X + 18, 138, -0.25, 1); PARTNERS.marco.arm(pose); });
-  g.restore();
+  g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(156, 150, 20, 3, 0, 0, Math.PI * 2); g.fill();
+  thick(146, 144, 166, 132, 7, '#3a4a6a'); thick(166, 132, 170, 148, 6, '#3a4a6a'); R(166, 147, 10, 4, '#1b1716');
+  thick(150, 145, 160, 136, 6, '#2c3a56'); thick(160, 136, 162, 148, 5, '#2c3a56'); R(158, 147, 8, 3, '#1b1716');
+  g.save(); g.beginPath(); g.rect(100, 0, 100, 146); g.clip();
+  drawActor('marco', 150, false, pose, nowMs, false, () => { if (opt.play) sdGuitar(BOSS_X + 18, 130, -0.3, 1); PARTNERS.marco.arm(pose); });
+  g.restore(); g.restore();
 }
 function drawBeachScene(nowMs) {
   const act = SCENE.beach || '';
   sdBeachBack(0.12, null, nowMs, 0);
   sdSitMarco(150, 150, nowMs, { play: false, smile: false });
-  if (act !== 'open') sdCase(178, 168, 1.35); else { R(166, 160, 34, 10, '#2a1d17'); R(168, 161, 30, 8, '#7a2a3a'); }
-  R(161, 150, 4, 6, '#c8302a'); R(161, 150, 4, 1, '#d8dde2');
-  g.save(); g.translate(236 - PLAYER_X, 22); drawPlayer(0, nowMs); g.restore();
+  if (act !== 'open') sdCase(196, 160, 1.4); else { R(184, 152, 34, 10, '#2a1d17'); R(186, 153, 30, 8, '#7a2a3a'); sdGuitar(204, 150, 0, 1); }
+  sdSitPlayer(250, 151, nowMs); R(236, 132, 4, 6, '#c8302a'); R(236, 132, 4, 1, '#d8dde2');
   drawSceneFade(nowMs);
 }
 // you, standing in a scene (the game draws you from the waist up behind your scanner): legs, shoes and arms added
@@ -6172,6 +6181,14 @@ function sdStandPlayer(x, floorY, nowMs, mir) {
   g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(PLAYER_X, 172, 12, 3, 0, 0, Math.PI * 2); g.fill();
   R(PLAYER_X - 8, 146, 7, 22, '#2c3440'); R(PLAYER_X + 1, 146, 7, 22, '#2c3440'); R(PLAYER_X - 9, 167, 9, 4, '#1b1716'); R(PLAYER_X + 1, 167, 9, 4, '#1b1716');
   drawPlayer(0, nowMs); thick(PLAYER_X - 8, 114, PLAYER_X - 10, 138, 4, C.hoodie); R(PLAYER_X - 12, 137, 4, 4, C.skin); thick(PLAYER_X + 8, 114, PLAYER_X + 10, 138, 4, C.hoodie); R(PLAYER_X + 8, 137, 4, 4, C.skin);
+  g.restore();
+}
+function sdSitPlayer(x, groundY, nowMs) {
+  g.save(); g.translate(x - PLAYER_X, groundY - 156);
+  g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(PLAYER_X, 156, 16, 3, 0, 0, Math.PI * 2); g.fill();
+  g.save(); g.beginPath(); g.rect(PLAYER_X - 30, 0, 60, 150); g.clip(); g.translate(0, 2); drawPlayer(0, nowMs); g.restore();
+  R(PLAYER_X - 15, 148, 30, 6, '#2c3440'); R(PLAYER_X - 15, 148, 30, 1, '#3a4452'); R(PLAYER_X - 17, 151, 5, 4, '#1b1716'); R(PLAYER_X + 12, 151, 5, 4, '#1b1716');
+  thick(PLAYER_X - 7, 116, PLAYER_X - 12, 140, 4, C.hoodie); R(PLAYER_X - 14, 139, 4, 4, C.skin); thick(PLAYER_X + 7, 116, PLAYER_X + 10, 140, 4, C.hoodie); R(PLAYER_X + 8, 139, 4, 4, C.skin);
   g.restore();
 }
 const SD_SCENES = { hosp: drawHosp, dock: drawDock, road: drawRoad, market: drawMarket, beach: drawBeachScene };
@@ -6212,13 +6229,12 @@ function drawGtr(t, nowMs, active) {
   sdBeachBack(0.12 + 0.88 * dawn, sunY, nowMs, pulse);
   // the open case, the phone propped in it (반장 in his bed while the call is on), 마르코 playing, you with the can
   const call = b >= D.call || !active;
-  R(166, 92, 34, 10, '#2a1d17'); R(168, 93, 30, 8, '#7a2a3a');
-  if (call) { R(178, 76, 11, 17, '#1a1a20'); R(179, 77, 9, 14, '#a8c4d8'); R(181, 80, 5, 5, '#efc7a6'); R(181, 79, 5, 2, '#8a8a90'); R(181, 86, 5, 5, '#5a6a7a');
-    const tap = b >= D.song && !(b >= D.endTap) && ph < 0.2 && Math.floor(b) % 2 === 0; R(184, tap ? 89 : 87, 3, 2, '#efc7a6'); }
+  R(170, 104, 34, 9, '#2a1d17'); R(172, 105, 30, 7, '#7a2a3a');
+  if (call) { R(182, 88, 11, 17, '#1a1a20'); R(183, 89, 9, 14, '#a8c4d8'); R(185, 92, 5, 5, '#efc7a6'); R(185, 91, 5, 2, '#8a8a90'); R(185, 98, 5, 5, '#5a6a7a');
+    const tap = b >= D.song && !(b >= D.endTap) && ph < 0.2 && Math.floor(b) % 2 === 0; R(188, tap ? 101 : 99, 3, 2, '#efc7a6'); }
   const thumbNow = live && notes.some(n => n.lane === 0 && n.state === 'hit' && T - n.hitAt < 0.12), fingNow = live && notes.some(n => n.lane === 1 && n.state === 'hit' && T - n.hitAt < 0.12);
-  g.save(); g.translate(0, -58); g.scale(1, 1);
-  sdSitMarco(138, 150, nowMs, { play: true, strum: thumbNow || fingNow, smile: b >= D.smile }); g.restore();
-  { const can = b >= D.waves && ph < 0.15; g.save(); g.translate(226 - PLAYER_X, -64); drawPlayer(0, nowMs); g.restore(); R(214, can ? 92 : 90, 4, 6, '#c8302a'); R(214, can ? 92 : 90, 4, 1, '#d8dde2'); }
+  sdSitMarco(138, 112, nowMs, { play: true, strum: thumbNow || fingNow, smile: b >= D.smile });
+  { const can = b >= D.waves && ph < 0.15; sdSitPlayer(232, 113, nowMs); R(218, can ? 95 : 93, 4, 6, '#c8302a'); R(218, can ? 95 : 93, 4, 1, '#d8dde2'); }
   // the neck: the fretboard across, frets going by (it moves the way the lights do), the body and its soundhole on the right
   const top = GTR.y0 - 10, bot = gtrY(5) + 10;
   R(0, top - 3, W, bot - top + 6, '#2a1a12'); R(0, top, 300, bot - top, '#3a2416'); R(0, top, 300, 1, '#5a3a24'); R(0, bot - 1, 300, 1, '#1a0e08');
