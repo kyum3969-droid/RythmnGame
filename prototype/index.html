@@ -1024,7 +1024,7 @@ const LEVELS = [
       strain: [30, 44, 56], touch: [[39.6, 41.4], [51.6, 53], [63.6, 65]], visits: [['chief', 24, 34, 150], ['driver', 46, 54.5, 540], ['chief', 230.8, 256, 150, 'stay'], ['driver', 230.8, 256, 540, 'stay']],
       // the song gets into 소장's and the driver's legs (twitch) and drags them out of the aisle onto the floor in front of the
       // belts, dancing till the end
-      twitch: [246, 256], dance: [256, 1e9, 452], danceFrom: [150, 540],
+      twitch: [246, 256], dance: [256, 1e9, 340], danceFrom: [150, 540],
       // their moves, a new one for each part of the song: a couple's sway, disco points, frozen on the break, a belly shake and an
       // air guitar taking turns (as 반장 and 마르코 do), a dip (소장 is heavy), side steps, jumps and circles on the drop, back to back,
       // a conga, out of breath in the breakdown, lifts and spins on the last drop, ta-da
@@ -5095,7 +5095,7 @@ function htDancers(b, nowMs) {
     cf.mir = true; cf.x = mx - 6; cf.r = ang + (heavy ? (e16 ? 0.03 : -0.03) : 0); cf.f = UPF; cf.b = OUT; cf.wince = heavy;
     dv.x = mx + 14 + (heavy ? (e16 ? 1 : -1) : 0); dv.r = -ang * 0.3; dv.f = [18, -2 - Math.round(ang * 10)]; dv.b = [16, 4];
   } else if (mv === 'side') {   // side steps together across the floor and back, a kick on four, claps on two and four
-    const off = Math.round(Math.sin((b - m0) * Math.PI / 4) * 26); cf.x += off; dv.x += off;
+    const off = Math.round(Math.sin((b - m0) * Math.PI / 4) * 50); cf.x += off; dv.x += off;
     const cl = ib % 2 === 1 && acc; dv.kick = ib === 3 && bt < 0.45; cf.y = ib === 3 && bt < 0.45 ? -5 : 0;
     cf.f = cl ? [14, -6] : [10, 8]; cf.b = cl ? [20, -6] : HIP; dv.f = cl ? [14, -6] : [10, 8]; dv.b = cl ? [20, -6] : HIP;
   } else if (mv === 'jump' || mv === 'finale') {   // the drops: a jump on every beat, arms up on the one, fists pumped; every other bar they go round each other
@@ -5112,7 +5112,7 @@ function htDancers(b, nowMs) {
     const j = e16 ? 1 : -1, dn = Math.round(4 * Math.sin(Math.PI * (b % 4) / 4)); cf.mir = true; dv.faceR = true; cf.x = mx - 9 + j; dv.x = mx + 9 - j; cf.dip = dn; dv.y = dn;
     cf.f = [12, -8 + j]; cf.b = [6, -10 - j]; dv.f = [12, -8 - j]; dv.b = [6, -10 + j];
   } else if (mv === 'train') {  // a conga: the driver behind 소장, his hands on 소장's shoulders, back and forth across the floor, a kick on four
-    const px = Math.round(Math.sin((b - m0) * Math.PI / 8) * 64); cf.x = mx + 10 + px; dv.x = mx - 10 + px; dv.faceR = true;
+    const px = Math.round(Math.sin((b - m0) * Math.PI / 8) * 120); cf.x = mx + 10 + px; dv.x = mx - 10 + px; dv.faceR = true;
     cf.y = ib === 3 && bt < 0.45 ? -4 : 0; dv.kick = ib === 3 && bt < 0.45; cf.f = beat % 2 ? UPF : UP; cf.b = HIP;
     dv.f = [16, -4 + cf.y]; dv.b = [20, -2 + cf.y]; front = 'cf';
   } else if (mv === 'pant') {   // the breakdown: hands on their knees, out of breath; at its end up again and ready
@@ -5129,7 +5129,7 @@ function htDancers(b, nowMs) {
   // high on every beat; in the drops whirling round each other, arms flailing, flipping round on the eighths
   const WILD = { sway: 0.35, disco: 0.55, freeze: 0, call: 0.45, dip: 0.15, side: 0.75, jump: 1, shimmy: 0.5, train: 0.3, pant: 0, finale: 1, pose: 0, shock: 0 };
   const w = on ? (WILD[mv] || 0) : 0;
-  const gx = Math.round((Math.sin(b * Math.PI / 8) * 110 + Math.sin(b * Math.PI / 2) * 16) * w), gz = Math.round(Math.sin(b * Math.PI / 6 + 1) * 30 * w);
+  const gx = Math.round((Math.sin(b * Math.PI / 8) * 200 + Math.sin(b * Math.PI / 2) * 20) * w), gz = Math.round(Math.sin(b * Math.PI / 6 + 1) * 30 * w);
   if (w > 0) { cf.y -= Math.round(Math.abs(Math.sin(b * Math.PI)) * 12 * w); dv.y -= Math.round(Math.abs(Math.sin(b * Math.PI + 0.9)) * 12 * w); }
   if (w >= 0.75 && !(mv === 'jump' && bar % 2 === 1 && ib >= 2)) {
     const th = b * Math.PI / 2; cf.x += Math.round(Math.cos(th) * 30 * w); dv.x -= Math.round(Math.cos(th) * 30 * w); cf.z = Math.round(Math.sin(th) * 18 * w); dv.z = -cf.z; front = cf.z > dv.z ? 'cf' : 'dv';
