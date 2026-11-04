@@ -1327,7 +1327,7 @@ const LEVELS = [
     // the walk home (drawCommute15, 217-232): the warehouse fades out (215.5-217), he walks home before dawn humming his tune
     // and planning the beat, breaks into a run (run), and is gone; his laptop's screen comes up in the dark (boot); his room
     commute: { from: 217, run: 226.6, boot: 229.5, x0: -16, x1: 250 },
-    room: { from: 232, stop: 360,
+    room: { from: 232, stop: 360, tutorial: { card: [232.6, 237], until: 248 },
       tracks: [[232, '시계', 'x...x...x...x...', 0], [248, '피아노', 'x.....x...x.....', 0], [264, '킥', 'xx......x.......xx......x.....x.', 1], [280, '스네어', '....x...x...x.x.', 1],
                [296, '베이스', 'x.......x.....x.', 1], [312, '기타', 'x.....x...x.x...', 0], [328, '멜로디', 'x...x.x.x...x...x...x...x.x...x.', 0], [344, '반짝이', '..x.......x.x.....x...x.....x...', 0]],
       memories: [[248, 'face'], [264, 'catch'], [280, 'cap'], [296, 'watch'], [312, 'look'], [344, 'face']] },
@@ -3790,59 +3790,79 @@ function drawRoom15(t, nowMs, b, post) {
     if (bar) { g.fillStyle = '#7a86a8'; g.fillText(String((bb - Rm.from) / 4 + 1), x + 2, ryR + 6); }
   }
   g.restore();
-  // the track: its header (the instrument going in now, its colour, a meter, the layer count) and its body
-  const ty = ryR + 9, tb = y1 - 1, th = tb - ty, laneH = 13, stackY = ty + laneH + 2, bandH = Math.max(3, Math.floor((tb - stackY - 1) / tk.length));
-  R(x0 + 1, ty, hdW - 1, th, '#182036'); R(x0 + 1, ty, hdW - 1, 1, '#24304c');
-  const cur = Math.max(0, recK), curCol = recK >= 0 ? TCOL[cur] : '#55607e';
-  R(x0 + 4, ty + 3, 4, 8, curCol);
-  g.save(); g.font = '700 7px sans-serif'; g.fillStyle = '#e8ecf8'; g.fillText(recK >= 0 ? tk[cur][1] : '—', x0 + 11, ty + 10);
-  g.font = '600 5px sans-serif'; g.fillStyle = '#7a86a8'; g.fillText(`레이어 ${Math.max(0, layers.filter(q => q > 0).length)}/${tk.length}`, x0 + 5, ty + 20);
-  if (!stopped && recK >= 0 && b < tk[recK][0] + 16 && Math.floor(nowMs / 350) % 2) R(x0 + 52, ty + 4, 4, 4, '#ff4d3d');
-  g.restore();
-  // the layer swatches stacked in the header, bottom up, as they go in
-  for (let k = 0; k < tk.length; k++) if (layers[k] > 0) { g.globalAlpha = layers[k]; R(x0 + 5 + k * 7, tb - 6, 6, 4, TCOL[k]); g.globalAlpha = 1; }
-  // the meter
-  const lvl = stopped ? 0 : Math.min(1, 0.25 + press * 0.75 + 0.15 * beatK);
-  R(x1 - 6, ty + 1, 3, th - 2, '#0a0e18'); const lh = Math.round((th - 2) * lvl); if (lh > 0) R(x1 - 6, tb - 1 - lh, 3, lh, lh > th - 6 ? '#ffe27a' : '#8fd694');
-  // the body: the lane on top, the stack under it
-  R(lx + 1, ty, x1 - 8 - lx, laneH, '#162034'); R(lx + 1, ty + laneH, x1 - 8 - lx, 1, '#0a0e18'); R(lx + 1, stackY - 1, x1 - 8 - lx, tb - stackY + 1, '#10172a');
-  g.save(); g.beginPath(); g.rect(lx + 1, ty, x1 - 8 - lx, th); g.clip();
-  for (let bb = Math.floor(b) - 8; bb < b + 12; bb++) { if (bb < Rm.from || (bb - Rm.from) % 4) continue; R(Math.round(px + (bb - b) * bpx), ty, 1, th, '#222c48'); }
-  const bandY = k => tb - 1 - (k + 1) * bandH;
-  // the layers: each instrument's pattern as little squares along its band, once its four bars are in
+  // the tracks: one row per instrument, added at the bottom as each one goes in (they share the height, so the stack of
+  // rows fills up as the beat builds); the row being recorded is lit, with a red dot; nothing is shown before it starts
+  const ty = ryR + 9, tb = y1 - 1, th = tb - ty;
+  const grow = tk.map(([at]) => Math.max(0, Math.min(1, (b - (at - TRAVEL * 0.5)) / 0.6)));
+  const rowsF = Math.max(1, grow.reduce((a, c) => a + c, 0)), rowH = Math.min(16, th / rowsF);
+  const rowY = k => ty + grow.slice(0, k).reduce((a, c) => a + c, 0) * rowH;
+  R(x0 + 1, ty, hdW - 1, th, '#151c30');
+  g.save(); g.beginPath(); g.rect(x0 + 1, ty, x1 - 8 - x0, th); g.clip();
   for (let k = 0; k < tk.length; k++) {
-    if (layers[k] <= 0) continue;
-    const [at, , pat] = tk[k], y = bandY(k);
-    g.globalAlpha = layers[k]; R(lx + 1, y, x1 - 8 - lx, bandH - 1, TCOL[k] + '22');
-    for (let c = Math.floor((b - 8) * 4); c <= Math.ceil((b + TRAVEL + 0.5) * 4); c++) {
-      const bb = c / 4; if (bb < at || bb >= Rm.stop) continue;
+    if (grow[k] <= 0) continue;
+    const [at, name, pat] = tk[k], y = Math.round(rowY(k)), h = Math.max(1, Math.round(rowH * grow[k])), rec = !stopped && k === recK && b < at + 16;
+    g.globalAlpha = grow[k];
+    // the row: header (colour chip, name, the red dot while recording) and its lane
+    R(x0 + 1, y, x1 - 8 - x0, h - 1, rec ? '#1e2a46' : k % 2 ? '#141c30' : '#172036'); R(x0 + 1, y + h - 1, x1 - 8 - x0, 1, '#0a0e18');
+    R(x0 + 3, y + 1, 3, Math.max(1, h - 3), TCOL[k]);
+    if (h >= 7) { g.font = `700 ${h >= 11 ? 7 : 5}px sans-serif`; g.fillStyle = rec ? '#ffffff' : '#b8c2dc'; g.fillText(name, x0 + 9, y + Math.min(h - 2, h / 2 + (h >= 11 ? 3 : 2))); }
+    if (rec && Math.floor(nowMs / 350) % 2) R(x0 + hdW - 8, y + Math.max(1, (h >> 1) - 1), 3, 3, '#ff4d3d');
+    // its loop, once its four bars are in: little squares of its colour along the lane
+    if (b >= at + 16) for (let c = Math.floor((b - 8) * 4); c <= Math.ceil((b + TRAVEL + 0.5) * 4); c++) {
+      const bb = c / 4; if (bb < at + 16 || bb >= Rm.stop) continue;
       const pc = ((Math.round((bb - at) * 4) % pat.length) + pat.length) % pat.length; if (pat[pc] !== 'x') continue;
-      R(Math.round(px + (bb - b) * bpx) - 1, y, 3, bandH - 1, TCOL[k]);
+      const sz = Math.max(2, Math.min(7, h - 3)), xx = Math.round(px + (bb - b) * bpx) - (sz >> 1);
+      if (xx > lx) R(xx, y + Math.round((h - 1 - sz) / 2), sz, sz, TCOL[k]);
     }
     g.globalAlpha = 1;
   }
-  // the blocks you set down: square, the colour of the instrument going in; caught ones drop into its band
+  g.restore();
+  R(lx, ty, 1, th, '#0a0e18');
+  // the meter
+  const lvl = stopped ? 0 : Math.min(1, 0.25 + press * 0.75 + 0.15 * beatK);
+  R(x1 - 6, ty + 1, 3, th - 2, '#0a0e18'); const lh = Math.round((th - 2) * lvl); if (lh > 0) R(x1 - 6, tb - 1 - lh, 3, lh, lh > th - 6 ? '#ffe27a' : '#8fd694');
+  // the bar lines, and the blocks you set down: square, on the row of the instrument going in, staying where you set them
+  g.save(); g.beginPath(); g.rect(lx + 1, ty, x1 - 8 - lx, th); g.clip();
+  for (let bb = Math.floor(b) - 8; bb < b + 12; bb++) { if (bb < Rm.from || (bb - Rm.from) % 4) continue; R(Math.round(px + (bb - b) * bpx), ty, 1, th, '#222c48'); }
   const flash = Math.max(0, 1 - (nowMs - lastGood) / 160), miss = nowMs - FX.lastMiss < 260;
   for (const n of notes) {
     if (n.beat < Rm.from) continue; if (!post && t < n.place) break;
     const x = px + (n.arr - t) * v; if (x < lx - 12) continue;
-    const k = rowOf(n.beat), col = n.state === 'miss' ? '#d8463b' : TCOL[k];
-    if (n.state === 'hit') {
-      const ha = t - n.hitAt, q = Math.min(1, ha / 0.28), yy = lerp(ty + 2, bandY(k), q * q);
-      if (layers[k] >= 1 && q >= 1) continue;   // (in the layer now, drawn with it)
-      R(Math.round(x) - 3, Math.round(yy), 7, Math.max(bandH - 1, Math.round(lerp(9, bandH - 1, q))), col);
-      if (ha < 0.12) { g.globalAlpha = 1 - ha / 0.12; R(Math.round(x) - 5, ty, 11, laneH, '#ffffff'); g.globalAlpha = 1; }
-    } else {
-      g.globalAlpha = n.state === 'miss' ? 0.6 : 1;
-      R(Math.round(x) - 4, ty + 2, 9, 9, col); R(Math.round(x) - 4, ty + 2, 9, 1, '#ffffff'); R(Math.round(x) - 4, ty + 10, 9, 1, '#00000055');
-      g.globalAlpha = 1;
-    }
+    const k = rowOf(n.beat), y = rowY(k), h = rowH * grow[k], sz = Math.max(3, Math.min(10, Math.round(h) - 3)), col = n.state === 'miss' ? '#d8463b' : TCOL[k];
+    const done = n.state === 'hit', ha = done ? t - n.hitAt : 9;
+    g.globalAlpha = n.state === 'miss' ? 0.55 : 1;
+    const yy = Math.round(y + (h - 1 - sz) / 2);
+    R(Math.round(x) - (sz >> 1), yy, sz, sz, col); if (!done) R(Math.round(x) - (sz >> 1), yy, sz, 1, '#ffffff');
+    if (done && ha < 0.12) { g.globalAlpha = 1 - ha / 0.12; R(Math.round(x) - (sz >> 1) - 2, yy - 2, sz + 4, sz + 4, '#ffffff'); }
+    g.globalAlpha = 1;
   }
   g.restore();
+  // the tutorial, over the app (it doesn't stop anything): what this is and what to do while the room comes up, then a
+  // '▼ 지금!' over the playhead for each of the first blocks until one is caught, and '+ 악기' as each new row goes in
+  const tut = Rm.tutorial;
+  if (tut && !post) {
+    const card = Math.min(1, Math.max(0, (b - tut.card[0]) / 0.5)) * Math.min(1, Math.max(0, (tut.card[1] - b) / 0.6));
+    if (card > 0) {
+      const cw = 210, ch = 34, cx = Math.round((W - cw) / 2), cy = ROOM.band - ch - 8;   // (over the room, above the app, so the app stays in view)
+      g.save(); g.globalAlpha = card; R(cx - 1, cy - 1, cw + 2, ch + 2, '#ffd27a'); R(cx, cy, cw, ch, '#0c111e');
+      g.font = '700 8px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText('지우의 작업 화면', cx + 8, cy + 11);
+      g.font = '600 7px sans-serif'; g.fillStyle = '#e8ecf8'; g.fillText('블록이 노란 선에 닿을 때 누르면 그 악기가 녹음돼요.', cx + 8, cy + 21);
+      g.fillStyle = '#9aa6c8'; g.fillText('한 악기를 네 마디 채우면, 다음 악기 트랙이 아래에 쌓여요.', cx + 8, cy + 30);
+      g.restore();
+    }
+    if (b < tut.until && !notes.some(n => n.beat >= Rm.from && n.state === 'hit')) {
+      const nx = notes.find(n => n.state === 'pending' && n.beat >= Rm.from && Math.abs((n.arr - t) / spb) < 0.6);
+      if (nx) { const q = 1 - Math.abs((nx.arr - t) / spb) / 0.6; g.save(); g.globalAlpha = q; g.font = '700 8px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText('▼ 지금!', px - 14, ty - 1); g.restore(); }
+      else if (b >= tut.card[1]) { g.save(); g.globalAlpha = 0.7; g.font = '600 6px sans-serif'; g.fillStyle = '#ffe27a'; g.fillText('노란 선에서 누르기', px + 4, ty + Math.round(rowH) + 7); g.restore(); }
+    }
+    for (let k = 1; k < tk.length; k++) { const q = b - tk[k][0]; if (q < 0 || q > 2.4) continue;
+      const a = Math.min(1, q / 0.3) * Math.min(1, (2.4 - q) / 0.5); g.save(); g.globalAlpha = a; g.font = '700 7px sans-serif'; g.fillStyle = TCOL[k];
+      g.fillText('+ ' + tk[k][1], x1 - 70, Math.round(rowY(k) + Math.min(rowH, 12) - 3) + 1); g.restore(); }
+  }
   // the playhead: a line down the track with a flag on the ruler
   const phc = miss ? '#ff5040' : flash > 0 ? '#ffffff' : '#ffe27a';
   R(px, ryR + 2, 1, tb - ryR - 2, phc); R(px - 2, ryR + 1, 5, 2, phc);
-  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(px - 6, ty, 13, laneH, '#fff2b0'); g.restore(); }
+  if (flash > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = flash * 0.5; R(px - 6, ty, 13, th, '#fff2b0'); g.restore(); }
   // at the stop: saving it, over the app
   if (stopped) {
     const q = b - Rm.stop, name = q < 1.5 ? '하은'.slice(0, Math.min(2, Math.floor(q * 3) + 1)) : q < 2.6 ? (q < 2.1 ? '하' : '') : q < 4.5 ? '새 비트'.slice(0, Math.min(4, Math.floor((q - 2.6) * 4) + 1)) : '새 비트';
