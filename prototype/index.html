@@ -1610,7 +1610,7 @@ const LEVELS = [
     hitKit: 'ticktock', bareBand: true, noCount: true,
     cine: { hGone: -10, jGone: 0, out: 67.5, end: 206, cut: [67.5, 38] },
     observer: 'boss', observerIntro: true, observerAt: [[0, 67.5]],   // 반장 by the line until 지우 runs out
-    heads: { j: [104, 58], h: [52, 90], b: [140, 84] },
+    heads: { j: [104, 58], h: [52, 90], b: [140, 106] },
     clock: '05:30', title: '하은의 새벽', hints: false, special: ['상자', 'none', '개'],
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 }, endAt: 208,
     chords: [[220, 261.63, 329.63]], roots: [110], chordAt: () => 0,
@@ -2121,6 +2121,188 @@ function castStill(who, kind, x, footY, mirror) {
 }
 const bossStill = (kind, x, footY, mirror) => castStill('boss', 'coffee', x, footY, mirror);   // (the study has him with his coffee)
 // ---------- end of 1-7's cast ----------
+// ---------- 1-7's cast, flat and outline-free (the reference: big blank faces, one shade, chunky 2x2 dots) ----------
+// Each of them is a head and a body drawn from small maps (one letter a dot, a dot = 2x2 screen pixels, faced right; the game
+// mirrors them to face left); arms and legs are drawn on the dot grid by pose, so walking, sitting, reaching and holding
+// all come from the same pieces. Only 1-7 draws them (L.cine).
+const CB = 2;
+const CHIBI_PAL = {
+  M: '#7a3346', m: '#5a2333', Y: '#c9d23e', y: '#a3ad2c', w: '#ece6d6', S: '#dba47c', s: '#bb8662', H: '#2b201f', P: '#30313d', p: '#25262f', W: '#e8e3d6',
+  R: '#c8453a', r: '#9c3129', K: '#1d191e', k: '#2e2830', B: '#86b8dc', b: '#6a9cc2', T: '#e9eef0', D: '#2c2e34', d: '#22242a',
+  N: '#2f3557', n: '#232843', A: '#a2a2a6', O: '#e8782e', o: '#c45f1e', E: '#5a5c62', e: '#46484e', Q: '#3a3b40', q: '#2e2f34',
+  J: '#2a4650', j: '#1f343c', L: '#bfd23a', F: '#7a4a2a', X: '#2d2f33',
+};
+// head: rows of dots (the face's right edge the shaded side); body: the torso between the arms (shoulders at its top
+// corners); sleeve/hand: the arm's colours; leg/shoe: the legs'; hip: the dots of trouser under the torso
+const CHIBI = {
+  jiwoo: { head: [
+    '...MMMMMM...',
+    '.MMMMMMMMMm.',
+    '.MMHHHHHHMm.',
+    'MMHHSSSSHHMm',
+    'MMSSSSSSSsMm',
+    'MMSSSSSSSsMm',
+    'MMSSSSSSSsMm',
+    '.MMSSSSSsMm.',
+    '..MMMMMMMm..'],
+    body: [
+    'MYYwwYym',
+    'MYYwwYym',
+    'MYYYwYym',
+    'MYYYYYym',
+    'MYYYYYym',
+    'MwwwwwwT',
+    'MYYYYYym',
+    'MYYYYYym',
+    'MYYYYYym',
+    'mmmmmmmm'],
+    sleeve: '#7a3346', sleeveD: '#5a2333', hand: '#dba47c', leg: '#30313d', legD: '#25262f', shoe: '#e8e3d6', legLen: 11 },
+  haeun: { head: [
+    '..RRRRRR....',
+    '.RRRRRRRr...',
+    '.rrrrrrrrRRR',
+    'KKSSSSSSKK..',
+    'KKSSSSSsKKk.',
+    'KKSSSSSsKKk.',
+    'KKSSSSSsKKk.',
+    'KKkSSSskKKk.',
+    'KKKKKKKKKKk.'],
+    body: [
+    'BBBBBBBb',
+    'BBBBBBBb',
+    'BBBBBBBb',
+    'BBBBBBBb',
+    'BBBBBBBb',
+    'BBBBBBBb',
+    'TTTTTTTT',
+    'DDDDDDDd'],
+    hair: [[-1, 9, 2, 5]],   // (her hair down her back, behind the shoulder: x, y, w, h in dots from the head's left)
+    sleeve: '#1d191e', sleeveD: '#151217', hand: '#dba47c', leg: '#2c2e34', legD: '#22242a', shoe: '#1d191e', legLen: 12, watch: true },
+  boss: { head: [
+    '...NNNNNN...',
+    '..NNNNNNNn..',
+    '..nnnnnnnnNN',
+    '..AASSSSAAA.',
+    '..ASSSSSSsA.',
+    '..SSSSSSSs..',
+    '..SSAAAAAs..',
+    '...SSSSSs...',
+    '...EEEEEe...'],
+    body: [
+    'EOOeeOOo',
+    'EOOeeOOo',
+    'EOOeeOOo',
+    'EOOOOOOo',
+    'EwwwwwwT',
+    'EOOOOOOo',
+    'EOOOOOOo',
+    'EooooooE',
+    'QQQQQQQq'],
+    sleeve: '#5a5c62', sleeveD: '#46484e', hand: '#dba47c', leg: '#3a3b40', legD: '#2e2f34', shoe: '#1d191e', legLen: 11, wide: 1 },
+  rookie: { head: [
+    '...HHHHHH...',
+    '..HHHHHHHH..',
+    '.HHHHHHHHHH.',
+    '.HHSSSSSSHH.',
+    '.HSSSSSSSsH.',
+    '..SSSSSSSs..',
+    '..SSSSSSSs..',
+    '...SSSSSs...',
+    '...JJJJJj...'],
+    body: [
+    'JLLJJLLj',
+    'JLLJJLLj',
+    'JLLLLLLj',
+    'JLLLLLLj',
+    'JwwwwwwT',
+    'JLLLLLLj',
+    'JLLLLLLj',
+    'jjjjjjjj'],
+    sleeve: '#2a4650', sleeveD: '#1f343c', hand: '#dba47c', leg: '#30313d', legD: '#25262f', shoe: '#7a4a2a', legLen: 11 },
+};
+for (const k in CHIBI) { const c = CHIBI[k]; c.height = (c.head.length + c.body.length + c.legLen + 1) * CB; }
+const chibiRow = (rows, x0, y0, flip, w) => { for (let j = 0; j < rows.length; j++) for (let i = 0; i < rows[j].length; i++) { const ch = rows[j][i], col = CHIBI_PAL[ch]; if (!col) continue; const ii = flip ? w - 1 - i : i; R(x0 + ii * CB, y0 + j * CB, CB, CB, col); } };
+// an arm on the dot grid: two dots wide from the shoulder (sx, sy) to the hand (hx, hy), the hand a 2x2 of skin
+function chibiArm(c, sx, sy, hx, hy, far) {
+  const col = far ? c.sleeveD : c.sleeve, n = Math.max(1, Math.round(Math.hypot(hx - sx, hy - sy) / CB));
+  const snap = v => Math.round(v / CB) * CB;
+  for (let k = 0; k <= n; k++) { const q = k / n, x = snap(lerp(sx, hx, q)), y = snap(lerp(sy, hy, q)); R(x - CB, y - CB, CB * 2, CB * 2, col); }
+  R(snap(hx) - CB, snap(hy) - CB, CB * 2, CB * 2, c.hand);
+  if (c.watch && !far) R(snap(lerp(sx, hx, 0.8)) - CB, snap(lerp(sy, hy, 0.8)) - CB, CB, CB, '#d8dde0');
+}
+// put one of them on the screen. x: the middle of the body; footY: the soles; o.left: facing left; o.mode: 'stand', 'walk',
+// 'run', 'sit' (o.seat: the seat's height); o.ph: the step (0-1); o.hand / o.hand2: the near / far hand's point on the
+// screen (else hanging, swinging with the step); o.bob, o.dip: dots down. Returns the near hand, the far hand, the head's top.
+function drawChibi(who, x, footY, o = {}) {
+  const c = CHIBI[who], hw = 6 * CB, bw = 8 * CB, X = Math.round(x / CB) * CB, flip = !!o.left;
+  const mode = o.mode || 'stand', ph = o.ph || 0, step = Math.floor(ph * 2) % 2;
+  const sit = mode === 'sit', run = mode === 'run', walk = mode === 'walk';
+  const legH = c.legLen * CB, bodyH = c.body.length * CB, headH = c.head.length * CB;
+  // the hip: on the seat sitting, else the legs' length above the feet (up a dot at a step's top)
+  const lift = (run && (ph % 0.5) < 0.25) || (walk && (ph % 0.5) < 0.2) ? CB : 0;
+  const hipY = Math.round((sit ? (o.seat || footY - legH) - CB : footY - CB - legH - lift) / CB) * CB + (o.dip || 0) * CB + (o.bob || 0) * CB;
+  const bodyY = hipY - bodyH + CB, headY = bodyY - headH, bx = X - bw / 2;
+  const sgn = flip ? -1 : 1;
+  // legs: two columns three dots wide (a dot apart), the near one a shade lighter; walking and running they part and lift
+  const lx = [bx + CB * 0, bx + CB * 5];
+  if (sit) {
+    // (sitting: the thighs out along the seat the way they face, the shins down from the knees, the feet on the ground)
+    const kx = sgn * CB * 4;
+    for (const i of [1, 0]) { const lxx = lx[i] + (i ? 0 : -sgn * CB); const col = i ? c.legD : c.leg;
+      R(Math.min(lxx, lxx + kx), hipY - CB, CB * 3 + Math.abs(kx), CB * 3, col);
+      R(lxx + kx, hipY + CB, CB * 3, footY - hipY - CB * 2, col); R(lxx + kx + (flip ? -CB : 0), footY - CB, CB * 4, CB, c.shoe); }
+  } else {
+    const spread = run ? 2 : walk ? 1 : 0;
+    for (const i of [0, 1]) {
+      const fwd = (i === step) ? 1 : -1, dx = spread * fwd * sgn * CB, up = (i === step && (run || walk)) ? CB * (run ? 2 : 1) : 0;
+      R(lx[i] + dx, hipY, CB * 3, footY - hipY - CB - up, i ? c.legD : c.leg); R(lx[i] + dx + (flip ? -CB : 0), footY - CB - up, CB * 4, CB, c.shoe);
+    }
+  }
+  // arms (the far one first, behind): from the shoulders, at the body's sides
+  const shN = { x: flip ? bx - CB : bx + bw + CB, y: bodyY + CB }, shF = { x: flip ? bx + bw + CB : bx - CB, y: bodyY + CB };
+  const armL = 10 * CB, swing = run ? 3 * CB : walk ? CB : 0, sw = step ? swing : -swing;
+  const handF = o.hand2 || { x: shF.x - sgn * CB * 0 + sgn * -sw * 0.5, y: shF.y + armL };
+  const handN = o.hand || { x: shN.x + sgn * sw, y: shN.y + armL - (run ? CB * 2 : 0) };
+  chibiArm(c, shF.x, shF.y, handF.x, handF.y, true);
+  // her hair down her back (behind the body)
+  if (c.hair) for (const [hx0, hy0, w, h] of c.hair) { const xx = flip ? X + hw - (hx0 + w) * CB : X - hw + hx0 * CB; R(flip ? xx : xx, headY + hy0 * CB, w * CB, h * CB, CHIBI_PAL.K); }
+  chibiRow(c.body, bx, bodyY, flip, 8);
+  chibiRow(c.head, X - hw, headY, flip, 12);
+  chibiArm(c, shN.x, shN.y, handN.x, handN.y, false);
+  return { handN, handF, top: headY, x: X };
+}
+// the head's top for a bubble: standing on the ground, or sitting on a seat
+function chibiTop(who, ground, sit, seat) { const c = CHIBI[who]; return sit ? seat - CB - (c.body.length - 1) * CB - c.head.length * CB : ground - c.height; }
+// 지우 in 1-7's drawn scenes and on its floor: run, walk, sit (the bench), stand, the pole (the train); his near hand on the
+// phone, held out (the earphones, to her), holding them, or up to a point (the hook)
+function chibiJiwoo(c, ground, b, nowMs) {
+  const left = !!c.mirror, sg = left ? -1 : 1, sit = c.mode === 'sit', seat = ground === CINE_GROUND.hosp ? CINE_SEAT : ground - 18;
+  const mode = c.mode === 'run' ? 'run' : c.mode === 'walk' ? 'walk' : sit ? 'sit' : 'stand';
+  const ph = mode === 'run' || mode === 'walk' ? ((((left ? -c.x : c.x) / (mode === 'run' ? 34 : 24)) % 1) + 1) % 1 : 0;
+  const songB = (b - 190) / 0.6667, nod = c.nod && (songB % 1) < 0.3 ? 1 : 0;
+  const top = chibiTop('jiwoo', ground, sit, seat) + nod * CB;
+  const hand = c.reachTo ? { x: c.reachTo[0], y: c.reachTo[1] } : c.mode === 'strap' ? { x: c.x + sg * 4, y: top - 2 } : c.phone ? { x: c.x + sg * 8, y: top + 26 }
+    : c.give ? { x: c.x + sg * 22, y: top + 30 } : c.holding ? (sit ? { x: c.x + sg * 10, y: seat - 4 } : { x: c.x + sg * 12, y: top + 34 }) : null;
+  const S = drawChibi('jiwoo', c.x, ground, { left, mode, ph, seat, hand, bob: nod });
+  const hd = S.handN;
+  if (c.holding && !c.give) drawEarphones(hd.x + sg, hd.y - 4);
+  if (c.give && b < 167.2 + 14 && b >= 165.3) drawEarphones(hd.x + sg, hd.y - 4);
+  if (c.phone) { R(hd.x - 2, hd.y - 9, 5, 8, '#1e1e24'); R(hd.x - 1, hd.y - 8, 3, 5, '#8fd0f0'); }
+  return { handN: hd, ear: { x: S.x - sg * 11, y: S.top + 12 } };
+}
+// 하은 in 1-7: walk, sit, stand; her watch, the tap on the bench, taking the earphones, her cup(s) in her far hand
+function chibiHaeun(c, ground, b, nowMs, tap) {
+  const left = !c.mirror, sg = left ? -1 : 1, sit = c.mode === 'sit', seat = ground === CINE_GROUND.hosp ? CINE_SEAT : ground - 18;
+  const mode = c.mode === 'walk' ? 'walk' : sit ? 'sit' : 'stand';
+  const ph = mode === 'walk' ? ((((left ? -c.x : c.x) / 24) % 1) + 1) % 1 : 0;
+  const top = chibiTop('haeun', ground, sit, seat);
+  const hand = c.mode === 'watch' ? { x: c.x + sg * 6, y: top + 26 } : tap != null ? { x: c.x + sg * 14, y: seat + (tap ? 1 : -3) } : c.give ? { x: c.x + sg * 18, y: top + 30 }
+    : (b >= 168.4 && b < 186.8 && sit) ? { x: c.x + sg * 10, y: seat - 6 } : null;
+  const hand2 = c.cup ? (sit ? { x: c.x - sg * 9, y: seat - 6 } : null) : null;
+  const S = drawChibi('haeun', c.x, ground, { left, mode, ph, seat, hand, hand2 });
+  if (c.cup) { const hf = S.handF; R(hf.x - 1, hf.y - 6, 3, 5, '#f2efe6'); R(hf.x - 1, hf.y - 6, 3, 1, '#c8b89a'); if (c.cup2) { R(hf.x + 2 * sg, hf.y - 5, 3, 5, '#f2efe6'); R(hf.x + 2 * sg, hf.y - 5, 3, 1, '#c8b89a'); } }
+  return { handN: S.handN, ear: { x: S.x + sg * 11, y: S.top + 12 } };
+}
 // ---------- 1-7 하은의 새벽: the cutscene past the line (L.cine.out on) ----------
 // Four places, each painted once: the dawn street (1-5's bgCommute, at its bluest), the underground platform, inside the
 // next train, and the hospital's front with its bench. Who stands where, and when, comes from one place (cineCast), so the
@@ -2234,6 +2416,7 @@ function haeun17(x, footY, o = {}) {
 // 지우, whole: the game's own sprite (drawActor) with legs to the ground and an arm; walking, running, at a strap, sitting
 function cineJiwoo(c, ground, b, nowMs) {
   if (cast17Ready()) return jiwoo17(c, ground, b);
+  if (L.cine) return chibiJiwoo(c, ground, b, nowMs);
   const run = c.mode === 'run', walk = c.mode === 'walk', sit = c.mode === 'sit', step = Math.floor(b * (run ? 6 : 3)) % 2;
   const songB = (b - 190) / 0.6667, nod = c.nod && (songB % 1) < 0.3 ? 1 : 0;
   const pose = { ...standPose(run || walk ? step : 0), nod };
@@ -2256,6 +2439,7 @@ function cineHaeun(c, ground, b, nowMs) {
   const songB = (b - 190) / 0.6667, ph = songB - Math.floor(songB), k = Math.floor(songB);
   // her taps on the bench: every other beat to begin with, then every beat, then the 'and's too in the last bars
   const tapOn = c.tap && (k < 16 ? k % 2 === 0 : k < 40 ? true : true) && ph < 0.35, tapAnd = c.tap && k >= 40 && Math.abs(ph - 0.5) < 0.15;
+  if (L.cine && !cast17Ready()) return chibiHaeun(c, ground, b, nowMs, c.tap ? (tapOn || tapAnd ? 1 : 0) : null);
   if (cast17Ready()) { const S = haeun17(c.x, ground, { right: !!c.mirror, walkPh: c.mode === 'walk' ? gaitPh(c, 46) : null, sit: c.mode === 'sit', watch: c.mode === 'watch', ear: c.ear, give: c.give, tap: c.tap ? (tapOn || tapAnd ? 1 : 0) : null });
     // (the paper cup from the lobby's machine, in her far hand)
     if (S && c.cup) { const hf = S.handF; R(hf.x - 1, hf.y - 5, 3, 5, '#f2efe6'); R(hf.x - 1, hf.y - 5, 3, 1, '#c8b89a'); }
@@ -2273,8 +2457,8 @@ function cineHead(spk, b) {
     const sit = who.mode === 'sit', top = spk === 'J' ? (sit ? CINE_SEAT - 51 : ground - 72) : (sit ? CINE_SEAT - 41 : ground - 64);
     return { x: who.x + (who.mirror ? -2 : 2), y: top - 3 };
   }
-  if (spk === 'J') return { x: who.x + (who.mirror ? -2 : 2), y: ground - 82 + (who.mode === 'sit' ? 5 : 0) };
-  return { x: who.x - (who.mirror ? -1 : 1), y: ground - 60 + (who.mode === 'sit' ? 2 - 4 : -14) };
+  if (spk === 'J') return { x: who.x + (who.mirror ? -2 : 2), y: (who.mode === 'sit' ? chibiTop('jiwoo', ground, true, CINE_SEAT) : chibiTop('jiwoo', ground)) - 3 };
+  return { x: who.x - (who.mirror ? -1 : 1), y: (who.mode === 'sit' ? chibiTop('haeun', ground, true, CINE_SEAT) : chibiTop('haeun', ground)) - 3 };
 }
 function cineSky(top, bot, p) {
   const mix = (a, c, q) => '#' + [0, 2, 4].map(i => Math.round(parseInt(a.substr(1 + i, 2), 16) * (1 - q) + parseInt(c.substr(1 + i, 2), 16) * q).toString(16).padStart(2, '0')).join('');
@@ -2335,7 +2519,7 @@ function drawCine17(b, t, nowMs) {
     if (b >= 163.6 && b < 164.4) { const q = (b - 163.6) / 0.8; cup(Math.round(lerp(74, 110, q)), Math.round(lerp(144, 156, q) - Math.sin(q * Math.PI) * 6)); }
     else if (b >= 164.4 && b < 244) cup(110, 156);
     // her earphones in her hands while they talk (168.4-186.8), the cord wound round her fingers from 181
-    if (b >= 168.4 && b < 186.8 && c.h) { const k = b >= 181 ? Math.floor(b * 2) % 2 : 0; drawEarphones(c.h.x + 9 + k, G - 30); }
+    if (b >= 168.4 && b < 186.8 && c.h) { const k = b >= 181 ? Math.floor(b * 2) % 2 : 0; if (hJ) drawEarphones(hJ.handN.x + 1 + k, hJ.handN.y - 4); else drawEarphones(c.h.x + 9 + k, G - 30); }
     // and back to him to plug into his phone (186.8-187.8)
     if (b >= 186.8 && b < 187.8) { const q = (b - 186.8) / 1; drawEarphones(Math.round(lerp(73, 108, q)), Math.round(lerp(144, 142, q))); }
     // the earphones changing hands (174-175.4), then shared: a bud in each of their ears, the cord between them
@@ -2413,7 +2597,7 @@ function drawEarHook(h, withEar = true) {
 function drawCineLine17(b, nowMs) {
   drawEarHook({ x: CAP.x, y: CAP.y, bottom: 150 }, b < J17_TAKE + 0.5);
   // 반장, on the floor in front of the belts (walking in, then facing 지우)
-  if (b < L.cine.out) drawStandingBoss(Math.round(boss17X(b)), nowMs, boss17Walk(b) ? Math.floor(b * 4) % 2 : (Math.sin(nowMs / 1000 * 1.7) > 0.85 ? 1 : 0), !boss17Walk(b));
+  if (b < L.cine.out) drawChibi('boss', boss17X(b), 169, { left: !boss17Walk(b), mode: boss17Walk(b) ? 'walk' : 'stand', ph: (boss17X(b) / 24) % 1 });
   if (b >= L.cine.hGone && b < L.cine.hGone + 3.4) cineHaeun({ x: lerp(52, -20, (b - L.cine.hGone) / 3.2), mode: 'walk', mirror: false }, 169, b, nowMs);
   const f = jiwooFloor17(b);
   if (f) {
@@ -3355,6 +3539,7 @@ const HAEUN_X = Math.round(SCAN_X + 0.82 * (PLAYER_X - SCAN_X)), HAEUN_TOP = 56;
 // o.gun = your scan kick while she works the upper gate; o.watch = checking the time; o.step = walking (which leg is forward);
 // o.load = she is a belt's loader and the arm is drawn with the box; o.mirror = facing right (at the loading end)
 function drawHaeunAt(cx, top, nowMs, o = {}) {
+  if (L.cine && !cast17Ready()) { const foot = top + 56, seat = top + 36; drawChibi('haeun', cx, foot, { left: !o.mirror, mode: o.sit ? 'sit' : o.step != null ? 'walk' : 'stand', ph: (nowMs / 600) % 1, seat, hand: o.watch ? { x: cx + (o.mirror ? 6 : -6), y: (o.sit ? chibiTop('haeun', foot, true, seat) : chibiTop('haeun', foot)) + 26 } : null, dip: haeunBow17(CINE_B) > 6 ? 1 : 0 }); return; }
   if (L.cine && !CAST17.ok && haeunBow17(CINE_B) > 6) top += haeunBow17(CINE_B) > 16 ? 3 : 1;   // (1-7: her bow)
   if (L.cine && cast17Ready()) { haeun17(cx, top + 56, { right: !!o.mirror, sit: o.sit, watch: o.watch, tap: o.tap, body: o.load, lean: haeunBow17(CINE_B) }); return; }
   const kick = o.gun != null ? o.gun : 0, bob = o.bob ? 1 : 0;
@@ -4162,6 +4347,10 @@ function haeunHead(beat) {
 }
 const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
 function drawPlayer(kick, nowMs) {
+  if (L.cine && !cast17Ready()) {
+    const hx = PLAYER_X - 16 - (kick > 0.15 ? 4 : 0), hy = 128; drawChibi('rookie', PLAYER_X, 171, { left: true, hand: { x: hx, y: hy } });
+    R(hx - 9, hy - 5, 10, 4, '#2d2f33'); R(hx - 2, hy - 2, 3, 5, '#2d2f33'); R(hx - 10, hy - 4, 2, 2, kick > 0.2 ? C.ok : C.laser); return;
+  }
   if (L.cine && cast17Ready()) {
     const fl = nowMs - FX.flinch, x = PLAYER_X + 3 + (fl < 160 ? 1 : 0), reach = kick > 0.15 ? (kick > 0.6 ? 2 : 1) : 0;
     castStill('rookie', 'body', x, 173, false); castStill('rookie', 'arm', x - reach, 173, false);
@@ -4184,7 +4373,7 @@ function drawGun(gx, gy, kick) {
 }
 function drawPlayerArm(kick, nowMs, twoHands, upperKick) {
   const top = playerTop(kick, nowMs);
-  if (L.cine && cast17Ready()) return;   // (1-7: the scanner is in his still)
+  if (L.cine) return;   // (1-7: the scanner is in his own drawing)
   if (L.daw) { drawPadArm(kick, nowMs, top, twoHands); return; }
   const gx = 324 - kick * 4, gy = 117;
   if (L.lanes === 2 && (!L.coScanner || DUO.mode !== 'one')) {
@@ -6430,9 +6619,9 @@ function drawOffice17(nowMs) {
   // ('leave': 반장 gets up and goes out after 지우, through the door to the line)
   if (st === 'leave') {
     const rise = 14 * (1 - ease(Math.min(1, age / 0.7))), bx = age < 0.9 ? O.bx : lerp(O.bx, O.door + 12, Math.min(1, (age - 0.9) / 2.1));
-    g.save(); if (bx > O.door - 6) g.globalAlpha = Math.max(0, 1 - (bx - (O.door - 6)) / 14); g.translate(0, rise); drawStandingBoss(Math.round(bx), nowMs, age > 0.9 && age < 3 ? Math.floor(age * 4) % 2 : 0, age < 0.8); g.restore();
+    g.save(); if (bx > O.door - 6) g.globalAlpha = Math.max(0, 1 - (bx - (O.door - 6)) / 14); g.translate(0, rise); drawChibi('boss', bx, O.floor, { left: age < 0.8, mode: age > 0.9 && age < 3 ? 'walk' : 'stand', ph: (bx / 24) % 1 }); g.restore();
   } else {
-  g.save(); g.beginPath(); g.rect(0, 0, W, O.top + 12); g.clip(); g.translate(0, 14); drawActor('boss', O.bx, true, standPose(Math.sin(nowMs / 1000 * 1.7) > 0.85 ? 1 : 0), nowMs, false, top => { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); }); g.restore();
+  drawChibi('boss', O.bx, O.floor, { left: true, mode: 'sit', seat: O.seat });
   }
   R(O.bx - 14, O.top - 4, 4, 4, '#f2efe6'); R(O.bx - 14, O.top - 4, 4, 1, '#c8b89a');
   // the table, her cup
@@ -9297,7 +9486,7 @@ function updateHud(t) {
   if (line && line[4] === 'd' && L.driver) placeHeadBubble(driverHead(beat));
   const spkNow = line ? line[4] : FX.bossLine && t < FX.bossLine.until ? FX.bossLine.spk : null;
   if (spkNow === 'w' && L.commute) placeHeadBubble(commuteHead(beat));
-  else if ((spkNow === 'J' || spkNow === 'H') && L.cine) { const f = jiwooFloor17(beat), hp = beat >= L.cine.out ? cineHead(spkNow, cineT(beat)) : spkNow === 'J' && f ? { x: f.x + (f.mirror ? -2 : 2), y: CAST17.ok ? 169 - 75 : 169 - 84 } : null; if (hp) placeHeadBubble(hp); }
+  else if ((spkNow === 'J' || spkNow === 'H') && L.cine) { const f = jiwooFloor17(beat), hp = beat >= L.cine.out ? cineHead(spkNow, cineT(beat)) : spkNow === 'J' && f ? { x: f.x + (f.mirror ? -2 : 2), y: CAST17.ok ? 169 - 75 : chibiTop('jiwoo', 169) - 3 } : null; if (hp) placeHeadBubble(hp); }
   else if (spkNow && L.heads && L.heads[spkNow]) { const [hx, hy] = STG.on && STG.heads && STG.heads[spkNow] ? STG.heads[spkNow] : L.heads[spkNow], up = spkNow === 'b' && L.bossSeat && (inRange(beat, L.bossSeat.stand) || (TUT.on && TUT.stand)) ? 14 : 0, walk = spkNow === 'b' && L.obsCue ? obsX(beat) - OBS_X : 0; placeHeadBubble({ x: hx + (up ? 6 : 0) + walk, y: hy - up }); }
   let h = '';
   if (L.tutorial) for (let i = 0; i < 3; i++) { const n = notes[i]; if (n && n.state === 'pending' && t > n.place) { h = '상자가 빨간 선에 닿을 때 터치'; break; } }
