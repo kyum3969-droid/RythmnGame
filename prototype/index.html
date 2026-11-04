@@ -2271,8 +2271,256 @@ function drawChibi(who, x, footY, o = {}) {
   chibiArm(c, shN.x, shN.y, handN.x, handN.y, false);
   return { handN, handF, top: headY, x: X };
 }
+// ---------- 1-7's cast, second pass: side and front views, limbs on the dot grid, motion eased frame to frame ----------
+// A dot is 2x2 screen pixels. Each of them has a front view and a side view (drawn facing right, mirrored for left) of the
+// head and the body (letter maps); legs and arms are segments laid on the dot grid from joint angles, so a walk is a real
+// stride (hips, knees, arms swinging) and sitting bends at the hip and knee. A per-character animator (C2) eases every
+// change (sitting down, getting up, turning round through the front view, a hand going out) over a few frames and steps
+// the walk by the distance actually covered, so no one slides or snaps.
+const D2 = 2;
+const C2PAL = {
+  M: '#7d3548', m: '#5c2536', Y: '#c8d040', y: '#a2ab2e', w: '#ece6d6', S: '#d9a27b', s: '#b9845f', H: '#2b201f', h: '#3a2d2b',
+  P: '#323441', p: '#272833', W: '#e6e1d4', R: '#c94a3d', r: '#9e3329', K: '#201b21', k: '#2f2931', B: '#8cbbdc', b: '#6f9fc3',
+  T: '#e9eef0', D: '#2d2f36', d: '#23252b', N: '#303658', n: '#242a45', A: '#a7a7ab', a: '#88888d', O: '#e57a32', o: '#c06020',
+  E: '#5c5e65', e: '#484a50', Q: '#3b3c42', q: '#2f3036', J: '#2c4852', j: '#21363e', L: '#bfd23c', F: '#7c4c2b', G: '#d5dadd',
+};
+const C2 = {
+  jiwoo: {
+    front: { head: [
+      '..MMMM..',
+      '.MMMMMMm',
+      'MMHHHHMm',
+      'MHHSSHHm',
+      'MSSSSSSm',
+      'MSSSSSsm',
+      'MmSSSSmm',
+      '.mMSSMm.'],
+      body: [
+      'MMYwwYMm',
+      'MYYwwYym',
+      'MYYYYYym',
+      'MYYYYYym',
+      'MwwwwwwT',
+      'MYYYYYym',
+      'mmmmmmmm'] },
+    side: { head: [
+      '.MMMMM..',
+      'MMMMMMM.',
+      'MMMMHHHH',
+      'MMMHSSSS',
+      'MMMSSSSS',
+      'MMMSSSSs',
+      'mMMSSSS.',
+      '.mMMSS..'],
+      body: [
+      'MMYYYw',
+      'MMYYYY',
+      'MMYYYY',
+      'MMYYYY',
+      'MwwwwT',
+      'MMYYYY',
+      'mmmmmm'] },
+    sleeve: 'M', sleeveD: 'm', hand: 'S', leg: 'P', legD: 'p', shoe: 'W', thigh: 6, shin: 6, upper: 4, fore: 4 },
+  haeun: {
+    front: { head: [
+      '.RRRRRR.',
+      'RRRRRRRr',
+      'rrrrrrrr',
+      'KSSSSSSK',
+      'KSSSSSsK',
+      'KSSSSSsK',
+      'KKSSSSKK',
+      'KK.SS.KK'],
+      body: [
+      'KBBBBBbK',
+      'KBBBBBbK',
+      '.BBBBBb.',
+      '.BBBBBb.',
+      '.BBBBBb.',
+      '.TTTTTT.',
+      '.DDDDDd.'], hair: [[0, 7, 1, 4], [7, 7, 1, 4]] },
+    side: { head: [
+      '.RRRRR..',
+      'RRRRRRR.',
+      'rrrrrrrrR',
+      'KKKSSSS.',
+      'KKKSSSSS',
+      'KKKSSSSs',
+      'KKKSSSS.',
+      'KKKkSS..'],
+      body: [
+      'KKBBBb',
+      'KKBBBb',
+      'KBBBBb',
+      '.BBBBb',
+      '.BBBBb',
+      '.TTTTT',
+      '.DDDDd'], hair: [[0, 8, 2, 5]] },
+    sleeve: 'K', sleeveD: 'k', hand: 'S', leg: 'D', legD: 'd', shoe: 'K', thigh: 6, shin: 6, upper: 4, fore: 4, watch: true },
+  boss: {
+    front: { head: [
+      '.NNNNNN.',
+      'NNNNNNNn',
+      'nnnnnnnn',
+      'AASSSSAA',
+      'ASSSSSsA',
+      '.SaaaaS.',
+      '.SSSSSs.',
+      '..SSSS..'],
+      body: [
+      'EOOeeOoE',
+      'EOOeeOoE',
+      'EOOOOOoE',
+      'EwwwwwwE',
+      'EOOOOOoE',
+      'EooooooE',
+      'QQQQQQQq'] },
+    side: { head: [
+      '.NNNNN..',
+      'NNNNNNN.',
+      'nnnnnnnnN',
+      'AAASSSS.',
+      'AAASSSSS',
+      'AASSSaaa',
+      '.ASSSSS.',
+      '..SSSS..'],
+      body: [
+      'EEOOOo',
+      'EEOOOo',
+      'EEOOOo',
+      'EEwwwT',
+      'EEOOOo',
+      'Eooooo',
+      'QQQQQq'] },
+    sleeve: 'E', sleeveD: 'e', hand: 'S', leg: 'Q', legD: 'q', shoe: 'K', thigh: 6, shin: 6, upper: 4, fore: 4, wide: true },
+  rookie: {
+    front: { head: [
+      '..HHHH..',
+      '.HHHHHHh',
+      'HHHHHHHh',
+      'HSSSSSSh',
+      'HSSSSSsH',
+      '.SSSSSs.',
+      '.SSSSSs.',
+      '..SSSS..'],
+      body: [
+      'JLLJJLLj',
+      'JLLJJLLj',
+      'JLLLLLLj',
+      'JwwwwwwT',
+      'JLLLLLLj',
+      'JLLLLLLj',
+      'jjjjjjjj'] },
+    side: { head: [
+      '.HHHHH..',
+      'HHHHHHH.',
+      'HHHHHHHH',
+      'HHHSSSS.',
+      'HHSSSSSS',
+      'HHSSSSSs',
+      '.HSSSSS.',
+      '..SSSS..'],
+      body: [
+      'JJLLLw',
+      'JJLLLL',
+      'JJLLLL',
+      'JJwwwT',
+      'JJLLLL',
+      'JJLLLL',
+      'jjjjjj'] },
+    sleeve: 'J', sleeveD: 'j', hand: 'S', leg: 'P', legD: 'p', shoe: 'F', thigh: 6, shin: 6, upper: 4, fore: 4 },
+};
+const c2col = ch => C2PAL[ch];
+function c2map(rows, x0, y0, flip) {
+  const w = Math.max(...rows.map(r => r.length));
+  for (let j = 0; j < rows.length; j++) for (let i = 0; i < rows[j].length; i++) { const col = c2col(rows[j][i]); if (!col) continue; R(x0 + (flip ? w - 1 - i : i) * D2, y0 + j * D2, D2, D2, col); }
+  return w;
+}
+// a limb on the dot grid: a run of dots t thick from (ax, ay) in dots, n dots long, at angle a (0 = straight down, positive
+// swings forward, the way the figure faces). Returns the end, in dots
+function c2seg(ax, ay, n, a, t, col, fwd) {
+  const dx = Math.sin(a) * fwd, dy = Math.cos(a);
+  for (let k = 0; k <= n; k++) { const x = Math.round(ax + dx * k), y = Math.round(ay + dy * k); R((x - (t >> 1)) * D2, y * D2, t * D2, D2, col); }
+  return { x: ax + dx * n, y: ay + dy * n };
+}
+// the animator: one state per character, eased each frame toward what the scene asks for
+const C2S = {};
+function c2state(id, x) { let s = C2S[id]; if (!s || Math.abs(s.x - x) > 60) s = C2S[id] = { x, dist: 0, sit: 0, face: 1, faceT: 1, hx: null, hy: null, speed: 0, t: performance.now() }; return s; }
+// draw: id, x (the body's middle), footY (the ground), o: { face: 1 right / -1 left / 0 front, sit (0/1), seat (y), hand: {x, y}
+// screen point for the near hand, hand2 for the far, nod (0-1) }. Moves come from x alone: the animator steps the walk by
+// the distance covered (run when fast). Returns the near and far hands, the head's top and the ear on the facing side
+function drawC2(id, x, footY, o = {}) {
+  const c = C2[id], s = c2state(o.key || id, x), now = performance.now(), dt = Math.min(0.1, Math.max(0.001, (now - s.t) / 1000)); s.t = now;
+  const vx = (x - s.x) / dt; s.speed += (Math.abs(vx) - s.speed) * Math.min(1, dt * 10); s.dist += Math.abs(x - s.x); s.x = x;
+  const moving = s.speed > 8, run = s.speed > 75;
+  // facing: eased; between the two sides it passes through the front view
+  const wantFace = o.face != null ? o.face : (vx > 4 ? 1 : vx < -4 ? -1 : s.faceT);
+  s.faceT = wantFace; s.face += (wantFace - s.face) * Math.min(1, dt * 9);
+  const view = Math.abs(s.face) < 0.5 ? 'front' : 'side', fwd = s.face >= 0 ? 1 : -1, flip = fwd < 0;
+  s.sit += ((o.sit ? 1 : 0) - s.sit) * Math.min(1, dt * 7);
+  const V = c[view], X = Math.round(x / D2), FY = Math.round(footY / D2);
+  const L1 = c.thigh, L2 = c.shin, stride = run ? 9 : 6;
+  // the walk: the phase from the distance covered; hips and knees and arms from it
+  const ph = (s.dist / D2 / (stride * 2)) * Math.PI * 2;
+  const amp = moving && s.sit < 0.5 ? (run ? 0.75 : 0.45) : 0;
+  let hipN = amp * Math.sin(ph), hipF = -hipN, kneeN = amp ? (run ? 0.95 : 0.6) * Math.max(0, Math.sin(ph + 1.6)) : 0, kneeF = amp ? (run ? 0.95 : 0.6) * Math.max(0, Math.sin(ph + 1.6 + Math.PI)) : 0;
+  // sitting: thighs forward, knees bent back down; the hip on the seat
+  const st = s.sit, seat = o.seat != null ? Math.round(o.seat / D2) : FY - L1 - L2;
+  hipN = lerp(hipN, 1.45, st); hipF = lerp(hipF, 1.4, st); kneeN = lerp(kneeN, 1.45, st); kneeF = lerp(kneeF, 1.4, st);
+  const bob = moving && st < 0.5 ? (run ? Math.round(Math.abs(Math.sin(ph)) * 1) : (Math.cos(ph * 2) > 0.3 ? 1 : 0)) : 0;
+  const standHip = FY - (L1 + L2) - 1 + bob, hipY = Math.round(lerp(standHip, seat - 1, st));
+  // the body and head sit on the hip
+  const bw = Math.max(...V.body.map(r => r.length)), hw = Math.max(...V.head.map(r => r.length));
+  const bodyTop = hipY - V.body.length + 1, headTop = bodyTop - V.head.length + (o.nod ? Math.round(o.nod) : 0);
+  const bx = X - (bw >> 1), hx = view === 'side' ? X - (hw >> 1) + (flip ? -1 : 0) : X - (hw >> 1);
+  const legX = view === 'side' ? [X, X] : [X - 2, X + 1];
+  const legCol = [C2PAL[c.leg], C2PAL[c.legD]];
+  // far leg and far arm first (behind the body)
+  const drawLeg = (i, hip, knee) => {
+    const k = c2seg(legX[i], hipY, L1, hip, view === 'side' ? 3 : 3, legCol[i], fwd);
+    const f = c2seg(k.x, k.y, L2, hip - knee, view === 'side' ? 3 : 3, legCol[i], fwd);
+    const fx = Math.round(f.x), fy = Math.round(f.y);
+    // (the shoe out the way they face)
+    if (view === 'side') R((flip ? fx - 3 : fx - 1) * D2, fy * D2, 4 * D2, D2, C2PAL[c.shoe]); else R((fx - 1) * D2, fy * D2, 3 * D2, D2, C2PAL[c.shoe]);
+  };
+  const shY = bodyTop + 1, shX = view === 'side' ? [X - fwd * 0, X - fwd * 1] : [X + 4 * (flip ? -1 : 1), X - 4 * (flip ? -1 : 1)];
+  const armSwing = amp ? -(run ? 0.9 : 0.5) * Math.sin(ph) : 0;
+  const drawArm = (i, swing, bend, target) => {
+    const col = C2PAL[i ? c.sleeveD : c.sleeve];
+    let a1 = swing, a2 = swing + bend;
+    if (target) {
+      // reach for a screen point: point the upper arm at it, the forearm the rest of the way (2-bone, the elbow down)
+      const tx = target.x / D2 - shX[i], ty = target.y / D2 - shY, d = Math.hypot(tx, ty), l1 = c.upper, l2 = c.fore, dd = Math.min(l1 + l2 - 0.01, Math.max(0.5, d));
+      const base = Math.atan2(tx * fwd, ty), off = Math.acos(Math.max(-1, Math.min(1, (l1 * l1 + dd * dd - l2 * l2) / (2 * l1 * dd))));
+      a1 = base - off; const ex = Math.sin(a1) * l1, ey = Math.cos(a1) * l1; a2 = Math.atan2((tx * fwd - ex), (ty - ey));
+    }
+    const e = c2seg(shX[i], shY, c.upper, a1, 2, col, fwd), h = c2seg(e.x, e.y, c.fore, a2, 2, col, fwd);
+    R(Math.round(h.x - 1) * D2, Math.round(h.y) * D2, 2 * D2, 2 * D2, C2PAL[c.hand]);
+    if (c.watch && i === 0) R(Math.round(e.x * 0.3 + h.x * 0.7 - 1) * D2, Math.round(e.y * 0.3 + h.y * 0.7) * D2, D2, D2, C2PAL.G);
+    return { x: (h.x + 0) * D2, y: (h.y + 1) * D2 };
+  };
+  // eased hand targets
+  const tgt = o.hand || null;
+  if (tgt) { if (s.hx == null) { s.hx = tgt.x; s.hy = tgt.y; } s.hx += (tgt.x - s.hx) * Math.min(1, dt * 10); s.hy += (tgt.y - s.hy) * Math.min(1, dt * 10); } else s.hx = s.hy = null;
+  const sitArm = st > 0.5 ? 0.5 : 0;
+  // order: in the side view the far side (behind) first; in the front view both legs then the body then both arms
+  let handF, handN;
+  if (c.front.hair && view === 'front') for (const [ax, ay, w, h] of V.hair) R((hx + ax) * D2, (headTop + ay) * D2, w * D2, h * D2, C2PAL.K);
+  if (view === 'side' && V.hair) for (const [ax, ay, w, h] of V.hair) R((hx + (flip ? hw - ax - w : ax)) * D2, (headTop + ay) * D2, w * D2, h * D2, C2PAL.K);
+  handF = drawArm(1, -armSwing + sitArm, 0.25 + sitArm * 0.6, o.hand2);
+  drawLeg(1, hipF, kneeF);
+  drawLeg(0, hipN, kneeN);
+  c2map(V.body, bx * D2, bodyTop * D2, flip);
+  c2map(V.head, hx * D2, headTop * D2, flip);
+  handN = drawArm(0, armSwing + sitArm, 0.25 + sitArm * 0.6, s.hx != null ? { x: s.hx, y: s.hy } : null);
+  return { handN, handF, top: headTop * D2, x: X * D2, ear: { x: (X + fwd * 2) * D2, y: (headTop + 4) * D2 } };
+}
+
+// the head's top (for a bubble): standing on the ground, or sitting on a seat
+function c2Top(id, footY, sit, seat) { const c = C2[id], v = c.side, FY = Math.round(footY / D2); const hip = sit ? Math.round(seat / D2) - 1 : FY - (c.thigh + c.shin) - 1; return (hip - v.body.length + 1 - v.head.length) * D2; }
+
 // the head's top for a bubble: standing on the ground, or sitting on a seat
-function chibiTop(who, ground, sit, seat) { const c = CHIBI[who]; return sit ? seat - CB - (c.body.length - 1) * CB - c.head.length * CB : ground - c.height; }
+function chibiTop(who, ground, sit, seat) { return c2Top(who, ground, sit, seat); }
 // 지우 in 1-7's drawn scenes and on its floor: run, walk, sit (the bench), stand, the pole (the train); his near hand on the
 // phone, held out (the earphones, to her), holding them, or up to a point (the hook)
 function chibiJiwoo(c, ground, b, nowMs) {
@@ -2283,12 +2531,12 @@ function chibiJiwoo(c, ground, b, nowMs) {
   const top = chibiTop('jiwoo', ground, sit, seat) + nod * CB;
   const hand = c.reachTo ? { x: c.reachTo[0], y: c.reachTo[1] } : c.mode === 'strap' ? { x: c.x + sg * 4, y: top - 2 } : c.phone ? { x: c.x + sg * 8, y: top + 26 }
     : c.give ? { x: c.x + sg * 22, y: top + 30 } : c.holding ? (sit ? { x: c.x + sg * 10, y: seat - 4 } : { x: c.x + sg * 12, y: top + 34 }) : null;
-  const S = drawChibi('jiwoo', c.x, ground, { left, mode, ph, seat, hand, bob: nod });
+  const S = drawC2('jiwoo', c.x, ground, { face: left ? -1 : 1, sit, seat, hand, nod });
   const hd = S.handN;
   if (c.holding && !c.give) drawEarphones(hd.x + sg, hd.y - 4);
   if (c.give && b < 167.2 + 14 && b >= 165.3) drawEarphones(hd.x + sg, hd.y - 4);
   if (c.phone) { R(hd.x - 2, hd.y - 9, 5, 8, '#1e1e24'); R(hd.x - 1, hd.y - 8, 3, 5, '#8fd0f0'); }
-  return { handN: hd, ear: { x: S.x - sg * 11, y: S.top + 12 } };
+  return { handN: hd, ear: { x: S.ear.x, y: S.ear.y } };
 }
 // 하은 in 1-7: walk, sit, stand; her watch, the tap on the bench, taking the earphones, her cup(s) in her far hand
 function chibiHaeun(c, ground, b, nowMs, tap) {
@@ -2299,9 +2547,9 @@ function chibiHaeun(c, ground, b, nowMs, tap) {
   const hand = c.mode === 'watch' ? { x: c.x + sg * 6, y: top + 26 } : tap != null ? { x: c.x + sg * 14, y: seat + (tap ? 1 : -3) } : c.give ? { x: c.x + sg * 18, y: top + 30 }
     : (b >= 168.4 && b < 186.8 && sit) ? { x: c.x + sg * 10, y: seat - 6 } : null;
   const hand2 = c.cup ? (sit ? { x: c.x - sg * 9, y: seat - 6 } : null) : null;
-  const S = drawChibi('haeun', c.x, ground, { left, mode, ph, seat, hand, hand2 });
+  const S = drawC2('haeun', c.x, ground, { face: left ? -1 : 1, sit, seat, hand, hand2 });
   if (c.cup) { const hf = S.handF; R(hf.x - 1, hf.y - 6, 3, 5, '#f2efe6'); R(hf.x - 1, hf.y - 6, 3, 1, '#c8b89a'); if (c.cup2) { R(hf.x + 2 * sg, hf.y - 5, 3, 5, '#f2efe6'); R(hf.x + 2 * sg, hf.y - 5, 3, 1, '#c8b89a'); } }
-  return { handN: S.handN, ear: { x: S.x + sg * 11, y: S.top + 12 } };
+  return { handN: S.handN, ear: { x: S.ear.x, y: S.ear.y } };
 }
 // ---------- 1-7 하은의 새벽: the cutscene past the line (L.cine.out on) ----------
 // Four places, each painted once: the dawn street (1-5's bgCommute, at its bluest), the underground platform, inside the
@@ -2346,6 +2594,42 @@ const HOSP_DOOR = { x0: 238, x1: 286, y0: 118, y1: 174 }, HOSP_LIFT = { x0: 292,
   h(33, 140, 3, 12, '#5a4030');
   h(62, 156, 64, 4, '#8a6a4a'); h(62, 156, 64, 1, '#a88a6a'); h(62, 146, 64, 3, '#8a6a4a'); h(66, 160, 3, 14, '#4a4a4c'); h(119, 160, 3, 14, '#4a4a4c'); h(64, 149, 2, 9, '#4a4a4c'); h(122, 149, 2, 9, '#4a4a4c');
   h(140, 60, 3, 114, '#4a4e58'); h(140, 58, 12, 3, '#4a4e58'); h(147, 61, 8, 3, '#e8e4d0');
+})();
+// the hospital's front, second pass: drawn on the cast's own 2x2 dots (a 192x108 picture, doubled), flat, muted, few
+// details, the same layout (the doors, the lift, the canopy, the bench, the planter, the lamp) so the scene's blocking holds
+const bgHosp2 = document.createElement('canvas'); bgHosp2.width = W; bgHosp2.height = H;
+(() => {
+  const lo = document.createElement('canvas'); lo.width = W / 2; lo.height = H / 2; const b = lo.getContext('2d');
+  const r = (x, y, w, h, c) => { b.fillStyle = c; b.fillRect(x, y, w, h); };   // (in dots)
+  // far blocks: flat silhouettes, a few lit windows
+  for (const [x0, w, hh, c] of [[0, 22, 34, '#3b3d58'], [18, 18, 26, '#45476a'], [36, 26, 42, '#3b3d58'], [60, 16, 30, '#45476a']]) {
+    r(x0, 70 - hh, w, hh, c);
+    for (let y = 70 - hh + 3; y < 66; y += 4) for (let x = x0 + 2; x < x0 + w - 2; x += 3) if (((x * 5 + y * 7) % 11) === 0) r(x, y, 1, 2, '#e8c47a');
+  }
+  // the building: a warm grey face, a shadow down its left edge, a darker band at the top
+  r(75, 12, 117, 75, '#c8c4ba'); r(75, 12, 117, 2, '#d8d5cc'); r(75, 12, 2, 75, '#aeaaa0'); r(75, 14, 117, 1, '#b8b4aa');
+  // windows: two long strips, panes in pairs, a few lit warm
+  for (const y of [33, 42, 51]) for (let x = 81; x < 188; x += 9) { r(x, y, 6, 5, '#7d8a95'); r(x, y, 6, 1, '#93a0aa'); if (((x + y * 3) % 7) === 2) r(x + 1, y + 1, 4, 4, '#ecd29a'); }
+  // the sign
+  r(88, 17, 85, 11, '#3d6d7c'); r(88, 17, 85, 1, '#4f8494'); r(93, 19, 7, 7, '#f2efe6'); r(95, 20, 3, 5, '#3d6d7c'); r(94, 21, 5, 3, '#3d6d7c');
+  // the canopy over the doors, its two posts
+  r(113, 55, 36, 3, '#868b92'); r(113, 55, 36, 1, '#a7acb2'); r(115, 58, 1, 29, '#868b92'); r(146, 58, 1, 29, '#868b92');
+  // the door frame (the glass and the lobby drawn live); the lift's frame beside
+  r(118, 58, 26, 29, '#6c7178');
+  // a planter with its tree
+  r(10, 75, 15, 12, '#6b5b4b'); r(10, 75, 15, 2, '#82705e');
+  for (const [cx, cy, rr] of [[17, 64, 9], [11, 70, 6], [23, 69, 6]]) for (let y = -rr; y <= rr; y++) for (let x = -rr; x <= rr; x++) if (x * x + y * y <= rr * rr) r(cx + x, cy + y, 1, 1, y < -rr / 3 ? '#5a8a5a' : '#4a7a4c');
+  r(16, 70, 2, 6, '#5a4232');
+  // the bench: the seat, the back, the legs
+  r(31, 78, 32, 2, '#8c6c4c'); r(31, 78, 32, 1, '#a7876a'); r(31, 73, 32, 2, '#8c6c4c'); r(33, 80, 2, 7, '#4b4b4f'); r(59, 80, 2, 7, '#4b4b4f'); r(32, 75, 1, 4, '#4b4b4f'); r(61, 75, 1, 4, '#4b4b4f');
+  // the lamp
+  r(70, 30, 2, 57, '#4b4f59'); r(70, 29, 6, 2, '#4b4f59'); r(73, 31, 4, 2, '#efe8d2');
+  // the pavement: flat, a seam every 8 dots, a kerb line
+  r(0, 87, W / 2, 21, '#a7a39a'); r(0, 87, W / 2, 1, '#bdb9b0'); for (let x = 0; x < W / 2; x += 8) r(x, 88, 1, 20, '#99958c'); r(0, 96, W / 2, 1, '#99958c');
+  const g2 = bgHosp2.getContext('2d'); g2.imageSmoothingEnabled = false; g2.drawImage(lo, 0, 0, W, H);
+  // (the sign's words at the screen's own resolution, to stay readable)
+  g2.fillStyle = '#ffffff'; g2.font = '700 12px sans-serif'; g2.fillText('한빛병원', 206, 50); g2.font = '600 6px sans-serif'; g2.fillStyle = '#cfe4ea'; g2.fillText('HANBIT HOSPITAL', 268, 50);
+  g2.clearRect(HOSP_DOOR.x0, HOSP_DOOR.y0, HOSP_DOOR.x1 - HOSP_DOOR.x0, HOSP_DOOR.y1 - HOSP_DOOR.y0);
 })();
 // the earphones she left: two white buds and their cord, the cord mended with tape
 function drawEarphones(x, y, a = 1) {
@@ -2502,7 +2786,7 @@ function drawCine17(b, t, nowMs) {
     // the lobby behind the doors: warm light, the floor, the lift with its doors
     const D = HOSP_DOOR, LF = HOSP_LIFT;
     R(D.x0, D.y0, D.x1 - D.x0, D.y1 - D.y0, '#e8dcc0'); R(D.x0, 160, D.x1 - D.x0, 14, '#c8bca0');
-    g.drawImage(bgHosp, 0, 0);
+    g.drawImage(L.cine && !cast17Ready() ? bgHosp2 : bgHosp, 0, 0);
     // (the lift is at the far right of the lobby, seen past the doors' right edge; drawn on the building's wall as a lit opening)
     const liftOpen = (b >= 144.8 && b < 146.8) ? Math.min(1, (b - 144.8) / 0.4) * Math.min(1, (146.8 - b) / 0.4) : 0;
     R(LF.x0, LF.y0, LF.x1 - LF.x0, LF.y1 - LF.y0, '#8a9098'); R(LF.x0 + 2, LF.y0 + 2, LF.x1 - LF.x0 - 4, LF.y1 - LF.y0 - 2, liftOpen > 0 ? '#f2e2b8' : '#b8bec4'); const lg = Math.round(9 * liftOpen); R(LF.x0 + 2, LF.y0 + 2, 10 - lg, LF.y1 - LF.y0 - 2, '#a8aeb4'); R(LF.x1 - 12 + lg, LF.y0 + 2, 10 - lg, LF.y1 - LF.y0 - 2, '#a8aeb4'); R(LF.x0 + 10, LF.y0 - 6, 4, 3, '#ff8a5a');
@@ -2597,7 +2881,7 @@ function drawEarHook(h, withEar = true) {
 function drawCineLine17(b, nowMs) {
   drawEarHook({ x: CAP.x, y: CAP.y, bottom: 150 }, b < J17_TAKE + 0.5);
   // 반장, on the floor in front of the belts (walking in, then facing 지우)
-  if (b < L.cine.out) drawChibi('boss', boss17X(b), 169, { left: !boss17Walk(b), mode: boss17Walk(b) ? 'walk' : 'stand', ph: (boss17X(b) / 24) % 1 });
+  if (b < L.cine.out) drawC2('boss', boss17X(b), 169, { face: boss17Walk(b) ? 1 : -1 });
   if (b >= L.cine.hGone && b < L.cine.hGone + 3.4) cineHaeun({ x: lerp(52, -20, (b - L.cine.hGone) / 3.2), mode: 'walk', mirror: false }, 169, b, nowMs);
   const f = jiwooFloor17(b);
   if (f) {
@@ -3539,7 +3823,7 @@ const HAEUN_X = Math.round(SCAN_X + 0.82 * (PLAYER_X - SCAN_X)), HAEUN_TOP = 56;
 // o.gun = your scan kick while she works the upper gate; o.watch = checking the time; o.step = walking (which leg is forward);
 // o.load = she is a belt's loader and the arm is drawn with the box; o.mirror = facing right (at the loading end)
 function drawHaeunAt(cx, top, nowMs, o = {}) {
-  if (L.cine && !cast17Ready()) { const foot = top + 56, seat = top + 36; drawChibi('haeun', cx, foot, { left: !o.mirror, mode: o.sit ? 'sit' : o.step != null ? 'walk' : 'stand', ph: (nowMs / 600) % 1, seat, hand: o.watch ? { x: cx + (o.mirror ? 6 : -6), y: (o.sit ? chibiTop('haeun', foot, true, seat) : chibiTop('haeun', foot)) + 26 } : null, dip: haeunBow17(CINE_B) > 6 ? 1 : 0 }); return; }
+  if (L.cine && !cast17Ready()) { const foot = top + 56, seat = top + 36; drawC2('haeun', cx, foot, { face: o.mirror ? 1 : -1, sit: o.sit, seat, hand: o.watch ? { x: cx + (o.mirror ? 6 : -6), y: c2Top('haeun', foot, o.sit, seat) + 22 } : null, nod: o.dip || 0 }); return; }
   if (L.cine && !CAST17.ok && haeunBow17(CINE_B) > 6) top += haeunBow17(CINE_B) > 16 ? 3 : 1;   // (1-7: her bow)
   if (L.cine && cast17Ready()) { haeun17(cx, top + 56, { right: !!o.mirror, sit: o.sit, watch: o.watch, tap: o.tap, body: o.load, lean: haeunBow17(CINE_B) }); return; }
   const kick = o.gun != null ? o.gun : 0, bob = o.bob ? 1 : 0;
@@ -4348,7 +4632,7 @@ function haeunHead(beat) {
 const playerTop = (kick, nowMs) => 94 - (kick > 0.5 ? 1 : 0) + (nowMs - FX.playerNod < 160 ? 2 : 0);
 function drawPlayer(kick, nowMs) {
   if (L.cine && !cast17Ready()) {
-    const hx = PLAYER_X - 16 - (kick > 0.15 ? 4 : 0), hy = 128; drawChibi('rookie', PLAYER_X, 171, { left: true, hand: { x: hx, y: hy } });
+    const hx = PLAYER_X - 14 - (kick > 0.15 ? 4 : 0), hy = 132; drawC2('rookie', PLAYER_X, 171, { face: -1, hand: { x: hx, y: hy } });
     R(hx - 9, hy - 5, 10, 4, '#2d2f33'); R(hx - 2, hy - 2, 3, 5, '#2d2f33'); R(hx - 10, hy - 4, 2, 2, kick > 0.2 ? C.ok : C.laser); return;
   }
   if (L.cine && cast17Ready()) {
@@ -6619,9 +6903,9 @@ function drawOffice17(nowMs) {
   // ('leave': 반장 gets up and goes out after 지우, through the door to the line)
   if (st === 'leave') {
     const rise = 14 * (1 - ease(Math.min(1, age / 0.7))), bx = age < 0.9 ? O.bx : lerp(O.bx, O.door + 12, Math.min(1, (age - 0.9) / 2.1));
-    g.save(); if (bx > O.door - 6) g.globalAlpha = Math.max(0, 1 - (bx - (O.door - 6)) / 14); g.translate(0, rise); drawChibi('boss', bx, O.floor, { left: age < 0.8, mode: age > 0.9 && age < 3 ? 'walk' : 'stand', ph: (bx / 24) % 1 }); g.restore();
+    g.save(); if (bx > O.door - 6) g.globalAlpha = Math.max(0, 1 - (bx - (O.door - 6)) / 14); g.translate(0, rise); drawC2('boss', bx, O.floor, { face: age < 0.8 ? -1 : 1 }); g.restore();
   } else {
-  drawChibi('boss', O.bx, O.floor, { left: true, mode: 'sit', seat: O.seat });
+  drawC2('boss', O.bx, O.floor, { face: -1, sit: true, seat: O.seat });
   }
   R(O.bx - 14, O.top - 4, 4, 4, '#f2efe6'); R(O.bx - 14, O.top - 4, 4, 1, '#c8b89a');
   // the table, her cup
