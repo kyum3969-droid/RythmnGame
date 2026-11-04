@@ -1025,6 +1025,10 @@ const LEVELS = [
       // the song gets into 소장's and the driver's legs (twitch) and drags them out of the aisle onto the floor in front of the
       // belts, dancing till the end
       twitch: [246, 256], dance: [256, 1e9, 452], danceFrom: [150, 540],
+      // their moves, a new one for each part of the song: a couple's sway, disco points, frozen on the break, a belly shake and an
+      // air guitar taking turns (as 반장 and 마르코 do), a dip (소장 is heavy), side steps, jumps and circles on the drop, back to back,
+      // a conga, out of breath in the breakdown, lifts and spins on the last drop, ta-da
+      moves: [[256, 'sway'], [272, 'disco'], [288, 'freeze'], [292, 'call'], [320, 'dip'], [328, 'side'], [352, 'jump'], [384, 'shimmy'], [396, 'train'], [428, 'pant'], [444, 'finale'], [456, 'pose']],
       stand: 82, roll: [0, 0], clap: 82.3,
       // 마르코 alone, dashing between the four belts: boxes he flings on in his hurry that ride partway and fall off the front
       // of the belt before the scanner (drops: [set down at, belt '1'-'4', how far along it falls]; not boxes you scan): one now
@@ -1132,8 +1136,8 @@ const LEVELS = [
           // the song: 소장's and the driver's legs go
           [246, '어… 어라…?', 2.2, 0, 'c'], [248.6, '어, 어어…?', 2.2, 0, 'd'], [252.3, '내 다리가 왜 이래!!!', 2, 0, 'c'], [254.3, '멈춰! 멈추라고!!', 1.8, 0, 'd'],
           [262, '…그래. 그거.', 2.5, 0, 'b'], [284.4, '반장님, 누워 계세요!', 2.6, 0, 'v'], [288.2, '…왼쪽은 내가 한다.', 3, 0, 'b'],
-          [336, '반장님, 이 노래 괜찮죠?', 3, 0, 'v'], [340, '…시끄러.', 2.5, 0, 'b'],
-          [429, '…윽.', 1.4, 0, 'b'], [430.6, '반장님?', 1.6, 0, 'v'], [432.4, '…괜찮아.', 2.4, 0, 'b']],
+          [321.5, '소, 소장님… 무거워요…!', 2.4, 0, 'd'], [336, '반장님, 이 노래 괜찮죠?', 3, 0, 'v'], [340, '…시끄러.', 2.5, 0, 'b'], [397, '칙칙폭폭~!', 2, 0, 'c'],
+          [429, '…윽.', 1.4, 0, 'b'], [430.6, '반장님?', 1.6, 0, 'v'], [432.4, '…괜찮아.', 2.4, 0, 'b'], [436, '헉… 헉…', 2, 0, 'c'], [438.8, '아직… 안 끝났어…!', 2.4, 0, 'd']],
     // the office before the shift: 반장 at the notice board with his back to 마르코, 마르코 behind him with two cans of coffee
     intro: [
       { who:'', text:'셋째 밤. 새벽 1시.', scene:'office', office: { b: 150, bm: true, m: 246, cans: 2 } },
@@ -1678,9 +1682,11 @@ function setTempo(level) {
     tempoSeg.push({ b, t, spb, nb }); if (nb !== Infinity) t += (nb - b) * spb;
   }
 }
-function timeAt(beat) { let s = tempoSeg[0]; for (const x of tempoSeg) if (beat >= x.b) s = x; return s.t + (beat - s.b) * s.spb; }
-function beatAt(t) { let s = tempoSeg[0]; for (const x of tempoSeg) if (t >= x.t) s = x; return s.b + (t - s.t) / s.spb; }
-function spbAt(t) { let s = tempoSeg[0]; for (const x of tempoSeg) if (t >= x.t) s = x; return s.spb; }
+// (a binary search: 2-3's song has a tempo for every beat)
+function segBy(key, v) { let lo = 0, hi = tempoSeg.length - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (v >= tempoSeg[m][key]) lo = m; else hi = m - 1; } return tempoSeg[lo]; }
+function timeAt(beat) { const s = segBy('b', beat); return s.t + (beat - s.b) * s.spb; }
+function beatAt(t) { const s = segBy('t', t); return s.b + (t - s.t) / s.spb; }
+function spbAt(t) { return segBy('t', t).spb; }
 
 function loadLevel(level) {
   const w = level.win || {}; WIN_P = w.p || 0.05; WIN_G = w.g || 0.10; WIN_M = w.m || 0.16; WIN_REL = w.release || 0.12; WIN_OFF = w.off || 1;
@@ -4605,7 +4611,7 @@ const cvHi = document.getElementById('cvhi'), gHi = cvHi.getContext('2d');
 // belts' loading ends behind them (ru, lu; he stands lower there, the upper belt hides his legs), and c, beside you
 const MARCO_SPOTS = () => ({ bx: { x: MID.ww - 90, dy: 0, mir: true }, rl: { x: MID.ww - BOSS_X, dy: 0, mir: true }, ru: { x: MID.ww - (BOSS_X + LANE_DX[0] + 22), dy: -22, mir: true },
   lu: { x: BOSS_X + LANE_DX[0] + 22, dy: -22, mir: false }, ll: { x: BOSS_X + 24, dy: 0, mir: false }, lk: { x: BOSS_X + 42, dy: 0, mir: true }, c: { x: MID.ax + 64, dy: -2, mir: true } });
-const midSpotAt = bb => { let sp = L.mid.route[0][1]; for (const [rb, s] of L.mid.route) if (bb >= rb) sp = s; return sp; };
+const midSpotAt = bb => { const R0 = L.mid.route; let lo = 0, hi = R0.length - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (bb >= R0[m][0]) lo = m; else hi = m - 1; } return R0[lo][1]; };
 function midMarco(b) {
   const R0 = L.mid.route, S = MARCO_SPOTS();
   if (L.ht && state === 'outro' && SCENE.act && SCENE.act.name === 'fall') {
@@ -4867,7 +4873,8 @@ function htEvents(ev) {
   for (let b = al[0]; b < D.jam; b++) { at(b + 0.5, T => clunk(T, 0.7, true)); if (b >= D.jam - 4) for (const f of [0.25, 0.75]) at(b + f, T => clunk(T, 0.5, true)); }
   for (let b = D.rush[0], k = 0; b < D.jam; b += 0.25, k++) {
     const p = b < D.back ? 0.06 + 0.1 * (b - D.rush[0]) / (D.back - D.rush[0]) : b >= al[0] ? 0.12 + 0.55 * (b - al[0]) / (D.jam - al[0]) : 0;
-    if (rnd(k, 32) < p) at(b, T => rattle(T, k));
+    // (under the recorded spy track the rattles are lost anyway: none, fewer sounds to make)
+    if (rnd(k, 32) < p) at(b, T => { if (b >= al[0] && b < al[1] && L.songs && L.songs.some((sp, i) => sp.at === al[0] && songReady(i))) return; rattle(T, k); });
   }
   at(D.rush[0], T => htWhine(T, timeAt(D.back) - timeAt(D.rush[0]), 52, 64, 0.008, 0.022, false));
   at(al[0], T => htWhine(T, timeAt(D.jam) - timeAt(al[0]), 60, 118, 0.008, 0.026, true));
@@ -5005,16 +5012,20 @@ function htVisitors(b, nowMs) {
 }
 // the truck's driver (as in 1-4): grey beanie, stubble, a navy padded vest over a red check shirt; a hand up to call out, a
 // tap of his watch, a wave to hurry
-function htDriver(cx, walking, faceR, step, k, nowMs, hold) {
+function htDriver(cx, walking, faceR, step, k, nowMs, hold, opt) {
   const top = 90, jean = '#3b4a63', boot = '#2a1d14', fl = '#a8342c', flD = '#5a1a16', vest = '#24324a', vestL = '#33456a', beanie = '#5d6168', skin = C.skin;
   g.save(); if (faceR) { g.translate(cx, 0); g.scale(-1, 1); g.translate(-cx, 0); }
-  const st = walking ? (step ? 3 : -3) : 0;
-  R(cx - 6 + st, top + 38, 6, 16, jean); R(cx + 1 - st, top + 38, 6, 16, jean); R(cx - 7 + st, top + 53, 7, 3, boot); R(cx + 1 - st, top + 53, 7, 3, boot);
+  const st = walking ? (step ? 3 : -3) : 0, kick = opt && opt.kick;
+  if (kick) { R(cx - 6, top + 38, 6, 7, jean); R(cx - 15, top + 42, 11, 5, jean); R(cx - 18, top + 41, 4, 7, boot); }
+  else { R(cx - 6 + st, top + 38, 6, 16, jean); R(cx - 7 + st, top + 53, 7, 3, boot); }
+  R(cx + 1 - st, top + 38, 6, 16, jean); R(cx + 1 - st, top + 53, 7, 3, boot);
   R(cx - 8, top + 16, 16, 24, fl); for (let q = 0; q < 24; q += 5) R(cx - 8, top + 16 + q, 16, 1, flD); for (let q = 2; q < 16; q += 5) R(cx - 8 + q, top + 16, 1, 24, flD);
   R(cx - 9, top + 17, 5, 22, vest); R(cx + 4, top + 17, 5, 22, vest); R(cx - 9, top + 17, 5, 1, vestL); R(cx + 4, top + 17, 5, 1, vestL);
   R(cx - 6, top + 2, 12, 14, skin); R(cx - 6, top + 10, 12, 5, '#8a6a55'); R(cx - 5, top + 12, 3, 1, '#5a3a2a');
   R(cx - 4, top + 6, 2, 2, C.ink); R(cx - 7, top - 2, 14, 6, beanie); R(cx - 7, top + 3, 14, 2, '#4a4d53');
   const hand = (x, y) => R(x - 2, y - 2, 4, 4, skin);
+  if (opt && opt.arms) { const mx_ = p => faceR ? { x: 2 * cx - p.x, y: p.y } : p, f = mx_(opt.arms.f), bk = mx_(opt.arms.b);
+    thick(cx + 6, top + 20, bk.x, bk.y, 4, flD); hand(bk.x, bk.y); thick(cx - 6, top + 20, f.x, f.y, 4, fl); hand(f.x, f.y); g.restore(); return; }
   if (hold && !faceR) { thick(cx - 6, top + 20, hold.x, hold.y, 4, fl); hand(hold.x, hold.y); thick(cx + 6, top + 20, cx + 10, top + 30, 4, fl); hand(cx + 9, top + 31); g.restore(); return; }
   if (walking) { const sw = step ? 3 : -3; thick(cx - 6, top + 20, cx - 8 + sw, top + 33, 4, fl); hand(cx - 8 + sw, top + 34); }
   else if (k < 4.6) { thick(cx - 6, top + 20, cx - 13, top + 8, 4, fl); hand(cx - 14, top + 6); }
@@ -5045,20 +5056,98 @@ function htDropBox(d, T, falling) {
 // couple: hands joined between them, swaying on the beat, a little hop, and every fourth beat 소장 lifts their hands and the
 // driver twirls under them
 function htDancers(b, nowMs) {
-  const [a, z, mx] = L.ht.dance; if (b < a || b >= z) return;
-  const inP = ease(Math.min(1, (b - a) / 2.5)), bt = b - Math.floor(b), beat = Math.floor(b), on = inP >= 1;
-  const sw = on ? (beat % 2 ? 3 : -3) : 0, hop = on && bt < 0.25 ? -2 : 0, twirl = on && beat % 4 === 3;
-  const fr = L.ht.danceFrom, xc = Math.round(lerp(fr ? fr[0] : -30, mx - 17, inP)) + sw, xd = Math.round(lerp(fr ? fr[1] : MID.ww + 30, mx + 17, inP)) + sw, jx = Math.round((xc + xd) / 2), step = on ? 0 : Math.floor(nowMs / 150) % 2;
-  // (on the floor in front of the belts they are nearer you than the line: drawn half as big again, about their feet; from
-  // the aisle behind the belts they come over them, growing as they come)
+  const D = L.ht, [a, z, mx] = D.dance; if (b < a || b >= z) return;
+  const inP = ease(Math.min(1, (b - a) / 2.5)), on = inP >= 1, fr = D.danceFrom;
+  const beat = Math.floor(b), bt = b - beat, bar = Math.floor(b / 4), ib = ((beat % 4) + 4) % 4, e8 = Math.floor(b * 2) % 2, e16 = Math.floor(b * 4) % 2;
+  const acc = bt < 0.25, sw = beat % 2 ? 1 : -1, step = on ? 0 : Math.floor(nowMs / 150) % 2;
   const ty = fr ? lerp(-22, 112, inP) - Math.sin(Math.PI * inP) * 30 : 112, sc = fr ? lerp(1, 1.5, inP) : 1.5;
-  g.save(); g.translate(0, ty + hop); g.translate(mx, 152); g.scale(sc, sc); g.translate(-mx, -152);
-  g.fillStyle = 'rgba(0,0,0,.3)'; for (const x of [xc, xd]) { g.beginPath(); g.ellipse(x, 152, 13, 3, 0, 0, Math.PI * 2); g.fill(); }
-  const pose = { ...standPose(0), hand: on ? { x: BOSS_X + (jx - xc), y: twirl ? 92 : 120 } : { x: BOSS_X + 10 + step * 2, y: 128 } };
-  drawActor('chief', xc, false, pose, nowMs, false, () => PARTNERS.chief.arm(pose));
-  R(xc - 9, 150, 9, 3, '#1b1716'); R(xc + 1, 150, 9, 3, '#1b1716');
-  htDriver(xd, !on, twirl && bt < 0.5, step, 99, nowMs, on && !twirl ? { x: jx + 2, y: 120 } : null);
-  g.restore();
+  // the move for this stretch of the song (L.ht.moves: [from, name])
+  let mv = 'sway', m0 = a; for (const [mb, name] of D.moves || []) if (b >= mb) { mv = name; m0 = mb; }
+  if (state === 'outro' && SCENE.act && SCENE.act.name === 'fall') mv = 'shock';
+  // 소장 (cf) and the driver (dv); their arms as [forward, down] from the shoulder (an arm is about 22 long): forward is the way
+  // each faces. Some reaches: up, up and forward, up and back, out, down, down across, a hand on the hip, on the knee
+  const UP = [2, -23], UPF = [11, -20], UPB = [-7, -21], OUT = [21, -5], DOWNX = [-8, 20], HIP = [7, 13], KNEE = [9, 24];
+  const cf = { x: mx - 17, y: 0, r: 0, mir: false, dip: 0, f: HIP, b: HIP, wince: false };
+  const dv = { x: mx + 17, y: 0, r: 0, faceR: false, f: [6, 20], b: [6, 20], kick: false };
+  let spot = 0, spark = false, front = 'dv';
+  if (!on) {
+    cf.x = Math.round(lerp(fr ? fr[0] : -30, mx - 17, inP)); dv.x = Math.round(lerp(fr ? fr[1] : MID.ww + 30, mx + 17, inP));
+    cf.f = UPF; cf.b = UPB; dv.f = UPF; dv.b = UPB;
+  } else if (mv === 'sway') {   // a couple's sway, hand in hand; the driver twirled under 소장's arm every fourth beat
+    cf.x += sw * 3; dv.x += sw * 3; const tw = ib === 3; cf.y = acc ? -2 : 0; dv.y = cf.y;
+    cf.f = tw ? [12, -18] : [14, 6]; cf.b = HIP; if (tw) { dv.faceR = bt < 0.5; dv.f = UP; dv.b = HIP; } else { dv.f = [14, 6]; dv.b = HIP; }
+  } else if (mv === 'disco') {  // pointing up to the corner and down across, hips swinging, mirror images
+    const up = beat % 2 === 0; cf.x += sw * 2; dv.x -= sw * 2; cf.r = sw * 0.07; dv.r = -sw * 0.07;
+    cf.f = up ? UPF : DOWNX; cf.b = HIP; dv.f = up ? UPF : DOWNX; dv.b = HIP;
+  } else if (mv === 'freeze') { // the song's break: frozen in a pose, trembling as it runs out
+    const tr = ib === 3 ? (e16 ? 1 : -1) : 0; cf.x += tr; dv.x -= tr; cf.r = -0.1; dv.r = 0.06;
+    cf.f = UPF; cf.b = HIP; dv.f = [-4, -22]; dv.b = [-2, -22];
+  } else if (mv === 'call') {   // 반장's bars: 소장 shakes his belly, hands on hips; 마르코's: the driver's air guitar, a kick
+    if (bar % 2 === 1) {
+      cf.dip = e8 ? 3 : 0; cf.f = HIP; cf.b = HIP; cf.r = Math.sin(b * Math.PI) * 0.09; cf.x += Math.round(Math.sin(b * Math.PI * 2) * 2);
+      dv.f = [8, 6]; dv.b = [12, 4];
+    } else {
+      dv.f = [10, 14 + (e8 ? 3 : 0)]; dv.b = [20, -2]; dv.r = -0.1; dv.kick = ib === 3 && bt < 0.5;
+      const cl = ib % 2 === 1 && acc; cf.f = cl ? [14, -4] : [12, 4]; cf.b = cl ? [20, -4] : [18, 4];
+    }
+  } else if (mv === 'dip') {    // the driver dips 소장 (back to him), who is heavy: the second time he can hardly hold him
+    const k = (b - bar * 4) / 4, ang = 0.42 * Math.sin(Math.PI * Math.min(1, k * 1.2)), heavy = bar % 2 === 1;
+    cf.mir = true; cf.x = mx - 6; cf.r = ang + (heavy ? (e16 ? 0.03 : -0.03) : 0); cf.f = UPF; cf.b = OUT; cf.wince = heavy;
+    dv.x = mx + 14 + (heavy ? (e16 ? 1 : -1) : 0); dv.r = -ang * 0.3; dv.f = [18, -2 - Math.round(ang * 10)]; dv.b = [16, 4];
+  } else if (mv === 'side') {   // side steps together across the floor and back, a kick on four, claps on two and four
+    const off = Math.round(Math.sin((b - m0) * Math.PI / 4) * 26); cf.x += off; dv.x += off;
+    const cl = ib % 2 === 1 && acc; dv.kick = ib === 3 && bt < 0.45; cf.y = ib === 3 && bt < 0.45 ? -5 : 0;
+    cf.f = cl ? [14, -6] : [10, 8]; cf.b = cl ? [20, -6] : HIP; dv.f = cl ? [14, -6] : [10, 8]; dv.b = cl ? [20, -6] : HIP;
+  } else if (mv === 'jump' || mv === 'finale') {   // the drops: a jump on every beat, arms up on the one, fists pumped; every other bar they go round each other
+    const jy = -Math.round(Math.sin(Math.PI * Math.min(1, bt / 0.42)) * (mv === 'finale' ? 12 : 9)); cf.y = jy; dv.y = jy; spot = 1; spark = ib === 0;
+    if (ib === 0) { cf.f = UP; cf.b = UPB; dv.f = UP; dv.b = UPB; }
+    else { cf.f = e8 ? UPF : [12, -8]; cf.b = HIP; dv.f = e8 ? [12, -8] : UPF; dv.b = HIP; }
+    if (mv === 'jump' && bar % 2 === 1 && ib >= 2) {   // round each other: a circle in two beats
+      const th = Math.PI * 2 * ((b - bar * 4 - 2) / 2); cf.x = Math.round(mx - 17 * Math.cos(th)); dv.x = Math.round(mx + 17 * Math.cos(th)); front = Math.sin(th) > 0 ? 'cf' : 'dv';
+      cf.mir = Math.sin(th) < 0; dv.faceR = Math.sin(th) > 0; }
+    if (mv === 'finale') {   // ...and the driver lifting 소장 on one and three (he strains), spinning on two and four
+      if (ib % 2 === 0) { cf.y = -Math.round(Math.sin(Math.PI * Math.min(1, bt / 0.6)) * 16); cf.f = UP; cf.b = UPB; dv.y = 2; dv.x = mx + 2; dv.f = [14, 4 + cf.y]; dv.b = [18, 6 + cf.y]; dv.r = -0.06; front = 'dv'; }
+      else { cf.mir = bt < 0.5; dv.faceR = bt < 0.5; } }
+  } else if (mv === 'shimmy') { // back to back, shoulders shimmying, down and up again over a bar
+    const j = e16 ? 1 : -1, dn = Math.round(4 * Math.sin(Math.PI * (b % 4) / 4)); cf.mir = true; dv.faceR = true; cf.x = mx - 9 + j; dv.x = mx + 9 - j; cf.dip = dn; dv.y = dn;
+    cf.f = [12, -8 + j]; cf.b = [6, -10 - j]; dv.f = [12, -8 - j]; dv.b = [6, -10 + j];
+  } else if (mv === 'train') {  // a conga: the driver behind 소장, his hands on 소장's shoulders, back and forth across the floor, a kick on four
+    const px = Math.round(Math.sin((b - m0) * Math.PI / 8) * 64); cf.x = mx + 10 + px; dv.x = mx - 10 + px; dv.faceR = true;
+    cf.y = ib === 3 && bt < 0.45 ? -4 : 0; dv.kick = ib === 3 && bt < 0.45; cf.f = beat % 2 ? UPF : UP; cf.b = HIP;
+    dv.f = [16, -4 + cf.y]; dv.b = [20, -2 + cf.y]; front = 'cf';
+  } else if (mv === 'pant') {   // the breakdown: hands on their knees, out of breath; at its end up again and ready
+    const k = b - m0, up = k >= 12 ? Math.min(1, (k - 12) / 3) : 0, br = Math.floor(b * 1.5) % 2;
+    cf.dip = Math.round(lerp(6, 0, up)) + br; cf.wince = up < 1; cf.f = up < 0.5 ? KNEE : [14, 2]; cf.b = up < 0.5 ? KNEE : HIP;
+    dv.r = lerp(-0.25, 0, up); dv.y = br; dv.f = up < 0.5 ? KNEE : [14, 2]; dv.b = up < 0.5 ? KNEE : HIP;
+  } else if (mv === 'pose') {   // the last hits: ta-da
+    cf.r = -0.06; cf.f = UPF; cf.b = UPB; dv.y = 5; dv.r = 0.05; dv.kick = true; dv.f = UPF; dv.b = UPB;
+    spark = (b >= 456 && b < 457) || (b >= 466 && b < 467); spot = 1;
+  } else if (mv === 'shock') {  // 반장 goes down in the ending: both turn to him, hands to their faces
+    cf.mir = true; cf.f = [-4, -12]; cf.b = [12, -12]; dv.f = [2, -12]; dv.b = [-10, -12];
+  }
+  g.save(); g.translate(0, ty); g.translate(mx, 152); g.scale(sc, sc); g.translate(-mx, -152);
+  // the floor under them: shadows, and in the drops a coloured spot under each, changing on the beat
+  if (spot) { const cols = ['255,90,150', '90,200,255', '255,210,80'];
+    [cf.x, dv.x].forEach((x, i) => { const c = cols[(beat + i) % 3], gr = g.createLinearGradient(0, 40, 0, 152); gr.addColorStop(0, `rgba(${c},0)`); gr.addColorStop(1, `rgba(${c},.22)`);
+      g.fillStyle = gr; g.beginPath(); g.moveTo(x - 4, 40); g.lineTo(x + 4, 40); g.lineTo(x + 20, 152); g.lineTo(x - 20, 152); g.closePath(); g.fill();
+      g.fillStyle = `rgba(${c},.35)`; g.beginPath(); g.ellipse(x, 152, 20, 4, 0, 0, Math.PI * 2); g.fill(); }); }
+  g.fillStyle = 'rgba(0,0,0,.3)'; for (const x of [cf.x, dv.x]) { g.beginPath(); g.ellipse(x, 152, 13, 3, 0, 0, Math.PI * 2); g.fill(); }
+  const drawC = () => {
+    g.save(); g.translate(cf.x, 150 + cf.y); g.rotate(cf.r); g.translate(-cf.x, -150);
+    const pose = { ...standPose(0), dip: cf.dip, wince: cf.wince }, st0 = bodyTop(86, pose) + 23;
+    pose.hand = { x: BOSS_X + 8 + cf.f[0], y: st0 + cf.f[1] }; const h2 = { x: BOSS_X - 9 + cf.b[0], y: st0 + cf.b[1] };
+    drawActor('chief', cf.x, cf.mir, pose, nowMs, false, top => {
+      if (h2) { thick(BOSS_X - 9, top + 23, h2.x, h2.y + 1, 6, '#a8a194'); thick(BOSS_X - 9, top + 22, h2.x, h2.y, 5, '#dcd7cb'); R(h2.x - 2, h2.y - 2, 5, 4, C.skin); }
+      PARTNERS.chief.arm(pose); });
+    R(cf.x - 9, 150, 9, 3, '#1b1716'); R(cf.x + 1, 150, 9, 3, '#1b1716'); g.restore(); };
+  const drawD = () => { g.save(); g.translate(dv.x, 146 + dv.y); g.rotate(dv.r); g.translate(-dv.x, -146);
+    const arms = { f: { x: dv.x - 6 - dv.f[0], y: 110 + dv.f[1] }, b: { x: dv.x + 6 - dv.b[0], y: 110 + dv.b[1] } };
+    htDriver(dv.x, !on, dv.faceR, step, 99, nowMs, null, { arms, kick: dv.kick }); g.restore(); };
+  if (front === 'dv') { drawC(); drawD(); } else { drawD(); drawC(); }
+  // sparkles flying out on the drops' downbeats and the last hits
+  if (spark) for (let i = 0; i < 14; i++) { const an = i / 14 * Math.PI * 2 + rnd(i, 71), r = 14 + bt * 46 * (0.7 + rnd(i, 72) * 0.6);
+    g.globalAlpha = Math.max(0, 1 - bt * 1.3); R(Math.round(mx + Math.cos(an) * r * 1.4), Math.round(104 + Math.sin(an) * r * 0.8), 2, 2, i % 3 ? '#fff4c0' : '#ffd060'); }
+  g.globalAlpha = 1; g.restore();
 }
 // the cuts' letterbox: black bars close in over a beat and open again at the end of each cut
 function htCine(c, w, h, b, active) {
@@ -5154,7 +5243,8 @@ function drawMid(t, nowMs, active) {
   const ph = b - Math.floor(b), pk = i => Math.max(0, 1 - (nowMs - QUADFX.press[i]) / 140);
   const marco = midMarco(b);
   // who loads a box: 반장 the left lower line's, unless 마르코 has squeezed in there; 마르코 throws all the rest from wherever he is
-  const bossLoads = n => n.q === 0 && !n.up && !['ll', 'lk'].includes(midSpotAt(n.place ? beatAt(n.place) : n.beat)) && !(L.ht && (htIn(beatAt(n.place), L.ht.alone) || (L.ht.down && beatAt(n.place) >= L.ht.down[0] && beatAt(n.place) < L.ht.up)));
+  // (worked out once a box: it only depends on the chart and the route)
+  const bossLoads = n => n._bl !== undefined ? n._bl : (n._bl = n.q === 0 && !n.up && !['ll', 'lk'].includes(midSpotAt(n.place ? beatAt(n.place) : n.beat)) && !(L.ht && (htIn(beatAt(n.place), L.ht.alone) || (L.ht.down && beatAt(n.place) >= L.ht.down[0] && beatAt(n.place) < L.ht.up))));
   let held = null;
   if (live) for (const n of notes) { if (!n.quad || !bossLoads(n)) continue; const k = (T - (n.place - n.carry)) / n.carry; if (k >= 0 && k < 1) { const f = { x: 16, y: 112 }, x = lerp(f.x, PLACE_X, k), y = lerp(f.y, BELT_Y - n.h / 2, ease(k)) - Math.sin(Math.PI * k) * 14; held = { n, x, y }; break; } }
   const mirror = (q, fn) => { g.save(); if (q) { g.translate(WW, 0); g.scale(-1, 1); } g.beginPath(); g.rect(0, -MID.oy, AX, MID.wh); g.clip(); fn(); g.restore(); };
@@ -9064,8 +9154,8 @@ function startSong(T, into = 0, i = 0) {
   const rate = sp.rate || 1, off = sp.lead + into * rate; if (off >= buf.duration) return;
   const s = ctx.createBufferSource(), gn = ctx.createGain(), lp = ctx.createBiquadFilter(), wet = ctx.createGain(); s.buffer = buf; gn.gain.value = sp.gain || 0.9;
   lp.type = 'lowpass'; lp.frequency.value = 20000; lp.Q.value = 0.5; wet.gain.value = 0;
-  const cv = ctx.createConvolver(), vlp = ctx.createBiquadFilter(); cv.buffer = songVerbBuf(); vlp.type = 'lowpass'; vlp.frequency.value = 2400;
-  s.connect(lp); lp.connect(gn); lp.connect(wet); wet.connect(cv); cv.connect(vlp); vlp.connect(gn); gn.connect(mus); s.playbackRate.value = rate;
+  s.connect(lp); lp.connect(gn); gn.connect(mus); s.playbackRate.value = rate;
+  if (L.songDuck) { const cv = ctx.createConvolver(), vlp = ctx.createBiquadFilter(); cv.buffer = songVerbBuf(); vlp.type = 'lowpass'; vlp.frequency.value = 2400; lp.connect(wet); wet.connect(cv); cv.connect(vlp); vlp.connect(gn); }
   s.start(Math.max(T, ctx.currentTime), off); SONG.src = s; SONG.gn = gn; SONG.lp = lp; SONG.wet = wet; SONG.g0 = gn.gain.value;
   // started (or sought) inside the pushed-back stretch: start there
   const d = L.songDuck, bb = beatAt(timeAt(sp.at) + into); if (d && bb >= d[0] && bb < d[1]) { lp.frequency.value = d[2]; gn.gain.value = SONG.g0 * d[3]; wet.gain.value = d[4] || 0; }
