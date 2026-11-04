@@ -1620,7 +1620,7 @@ const LEVELS = [
     cutscene: [[0, 208]],
     camPlay: [[0, 14.5, { x: 128, y: 96, k: 1.55 }], [14.5, 45, { x: 128, y: 120, k: 1.7 }], [45, 52, { x: 92, y: 120, k: 1.6 }],
       [52, 55.6, { x: 74, y: 122, k: 1.8 }], [55.6, 60.6, { x: 52, y: 104, k: 2.6 }], [60.6, 65.6, { x: 96, y: 120, k: 1.6 }]],
-    devMarks: [[0, '라인: 반장과 지우'], [14.5, '지우 내려옴'], [45, '이어폰 발견'], [55.4, '이어폰 집기'], [67.5, '거리'], [78, '승강장'], [89, '열차'], [98, '병원 앞'], [115, '문자'], [125.5, '하은이 나옴'], [150, '벤치'], [190, '엔딩']],
+    devMarks: [[0, '라인: 반장과 지우'], [14.5, '지우 내려옴'], [45, '이어폰 발견'], [55.4, '이어폰 집기'], [67.5, '거리'], [78, '승강장'], [89, '열차'], [98, '병원 앞'], [115, '문자'], [121, '하은이 나옴'], [127.5, '이어폰'], [150, '비트'], [190, '엔딩']],
     bars: [
       '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
       '........', '........', '........', '........', '........', '........', '........', '........', '........', '........',
@@ -1645,11 +1645,11 @@ const LEVELS = [
           [47, '…아.', 1.2, 0, 'J'], [48.8, '그래서 누나 자리에 이어폰이 있었구나.', 3, 0, 'J'],
           [57.4, '…이거, 두고 가신 거예요?', 2.6, 0, 'J'], [61, '…그럼 갖다주던지.', 2.6, 0, 'b'],
           [72.5, '누나! 이어폰—!', 2.2, 0, 'J'], [83.6, '…아!', 1.2, 0, 'J'], [86, '…누나!', 1.6, 0, 'J'],
-          [109.5, '(…그러니까 맨날 시계만 보죠.)', 3.4, 0, 'J'],
-          [128.5, '…너, 왜 여기 있어?', 2.2, 1, 'H'], [131, '이거… 두고 가셔서요.', 2.6, 0, 'J'], [134, '…봤어?', 1.6, 1, 'H'],
-          [136, '…네. 죄송해요. 따라오려던 건 아닌데.', 3.2, 0, 'J'], [140.5, '…엄마. 작년부터.', 2.6, 1, 'H'],
-          [143.5, '어제, 꿈도 없냐고 한 거… 미안해요. 몰랐어요.', 3.4, 0, 'J'], [147.3, '…그 비트.', 1.4, 1, 'H'], [148.8, '한 번만 다시 들려줘.', 1.6, 1, 'H'],
-          [190, '…나도, 예전엔 이런 거 했었어.', 3, 1, 'H'], [193.4, '…알아요.', 1.6, 0, 'J'], [195.4, '…박자는 맞네.', 2.2, 1, 'H']],
+          [109.5, '(…그래서 맨날 시계를 봤구나.)', 3.4, 0, 'J'],
+          [127.5, '…이거, 두고 가셔서요.', 2.4, 0, 'J'], [130.8, '…두고 간 거야.', 2, 1, 'H'], [133.2, '이제 안 들으려고.', 2, 1, 'H'],
+          [136, '…엄마가 작년부터 여기 계셔.', 2.6, 1, 'H'], [139.4, '…몰랐어요.', 1.4, 0, 'J'], [141.2, '어제 그 말… 죄송해요.', 2.2, 0, 'J'],
+          [146.2, '…그 비트, 아직 있어?', 2.2, 1, 'H'], [148.6, '…네.', 1, 0, 'J'],
+          [190, '…나도 예전엔 이런 거 만들었어.', 3, 1, 'H'], [193.4, '…반장님한테 들었어요.', 2, 0, 'J'], [195.4, '…노래 좋네.', 2.2, 1, 'H'], [197.8, '…이건 가져갈게.', 1.8, 1, 'H']],
     comfort: [],
     // the opening: the office before the shift, 반장 and 하은 at the table (o17: how the room stands, drawOffice17)
     intro: [
@@ -2181,21 +2181,20 @@ function cineCast(b) {
   if (b < 136) return { scene: 'train', j: { x: 190, mode: 'strap' } };
   if (b < 188) {
     const hIn = b < 140.6 ? { x: L7(-10, 262, (b - 136) / 4.6), mode: 'walk', mirror: true } : b < 146.5 ? { x: L7(262, 304, (b - 140.6) / 4.4), mode: b > 142.6 && b < 144.2 ? 'watch' : 'walk', mirror: true, inside: true, gone: b > 145.6 } : null;
-    // (out through the doors for some air with a cup from the lobby's machine; she stops when she sees him; a step closer to
-    // take the earphones; then to the bench)
-    const hOut = b >= 163.5 ? { x: b < 166.3 ? L7(262, 176, (b - 163.5) / 2.8) : b < 176.4 ? 176 : b < 177.3 ? L7(176, 148, (b - 176.4) / 0.9) : b < 186.2 ? 148 : L7(148, 64, (b - 186.2) / 2),
-      mode: b < 166.3 || (b >= 176.4 && b < 177.3) || b >= 186.2 ? 'walk' : 'stand', mirror: false, cup: true, give: b >= 177.3 && b < 178.7 } : null;
+    // (she has seen him from the lobby: out through the doors with two cups from its machine, past him to the bench's
+    // other end, sitting facing him; a cup held out to him)
+    const hOut = b >= 159 ? { x: b < 163 ? L7(262, 64, (b - 159) / 4) : 64, mode: b < 163 ? 'walk' : 'sit', mirror: b >= 163, cup: true, cup2: b < 164.4, give: b >= 163.6 && b < 164.6 } : null;
     let j = null;
     if (b >= 141.5) {
-      // (to the bench; the phone, nothing sent; the earphones turning in his hands; up when she speaks, holding them out)
-      const x = b < 144.5 ? L7(-20, 200, (b - 141.5) / 3) : b < 151 ? 200 : b < 153.4 ? L7(200, 120, (b - 151) / 2.4) : 120;
-      const mode = b < 144.5 ? 'run' : b < 151 ? 'stand' : b < 153.4 ? 'walk' : b < 168 ? 'sit' : b < 186.6 ? 'stand' : 'sit';
-      j = { x: b >= 186.6 ? 124 : x, mode, mirror: b >= 151 && b < 168 ? true : b >= 186.6, phone: b >= 153.4 && b < 159.4, give: (b >= 169 && b < 172) || (b >= 177.3 && b < 178.7) };
+      // (to the bench; the phone, nothing sent; waiting, the earphones in his hands; holding them out to her)
+      const x = b < 144.5 ? L7(-20, 200, (b - 141.5) / 3) : b < 151 ? 200 : b < 153.4 ? L7(200, 124, (b - 151) / 2.4) : 124;
+      const mode = b < 144.5 ? 'run' : b < 151 ? 'stand' : b < 153.4 ? 'walk' : 'sit';
+      j = { x, mode, mirror: b >= 151, phone: b >= 153.4 && b < 158.6, give: b >= 165.3 && b < 168.4 };
     }
     return { scene: 'hosp', h: hOut || hIn, j };
   }
-  // the bench at sunrise; at the end she gets up and goes back in, the earphones in
-  const h = b < 236 ? { x: 64, mode: 'sit', mirror: true, tap: b >= 190 && b < 227.3 } : { x: L7(64, 262, (b - 236.4) / 3.6), mode: b < 236.4 ? 'stand' : 'walk', mirror: true, inside: b > 240, gone: b > 241.2, ear: b >= 236.8 && b < 237.8 };
+  // the bench at sunrise; at the end she unplugs her earphones, winds them into her pocket ('…이건 가져갈게.') and goes back in
+  const h = b < 236 ? { x: 64, mode: 'sit', mirror: true, cup: true, tap: b >= 190 && b < 227.3 } : { x: L7(64, 262, (b - 236.4) / 3.6), mode: b < 236.4 ? 'stand' : 'walk', mirror: true, inside: b > 240, gone: b > 241.2 };
   return { scene: 'hosp', h, j: { x: 124, mode: 'sit', mirror: true, nod: b >= 190 && b < 227.3 } };
 }
 const CINE_FEET = { jiwoo: 163, haeun: 142 };
@@ -2263,7 +2262,7 @@ function cineHaeun(c, ground, b, nowMs) {
   const top = ground - 56 + (c.mode === 'sit' ? 2 : 0);
   drawHaeunAt(c.x, top, nowMs, { mirror: !!c.mirror, step: c.mode === 'walk' ? 1 : null, sit: c.mode === 'sit', watch: c.mode === 'watch' || c.ear, rest: c.mode !== 'walk', tap: c.tap ? (tapOn || tapAnd ? 1 : 0) : null });
   // (the paper cup from the lobby's machine, in her hand at her side)
-  if (c.cup) { const hx = c.x + (c.mirror ? 8 : -8), hy = top + 31; R(hx - 1, hy - 4, 3, 4, '#f2efe6'); R(hx - 1, hy - 4, 3, 1, '#c8b89a'); }
+  if (c.cup) { const hx = c.x + (c.mirror ? 8 : -8), hy = top + 31; R(hx - 1, hy - 4, 3, 4, '#f2efe6'); R(hx - 1, hy - 4, 3, 1, '#c8b89a'); if (c.cup2) { R(hx + (c.mirror ? 3 : -5), hy - 3, 3, 4, '#f2efe6'); R(hx + (c.mirror ? 3 : -5), hy - 3, 3, 1, '#c8b89a'); } }
 }
 function cineHead(spk, b) {
   const c = cineCast(b), who = spk === 'J' ? c.j : spk === 'H' ? c.h : null; if (!who) return null;
@@ -2312,7 +2311,7 @@ function drawCine17(b, t, nowMs) {
     drawEarphones(206 + sway, 128, 1);
   } else {
     // the hospital: the sky going from first light to sunrise (fast while he waits on the bench), the lobby behind the glass
-    const p = b < 161 ? 0.12 + 0.2 * (b - 136) / 25 : b < 165 ? 0.32 + 0.3 * (b - 161) / 4 : b < 188 ? 0.62 + 0.1 * (b - 165) / 23 : 0.72 + 0.28 * Math.min(1, (b - 188) / 40);
+    const p = b < 155 ? 0.12 + 0.2 * (b - 136) / 19 : b < 159 ? 0.32 + 0.3 * (b - 155) / 4 : b < 188 ? 0.62 + 0.1 * (b - 159) / 29 : 0.72 + 0.28 * Math.min(1, (b - 188) / 40);
     cineSky(0, 174, p);
     if (b >= 188) { const sy = lerp(96, 26, Math.min(1, (b - 188) / 46)); for (let y = -10; y <= 10; y++) for (let x = -10; x <= 10; x++) if (Math.hypot(x, y) <= 10) R(102 + x, sy + y, 1, 1, '#fff2c8'); }
     // the lobby behind the doors: warm light, the floor, the lift with its doors
@@ -2323,16 +2322,24 @@ function drawCine17(b, t, nowMs) {
     const liftOpen = (b >= 144.8 && b < 146.8) ? Math.min(1, (b - 144.8) / 0.4) * Math.min(1, (146.8 - b) / 0.4) : 0;
     R(LF.x0, LF.y0, LF.x1 - LF.x0, LF.y1 - LF.y0, '#8a9098'); R(LF.x0 + 2, LF.y0 + 2, LF.x1 - LF.x0 - 4, LF.y1 - LF.y0 - 2, liftOpen > 0 ? '#f2e2b8' : '#b8bec4'); const lg = Math.round(9 * liftOpen); R(LF.x0 + 2, LF.y0 + 2, 10 - lg, LF.y1 - LF.y0 - 2, '#a8aeb4'); R(LF.x1 - 12 + lg, LF.y0 + 2, 10 - lg, LF.y1 - LF.y0 - 2, '#a8aeb4'); R(LF.x0 + 10, LF.y0 - 6, 4, 3, '#ff8a5a');
     // the glass doors: two leaves that slide apart as she comes and goes
-    const opens = [[139.6, 141.8], [163.0, 165.4], [239.4, 241.6]], o = opens.reduce((m, [a, z]) => Math.max(m, Math.min(1, (b - a) / 0.5) * Math.min(1, (z - b) / 0.5)), 0), gp = Math.round(20 * Math.max(0, o));
+    const opens = [[139.6, 141.8], [158.6, 161.0], [239.4, 241.6]], o = opens.reduce((m, [a, z]) => Math.max(m, Math.min(1, (b - a) / 0.5) * Math.min(1, (z - b) / 0.5)), 0), gp = Math.round(20 * Math.max(0, o));
     const leaf = (x) => { g.save(); g.globalAlpha = 0.5; R(x, D.y0, 24, D.y1 - D.y0, '#a8c8d8'); g.globalAlpha = 1; R(x, D.y0, 24, 1, '#e8f4f8'); R(x + 23, D.y0, 1, D.y1 - D.y0, '#6a7078'); g.restore(); };
     // her, inside, seen through the glass
     if (c.h && c.h.inside && !c.h.gone) { g.save(); g.beginPath(); g.rect(D.x0, D.y0, LF.x1 - D.x0, D.y1 - D.y0); g.clip(); cineHaeun(c.h, G - 2, b, nowMs); g.restore(); }
     leaf(D.x0 - gp); leaf(D.x0 + 24 + gp);
     const hJ = c.h && !c.h.inside ? cineHaeun(c.h, G, b, nowMs) : null;
-    const jJ = c.j ? cineJiwoo({ ...c.j, holding: b < 177.3 }, G, b, nowMs) : null;
+    const jJ = c.j ? cineJiwoo({ ...c.j, holding: b < 167.2 || (b >= 187.8 && b < 188.8) }, G, b, nowMs) : null;
+    // his cup: handed over (163.6-164.4), then on the bench beside him
+    const cup = (x, y) => { R(x - 1, y - 4, 3, 4, '#f2efe6'); R(x - 1, y - 4, 3, 1, '#c8b89a'); };
+    if (b >= 163.6 && b < 164.4) { const q = (b - 163.6) / 0.8; cup(Math.round(lerp(74, 110, q)), Math.round(lerp(144, 156, q) - Math.sin(q * Math.PI) * 6)); }
+    else if (b >= 164.4 && b < 244) cup(110, 156);
+    // her earphones in her hands while they talk (168.4-186.8), the cord wound round her fingers from 181
+    if (b >= 168.4 && b < 186.8 && c.h) { const k = b >= 181 ? Math.floor(b * 2) % 2 : 0; drawEarphones(c.h.x + 9 + k, G - 30); }
+    // and back to him to plug into his phone (186.8-187.8)
+    if (b >= 186.8 && b < 187.8) { const q = (b - 186.8) / 1; drawEarphones(Math.round(lerp(73, 108, q)), Math.round(lerp(144, 142, q))); }
     // the earphones changing hands (174-175.4), then shared: a bud in each of their ears, the cord between them
-    if (b >= 177.3 && b < 178.7) { const q = (b - 177.3) / 1.4; if (jJ && hJ) drawEarphones(lerp(jJ.handN.x, hJ.handN.x, q), lerp(jJ.handN.y, hJ.handN.y, q) - 3); else drawEarphones(lerp(c.j ? c.j.x + (c.j.mirror ? -16 : 16) : 140, c.h ? c.h.x + (c.h.mirror ? 6 : -6) : 140, q), 140); }
-    if (b >= 188.8 && b < 236) {
+    if (b >= 167.2 && b < 168.4) { const q = (b - 167.2) / 1.2; if (jJ && hJ) drawEarphones(lerp(jJ.handN.x, hJ.handN.x, q), lerp(jJ.handN.y, hJ.handN.y, q) - 3); else drawEarphones(lerp(c.j ? c.j.x + (c.j.mirror ? -16 : 16) : 140, c.h ? c.h.x + (c.h.mirror ? 6 : -6) : 140, q), 140); }
+    if (b >= 188.8 && b < 235.4) {
       // (from her ear to his: the new design's ears, or the dots')
       const ha = hJ ? { x: hJ.ear.x + 1, y: hJ.ear.y + 1 } : { x: (c.h ? c.h.x : 72) + 2, y: G - 50 }, ja = jJ ? { x: jJ.ear.x - 1, y: jJ.ear.y + 1 } : { x: (c.j ? c.j.x : 114) - 4, y: G - 67 };
       const hx = ha.x, hy = ha.y;
@@ -2342,7 +2349,7 @@ function drawCine17(b, t, nowMs) {
     }
   }
   // his phone, close (153.4-161.2): the long message typed and wiped, the short one sent
-  if (b >= 153.4 && b < 159.8) drawCinePhone(b);
+  if (b >= 153.4 && b < 158.6) drawCinePhone(b);
   // the cut in from the line, and out at the end
   const fin = Math.max(0, 1 - (b - cineT(L.cine.out)) / 1), fout = Math.max(0, Math.min(1, (b - 241) / 2.5));
   const cut = [116, 127, 136].reduce((m, x) => Math.max(m, Math.max(0, 1 - Math.abs(b - x) / 0.35)), 0);
@@ -2352,12 +2359,12 @@ function drawCine17(b, t, nowMs) {
 function drawCinePhone(b) {
   // the long one typed and wiped; a short one started and wiped too; the phone goes down unsent
   const long = '누나 저 진짜 몰랐어요 제가 그동안 누나한테', short = '누나, 이어폰';
-  const q = b - 153.4, a = Math.min(1, q / 0.4) * Math.min(1, (159.8 - b) / 0.4);
+  const q = b - 153.4, a = Math.min(1, q / 0.4) * Math.min(1, (158.6 - b) / 0.4);
   let text = '';
-  if (q < 2.6) text = long.slice(0, Math.floor(q / 2.6 * long.length));
-  else if (q < 3.8) text = long.slice(0, Math.max(0, Math.floor(long.length * (1 - (q - 2.6) / 1.2))));
-  else if (q < 5) text = short.slice(0, Math.floor((q - 3.8) / 1.2 * short.length));
-  else if (q < 5.6) text = short.slice(0, Math.max(0, Math.floor(short.length * (1 - (q - 5) / 0.6))));
+  if (q < 2.2) text = long.slice(0, Math.floor(q / 2.2 * long.length));
+  else if (q < 3.2) text = long.slice(0, Math.max(0, Math.floor(long.length * (1 - (q - 2.2) / 1))));
+  else if (q < 4.2) text = short.slice(0, Math.floor((q - 3.2) / 1 * short.length));
+  else if (q < 4.7) text = short.slice(0, Math.max(0, Math.floor(short.length * (1 - (q - 4.2) / 0.5))));
   const x0 = 228, y0 = 30, w = 120, hh = 150;
   g.save(); g.globalAlpha = a;
   R(x0 - 3, y0 - 3, w + 6, hh + 6, '#101014'); R(x0, y0, w, hh, '#f4f2f6'); R(x0, y0, w, 14, '#e4e0ea');
@@ -2436,8 +2443,8 @@ function cine17Events(b, E, s, real = b) {
   if (b === 136 || b === 150 || b === 170 || b === 200 || b === 220) E(0.3, T => { for (const dt of [0, 0.13, 0.31]) { const o = osc('sine', 3000 + dt * 1800, T + dt, 0.005, 0.016, 0.08); o.frequency.exponentialRampToValueAtTime(4200, T + dt + 0.07); } });
   if (b >= 136 && b < 141) for (let k = 0; k < 2; k++) E(k * s / 2, T => noise(T, 'lowpass', 700, 0.03, 0.04));
   if (b >= 141 && b < 145) for (let k = 0; k < 3; k++) E(k * s / 3, T => noise(T, 'lowpass', 560, 0.055, 0.05));
-  for (const d of [139.6, 163.0, 239.4]) if (Math.floor(d) === b) E((d - b) * s, T => noise(T, 'bandpass', 1200, 0.04, 0.6, 0.6));
-  if (b >= 153 && b < 159) for (let k = 0; k < 4; k++) if ((b * 4 + k) % 3) E(k * s / 4, T => noise(T, 'highpass', 4000, 0.012, 0.015));
+  for (const d of [139.6, 158.6, 239.4]) if (Math.floor(d) === b) E((d - b) * s, T => noise(T, 'bandpass', 1200, 0.04, 0.6, 0.6));
+  if (b >= 153 && b < 158) for (let k = 0; k < 4; k++) if ((b * 4 + k) % 3) E(k * s / 4, T => noise(T, 'highpass', 4000, 0.012, 0.015));
   if (b === 190) E(0, T => { mus.gain.cancelScheduledValues(T); mus.gain.setValueAtTime(1, T); if (songReady(0)) startSong(T, L.songs[0].into || 0, 0); });
 }
 function drawSpring15(p) {
