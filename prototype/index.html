@@ -1680,20 +1680,13 @@ const LEVELS = [
     // next evening her place is empty: her earphones on the hook with a note wound on the cord (scene 'note16').
     earHook: { x: 44, y: 112, bottom: 150 },
     lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
-    hitKit: 'ticktock', bareBand: true, noCount: true, observer: 'boss', observerIntro: true, observerAt: [[116, 244]], obsCue: { enter: [116, 119], tap: [192, 224] },   // 반장 comes in with the first hook and stays; in the last he taps the belt on 2 and 4
+    hitKit: 'ticktock', bareBand: true, noCount: true, observer: 'boss', observerIntro: true, observerAt: [[116, 136]], obsCue: { enter: [116, 119], leave: [131, 135] },   // 반장 stops by in the hook
     heads: { j: [104, 58], h: [52, 90], b: [168, 84] },
     clock:'03:10', title:'마지막 박자', hints: false, special:['하은 랩 상자', 'lane', '받아냄'],
     win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 },
     chords: [[277.18, 349.23, 415.3], [233.08, 277.18, 349.23], [185, 233.08, 277.18], [207.65, 261.63, 311.13]], roots: [69.3, 58.27, 92.5, 103.83], chordAt: bar => bar % 4,
     sections: [[0, 'intro'], [3, 'beat'], [12, 'verse'], [28, 'hook'], [36, 'verse2'], [48, 'hook2'], [56, 'outro']],
     songs: [{ src: 'audio/1-6-one-more-time.mp3', at: 0, lead: 0.038, gain: 0.9 }], songStart: 0,
-    // the finale (drawFinale16): lights out before her first line (cut) and a spotlight on her as it starts (hit), the line
-    // coming back up into the hook (back); a string of bulbs over the line lit one by one through the first hook, all of them
-    // in the last, with dust in the light and leaves coming down; first light through the high windows in the outro (dawn);
-    // her last word a long box held to the end of the Rhodes (holdTo), slow motion when it is done, then the bell
-    finale16: { cut: 44, hit: 46.6, back: [104, 112], hook: [112, 140], last: [192, 224], dawn: 224 },
-    holdTo: [[229, 1, 235.5]], finaleHold: [229, 1],
-    sfx: [[44, 'breaker'], [46.6, 'spot'], [238, 'bell16'], ...[...Array(16)].map((_, k) => [193 + k * 2, 'thump'])],
     devMarks: [[0, '처음'], [12, '지우 비트'], [46, '하은 1절'], [110, '훅'], [146, '2절'], [190, '마지막 훅'], [224, '끝']],
     // [beat, text, beats shown, lane, speaker]
     say: [[1, '자, 갑니다—', 2.5, 0, 'j'], [16, '누나, 지금 박 탔죠?', 3, 0, 'j'], [20, '…좋은데?', 2.6, 1, 'h'],
@@ -1780,8 +1773,8 @@ const LEVELS = [
       'x...............', '................', '................', 'x...............', '................', 'x...x.......x...',
       'x...............', '................', 'x...............', '................', '................', '................',
       'x...............', '................', '................', '................', 'x...............', '................',
-      'x...x.......x...', 'x...x.......x...', 'x...x.......x...', 'x...x.......x...', 'x...x.......x...', 'x...x.......x...',
-      '....x.......x...', 'x...x.......x...', '................', '................', '................', '................',
+      'x...............', 'x...............', 'x...............', 'x...............', 'x...............', 'x...........x...',
+      '................', 'x...............', '................', '....x...........', '................', '................',
     ],
     bars2: [
       '................', '................', '................', '................', '................', '................',
@@ -1792,8 +1785,8 @@ const LEVELS = [
       '..x.....x...x...', 'x...x.x...x.....', 'x...x...x...x...', '......x.x...x...', 'x...x...x...x...', '................',
       '..x.x...x.x.....', 'x...x...x...x.x.', '........x.....x.', 'x...x...x.x...x.', 'x.x.x.....x.x...', 'x...x...x...x...',
       '....x...x.x.x.x.', 'x...x...x.x.x...', 'x...x...x.x.x...', 'x.......x.x.x.x.', '....x...........', 'x.....x.........',
-      '....x...x...x...', '....x...x.x.x...', '..x.x...x...x...', '....x.....x.x.x.', '..x.x...x...x...', '..x.x.x.x...x...',
-      'x...x...x...x...', '....x.....x.x.x.', 'x...........x...', '....h===========', '................', '................',
+      '....x...x...x...', '....x...x.x.....', '..x.....x...x...', '....x.....x.x.x.', '..x.....x...x...', '..x...x.x.......',
+      'x...x...x...x...', '....x.....x...x.', 'x...........x...', '....x...........', '................', '................',
     ]
   }
 ];
@@ -1849,8 +1842,6 @@ function loadLevel(level) {
       notes.push(note);
     }
   }); });
-  // a long box stretched past its bar (L.holdTo: [[beat, lane, end beat]])
-  if (level.holdTo) for (const [hb, hl, he] of level.holdTo) { const n = notes.find(m => m.lane === hl && Math.abs(m.beat - hb) < 1e-6); if (n) n.len = he - hb; }
   // a dropped box that lands on one of hers ('D', 1-6): she has set a box of her own down there (the victim, loaded by her like
   // any other, never scanned and never counted) and his comes down on top of it and knocks it off the belt
   notes.filter(n => n.knock).forEach(d => notes.push({ beat: d.beat, beat0: d.beat, lane: 1, len: 0, victim: true, by: d, push: false, grab: false, late: false, heavy: false, gtr: false, jam: false, drop: false, up: false, shuffle: false, off: false, top: false }));
@@ -3375,9 +3366,6 @@ function drawObserver(t, nowMs, active) {
   PARTNERS[L.observer].draw(pose, nowMs, active);
   const top = bodyTop(90, pose);
   if (point) { thick(BOSS_X + 7, top + 22, BOSS_X + 24, top + 14, 4, C.shirt); R(BOSS_X + 22, top + 12, 4, 4, C.skin); R(BOSS_X + 25, top + 13, 3, 1, C.skin); }
-  else if (cue.tap && active && beat >= cue.tap[0] && beat < cue.tap[1] && Math.floor(beat) % 2 === 1 && ph < 0.3) {   // (1-6: his palm on the belt, on 2 and 4)
-    thick(BOSS_X + 7, top + 22, BOSS_X + 20, top + 36, 4, C.shirt); R(BOSS_X + 18, top + 35, 5, 3, C.skin); R(BOSS_X - 9, top + 25, 9, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin);
-    if (ph < 0.15) { g.globalAlpha = 0.8; R(BOSS_X + 16, top + 39, 1, 2, '#fff2b0'); R(BOSS_X + 21, top + 39, 1, 2, '#fff2b0'); R(BOSS_X + 25, top + 37, 2, 1, '#fff2b0'); g.globalAlpha = 1; } }
   else if (ears) { thick(BOSS_X - 7, top + 24, BOSS_X - 8, top + 9, 4, C.shirt); thick(BOSS_X + 7, top + 24, BOSS_X + 8, top + 9, 4, C.shirt); R(BOSS_X - 10, top + 5, 4, 5, C.skin); R(BOSS_X + 6, top + 5, 4, 5, C.skin); }
   else { R(BOSS_X - 9, top + 25, 18, 5, C.shirt); R(BOSS_X - 9, top + 26, 3, 3, C.skin); R(BOSS_X + 6, top + 26, 3, 3, C.skin); }
   if (point && !reduce) { g.globalAlpha = 0.9; R(BOSS_X + 12, top - 8, 2, 5, '#ff5a4a'); R(BOSS_X + 12, top - 2, 2, 2, '#ff5a4a'); g.globalAlpha = 1; }
@@ -6587,61 +6575,6 @@ function drawHook16(nowMs) {
   if (!SCENE.h16Tick && s >= 6 && ctx) { SCENE.h16Tick = true; const T = ctx.currentTime + 0.05; for (const [dt, f] of [[0, 1760], [0.32, 1320], [0.64, 1760], [0.96, 1320]]) noise(T + dt, 'bandpass', f, 0.03 * (1 - dt / 1.4), 0.03, 4, bus); }
   drawSceneFade(nowMs);
 }
-// 1-6's finale (L.finale16), drawn over the line: see the level. Bulbs on a wire under the ceiling; the drop's dark leaves
-// the belts readable (the band they run in is only half dark) and holes for her (the spotlight) and the scanner
-const FIN16 = { bulbs: 12, leafAt: 0 };
-function drawFinale16(t, nowMs) {
-  const F = L.finale16, b = beatAt(t), ph = b - Math.floor(b), cl = x => Math.max(0, Math.min(1, x)), K = L.earHook || { x: 44 };
-  const hx = (L.heads && L.heads.h ? L.heads.h[0] : 52);
-  // the drop: lights out, then her spotlight, then the line coming back up
-  const dark = b < F.cut ? 0 : b < F.hit ? cl((b - F.cut) / 0.3) : b < F.back[0] ? 0.82 : 0.82 * (1 - cl((b - F.back[0]) / (F.back[1] - F.back[0])));
-  if (dark > 0) {
-    if (!FIN16.cv) { FIN16.cv = document.createElement('canvas'); FIN16.cv.width = W; FIN16.cv.height = H; }
-    const c = FIN16.cv.getContext('2d'); c.globalCompositeOperation = 'source-over'; c.clearRect(0, 0, W, H);
-    const gr = c.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, `rgba(4,3,8,${dark})`); gr.addColorStop(0.42, `rgba(4,3,8,${dark})`); gr.addColorStop(0.55, `rgba(4,3,8,${dark * 0.45})`); gr.addColorStop(0.75, `rgba(4,3,8,${dark * 0.45})`); gr.addColorStop(0.85, `rgba(4,3,8,${dark})`);
-    c.fillStyle = gr; c.fillRect(0, 0, W, H);
-    if (b >= F.hit) {
-      c.globalCompositeOperation = 'destination-out';
-      for (const [x, y, r] of [[hx, 110, 46], [SCAN_X, 128, 40]]) { const h = c.createRadialGradient(x, y, 4, x, y, r); h.addColorStop(0, 'rgba(0,0,0,1)'); h.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = h; c.fillRect(x - r, y - r, r * 2, r * 2); }
-    }
-    g.drawImage(FIN16.cv, 0, 0);
-    if (b >= F.hit) {   // the spotlight's cone down onto her, and the flash as it comes on
-      const on = 1 - cl((b - F.back[0]) / (F.back[1] - F.back[0]));
-      g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.22 * on;
-      const cg = g.createLinearGradient(0, 0, 0, 150); cg.addColorStop(0, 'rgba(255,240,200,.9)'); cg.addColorStop(1, 'rgba(255,220,160,.25)'); g.fillStyle = cg;
-      g.beginPath(); g.moveTo(hx - 5, 0); g.lineTo(hx + 5, 0); g.lineTo(hx + 30, 150); g.lineTo(hx - 30, 150); g.closePath(); g.fill();
-      g.globalAlpha = 0.7 * cl(1 - (b - F.hit) / 0.6); g.fillStyle = '#fff6e0'; g.fillRect(0, 0, W, H); g.restore();
-    }
-  }
-  // the bulbs: off until the first hook, lit one by one through it, steady through the second verse, all bright (and
-  // twinkling on the beat) in the last hook
-  const n = FIN16.bulbs, hk = F.hook, ls = F.last, inLast = b >= ls[0];
-  for (let k = 0; k < n; k++) {
-    const x = 16 + k * 32, sag = Math.sin((k % 3 + 0.5) / 3 * Math.PI) * 4, y = Math.round(12 + sag);
-    if (k < n - 1) for (let q = 1; q < 32; q += 2) R(x + q, Math.round(lerp(y, 12 + Math.sin(((k + 1) % 3 + 0.5) / 3 * Math.PI) * 4, q / 32)) - 1, 1, 1, '#14121a');
-    const litAt = hk[0] + (k + 0.5) * (hk[1] - hk[0]) / n, lit = cl((b - litAt) / 0.3) * (b >= F.hit && b < F.back[1] ? 0 : 1);
-    const lv = lit * (inLast ? 0.85 + 0.15 * Math.max(0, 1 - ph * 3) : b >= hk[1] ? 0.7 : 1);
-    R(x, y, 3, 1, '#2a2620'); R(x, y + 1, 3, 3, lv > 0 ? '#ffd27a' : '#3a3630');
-    if (lv > 0) { g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.35 * lv; R(x - 3, y - 2, 9, 9, '#ffd27a'); g.globalAlpha = 0.08 * lv;
-      const lg = g.createRadialGradient(x + 1, y + 3, 1, x + 1, y + 3, 40); lg.addColorStop(0, 'rgba(255,210,122,1)'); lg.addColorStop(1, 'rgba(255,210,122,0)'); g.fillStyle = lg; g.fillRect(x - 40, y - 37, 82, 82); g.restore(); }
-  }
-  // the last hook: the whole line warm, pulsing on 2 and 4; dust shining in the light; leaves drifting down
-  if (inLast && b < ls[1] + 4) {
-    const e = cl((b - ls[0]) / 1) * cl((ls[1] + 4 - b) / 4), snare = Math.floor(b) % 2 === 1 ? Math.max(0, 1 - ph * 4) : 0;
-    g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,190,110,${(0.05 + 0.06 * snare) * e})`; g.fillRect(0, 0, W, H);
-    for (let k = 0; k < 26; k++) { const q = (nowMs / 7000 + k * 0.137) % 1, x = (k * 53.7) % W + Math.sin(q * 6 + k) * 6, y = 20 + q * 120; g.globalAlpha = Math.sin(Math.PI * q) * 0.7 * e; R(Math.round(x), Math.round(y), 1, 1, '#fff2c8'); }
-    g.restore();
-    if (!reduce && nowMs - FIN16.leafAt > 260 && b < ls[1]) { FIN16.leafAt = nowMs; spawn(Math.random() * W, -4, 1, ['#d9822b', '#b5562a', '#e0a23a', '#c7702e'], -14, 14, 14, 28, 0, 6000, [2, 2]); }
-  }
-  // dawn: first light through the high windows, pale pink and blue, coming up through the outro
-  if (b >= F.dawn) {
-    const d = cl((b - F.dawn) / 10);
-    g.save(); g.globalCompositeOperation = 'lighter';
-    for (const [x0, col] of [[250, '255,190,200'], [300, '190,215,255']]) { g.globalAlpha = 0.16 * d; const sg = g.createLinearGradient(x0, 0, x0 - 90, 160); sg.addColorStop(0, `rgba(${col},1)`); sg.addColorStop(1, `rgba(${col},0)`); g.fillStyle = sg;
-      g.beginPath(); g.moveTo(x0, 0); g.lineTo(x0 + 26, 0); g.lineTo(x0 - 60, 160); g.lineTo(x0 - 110, 160); g.closePath(); g.fill(); }
-    g.restore();
-  }
-}
 // 1-6's end, the next evening (scene 'note16'): the line before the shift, the lower belt empty, a lamp on her post; her
 // earphones on the hook and, wound on the cord, a folded note. On the lines marked `note` the camera goes in close on it
 function drawNote16(nowMs) {
@@ -7878,10 +7811,6 @@ function fanfare21(t) {
   for (const f of [311.13, 392, 466.16, 622.25]) brass(f, t + 0.25, 0.7, 0.035);
 }
 function levelSfx(t, kind) {
-  // 1-6: the breaker dropping the line's lights (a clunk, the hum dying); the spotlight slamming on; the end-of-shift bell
-  if (kind === 'breaker') { osc('square', 70, t, 0.002, 0.09, 0.08, bus); noise(t, 'lowpass', 900, 0.2, 0.08, 0.7, bus); const o = osc('sawtooth', 120, t, 0.01, 0.04, 0.5, bus); o.frequency.exponentialRampToValueAtTime(40, t + 0.5); return; }
-  if (kind === 'spot') { osc('sine', 55, t, 0.002, 0.3, 0.6, bus); noise(t, 'lowpass', 1600, 0.3, 0.1, 0.8, bus); noise(t + 0.02, 'highpass', 4000, 0.08, 0.3, 0.5, bus); return; }
-  if (kind === 'bell16') { for (let k = 0; k < 14; k++) { osc('sine', 1046.5, t + k * 0.09, 0.002, 0.05, 0.08, bus); osc('sine', 1568, t + k * 0.09, 0.002, 0.025, 0.06, bus); } return; }
   // 2-3: the belt motor's clunk (the only clock in the cold war); the announcement's chime and its speaker's hiss; 반장 heaving
   // the heavy box up and it landing; four belts jamming (boxes crashing into each other and down); a palm on a cardboard box;
   // the boombox's plug going back in (a click and a hum)
@@ -9459,7 +9388,6 @@ function completeHold(n) {
   lastGood = now; FX.goodLane = n.lane; ring(C.ok, n.lane); spawnBits(16); FX.punchAt = now; FX.punch = 1.4; FX.shakeUntil = now + 150; FX.react[n.lane] = { type: 'nod', at: now };
   if (phase3(n.beat)) alleyHit('perfect', n.beat);
   popJudge('done', milestone, n.lane);
-  if (L.finaleHold && n.lane === L.finaleHold[1] && Math.abs(n.beat - L.finaleHold[0]) < 1e-6) tutSlow(n, songAt(now));   // (1-6's last word, held to the end)
 }
 function onRelease(ts, lane = 0) {
   const t = songAt(ts) - offsetMs / 1000;
@@ -10245,7 +10173,6 @@ function frame(now) {
   else { drawScene(t, now / 1000, active, now); if (L.quad && quadP(castBeatAt(t, active)) > 0) drawQuadTurn(t, now, active); if (L.phaseFx) phaseLook(g, W, H, castBeatAt(t, active), active); drawSceneFade(now); }
   FX.rumble = 0; if (active && L.show && !L.practiceOf) drawShow15(t, now);
   if (active && L.love && !L.practiceOf) drawLove15(t, now);
-  if (active && L.finale16) drawFinale16(t, now);
   drawCamera(now);
   if (active && L.room && L.room.tutorial && !TUT.on) roomTutOverlay(beatAt(t), now);
   if (!active) CAM.lbTo = 0;
