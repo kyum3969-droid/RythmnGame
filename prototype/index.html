@@ -1405,7 +1405,7 @@ const LEVELS = [
       { who:'지우', text:'…오늘은 그냥 자자.' }]
   }
   ,{
-    id:'s1-6', stageNo:'1-6', who:'지우 + 하은', role:'지우 · 하은 · 94 BPM · 벨트 둘', tag:'둘의 다툼 · 랩 배틀', bpm:94, style:'duo15', fxTheme:'blues',
+    id:'s1-6-battle', stageNo:'1-6', who:'지우 + 하은', role:'지우 · 하은 · 94 BPM · 벨트 둘', tag:'둘의 다툼 · 랩 배틀', bpm:94, style:'duo15', fxTheme:'blues',
     earHook: { x: 44, y: 112, bottom: 150 },   // her old taped earphones on the hook of her belt's end post (every stage she's in)
     // 지우 is back (반장 is not in this one). 지우 loads the upper belt and 하은 the lower, and you scan both with one button as
     // in 1-4, every light on the whole way, every box on the beat. Their fight is played on the belts: 지우 throws his boxes up
@@ -1670,6 +1670,125 @@ const LEVELS = [
       { who:'', text:'3번 라인. 근무 시작 전.' }],
     outro: () => []
   }
+  ,{
+    id:'s1-6', stageNo:'1-6', who:'지우 + 하은', role:'지우 · 하은 · 90 BPM · 벨트 둘', tag:'마지막 밤 · 지우의 비트 · 하은의 랩', bpm:90, style:'song16', fxTheme:'warm',
+    // 1-6 마지막 박자 (docs/stage1-6-last-beat.md): 하은's last night, and only 지우 doesn't know. He plays the beat he made
+    // in 1-5 off his phone, finished now as a jazz boom-bap beat (audio/1-6-one-more-time.mp3, 'One More Time': 90 BPM,
+    // first downbeat 0.038 s; intro 0-2, his beat 3-11, her verse 12-27, hook 28-35, verse 2 36-47, last hook 48-55, out
+    // 56-), and she raps on it, the once. His belt (upper) goes with the drums, hers (lower) with the words of her rap
+    // (whisper word starts, nudged 50 ms and set on the eighths). Her lines run along the bottom as lyrics (L.lyrics). The
+    // next evening her place is empty: her earphones on the hook with a note wound on the cord (scene 'note16').
+    earHook: { x: 44, y: 112, bottom: 150 },
+    lanes: 2, partners: ['jiwoo', 'haeun'], oneButton: true, laneSound: true, allLit: true, farLoaderDy: 14, farLoaderDx: 22, nearLoaderDy: 8,
+    hitKit: 'ticktock', bareBand: true, noCount: true, observer: 'boss', observerIntro: true, observerAt: [[116, 136]], obsCue: { enter: [116, 119], leave: [131, 135] },   // 반장 stops by in the hook
+    heads: { j: [104, 58], h: [52, 90], b: [168, 84] },
+    clock:'03:10', title:'마지막 박자', hints: false, special:['하은 랩 상자', 'lane', '받아냄'],
+    win: { p: 0.07, g: 0.13, m: 0.2, release: 0.18 },
+    chords: [[277.18, 349.23, 415.3], [233.08, 277.18, 349.23], [185, 233.08, 277.18], [207.65, 261.63, 311.13]], roots: [69.3, 58.27, 92.5, 103.83], chordAt: bar => bar % 4,
+    sections: [[0, 'intro'], [3, 'beat'], [12, 'verse'], [28, 'hook'], [36, 'verse2'], [48, 'hook2'], [56, 'outro']],
+    songs: [{ src: 'audio/1-6-one-more-time.mp3', at: 0, lead: 0.038, gain: 0.9 }], songStart: 0,
+    devMarks: [[0, '처음'], [12, '지우 비트'], [46, '하은 1절'], [110, '훅'], [146, '2절'], [190, '마지막 훅'], [224, '끝']],
+    // [beat, text, beats shown, lane, speaker]
+    say: [[1, '자, 갑니다—', 2.5, 0, 'j'], [16, '누나, 지금 박 탔죠?', 3, 0, 'j'], [20, '…좋은데?', 2.6, 1, 'h'],
+          [27, '여기부터 랩 자리예요.', 3, 0, 'j'], [30.5, '근데 가사를 아직 못 썼어요.', 3.5, 0, 'j'], [36, '…', 1.6, 1, 'h'], [38.5, '…한 번만이다.', 3.5, 1, 'h'],
+          [58, '(…누나?)', 2.4, 0, 'j']],
+    // her rap, as lyrics along the bottom: [from beat, line, to beat]
+    lyrics: [
+      [46.58, "새벽 네 시, 창 하나 없는 이곳에도", 51.2],
+      [51.2, "가을은 오나 봐, 상자 틈에 낀 바람에도", 55.22],
+      [55.22, "손목 위의 시계는 오늘도 날 재촉해", 59.69],
+      [59.69, "째깍, 째깍, 숨 고를 틈도 없이 또 내일", 63.35],
+      [63.35, "예전엔 나도 썼어, 불 끄고 이불 속에서", 66.92],
+      [66.92, "작은 노트 하나에 하루를 다 털어놓곤 했어", 71.18],
+      [71.18, "그땐 몰랐지, 꿈에도 무게가 있다는 걸", 75.11],
+      [75.11, "어느 날 내려놨어, 들기엔 너무 무거웠던 걸", 79.16],
+      [79.16, "아무도 모르게 이어폰 줄을 감아", 83.24],
+      [83.24, "기둥에 걸어 뒀어, 다시는 듣지 않게", 87.23],
+      [87.23, "근데 오늘 밤, 네가 튼 그 비트", 90.86],
+      [90.86, "먼지 낀 드럼, 서툰 피아노 키", 94.85],
+      [94.85, "밤새 만들었다며 빨개진 눈으로 웃길래", 99.29],
+      [99.29, "오래 잠가 둔 문이 나도 몰래 열렸네", 103.19],
+      [103.19, "한 번만 할게, 딱 이번 한 번만", 107.18],
+      [107.18, "오늘 밤만큼은 나도 꿈꿔 볼게, 잠깐만", 111.05],
+      [111.05, "Play it one more time", 116.48],
+      [116.48, "이 밤이 다 가기 전에", 120.38],
+      [120.38, "Play it one more time", 123.56],
+      [123.56, "네 박자에 잠깐 기대어 볼게", 128.45],
+      [128.45, "Play it one more time", 131.87],
+      [131.87, "시계는 잠시 멈춘 걸로 해", 136.76],
+      [136.76, "Play it one more time", 143.06],
+      [144.05, "오늘만큼은 나도 꿈꿀래", 147.14],
+      [147.14, "빠르게 지나가, 이 밤도 상자처럼 내 손을 떠나", 153.44],
+      [153.59, "붙잡고 싶은 건 왜 늘 박자보다 먼저 사라져 가", 159.17],
+      [159.17, "네가 놓친 박 하나쯤, 저번처럼 내가 받아 줄게", 163.82],
+      [163.82, "근데 언젠간 혼자일 테니까, 이 박자는 여기 두고 갈게", 170.12],
+      [171.41, "네 노래 속에 내 목소리 한 줄쯤 남겨 둘게", 175.82],
+      [175.82, "내가 없는 밤에도 네 비트가 날 기억하게", 179.6],
+      [179.6, "그러니까 멈추지 마, 서툴러도 괜찮아", 183.23],
+      [183.23, "끝까지 가, 너는 꼭, 끝까지 가 줘", 189.53],
+      [192.55, "Play it one more time", 196.81],
+      [196.81, "내가 없는 밤에도", 200.32],
+      [200.32, "Play it one more time", 204.52],
+      [204.52, "이 노래가 날 대신해 줄 테니까", 208.13],
+      [208.13, "Play it one more time", 212.41],
+      [212.41, "네 박자, 끝까지 가", 216.53],
+      [216.53, "Play it one more time", 220.55],
+      [220.55, "고마웠어, 이 밤 전부", 226.49],
+      [226.49, "Play it one more time", 232.19]
+    ],
+    comfort: [],
+    intro: [
+      { who:'', text:'다음 날 밤. 지우가 평소보다 일찍 와 있다.' },
+      { who:'지우', text:'누나! 형! 저 어제 밤새 비트 만들었어요.' },
+      { who:'하은', text:'…밤샜어? 눈 빨갛다.' },
+      { who:'지우', text:'괜찮아요! 이건 진짜 들어 봐야 돼요.' },
+      { who:'반장', text:'…볼륨은 줄여라.' },
+      { who:'하은', text:'(작게 웃는다) 일하면서 들어 볼게.' }],
+    // the bell; and the next evening, her place empty (the hook, close)
+    outro: () => [
+      { who:'', text:'종료 벨이 울린다. 지우 폰 화면이 꺼진다.' },
+      { who:'지우', text:'누나 뭐예요?! 랩 해요?!' },
+      { who:'하은', text:'…했었어. 옛날에.' },
+      { who:'지우', text:'아니, 그냥 했었던 수준이 아닌데요?' },
+      { who:'하은', text:'(이어폰 줄을 한 번 만지고, 손을 뗀다) 그 비트, 끝까지 만들어.' },
+      { who:'하은', text:'수고했어, 지우. 너도 수고했어.' },
+      { who:'지우', text:'내일 2절 가사 써 올게요! 같이 맞춰 봐요!' },
+      { who:'', text:'하은은 대답 대신 손을 한 번 들어 보이고 나갔다.' },
+      { who:'', text:'다음 날 저녁. 아래 벨트 자리가 비어 있다.', scene:'note16' },
+      { who:'지우', text:'형, 누나 늦네요?', scene:'note16' },
+      { who:'반장', text:'…하은이, 어제가 마지막이었다.', scene:'note16' },
+      { who:'반장', text:'낮에 하는 일 구했단다. 사정이 있었다.', scene:'note16' },
+      { who:'지우', text:'…네?', scene:'note16' },
+      { who:'', text:'기둥 고리에 이어폰이 걸려 있다. 줄에 접힌 쪽지가 감겨 있다.', scene:'note16', note: true },
+      { who:'', text:'"Play it one more time. 내가 없는 밤에도, 끝까지 가. — 하은"', scene:'note16', note: true },
+      { who:'지우', text:'…내일 들려줄 거, 또 있었는데.', scene:'note16', note: true },
+      { who:'', text:'지우가 이어폰을 귀에 꽂는다. 벨트가 돈다.', scene:'note16', note: true }],
+    // upper: 지우 (his beat's drums), lower: 하은 (her rap); 16 cells a bar
+    bars: [
+      '................', '................', '................', 'x...x...x...x...', 'x...x...x...x...', 'x...x..x..x.x...',
+      'x...x..x..x.x...', 'x...x..x..x.x...', 'x...x..x..x.x...', 'x...x..x..x.x...', 'x...x..x..x.x...', 'x...x..x..x.x...',
+      '................', 'x...............', 'x...............', '................', 'x...............', '................',
+      '................', '................', '................', 'x...............', '................', 'x...............',
+      '................', '................', '................', '................', 'x...x...........', 'x...............',
+      'x...............', '................', '................', 'x...............', '................', 'x...x.......x...',
+      'x...............', '................', 'x...............', '................', '................', '................',
+      'x...............', '................', '................', '................', 'x...............', '................',
+      'x...............', 'x...............', 'x...............', 'x...............', 'x...............', 'x...........x...',
+      '................', 'x...............', '................', '....x...........', '................', '................',
+    ],
+    bars2: [
+      '................', '................', '................', '................', '................', '................',
+      '................', '................', '................', '................', '................', '............x...',
+      'x...x...x.x...x.', '..x.x.x...x...x.', '....x.x.x.x.x...', 'x...x...x...x.x.', '..x...x.x.x.x...', 'x...x...x...x.x.',
+      'x...x...x...x.x.', 'x...x...x...x.x.', 'x...x...x.x...x.', '..x...x...x.x.x.', 'x.x.x...x...x...', '....x...x...x...',
+      'x...x...x.x...x.', 'x...x...x.x...x.', 'x.....x...x.x.x.', 'x...x.x...x...x.', '........x...x...', '....x.x.x...x...',
+      '..x.....x...x...', 'x...x.x...x.....', 'x...x...x...x...', '......x.x...x...', 'x...x...x...x...', '................',
+      '..x.x...x.x.....', 'x...x...x...x.x.', '........x.....x.', 'x...x...x.x...x.', 'x.x.x.....x.x...', 'x...x...x...x...',
+      '....x...x.x.x.x.', 'x...x...x.x.x...', 'x...x...x.x.x...', 'x.......x.x.x.x.', '....x...........', 'x.....x.........',
+      '....x...x...x...', '....x...x.x.....', '..x.....x...x...', '....x.....x.x.x.', '..x.....x...x...', '..x...x.x.......',
+      'x...x...x...x...', '....x.....x...x.', 'x...........x...', '....x...........', '................', '................',
+    ]
+  }
 ];
 // the stage board. Locked entries show what is coming.
 const STAGE1 = [
@@ -1678,8 +1797,7 @@ const STAGE1 = [
   { level: LEVELS[2] },
   { level: LEVELS[3] },
   { level: LEVELS.find(l => l.id === 's1-5') },
-  { level: LEVELS.find(l => l.id === 's1-6') },
-  { level: LEVELS.find(l => l.id === 's1-7') },
+  { level: LEVELS.find(l => l.id === 's1-6') },   // (the new 1-6; the old one, 's1-6-battle', and 1-7 are off the board)
   { level: LEVELS[4], stage2: true },
   { level: LEVELS[5] },
   { level: LEVELS[6] },
@@ -6457,6 +6575,25 @@ function drawHook16(nowMs) {
   if (!SCENE.h16Tick && s >= 6 && ctx) { SCENE.h16Tick = true; const T = ctx.currentTime + 0.05; for (const [dt, f] of [[0, 1760], [0.32, 1320], [0.64, 1760], [0.96, 1320]]) noise(T + dt, 'bandpass', f, 0.03 * (1 - dt / 1.4), 0.03, 4, bus); }
   drawSceneFade(nowMs);
 }
+// 1-6's end, the next evening (scene 'note16'): the line before the shift, the lower belt empty, a lamp on her post; her
+// earphones on the hook and, wound on the cord, a folded note. On the lines marked `note` the camera goes in close on it
+function drawNote16(nowMs) {
+  const K = L.earHook || { x: 44, y: 112, bottom: 150 }, ln = dlg && dlg.lines[dlg.i], close = !!(ln && ln.note);
+  g.drawImage(bg, 0, 0);
+  g.fillStyle = 'rgba(8,6,10,.62)'; g.fillRect(0, 0, W, H);
+  g.save(); g.globalCompositeOperation = 'lighter';
+  const grd = g.createRadialGradient(K.x + 6, K.y + 12, 2, K.x + 6, K.y + 12, 70); grd.addColorStop(0, 'rgba(255,226,160,.45)'); grd.addColorStop(1, 'rgba(255,226,160,0)');
+  g.fillStyle = grd; g.fillRect(K.x - 70, K.y - 70, 150, 150); g.restore();
+  const sw = Math.sin(nowMs / 900) * 0.6;
+  R(K.x - 1, K.y - 1, 2, K.bottom - K.y, '#5a5550'); R(K.x - 1, K.y - 1, 1, K.bottom - K.y, '#7a746c'); R(K.x - 2, K.y - 2, 4, 2, '#8a847a'); R(K.x + 1, K.y, 2, 1, '#8a847a');
+  drawEarphones(Math.round(K.x + 1 + sw), K.y + 2, 1);
+  // the note: folded twice, wound on the cord under the buds
+  const nx = Math.round(K.x + 2 + sw), ny = K.y + 15;
+  R(nx, ny - 1, 1, 2, '#d8d0c0'); R(nx - 2, ny + 1, 6, 7, '#efe6d2'); R(nx - 2, ny + 1, 6, 1, '#fffaf0'); R(nx - 2, ny + 4, 6, 1, '#cfc4ae'); R(nx + 3, ny + 1, 1, 7, '#d6ccb6');
+  R(nx - 1, ny + 2, 3, 1, '#9a8f7c'); R(nx - 1, ny + 6, 2, 1, '#9a8f7c');
+  CAM.to = close ? { x: K.x + 20, y: K.y + 14, k: 2.2 } : null;
+  drawSceneFade(nowMs);
+}
 // 1-7's opening in the office: a table under the light, 하은 (left, facing right) and 반장 (right, his coffee) sitting at it;
 // her cup on the table. o17: 'sit', 'watch' (her watch), 'stand' (up beside her chair), 'pass' (she goes out through the
 // door to the line while 지우 comes in, the two passing at the door), 'jiwoo' (지우 inside the door, 하은 gone)
@@ -9304,7 +9441,7 @@ function placeHeadBubble({ x, y }) {
 }
 const hud = $('hud'), clockEl = $('clock'), comboEl = $('combo'), bubble = $('bubble'), hint = $('hint');
 let lastClock = '', lastCombo = -1, lastSay = '', lastHint = '';
-const subEl = document.getElementById('sub');
+const subEl = document.getElementById('sub'), HUD = { lyric: '' };
 function updateHud(t) {
   const beat = beatAt(t);
   // (1-5's room: his place and the hour there, counted from 4:12)
@@ -9316,6 +9453,9 @@ function updateHud(t) {
     if (cut && performance.now() - (FX.muffleAt || -1e9) > 600) { musF.frequency.setTargetAtTime(cut, ctx.currentTime, 0.05); FX.feverF = true; }
     else if (!cut && FX.feverF) { musF.frequency.setTargetAtTime(L.lofi || 20000, ctx.currentTime, 0.02); FX.feverF = false; }
   }
+  // a song's words along the bottom (1-6: her rap)
+  if (L.lyrics) { const ly = L.lyrics.find(([a, , z]) => beat >= a && beat < z), txt = ly ? ly[1] : '';
+    if (txt !== HUD.lyric) { HUD.lyric = txt; subEl.hidden = !txt; subEl.innerHTML = ''; if (txt) { const k = document.createElement('b'); k.textContent = '♪'; k.style.color = '#ff9cc2'; subEl.append(k, txt); } } }
   if (stats.combo !== lastCombo) { comboEl.textContent = '콤보 ' + stats.combo; comboEl.classList.toggle('hot', stats.combo >= 10); lastCombo = stats.combo; }
   comboEl.classList.toggle('fever', !!(L.fever && inRange(beat, L.fever)));
   const cnt = TUT.on && TUT.count && !TUT.line ? TUT.count.findIndex(ct => t >= ct && t < ct + spbAt(ct) * 0.95) : -1;
@@ -9916,7 +10056,7 @@ function startPlay() {
   guideOff(); roomTutReset(); stopSong(); ensureAudio(); loadSongs(L); resetRun(); sceneReset();
   $('title').hidden = true; $('result').hidden = true; $('select').hidden = true;
   events = buildEvents(); evI = 0; T0 = ctx.currentTime + 0.8;
-  lastClock = ''; lastCombo = -1; lastSay = ''; lastHint = ''; bubble.hidden = true; bubble.textContent = ''; subEl.hidden = true; bubble.classList.remove('dots');
+  lastClock = ''; lastCombo = -1; lastSay = ''; lastHint = ''; HUD.lyric = ''; bubble.hidden = true; bubble.textContent = ''; subEl.hidden = true; bubble.classList.remove('dots');
   musF.frequency.cancelScheduledValues(ctx.currentTime); musF.frequency.setValueAtTime(L.lofi || 20000, ctx.currentTime);
   musHP.frequency.cancelScheduledValues(ctx.currentTime); musHP.frequency.setValueAtTime(20, ctx.currentTime);
   mus.gain.cancelScheduledValues(ctx.currentTime); mus.gain.setValueAtTime(1, ctx.currentTime);
@@ -10026,6 +10166,7 @@ function frame(now) {
   if (SCENE.kind === 'office' && !active) { drawOffice(now); if (!hud.hidden) hud.hidden = true; }
   else if (SCENE.kind === 'wings' && !active) drawWings(now);
   else if (SCENE.kind === 'hook16' && !active) { drawHook16(now); if (!hud.hidden) hud.hidden = true; }
+  else if (SCENE.kind === 'note16' && !active) { drawNote16(now); if (!hud.hidden) hud.hidden = true; }
   else if (SCENE.kind === 'pocha' && !active) { drawPocha(now); if (!hud.hidden) hud.hidden = true; }
   else if (L.mid && castBeatAt(t, active) >= L.mid.at && state !== 'select' && state !== 'title') { drawMid(t, now, active); drawSceneFade(now); }
   else if (L.quad && quadP(castBeatAt(t, active)) >= 1) { drawQuad(t, now, active); drawSceneFade(now); }
