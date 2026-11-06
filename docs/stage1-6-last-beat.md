@@ -66,7 +66,7 @@
 > 반장: 낮에 하는 일 구했단다. 사정이 있었다.
 > 지우: …네?
 > (기둥 고리에 이어폰이 걸려 있다. 줄에 접힌 쪽지가 감겨 있다.)
-> (쪽지: 어젯밤 훅 가사. 맨 아래 "— 하은. 끝까지 만들어.")
+> (쪽지: "Keep it rollin' / 끝까지 가, 네 비트 괜찮아. — 하은")
 > 지우: …내일 들려줄 거, 또 있었는데.
 > (지우가 이어폰을 귀에 꽂는다. 벨트가 돈다. 첫 상자.)
 
@@ -102,6 +102,69 @@ Song form: intro, long instrumental beat, verse 1, hook, verse 2, final hook, ou
 **막히면**: 랩이 너무 빽빽하면 첫 문단에 "leave space between lines"를 붙인다. 목소리가 세면 `The rapper:` 끝에 "soft-spoken, close to the microphone"을 붙인다. 앞 비트 구간이 너무 짧으면 "the instrumental beat before the first verse is long, like a producer's beat tape"를 붙인다. 영어가 너무 많으면 "mostly Korean, English only in a few short phrases"로 바꾼다.
 
 **곡을 받으면**: 템포, 첫 박, 구간을 재고, 받아쓰기로 가사를 확인해 자막(한국어 줄은 해외판 영어, 영어 줄은 한국어 뜻)을 만든다. 하은 벨트는 랩 강세를 8분·16분 단위로, 지우 벨트는 킥과 스네어를 따라 차트를 짠다.
+
+## 가사 (초안 2026-11-06)
+
+한 줄이 한 마디다. 1절은 여유 있게(한 마디 10–13음절), 2절은 두 배 빠르게(한 마디 16–20음절). 2절에 복선 셋: "저번처럼 내가 받아 줄게"(1-5에서 상자를 받아 낸 일), "이 박자는 여기 두고 갈게"(다음 날 쪽지), "내가 없는 밤에도"(그만둔다는 것). 지우는 들을 때는 모르고, 다음 날 쪽지를 보고 알아챈다.
+
+```
+[Verse 1]
+새벽 네 시, 잠든 도시 위로
+불 켜진 건 여기, 벨트 하나 위로
+상자는 오고 가고, 손목 위엔 시계
+째깍째깍, 내 하루는 늘 그 박자 위에
+예전엔 나도 썼어, 노트 한 귀퉁이
+밤새 쓰고 지운 줄, 그게 내 숨이
+근데 시급은 기다려 주지 않더라
+꿈은 접어 주머니에, 그냥 넣어 놨다
+That's life, 불평은 안 해, 그냥 해
+하루치 박자 하나씩 벨트 위에 실어 내
+근데 오늘 밤, 네가 튼 그 비트
+먼지 낀 드럼, 낡은 피아노 키
+밤새 만들었다며, 눈은 새빨간데
+그 얼굴 보니까 나도 몰래 박을 타네
+한 번만 할게, 딱 이번 한 번만
+오래 닫아 둔 문, 열어 볼게 잠깐만
+
+[Hook]
+Keep it rollin', keep it rollin'
+멈추지 마, 네 박자 끝까지
+Keep it rollin', keep it rollin'
+시계가 뭐래도 right on time
+Keep it rollin', keep it rollin'
+상자처럼 하나씩 쌓아 가
+Keep it rollin', keep it rollin'
+끝까지 가, 네 비트 괜찮아
+
+[Verse 2]
+빠르게, 더 빠르게, 상자 위에 박자 위에 one, two
+손은 정확하게, 숨은 천천히, 그게 내가 배운 rule
+네가 놓친 박 하나쯤은 저번처럼 내가 받아 줄게
+근데 언젠간 혼자일 테니, 이 박자는 여기 두고 갈게
+시계는 내 거, 꿈은 네 거, 이 밤만 나눠 갖자
+내가 없는 밤에도 네 박자는 계속 가야 해
+그러니까 볼륨 올려, 반장님 몰래 조금만
+끝까지 가 봐, 끝까지, 이 박자 끝까지만
+
+[Final Hook]
+Keep it rollin', keep it rollin'
+멈추지 마, 네 박자 끝까지
+Keep it rollin', keep it rollin'
+시계가 뭐래도 right on time
+Keep it rollin', keep it rollin'
+상자처럼 하나씩 쌓아 가
+Keep it rollin', keep it rollin'
+끝까지 가, 네 비트 괜찮아
+
+[Outro]
+(Keep it rollin'…)
+```
+
+**가사를 넣어 받는 프롬프트**: 1-5 때는 가사를 정해 주면 비트에 억지로 끼워 넣어 어색해졌다. 랩은 한 줄 = 한 마디가 분명해서 덜하겠지만, 어색하면 위의 '가사 없이' 프롬프트로 받고 이 가사는 주제 참고로만 쓴다. 넣을 때는 위 프롬프트의 첫 문단을 아래로 바꾸고, 끝에 가사를 통째로 붙인다.
+
+```
+A warm, jazzy 90s-style boom-bap hip-hop track with ONE solo young female rapper, using EXACTLY the lyrics below (Korean with a few English phrases), one lyric line per bar. Old-school flow that sits right in the pocket of the beat: clear, rhythmic, confident but relaxed, never shouting. Verse 1 is laid-back with space; Verse 2 is a faster, tighter double-time flow. The hook is rapped like a chant, not sung. One female voice only from start to finish: no male vocals, no second rapper, no spoken dialogue. 90 BPM, 4/4, C# major with jazzy major-seventh chords.
+```
 
 ## 만들 것
 - **재사용**: 1-5 라인 배경과 두 벨트, 지우·하은·반장 도트, 기둥 고리 이어폰(`drawEarHook`), 대화창 인트로, 컷씬 검은 띠.
