@@ -66,13 +66,13 @@
 > 반장: 낮에 하는 일 구했단다. 사정이 있었다.
 > 지우: …네?
 > (기둥 고리에 이어폰이 걸려 있다. 줄에 접힌 쪽지가 감겨 있다.)
-> (쪽지: "Keep it rollin' / 끝까지 가, 네 비트 괜찮아. — 하은")
+> (쪽지: "Play it one more time. / 내가 없는 밤에도, 끝까지 가. — 하은")
 > 지우: …내일 들려줄 거, 또 있었는데.
 > (지우가 이어폰을 귀에 꽂는다. 벨트가 돈다. 첫 상자.)
 
 마지막 줄 "…내일 들려줄 거, 또 있었는데."는 1-5 끝의 "…내일 들려줘야지."를 받는다. 결과 화면 뒤 출근부로 넘어가고, 스테이지 2(2-1)는 하은이 빠진 3라인에서 시작한다.
 
-## 곡: "끝까지 (Keep It Rollin')" — 제미나이(Lyria) 프롬프트
+## 곡: "한 번 더 (One More Time)" — 제미나이(Lyria) 프롬프트
 
 - 1-5 '새 비트'의 완성판이다. 같은 **90 BPM, 올림다 장조(C# major)**로 맞춰서, 1-5 방에서 쌓던 그 비트가 1-6에서 다 갖춰진 소리로 나온다.
 - **재즈 붐뱁, 올드스쿨 랩.** 먼지 낀 스윙 드럼, 업라이트 베이스, 로즈 피아노, 뮤트 트럼펫이나 색소폰 샘플, 레코드 잡음, 훅의 DJ 스크래치.
@@ -83,19 +83,19 @@
 ```
 A warm, jazzy 90s-style boom-bap hip-hop track with ONE solo young female rapper. Korean rap lyrics with some English phrases mixed in naturally, old-school flow that sits right in the pocket of the beat: clear, rhythmic, confident but relaxed, never shouting. One female voice only from start to finish: no male vocals, no second rapper, no spoken dialogue. Clean lyrics. 90 BPM, 4/4, C# major with jazzy major-seventh chords.
 
-What the song is about: a young woman on the night shift in a warehouse, 4 a.m., boxes on the belt and the clock ticking on her wrist. She used to write raps but put it down to keep going, working and getting by. Tonight a younger co-worker played her a beat he stayed up all night making, and for once she raps on it. She raps about the night shift, the clock, keeping the rhythm when you're tired, the dream she put away, and tells him (without saying it straight) that his beat is good and he should keep going all the way. Warm, a little bittersweet, quietly proud. Not a diss, not angry.
+What the song is about: a young woman on the night shift in a warehouse, 4 a.m., boxes on the belt and the clock ticking on her wrist. She used to write raps but put it down to keep going, working and getting by. Tonight a younger co-worker played her a beat he stayed up all night making, and for once she raps on it. She raps about the night shift, the clock, the notebook of lyrics she used to write under the covers, the old earphones she hung up so she wouldn't listen any more, and how his beat opened that door again for one night. She knows she won't be there tomorrow, and tells him (without saying it straight) to keep his music going all the way, even on the nights she isn't there. Emotional, tender and bittersweet, nostalgic like the last night of something, but warm. Not a diss, not angry, not showing off.
 
-The sound: dusty, swung boom-bap drums with a fat kick and a crisp snare, a warm upright bass line, mellow Rhodes electric piano chords, a muted jazz trumpet (or soft saxophone) sample that answers the vocal lines, soft vinyl crackle, warm tape saturation. Classic DJ record scratches in the hooks.
+The sound: dusty, swung boom-bap drums with a fat kick and a crisp snare, a warm upright bass line, mellow, melancholic Rhodes electric piano chords, a muted jazz trumpet (or soft saxophone) sample that answers the vocal lines like a sigh, soft vinyl crackle, warm tape saturation, a little rain-like hiss. Gentle DJ record scratches in the hooks.
 
-The rapper: a woman in her early twenties with a low, warm, slightly husky voice, laid-back and precise, every word landing on the beat. A catchy, chant-like hook she raps (not sung), with a short English phrase in it that repeats.
+The rapper: a woman in her early twenties with a low, warm, slightly husky voice, soft and a little vulnerable, like she is telling a secret at 4 a.m., every word landing on the beat. The hook is softly half-sung by the same voice, with a short English phrase that repeats.
 
 Song form: intro, long instrumental beat, verse 1, hook, verse 2, final hook, outro.
 - Intro: vinyl crackle and the Rhodes chords alone.
 - Long instrumental beat: the drums, bass and trumpet come in and the beat plays on its own for a while before any vocals, the trumpet riff on top.
 - Verse 1: relaxed old-school flow.
-- Hook: chant-like, the English phrase repeats, the trumpet answers it, DJ scratches.
-- Verse 2: faster, tighter double-time flow, the most intense part.
-- Final hook: the fullest, scratches and the trumpet.
+- Hook: softly half-sung, the English phrase repeats, the trumpet answers it like a sigh.
+- Verse 2: faster double-time flow, the feelings pouring out, the most emotional part.
+- Final hook: the fullest, gentle scratches and the trumpet, then everything thins out.
 - Outro: the drums drop out, the Rhodes plays alone, then stops cleanly. No fade out.
 ```
 
@@ -103,67 +103,70 @@ Song form: intro, long instrumental beat, verse 1, hook, verse 2, final hook, ou
 
 **곡을 받으면**: 템포, 첫 박, 구간을 재고, 받아쓰기로 가사를 확인해 자막(한국어 줄은 해외판 영어, 영어 줄은 한국어 뜻)을 만든다. 하은 벨트는 랩 강세를 8분·16분 단위로, 지우 벨트는 킥과 스네어를 따라 차트를 짠다.
 
-## 가사 (초안 2026-11-06)
+## 가사 (2판, 감성 2026-11-06)
 
-한 줄이 한 마디다. 1절은 여유 있게(한 마디 10–13음절), 2절은 두 배 빠르게(한 마디 16–20음절). 2절에 복선 셋: "저번처럼 내가 받아 줄게"(1-5에서 상자를 받아 낸 일), "이 박자는 여기 두고 갈게"(다음 날 쪽지), "내가 없는 밤에도"(그만둔다는 것). 지우는 들을 때는 모르고, 다음 날 쪽지를 보고 알아챈다.
+한 줄이 한 마디다. 1절은 여유 있게(한 마디 10–14음절), 2절은 두 배 빠르게 쏟아 내듯(한 마디 16–20음절). 자랑이나 농담 대신 고백하듯 쓴다.
+- 1절에서 **기둥에 걸린 이어폰의 뜻**이 처음 나온다("이어폰 줄을 감아 기둥에 걸어 뒀어, 다시는 듣지 않게"). 1-4부터 늘 걸려 있던 그 이어폰이다.
+- 2절의 복선 넷: "저번처럼 내가 받아 줄게"(1-5에서 상자를 받아 낸 일), "이 박자는 여기 두고 갈게"(다음 날 쪽지), "내가 없는 밤에도"(그만둔다는 것), "네 노래 속에 내 목소리 한 줄"(쪽지에 남긴 가사). 지우는 들을 때는 모르고, 다음 날 빈자리를 보고 알아챈다.
+- 훅 "Play it one more time"은 지우에게 비트를 한 번 더 틀어 달라는 말이자, 마지막 밤이라는 말이다. 마지막 훅에서 "내가 없는 밤에도"로 바뀐다.
 
 ```
 [Verse 1]
-새벽 네 시, 잠든 도시 위로
-불 켜진 건 여기, 벨트 하나 위로
-상자는 오고 가고, 손목 위엔 시계
-째깍째깍, 내 하루는 늘 그 박자 위에
-예전엔 나도 썼어, 노트 한 귀퉁이
-밤새 쓰고 지운 줄, 그게 내 숨이
-근데 시급은 기다려 주지 않더라
-꿈은 접어 주머니에, 그냥 넣어 놨다
-That's life, 불평은 안 해, 그냥 해
-하루치 박자 하나씩 벨트 위에 실어 내
+새벽 네 시, 창 하나 없는 이곳에도
+가을은 오나 봐, 상자 틈에 낀 바람에도
+손목 위의 시계는 오늘도 날 재촉해
+째깍, 째깍, 숨 고를 틈도 없이 또 내일
+예전엔 나도 썼어, 불 끄고 이불 속에서
+작은 노트 하나에 하루를 다 털어놓곤 했어
+그땐 몰랐지, 꿈에도 무게가 있다는 걸
+어느 날 내려놨어, 들기엔 너무 무거웠던 걸
+아무도 모르게 이어폰 줄을 감아
+기둥에 걸어 뒀어, 다시는 듣지 않게
 근데 오늘 밤, 네가 튼 그 비트
-먼지 낀 드럼, 낡은 피아노 키
-밤새 만들었다며, 눈은 새빨간데
-그 얼굴 보니까 나도 몰래 박을 타네
+먼지 낀 드럼, 서툰 피아노 키
+밤새 만들었다며 빨개진 눈으로 웃길래
+오래 잠가 둔 문이 나도 몰래 열렸네
 한 번만 할게, 딱 이번 한 번만
-오래 닫아 둔 문, 열어 볼게 잠깐만
+오늘 밤만큼은 나도 꿈꿔 볼게, 잠깐만
 
 [Hook]
-Keep it rollin', keep it rollin'
-멈추지 마, 네 박자 끝까지
-Keep it rollin', keep it rollin'
-시계가 뭐래도 right on time
-Keep it rollin', keep it rollin'
-상자처럼 하나씩 쌓아 가
-Keep it rollin', keep it rollin'
-끝까지 가, 네 비트 괜찮아
+Play it one more time
+이 밤이 다 가기 전에
+Play it one more time
+네 박자에 잠깐 기대어 볼게
+Play it one more time
+시계는 잠시 멈춘 걸로 해
+Play it one more time
+오늘만큼은 나도 꿈꿀래
 
 [Verse 2]
-빠르게, 더 빠르게, 상자 위에 박자 위에 one, two
-손은 정확하게, 숨은 천천히, 그게 내가 배운 rule
-네가 놓친 박 하나쯤은 저번처럼 내가 받아 줄게
-근데 언젠간 혼자일 테니, 이 박자는 여기 두고 갈게
-시계는 내 거, 꿈은 네 거, 이 밤만 나눠 갖자
-내가 없는 밤에도 네 박자는 계속 가야 해
-그러니까 볼륨 올려, 반장님 몰래 조금만
-끝까지 가 봐, 끝까지, 이 박자 끝까지만
+빠르게 지나가, 이 밤도 상자처럼 내 손을 떠나
+붙잡고 싶은 건 왜 늘 박자보다 먼저 사라져 가
+네가 놓친 박 하나쯤, 저번처럼 내가 받아 줄게
+근데 언젠간 혼자일 테니까, 이 박자는 여기 두고 갈게
+네 노래 속에 내 목소리 한 줄쯤 남겨 둘게
+내가 없는 밤에도 네 비트가 날 기억하게
+그러니까 멈추지 마, 서툴러도 괜찮아
+끝까지 가, 너는 꼭, 끝까지 가 줘
 
 [Final Hook]
-Keep it rollin', keep it rollin'
-멈추지 마, 네 박자 끝까지
-Keep it rollin', keep it rollin'
-시계가 뭐래도 right on time
-Keep it rollin', keep it rollin'
-상자처럼 하나씩 쌓아 가
-Keep it rollin', keep it rollin'
-끝까지 가, 네 비트 괜찮아
+Play it one more time
+내가 없는 밤에도
+Play it one more time
+이 노래가 날 대신해 줄 테니까
+Play it one more time
+네 박자, 끝까지 가
+Play it one more time
+고마웠어, 이 밤 전부
 
 [Outro]
-(Keep it rollin'…)
+(Play it one more time…)
 ```
 
 **가사를 넣어 받는 프롬프트**: 1-5 때는 가사를 정해 주면 비트에 억지로 끼워 넣어 어색해졌다. 랩은 한 줄 = 한 마디가 분명해서 덜하겠지만, 어색하면 위의 '가사 없이' 프롬프트로 받고 이 가사는 주제 참고로만 쓴다. 넣을 때는 위 프롬프트의 첫 문단을 아래로 바꾸고, 끝에 가사를 통째로 붙인다.
 
 ```
-A warm, jazzy 90s-style boom-bap hip-hop track with ONE solo young female rapper, using EXACTLY the lyrics below (Korean with a few English phrases), one lyric line per bar. Old-school flow that sits right in the pocket of the beat: clear, rhythmic, confident but relaxed, never shouting. Verse 1 is laid-back with space; Verse 2 is a faster, tighter double-time flow. The hook is rapped like a chant, not sung. One female voice only from start to finish: no male vocals, no second rapper, no spoken dialogue. 90 BPM, 4/4, C# major with jazzy major-seventh chords.
+A warm, jazzy 90s-style boom-bap hip-hop track with ONE solo young female rapper, using EXACTLY the lyrics below (Korean with a few English phrases), one lyric line per bar. Old-school flow that sits right in the pocket of the beat: clear, rhythmic, soft and emotional, never shouting. Verse 1 is laid-back with space, like a confession; Verse 2 is a faster double-time flow, the feelings pouring out. The hook is softly half-sung by the same voice. One female voice only from start to finish: no male vocals, no second rapper, no spoken dialogue. 90 BPM, 4/4, C# major with jazzy major-seventh chords.
 ```
 
 ## 만들 것
@@ -179,5 +182,5 @@ A warm, jazzy 90s-style boom-bap hip-hop track with ONE solo young female rapper
 
 ## 정할 것
 - 곡을 받은 뒤 실제 구조(특히 앞 비트 구간 길이)에 따라 대사 자리를 옮긴다.
-- 쪽지 글귀: 훅 가사 그대로 쓸지, 한 줄만 쓸지.
+- 쪽지 글귀: 지금은 마지막 훅 두 줄("Play it one more time. / 내가 없는 밤에도, 끝까지 가."). 훅 전부를 쓸지.
 - 가사 상자를 넣을지(조작은 그대로, 보이는 것만 바뀜).
