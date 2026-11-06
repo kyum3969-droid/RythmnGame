@@ -163,10 +163,80 @@ Play it one more time
 (Play it one more time…)
 ```
 
-**가사를 넣어 받는 프롬프트**: 1-5 때는 가사를 정해 주면 비트에 억지로 끼워 넣어 어색해졌다. 랩은 한 줄 = 한 마디가 분명해서 덜하겠지만, 어색하면 위의 '가사 없이' 프롬프트로 받고 이 가사는 주제 참고로만 쓴다. 넣을 때는 위 프롬프트의 첫 문단을 아래로 바꾸고, 끝에 가사를 통째로 붙인다.
+**한 번에 붙여 넣는 프롬프트 (분위기 + 가사)**: 아래를 통째로 붙여 넣는다. 1-5 때는 가사를 정해 주면 비트에 억지로 끼워 넣어 어색해졌다. 랩은 한 줄 = 한 마디가 분명해서 덜하겠지만, 어색하면 위의 '가사 없이' 프롬프트로 받고 이 가사는 주제 참고로만 쓴다.
 
 ```
-A warm, jazzy 90s-style boom-bap hip-hop track with ONE solo young female rapper, using EXACTLY the lyrics below (Korean with a few English phrases), one lyric line per bar. Old-school flow that sits right in the pocket of the beat: clear, rhythmic, soft and emotional, never shouting. Verse 1 is laid-back with space, like a confession; Verse 2 is a faster double-time flow, the feelings pouring out. The hook is softly half-sung by the same voice. One female voice only from start to finish: no male vocals, no second rapper, no spoken dialogue. 90 BPM, 4/4, C# major with jazzy major-seventh chords.
+A tender, emotional, jazzy 90s-style boom-bap hip-hop track with ONE solo young female rapper, using EXACTLY the lyrics below (Korean with a few English phrases), one lyric line per bar. One female voice only from start to finish: no male vocals, no second rapper, no spoken dialogue. Clean lyrics. 90 BPM, 4/4, C# major with warm, jazzy major-seventh and ninth chords.
+
+The mood: 4 a.m. on an autumn night, the last night of something. A quiet, lonely warehouse where only one conveyor line is lit. Bittersweet and nostalgic, warm but aching, like a memory you already know you will miss. Intimate and soft, never aggressive, never showing off, not a diss. Hopeful underneath the sadness, like the sky just before dawn.
+
+The story: a young woman on the night shift used to write raps in a notebook under the covers, but put her dream down because life was too heavy, and hung her old earphones on a post so she wouldn't listen any more. Tonight a younger co-worker plays her a beat he stayed up all night making, and for one night she raps on it, like a confession. She knows she won't be there tomorrow, and tells him to keep his music going all the way, even on the nights she isn't there.
+
+The sound: dusty, swung boom-bap drums with a soft but fat kick and a crisp, woody snare, a warm upright bass, mellow and melancholic Rhodes electric piano chords, a muted jazz trumpet sample that answers her lines like a sigh, soft vinyl crackle, warm tape saturation, a faint rain-like hiss, the ticking of a clock hidden deep in the beat. Gentle DJ record scratches in the hooks. Lo-fi warmth, lots of space, nothing harsh.
+
+The rapper: a woman in her early twenties with a low, warm, slightly husky voice, soft and a little vulnerable, like she is telling a secret at 4 a.m. Precise and in the pocket, every word landing on the beat, close to the microphone. The hooks are softly half-sung by the same voice, breathy and gentle.
+
+How the feeling moves:
+- Intro: vinyl crackle, a ticking clock and lonely Rhodes chords alone. Quiet and empty.
+- Long instrumental beat: the drums, bass and trumpet come in and the beat plays on its own for a while before any vocals, warm and hopeful, the trumpet riff on top.
+- Verse 1: laid-back, with space, almost whispered at first, like a confession; the beat stays soft under her.
+- Hook: softly half-sung, warm and nostalgic, the trumpet answering like a sigh.
+- Verse 2: a faster double-time flow, the feelings pouring out, the drums fuller, the most emotional and urgent part, but still never shouting.
+- Final hook: the warmest and fullest, like the first light of dawn, gentle scratches and the trumpet, then everything slowly thins out.
+- Outro: the drums drop out, the Rhodes plays alone with the ticking clock, then stops cleanly, like a phone switched off. No fade out.
+
+Lyrics:
+
+[Verse 1]
+새벽 네 시, 창 하나 없는 이곳에도
+가을은 오나 봐, 상자 틈에 낀 바람에도
+손목 위의 시계는 오늘도 날 재촉해
+째깍, 째깍, 숨 고를 틈도 없이 또 내일
+예전엔 나도 썼어, 불 끄고 이불 속에서
+작은 노트 하나에 하루를 다 털어놓곤 했어
+그땐 몰랐지, 꿈에도 무게가 있다는 걸
+어느 날 내려놨어, 들기엔 너무 무거웠던 걸
+아무도 모르게 이어폰 줄을 감아
+기둥에 걸어 뒀어, 다시는 듣지 않게
+근데 오늘 밤, 네가 튼 그 비트
+먼지 낀 드럼, 서툰 피아노 키
+밤새 만들었다며 빨개진 눈으로 웃길래
+오래 잠가 둔 문이 나도 몰래 열렸네
+한 번만 할게, 딱 이번 한 번만
+오늘 밤만큼은 나도 꿈꿔 볼게, 잠깐만
+
+[Hook]
+Play it one more time
+이 밤이 다 가기 전에
+Play it one more time
+네 박자에 잠깐 기대어 볼게
+Play it one more time
+시계는 잠시 멈춘 걸로 해
+Play it one more time
+오늘만큼은 나도 꿈꿀래
+
+[Verse 2]
+빠르게 지나가, 이 밤도 상자처럼 내 손을 떠나
+붙잡고 싶은 건 왜 늘 박자보다 먼저 사라져 가
+네가 놓친 박 하나쯤, 저번처럼 내가 받아 줄게
+근데 언젠간 혼자일 테니까, 이 박자는 여기 두고 갈게
+네 노래 속에 내 목소리 한 줄쯤 남겨 둘게
+내가 없는 밤에도 네 비트가 날 기억하게
+그러니까 멈추지 마, 서툴러도 괜찮아
+끝까지 가, 너는 꼭, 끝까지 가 줘
+
+[Final Hook]
+Play it one more time
+내가 없는 밤에도
+Play it one more time
+이 노래가 날 대신해 줄 테니까
+Play it one more time
+네 박자, 끝까지 가
+Play it one more time
+고마웠어, 이 밤 전부
+
+[Outro]
+(Play it one more time…)
 ```
 
 ## 만들 것
