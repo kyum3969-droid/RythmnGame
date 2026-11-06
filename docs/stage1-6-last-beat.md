@@ -81,22 +81,24 @@
 - 길이, 마디 수, 시간은 적지 않는다. 받은 뒤 박과 구간을 재서 차트를 맞춘다. 단, 앞에 **보컬 없는 비트 구간이 길게** 있어야 한다(지우 비트 구간, 대사가 들어감).
 
 ```
-A warm, jazzy 90s-style boom-bap hip-hop track with ONE solo young female rapper. Korean rap lyrics with some English phrases mixed in naturally, old-school flow that sits right in the pocket of the beat: clear, rhythmic, confident but relaxed, never shouting. One female voice only from start to finish: no male vocals, no second rapper, no spoken dialogue. Clean lyrics. 90 BPM, 4/4, C# major with jazzy major-seventh chords.
+A tender, emotional, jazzy 90s-style boom-bap hip-hop track with ONE solo young female rapper. Korean rap lyrics with a few short English phrases mixed in naturally, written to sit right in the pocket of the beat: simple, everyday Korean words, short lines with space between them, a hook that repeats. One female voice only from start to finish: no male vocals, no second rapper, no spoken dialogue. Clean lyrics. 90 BPM, 4/4, C# major with warm, jazzy major-seventh and ninth chords.
 
-What the song is about: a young woman on the night shift in a warehouse, 4 a.m., boxes on the belt and the clock ticking on her wrist. She used to write raps but put it down to keep going, working and getting by. Tonight a younger co-worker played her a beat he stayed up all night making, and for once she raps on it. She raps about the night shift, the clock, the notebook of lyrics she used to write under the covers, the old earphones she hung up so she wouldn't listen any more, and how his beat opened that door again for one night. She knows she won't be there tomorrow, and tells him (without saying it straight) to keep his music going all the way, even on the nights she isn't there. Emotional, tender and bittersweet, nostalgic like the last night of something, but warm. Not a diss, not angry, not showing off.
+The mood: 4 a.m. on an autumn night, the last night of something. A quiet, lonely warehouse where only one conveyor line is lit. Bittersweet and nostalgic, warm but aching, like a memory you already know you will miss. Intimate and soft, never aggressive, never showing off, not a diss. Hopeful underneath the sadness, like the sky just before dawn.
 
-The sound: dusty, swung boom-bap drums with a fat kick and a crisp snare, a warm upright bass line, mellow, melancholic Rhodes electric piano chords, a muted jazz trumpet (or soft saxophone) sample that answers the vocal lines like a sigh, soft vinyl crackle, warm tape saturation, a little rain-like hiss. Gentle DJ record scratches in the hooks.
+What the song is about: a young woman on the night shift, boxes on the belt and a watch ticking on her wrist. She used to write raps in a small notebook under the covers, but one day she put her dream down because life was too heavy, wound up her old earphones and hung them on a post so she wouldn't listen any more. Tonight a younger co-worker, eyes red from no sleep, plays her a beat he stayed up all night making, and for one night she raps on it, like a confession. She knows she won't be there tomorrow. Without saying it straight, she tells him his beat is good, that she'll leave this rhythm with him, and that he should keep his music going all the way, even on the nights she isn't there. The hook asks him to play it one more time, before the night is over, and repeats the English phrase "play it one more time".
 
-The rapper: a woman in her early twenties with a low, warm, slightly husky voice, soft and a little vulnerable, like she is telling a secret at 4 a.m., every word landing on the beat. The hook is softly half-sung by the same voice, with a short English phrase that repeats.
+The sound: dusty, swung boom-bap drums with a soft but fat kick and a crisp, woody snare, a warm upright bass, mellow and melancholic Rhodes electric piano chords, a muted jazz trumpet sample that answers her lines like a sigh, soft vinyl crackle, warm tape saturation, a faint rain-like hiss, the ticking of a clock hidden deep in the beat. Gentle DJ record scratches in the hooks. Lo-fi warmth, lots of space, nothing harsh.
+
+The rapper: a woman in her early twenties with a low, warm, slightly husky voice, soft and a little vulnerable, like she is telling a secret at 4 a.m. Precise and in the pocket, every word landing on the beat, close to the microphone. The hooks are softly half-sung by the same voice, breathy and gentle.
 
 Song form: intro, long instrumental beat, verse 1, hook, verse 2, final hook, outro.
-- Intro: vinyl crackle and the Rhodes chords alone.
-- Long instrumental beat: the drums, bass and trumpet come in and the beat plays on its own for a while before any vocals, the trumpet riff on top.
-- Verse 1: relaxed old-school flow.
-- Hook: softly half-sung, the English phrase repeats, the trumpet answers it like a sigh.
-- Verse 2: faster double-time flow, the feelings pouring out, the most emotional part.
-- Final hook: the fullest, gentle scratches and the trumpet, then everything thins out.
-- Outro: the drums drop out, the Rhodes plays alone, then stops cleanly. No fade out.
+- Intro: vinyl crackle, a ticking clock and lonely Rhodes chords alone. Quiet and empty.
+- Long instrumental beat: the drums, bass and trumpet come in and the beat plays on its own for a while before any vocals, warm and hopeful, the trumpet riff on top.
+- Verse 1: laid-back, with space, almost whispered at first, like a confession; the beat stays soft under her.
+- Hook: softly half-sung, warm and nostalgic, the trumpet answering like a sigh.
+- Verse 2: a faster double-time flow, the feelings pouring out, the drums fuller, the most emotional and urgent part, but still never shouting.
+- Final hook: the warmest and fullest, like the first light of dawn, gentle scratches and the trumpet, then everything slowly thins out.
+- Outro: the drums drop out, the Rhodes plays alone with the ticking clock, then stops cleanly, like a phone switched off. No fade out.
 ```
 
 **막히면**: 랩이 너무 빽빽하면 첫 문단에 "leave space between lines"를 붙인다. 목소리가 세면 `The rapper:` 끝에 "soft-spoken, close to the microphone"을 붙인다. 앞 비트 구간이 너무 짧으면 "the instrumental beat before the first verse is long, like a producer's beat tape"를 붙인다. 영어가 너무 많으면 "mostly Korean, English only in a few short phrases"로 바꾼다.
