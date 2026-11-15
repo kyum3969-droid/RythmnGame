@@ -55,3 +55,98 @@ Ending: one big final hit, and one last thump on the box.
 - **격자**: 박 k = 0.365 + 0.56609·k 초, 마디 = 4박(2.2644초), 0마디 = 0.365초.
 - **구간(마디)**: 0~2 상자 두드림만(아주 작게, 1·3박 + 밀어 치는 한 방) / 3~6 기타 혼자(6마디는 거의 빔) / **7 밴드가 들어옴**(16.2초) / 7~23 그루브 / 24~43 주고받기(짝수 마디 기타, 홀수 마디 브라스가 더 밝음) / 44~53 드롭 / 54~57 브레이크다운(고음이 빠짐), 58~60 다시 쌓임 / **61~64 마지막 드롭** / 65~67 끊어 치기 / **68마디의 마지막 한 방**(곡 박 272.5, 154.6초), 155.5초에 끝.
 - 게임에선 **게임 박 108 = 곡 박 0**(`songs.at` 108, `lead` 0.365). 곡의 두드림이 작아서 게임이 같은 자리에 두드림 소리를 더 깐다.
+
+## 마르코 혼자 구간의 첩보물 음악 (2026-11-04)
+지금은 엔진 악기로 만든 오리지널 큐가 깔려 있다(E단조, 84~116, 32박 ≈ 18초). 녹음 곡으로 바꾸려면 아래 프롬프트로. **특정 영화·곡·작곡가 이름은 넣지 않는다**(저작권 거절). 유명한 첩보 테마의 상징인 5/4 박자도 피하고 4/4로.
+
+- 106 BPM, 4/4(게임 격자 105.99에 맞춤). 첫 브라스 한 방 = 게임 박 84.
+- 1분 30초쯤으로 길게 뽑아 둔다: 지금은 앞 32박만 쓰지만, 구간이 길어지거나 다른 스테이지(마르코가 혼자 허둥대는 장면)에서 다시 쓸 수 있게 구간마다 성격을 다르게(잠입 → 추격 → 대혼란 → 뚝).
+- 마지막은 테이프가 멈추듯 뚝. 게임은 엉킴(116)에서 곡을 자른다.
+- 받으면: librosa로 첫 한 방 위치와 템포를 재서 `songs`에 넣고(at 84), 엔진 큐(`htEvents`의 spy cue)는 끈다.
+
+```
+An original instrumental spy-caper track. No vocals, no humming, no spoken words. 106 BPM, steady from start to finish, 4/4 time throughout, E minor. About one minute and thirty seconds. Ends by stopping dead, like a tape being yanked, no fade-out and no final chord.
+
+The mood: a clumsy one-man heist in a huge warehouse at night. One young man in a loud shirt is dashing between four conveyor belts, trying to do four people's work at once. Tense and fast, but comic and a little ridiculous: he is brave, he is fast, and he is slowly losing control. Never dark or scary; it should make you grin.
+
+Sound: tight, dry and punchy, like a small studio band in a cramped room. Clear, separate instruments, lots of space between the hits, a big low end. Not orchestral, not epic, not electronic.
+
+Instruments: a driving electric bass ostinato on straight eighth notes, tight sixteenth-note closed hi-hats, a dry snare rim click on beats two and four, a punchy kick, bongos and a cabasa, short muted trumpet and trombone stabs, a twangy baritone guitar with tremolo that answers the brass, a vibraphone for sneaky moments, low pizzicato strings, and a rising string tremolo for tension.
+
+Structure:
+
+Intro: one sharp brass hit with a cymbal choke, then straight into the bass ostinato and the ticking hi-hats. No slow intro.
+
+Sneaking (8 bars): the bass ostinato, the hats, the rim click. Every two bars a short muted brass stab figure, and the baritone guitar answers it with a twangy two-note reply. Pizzicato strings tiptoe underneath. Sly and light on its feet.
+
+Chase (8 bars): the bongos come in busy, the kick doubles, the brass stabs come every bar, the vibraphone plays a nervous little run that keeps going up. Faster feeling but the same tempo.
+
+Close calls (8 bars): sudden stops: the whole band hits one stab and goes silent for half a bar, then the bass jumps back in, three times, as if he barely caught something falling. A comic trombone slide down after each stop.
+
+Chaos (8 bars): everything at once, getting messier and busier: the bass jumps up an octave, the brass stabs pile on top of each other, the string tremolo rises higher and higher, a snare roll builds over the last two bars.
+
+Ending: at the very top of the build, it stops dead, like a tape being yanked. Silence.
+```
+
+### 받은 곡: "Stumbling Through the Vault" (2026-11-04)
+`prototype/audio/2-3-stumbling-through-the-vault.mp3`, 1:29, 사용자가 위 프롬프트로 생성.
+- **템포 107.98 BPM**(106이 아니라), 처음부터 끝까지 고름. 게임(105.99)에 맞춰 **0.9816배로 재생**(음 높이가 0.3반음쯤 내려감, 들어서는 모름). 엔진에 곡별 `rate`를 새로 넣음.
+- **격자**: 곡 박 k = 1.2165 + 0.55566·k 초(0마디 = 첫 브라스 한 방, 1.22초).
+- **구간(마디)**: 0 브라스 한 방과 울림 / 1 잦아듦 / 2~3 살금살금(작게) / 4~10 잠입 그루브 / 11 멈춤 / 12~18 추격 / 19~21, 24~25 멈칫(멈췄다 다시) / 22~23 / 26~34 대혼란(점점 커짐, 34가 제일 큼) / 35 멈춤 한 방 / 36 마지막 한 방과 울림, 86초에 끝.
+- **게임에서 쓰는 곳(84~116, 8마디)**: 곡을 두 토막으로 이어 붙임. 84~100 = 곡 4~7마디(잠입 그루브, `lead` 10.107) → 100~116 = 곡 31~34마디(대혼란, `lead` 70.119) → 116 엉킴 = 곡 35마디의 멈춤 한 방, 반 박 뒤 0.12초 만에 끊음. 이어 붙이는 자리는 0.03초 겹쳐 넘김.
+- 녹음 곡이 있으면 엔진 첩보물 큐는 소리를 안 냄(파일이 안 열리면 엔진 큐가 대신).
+- 차트 60개 중 52개가 곡의 소리 위(중앙값 +9ms), 나머지 8개는 베이스 리프의 쉼 자리(격자 위).
+- **(바뀜, 같은 날) 곡을 통째로 씀**: 84 = 곡 0마디(첫 브라스 한 방, `lead` 1.2165), 곡 36마디의 마지막 큰 한 방 = 228 엉킴, 반 박 뒤 끊음. 블루스 펑크는 236부터(게임 박 236 = 곡 박 0). 차트 186개 중 185개가 곡 소리 위(중앙값 +10ms).
+
+## 새 합주곡 (2026-11-04, 사용자: "처음부터 압도적으로 댄싱댄싱한 걸로")
+"First Light on the Sand"는 상자 두드림으로 조용히 시작해서, 반장이 쓰러지고 "라디오 틀어…" 한 뒤에 터지는 장면에 안 맞음. 첫 소리부터 브라스가 터지고 끝까지 춤추는 곡으로 바꿈.
+- 거절된 적 있는 말은 뺌: 지명, "half-time shuffle", "Chicago blues", "slap bass", 외치는 말 그대로("Hey!").
+- 템포 116 BPM: 지금 게임(106)보다 빠르게 해서 춤추는 느낌. 곡이 들어오는 236부터 게임 템포를 곡에 맞춤(템포 바꾸기는 2-4가 이미 씀).
+- 2분 안팎. 구간: 터지는 인트로 / 그루브 / 멈춤 브레이크(반장이 일어나는 자리) / 주고받기 / 드롭 / 브레이크다운 / 마지막 드롭 / 한 방으로 끝.
+
+```
+An instrumental dance track that explodes from the very first beat: an irresistible, joyful brass funk-disco party. No singing, no humming, no spoken words. 116 BPM, steady from start to finish, 4/4, A-flat major with bluesy dominant seventh chords. About two minutes. Ends with one huge final hit, no fade-out.
+
+The mood: dawn after a terrible night at work, and someone turns the radio up as loud as it goes. Everyone in the room, even the grumpy boss and the impatient truck driver, cannot help dancing. Euphoric, cheeky, funny, unstoppable. Not sad.
+
+Sound: huge, loud and bright from the first second, like a big live party band. Four-on-the-floor kick, open hi-hats on the off-beats, handclaps on two and four, a fat bouncy bass line, a big brass section (trumpets, saxophones, trombones), a gritty bluesy electric guitar, a funky rhythm guitar, a Hammond organ, congas and a cowbell. Group shouts on the big hits only.
+
+Structure:
+
+Intro: no build-up. On the very first beat a massive brass fanfare, five short blasts and a long one, with the whole band slamming in at full power together.
+
+Groove (8 bars): the full dance groove, the brass riff, the bass bouncing, the organ stabbing.
+
+Break (2 bars): the band stops dead on a brass hit and only the handclaps and the kick keep going, then the whole band crashes back in with the brass fanfare.
+
+Call and response (8 bars): the bluesy guitar plays a phrase, the brass answers it, back and forth bar by bar, getting cheekier each time.
+
+Drop (8 bars): a huge hit with a group shout, and the brass, the guitar and the organ play one big, singable hook together, everything at full power.
+
+Breakdown (4 bars): everything drops out except the bass and the handclaps, quiet, then a fast build back up with a snare roll and rising brass.
+
+Final drop (8 bars): the biggest part of the song, the hook again with the brass an octave higher, a crash on every bar, group shouts.
+
+Ending: one huge final hit and silence.
+```
+
+### 받은 곡: "Sunday Brass Kickback" (2026-11-04)
+`prototype/audio/2-3-sunday-brass-kickback.mp3`, 2:00, 사용자가 위 프롬프트로 생성.
+- **템포가 흔들림**: 평균 117.4 BPM이지만 구간마다 113~122를 오감(생성 곡이라). 그래서 게임 템포가 곡을 한 박씩 따라감(`tempo`에 박마다 하나씩). 박은 드럼(타악 성분)에서 잡고 살짝 고름(흔들림 9ms).
+- **0.2~7.1초 인프로 팡파르**(약 122 BPM으로 14박) → 게임 238~252. 첫 소리 `lead` 0.215.
+- **곡 박 0(7.106초) = 게임 252**. 구간(곡 마디, 게임 박):
+  - 0 조용한 한 마디(252, 소장·기사 다리 대사)
+  - 1~8 그루브(256)
+  - 9 멈춤 한 마디(288, 반장이 일어남)
+  - 10~16 주고받기(292)
+  - 17~18 잦아듦(320)
+  - 19~24 그루브(328)
+  - 25~32 드롭(352, 요청서 찢기)
+  - 33~35 잔잔(384)
+  - 36~43 두 번째 드롭(396)
+  - 44~47 브레이크다운(428, 허리 멈칫)
+  - 48~50 마지막 드롭(444)
+  - 51 큰 한 방(456)
+  - 53 마지막 한 방(466)
+  - 117초에 끝
+- 차트 234개 중 218개가 곡 소리 위(중앙값 +7ms), 나머지는 곡의 박 위.
